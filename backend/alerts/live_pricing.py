@@ -73,8 +73,11 @@ def _desired_dataset_identities(account):
         targets = composite_targets(db, wanted)
         residents = {symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip()}
         from .storage import MarketDemand
-        direct_demands = set(db.scalars(select(MarketDemand.instrument_id).where(
-            MarketDemand.composite_revision_id.is_(None), MarketDemand.expires > now_ms())))
+        direct_demands = {
+            instrument_id for instrument_id in db.scalars(select(MarketDemand.instrument_id).where(
+                MarketDemand.composite_revision_id.is_(None), MarketDemand.expires > now_ms()))
+            if enabled(db, instrument_id)
+        }
         result = []
         for row in db.scalars(select(MarketDataset)):
             identity = DatasetIdentity.model_validate(row.identity)

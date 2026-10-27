@@ -91,6 +91,10 @@ def test_empty_residents_and_account_catalog_other_assets_idle_cleanly(database,
         instrument = db.scalar(select(Instrument).where(Instrument.symbol == "US30_USD"))
         assert instrument and not instrument.enabled
         renew_demand(db, "index-chart", instrument)
+        assert not db.scalar(select(MarketDemand).where(MarketDemand.instrument_id == instrument.id))
+        from alerts.realtime_switch import set_enabled
+        set_enabled(db, instrument.id, True, now=125000)
+        renew_demand(db, "index-chart", instrument)
     assert set(live.desired_datasets("catalog-test")) == {"US30_USD"}
 
 

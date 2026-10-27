@@ -277,7 +277,7 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
         if not source_dataset:
             return
         managed_id = source_dataset.instrument_id
-    if (composite or not live_source) and not enabled(db, managed_id):
+    if (composite or dataset) and not enabled(db, managed_id):
         return
     if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
         return

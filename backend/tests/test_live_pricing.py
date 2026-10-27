@@ -5,7 +5,7 @@ from alerts import live_pricing as live
 from alerts.config import settings
 from alerts.market_contracts import CandleBatch, QuoteEvent, RequestResult
 from alerts.oanda_rest_batch import live_demand_revision
-from alerts.storage import Audit, Bar, LiveState, PricingOwner, SignalRow, Watch
+from alerts.storage import Audit, Bar, LiveState, MarketDemand, PricingOwner, SignalRow, Watch
 from legacy_records import archived_watch
 from sqlalchemy import select
 from test_market_contracts import minute
@@ -81,6 +81,23 @@ def test_disabled_resident_is_not_owned_or_collected(running):
     with factory.begin() as db:
         instrument = db.get(MarketDataset, identities['EUR_USD'].key).instrument_id
         set_enabled(db, instrument, False, now=125001)
+    assert set(live.desired_datasets('test-account')) == {'XAU_USD'}
+
+
+def test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection(running):
+    factory, _, _, identities = running
+    from alerts.market_data import renew_demand
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import Instrument, MarketDataset
+
+    with factory.begin() as db:
+        dataset = db.get(MarketDataset, identities['EUR_USD'].key)
+        instrument = db.get(Instrument, dataset.instrument_id)
+        set_enabled(db, instrument.id, False, now=125001)
+        renew_demand(db, 'managed-chart', instrument)
+        db.add(MarketDemand(id='stale-managed-chart', instrument_id=instrument.id,
+            composite_revision_id=None, expires=185000, updated_at=125001))
+
     assert set(live.desired_datasets('test-account')) == {'XAU_USD'}
 
 

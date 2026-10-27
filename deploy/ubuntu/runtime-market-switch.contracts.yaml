@@ -9,7 +9,7 @@ services:
     command: [postgres, -c, jit=off, -c, max_connections=40]
     tmpfs: [/var/lib/postgresql/data]
     healthcheck:
-      test: [CMD-SHELL, 'pg_isready -U runtime_switch -d runtime_switch']
+      test: [CMD-SHELL, "pg_isready -U runtime_switch -d runtime_switch && test \"$$(PGOPTIONS='-c jit=on' psql -U runtime_switch -d runtime_switch -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
       interval: 2s
       timeout: 3s
       retries: 30

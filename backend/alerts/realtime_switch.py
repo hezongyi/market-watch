@@ -42,18 +42,15 @@ def enabled(db, instrument_id):
 
 
 def compatibility_default(db, instrument_id, *, now):
-    """Carry forward persisted live state, then detect consumers for mapped data."""
-    plan = db.scalar(select(ChartHistoryPlan.realtime_enabled).where(
-        ChartHistoryPlan.instrument_id == instrument_id))
-    if plan is not None:
-        return bool(plan)
+    """Gate registered datasets on mapped consumers; retain unregistered legacy state."""
     datasets = set(db.scalars(select(MarketDataset.id).where(
         MarketDataset.instrument_id == instrument_id)))
-    legacy_enabled = db.scalar(select(Instrument.enabled).where(Instrument.id == instrument_id))
-    if legacy_enabled:
-        return True
     if not datasets:
-        return False
+        plan = db.scalar(select(ChartHistoryPlan.realtime_enabled).where(
+            ChartHistoryPlan.instrument_id == instrument_id))
+        if plan is not None:
+            return bool(plan)
+        return bool(db.scalar(select(Instrument.enabled).where(Instrument.id == instrument_id)))
     revisions = set(db.scalars(select(CompositeRevision.id).join(HistoryVersion,
         HistoryVersion.id == CompositeRevision.history_version_id).where(
             HistoryVersion.dataset_id.in_(datasets)).join(RealtimeMapping,
@@ -83,7 +80,8 @@ def initialize_defaults(db, *, now):
     instruments = list(db.scalars(select(MarketDataset.instrument_id).distinct().order_by(MarketDataset.instrument_id)))
     for instrument_id in instruments:
         lock_plan_instrument(db, instrument_id)
-        if configured(db, instrument_id) is None:
+        value = configured(db, instrument_id)
+        if value is None:
             value = compatibility_default(db, instrument_id, now=now)
             db.add(Preference(key=preference_key(instrument_id), value={"enabled": value, "updated_at": now}))
             plan = db.get(ChartHistoryPlan, instrument_id, populate_existing=True)

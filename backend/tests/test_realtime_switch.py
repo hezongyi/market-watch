@@ -45,7 +45,9 @@ def source_id(db, revision_id):
     return db.get(MarketDataset, db.get(HistoryVersion, revision.history_version_id).dataset_id).instrument_id
 
 
-@pytest.mark.parametrize('consumer', ['none', 'expired', 'chart', 'alert'])
+@pytest.mark.parametrize('consumer', [
+    'none', 'expired', 'chart', 'alert', 'legacy-instrument', 'legacy-plan',
+])
 def test_compatibility_default_requires_existing_live_consumers(database, monkeypatch, consumer):
     composite, revision, _ = populated(database, monkeypatch)
     stamp = START
@@ -56,7 +58,10 @@ def test_compatibility_default_requires_existing_live_consumers(database, monkey
         if pref:
             db.delete(pref)
             db.flush()
-        db.get(Instrument, sid).enabled = False
+        db.get(Instrument, sid).enabled = consumer == 'legacy-instrument'
+        plan = db.get(ChartHistoryPlan, sid)
+        if plan:
+            plan.realtime_enabled = consumer == 'legacy-plan'
         if consumer in ('chart', 'expired'):
             db.add(MarketDemand(id='migration-lease', instrument_id=db.get(MarketComposite, composite).instrument_id,
                 composite_revision_id=revision, expires=stamp + (60000 if consumer == 'chart' else -1)))
@@ -72,8 +77,93 @@ def test_compatibility_default_requires_existing_live_consumers(database, monkey
         assert enabled(db, sid) is (consumer in ('chart', 'alert'))
 
 
+def test_compatibility_default_without_a_registered_mapping_is_off(database):
+    from alerts.market_datasets import register_dataset
+    from alerts.realtime_switch import compatibility_default
+    from test_market_contracts import identity
+
+    stamp = START
+    with database.begin() as db:
+        inst = register_dataset(db, identity(provider_symbol='EUR/USD'), logical_symbol='EURUSD',
+            label='EURUSD', calendar='ny17', precision=5, volume_kind='quantity',
+            volume_unit='source_quantity')
+        inst.enabled = True
+        db.add(ChartHistoryPlan(instrument_id=inst.id, target_start=0, target_end=60000,
+            cursor=60000, realtime_enabled=True))
+        db.flush()
+        assert not compatibility_default(db, inst.id, now=stamp)
+
+
+def test_unregistered_legacy_instrument_keeps_its_existing_realtime_state(database, monkeypatch):
+    from alerts.realtime_switch import compatibility_default, enabled, set_enabled, status
+
+    stamp = START + 30 * 60000 + 5000
+    monkeypatch.setattr(market, 'now_ms', lambda: stamp)
+    with database.begin() as db:
+        for row in db.scalars(select(Instrument)):
+            row.enabled = False
+        for row in db.scalars(select(ChartHistoryPlan)):
+            row.realtime_enabled = False
+        instrument = db.get(Instrument, 'BTCUSDT')
+        instrument.enabled = True
+        plan = ChartHistoryPlan(instrument_id=instrument.id, target_start=START,
+            target_end=stamp, cursor=stamp, realtime_enabled=True)
+        db.add(plan)
+        db.flush()
+        assert compatibility_default(db, instrument.id, now=START)
+        assert status(db, instrument.id, now=stamp)['realtime_enabled']
+        set_enabled(db, instrument.id, False, now=stamp)
+        db.add(ImportJob(instrument_id=instrument.id, start=START, end=stamp,
+            cursor=START, priority=0, next_at=stamp))
+        assert not enabled(db, instrument.id)
+        assert not status(db, instrument.id, now=stamp)['realtime_enabled']
+        assert not instrument.enabled and not plan.realtime_enabled
+
+    def forbidden(*args, **kwargs):
+        pytest.fail('disabled legacy instrument reached realtime collection')
+
+    market.once(include_viewers=True, fetcher=forbidden)
+    assert not market.import_once(realtime_only=True, fetcher=forbidden)
+
+
+def test_registered_pure_history_bootstrap_stays_off_and_legacy_collectors_exclude_it(database):
+    from alerts.market_datasets import register_dataset
+    from alerts.realtime_switch import configured, enabled, initialize_defaults
+    from test_market_contracts import identity
+
+    with database.begin() as db:
+        for instrument in db.scalars(select(Instrument)):
+            instrument.enabled = False
+        for plan in db.scalars(select(ChartHistoryPlan)):
+            plan.realtime_enabled = False
+        instrument = register_dataset(db, identity(provider_symbol='GBP/USD'), logical_symbol='GBPUSD',
+            label='GBPUSD', calendar='ny17', precision=5, volume_kind='quantity',
+            volume_unit='source_quantity')
+        instrument.enabled = True
+        db.add(ImportJob(instrument_id=instrument.id, start=START, end=START + 60000,
+            cursor=START, priority=0, next_at=START))
+        initialize_defaults(db, now=START)
+        assert configured(db, instrument.id) is False
+        assert db.get(Preference, 'managed_realtime:' + instrument.id).value['enabled'] is False
+        assert instrument.enabled
+        assert db.get(ChartHistoryPlan, instrument.id) is None
+        initialize_defaults(db, now=START + 1)
+        assert enabled(db, instrument.id) is False
+        assert instrument.enabled
+
+    def forbidden(*args, **kwargs):
+        pytest.fail('pure-history dataset reached realtime collection')
+
+    market.once(include_viewers=True, fetcher=forbidden)
+    assert not market.import_once(realtime_only=True, fetcher=forbidden)
+
+
 def test_http_switch_is_strict_idempotent_and_does_not_authorize_history(database, monkeypatch):
     monkeypatch.setattr('alerts.market_data.now_ms', lambda: START)
+    with database.begin() as db:
+        db.add(Preference(key='managed_realtime:BTCUSDT', value={
+            'enabled': True, 'updated_at': START - 1,
+        }))
     api.app.dependency_overrides[api.authenticated] = lambda: 'test'
     try:
         with TestClient(api.app) as client:
