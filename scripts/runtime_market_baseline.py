@@ -103,6 +103,7 @@ def sample_quote(factory, revision, at, stamp, price):
     from alerts.market_contracts import DatasetIdentity, QuoteEvent
     from alerts.storage import (
         CompositeRevision,
+        HistoryVersion,
         Instrument,
         LiveState,
         MarketDataset,
@@ -115,6 +116,11 @@ def sample_quote(factory, revision, at, stamp, price):
     with factory.begin() as db:
         rev = db.get(CompositeRevision, revision)
         target = db.get(RealtimeMapping, rev.mapping_id).target_dataset_id
+        history = db.get(HistoryVersion, rev.history_version_id)
+        # Respect the existing evidence/reference writers' dataset lock order
+        # before mutating LiveState, whose FK checks also touch the dataset.
+        list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+            [target, history.dataset_id])).order_by(MarketDataset.id).with_for_update()))
         state = db.get(LiveState, target)
         owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
         owner.expires = stamp + 60000

@@ -15,6 +15,8 @@ Compose 自测发现短语法挂载会被 CI 的 fixture 变量解释为未声�
 
 连续时钟试跑的按窗口 oracle 又发现一规则在中段多触发一次、提前完成，末段缺失；按类别总数会漏掉这个问题。根因是并发使用 `test_composite_alerts.forming`：先调用 live 提交默认 1.11，再另事务提交 1.119，读者可能在同一 source_time 看见两种价格。`backend/tests/test_runtime_market_baseline.py` 以独立 Session 在每次 commit 后观察真实状态，旧 helper 明确 red（读到 `('1.11', None)` 再读 `('1.119','1.119')`），新 sample_quote 单事务更新 QuoteEvent、owner freshness、LiveState 与既有 display_observations.accept，green 为 1 passed。该修改只模拟真实来源的一次完整输入，不更改判定逻辑或 age 门槛。已停止当时 task-owned probe（exit137，不计通过），保留 two-phase-source-helper 证据；PG 与其他项目未停止。后续所有正式场景使用同一修正后的 sampler 重测。
 
+单事务 writer 还必须遵守现有证据/引用 writer 的锁序。初版先更新 LiveState 再触发 dataset 外键检查，与判定的 dataset→LiveState 顺序相反，PG 实测产生 40P01 并使探针退出1；失败日志和部分 JSONL 保留于 source-lock-order。已在同一输入事务开始按 dataset id 排序锁定目标/历史身份，再更新 LiveState/observations，未用吞异常或隐藏重试掩盖失败。新增实际 PG 的独立读者合同，与 SQLite 同一合同复用；正式采样覆盖其与判定的持续并发。该 fixture writer 合同不认证真实 OANDA 供应商网络和协议循环，后续 A07/A08 仍须验证。
+
 事件延迟关联 input → SignalRow → NoticeEvent / Notification → MockTransport 接受，不输出确认令牌或通知正文。投影时刻是提交后的观察点，不是精确 SQL commit；同机 monotonic 可以相减，fixture 业务时间与 monotonic 不可混减。pool acquire 包含建连成本，SQL reads/writes 是语句分类，WITH 归 read 不等同磁盘 I/O；PG 全库计数另外记录，且本任务应用和回归库不同。
 
 这些改动只修正测量工具，不修改 v1.29.1 的生产算法、任务装配、schema 或资源配置。没有真实供源/ntfy 网络请求，没有访问生产。
