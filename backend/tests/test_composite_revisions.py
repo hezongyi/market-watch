@@ -23,6 +23,9 @@ from test_composite_chart import populated
 
 def request(database, monkeypatch, **changes):
     composite, old, seam = populated(database, monkeypatch)
+    from test_composite_alerts import aggregate, live
+    live(database, old, 200000000, seam + 600000)
+    aggregate(old, "M1")
     monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: 200010000)
     with database() as db:
         revision = db.get(CompositeRevision, old)

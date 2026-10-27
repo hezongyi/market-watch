@@ -72,6 +72,9 @@ def armed(database, monkeypatch, **changes):
     stamp = seam + 600010
     live(database, revision, stamp, seam + 600000)
     aggregate(revision, "M1")
+    timeframe = changes.get("timeframe", "M1")
+    if timeframe != "M1":
+        aggregate(revision, timeframe)
     with database.begin() as db:
         source_id = db.get(HistoryVersion,
             db.get(CompositeRevision, revision).history_version_id).dataset_id
@@ -82,14 +85,16 @@ def armed(database, monkeypatch, **changes):
 
 
 def ready_config(database, monkeypatch):
+    """A ready composite config factory for real HTTP and MCP write contracts."""
+    from alerts.chart_data import FRAMES
     from alerts.realtime_switch import set_enabled
 
-    """A ready composite config factory for real HTTP and MCP write contracts."""
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
     composite, revision, seam = populated(database, monkeypatch)
     stamp = seam + 600010
     live(database, revision, stamp, seam + 600000)
-    aggregate(revision, "M1")
+    for frame in FRAMES:
+        aggregate(revision, frame)
     with database.begin() as db:
         source_id = db.get(MarketDataset,
             db.get(HistoryVersion, db.get(CompositeRevision, revision).history_version_id).dataset_id).instrument_id
@@ -100,6 +105,7 @@ def ready_config(database, monkeypatch):
     def make(**changes):
         return config(composite, **{"composite_revision_id": revision, **changes})
 
+    make.at = stamp
     return make
 
 

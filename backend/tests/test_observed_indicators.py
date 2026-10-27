@@ -360,12 +360,19 @@ def test_foreground_never_substitutes_durable_prices_for_snapshot(database, monk
     from alerts.composite_inputs import apply_minutes
     from alerts.confirmed_minutes import record
     from alerts.market_contracts import DatasetIdentity
-    from alerts.storage import CompositeRevision, MarketDataset, ObservedMinute, RealtimeMapping
+    from alerts.storage import (
+        CompositeRevision,
+        HistoryVersion,
+        MarketDataset,
+        ObservedMinute,
+        RealtimeMapping,
+    )
     from test_composite_aggregates import drain as aggregates
     from test_composite_preparation import ready
     from test_market_contracts import batch, minute
 
     revision_id = ready(database, monkeypatch)
+    from alerts.realtime_switch import set_enabled
     with database.begin() as db:
         revision = db.get(CompositeRevision, revision_id)
         target = db.get(
@@ -390,6 +397,9 @@ def test_foreground_never_substitutes_durable_prices_for_snapshot(database, monk
         apply_minutes(db, record(db, source))
         composite = revision.composite_id
         parent = revision.history_version_id
+        history_dataset_id = db.get(HistoryVersion, revision.history_version_id).dataset_id
+        set_enabled(db, db.get(MarketDataset, history_dataset_id).instrument_id,
+                    True, now=seam + 600000)
         db.add(
             ObservedMinute(
                 dataset_id=target.id,

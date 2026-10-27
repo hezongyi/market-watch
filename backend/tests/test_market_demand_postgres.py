@@ -15,6 +15,9 @@ from test_composite_chart import populated
 from test_history_retention import prepared
 from test_market_contracts import identity
 from test_market_datasets import register
+from test_provider_postgres import provider_pg as _provider_pg
+
+provider_pg = _provider_pg
 
 pytestmark = pytest.mark.skipif(
     not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated Ubuntu PostgreSQL"
@@ -96,7 +99,8 @@ def test_concurrent_late_older_renewal_cannot_shorten_lease(provider_pg, monkeyp
     factory, _ = provider_pg
     with factory.begin() as db:
         inst = register(db)
-        inst.enabled = True
+        from alerts.realtime_switch import set_enabled
+        set_enabled(db, inst.id, True, now=0)
         instrument_id = inst.id
         market_data.renew_demand(db, "clock", inst)
     monkeypatch.setattr(market_data, "now_ms", lambda: (
@@ -133,7 +137,8 @@ def test_demand_core_write_fences_reclamation_and_rolls_back(provider_pg):
     factory, _ = provider_pg
     _, instrument_id = prepared(factory)
     with factory.begin() as db:
-        db.get(Instrument, instrument_id).enabled = True
+        from alerts.realtime_switch import set_enabled
+        set_enabled(db, instrument_id, True, now=0)
     with factory() as writer:
         writer.begin()
         market_data.renew_demand(writer, "fenced", writer.get(Instrument, instrument_id))
@@ -158,7 +163,9 @@ def test_conflicting_identity_is_rejected_instead_of_silently_renewed(provider_p
     with factory.begin() as db:
         first = register(db)
         second = register(db, identity(channel="node"))
-        first.enabled = second.enabled = True
+        from alerts.realtime_switch import set_enabled
+        set_enabled(db, first.id, True, now=0)
+        set_enabled(db, second.id, True, now=0)
         first_id, second_id = first.id, second.id
         market_data.renew_demand(db, "first", first)
     with factory.begin() as db:

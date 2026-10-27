@@ -279,7 +279,9 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
         managed_id = source_dataset.instrument_id
     if (composite or dataset) and not enabled(db, managed_id):
         return
-    if not live_source and not composite and not inst.enabled and not (plan and plan.realtime_enabled):
+    if not dataset and not live_source and not composite and not inst.enabled and not (
+        plan and plan.realtime_enabled
+    ):
         return
     ident = demand_id(client, inst.id, composite_revision_id=composite_revision_id)
     from .history_retention import lock_reference_values

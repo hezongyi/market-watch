@@ -30,9 +30,10 @@ def sparse_daily(database, monkeypatch, **changes):
     with database.begin() as db:
         chart_page(db, composite, "D1", count=2, now=stamp)
         parent = db.get(CompositeRevision, revision).history_version_id
-        ident = create(db, "sparse-daily", config(composite, timeframe="D1", **changes), at=stamp).id
     while artifact_tick(parent):
         pass
+    with database.begin() as db:
+        ident = create(db, "sparse-daily", config(composite, timeframe="D1", **changes), at=stamp).id
     return ident, composite, revision, seam, end, stamp
 
 

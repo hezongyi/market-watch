@@ -2,7 +2,7 @@ from alerts import market
 from alerts.storage import ChartViewportDemand, Instrument
 
 
-def test_realtime_keeps_maintained_symbols_and_only_active_viewers(database, monkeypatch):
+def test_realtime_switch_off_gates_active_viewport_collection(database, monkeypatch):
     now = 1790780000000
     monkeypatch.setattr(market, 'now_ms', lambda: now)
     monkeypatch.setattr(market, 'ingest', lambda *args, **kwargs: market.Ingestion(0, False))
@@ -25,8 +25,7 @@ def test_realtime_keeps_maintained_symbols_and_only_active_viewers(database, mon
         eur = db.get(Instrument,'EURUSD').symbol
         gold = db.get(Instrument,'XAUUSD').symbol
         btc = db.get(Instrument,'BTCUSDT').symbol
-    assert eur in calls and gold in calls and btc not in calls
-    assert calls.index(eur) < calls.index(gold)
+    assert eur in calls and gold not in calls and btc not in calls
     calls.clear()
     market.once(fetcher=fetch)
     assert eur in calls and gold not in calls

@@ -44,6 +44,10 @@ def test_owned_composite_fixture_drives_shared_authoritative_quote_overlay(datab
     else:
         pytest.fail("Fixture artifacts did not finish")
     active = invoke(monkeypatch,capsys,"activate")
+    from alerts.realtime_switch import enabled, revision_instrument_id
+    from alerts.storage import CompositeRevision
+    with transaction() as db:
+        assert enabled(db, revision_instrument_id(db, db.get(CompositeRevision, active["revision"])))
     query = DataQuery(instrument=active["composite"],series_kind="composite",timeframe="W1",provisional=True)
     identity,serialized = resolve(Subscription(client="fixture",listener="chart",generation=1,kind="bars",query=query))
     owner = session(database)

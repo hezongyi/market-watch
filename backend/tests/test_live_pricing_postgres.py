@@ -9,7 +9,14 @@ from alerts import live_pricing as live
 from alerts import market_resources, oanda_worker
 from alerts.market_contracts import RequestResult
 from alerts.oanda_stream import OandaPractice
-from alerts.storage import LiveMinute, LiveState, Preference, PricingOwner, SourceMinuteRevision
+from alerts.storage import (
+    LiveMinute,
+    LiveState,
+    MarketDataset,
+    Preference,
+    PricingOwner,
+    SourceMinuteRevision,
+)
 from sqlalchemy import select
 from test_live_pricing import quote
 from test_provider_postgres import provider_pg as _provider_pg
@@ -26,6 +33,11 @@ def test_competing_collectors_and_superseded_connection_are_fenced(provider_pg):
         {"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5},
         {"name": "XAU_USD", "type": "METAL", "displayPrecision": 3},
     ], "acceptance-test-account")
+    from alerts.realtime_switch import set_enabled
+    with factory.begin() as db:
+        for row in db.scalars(select(MarketDataset)):
+            if row.identity.get("provider_symbol") in {"EUR_USD", "XAU_USD"}:
+                set_enabled(db, row.instrument_id, True, now=live.now_ms())
     identities = live.desired_datasets("acceptance-test-account")
     with ThreadPoolExecutor(max_workers=4) as pool:
         claims = list(pool.map(lambda _: live.claim("acceptance-test-account"), range(4)))
@@ -76,6 +88,11 @@ def test_controlled_rest_fault_uses_real_commit_fence_and_shared_budget(provider
         {"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5},
         {"name": "XAU_USD", "type": "METAL", "displayPrecision": 3},
     ], "fault-contract-account")
+    from alerts.realtime_switch import set_enabled
+    with factory.begin() as db:
+        for row in db.scalars(select(MarketDataset)):
+            if row.identity.get("provider_symbol") in {"EUR_USD", "XAU_USD"}:
+                set_enabled(db, row.instrument_id, True, now=125000)
     identities = live.desired_datasets("fault-contract-account")
     ownership = live.claim("fault-contract-account")
     epoch = live.begin_connection(ownership, identities)
