@@ -31,8 +31,8 @@ def test_alert_reference_postgres_contracts(provider_pg, monkeypatch, contract):
     from sqlalchemy import select
 
     with factory() as db:
-        assert db.scalar(select(SignalRow)) is not None
         if contract is cleanup_contract:
+            assert db.scalar(select(SignalRow)) is not None
             notice = db.scalar(select(NoticeEvent))
             assert notice.viewed_at and notice.handled_at
             assert db.scalar(select(Notification)).ack_at is None

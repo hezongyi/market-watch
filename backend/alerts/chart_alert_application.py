@@ -71,8 +71,11 @@ def capabilities(body):
     sources = [row for row in (managed, provider) if row]
     for row in sources:
         row["atr_frames"] = list(frames(row["source"]) if row["series_kind"] == "provider" else FRAMES)
+        existing_reason = ("此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
+                          else "来源或周期暂不可用" if not row["enabled"] else None)
         row["available"] = False
-        row["reason"] = "旧来源告警已退役，仅支持查看、暂停或归档"
+        retirement_reason = "旧来源告警已退役，仅支持查看、暂停或归档"
+        row["reason"] = (existing_reason + "；" if existing_reason else "") + retirement_reason
         seconds = poll_seconds(row["source"]) if row["series_kind"] == "provider" else 15
         row["observation_basis"] = f"抽样 K 线当前收盘值，约每 {seconds} 秒观察；不重建未观测路径"
     return {"instrument": body.instrument, "timeframe": body.timeframe, "sources": sources,
