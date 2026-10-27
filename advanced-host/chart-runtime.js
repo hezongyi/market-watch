@@ -91,6 +91,11 @@ const frames = {
 const subscriptions = new Map();
 const quoteSubscriptions = new Map();
 const marketPollingFallback = new URLSearchParams(location.search).get('marketPolling') === '1';
+// Diagnostic polling applies to managed/composite feeds and quote snapshots.
+// Supplier bars already used SSE in this mode; retain it on the unified stream.
+function usesMarketStream(ticker) {
+  return !marketPollingFallback || decode(ticker).series_kind === 'provider';
+}
 const marketHistoryState = new Map();
 let marketGeneration = 0;
 const compositeDisplayBatches=chartDisplayBatches({
@@ -261,7 +266,7 @@ function marketQuery(ticker, res) {
       dataset_start:managedSessions.get(identity.symbol+'|'+res)?.start} : {})};
 }
 function registerMarketBar(sub) {
-  if (marketPollingFallback || !sub.marketListener || sub.marketPaused) return;
+  if (!usesMarketStream(sub.symbol) || !sub.marketListener || sub.marketPaused) return;
   const state = marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || '')) || {};
   sub.marketGeneration = ++marketGeneration;
   sub.marketSequence = 0;
@@ -609,7 +614,7 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false,failureEviden
 }
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
   rememberIndicatorBinding(ticker,res,page);
-  if(marketPollingFallback) return;
+  if(!usesMarketStream(ticker)) return;
   const key=ticker+'|'+res+'|'+(window || ''), old=marketHistoryState.get(key) || {};
   const acceptedTimes=acceptedRows && new Set(acceptedRows.map(bar=>bar.time));
   const bars=(page.bars || []).filter(bar=>!acceptedTimes ||
@@ -652,7 +657,7 @@ async function recoverMarketBar(sub) {
 }
 function synchronizeMarketVisibility() {
   resumeDeferredDisplayRecoveries();
-  if(marketPollingFallback || !ready || loading) return;
+  if(!ready || loading) return;
   for(const sub of subscriptions.values()) {
     if(!sub.marketListener) continue;
     const visible=hasHistoryViewer({instrument:sub.symbol,timeframe:frames[sub.res]});
@@ -1780,18 +1785,7 @@ const feed = {
       sub.window=s.mw_window; sub.historical=MWNativeNavigation.historical(s.mw_window);
       if (sub.historical) sub.last=MWNativeNavigation.coverage(s.mw_window)?.last || sub.last;
     }
-    if(identity.series_kind==='provider') {
-      if(!marketPollingFallback) {
-        sub.marketListener=crypto.randomUUID(); registerMarketBar(sub); return;
-      }
-      sub.providerListener=crypto.randomUUID();
-      const state=providerHistoryState.get(s.ticker+'|'+res)||{};
-      send({type:'provider-subscribe',args:{client:clientId,listener:sub.providerListener,
-        instrument:identity.symbol,timeframe:frames[res],cursor:sub.last,
-        revision:state.revision||0,observed_at:state.observed_at||0,
-        indicators:identity.spec?[{...identity.spec,calculation_origin:alertCalculationOrigins.get(MWSeries.encode(identity.symbol,identity.series_kind)+'|'+res) ?? null}]:[]}});
-    }
-    if(!marketPollingFallback) {sub.marketListener=crypto.randomUUID(); registerMarketBar(sub);}
+    if(usesMarketStream(sub.symbol)) {sub.marketListener=crypto.randomUUID(); registerMarketBar(sub);}
   },
   unsubscribeBars: id => {
     const sub=subscriptions.get(id);
@@ -1800,8 +1794,6 @@ const feed = {
     clearTimeout(sub?.marketRetry);
     if(sub?.marketListener)
       send({type:'market-unsubscribe',args:{client:clientId,listener:sub.marketListener,generation:sub.marketGeneration}});
-    if(sub?.providerListener)
-      send({type:'provider-unsubscribe',args:{client:clientId,listener:sub.providerListener}});
     subscriptions.delete(id);
     if (sub?.window && ![...subscriptions.values()].some(other=>other.window===sub.window)) {
       const key=sub.symbol+'|'+sub.res+'|'+(sub.window || '');
@@ -1846,59 +1838,10 @@ function hasProviderWindowViewer(work) {
     chart=>chartUsesSymbol(chart,work.symbol,work.res) && providerWindowMatches(chart,work));
 }
 let historyReloading = false;
-globalThis.setInterval?.(()=>{
-  resumeDeferredDisplayRecoveries();
-  for(const sub of subscriptions.values())if(sub.reviewPending && !sub.resetReview &&
-     Date.now()>=(sub.reviewRetryAt||0)) {
-    sub.reviewRetryAt=Date.now()+30000;
-    void reviewProviderReset(sub,{revision:sub.resetRevision}).catch(()=>{});
-  }
-},5000);
+// Unified stream tasks validate accepted history before publishing resets.
+// Late HTTP pages retain their separate bounded revalidation path below.
+globalThis.setInterval?.(resumeDeferredDisplayRecoveries,5000);
 
-function reviewProviderReset(sub, event) {
-  sub.resetRevision=Math.max(sub.resetRevision||0,event.revision||0);
-  sub.reviewPending=true;
-  if(sub.resetReview) return sub.resetReview;
-  const epoch=workspaceEpoch;
-  const current=()=>epoch===workspaceEpoch &&
-    [...subscriptions.values()].includes(sub);
-  const task=(async()=>{
-    for(let attempt=0;attempt<3 && current();attempt++) {
-      const work=providerHistoryWork.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
-      const observation=work?.observation;
-      if(!observation) throw Error('历史数据尚未完成观察，请稍后刷新历史');
-      if(sub.resetRevision<=observation.revision) {sub.reviewPending=false;return;}
-      // Stream gaps do not prove delivered history changed. Verify delivered
-      // bars and indicator dependencies before invalidating the native source.
-      const page=await query(sub.symbol,sub.res,{
-        limit:1,countBack:1,before:observation.last+1,
-        native_history:{...nativeHistoryContext(sub.symbol,sub.res),historical_navigation:true},
-        history_observation:{...observation},
-      },Date.now()+30000,current);
-      if(!current()) return;
-      if(!page.history_revalidation || historyOlder(page,{
-        revision:observation.revision,observed_at:observation.observed_at}))
-        throw Error('历史更正尚未核实，请刷新历史');
-      if(page.history_revalidation.changed) {
-        // A transport gap alone does not invalidate painted history. Once a
-        // delivered interval is proven changed, reject its metadata/tickets
-        // immediately, including when user navigation defers the native reload.
-        barRangeMapping?.invalidate(sub.symbol,sub.res,sub.window);
-        sub.needsHistoryReload=true;
-        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub))) {
-          sub.needsHistoryReload=false;sub.reviewPending=false;
-        }
-        return;
-      }
-      if(work.observation!==observation) continue;
-      work.observation={...observation,revision:page.cache_revision||0,observed_at:page.as_of||0};
-      if(sub.resetRevision<=work.observation.revision) {sub.reviewPending=false;return;}
-    }
-    if(current()) throw Error('历史更正尚未核实，请刷新历史');
-  })();
-  sub.resetReview=task;
-  return task.finally(()=>{if(sub.resetReview===task)sub.resetReview=null;});
-}
 function mergeProviderCorrection(work,generation,verified,original) {
   // A failed/older review cannot erase an earlier confirmed real revision.
   const originals=[...(work.correction?.originals || [])];
@@ -3183,6 +3126,7 @@ async function update(m) {
     }
     if(event.type==='reset') {
       compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
+      barRangeMapping?.invalidate(sub.symbol,sub.res,sub.window);
       rememberIndicatorBinding(sub.symbol,sub.res,event,{correction:true});
       // Fence the old generation while asynchronous native recovery runs.
       // Its replacement is registered only after the new history is accepted.
@@ -3207,48 +3151,6 @@ async function update(m) {
       }else acceptMarketBars(sub,event);
     } else if(event.type==='status' && event.error) {
       send({type:'feed-poll-state',key:sub.symbol+'|'+sub.res,error:event.error});
-    }
-    return;
-  }
-  if(m.type==='provider-event') {
-    const event=m.event,sub=[...subscriptions.values()].find(s=>s.providerListener===event?.listener);
-    if(!sub) return;
-    const key=sub.symbol+'|'+sub.res;
-    const old=providerHistoryState.get(key);
-    if(event.type!=='error' && !historyOlder({cache_revision:event.revision,as_of:event.as_of},old))
-      providerHistoryState.set(key,{revision:event.revision||0,observed_at:event.as_of||0,
-        cursor:Math.max(old?.cursor||0,event.cursor||0)});
-    if(event.type==='reset') {
-      compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
-      rememberIndicatorBinding(sub.symbol,sub.res,{...event,cache_revision:event.revision},{correction:true});
-      await reviewProviderReset(sub,event).catch(error=>{
-        if(error.code!=='HISTORY_CANCELLED') send({type:'error',error:'历史检查未完成：'+String(error)});
-      });
-    } else if(event.type==='bars') {
-      if(sub.needsHistoryReload) {
-        if(await reloadHistory(sub.symbol,sub.res,chart=>providerWindowMatches(chart,sub)))sub.needsHistoryReload=false;
-        return;
-      }
-      if (sub.historical) return;
-      const rows=barsOf({bars:event.bars,indicators:event.indicators||[]},sub.res,sub.symbol);
-      if (historyOlder({cache_revision:event.revision,as_of:event.as_of},old)) return;
-      const identity=decode(sub.symbol);
-      if(!identity.spec && event.provider_snapshot_id){
-        const generation=sub.marketGeneration;
-        compositeDisplayBatches.enqueue(indicatorKey(sub.symbol,sub.res),sub,event,
-          ()=>[...subscriptions.values()].includes(sub) && sub.marketGeneration===generation &&
-            !sub.needsHistoryReload && !sub.historical);
-        return;
-      }
-      if(identity.spec?.name==='ROLLING_RANGE_SQUEEZE') publishSqueeze(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event);
-      if(identity.spec?.name==='SWING_SR_V1') {
-        swingStore().publish(MWSeries.encode(identity.symbol,identity.series_kind),sub.res,event,swingStore().ticket());
-        swingDisplay?.refresh();
-      }
-      for(const bar of rows) if(bar.time>=sub.last) {sub.cb({...bar});observeRangeBars(sub.symbol,sub.res,event.bars,[bar],sub.window);sub.last=bar.time;}
-      rememberIndicatorBinding(sub.symbol,sub.res,{...event,cache_revision:event.revision});
-    } else if(event.type==='error') {
-      send({type:'error',error:event.error||'平台行情暂不可用，后台重试中'});
     }
     return;
   }
