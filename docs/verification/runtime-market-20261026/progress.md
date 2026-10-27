@@ -22,7 +22,7 @@ docker compose --env-file /home/quant/.local/share/market-watch-runtime-20261026
   -p mw-runtime-20261026 -f deploy/ubuntu/runtime-market.baseline.yaml stop
 ```
 
-用户已于2026-10-27明确接受建议业务门槛，确认记录见 acceptance-thresholds.md。阶段0产物/验证完成，PR CI Backend 最终检查仍须核实后再标记签收；不涉及合并 main、正式发布、生产操作、真实 ntfy 投递或永久删除。
+用户已于2026-10-27明确接受建议业务门槛，确认记录见 acceptance-thresholds.md。阶段0门槛检查点与基线 CI 已通过 PR #100，阶段0完成。阶段1A 已由 PR #101 验证通过。当前 PR #102 是阶段1边界切片，最终 SHA `2e85bfc5` 的 Backend（3094 passed、3 skipped）、Web、Compose、分类检查全通过；该 PR 通过不代表阶段1的实时开关资格语义或后续阶段完成。不涉及合并 main、正式发布、生产操作、真实 ntfy 投递或永久删除。
 
 合同回归 127 passed；十个任务 PG 套件 150 passed、1 skipped（需要 v1.14.0 源码挂载的旧进程专项，不计通过）。运维检查 97 passed、68 subtests，三个应用依赖项在基线镜像另跑 3 passed；事件分母两项回归包含于运维检查。新脚本 ruff 通过。schema head `ay52_history_modes`。试跑校正与失效证据见 `probe-corrections.md`；正式采样采用连续业务时钟、61×2秒/场，包含四场及同资源快重建对照，测量期间不并跑性能/PG套件。
 
