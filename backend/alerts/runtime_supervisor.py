@@ -37,8 +37,8 @@ def run_steps(step, stop, *, idle_wait, work_wait=.01, on_cycle=None):
         if on_cycle:
             try:
                 on_cycle(result=result, started=started, finished=finished)
-            except Exception:
-                log.exception("Loop progress report failed")
+            except Exception as error:
+                log.warning("Loop progress report failed error_type=%s", type(error).__name__)
         stop.wait(work_wait if result else idle_wait)
 
 
@@ -74,8 +74,9 @@ def run_group(loops, *, stop=None, on_state=None, join_timeout=30, handle_signal
         if on_state:
             try:
                 on_state(role, state, error)
-            except Exception:
-                log.exception("Loop state report failed role=%s", role)
+            except Exception as error:
+                log.warning("Loop state report failed role=%s error_type=%s",
+                            role, type(error).__name__)
 
     def invoke(loop):
         report(loop.role, "running")
@@ -85,7 +86,7 @@ def run_group(loops, *, stop=None, on_state=None, join_timeout=30, handle_signal
             with lock:
                 failures[loop.role] = error
             stop.set()
-            report(loop.role, "failed", error)
+            report(loop.role, "failed", type(error).__name__)
             return
         if stop.is_set():
             report(loop.role, "stopped")
@@ -94,7 +95,7 @@ def run_group(loops, *, stop=None, on_state=None, join_timeout=30, handle_signal
         with lock:
             failures[loop.role] = error
         stop.set()
-        report(loop.role, "failed", error)
+        report(loop.role, "failed", type(error).__name__)
 
     threads = [threading.Thread(target=invoke, args=(loop,), name=loop.role)
                for loop in loops]

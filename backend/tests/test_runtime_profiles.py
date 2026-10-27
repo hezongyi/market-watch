@@ -128,7 +128,9 @@ def test_signal_handler_sets_stop_and_restores_previous_handler():
 
 def test_supervised_worker_failure_exits_subprocess_nonzero():
     code = """from alerts.runtime_supervisor import Loop, run_group
-run_group([Loop('fatal', lambda stop: (_ for _ in ()).throw(ValueError()))], handle_signals=False)
+def fail(_stop):
+    raise ValueError('private details')
+run_group([Loop('fatal', fail)], handle_signals=False)
 """
     root = Path(__file__).resolve().parents[2]
     env = {**os.environ, "PYTHONPATH": str(root / "backend")}
@@ -136,3 +138,4 @@ run_group([Loop('fatal', lambda stop: (_ for _ in ()).throw(ValueError()))], han
                             capture_output=True, text=True, timeout=10)
     assert result.returncode != 0
     assert "RuntimeGroupError" in result.stderr
+    assert "private details" not in result.stderr
