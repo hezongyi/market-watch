@@ -39,7 +39,7 @@ def test_join_is_persistent_and_date_uses_trading_session(database):
         inst = db.get(Instrument, "BTCUSDT")
         inst.enabled = False
         plan = join(db, inst, START, now)
-        assert inst.enabled and plan.realtime_enabled and plan.target_end == now - 5000
+        assert not inst.enabled and not plan.realtime_enabled and plan.target_end == now - 5000
         assert plan.cursor == plan.target_end
         # Later display/indicator demands may not grant earlier history.
         for frame in ("M1", "M5", "W1", "MN"):

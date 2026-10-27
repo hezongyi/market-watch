@@ -61,7 +61,7 @@ def join(db, inst, start, now):
             target_start=start,
             target_end=end,
             cursor=end,
-            realtime_enabled=configured(db, inst.id) if configured(db, inst.id) is not None else True,
+            realtime_enabled=configured(db, inst.id) if configured(db, inst.id) is not None else bool(inst.enabled),
             status="pending",
             updated_at=now,
         )

@@ -218,6 +218,19 @@ def test_stale_creation_is_rejected(database, monkeypatch):
             create(db, 'late-create', config(composite), at=stamp + 15001)
 
 
+@pytest.mark.parametrize('gap', ['preparation', 'period'])
+def test_alert_admission_requires_prepared_seam_and_period(database, monkeypatch, gap):
+    _, composite, revision, _, stamp = armed(database, monkeypatch)
+    with database.begin() as db:
+        if gap == 'preparation':
+            db.get(CompositePreparation, revision).status = 'pending'
+        else:
+            from alerts.storage import CompositeAggregateTask
+            db.delete(db.get(CompositeAggregateTask, (revision, 'M1')))
+        with pytest.raises(ValueError, match='接缝或告警周期'):
+            create(db, 'not-ready-' + gap, config(composite), at=stamp)
+
+
 def test_expired_input_pauses_even_while_preparation_is_pending(database, monkeypatch):
     ident, _, revision, _, stamp = armed(database, monkeypatch)
     with database.begin() as db:

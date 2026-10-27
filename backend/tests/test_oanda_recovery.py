@@ -269,6 +269,12 @@ def test_verified_weekend_parks_worker_and_never_claims_quote_readiness(database
         basis='bid', calendar_version=settings.oanda_calendar_version) for symbol in ('EUR_USD', 'XAU_USD')}
     monkeypatch.setattr(settings, 'oanda_calendar_profiles', {symbol: profile(identity) for symbol, identity in candidates.items()})
     live.ensure_catalog([{'name': 'EUR_USD', 'displayPrecision': 5}, {'name': 'XAU_USD', 'displayPrecision': 3}], 'test-account')
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
+    with factory.begin() as db:
+        for symbol in ('EUR_USD', 'XAU_USD'):
+            instrument = db.get(MarketDataset, candidates[symbol].key).instrument_id
+            set_enabled(db, instrument, True, now=0)
     identities = live.desired_datasets('test-account')
     stamp = int(datetime.fromisoformat('2026-10-10T04:00:00+00:00').timestamp()*1000)
     with factory.begin() as db:

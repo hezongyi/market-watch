@@ -47,16 +47,21 @@ def capabilities(body):
         raise ValueError("未知判定周期")
     with transaction() as db:
         if body.series_kind == "composite":
-            from .composite_quotes import live_snapshot
+            from .composite_alerts import require_live_eligibility
             from .series_access import composite_definition
             from .series_access import metadata as fixed_metadata
-            from .storage import CompositeRevision
+            from .storage import CompositeRevision, now_ms
 
             meta = fixed_metadata(db, body.instrument, "composite")
             _, _, composite = composite_definition(db, body.instrument)
             revision = db.get(CompositeRevision, composite.active_revision_id) if composite else None
-            available = bool(body.timeframe in meta["frames"] and revision
-                and live_snapshot(db, revision)["sample_ready"])
+            try:
+                if body.timeframe not in meta["frames"] or not revision:
+                    raise ValueError
+                require_live_eligibility(db, revision, now=now_ms(), timeframe=body.timeframe, lock=False)
+                available = True
+            except ValueError:
+                available = False
             return {"instrument": body.instrument, "timeframe": body.timeframe,
                 "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
                     "calendar": meta["calendar"], "available": available,

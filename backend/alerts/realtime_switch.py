@@ -42,14 +42,18 @@ def enabled(db, instrument_id):
 
 
 def compatibility_default(db, instrument_id, *, now):
-    """Only pre-existing real consumers authorize a mapped dataset at migration."""
+    """Carry forward persisted live state, then detect consumers for mapped data."""
+    plan = db.scalar(select(ChartHistoryPlan.realtime_enabled).where(
+        ChartHistoryPlan.instrument_id == instrument_id))
+    if plan is not None:
+        return bool(plan)
     datasets = set(db.scalars(select(MarketDataset.id).where(
         MarketDataset.instrument_id == instrument_id)))
+    legacy_enabled = db.scalar(select(Instrument.enabled).where(Instrument.id == instrument_id))
+    if legacy_enabled:
+        return True
     if not datasets:
-        plan = db.scalar(select(ChartHistoryPlan.realtime_enabled).where(
-            ChartHistoryPlan.instrument_id == instrument_id))
-        return bool(plan if plan is not None else db.scalar(select(Instrument.enabled).where(
-            Instrument.id == instrument_id)))
+        return False
     revisions = set(db.scalars(select(CompositeRevision.id).join(HistoryVersion,
         HistoryVersion.id == CompositeRevision.history_version_id).where(
             HistoryVersion.dataset_id.in_(datasets)).join(RealtimeMapping,
@@ -73,7 +77,8 @@ def initialize_defaults(db, *, now):
     """Snapshot compatibility once; lease expiry must not change a saved choice.
 
     Called under bootstrap's PostgreSQL advisory lock before runtime assembly.
-    New datasets default off until explicitly configured.
+    New registered datasets default off. Legacy standalone instruments retain
+    their persisted enabled flag until an explicit user choice replaces it.
     """
     instruments = list(db.scalars(select(MarketDataset.instrument_id).distinct().order_by(MarketDataset.instrument_id)))
     for instrument_id in instruments:

@@ -20,6 +20,13 @@ def running(database, monkeypatch):
         {"name": "XAU_USD", "type": "METAL", "displayPrecision": 3},
         {"name": "GBP_USD", "type": "CURRENCY", "displayPrecision": 5},
     ], "test-account")
+    from alerts.realtime_switch import enabled, set_enabled
+    from alerts.storage import MarketDataset
+    with database.begin() as db:
+        for dataset in db.scalars(select(MarketDataset)):
+            instrument = dataset.instrument_id
+            set_enabled(db, instrument, True, now=125000)
+            assert enabled(db, instrument)
     identities = live.desired_datasets("test-account")
     ownership = live.claim("test-account", now=125000)
     epoch = live.begin_connection(ownership, identities, now=125000)
@@ -65,6 +72,16 @@ def test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner
         create(db, "persistent-demand", config(instrument=dataset.instrument_id, source="oanda",
             timeframe="M1"), at=0)
     assert set(live.desired_datasets("test-account")) == {"EUR_USD", "XAU_USD", "GBP_USD"}
+
+
+def test_disabled_resident_is_not_owned_or_collected(running):
+    factory, _, _, identities = running
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
+    with factory.begin() as db:
+        instrument = db.get(MarketDataset, identities['EUR_USD'].key).instrument_id
+        set_enabled(db, instrument, False, now=125001)
+    assert set(live.desired_datasets('test-account')) == {'XAU_USD'}
 
 
 def test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced(running):

@@ -21,6 +21,6 @@
 | 修订准备与激活 | `composite_revisions.create/readiness/activate`、`composite_preparation.claim/commit`；比较 expected/parent revision、持久激活记录 | `test_composite_revisions.py`、`test_composite_revisions_postgres.py` | 不是周日自动编排；活跃 ChartAlert 固定绑定也不自动更新。轨道 C 增统一绑定、基线重建、旧任务 fencing/失败汇总 |
 | 历史清理 | `history_retention.references/reclaim`、native history retention、provider cleanup、stream cleanup | `test_history_retention_postgres.py`、`test_native_history_retention.py` | 不是实时源成功切换解锁的 30 天清理；轨道 C 独立实现 dry-run、成功事件门槛、恢复验证和幂等批次 |
 
-实时开关存储：MarketComposite / CompositeRevision 的定义与 rules JSON 是优先兼容候选；先核查定义导出、修订身份与校验约束，不能直接把影响输入身份的开关塞进不可变旧修订。初始值按有效映射及活跃消费者推导；无实时消费者的纯历史对象关闭，既有有效实时对象保持开启。只有现有兼容位置确实不能表达时才新增 additive 字段。
+实时开关存储：现有 Preference 表以 `managed_realtime:<instrument_id>` 保存显式选择，不修改不可变历史/实时映射身份，也不扩大历史授权。启动时只对尚无显式选择的已注册数据集做一次兼容快照：延续 `Instrument.enabled` 所示的既有运行配置；否则只在有有效 composite 映射并存在未过期浏览 lease 或有效 composite 告警时开启。其它新注册的纯历史数据集关闭。快照持久化后，lease 到期不改写用户选择；显式关闭优先。非注册的旧 managed 品种继续读取已有 `Instrument.enabled` 或 `ChartHistoryPlan.realtime_enabled`，新历史计划沿用现值，不因加入历史维护而开启实时采集。
 
 未指定真实备用供应商；本轮后续只交付最小能力边界及双来源 fixture。未访问生产，也未把前置手机/长期压力未测项视为通过。

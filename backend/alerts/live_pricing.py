@@ -54,12 +54,10 @@ def ensure_catalog(items, account, *, ownership=None):
             identity = DatasetIdentity(source="oanda", channel="v20", environment="practice",
                 account_scope=scope, provider_symbol=symbol, basis="bid",
                 calendar_version=settings.oanda_calendar_version)
-            inst = register_dataset(db, identity, logical_symbol=logical,
+            register_dataset(db, identity, logical_symbol=logical,
                 label=meta.get("displayName", symbol), calendar="ny17", precision=meta["displayPrecision"],
                 volume_kind="price_count", volume_unit="quotes",
                 calendar_profile=settings.oanda_calendar_profiles.get(symbol))
-            if symbol in resident:
-                inst.enabled = True
             if not db.get(LiveState, identity.key):
                 db.add(LiveState(dataset_id=identity.key))
     return resident
@@ -67,12 +65,16 @@ def ensure_catalog(items, account, *, ownership=None):
 
 def _desired_dataset_identities(account):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
-    residents = {symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip()}
     with transaction() as db:
         from .market_usage import composite_targets, wanted_instruments
+        from .realtime_switch import enabled
 
         wanted = wanted_instruments(db)
         targets = composite_targets(db, wanted)
+        residents = {symbol.strip() for symbol in settings.oanda_resident_symbols.split(",") if symbol.strip()}
+        from .storage import MarketDemand
+        direct_demands = set(db.scalars(select(MarketDemand.instrument_id).where(
+            MarketDemand.composite_revision_id.is_(None), MarketDemand.expires > now_ms())))
         result = []
         for row in db.scalars(select(MarketDataset)):
             identity = DatasetIdentity.model_validate(row.identity)
@@ -81,7 +83,9 @@ def _desired_dataset_identities(account):
                 continue
             if identity.calendar_version != settings.oanda_calendar_version:
                 continue
-            if identity.provider_symbol in residents or row.instrument_id in wanted or row.id in targets:
+            if (row.id in targets or row.instrument_id in direct_demands
+                    or row.instrument_id in wanted and enabled(db, row.instrument_id)
+                    or identity.provider_symbol in residents and enabled(db, row.instrument_id)):
                 result.append(identity)
         return tuple(sorted(result, key=lambda identity: identity.key))
 

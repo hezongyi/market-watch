@@ -285,7 +285,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             revision = db.get(CompositeRevision, current_version(db, alert).market_identity["composite_revision_id"])
             if not revision:
                 raise ValueError("告警绑定的组合修订不存在")
-            require_live_eligibility(db, revision, now=at)
+            require_live_eligibility(db, revision, now=at, timeframe=config.timeframe)
         if action == "restart":
             alert.run += 1
             alert.count = 0

@@ -53,7 +53,8 @@ def bind(db, config, *, now=None):
     if not revision or revision.composite_id != composite.id:
         raise ValueError("组合修订不属于所选系列")
     version = db.get(HistoryVersion, revision.history_version_id)
-    require_live_eligibility(db, revision, now=now_ms() if now is None else now)
+    require_live_eligibility(db, revision, now=now_ms() if now is None else now,
+                             timeframe=config.timeframe)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     target = db.get(MarketDataset, mapping.target_dataset_id)
     if target.identity["account_scope"] != account_scope():
@@ -76,9 +77,10 @@ def bind(db, config, *, now=None):
         "initial_input_revision": db.get(CompositePreparation, revision.id).input_revision}
 
 
-def require_live_eligibility(db, revision, *, now, lock=True):
+def require_live_eligibility(db, revision, *, now, timeframe, lock=True):
     from .composite_quotes import live_snapshot
     from .realtime_switch import enabled, revision_instrument_id
+    from .storage import CompositeAggregateTask, CompositePreparation, HistoryArtifact
 
     instrument_id = revision_instrument_id(db, revision)
     if not instrument_id:
@@ -96,6 +98,14 @@ def require_live_eligibility(db, revision, *, now, lock=True):
         raise ValueError("该自建品种实时流已关闭，不能启动可执行告警")
     if not live_snapshot(db, revision, now=now)["sample_ready"]:
         raise ValueError("该组合实时来源尚未就绪，暂不能创建或恢复告警")
+    prep = db.get(CompositePreparation, revision.id)
+    task = db.get(CompositeAggregateTask, (revision.id, timeframe))
+    artifact = db.scalar(select(HistoryArtifact.id).where(
+        HistoryArtifact.version_id == revision.history_version_id,
+        HistoryArtifact.timeframe == timeframe, HistoryArtifact.status == "published").limit(1))
+    if (not prep or prep.status != "queried" or prep.error or not task or
+            task.applied_input_revision < prep.input_revision or not artifact):
+        raise ValueError("组合接缝或告警周期尚未准备就绪")
 
 
 def geometry_rows(db, composite_id, frame, points, *, revision_id=None, input_revision=None, now=None):
