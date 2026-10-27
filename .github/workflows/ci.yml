@@ -133,16 +133,7 @@ jobs:
 
       - name: Python tests
         if: needs.changes.outputs.backend_changed == 'true'
-        run: python -m pytest -q
-
-      - name: Mapping PostgreSQL migration compatibility
-        if: needs.changes.outputs.backend_changed == 'true'
-        env:
-          CHART_ALERT_TEST_DATABASE_URL: ${{ env.TEST_POSTGRES_URL }}
-        run: python -m pytest -q backend/tests/test_composite_mapping_postgres.py
-
-      - name: Observed indicator PostgreSQL policy compatibility
-        run: python -m pytest -q backend/tests/test_observed_indicators_postgres.py
+        run: python -m pytest -q -n 2 --dist=loadfile
 
       - name: Backend checks skipped
         if: needs.changes.outputs.backend_changed != 'true'
