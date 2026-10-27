@@ -146,7 +146,7 @@ async def test_sse_publishes_cooldown_start_and_expiry_with_unchanged_revision(m
     assert [row["cooldown_until"] for row in snapshots] == [None, 200000, None]
 
 
-def test_source_chart_alert_uses_shared_browser_business_schema(running):
+def test_source_chart_is_readable_but_cannot_create_legacy_alert(running):
     factory, _, _, _ = running
     from alerts import business
     from alerts.storage import ChartAlertVersion
@@ -160,10 +160,10 @@ def test_source_chart_alert_uses_shared_browser_business_schema(running):
         with TestClient(api_module.app) as client:
             response = client.post("/api/chart-alerts", json={"request_id": "source-integration",
                 "config": config(instrument=instrument, source="oanda", timeframe="M1").model_dump(mode="json")})
-            assert response.status_code == 201, response.text
-            assert response.json()["config"]["instrument"] == instrument
+            assert response.status_code == 422, response.text
+            assert "必须绑定组合行情" in response.json()["detail"]
         with factory.begin() as db:
-            assert db.scalar(select(ChartAlertVersion)).config["instrument"] == instrument
+            assert db.scalar(select(ChartAlertVersion)) is None
         assert instrument in {row["id"] for row in business.instruments()}
     finally:
         api_module.app.dependency_overrides.clear()

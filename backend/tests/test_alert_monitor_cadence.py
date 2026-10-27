@@ -45,8 +45,9 @@ def test_monitor_errors_back_off(monkeypatch):
 def test_each_alert_uses_its_read_time_and_reports_committed_state(database, monkeypatch):
     from alerts.chart_alert_service import AlertConfig, create
     from alerts.storage import ChartAlert
-    from test_chart_alert_worker import config
+    from test_composite_alerts import ready_config
 
+    config = ready_config(database, monkeypatch)
     with database.begin() as db:
         ids=[create(db,'monitor-clock-'+str(i),AlertConfig.model_validate(config()),at=1000).id
              for i in range(2)]
@@ -72,7 +73,8 @@ def test_each_alert_uses_its_read_time_and_reports_committed_state(database, mon
 def test_observer_failure_does_not_rewrite_committed_health(database,monkeypatch):
     from alerts.chart_alert_service import create
     from alerts.storage import ChartAlert
-    from test_chart_alert_worker import config
+    from test_composite_alerts import ready_config
+    config = ready_config(database, monkeypatch)
     with database.begin() as db:
         ident=create(db,'observer-error',config(),at=1000).id
     def evaluate(db,ident,**kwargs):

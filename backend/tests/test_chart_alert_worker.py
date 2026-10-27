@@ -181,6 +181,9 @@ def test_legacy_provider_alert_is_paused_without_creating_provider_demand(databa
         return {}
 
     monkeypatch.setattr(provider_cache, "read", read)
+    # Provider acquisition can run before the monitor retires the active rule.
+    provider_service.realtime_step("binance")
+    assert calls == []
     from alerts.chart_alert_worker import step
     step(now=180_000)
     with database.begin() as db:

@@ -74,6 +74,20 @@ def armed(database, monkeypatch, **changes):
     return ident, composite, revision, seam, stamp
 
 
+def ready_config(database, monkeypatch):
+    """A ready composite config factory for real HTTP and MCP write contracts."""
+    monkeypatch.setattr(settings, "oanda_resident_symbols", "")
+    composite, revision, seam = populated(database, monkeypatch)
+    stamp = seam + 600010
+    live(database, revision, stamp, seam + 600000)
+    aggregate(revision, "M1")
+
+    def make(**changes):
+        return config(composite, **{"composite_revision_id": revision, **changes})
+
+    return make
+
+
 def append(database, revision, at, close, now):
     add_tail(database, revision, [minute(at, volume="3", close=close)], observed_at=at + 60000)
     aggregate(revision, "M1")
@@ -295,7 +309,7 @@ def forming(database, revision, at, stamp, price="1.11", epoch=1):
                          "close": price, "complete": False, "connection_epoch": epoch, "volume": None}
         from alerts.display_observations import accept
         from alerts.market_contracts import DatasetIdentity, QuoteEvent
-        from alerts.storage import MarketDataset, Instrument
+        from alerts.storage import Instrument, MarketDataset
 
         dataset = db.get(MarketDataset, target)
         accept(db, state, QuoteEvent(identity=DatasetIdentity.model_validate(dataset.identity),

@@ -71,10 +71,8 @@ def capabilities(body):
     sources = [row for row in (managed, provider) if row]
     for row in sources:
         row["atr_frames"] = list(frames(row["source"]) if row["series_kind"] == "provider" else FRAMES)
-        reason = ("旧来源告警已退役，仅支持查看、暂停或归档" if row["series_kind"] != "composite"
-                  else "此来源尚未确认告警交易日历" if row["calendar"] not in ("ny17", "utc0")
-                  else "来源或周期暂不可用" if not row["enabled"] else None)
-        row["available"], row["reason"] = reason is None, reason
+        row["available"] = False
+        row["reason"] = "旧来源告警已退役，仅支持查看、暂停或归档"
         seconds = poll_seconds(row["source"]) if row["series_kind"] == "provider" else 15
         row["observation_basis"] = f"抽样 K 线当前收盘值，约每 {seconds} 秒观察；不重建未观测路径"
     return {"instrument": body.instrument, "timeframe": body.timeframe, "sources": sources,
@@ -102,6 +100,8 @@ class Action(Contract):
 
 
 def dataset_for(config):
+    if isinstance(config, AlertConfig):
+        require_executable_source(config)
     if config.series_kind in ("managed", "composite"):
         return None
     from .provider_cache import ensure
@@ -227,9 +227,9 @@ def judgments(db, alert_id: str, before: int | None = None, limit: int = 100):
         for row in db.scalars(query.order_by(CompositeJudgment.created_at.desc(), CompositeJudgment.id).limit(limit))]
 
 def new(db, body: Create, *, dataset_id=None):
+    require_executable_source(body.config)
     existing = db.scalar(select(ChartAlert).where(ChartAlert.request_id == body.request_id))
     if existing is None:
-        require_executable_source(body.config)
         validate_association(db, body.config)
         validate_geometry(db, body.config, dataset_id=dataset_id)
     return alert_dict(db, create(db, body.request_id, body.config, dataset_id=dataset_id))
@@ -248,7 +248,7 @@ def require_executable_source(config):
 
 
 def action(db, alert_id: str, body: Action):
-    alert = db.get(ChartAlert, alert_id)
+    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update())
     if alert:
         config = AlertConfig.model_validate(current_version(db, alert).config)
         if config.series_kind != "composite" and body.action not in ("pause", "archive"):

@@ -180,6 +180,25 @@ def test_export_page_overflow_raises_transport_neutral_query_error(monkeypatch):
     assert error.value.status_code == 413
 
 
+def test_pending_fixed_export_commits_indicator_request_before_http_conflict(database, monkeypatch):
+    from alerts.storage import FixedIndicatorRun
+
+    parent = fixture(database, monkeypatch)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            response = client.post("/api/charts/export", json={
+                "instrument": parent, "series_kind": "history", "timeframe": "M1",
+                "start": 0, "end": 172920000,
+                "indicators": [{"name": "SMA", "version": "1", "params": {"period": 2}}]})
+            assert response.status_code == 409, response.text
+        with database() as db:
+            run = db.scalar(select(FixedIndicatorRun))
+            assert run is not None and run.status == "pending"
+    finally:
+        api.app.dependency_overrides.clear()
+
+
 def alternate_revision(factory, ident, old_id):
     """A deliberately different calendar, baseline, mapping and precision."""
     from alerts.storage import (

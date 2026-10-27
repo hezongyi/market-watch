@@ -397,59 +397,6 @@ def realtime_step(source=None):
                 max(extra + 3, old[2] if old else 3),
             )
             row.next_poll = now + poll_seconds(dataset.source) * 1000
-        # Database-owned demands outlive browser subscription expiry. They share
-        # the same source/dataset acquisition turn and existing source budgets.
-        from .chart_alert_service import AlertConfig
-        for alert, version, dataset in db.execute(
-            select(ChartAlert, ChartAlertVersion, ProviderDataset).join(
-                ChartAlertVersion,
-                (ChartAlertVersion.alert_id == ChartAlert.id)
-                & (ChartAlertVersion.version == ChartAlert.version),
-            ).join(ProviderDataset, ProviderDataset.id == ChartAlertVersion.dataset_id).where(
-                ChartAlert.status == "active",
-            )
-        ):
-            if source and dataset.source != source:
-                continue
-            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
-                alert.health, alert.health_reason = "blocked", "平台账户或数据集身份已改变，需显式编辑告警"
-                continue
-            if alert.expires_at is not None and alert.expires_at <= now:
-                # The locked alert evaluator owns lifecycle transitions. This
-                # acquisition snapshot may race an edit extending expiry.
-                continue
-            if dataset.latest_at + poll_seconds(dataset.source) * 1000 > now:
-                continue
-            config = AlertConfig.model_validate(version.config)
-            checkpoint = alert.state.get("sequence", alert.effective_at)
-            missing = max(0, now - checkpoint) // upstream.FRAME_MS[dataset.timeframe] + 3
-            old = groups.get(dataset.id)
-            groups[dataset.id] = (
-                dataset.metadata_json, dataset.timeframe,
-                max(min(20_000, config.warmup() + missing), old[2] if old else 3),
-            )
-        # Independent ATR datasets need acquisition even if the main dataset is
-        # fresh. Deduplicate with browser and other rule demand before any I/O.
-        for alert, version in db.execute(select(ChartAlert, ChartAlertVersion).join(
-            ChartAlertVersion, (ChartAlertVersion.alert_id == ChartAlert.id)
-            & (ChartAlertVersion.version == ChartAlert.version)).where(ChartAlert.status == "active")):
-            binding = version.market_identity.get("atr_dependency", {})
-            dataset = db.get(ProviderDataset, binding.get("dataset_id")) if binding.get("dataset_id") else None
-            if not dataset or source and dataset.source != source:
-                continue
-            if alert.expires_at is not None and alert.expires_at <= now:
-                continue
-            if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
-                continue
-            if dataset.latest_at + poll_seconds(dataset.source) * 1000 > now:
-                continue
-            spec = AlertConfig.model_validate(version.config).condition.offset
-            from .chart_indicators import history_requirement
-            origin = alert.runtime.get("atr_calculation", {}).get("end", binding["origin"])
-            missing = max(0, now - origin) // upstream.FRAME_MS[dataset.timeframe] + 3
-            old = groups.get(dataset.id)
-            groups[dataset.id] = (dataset.metadata_json, dataset.timeframe,
-                max(min(20_000, history_requirement(spec.spec()) + missing), old[2] if old else 3))
     for key, (meta, frame, count) in groups.items():
         if meta["source"] == "yahoo" and not settings.yahoo_enabled:
             continue

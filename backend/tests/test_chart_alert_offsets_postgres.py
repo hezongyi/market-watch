@@ -30,10 +30,10 @@ def seeded_instruments(provider_pg):
     contracts.test_missing_latest_atr_waits_then_recovers_without_gap_signal,
     contracts.test_h4_d1_shared_close_uses_old_day_then_rebases_on_first_new_price,
     contracts.test_independent_atr_revision_blocks_while_main_input_is_unchanged,
-    contracts.test_provider_second_frame_polled_shared_and_protected_without_browser,
+    contracts.test_retired_provider_atr_does_not_poll_but_preserves_evidence_cache,
 ])
 def test_postgres_atr_contract(provider_pg, contract, monkeypatch):
-    if contract == contracts.test_provider_second_frame_polled_shared_and_protected_without_browser:
+    if contract == contracts.test_retired_provider_atr_does_not_poll_but_preserves_evidence_cache:
         contract(provider_pg[0], monkeypatch)
     else:
         contract(provider_pg[0])

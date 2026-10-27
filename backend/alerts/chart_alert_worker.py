@@ -439,16 +439,18 @@ def step(*, now=None, on_evaluated=None):
         try:
             with transaction() as db:
                 business_now = now_ms() if now is None else now
-                row = db.get(ChartAlert, ident)
-                if row and row.status == "active":
-                    version = current_version(db, row)
-                    config = AlertConfig.model_validate(version.config)
-                    if config.series_kind != "composite":
-                        row.status = "paused"
-                        row.control_revision += 1
-                        health(row, "blocked", "旧来源告警已退役；请改用组合行情重新创建")
-                    else:
-                        evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE)
+                row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident)
+                    .with_for_update(skip_locked=True))
+                if row is None or row.status != "active":
+                    continue
+                version = current_version(db, row)
+                config = AlertConfig.model_validate(version.config)
+                if config.series_kind != "composite":
+                    row.status = "paused"
+                    row.control_revision += 1
+                    health(row, "blocked", "旧来源告警已退役；请改用组合行情重新创建")
+                else:
+                    evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE)
                 if on_evaluated:
                     row = db.get(ChartAlert, ident)
                     observation = dict(alert_id=ident, read_started=started,
