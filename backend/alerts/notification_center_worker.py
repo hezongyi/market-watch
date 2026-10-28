@@ -24,6 +24,47 @@ def once():
         return count
 
 
+def retain_once():
+    with transaction() as db:
+        return retain(db)
+
+
+def run_projection(stop):
+    last_report = 0
+    while not stop.is_set():
+        count, error = 0, None
+        try:
+            count = once()
+            if now_ms() - last_report > 30_000:
+                report('ok' if settings.notification_center_projection_enabled else 'paused', count)
+                last_report = now_ms()
+        except Exception as exc:
+            error = exc
+            log.exception('Notice projection unavailable')
+            try:
+                report('failed', error=error)
+            except Exception:
+                log.warning('Notice worker health unavailable')
+        from .runtime_health import progress
+
+        progress(error=error)
+        stop.wait(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
+
+
+def run_retention(stop):
+    while not stop.is_set():
+        error = None
+        try:
+            retain_once()
+        except Exception as exc:
+            error = exc
+            log.exception('Notice retention unavailable')
+        from .runtime_health import progress
+
+        progress(error=error)
+        stop.wait(60)
+
+
 def report(state, count=0, error=None):
     with transaction() as db:
         row = db.get(Preference, 'notice_projector_health')

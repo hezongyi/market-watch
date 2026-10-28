@@ -82,19 +82,18 @@ services:
       ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-data
     depends_on:
       migrate: {condition: service_completed_successfully}
-  notification-projector:
+  notification-worker:
     <<: *app
-    command: ["python", "-m", "alerts.notification_center_worker"]
-    depends_on:
-      api: {condition: service_healthy}
-  notify-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.notify"]
+    command: ["python", "-m", "alerts.runtime", "--profile", "notifications"]
     environment:
       <<: *app-environment
-      ALERTS_DATABASE_JIT: ${MW_NOTIFY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DATABASE_JIT: ${MW_NOTIFICATION_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-notifications
+      ALERTS_DATABASE_POOL_SIZE: "4"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
     depends_on:
-      api: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
   web:
     image: ${MW_WEB_IMAGE:?Set the immutable web release image}
     ports: ["192.168.7.33:18080:80"]

@@ -2,6 +2,10 @@
 
 ## 当前状态（2026-10-28，优先于下方历史记录）
 
+### 阶段 3B 当前切片
+
+阶段3B 通知组已在独立分支 `refactor/runtime-notifications-stage3b-20261028` 实现并完成本地/Ubuntu隔离PG合同；详细证据见 [`stage-3b-notifications-acceptance.md`](stage-3b-notifications-acceptance.md)。默认及生产 Compose 已收敛到五个应用服务，测试与系统提醒走持久 Outbox。该切片尚未完成 PR review/CI；PR #109 后端 CI 仍在运行，按用户授权不等待其结果继续阶段开发。阶段4/5联合矩阵、真实 ntfy/A17a 与手机 A17b仍未签收。
+
 ### 本轮最终证据与下一步
 
 目标仍为五个应用服务，告警留在 market-runtime。**当前只完成 market 迁移切片；data/notification 旧服务仍在，全部五服务装配尚未完成。** 性能超阈值记录为非阻塞验收偏差，独立事项见 `performance-followup-20261028.md`，不再以第六服务实验阻塞开发。

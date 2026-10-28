@@ -113,7 +113,7 @@ class DatabaseComposeTests(unittest.TestCase):
                 self.assertNotIn('ALERTS_DATABASE_EXPECTED_VERSION',service['environment'])
 
     def test_only_selected_production_worker_can_enable_jit(self):
-        for selected in ('chart-aggregation-worker','notify-worker','migrate','backup'):
+        for selected in ('notification-worker','migrate','backup'):
             with self.subTest(selected=selected):
                 key = 'MW_'+selected.upper().replace('-','_')+'_DATABASE_JIT'
                 rendered = self.render([Path('compose.production.yaml')],**{key:'on'})
@@ -136,3 +136,17 @@ class DatabaseComposeTests(unittest.TestCase):
                          'service_completed_successfully')
         self.assertNotIn('market-stream-worker', services)
         self.assertNotIn('import-worker', services)
+
+    def test_notification_runtime_is_one_of_five_default_application_services(self):
+        services = self.render([Path('compose.yaml')])['services']
+        self.assertEqual(
+            {name for name in services if name in {
+                'web', 'api', 'market-runtime', 'data-worker', 'notification-worker'}},
+            {'web', 'api', 'market-runtime', 'data-worker', 'notification-worker'},
+        )
+        notification = services['notification-worker']
+        self.assertEqual(notification['command'],
+                         ['python', '-m', 'alerts.runtime', '--profile', 'notifications'])
+        self.assertEqual(notification['depends_on']['migrate']['condition'],
+                         'service_completed_successfully')
+        self.assertNotIn('api', notification['depends_on'])

@@ -908,7 +908,9 @@ def immutable_composite_signal(mapper, connection, target):
 class Notification(Base):
     __tablename__ = "notifications"
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
-    signal_id: Mapped[str] = mapped_column(ForeignKey("signals.id"), unique=True)
+    signal_id: Mapped[str | None] = mapped_column(ForeignKey("signals.id"), unique=True)
+    kind: Mapped[str] = mapped_column(String(16), default="signal", server_default="signal")
+    payload: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
     status: Mapped[str] = mapped_column(default="pending")
     ack_at: Mapped[int | None] = mapped_column(BigInteger)
     ack_hash: Mapped[str | None]

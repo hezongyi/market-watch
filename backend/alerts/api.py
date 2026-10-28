@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-import httpx
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
@@ -315,62 +314,50 @@ def send_notification_test():
         if last is not None and now_ms() - last < 60000:
             raise HTTPException(429, "请间隔一分钟再发送测试")
         test_id = secrets.token_hex(16)
-        token = secrets.token_urlsafe(32)
-        db.add(
-            Preference(
-                key="test_ack:" + test_id,
-                value={"token_hash": digest(token), "expires": now_ms() + 86400000, "ack_at": None},
-            )
-        )
         db.add(Audit(kind="notification_test_requested", details={"test_id": test_id}))
-    headers = {"Authorization": f"Bearer {settings.ntfy_token}"} if settings.ntfy_token else {}
-    body = {
-        "topic": settings.ntfy_topic,
-        "title": "守望 · 手机通知测试",
-        "message": "这是你在工作台主动发送的测试通知，不是交易信号。点击打开工作台。",
-        "priority": 5,
-        "click": settings.public_url + "/settings",
-        "actions": [
-            {
-                "action": "http",
-                "label": "确认测试",
-                "method": "POST",
-                "url": f"{settings.public_url}/api/notification-tests/{test_id}/ack",
-                "headers": {"Authorization": f"Bearer {token}"},
-                "clear": True,
-            }
-        ],
-    }
-    try:
-        with httpx.Client(timeout=15) as client:
-            response = client.post(settings.ntfy_url.rstrip("/"), json=body, headers=headers)
-            response.raise_for_status()
-    except httpx.HTTPError:
-        with transaction() as db:
-            db.add(Audit(kind="notification_test_failed_or_unknown", details={"test_id": test_id}))
-        raise HTTPException(502, "推送请求失败或结果未知，请先检查手机，避免重复发送")
-    with transaction() as db:
-        db.add(Audit(kind="notification_test_accepted", details={"test_id": test_id}))
-    return {"status": "server_accepted", "device_delivery": "unknown"}
+        note = Notification(kind="test", signal_id=None, status="pending", payload={
+            "test_id": test_id, "title": "守望 · 手机通知测试",
+            "message": "这是你在工作台主动发送的测试通知，不是交易信号。点击打开工作台。",
+            "test_authorized": True,
+        })
+        db.add(note)
+        db.flush()
+        db.add(Outbox(notification_id=note.id, status="pending", attempts=0,
+                      next_at=now_ms(), lease_until=None, error=None, provider_id=None))
+        db.add(Preference(key="test_notification:" + test_id,
+                          value={"notification_id": note.id, "ack_at": None}))
+        return {"status": "queued", "device_delivery": "unknown", "test_id": test_id}
 
 
 @app.post("/api/notification-tests/{test_id}/ack")
 def acknowledge_test(test_id: str, request: Request):
     token = request.headers.get("authorization", "").removeprefix("Bearer ")
     with transaction() as db:
-        row = db.scalar(
-            select(Preference).where(Preference.key == "test_ack:" + test_id).with_for_update()
-        )
+        row = db.scalar(select(Preference).where(
+            Preference.key == "test_notification:" + test_id).with_for_update())
+        hashes = row.value.get("token_hashes", []) if row else []
+        token_hash = digest(token) if token else ""
+        valid_token = any(secrets.compare_digest(saved, token_hash) for saved in hashes)
+        if row and not hashes:
+            valid_token = secrets.compare_digest(row.value.get("token_hash", ""), token_hash)
         if (
             not token
             or not row
-            or not secrets.compare_digest(row.value["token_hash"], digest(token))
+            or not valid_token
         ):
             raise HTTPException(403, "测试确认凭证无效")
-        if row.value["expires"] < now_ms():
+        if row.value.get("expires", 0) < now_ms():
             raise HTTPException(403, "测试确认凭证已过期")
         if row.value["ack_at"] is None:
             row.value = {**row.value, "ack_at": now_ms()}
+            note = db.get(Notification, row.value["notification_id"])
+            if note:
+                note.ack_at = now_ms()
+                note.status = "acknowledged"
+                task = db.scalar(select(Outbox).where(
+                    Outbox.notification_id == note.id).with_for_update())
+                if task:
+                    task.status = "cancelled"
             db.add(Audit(kind="notification_test_acknowledged", details={"test_id": test_id}))
         return {"status": "acknowledged"}
 
@@ -430,7 +417,7 @@ def health():
         last_test_result = None
         if requested:
             test_id = requested.details.get("test_id")
-            grant = db.get(Preference, "test_ack:" + test_id) if test_id else None
+            grant = db.get(Preference, "test_notification:" + test_id) if test_id else None
             outcomes = db.scalars(
                 select(Audit)
                 .where(

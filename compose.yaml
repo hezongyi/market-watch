@@ -72,27 +72,19 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
     restart: unless-stopped
-  notify-worker:
+  notification-worker:
     build: .
-    command: ["python", "-m", "alerts.notify"]
+    command: ["python", "-m", "alerts.runtime", "--profile", "notifications"]
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-notification-worker
+      ALERTS_DATABASE_POOL_SIZE: "4"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
     depends_on:
-      api: {condition: service_healthy}
-    restart: unless-stopped
-  notification-projector:
-    build: .
-    command: ["python", "-m", "alerts.notification_center_worker"]
-    env_file: .env
-    environment:
-      ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
-      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
-      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
-    depends_on:
-      api: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
     restart: unless-stopped
   web:
     build: {context: ., dockerfile: web/Dockerfile}
