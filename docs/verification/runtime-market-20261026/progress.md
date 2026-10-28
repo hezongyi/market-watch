@@ -10,6 +10,8 @@
 
 阶段3B验收记录见 [`stage-3b-notifications-acceptance.md`](stage-3b-notifications-acceptance.md)。阶段4/5联合矩阵、真实 ntfy/A17a 与生产切换准备仍未签收。
 
+阶段5本轮联合核对补记见 [`stage-5-joint-acceptance.md`](stage-5-joint-acceptance.md)：当前 head 下 stage3A PostgreSQL 全集 **153 passed**，stage3B 通知 PostgreSQL 合同 **17 passed**，五服务 synthetic crossing/API-offline/restart、Chromium SSE、阶段4隔离旧版读写与回退分别通过。复跑修正了 stage3A 测试跨分钟导致的时钟不确定性；仅修改测试时钟及合同 wrapper，没有生产代码变化。阶段5仍为分层证据联合核对，不冒称真实供应商、实际部署浏览器和手机通知的单次端到端；A17a/A17b、provider-disabled 下的供源状态和生产部署仍未验收。ATR门槛偏差依用户决定作为独立性能后续，不阻塞本轮核心交付；旧 Alembic 不得运行在 `az53` schema 上。
+
 ### 本轮最终证据与下一步
 
 目标仍为五个应用服务，告警留在 market-runtime。**当前只完成 market 迁移切片；data/notification 旧服务仍在，全部五服务装配尚未完成。** 性能超阈值记录为非阻塞验收偏差，独立事项见 `performance-followup-20261028.md`，不再以第六服务实验阻塞开发。
