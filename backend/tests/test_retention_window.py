@@ -273,6 +273,45 @@ def contract_interrupted_pass_resumes(factory):
                                "composite_inputs": 0, "events": 0}
 
 
+def contract_kill_between_commit_and_release_keeps_counts(factory):
+    """Committed deletions are counted before the release; no residual window."""
+    graph(factory, starts=(OLD, OLD - 60_000, OLD - 120_000))
+    run_id = run(factory)
+    drill()
+    original = window._checkpoint
+
+    def killed(run_id_arg, totals):
+        raise KeyboardInterrupt("process killed between commit and release")
+
+    window._checkpoint = killed
+    try:
+        with pytest.raises(KeyboardInterrupt):
+            window.execute(run_id, now=NOW, chunk=1)
+    finally:
+        window._checkpoint = original
+    killed_state = switch_runs.get(run_id)["retention"]
+    assert killed_state["state"] == "running"
+    assert killed_state["released_at"] is None
+    # The committed chunk is already counted although no release ever ran.
+    assert killed_state["stats"]["deleted"]["market_source_minutes"] == 1
+    assert killed_state["stats"]["rows"] == 5
+    assert counts(factory)["minutes"] == 2
+    resumed = window.execute(run_id, now=NOW, chunk=1)
+    assert resumed["deleted"]["market_source_minutes"] == 2
+    final = switch_runs.get(run_id)["retention"]
+    assert final["state"] == "completed"
+    assert final["stats"]["rows"] == 15
+    assert final["stats"]["deleted"] == {
+        "market_composite_minute_inputs": 3,
+        "market_composite_minutes": 3,
+        "market_composite_input_events": 3,
+        "market_source_minutes": 3,
+        "market_source_minute_revisions": 3,
+    }
+    assert counts(factory) == {"minutes": 0, "revisions": 0, "composite_minutes": 0,
+                               "composite_inputs": 0, "events": 0}
+
+
 def contract_mixed_batch_deletes_only_unprotected(factory):
     """Protected candidates stay, safe ones leave, and one pass never rescans them."""
     graph(factory, starts=(OLD, OLD - 60_000))
@@ -389,6 +428,10 @@ def test_foreign_key_order_and_idempotent_rerun(runtime):
 
 def test_interrupted_pass_resumes(runtime):
     contract_interrupted_pass_resumes(runtime)
+
+
+def test_kill_between_commit_and_release_keeps_counts(runtime):
+    contract_kill_between_commit_and_release_keeps_counts(runtime)
 
 
 def test_mixed_batch_deletes_only_unprotected(runtime):

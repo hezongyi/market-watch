@@ -35,8 +35,8 @@ def main():
     parser.add_argument("--limit", type=int, help="单批候选分钟上限")
     parser.add_argument("--chunk", type=int, help="每个事务提交的行数上限")
     parser.add_argument("--budget-ms", type=int, help="单次调用的时间预算（毫秒）")
-    parser.add_argument("--dry-run", action="store_true", help="只报告，绝不删除")
-    parser.add_argument("--execute", action="store_true", help="执行真实删除")
+    parser.add_argument("--execute", action="store_true",
+                        help="执行真实删除；省略时只报告（dry-run），绝不删除")
     parser.add_argument("--status", action="store_true", help="查看恢复演练标记与清理顺序")
     parser.add_argument("--restore-drill", metavar="DIRECTORY",
                         help="执行一次备份与真实恢复校验并记录标记")

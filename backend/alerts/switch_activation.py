@@ -40,7 +40,6 @@ PATHS = {"shadow_ready": ("shadow_ready",),
          "succeeded": ("shadow_ready", "activating", "succeeded"),
          "partial": ("shadow_ready", "activating", "partial"),
          "failed": ("failed",)}
-FROZEN_REASON = "组合已切换到新修订；旧修订输入已冻结，需显式改为新修订后恢复"
 
 
 def advance_to(row, state, now, *, phase=None, error_summary=None):
@@ -136,6 +135,31 @@ def freeze_previous(db, previous, *, run_id, boundary, now):
             "at": now, "run_id": run_id}
 
 
+def shadow_pauses(db, *, composite_id, revision_id):
+    """Rules the candidate's own shadow report already marked as will_pause.
+
+    The Sunday shadow run owns the geometry comparison (shifted drawings, ATR
+    warmup, missing indicator values). Activation must honour that verdict: a
+    rule the shadow proved immovable is paused with the shadow's own reason
+    instead of being relocated onto a revision it cannot keep its shape on.
+    """
+    from .baseline_shadow import KIND as shadow_kind
+
+    row = db.scalar(select(MarketSwitchRun).where(
+        MarketSwitchRun.kind == shadow_kind,
+        MarketSwitchRun.composite_id == composite_id,
+        MarketSwitchRun.target_revision_id == revision_id,
+    ).order_by(MarketSwitchRun.created_at.desc()).limit(1))
+    output = {}
+    for item in (row.shadow_report or {}).get("paused_rules") or [] if row else []:
+        if not item.get("will_pause"):
+            continue
+        details = [reason.get("detail") or reason.get("code")
+                   for reason in item.get("reasons") or []]
+        output[item["alert_id"]] = "；".join(filter(None, details)) or "shadow 判定不可重定位"
+    return output
+
+
 def safe_pause(db, composite, target_revision_id, *, run_id, now):
     """Pause rules when no revision can serve them after a failed switch."""
     active = (db.get(CompositePreparation, composite.active_revision_id)
@@ -144,8 +168,8 @@ def safe_pause(db, composite, target_revision_id, *, run_id, now):
     if (active is not None and composite.active_revision_id != target_revision_id
             and not frozen(active)):
         return {"paused": [], "bound": bound, "reason": "旧修订继续运行"}
-    paused = composite_alerts.pause_bound(db, composite.id, reason=FROZEN_REASON,
-        run_id=run_id, now=now)
+    paused = composite_alerts.pause_bound(db, composite.id,
+        reason=composite_alerts.FROZEN_REASON, run_id=run_id, now=now)
     return {"paused": paused["paused"], "bound": bound,
             "reason": "当前修订无法继续服务，已安全暂停"}
 
@@ -209,9 +233,10 @@ def publish(db, *, composite, revision, body, progress, now):
         advance_to(run, "activating", now, phase="binding")
         boundary = now // 60000 * 60000
         stage = "alerts"
+        shadow = shadow_pauses(db, composite_id=composite.id, revision_id=revision.id)
         alerts = composite_alerts.rebind_active(db, composite, previous=previous,
             target=revision, boundary=boundary, run_id=run.id, now=now,
-            input_revision=progress["input_revision"], source=source)
+            input_revision=progress["input_revision"], source=source, shadow=shadow)
         completed.append("alerts")
         stage = "metrics"
         metrics = consolidate_metrics(db, revision, progress, run_id=run.id,
@@ -240,9 +265,12 @@ def publish(db, *, composite, revision, body, progress, now):
             from .switch_runs import _record
 
             switch_notice.record(db, run=_record(run), stage="alerts",
-                reasons=[{"stage": "alerts", "scope": item["id"], "type": "rule_not_relocatable",
+                reasons=[{"stage": "alerts", "scope": item["id"],
+                          "type": ("rule_not_relocatable" if item["migration"]
+                                   == "paused_target_not_ready" else "rule_paused_by_shadow"),
                           "reason": item["reason"]} for item in alerts["affected"]
-                         if item["migration"] == "paused_target_not_ready"],
+                         if item["migration"] in ("paused_target_not_ready",
+                                                 "paused_shadow_rule")],
                 counts={"sources": 2 if source["switch"] else 1,
                         "rules": len(alerts["affected"]),
                         "paused": len(alerts["paused"]),

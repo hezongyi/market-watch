@@ -81,7 +81,7 @@ schema_signature(connection=None) -> dict        # {tables, digest, alembic}
 ## 6. 批次、幂等与续跑
 
 - 批次身份来自 `switch_runs.claim_retention(run_id, dry_run=...)`：同 run 同模式复用同一 `batch_id`，`interrupted` 再 claim 会 `attempts+1` 续跑。
-- 单次 `execute` 处理不超过 `limit` 个候选分钟，按 `chunk` 分段提交；每段提交后立刻 `release_retention(outcome="interrupted", stats=累计)` 再 `claim_retention`，因此中断点的进度与计数都持久化在切换运行行上，续跑既不重复计数也不跳删。
+- 单次 `execute` 处理不超过 `limit` 个候选分钟，按 `chunk` 分段提交。**每个分段的删除行数与累计 stats 在同一个事务内写回 `market_switch_runs.retention.stats`**，提交成功后才 `release_retention(outcome="interrupted")` + `claim_retention` 标记为可续跑；因此进程在“提交后、release 前”被杀也不会漏计，续跑的累计值恒等于数据库实际删除量（既不重复计数也不跳删）。
 - 批次进入 `completed` 后同 ID 重跑不再删除：返回 `skipped=[{reason: "batch_completed"}]`、`idempotent: true`，累计计数取 `batch.stats`。
 - dry-run 与真实批次按 `dry_run` 标志区分，交替调用会重置另一模式的批次（不会重复删除，只是重新规划）。
 
@@ -110,5 +110,5 @@ schema_signature(connection=None) -> dict        # {tables, digest, alembic}
 
 ## 10. 验证
 
-- sqlite 合同（`backend/tests/test_retention_window.py`）：下界边界、解锁、dry-run 零删除、外键顺序、按 run ID 幂等重跑、中断续跑不重复计数、活跃告警绑定整批跳过、恢复门槛缺失/过期拒绝、真实 backup+restore_check 演练。
+- sqlite 合同（`backend/tests/test_retention_window.py`）：下界边界、解锁、dry-run 零删除、外键顺序、按 run ID 幂等重跑、中断续跑不重复计数、**“分段提交后立刻被杀、从未 release”后续跑累计 stats 仍等于实际删除量**、混合批次只删安全行、活跃告警绑定整批跳过、恢复门槛缺失/过期拒绝、真实 backup+restore_check 演练。
 - PostgreSQL 合同（`backend/tests/test_retention_window_postgres.py`）：同一组共享合同在真实 PostgreSQL（`TEST_POSTGRES_URL`）上重跑，覆盖真实外键与行锁语义。

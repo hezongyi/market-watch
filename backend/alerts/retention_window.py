@@ -512,8 +512,9 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
     try:
         while processed < limit:
             size = min(chunk, limit - processed)
-            applied = _apply_chunk(lower=lower, limit=size, now=stamp, deadline=deadline,
-                                   skip_minutes=skip_minutes, skip_revisions=skip_revisions)
+            applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+                                   deadline=deadline, skip_minutes=skip_minutes,
+                                   skip_revisions=skip_revisions, totals=totals)
             summary, deleted, planned_bytes = (applied["summary"], applied["deleted"],
                                                applied["bytes"])
             # A protected candidate cannot become deletable inside one pass, so the
@@ -533,12 +534,9 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
             report["protected"]["detail_truncated"] |= summary["protected"]["detail_truncated"]
             for name in DELETION_ORDER:
                 report["deleted"][name] += deleted[name]
-                totals["deleted"][name] = totals["deleted"].get(name, 0) + deleted[name]
             passed = sum(deleted.values())
             report["rows"] += passed
             report["bytes"] += planned_bytes
-            totals["rows"] += passed
-            totals["bytes"] += planned_bytes
             processed += candidates["source_minutes"] + candidates["source_revisions"]
             if not summary["deletable_revisions"]:
                 if not (candidates["source_minutes"] or candidates["source_revisions"]):
@@ -546,19 +544,13 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
                     break
                 # Everything selected was protected. Those keys are skipped from now
                 # on, so keep planning instead of stopping on a protected prefix.
-                switch_runs.release_retention(run_id, outcome="interrupted",
-                                              stats=_stats(totals, None))
-                switch_runs.claim_retention(run_id, dry_run=False)
+                _checkpoint(run_id, totals)
                 if now_ms() > deadline:
                     break
                 continue
             if not passed:
                 break
-            # Committed progress is durable: release the batch and claim it again
-            # so an interrupted pass resumes on the same batch with its counts.
-            switch_runs.release_retention(run_id, outcome="interrupted",
-                                          stats=_stats(totals, None))
-            switch_runs.claim_retention(run_id, dry_run=False)
+            _checkpoint(run_id, totals)
             if now_ms() > deadline:
                 break
     except Exception:
@@ -584,15 +576,50 @@ def _stats(totals, remaining):
     }
 
 
-def _apply_chunk(*, lower, limit, now, deadline, skip_minutes, skip_revisions):
+def _project(totals, deleted, planned_bytes):
+    return {
+        "rows": totals["rows"] + sum(deleted.values()),
+        "bytes": totals["bytes"] + planned_bytes,
+        "deleted": {name: totals["deleted"].get(name, 0) + deleted[name]
+                    for name in DELETION_ORDER},
+    }
+
+
+def _persist(db, run_id, totals):
+    """Write the batch counts inside the caller's transaction, never after it."""
+    row = db.get(MarketSwitchRun, run_id)
+    if row is None:
+        raise ValueError("切换运行不存在：" + str(run_id))
+    segment = dict(row.retention or {})
+    segment["stats"] = _stats(totals, None)
+    row.retention = segment
+
+
+def _checkpoint(run_id, totals):
+    """Leave committed progress resumable on the same batch."""
+    switch_runs.release_retention(run_id, outcome="interrupted", stats=_stats(totals, None))
+    switch_runs.claim_retention(run_id, dry_run=False)
+
+
+def _apply_chunk(*, run_id, lower, limit, now, deadline, skip_minutes, skip_revisions, totals):
+    """Delete one chunk and record its counts before the commit.
+
+    The batch statistics are written in the deletion transaction, so a process
+    killed between a commit and the release cannot lose the evidence of rows it
+    already removed; the resumed totals stay equal to what the database lost.
+    """
     with transaction() as db:
         plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline,
                      skip_minutes=skip_minutes, skip_revisions=skip_revisions)
         summary = _plan_report(plan)
         deleted = _delete(db, plan)
-        return {"summary": summary, "deleted": deleted, "bytes": plan["bytes"],
-                "blocked_minutes": plan["blocked_minutes"],
-                "blocked_revisions": plan["blocked_revisions"]}
+        projected = _project(totals, deleted, plan["bytes"])
+        _persist(db, run_id, projected)
+        applied = {"summary": summary, "deleted": deleted, "bytes": plan["bytes"],
+                   "blocked_minutes": plan["blocked_minutes"],
+                   "blocked_revisions": plan["blocked_revisions"]}
+    totals.update(projected)
+    return applied
 
 
 def dry_run(run_id=None, *, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,

@@ -21,6 +21,14 @@ Activation is one-shot per candidate revision: a failure keeps its own recorded
 failed/partial run and this loop never retries it automatically; only a new
 Sunday window opens a new slot, and with it new runs.
 
+Activation trusts the persisted shadow verdict, not the run state alone:
+baseline_shadow marks the run shadow_ready and only then downgrades a not-ready
+candidate to failed, so a report that is not ready is deferred as
+shadow_not_ready. A deferred window consumes no activation attempt and keeps the
+retry that baseline_shadow owns. The gate is that verdict (status, ready and
+reasons); rules the report lists as will_pause do not block it, because pausing
+them is the activation path's own safe state, not a preparation failure.
+
 The shadow run and the activation run are two records, not one. They are linked
 by (composite_id, target_revision_id) plus the activation request id
 'auto:<shadow_run_id>', which is enough for the audit trail; open_run only
@@ -55,6 +63,8 @@ WORK_SECONDS = .5
 FAILURE_SECONDS = 2
 # A run in these states has nothing left to prepare for this window.
 DONE_STATES = ("shadow_ready", "activating", "succeeded")
+# Deferral reason: the persisted shadow verdict does not allow activation yet.
+NOT_READY = "shadow_not_ready"
 
 
 def _instant(now):
@@ -125,8 +135,50 @@ def shadow_cycle(*, now=None, adapter=None, budget=None, composites=None, prepar
             "composites": results}
 
 
-def ready_candidates():
-    """Ready shadow runs whose candidate is neither active nor already attempted."""
+def _verdict(report):
+    """Why a persisted shadow report does not allow activation; None means ready."""
+    if not isinstance(report, dict):
+        return NOT_READY
+    if report.get("ready") is not True or report.get("status") != "ready":
+        return NOT_READY
+    if report.get("reasons"):
+        return NOT_READY
+    return None
+
+
+def _deferral(db, row, activation_kind):
+    """Why this window must wait; None means activate it now.
+
+    baseline_shadow records the report (preparing -> shadow_ready) and only then
+    downgrades a not-ready run to failed, so the state alone can name a candidate
+    that is not ready. The verdict is therefore read from the report, and a
+    deferred window consumes no activation attempt: its run keeps the retry that
+    baseline_shadow owns.
+    """
+    verdict = _verdict(row.shadow_report)
+    if verdict:
+        return verdict
+    composite = db.get(MarketComposite, row.composite_id)
+    if composite is None:
+        return "composite_missing"
+    if composite.active_revision_id == row.target_revision_id:
+        return "already_active"
+    # A window prepared against a revision that is no longer active is stale:
+    # activate() would refuse it, so it waits for a new window.
+    if composite.active_revision_id != row.previous_revision_id:
+        return "window_superseded"
+    # One activation attempt per candidate revision; a failed or partial attempt
+    # is retried explicitly, never by this loop.
+    if db.scalar(select(MarketSwitchRun.id).where(
+            MarketSwitchRun.kind == activation_kind,
+            MarketSwitchRun.composite_id == row.composite_id,
+            MarketSwitchRun.target_revision_id == row.target_revision_id).limit(1)):
+        return "activation_recorded"
+    return None
+
+
+def activation_targets():
+    """Windows to activate now, plus every deferred window with its reason."""
     from .baseline_shadow import KIND as shadow_kind
     from .switch_activation import KIND as activation_kind
 
@@ -138,37 +190,28 @@ def ready_candidates():
             MarketSwitchRun.previous_revision_id.is_not(None),
             MarketSwitchRun.target_revision_id.is_not(None),
         ).order_by(MarketSwitchRun.created_at, MarketSwitchRun.id)))
-        pending = []
+        pending, skipped = [], []
         for row in rows:
-            composite = db.get(MarketComposite, row.composite_id)
-            if composite is None or composite.active_revision_id == row.target_revision_id:
-                continue
-            # A window prepared against a revision that is no longer active is
-            # stale: activate() would refuse it, so it waits for a new window.
-            if composite.active_revision_id != row.previous_revision_id:
-                continue
-            # One activation attempt per candidate revision; a failed or partial
-            # attempt is retried explicitly, never by this loop.
-            attempted = db.scalar(select(MarketSwitchRun.id).where(
-                MarketSwitchRun.kind == activation_kind,
-                MarketSwitchRun.composite_id == row.composite_id,
-                MarketSwitchRun.target_revision_id == row.target_revision_id).limit(1))
-            if attempted:
-                continue
-            pending.append({"run_id": row.id, "composite_id": row.composite_id,
-                            "revision_id": row.target_revision_id,
-                            "previous_revision_id": row.previous_revision_id,
-                            "scheduled_for": row.scheduled_for})
-        return tuple(pending)
+            window = {"run_id": row.id, "composite_id": row.composite_id,
+                      "revision_id": row.target_revision_id,
+                      "previous_revision_id": row.previous_revision_id,
+                      "scheduled_for": row.scheduled_for}
+            reason = _deferral(db, row, activation_kind)
+            if reason:
+                skipped.append({**window, "reason": reason})
+            else:
+                pending.append(window)
+        return tuple(pending), tuple(skipped)
 
 
 def activation_cycle(*, activate=None):
-    """Activate every ready candidate through the existing activation path."""
+    """Activate every ready candidate once, through the existing activation path."""
     from .composite_revisions import activate as default_activate
 
     activate = default_activate if activate is None else activate
+    candidates, skipped = activation_targets()
     results = []
-    for item in ready_candidates():
+    for item in candidates:
         try:
             with transaction() as db:
                 activate(db, item["composite_id"], item["revision_id"], {
@@ -180,7 +223,7 @@ def activation_cycle(*, activate=None):
             log.warning("Activation cycle failed composite=%s run=%s error_type=%s",
                         item["composite_id"], item["run_id"], type(error).__name__)
             results.append({**item, "status": "failed", "error": type(error).__name__})
-    return {"worked": bool(results), "candidates": results}
+    return {"worked": bool(results), "candidates": results, "skipped": list(skipped)}
 
 
 def retention_cycle(*, mode=None, now=None, limit=None, chunk=None, budget_ms=None,

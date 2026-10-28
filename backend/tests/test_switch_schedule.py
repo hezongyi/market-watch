@@ -43,7 +43,7 @@ def ready_prepare(target):
         switch_runs.record_target(run_id, target["revision"],
                                   previous_revision_id=target["previous"])
         switch_runs.record_shadow(run_id, {"schema": "baseline-shadow-v1",
-                                           "status": "ready", "ready": True})
+                                           "status": "ready", "ready": True, "reasons": []})
         return {"run": {"id": run_id, "state": "shadow_ready"}, "ready": True, "reasons": []}
     return prepare
 
@@ -138,6 +138,9 @@ def test_ready_candidate_is_activated_once_through_the_existing_path(database, m
         now=at(2026, 3, 1, 1, 5), composites=(composite,), budget=7, adapter=ADAPTER,
         prepare=ready_prepare({"revision": ident, "previous": old}))
     assert window["composites"][0]["status"] == "ready"
+    targets, deferred = switch_schedule.activation_targets()
+    assert [item["run_id"] for item in targets] == [window["composites"][0]["run_id"]]
+    assert deferred == ()
     result = switch_schedule.activation_cycle()
     assert [(item["composite_id"], item["revision_id"], item["status"])
             for item in result["candidates"]] == [(composite, ident, "activated")]
@@ -156,10 +159,83 @@ def test_a_window_prepared_against_a_superseded_revision_is_not_activated(databa
     record = switch_runs.start("baseline_shadow", composite_id=composite,
                                previous_revision_id=ident, scheduled_for=at(2026, 3, 1, 1, 0))
     switch_runs.record_target(record["id"], ident, previous_revision_id=ident)
-    switch_runs.record_shadow(record["id"], {"status": "ready", "ready": True})
-    assert switch_schedule.ready_candidates() == ()
-    assert switch_schedule.activation_cycle()["worked"] is False
+    switch_runs.record_shadow(record["id"], {"status": "ready", "ready": True,
+                                             "reasons": []})
+    assert switch_schedule.activation_targets()[0] == ()
+    cycle = switch_schedule.activation_cycle()
+    assert cycle["worked"] is False
+    assert [item["reason"] for item in cycle["skipped"]] == ["window_superseded"]
     assert [row["kind"] for row in rows(database)] == ["baseline_shadow"]
+
+
+def test_a_not_ready_report_is_deferred_without_consuming_an_attempt(database, monkeypatch):
+    composite, old, ident, _ = activation_candidate(database, monkeypatch)
+    record = switch_runs.start("baseline_shadow", composite_id=composite,
+                               previous_revision_id=old, scheduled_for=at(2026, 3, 1, 1, 0))
+    switch_runs.record_target(record["id"], ident, previous_revision_id=old)
+    # baseline_shadow records the report first and only then marks the run failed,
+    # so the state can name a candidate whose persisted verdict is not ready.
+    switch_runs.record_shadow(record["id"], {"status": "not_ready", "ready": False,
+        "reasons": [{"code": "preparation_confirming_m1", "detail": "候选修订尚未完成准备"}]})
+    targets, deferred = switch_schedule.activation_targets()
+    assert targets == ()
+    assert [(item["run_id"], item["reason"]) for item in deferred] == [
+        (record["id"], "shadow_not_ready")]
+    cycle = switch_schedule.activation_cycle()
+    assert cycle["worked"] is False and cycle["candidates"] == []
+    assert [item["reason"] for item in cycle["skipped"]] == ["shadow_not_ready"]
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(CompositeActivation)) == 0
+    # No attempt was consumed and the run still owns its retry.
+    assert [row["kind"] for row in rows(database)] == ["baseline_shadow"]
+    with database() as db:
+        assert db.get(MarketSwitchRun, record["id"]).state == "shadow_ready"
+    # A ready flag with preparation reasons left is not a ready window either.
+    switch_runs.record_shadow(record["id"], {"status": "ready", "ready": True,
+        "reasons": [{"code": "preparation_publishing_periods"}]})
+    assert switch_schedule.activation_targets()[1][0]["reason"] == "shadow_not_ready"
+    assert switch_schedule.activation_cycle()["worked"] is False
+
+
+def test_a_not_ready_window_is_never_activated_and_activates_once_when_ready(database, monkeypatch):
+    composite, active, candidate, plan, _ = candidate_fixture(database, monkeypatch)
+    with database.begin() as db:
+        db.get(CompositePreparation, candidate).status = "pending"
+    now = at(2026, 3, 1, 1, 0, 30)
+    for tick in range(3):
+        window = switch_schedule.shadow_cycle(now=now + tick * 60_000, composites=(composite,))
+        assert window["composites"][0]["status"] == "not_ready"
+        cycle = switch_schedule.activation_cycle()
+        assert cycle["worked"] is False and cycle["candidates"] == []
+        assert switch_schedule.activation_targets()[0] == ()
+    # One run, three retries, no activation attempt while the candidate lags.
+    stored = rows(database)
+    assert [row["kind"] for row in stored] == ["baseline_shadow"]
+    assert stored[0]["state"] == "failed" and stored[0]["attempts"] == 2
+    # baseline_shadow writes the report and only then fails the run; hold the real
+    # not-ready report on a shadow_ready run to stand inside that window once.
+    with database.begin() as db:
+        run = db.get(MarketSwitchRun, stored[0]["id"])
+        assert run.shadow_report["status"] == "not_ready" and run.shadow_report["reasons"]
+        run.state = "shadow_ready"
+    targets, deferred = switch_schedule.activation_targets()
+    assert targets == () and [item["reason"] for item in deferred] == ["shadow_not_ready"]
+    assert switch_schedule.activation_cycle()["worked"] is False
+    with database.begin() as db:
+        db.get(MarketSwitchRun, stored[0]["id"]).state = "failed"
+    with database.begin() as db:
+        prep = db.get(CompositePreparation, candidate)
+        prep.status, prep.cursor = "queried", prep.cutoff
+    ready = switch_schedule.shadow_cycle(now=now + 600_000, composites=(composite,))
+    assert ready["composites"][0]["status"] == "ready"
+    cycle = switch_schedule.activation_cycle()
+    assert [item["status"] for item in cycle["candidates"]] == ["activated"], cycle
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(CompositeActivation)) == 1
+        assert db.get(MarketComposite, composite).active_revision_id == candidate
+    # Exactly one activation attempt for this candidate revision.
+    assert switch_schedule.activation_cycle()["worked"] is False
+    assert [row["kind"] for row in rows(database)].count(switch_activation.KIND) == 1
 
 
 def test_failed_activation_is_recorded_once_and_not_repeated(database, monkeypatch):

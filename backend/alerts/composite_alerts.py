@@ -208,7 +208,7 @@ def relocatable(db, previous, target, config, bound, *, input_revision, source=N
 
 
 def rebind_active(db, composite, *, previous, target, boundary, run_id, now, input_revision,
-                  source=None):
+                  source=None, shadow=None):
     """Move every active rule onto the activated revision at one event boundary.
 
     A rule that the target revision can serve is relocated by a new immutable
@@ -216,6 +216,12 @@ def rebind_active(db, composite, *, previous, target, boundary, run_id, now, inp
     revision changes. Its judgment baseline restarts at the boundary, so no
     pre-switch value replays as a fresh crossing. A rule the target cannot serve
     yet is paused with a concrete reason instead of silently kept on frozen input.
+
+    The shadow mapping carries the candidate's own shadow report: a rule it already
+    marks as will_pause (missing indicator, incompatible source, geometry that
+    cannot be relocated) was never allowed to move, because a shifted drawing or a
+    rebuilt ATR reference is a different rule. Both judgements are a union: either
+    one can only pause, never relocate.
     """
     from .chart_alert_service import AlertConfig
 
@@ -227,6 +233,14 @@ def rebind_active(db, composite, *, previous, target, boundary, run_id, now, inp
             aligned.append({"id": alert.id, "revision_id": target.id, "version": alert.version})
             affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
                              "migration": "aligned_on_target"})
+        elif (shadow or {}).get(alert.id):
+            # The candidate's shadow report already proved this rule cannot move.
+            reason = shadow[alert.id]
+            paused.extend(pause(db, [(version, alert)],
+                reason="组合修订切换后该规则暂不可迁移：" + reason, run_id=run_id, now=now))
+            affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
+                             "migration": "paused_shadow_rule", "reason": reason})
+            continue
         else:
             ready, reason = relocatable(db, previous, target, config,
                 version.market_identity, input_revision=input_revision, source=source)
@@ -425,7 +439,7 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     composite = db.get(MarketComposite, identity["composite_id"])
     if revision and frozen(db.get(CompositePreparation, revision.id)):
         # Fencing: a judgment round for a switched-away revision writes nothing.
-        return wait(alert, runtime, "blocked", "该组合修订已切换并冻结，请显式改为新修订后恢复")
+        return wait(alert, runtime, "blocked", FROZEN_REASON)
     mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
     target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
     if (not composite or composite.permission_scope != "workspace:default" or not revision or

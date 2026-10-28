@@ -141,13 +141,21 @@ if revision and frozen(db.get(CompositePreparation, revision.id)):
    (vi) 目标修订该周期产物已发布（`HistoryArtifact`）；
    (vii) 该周期聚合水位 ≥ 激活输入。
    任一项不满足即不可重定位 → 暂停，`health_reason` 写明具体一项（例如「目标修订服务日历 utc0，与规则绑定的 ny17 不兼容」）。只有同日历、同口径、仅历史版本/接缝前移的常规基线切换才重绑。指标预热仍走规则原本的 `chart_results` 懒加载路径：未就绪时 `evaluate` 返回 warming，不产生伪信号，因此不阻塞重绑。
+   **与 shadow 结论取并集**：`switch_activation.shadow_pauses()` 读取该组合该候选修订的 Sunday shadow run（`baseline_shadow.KIND`、`target_revision_id`）里 `paused_rules` 中 `will_pause=true` 的规则，把 shadow 给出的具体原因传进 `rebind_active(shadow=...)`。这些规则一律不重绑、直接暂停，`health_reason` 用 shadow 的原因（`migration=paused_shadow_rule`，汇总消息 `type=rule_paused_by_shadow`）；shadow 未标记的规则仍走上面 (i)—(vii)。floor 变化、ATR 暖机不足、指标缺值等几何不可重定位因此在激活侧生效，而不是只停留在 shadow 报告里。
 3. **不可重定位才暂停**：`status=paused / health=blocked`，`health_reason` 给出具体缺口（日历/口径/周期产物/水位），并在汇总消息里计入受影响规则数与暂停数。日历或口径变化的切换因此不会把规则挪到另一种桶边界上。
 4. 暂停时沿用既有 held-rule 需求机制（`runtime.demand_hold = "stale_input"`），因为 `market_usage.composite_targets` / `realtime_switch` 只识别该值；`health_reason` 与 `runtime.switch_reason` 记录真实原因。若后续允许改 `market_usage`，应新增独立的 hold 值替换该复用。
+   **冻结修订不再维持自身采集需求**：`market_usage.composite_targets` 的 held 分支读到规则绑定的修订已冻结（`composite_inputs.frozen`）时跳过它——来源切换后 target 不同，旧修订的那条采集需求被丢弃；共享来源仍服务其它有效消费者。唯一保留的情形是「运行修订需要的正是同一个 target」，此时两条需求本就是同一条（`test_frozen_held_pause_drops_its_own_target_after_a_source_switch` / `test_held_pause_on_a_running_revision_keeps_its_target`）。保留该情形是因为既有 `test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity` 的唯一需求来源就是这条 held 规则，而它切换后的运行修订在该 fixture 里未启用实时；若改为「一律跳过」，需同时修改该测试的期望。
 5. 判定基线：重绑后 `alert.state` 清空、`effective_at=boundary`、`control_revision+1`、`runtime.switch_run_id/switch_boundary` 记录本次运行，并写 `Audit(kind=chart_alert_rebound, run_id, 旧/新修订, from/to version)`。切换前最后一次收盘在阈值下方、切换后第一根在上方时不会产生穿越（`test_relocation_never_replays_a_pre_switch_crossing`）。
 
 ### 与既有测试的关系（未改任何既有测试）
 
 `backend/tests/test_composite_revisions.py::test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity` 的场景是 ny17→utc0 派生（换 history_version、mapping、接缝）后显式激活：日历变化会移动日界与桶边界，规则几何与判定基线无法等比平移，因此按第 2 条 (i) 判定为**不可重定位 → 显式暂停**，规则版本身份保持不变，该测试**原样通过**。其"旧修订仍可按 revision_id 读出 ny17 页面"与"规则身份不被悄悄改写"两条意图同时成立。只有同日历同口径的常规基线切换才重绑（`test_forward_history_version_rebinds_without_pausing`）。
+
+## 8b. 汇总消息的再投递
+
+- 一个 run 始终只有 1 条 `Notification` + 1 条 `Outbox`（id 由 run id 派生，`notification_id` 唯一约束兜底）。
+- 合并时若**引入新的错误键**（不是重复计数）且该 run 的 Outbox 已投递完成（`accepted` / `blocked`），把**同一行**重新置为 `pending`（`next_at=now`、保留 `attempts`、清空 `lease_until`），让合并后的逻辑消息再投递一次；重复错误只累加 `seen/last_at`，不触发再投递；已 `pending/sending` 时不重复排队；`cancelled` 是显式退役，不复活。返回体带 `new_errors` 与 `requeued`。
+- 插入判断按「行是否存在」而不是 `rowcount`：`INSERT … ON CONFLICT DO NOTHING` 的 rowcount 在 PostgreSQL 驱动下不可靠（实测把冲突后的二次写入误判为新建），否则重试合并后永不重排。
 
 ## 9. 未交付 / 被 Boundary 阻挡
 
@@ -160,13 +168,14 @@ if revision and frozen(db.get(CompositePreparation, revision.id)):
 环境：Ubuntu 本机，Python `/home/quant/repos/market-watch/.venv/bin/python`（共享 venv，editable 指向主仓库，必须带 `PYTHONPATH=backend`）。
 
 - SQLite 合同测试（本切片）：
-  - `PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_switch_activation.py backend/tests/test_switch_source.py -q` → **12 passed**（8 条激活合同 + 4 条来源能力）。
+  - `PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_switch_activation.py backend/tests/test_switch_source.py -q` → **18 passed**（14 条激活合同 + 4 条来源能力）。新增的三组：shadow 结论并集（`test_shadow_verdict_pauses_rules_the_candidate_cannot_move`：shadow 标记的规则被暂停且原因来自 shadow、未标记的同口径规则正常重绑）；汇总消息再投递（`test_merged_new_error_requeues_the_same_outbox_row`：重复错误只累加 seen、已投递后新错误把同一行重排一次且 attempts 保留、再次新错误在 pending 状态不重复排队、Notification/Outbox 恒为 1）；held 需求（`test_held_pause_on_a_running_revision_keeps_its_target` / `test_frozen_held_pause_drops_its_own_target_after_a_source_switch`）。
+  - 本切片相关套件合并运行（`test_switch_activation.py test_switch_source.py test_composite_revisions.py test_composite_alerts.py test_composite_aggregates.py test_market_usage.py test_switch_runs.py test_switch_schedule.py test_runtime_loops.py`）→ **96 passed**。
   - 迁移语义专项：`-k 'binds_one_state'`（重绑：新版本行指向目标修订、旧版本逐字段不变、state 清空、effective_at=boundary、`chart_alert_rebound` 审计）1 passed；`-k 'forward_history_version'`（同日历同口径、仅历史版本前移 → 重绑且不暂停、不发消息）1 passed；`-k 'calendar_change'`（ny17→utc0 → 暂停且原因写明 utc0/ny17、运行仍 succeeded、汇总消息 paused/rules 计数为 1）1 passed；`-k 'relocation_never'`（切换前最后一根在阈下、切换后第一根在阈上也不产生伪穿越，随后真实穿越只发一次）1 passed；`-k 'relocatable_requires or cannot_serve'`（判据单测 + 暂停后运行仍 succeeded 且计数正确）2 passed。
   - 验收要求的五套件合并运行（`test_switch_activation.py test_switch_source.py test_composite_revisions.py test_composite_alerts.py test_composite_aggregates.py`）→ **46 passed**；其中 `test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity` 单独运行 **1 passed**（文件未改动）。
   - 既有隐式指针不变量 `test_composite_alerts.py -k 'never_retargets_running_rule or fixed_binding'` → **2 passed**。
-  - 与相邻回归 `test_composite_revisions.py test_composite_alerts.py test_composite_aggregates.py test_switch_runs.py test_composite_api.py test_market_usage.py` 合并运行 → **66 passed, 1 failed**；唯一失败是 `test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity`，即第 8 节记录的既有断言冲突（该文件不在本切片 Boundary，未改动）。
+  - 相邻回归（含 `test_market_usage.py`）全部通过；`test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity` 仍原样通过（见第 8.4 条对 held 分支的收窄）。
 - 真实 PostgreSQL（本机 Docker，容器 `mw-tc-activation`，镜像 `postgres:14-bookworm`，端口 `15611`，每个测试独立 schema，跑完 `docker rm -f` 清理）：
-  - `TEST_POSTGRES_URL=postgresql+psycopg://activation:activation@127.0.0.1:15611/activation PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_switch_activation_postgres.py -q` → **11 passed**：10 条把 SQLite 合同整体搬到 PG（一致激活与重绑、历史版本前移重绑、日历变化暂停、回滚、去重消息、fencing、来源拒绝、不可重定位暂停、切换前穿越不回放），另 1 条为并发激活 + 迟到写入 —— 4 线程并发激活同一候选修订只产生 1 条 `CompositeActivation`、1 条 `MarketSwitchRun`、0 条通知；切换后旧修订的迟到 `apply_minutes` 与迟到聚合 `commit` 均被拒绝，聚合柱数量不变。
+  - `TEST_POSTGRES_URL=... CHART_ALERT_TEST_DATABASE_URL=... PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_switch_activation_postgres.py backend/tests/test_composite_alerts_postgres.py backend/tests/test_composite_revisions_postgres.py -q` → **41 passed**（本切片 PG 15 条合同 = 14 条 SQLite 合同搬 PG + 并发激活/迟到写入；其余为 composite 告警与修订的既有 PG 门控）。其中 `switch_notice` 的 `rowcount` 不可靠问题正是这轮 PG 实测发现的 —— 4 线程并发激活同一候选修订只产生 1 条 `CompositeActivation`、1 条 `MarketSwitchRun`、0 条通知；切换后旧修订的迟到 `apply_minutes` 与迟到聚合 `commit` 均被拒绝，聚合柱数量不变。
   - 同一次 PG 运行中 `test_composite_revisions_postgres.py` 一并通过（7 passed），确认既有"同请求重试幂等 / 并发激活单条"语义未回退。
 - 全量 backend 套件（不带 `TEST_POSTGRES_URL`）：**2496 passed, 10 failed, 746 skipped, 105 errors**。失败与本切片无关，均为既有噪声：
   - 105 errors 及 MCP 相关失败：共享 venv 缺少 `mcp` 模块、PG fixture 无连接串；

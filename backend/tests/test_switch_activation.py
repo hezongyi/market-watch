@@ -20,6 +20,7 @@ from alerts.storage import (
     CompositePreparation,
     CompositeRevision,
     HistoryVersion,
+    Instrument,
     MarketComposite,
     MarketDataset,
     MarketSwitchRun,
@@ -517,3 +518,141 @@ def test_calendar_change_pauses_the_running_rule(database, monkeypatch):
         assert (payload["state"], payload["counts"]["paused"], payload["counts"]["rules"]) == (
             "succeeded", 1, 1)
         assert "日历" in payload["errors"][0]["reason"]
+
+
+def standby_mapping(database, old, *, name="standby"):
+    """A second reviewed live mapping: same identity, independent target rows."""
+    mapping_id = ("RM:" + name).ljust(64, "0")
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, old)
+        history = db.get(HistoryVersion, revision.history_version_id)
+        source = db.get(RealtimeMapping, revision.mapping_id)
+        original = db.get(MarketDataset, source.target_dataset_id)
+        instrument = db.get(Instrument, original.instrument_id)
+        db.add(Instrument(id="V:" + name, label=instrument.label, source=instrument.source,
+            symbol=instrument.symbol, basis=instrument.basis, calendar=instrument.calendar,
+            calendar_profile=instrument.calendar_profile, precision=instrument.precision))
+        db.add(MarketDataset(id="MD:" + name, instrument_id="V:" + name,
+            logical_symbol=original.logical_symbol, identity=dict(original.identity),
+            volume_kind=original.volume_kind, volume_unit=original.volume_unit))
+        db.add(RealtimeMapping(id=mapping_id, dataset_id=history.dataset_id,
+            target_dataset_id="MD:" + name, permission_scope="workspace:default",
+            match=dict(source.match)))
+    return mapping_id
+
+
+def test_shadow_verdict_pauses_rules_the_candidate_cannot_move(database, monkeypatch):
+    from alerts import baseline_shadow
+    from alerts import switch_runs as runs
+
+    composite, old, ident, _ = candidate(database, monkeypatch)
+    monkeypatch.setattr("alerts.composite_alerts.require_live_eligibility",
+                        lambda *args, **kwargs: None)
+    with database.begin() as db:
+        blocked = create_alert(db, "shadow-blocked", config(composite), at=STAMP).id
+        movable = create_alert(db, "shadow-movable", config(composite), at=STAMP).id
+    with database.begin() as db:
+        run = runs.start(baseline_shadow.KIND, composite_id=composite,
+                         previous_revision_id=old, scheduled_for=STAMP)
+        runs.record_target(run["id"], ident, previous_revision_id=old)
+        runs.record_shadow(run["id"], {"schema": baseline_shadow.SCHEMA, "paused_rules": [
+            {"alert_id": blocked, "will_pause": True, "alert_version": 1,
+             "reasons": [{"code": "geometry_not_relocatable",
+                          "detail": "候选聚合日历与规则绑定的修订不同，已有时点无法按原几何重定位"}]},
+            {"alert_id": movable, "will_pause": False, "reasons": []}]})
+    monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: STAMP)
+    with database.begin() as db:
+        activation = activate(db, composite, ident,
+                              {"request_id": "shadow", "expected_revision_id": old})
+        assert [item["id"] for item in activation.evidence["switch"]["alerts"]["paused"]] == [blocked]
+        assert [item["id"] for item in activation.evidence["switch"]["alerts"]["rebound"]] == [movable]
+    with database() as db:
+        paused = db.get(ChartAlert, blocked)
+        assert (paused.status, paused.version) == ("paused", 1)
+        assert "无法按原几何重定位" in paused.health_reason
+        assert (db.get(ChartAlert, movable).status, db.get(ChartAlert, movable).version) == (
+            "active", 2)
+        payload = db.scalar(select(Notification)).payload
+        assert (payload["counts"]["paused"], payload["counts"]["rules"]) == (1, 2)
+        assert payload["errors"][0]["type"] == "rule_paused_by_shadow"
+
+
+def test_merged_new_error_requeues_the_same_outbox_row(database):
+    from alerts import switch_notice
+    from alerts import switch_runs as runs
+
+    with database.begin() as db:
+        run = runs.start("switch_notice_test", composite_id="c1", scheduled_for=STAMP)
+    def report(stage, reason):
+        with database.begin() as db:
+            return switch_notice.record(db, run=runs.get(run["id"]), stage=stage,
+                reasons=[{"stage": stage, "scope": "switch", "type": "ValueError",
+                          "reason": reason}],
+                counts={"sources": 1, "rules": 0, "paused": 0}, now=STAMP)
+    first = report("fence", "旧修订冻结失败")
+    assert (first["created"], first["requeued"], first["outbox_rows"]) == (True, False, 1)
+    with database.begin() as db:
+        row = db.scalar(select(Outbox))
+        row.status, row.attempts, row.next_at = "accepted", 1, STAMP - 60000
+    repeated = report("fence", "旧修订冻结失败")
+    assert (repeated["new_errors"], repeated["requeued"]) == (0, False)
+    with database() as db:
+        row = db.scalar(select(Outbox))
+        assert (row.status, row.attempts, row.next_at) == ("accepted", 1, STAMP - 60000)
+        note = db.scalar(select(Notification))
+        assert [item["seen"] for item in note.payload["errors"]] == [2]
+    merged = report("metrics", "指标水位不一致")
+    assert (merged["new_errors"], merged["requeued"], merged["outbox_rows"]) == (1, True, 1)
+    with database() as db:
+        row = db.scalar(select(Outbox))
+        assert (row.status, row.attempts, row.next_at, row.lease_until) == (
+            "pending", 1, STAMP, None)
+        assert db.scalar(select(func.count()).select_from(Outbox)) == 1
+        assert db.scalar(select(func.count()).select_from(Notification)) == 1
+        assert len(db.scalar(select(Notification)).payload["errors"]) == 2
+    queued = report("alerts", "规则不可迁移")
+    assert (queued["new_errors"], queued["requeued"]) == (1, False)  # already pending
+    with database() as db:
+        row = db.scalar(select(Outbox))
+        assert (row.attempts, row.next_at) == (1, STAMP)
+        assert db.scalar(select(func.count()).select_from(Outbox)) == 1
+
+
+def test_held_pause_on_a_running_revision_keeps_its_target(database, monkeypatch):
+    from alerts.market_usage import composite_targets
+
+    composite, old, ident, _ = candidate(database, monkeypatch)
+    with database.begin() as db:
+        rule = create_alert(db, "held-live-rule", config(composite), at=STAMP).id
+        alert = db.get(ChartAlert, rule)
+        alert.status, alert.runtime = "paused", {"demand_hold": "stale_input"}
+        target = db.get(RealtimeMapping, db.get(CompositeRevision, old).mapping_id).target_dataset_id
+        internal = db.get(MarketComposite, composite).instrument_id
+        assert composite_targets(db, {internal}) == {target}
+
+
+def test_frozen_held_pause_drops_its_own_target_after_a_source_switch(database, monkeypatch):
+    from alerts.market_usage import composite_targets
+
+    composite, old, body = contracts.request(database, monkeypatch)
+    mapping = standby_mapping(database, old)
+    with database.begin() as db:
+        ident = create(db, composite, {**body, "request_id": "held-switch",
+                                       "mapping_id": mapping}).id
+    contracts.prepared(database, ident)
+    frozen_rule, live_rule = rules(database, monkeypatch, composite, old, ident)
+    monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: STAMP)
+    with database.begin() as db:
+        activate(db, composite, ident, {"request_id": "held", "expected_revision_id": old})
+    with database.begin() as db:
+        for rule in (frozen_rule, live_rule):
+            alert = db.get(ChartAlert, rule)
+            alert.status, alert.control_revision = "paused", alert.control_revision + 1
+            alert.runtime = {**alert.runtime, "demand_hold": "stale_input"}
+        internal = db.get(MarketComposite, composite).instrument_id
+        old_target = db.get(RealtimeMapping, db.get(CompositeRevision, old).mapping_id).target_dataset_id
+        live_target = db.get(RealtimeMapping, mapping).target_dataset_id
+        assert old_target != live_target
+        # The frozen revision ends its own demand; the paused rule on the running
+        # revision still contributes exactly its own target.
+        assert composite_targets(db, {internal}) == {live_target}

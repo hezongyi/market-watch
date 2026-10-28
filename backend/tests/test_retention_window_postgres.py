@@ -22,6 +22,7 @@ pytestmark = pytest.mark.skipif(
     contracts.contract_dry_run_reports_and_deletes_nothing,
     contracts.contract_foreign_key_order_and_idempotent_rerun,
     contracts.contract_interrupted_pass_resumes,
+    contracts.contract_kill_between_commit_and_release_keeps_counts,
     contracts.contract_active_alert_blocks_the_batch,
     contracts.contract_mixed_batch_deletes_only_unprotected,
     contracts.contract_restore_gate_blocks_real_deletion,

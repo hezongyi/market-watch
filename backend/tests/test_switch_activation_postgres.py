@@ -25,6 +25,11 @@ pytestmark = pytest.mark.skipif(
     not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated Ubuntu PostgreSQL")
 
 
+def notice_contract(database, monkeypatch):
+    """The notice contract owns no fixture state, only the database."""
+    contracts.test_merged_new_error_requeues_the_same_outbox_row(database)
+
+
 @pytest.mark.parametrize("contract", [
     contracts.test_activation_binds_one_state_and_freezes_the_previous,
     contracts.test_partial_failure_rolls_back_and_never_unlocks,
@@ -36,6 +41,10 @@ pytestmark = pytest.mark.skipif(
     contracts.test_relocation_never_replays_a_pre_switch_crossing,
     contracts.test_forward_history_version_rebinds_without_pausing,
     contracts.test_calendar_change_pauses_the_running_rule,
+    contracts.test_shadow_verdict_pauses_rules_the_candidate_cannot_move,
+    notice_contract,
+    contracts.test_held_pause_on_a_running_revision_keeps_its_target,
+    contracts.test_frozen_held_pause_drops_its_own_target_after_a_source_switch,
 ])
 def test_activation_contract(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)
