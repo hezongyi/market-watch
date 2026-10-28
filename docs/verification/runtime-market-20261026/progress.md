@@ -136,3 +136,6 @@ docker compose --env-file /home/quant/.local/share/market-watch-runtime-20261026
 本次服务拓扑已落实到正式 Compose：移除 `chart-alert-runtime` 独立服务和 `independent-alert` profile，market-runtime 默认装配 ChartAlert；独立 alert profile/Compose fixture 仅保留在阶段验收工具中，不属于正式五服务部署。
 
 五服务真实网络功能验收：新建隔离 project `mw-runtime-stage2-five-stream-20261028`，显式启用 market 内嵌告警，未启动独立 alert 容器；API 停止后通过 synthetic OANDA stream fixture 输入 crossing，7/7 规则均产生唯一预期 signal，检查耗时57.02秒，角色心跳/owner及规则状态均 ready。首次就绪轮因启动竞态先连接 supplier 失败并令 seed 输入过期，证据保留为 `five-service-network-ready-failure-20261028.json`；执行合同要求的显式 restart 后规则恢复 ready，再完成 crossing。本项不作为时延SLO或生产供源验收。数据见 `stage-2-network-acceptance.md` 和 `results/five-service-network-*-20261028.json`。运行容器已停止，独立 PG 容器保留且健康，未删除 volume。
+
+
+2026-10-28 PR #113 review 修复：已修正按组维护漏抑制 boot_loop、五分钟第 3 次启动阈值、topup 内部网络及 catalog 直连、发布 `.env` 操作说明；撤回旧 A11 不同 task 的接管结论并补同一 task 的真实到期接管。主机 39 passed / 43 subtests，容器内含 5 个真实 PG 合同的回归 36 passed、无 skip。新项目 `mw-stage5-review-20261028` 的同任务 attempts 1→2、原租约到期前不重领、新 boot 接管并由本地 stub 接受；网络 Internal=true，catalog fixture 命中 1 次。全部任务容器已停止，卷和证据保留。证据见 `stage-5-review-fixes.md`；A09 信号级仍部分覆盖，A08 仍为既决非阻塞偏差，轨道 C 独立交付，不把本轮 review 修复当作整个阶段 5 全矩阵通过。

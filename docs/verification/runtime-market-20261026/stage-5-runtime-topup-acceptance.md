@@ -1,6 +1,8 @@
 # 阶段 5：运行组联合验收补证（A06 / A09 / A10 / A11 / A12）
 
-日期：2026-10-28。范围：只补 `acceptance-matrix-index.md` 中 A06、A09、A10、A11、A12 五项仍缺的**容器级**子项，不重跑整套语义回归，不新增产品功能、不修改 `backend/`。
+日期：2026-10-28。**Review 更正**：原批次网络实际为可出网的默认 bridge，catalog 直连未被 fixture 覆盖，撤回原“禁止供应商出网/零真实供源请求”断言；A11 原两次 claim 是不同任务，不能证明同任务租约接管。修复与替代证据见 `stage-5-review-fixes.md`。以下保留旧批次观测，不把新配置倒推为旧环境。
+
+范围：只补 `acceptance-matrix-index.md` 中 A06、A09、A10、A11、A12 五项仍缺的**容器级**子项，不重跑整套语义回归，不新增产品功能、不修改 `backend/`。
 
 ## 实际运行环境
 
@@ -18,7 +20,7 @@
   - 应用/夹具：`sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743`（`market-watch-api:v1.29.1-rc.2` 已有发布镜像，仅作依赖层；候选代码来自只读快照挂载）。
   - PostgreSQL 14.24：`postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`，容器实际镜像 `sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`。
 - 资源上限：应用服务合计 1.45 CPU / 1536 MiB（market-runtime 0.40/512m、data-worker 0.45/448m、notification-worker 0.30/320m、api 0.30/256m）；PostgreSQL 0.50 CPU / 1024 MiB；fixture-supplier 0.10/128m；一次性 seed 1.0/768m；日志 10m × 3 轮转。
-- 供源与通知边界：`ALERTS_YAHOO_ENABLED=false`、`ALERTS_AKSHARE_ENABLED=false`、`ALERTS_FXCM_ENABLED=false`、`ALERTS_DELIVERY_ENABLED=false`、未设 `ALERTS_NTFY_TOPIC`。OANDA/Binance HTTP 目的地被改写为本项目内 `fixture-supplier`；Dukascopy 目的地被改写为永不响应的本地 stub（注入的慢来源）。无生产凭据、无真实 ntfy、无真实供应商。
+- 供源与通知边界：`ALERTS_YAHOO_ENABLED=false`、`ALERTS_AKSHARE_ENABLED=false`、`ALERTS_FXCM_ENABLED=false`、`ALERTS_DELIVERY_ENABLED=false`、未设 `ALERTS_NTFY_TOPIC`。OANDA/Binance HTTP 目的地被改写为本项目内 `fixture-supplier`；Dukascopy 目的地被改写为永不响应的本地 stub（注入的慢来源）。无生产凭据、无真实 ntfy；原批次未禁止出网，catalog 可能直连真实供应商，不能证明零真实供应商请求。
 
 ### 启动 / 停止命令原文
 
@@ -251,9 +253,9 @@ a11-notifications applied 38 confirmed_end 168240000 signals 0 notifications 96 
 - 三个运行组各自 `SIGTERM`（`stop -t 30`）均正常退出：exit 0、`OOMKilled=false`，均在宽限期内停止。
 - 各自重启后 boot 身份全部更替（market `9a20899a`→`128b6053`、data `9d32d552`→`4aa8342b`、notifications `398ca508`→`dba35cd3`），重启只替换本组，其他组 boot 不变。
 - 检查点与确认水位保留并继续推进：组合聚合 `applied_input_revision` 36→36→37→38，行情 `confirmed_end` 168120000→168180000→168240000；通知/Outbox 计数一直保持一对一（87→90→93→96 两边同增）。
-- 租约/确认水位：停止前真实领取到的 Outbox 任务（attempts 9）在重启后由同一个投递循环继续按 `next_at`/`lease_until` 接管（重启后再次领取成功，attempts 继续递增）；没有出现重复发布者（advisory lock 保证单实例）或重复逻辑事件（`notifications`/`outbox` 一一对应，未见新建重复行）。
+- **撤回原租约接管结论**：以上两次领取的 task ID 不同、attempts 为 9 与 4，只能证明仍能领取任务，不能证明同一在途任务的租约接管。`notifications`/`outbox` 一一对应也不能单独证明无重复逻辑事件；同任务到期接管的替代证据见 `stage-5-review-fixes.md`。
 - **限制**：本次没有运行中的 crossing 信号，因此"在途任务"只能以聚合水位、`confirmed_end`、Outbox 租约/尝试次数为证；"重启前后 signal ID 集合完全相同"在本夹具中退化为"signals 恒为 0"，不构成该子项的加强证据（该点由阶段 2 `five_recovery28a` 的容器级记录覆盖）。
-- **本项缺口是否关闭：关闭**（三组各一次容器级 SIGTERM/恢复核对，并复用阶段 2 的 signal ID 不变证据）。
+- 三组 SIGTERM/恢复与水位证据保留，复用阶段 2 的 signal ID 不变证据；原批次的同任务接管子项未证明，须同时引用 `stage-5-review-fixes.md` 的新证据，不能仅凭本节签收 A11。
 
 ## A12 循环失败与健康
 
@@ -316,7 +318,7 @@ fault container exit=1
 2. **报价流在夹具重建后未重新建立**：取证中重建 `fixture-supplier` 后，market-runtime 的 OANDA 报价流反复 `ConnectError` 并在之后不再写入报价样本（`market_live_states.received_at` 停滞，而 REST M1 确认仍写入 `confirmed_end`）。因此本夹具**没有跑出 crossing → signal**（7 条组合规则长期 `blocked`，原因"组合实时输入已过期"）。A09/A11 的"判定循环继续推进"以组合聚合 `applied_input_revision`、存活告警判定序列（A06 窗口 166620000→166740000）、角色心跳为证；**信号级判定不在本次签收范围**。未判定这是产品缺陷：仅替换 HTTP 目的地的夹具在容器重建后未重连，需要单独复现才能定性，本记录按"夹具限制"保留，不做修补。
 3. **已知缺陷 B**：`notification_runtime` 活动故障分支对 `Preference.value` 原地赋值，`runtime_incident:<group>:<role>` 的 `last_notified_at`/`observed_at` 冻结，导致同一活动故障的 system 提醒按健康检查周期重复推送。本记录中 system 通知数量（71 条）明显受此影响；A10/A12 的结论不依赖推送次数，A10 的"通知只推一次"不作为通过项。
 4. **通知通道**：全程 `ALERTS_DELIVERY_ENABLED=false`、无 `ALERTS_NTFY_TOPIC`，投递目的地是永不回应的本地 stub；`DeliveryAttempt` 只有 `failed_or_unknown`，**没有任何 `server accepted`**，更不代表手机送达（A17a/A17b 不在本记录范围）。
-5. **真实供应商**：未访问真实 OANDA/Binance/Dukascopy，无供应商 SLA、无真实网络断线恢复、无生产凭据；`chart_history` 角色在本夹具因平台目录请求被阻断长期 `degraded`（`catalog:HTTPStatusError`），属夹具已知状态，非本次结论依据。
+5. **真实供应商**：无生产凭据、无供应商 SLA 或真实网络断线恢复验收。原批次 catalog 请求绕过 fixture，默认网络可出网，不能断言未访问真实 OANDA；`catalog:HTTPStatusError` 不是禁止出网证明。其他主行情路径使用合成供源；修复后内部网络与 catalog 的新证据见 `stage-5-review-fixes.md`。
 6. **资源与并发**：本实例常驻应用服务合计 1.45 CPU / 1536 MiB、PG 0.50 / 1024 MiB；取证期间宿主另有他人的 `mw-runtime-stage5-a17a-20261028` project 在运行，未对其进行任何操作。
 7. 早期 A10 夹具缺陷（测试消息缺少 `test_notification:<id>` 持久身份，导致 claim 直接 `cancelled`）已在本次夹具修正；相应早期快照保留为过程记录，不用作结论。
 

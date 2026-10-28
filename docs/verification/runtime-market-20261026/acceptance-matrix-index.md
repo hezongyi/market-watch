@@ -38,20 +38,20 @@
 | A08 历史/指标积压及候选重建 | 偏差 | `baseline.md`（四场同预算可比负载 + candidate aggressive control 证明争用与事件正确性风险）；`performance-followup-20261028.md`（内嵌忙载 ATR 可见→判定 p95 1.197 s；六 owner Compose p95 1.163 s，n=40，目标约 1 s） | 门槛未达成，按 2026-10-28 决定保留为**非阻塞验收偏差**；关闭动作：按 `performance-followup` 的分段口径在最终源码同预算复测，结果作为偏差更新，不放宽门槛 |
 | A09 慢来源 | 部分 | stage-5-runtime-topup-acceptance.md（注入源 error=ReadTimeout、其他源与聚合继续、容器不退出；error/等待/休市三态同快照可区分，休市用真实墙钟 closed/周末 verified） | 该夹具未产出 crossing→signal，信号级判定仍未签收；需一次能触发信号的慢源注入才能关闭 |
 | A10 慢通知 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（投递目的地改永不响应 stub：投递阻塞期间投影/保留 checked_at 持续推进 28 采样；停 API+data-worker+打包后仅通知组仍领取既有 Outbox，attempts 0→1；notifications 与 outbox 严格 1:1）。artifact：projection-watch.json、snapshot-a10-*.json | 关闭 |
-| A11 后台组分别重启 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（三组各自 stop -t 30 全部 exit 0 / OOMKilled=false；boot 各自更替且其他组 boot 不变；applied 36→37→38、confirmed_end 推进、通知与 Outbox 一对一增长；租约停止后再领取成功）。artifact：snapshot-a11-*.json | 关闭；signal ID 集合不变仍引用阶段 2 five_recovery28a |
+| A11 后台组分别重启 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（三组各自 stop -t 30 全部 exit 0 / OOMKilled=false；boot 各自更替且其他组 boot 不变；applied 36→37→38、confirmed_end 推进、通知与 Outbox 一对一增长；三组恢复）。同任务租约接管改引 `stage-5-review-fixes.md`（原租约到期前 38 个采样 attempts=1，新 boot 到期后同 task attempts=2、accepted、仅一行 Outbox）。artifact：snapshot-a11-*.json、results/stage-5-review-fixes-20261028.json | 关闭；signal ID 集合不变仍引用阶段 2 five_recovery28a |
 | A12 循环失败与健康 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（7 规则全 paused 时 chart_alert 仍 idle、无假故障；旧 boot 迟到写入被围栏拒绝——fence-old.json 显示 stored_boot 已为新 boot、state idle、same_boot false；新实例 16 采样全 idle；关键循环抛错 → 真实 exit 1 且记录组失败） | 关闭 |
 | A13a 30 天下界与引用保护 | 未覆盖 | 仅有设计：`data-retention-inventory.md`（UTC 30×24 h、未满窗不删、有效引用与 Dukascopy 不删、清理顺序与外键约束） | 轨道 C 实现 + dry-run 证据；阶段 5 不实施删除 |
 | A13b 切换解锁与 dry-run | 未覆盖 | 同上；现有 `history_retention` 不等于切换成功解锁的清理 | 轨道 C |
 | A13c 首次清理与恢复 | 未覆盖 | 同上；首次真删前的适用备份**实际恢复**门槛未执行 | 轨道 C；需用户安排恢复演练窗口 |
 | A14 入口、能力与运维配置 | 通过（合同级） | `stage-1-realtime-switch.md`（逐品种实时开关、composite-only 可执行资格、能力发现）；`stage-3a-data-acceptance.md`（默认/生产模板含 data-worker、Compose 合同 5 passed / 29 subtests）；`stage-4-preflight-acceptance.md`（生产模板全部后端 `ALERTS_YAHOO_ENABLED=true`） | 日志轮转、pool/线程预算等运维项未在容器内逐项核对；正式切换清单核对 Setting 后关闭 |
 | A15 配置切换与回退 | 通过（隔离实例） | `stage-4-preflight-acceptance.md`：preflight 合同 5 passed；fixture 冲突返回 1 并点名 `notify-worker`，停止后返回 0；真实 preflight 对 `mw-single-frontend-20261026` 返回 1 并列出 `api`、`notification-projector`；隔离 old→new→old 演练与候选恢复 | 旧镜像无法解析 `az53`，回退必须绕过旧迁移（见 `switch-rollback-runbook.md`）；旧业务写路径未全覆盖 |
-| A16 运行故障主动提醒 | 通过（隔离实例） | 代码与合同：42a1eb82、e67b556f（应用级与真实 PG 套件）。真实通道：stage-5-a17a-channel-acceptance.md 第 8 节——同一活动故障 T0=166401062 → T0+901938 ms=167303000 仅两条提醒、零中间重推；last_notified_at 三次推进（166401046 → 167302980 → 168205820）不再冻结；healthy 663 s 内 system 通知新增 0 | 关闭 |
+| A16 运行故障主动提醒 | 通过（隔离实例） | 代码与合同：42a1eb82、e67b556f；review 修复 a49bce8a（第 3 次启动触发、按组维护抑制 boot_loop、不假恢复，真实 PG 5 合同均通过，见 `stage-5-review-fixes.md`）。真实通道：stage-5-a17a-channel-acceptance.md 第 8 节——同一活动故障 T0=166401062 → T0+901938 ms=167303000 仅两条提醒、零中间重推；last_notified_at 三次推进（166401046 → 167302980 → 168205820）不再冻结；healthy 663 s 内 system 通知新增 0 | 关闭 |
 | A17a ntfy 服务端持久链路 | 通过（隔离实例，真实 ntfy.sh） | stage-5-a17a-channel-acceptance.md 第 8 节：6 条消息全部服务端接受（测试 G3nsoYqJvcS1、信号 PO9zmT4tPqSD、故障 zk1xGctTf73x、提醒 31fVwXbjo8qy、恢复 W7MzTlpGGxZA、下轮提醒 qCfIPoubT1R7）；库内 delivery_attempts accepted=6、outbox accepted=1/cancelled=5（调度方独立复读） | 关闭；手机侧点击/确认单列 A17b |
 | A17b 手机端独立签收 | 通过（单设备手机签收） | 用户于 2026-10-28 在手机上实测：收到通知、点开（click 指向 LAN 地址 `http://192.168.7.232:18090`）、点「确认」；api 记录 5 次 `POST /api/notification-actions/<id>/ack 200` 且 `ack_at` 与消息一一对应（见 `stage-5-a17a-channel-acceptance.md` 第 9 节） | 已关闭；多设备、锁屏展示效果、到达率与时延不在本轮范围 |
 
 ## 阶段 5 剩余关闭清单
 
-阶段 5 的实现与联合验收切片已完成（A16、A17a 关闭；A06、A10—A12 容器级关闭），下列项按归属另行处理：
+本 PR 的实现及联合验收切片已交付（A16、A17a 关闭；A06、A10—A12 容器级关闭；review 修复见 `stage-5-review-fixes.md`）。**A09 信号级仍未签收，不能宣布阶段 5 核心矩阵全部通过**；下列项按归属处理：
 
 1. ~~A17b 点击/确认~~：已由用户在手机实测签收（收取 + 点击 + 确认），见上表。
 2. **A09 信号级**：慢源注入需同时产出 crossing→signal 才能签收；当前只有来源级降级证据。
