@@ -1,0 +1,151 @@
+# Stage-5 joint-acceptance top-up: container-level probes for A06/A09/A10/A11/A12.
+# Task-owned project only. Internal network, no host ports, no real provider or
+# notification destination: the supplier fixture substitutes HTTP destinations
+# and the delivery stub never answers. Application services are capped at
+# 1.45 CPU / 1536 MiB in total; PostgreSQL at 0.50 CPU / 1024 MiB.
+x-probe: &probe
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /candidate
+  volumes:
+    - ${MW_TOPUP_SNAPSHOT:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/snapshot}:/candidate:ro
+    - ${MW_TOPUP_HARNESS:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/harness}:/stage5:ro
+    - ${MW_TOPUP_ARTIFACTS:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/artifacts}:/artifacts
+  restart: 'no'
+  labels:
+    market-watch.task: runtime-market-stage5-topup-20261028
+    market-watch.project: mw-runtime-stage5-topup-20261028
+    market-watch.purpose: acceptance
+  environment: &probe-environment
+    PYTHONPATH: /candidate/backend:/candidate/backend/tests:/candidate/scripts
+    PYTHONDONTWRITEBYTECODE: '1'
+    ALERTS_DATABASE_URL: postgresql+psycopg://runtime_topup:topup_acceptance_only@postgres/runtime_profile
+    ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+    ALERTS_DATABASE_POOL_SIZE: '4'
+    ALERTS_DATABASE_MAX_OVERFLOW: '0'
+    ALERTS_DATABASE_JIT: 'off'
+    ALERTS_RUNTIME_DEPLOYMENT: stage5_topup
+    ALERTS_OANDA_ACCOUNT_ID: composite-test-account
+    ALERTS_OANDA_TOKEN: synthetic-no-upstream-access
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ''
+    ALERTS_OANDA_STREAM_ENABLED: 'true'
+    ALERTS_OANDA_RECOVERY_MINUTES: '120'
+    ALERTS_OANDA_CONFIRMATION_MARGIN_SECONDS: '10'
+    ALERTS_OANDA_ACQUISITION_MODE: stream
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
+    ALERTS_YAHOO_ENABLED: 'false'
+    ALERTS_AKSHARE_ENABLED: 'false'
+    ALERTS_FXCM_ENABLED: 'false'
+    ALERTS_DELIVERY_ENABLED: 'false'
+    ALERTS_HISTORY_HEALTH_WORKERS: '[]'
+    ALERTS_PROVIDER_SUBSCRIPTION_SECONDS: '30'
+    ALERTS_PROVIDER_ACTIVITY_SECONDS: '30'
+    MW_TOPUP_RUN: topup
+  entrypoint: [python, /stage5/stage5_topup_probe.py]
+  logging: &logging
+    driver: json-file
+    options: {max-size: 10m, max-file: '3'}
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: runtime_profile
+      POSTGRES_USER: runtime_topup
+      POSTGRES_PASSWORD: topup_acceptance_only
+      POSTGRES_INITDB_ARGS: '--data-checksums'
+    cpus: 0.5
+    mem_limit: 1024m
+    volumes: [runtime-topup-postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U runtime_topup -d runtime_profile && test \"$$(PGOPTIONS='-c jit=on' psql -U runtime_topup -d runtime_profile -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+    restart: unless-stopped
+    logging: *logging
+    labels:
+      market-watch.task: runtime-market-stage5-topup-20261028
+      market-watch.project: mw-runtime-stage5-topup-20261028
+      market-watch.purpose: acceptance
+  fixture-supplier:
+    <<: *probe
+    cpus: 0.1
+    mem_limit: 128m
+    command: [supplier]
+    depends_on:
+      postgres: {condition: service_healthy}
+  fixture-seed:
+    <<: *probe
+    cpus: 1
+    mem_limit: 768m
+    command: [seed]
+    depends_on:
+      postgres: {condition: service_healthy}
+  market-runtime:
+    <<: *probe
+    cpus: 0.4
+    mem_limit: 512m
+    command: [runtime, --profile, market]
+    stop_grace_period: 45s
+    environment:
+      <<: *probe-environment
+      ALERTS_DATABASE_POOL_SIZE: '6'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-topup-market
+    depends_on:
+      fixture-supplier: {condition: service_started}
+  data-worker:
+    <<: *probe
+    cpus: 0.45
+    mem_limit: 448m
+    command: [runtime, --profile, data]
+    stop_grace_period: 45s
+    environment:
+      <<: *probe-environment
+      ALERTS_DATABASE_POOL_SIZE: '10'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-topup-data
+    depends_on:
+      fixture-supplier: {condition: service_started}
+  notification-worker:
+    <<: *probe
+    cpus: 0.3
+    mem_limit: 320m
+    command: [runtime, --profile, notifications]
+    stop_grace_period: 45s
+    environment:
+      <<: *probe-environment
+      ALERTS_DATABASE_POOL_SIZE: '4'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-topup-notifications
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    <<: *probe
+    cpus: 0.3
+    mem_limit: 256m
+    command: [api]
+    stop_grace_period: 30s
+    environment:
+      <<: *probe-environment
+      ALERTS_COOKIE_SECURE: 'false'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-topup-api
+    depends_on:
+      postgres: {condition: service_healthy}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+      start_period: 20s
+  probe:
+    <<: *probe
+    profiles: [tools]
+    cpus: 1
+    mem_limit: 768m
+    command: [status]
+    depends_on:
+      postgres: {condition: service_healthy}
+volumes:
+  runtime-topup-postgres:
+    labels:
+      market-watch.task: runtime-market-stage5-topup-20261028
+      market-watch.project: mw-runtime-stage5-topup-20261028
+      market-watch.purpose: acceptance
