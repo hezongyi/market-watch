@@ -23,12 +23,24 @@ from .storage import (
 )
 
 
+def frozen(prep):
+    """A superseded revision keeps its waterline and accepts no new input."""
+    return bool(prep is not None and prep.state.get("revision_frozen"))
+
+
+def unfrozen():
+    """Live fan-out and aggregate claim skip frozen revisions; missing means live."""
+    return CompositePreparation.state["revision_frozen"].as_boolean().is_not(True)
+
+
 def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation"):
     if not recorded["minutes"]:
         return []
     query = select(CompositeRevision, MarketDataset).join(
         RealtimeMapping, CompositeRevision.mapping_id == RealtimeMapping.id).join(
-        MarketDataset, RealtimeMapping.target_dataset_id == MarketDataset.id)
+        MarketDataset, RealtimeMapping.target_dataset_id == MarketDataset.id).join(
+        CompositePreparation, CompositePreparation.revision_id == CompositeRevision.id).where(
+        unfrozen())
     if revision_id:
         query = query.where(CompositeRevision.id == revision_id)
     output = []
@@ -51,6 +63,8 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
             CompositePreparation.revision_id == revision.id).with_for_update())
         if not prep:
             raise ValueError("Composite preparation missing")
+        if frozen(prep):
+            continue  # The switched-away revision keeps its fixed waterline.
         current = {row.start: row for row in db.scalars(select(CompositeMinute).where(
             CompositeMinute.revision_id == revision.id,
             CompositeMinute.start >= selected[0]["start"],

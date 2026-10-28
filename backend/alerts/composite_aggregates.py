@@ -10,6 +10,7 @@ import copy
 from sqlalchemy import and_, func, select
 
 from .chart_data import FRAMES
+from .composite_inputs import frozen, unfrozen
 from .composite_series import period, read_window
 from .source_history_store import _insert
 from .storage import (
@@ -28,6 +29,10 @@ from .storage import (
 )
 
 MAX_BUCKETS = 128
+
+
+class Fenced(TimeoutError):
+    """A switched-away revision refuses late aggregates; nothing is written."""
 
 
 def request(db, revision_id):
@@ -60,8 +65,10 @@ def claim(revision_id=None, timeframe=None, *, runtime_only=False):
         eligible = runtime_revisions()
         # Backfill tasks for pre-upgrade composites without touching definitions
         # or creating chart/source demand. Each scan registers at most 20 revisions.
-        missing = select(CompositeRevision.id).where(~select(CompositeAggregateTask.revision_id).where(
-            CompositeAggregateTask.revision_id == CompositeRevision.id).exists())
+        missing = select(CompositeRevision.id).join(
+            CompositePreparation, CompositePreparation.revision_id == CompositeRevision.id).where(
+            unfrozen(), ~select(CompositeAggregateTask.revision_id).where(
+                CompositeAggregateTask.revision_id == CompositeRevision.id).exists())
         if runtime_only:
             missing = missing.where(CompositeRevision.id.in_(eligible))
         missing = missing.limit(20)
@@ -70,6 +77,7 @@ def claim(revision_id=None, timeframe=None, *, runtime_only=False):
         stamp = now_ms()
         query = select(CompositeAggregateTask).join(CompositePreparation,
             CompositeAggregateTask.revision_id == CompositePreparation.revision_id).where(
+                unfrozen(),
                 CompositeAggregateTask.applied_input_revision < CompositePreparation.input_revision,
                 CompositeAggregateTask.lease_until <= stamp, CompositeAggregateTask.next_at <= stamp)
         if revision_id:
@@ -120,6 +128,8 @@ def build(ownership):
 
 
 def _lock(db, ownership):
+    if frozen(db.get(CompositePreparation, ownership["revision_id"])):
+        raise Fenced("组合修订已冻结，迟到聚合提交被拒绝")
     task = db.scalar(select(CompositeAggregateTask).where(
         CompositeAggregateTask.revision_id == ownership["revision_id"],
         CompositeAggregateTask.timeframe == ownership["timeframe"]).with_for_update())

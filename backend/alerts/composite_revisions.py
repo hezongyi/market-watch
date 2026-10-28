@@ -56,6 +56,9 @@ class ActivationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     request_id: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9:_-]+$")
     expected_revision_id: str = Field(min_length=36, max_length=36)
+    # Optional scheduled switch run; without it activation owns one run per
+    # candidate revision, so a retry reuses the same run and the same message.
+    switch_run_id: str | None = Field(default=None, min_length=36, max_length=36)
 
 
 def owned(db, composite_id, *, lock=False):
@@ -278,17 +281,10 @@ def activate(db, composite_id, revision_id, body):
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     if db.get(MarketDataset, mapping.target_dataset_id).identity["account_scope"] != account_scope():
         raise ValueError("实时账户已改变，不能启用旧映射")
-    stamp = now_ms()
+    from .switch_activation import publish
 
-    activation = CompositeActivation(revision_id=revision.id, previous_revision_id=composite.active_revision_id,
-        request_id=body.request_id, input_revision=progress["input_revision"], event_boundary=stamp // 60000 * 60000,
-        at=stamp, evidence={"preparation": progress, "affected_rules": [
-            {"id": alert.id, "revision_id": saved.market_identity["composite_revision_id"],
-                "migration": "keeps_fixed_revision"} for saved, alert in affected_rules(db, composite.id)]})
-    db.add(activation)
-    composite.active_revision_id, revision.activated_at = revision.id, stamp
-    db.flush()
-    return activation
+    return publish(db, composite=composite, revision=revision, body=body, progress=progress,
+                   now=now_ms())
 
 
 def preparation_tick():
