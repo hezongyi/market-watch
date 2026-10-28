@@ -7,8 +7,8 @@ x-probe: &probe
   image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
   working_dir: /candidate
   volumes:
-    - ${MW_TOPUP_SNAPSHOT:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/snapshot}:/candidate:ro
-    - ${MW_TOPUP_HARNESS:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/harness}:/stage5:ro
+    - ${MW_TOPUP_SNAPSHOT_DIR:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/snapshot}:/candidate:ro
+    - ${MW_TOPUP_HARNESS_DIR:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/harness}:/stage5:ro
     - ${MW_TOPUP_ARTIFACTS:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/artifacts}:/artifacts
   restart: 'no'
   labels:
