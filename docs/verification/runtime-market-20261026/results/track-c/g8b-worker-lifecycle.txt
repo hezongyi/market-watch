@@ -1,0 +1,15 @@
+== HEAD 9c5a0801 rerun session ==
+head=9c5a08015b68868ab92c68bb5b15ae86eda16f67
+2026-10-28T18:00:26Z
+data-worker created=2026-10-28T14:59:46.00656418Z startedAt=2026-10-28T17:33:28.863083502Z restartCount=0 status=running
+api status=exited exit=0
+market-runtime status=exited exit=0
+postgres status=running health=healthy
+--- docker ps ---
+mw-track-c-20261028-data-worker-1 running Up 26 minutes
+mw-track-c-20261028-postgres-1 running Up 27 minutes (healthy)
+--- data-worker own log stream (first/last) ---
+2026-10-28T14:59:56.321688957Z 2026-10-28 14:59:56,321 INFO chart_aggregation_slice seconds=0.642
+2026-10-28T14:59:56.632965398Z 2026-10-28 14:59:56,632 INFO chart_aggregation_slice seconds=0.265
+2026-10-28T17:59:00.579825296Z 2026-10-28 17:59:00,579 WARNING oanda_rest_failed operation=candles phase=http_status route=upstream type=HTTPStatusError http_status=400 body_kind=json elapsed_ms=973
+2026-10-28T18:00:05.778443123Z 2026-10-28 18:00:05,775 WARNING oanda_rest_failed operation=candles phase=http_status route=upstream type=HTTPStatusError http_status=400 body_kind=json elapsed_ms=941

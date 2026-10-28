@@ -1,0 +1,91 @@
+{
+  "before": {
+    "market_source_minutes": 17197,
+    "market_source_minutes@old": 1083,
+    "market_source_minute_revisions": 17197,
+    "market_source_minute_revisions@old": 1083,
+    "market_composite_minutes": 55850,
+    "market_composite_minutes@old": 2081,
+    "market_composite_minute_inputs": 55850,
+    "market_composite_minute_inputs@old": 2081,
+    "market_composite_input_events": 85,
+    "lower_bound": 1790618403533
+  },
+  "after": {
+    "market_source_minutes": 17197,
+    "market_source_minutes@old": 1083,
+    "market_source_minute_revisions": 17197,
+    "market_source_minute_revisions@old": 1083,
+    "market_composite_minutes": 55850,
+    "market_composite_minutes@old": 2081,
+    "market_composite_minute_inputs": 55850,
+    "market_composite_minute_inputs@old": 2081,
+    "market_composite_input_events": 85,
+    "lower_bound": 1790618403681
+  },
+  "delta": {
+    "market_source_minutes": 0,
+    "market_source_minutes@old": 0,
+    "market_source_minute_revisions": 0,
+    "market_source_minute_revisions@old": 0,
+    "market_composite_minutes": 0,
+    "market_composite_minutes@old": 0,
+    "market_composite_minute_inputs": 0,
+    "market_composite_minute_inputs@old": 0,
+    "market_composite_input_events": 0
+  },
+  "report": {
+    "run": {
+      "id": "5cf1f9b2-b727-4862-b43e-08957d75b2b2",
+      "kind": "revision_activation",
+      "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+      "state": "partial",
+      "unlocked": false,
+      "finished_at": 1793210386729,
+      "batch": {}
+    },
+    "dry_run": false,
+    "window_hours": 720,
+    "lower_bound": 1790618403680,
+    "now": 1793210403680,
+    "deleted": {
+      "market_composite_minute_inputs": 0,
+      "market_composite_minutes": 0,
+      "market_composite_input_events": 0,
+      "market_source_minutes": 0,
+      "market_source_minute_revisions": 0
+    },
+    "rows": 0,
+    "bytes": 0,
+    "candidates": {
+      "source_minutes": 0,
+      "source_revisions": 0,
+      "composite_minutes": 0,
+      "composite_inputs": 0,
+      "composite_input_events": 0
+    },
+    "protected": {
+      "revisions": 0,
+      "by_reason": {},
+      "detail": [],
+      "detail_truncated": false
+    },
+    "remaining": null,
+    "batch": null,
+    "skipped": [
+      {
+        "reason": "switch_run_partial",
+        "detail": "只有持久化的 succeeded 切换运行解锁清理"
+      }
+    ],
+    "limit": 10,
+    "chunk": 1000,
+    "budget_ms": 20000
+  },
+  "inside_window": {
+    "source_minutes_inside_window": 16114,
+    "bars": 43769,
+    "history_chunks": 40,
+    "history_artifacts": 135
+  }
+}

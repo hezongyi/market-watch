@@ -1,0 +1,40 @@
+{
+  "head": "9c5a08015b68868ab92c68bb5b15ae86eda16f67",
+  "candidate": {
+    "run_id": "de89814c-9077-4966-9002-5b1524facd7b",
+    "revision": "2cfe56b8-6ffe-404e-9b25-13c2b62e861b"
+  },
+  "steps": [
+    {
+      "stage": "metrics",
+      "failure": {
+        "type": "ValueError",
+        "detail": "acceptance injected failure at metrics"
+      },
+      "run": {
+        "id": "5cf1f9b2-b727-4862-b43e-08957d75b2b2",
+        "state": "partial",
+        "phase": "metrics",
+        "attempts": 1,
+        "retention": {}
+      },
+      "outbox": {
+        "run_id": "5cf1f9b2-b727-4862-b43e-08957d75b2b2",
+        "notification_id": "7e88bb2e-1fae-5839-a768-0b27bc88ccf6",
+        "outbox_rows": 1,
+        "outbox_id": "e12eaf20-10de-53ef-afd7-a918680e81fa",
+        "status": "accepted",
+        "attempts": 0,
+        "errors": [
+          [
+            "metrics",
+            "ValueError",
+            2
+          ]
+        ],
+        "payload_attempts": 1,
+        "payload_state": "partial"
+      }
+    }
+  ]
+}

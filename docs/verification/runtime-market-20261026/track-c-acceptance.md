@@ -52,6 +52,19 @@ G0 资源与归属（`results/track-c/g0-resources.txt`）：本机无其它运�
 
 ## 3. 门槛结论
 
+**每条证据跑在哪个 HEAD 上（旧证据保留，未删除）**
+
+| 门槛 | 首轮 | 修复后复验 | 复核修复后重跑（本批） |
+|---|---|---|---|
+| G1 shadow | `5f8e2c54`（`g1-shadow.json`） | `0716c4fc`（`g1b-*`/`g1c-*`/`g1d-*`） | `9c5a0801`（`g1e-*`/`g1f-*`） |
+| G2 激活 | `5f8e2c54`（`g2-*`） | — | `9c5a0801`（`g2b-*`/`g2c-*`） |
+| G3 周日基线 | `5f8e2c54`（`g3-*`） | `0716c4fc`（`g3b-*`） | `9c5a0801`（`g3c-*`） |
+| G4 dry-run | `5f8e2c54`（`g4-dry-run.json`） | — | `9c5a0801`（`g4b-*`/`g4c-*`） |
+| G5 清理 | `5f8e2c54`（`g5-*`） | `0716c4fc`（`g5b-*`） | `9c5a0801`（`g5c-*`/`g5d-*`） |
+| G6 失败安全 | `5f8e2c54`（`g6-*`） | — | `9c5a0801`（`g6b-*`/`g6c-*`） |
+
+`9c5a0801` = `9c5a08015b68868ab92c68bb5b15ae86eda16f67`（`fix: close the review findings on activation, notice and cleanup`）。本批重跑都在**同一个既有隔离实例**（project `mw-track-c-20261028`、同一 DB/volume）上完成：`data-worker` 自 `17:33:28` 起一次性运行至收尾（`RestartCount=0`，见 `g8b-worker-lifecycle.txt`），`api` 全程 `exited 0`，`market-runtime` 保持 `exited` 未被触碰。
+
 ### G1 · A04a shadow —— 通过
 
 * artifact：`results/track-c/g1-shadow.json`
@@ -73,6 +86,11 @@ G0 资源与归属（`results/track-c/g0-resources.txt`）：本机无其它运�
 * 恢复：`restore-scope` 写回后复核 `chart_publications=(complete_count 1, revision 4, updated_at 1793201334643)`、`chart_alert_versions.effective_at=1793199960000`、`preferences` 无临时键残留；随后一次干净 shadow（run `f7fa959d-a160-437b-af0d-adf3d7cd6322`）重新 `shadow_ready` / `critical_unchanged=true`。
 * 报告内容：`bars`（9 个周期，history/target 段均 `compared`；M1 target 段 60 根全同、`changed=0`，history 段 `missing=60` 因为候选历史起点更晚）、`indicators`（无指标规则 → 空，两端 `has_value=false`）、`gaps`（`observed_minutes=4675`，`missing_minutes=[]`，`uncovered=[history]`）、`paused_rules`（1 条规则，`will_pause=false`）、`preparation`（`ready=true`，`input_revision=5`，`periods_ready=true`）。
 
+**HEAD `9c5a0801` 重跑（data-worker 不停）** —— artifact：`results/track-c/g1e-shadow-rerun.json`、`g1f-shadow-willpause.json`、`g8b-version7.json`、`g8b-version8late.json`
+
+* `g1e`：run `c561e8ad…` `shadow_ready`、`status=ready`、`critical_unchanged=true`，`bindings.scope` = 3 instrument / 2 `alert_ids`（新加了一条「计算起点晚于候选历史」规则）。行为与旧 HEAD 一致。
+* `g1f`：切换到带**更晚固定历史起点**的已发布版本（`a5785d7e…`，start=clock−30d）后重跑，run `0e0cf334…` 仍 `shadow_ready/ready`、`critical_unchanged=true`，且 `paused_rules` 现在给出真实判定：规则 `45bfd944…` `will_pause=false`；规则 `a77a804c…` `will_pause=true`，`reasons=[{code:"geometry_not_relocatable", detail:"候选固定历史起点晚于规则计算起点"}]`。该候选即 G2 重跑的输入。
+
 ### G2 · A04b 一致激活 —— 通过
 
 artifact：`results/track-c/g2-activation.json`、`g2-fencing.json`、`g2-pause.json`
@@ -84,6 +102,15 @@ artifact：`results/track-c/g2-activation.json`、`g2-fencing.json`、`g2-pause.
 5. 切换前数据不回放、无重复告警：激活前后 `judgments 7→7`、`notifications 4→4`、`outbox 3→3`；激活后第一次判定（G3 中）结果为 `initial_baseline`，没有把切换前的穿越重放成新事件。
 6. 成功后 `unlocked_runs` 出现该 run（`822ab313…`，`unlocked=true`）。
 7. 不可重定位（日历不同）分支（组合 B）：utc0 候选 `a0be0d03…`（`change_aggregation` 派生数据集 `f94f7045…`，版本 `2e28b0cf…`）激活 run `5024863b…` `succeeded/activated`，`active_revision_id` 切到候选；规则**未重绑**（仍是 `version 1`，绑旧修订 `05694f9d…`），状态 `paused/blocked`，`health_reason="组合修订切换后该规则暂不可迁移：目标修订服务日历 utc0，与规则绑定的 ny17 不兼容"`，并在同一次成功事务内写出 1 条汇总 system 消息（payload `topic=switch_run`, `run_id=5024863b…`, `stage=alerts`）。
+
+**HEAD `9c5a0801` 重跑（本批修复重点）** —— artifact：`results/track-c/g2b-activation-rerun.json`、`g2c-targets-*.json`、`g2c-report-stimulus.json`、`g2c-report-restored.json`、`g8b-pause-rule.json`、`g2d-calendar-pause-rerun.json`
+
+* 成功切换：run `8ad02acb-5850-4f79-a57c-947a83328da0` `state=succeeded`、`phase=activated`、`attempts=0`；`active_revision_id` 从 `4271c8d0…` 切到 `c8c7dd51…`；`event_boundary=1793209020000`、`input_revision=5`。
+* 可重定位规则重绑：`45bfd944…` `version 3→4`，新版本行绑到 `c8c7dd51…`，`evidence.alerts.rebound=[{id, revision_id, version:4, previous_revision_id:4271c8d0…}]`，`migration="relocated_to_activated_revision"`。
+* **被 shadow 标记 will_pause 的规则被暂停且原因来自 shadow**：`a77a804c…` `migration="paused_shadow_rule"`、`reason="候选固定历史起点晚于规则计算起点"`，规则 `status=paused`、`health=blocked`、`health_reason="组合修订切换后该规则暂不可迁移：候选固定历史起点晚于规则计算起点"`，版本仍为 1（未被挪到新修订）。这正是 `shadow_pauses()` 读取持久化 shadow 报告 `paused_rules` 后交给 `rebind_active(shadow=…)` 的结果（`relocatable()` 本身对该规则是放行的，说明 shadow 判定优先）。
+* 通知：该 run 仅 1 条 system 通知（`0c955380…`），error key = `alerts|a77a804c…|rule_paused_by_shadow`，`counts={sources:1, rules:2, paused:1}`，Outbox 1 行 `pending`。
+* **激活前的 shadow 判定门禁**（本批修复 2）：`activation-snapshot` 在构造刺激（把一份 `shadow_ready` run 的报告临时改成 `not_ready`，`g2c-report-stimulus.json`）前，该窗口的原因分类是 `window_superseded`；刺激后变成 **`shadow_not_ready`**（`g2c-targets-not-ready.json`），且该 target 的 `revision_activation` run 数仍为 **0**（未消耗唯一一次激活机会）；恢复报告后回到 `window_superseded`（`g2c-targets-after-restore.json`，`g2c-report-restored.json`）。
+* 日历不同的暂停分支：本批未改动 `relocatable()` 的日历比较，本 HEAD 上**未重跑**——组合 B 的 ny17 反向候选在本实例里无法完成准备（data-worker 的真实供应商历史循环持续抢走该 prep 行并写 `unavailable`，见 `g2d-calendar-pause-rerun.json` 与 `g8b-worker-lifecycle.txt` 里 data-worker 全程在跑）。旧证据 `g2-pause.json`（HEAD `5f8e2c54`，utc0 候选 → 规则 `paused`，原因「目标修订服务日历 utc0，与规则绑定的 ny17 不兼容」）保留未删；本 HEAD 的等效暂停语义由上面 `paused_shadow_rule` 走同一 `pause()` 落库路径。
 
 ### G3 · A05 周日基线不依赖 API —— 通过
 
@@ -100,6 +127,12 @@ artifact：`results/track-c/g3-feed.json`、`g3-shadow.json`、`g3-activate.json
 * 结果：run `b2ff067e-e032-4316-931c-b850e836e9cd` `shadow_ready`，`status=ready`、`ready=true`、`reasons=[]`、`critical_unchanged=true`；`bindings.scope` 同样只含 3 个本组合 instrument / 1 个 alert_id；候选 `e808c0a1…` 准备 `ready（input_revision=2，periods_ready=true）`。即 API 停机 + data-worker 正常发布并行时，周日候选仍能就绪。
 * 修复前的失败证据保留：`g3-shadow-first-attempt.txt`（`binding_changed`，`publications.rows=12`、`unchanged=false`，原因是 BTCUSDT 等无关品种的发布写）。
 
+**HEAD `9c5a0801` 重跑（api 仍停机、data-worker 不停）** —— artifact：`results/track-c/g3c-version9.json`、`g3c-shadow-apidown.json`、`g3c-activate-apidown.json`
+
+* `api` 在整个重跑前后都是 `exited 0`；`data-worker` 同一 `StartedAt=2026-10-28T17:33:28.863083502Z`、`RestartCount=0`。
+* shadow：run `a72ed23c…` `shadow_ready`、`ready=true`、`reasons=[]`、`critical_unchanged=true`（候选来自新发布版本 `a1c0e810…`）。
+* 激活：`activation_cycle` 选中该窗口并 `activated`，`active_revision_id` → `e3af4bf5…`；期间无 api。行为与旧 HEAD 一致。
+
 ### G4 · A13a/A13b dry-run —— 通过（零删除）
 
 artifact：`results/track-c/g4-dry-run.json`
@@ -109,6 +142,13 @@ artifact：`results/track-c/g4-dry-run.json`
 * 保护明细与跳过原因：`protected.revisions=1070`，`by_reason={active_composite_revision: 1022, alert_bound_revision: 1034}`，`detail` 前 50 条给出具体 `source_id/start/revision_id/reasons`（例：`reasons=["alert_bound_revision"]` 属于被暂停规则仍绑定的旧修订）。
 * 零删除：前后逐表行数差全为 0（`zero_deletion=true`），`skipped=[]`（该 run 已解锁、dry-run 批次可认领）。
 * 单列断言：`source_minutes_inside_window=13438`（未满 30 天数据）前后不变；`history_chunks=9`、`history_artifacts=54` 前后不变。
+
+**HEAD `9c5a0801` 重跑（dry-run 与 CLI 开关）** —— artifact：`results/track-c/g4b-dry-run.json`、`g4b-cli-default-dryrun.json`、`g4b-cli-dry-run-removed.txt`、`g4b-cli-status.json`、`g4c-cli-default-dryrun.json`
+
+* 脚本 dry-run（run `8ad02acb…`）：`dry_run=true`、`rows=2440`、`bytes=84612`、候选 `{source_minutes:1210, source_revisions:1210, composite_minutes:10, composite_inputs:10, events:0}`、保护 `1080`（`active_composite_revision`/`alert_bound_revision`）、逐表 delta 全 0（`zero_deletion=true`）、字段集与旧 HEAD 相同。
+* CLI 默认即 dry-run：`python -m alerts.cli retention` 不带任何开关输出 `dry_run=true` 的报告（`g4c-cli-default-dryrun.json`）。
+* `--dry-run` 已不存在：`python -m alerts.cli retention --dry-run` → `cli.py: error: unrecognized arguments: --dry-run`，退出码 **2**，usage 里只剩 `[--execute]`（`g4b-cli-dry-run-removed.txt`）。
+* `--execute` 才删除：见下面 G5 的 `--execute` 实际删除证据（`g5d-cli-execute-resume.json`，`dry_run=false`，删 192 行）。
 
 ### G5 · A13c 备份真实恢复 + 首次真实删除 + 幂等/续跑 —— 通过（恢复演练已改用产品入口重做）
 
@@ -130,6 +170,16 @@ artifact：`results/track-c/g4-dry-run.json`
 
 **对照：首轮的手工演练（历史记录，未删除）** — artifact：`g5-backup-counts.json`、`g5-restore-counts.json`、`g5-restore-verification.json`、`g5-marker.json`、`g5-drill-commands.sh`。首轮因为不知道/没使用产品备份入口（`deploy/Dockerfile.backup` + `ALERTS_POSTGRES_BIN_DIR`），改用 PostgreSQL 容器内的 `pg_dump/pg_restore` 手工完成：dump `/home/quant/tc-scratch/track-c.dump`（6 558 905 字节，`sha256=cce6bb5f…`）、临时库 `track_c_restore_1793200123`、103 表计数完全一致（`differences={}`）、标记经 `retention_window.save_restore_drill` 写入。结论与产品入口一致，但它绕过了产品入口，因此以 G5a 为准。
 
+**HEAD `9c5a0801` 重跑（块提交后立即被杀 + 续跑 + 幂等）** —— artifact：`results/track-c/g5c-victim-minutes.json`、`g5c-drop-orphans.json`、`g5d-counts-before.json`、`g5d-chunk-commit-then-die.json`、`g5d-counts-after-kill.json`、`g5d-status-after-kill.json`、`g5d-cli-execute-resume.json`、`g5d-counts-after-resume.json`、`g5d-idempotent-rerun.json`、`g5d-counts-after-idempotent.json`
+
+可删除数据的构造：清理只会删除「有组合行随它一起离开」的源分钟，因此先用 `victim-old-minutes` 建了一个**不受保护**的修订（request_id `acceptance-victim-revision-2`，seam=clock−34d，prep `queried`、9 个周期 `applied==input`），让 33 天前的旧分钟由它引用；原先只插入的 60 条「无引用」孤儿分钟用 `drop-orphans` 撤掉（`g5c-drop-orphans.json`，删 60 条）——它们在计划里是 `deletable` 但 `touched` 为空，`_delete` 不会删，反而会让 pass 在 `passed==0` 处停住（见 §6 新观察）。
+
+* 块提交后立即被杀：`chunk-commit-then-die --chunk 1500` 在**删除的同一个事务**里写 `retention.stats`，随后 `os._exit(0)`（不 release、不 claim）。删除 464 源分钟 + 464 源修订 + 464 组合分钟 + 464 组合输入 + 2 事件 = **rows 1858**；`durable_stats_after_commit` 已经是这 5 项完整计数，批次 `state=running`（从未 release）。
+* stats 与实际删除量相等：同一时刻库内 delta = `{source_minutes:464, source_minute_revisions:464, composite_minutes:464, composite_minute_inputs:464, composite_input_events:2}`，**与 stats 逐键相等**（旧 HEAD 上这一场景会少计，因为计数只在 release 时写）。
+* 续跑（`python -m alerts.cli retention --execute --run-id <run>`）：删除 46 源分钟 + 54 源修订 + 46 组合分钟 + 46 组合输入 = **rows 192**，其批次 `stats` 与该批实际 delta 逐键相等；两个批次合计 `1858 + 192 = 2050` = 整个序列的库内实际删除总量。
+* 同 run 再跑（脚本 `g5-execute`）：`rows=0`、逐表 delta 全 0（无重复计数、无跳删）。
+* 未满 30 天数据与历史表：本批未触发这两张断言的变化（`source_minutes` 总量只按删除量下降；清理报告的 `deleted` 仍只有 5 张活分钟表）。
+
 ### G6 · 失败安全 —— 通过
 
 artifact：`results/track-c/g6-shadow.json`、`g6-activate.json`
@@ -139,6 +189,15 @@ artifact：`results/track-c/g6-shadow.json`、`g6-activate.json`
 * 去重消息：按 run id 过滤 `notifications=1`（`ddd0d8f4…`, `attempts=2`, `state=partial`）、`outbox=1`（`518dfb3d…`），多次重试后仍各 1 条。
 * `unlocked_runs` 不含该 run（只含 3 个 succeeded 运行）。
 * retention 拒绝清理：`retention_window.dry_run(ae9720ac…)` → `skipped=[{reason:"switch_run_partial", detail:"只有持久化的 succeeded 切换运行解锁清理"}]`，`rows=0`。
+
+**HEAD `9c5a0801` 重跑（新错误键重排 Outbox）** —— artifact：`results/track-c/g6b-version10.json`、`g6b-shadow.json`、`g6b-shadow-ready.json`、`g6c-step1-metrics.json`、`g6c-deliver.json`、`g6c-step2-duplicate.json`、`g6c-outbox-after-duplicate.json`、`g6c-step3-new-error.json`、`g6c-outbox-final.json`、`g6c-retention-refusal.json`、`g6c-status-final.json`
+
+* 候选：新发布版本 `1db5ea30…` → shadow run `de89814c…` `shadow_ready/ready=true`。注意：版本刚发布时，data-worker 的发布循环会写本组合范围内的 `chart_publications`，此窗口内的 shadow 会按设计判 `binding_changed` 失败（`g6b-shadow.json` 记录了两次这样的失败），等发布沉降后再跑即通过（`g6b-shadow-ready.json`）。
+* 同一 run（`5cf1f9b2…`）三次失败：
+  1. stage `metrics` → run `partial/phase=metrics`；1 条 system 通知（`7e88bb2e…`）+ 1 行 Outbox（`e12eaf20…`）`status=pending`；`errors=[["metrics","ValueError",1]]`。
+  2. 模拟投递成功（本实例投递关闭，`deliver-outbox` 把该行置 `accepted`，`g6c-deliver.json`）后，重复同一错误 → run 仍 `partial`、`errors=[["metrics","ValueError",2]]`（seen+1）、`payload_attempts=1`，**Outbox 仍是 `accepted`（未重排）**。
+  3. 引入**新错误键**（stage `fence`）→ `errors=[["metrics","ValueError",2],["fence","ValueError",1]]`、`payload_attempts=2`，**同一行 Outbox 回到 `pending`（重排一次）**，`outbox_rows` 始终为 **1**，Notification 始终为 **1**。
+* `unlocked_runs` 不含该 `partial` run；`retention --execute --run-id 5cf1f9b2…` 被拒：`skipped=[{reason:"switch_run_partial", ...}]`、`rows=0`、`dry_run=false`。
 
 ## 4. 容器退出状态
 
@@ -159,6 +218,7 @@ artifact：`results/track-c/g6-shadow.json`、`g6-activate.json`
 * 保留：network `mw-track-c-20261028`、volume `mw-track-c-20261028-postgres`（544 MB）、volume `mw-track-c-20261028-artifacts`（13.7 MB，含两份产品路径 dump + manifest）、镜像 `sha256:995534fb…` 与 `sha256:a389ed49…`（共用依赖镜像，未删）。
 * 备份件保留在仓库外：`/home/quant/tc-scratch/track-c.dump`（首轮手工演练，6 558 905 B，sha256 `cce6bb5f…`）；产品路径的两份 dump 在任务命名卷 `mw-track-c-20261028-artifacts:/artifacts/backups`（`e1d55632…` 7 043 323 B、`26e07eb9…` 7 043 391 B），两者都未放入仓库。
 * `pg_dump/pg_restore` 的暂存目录 `/home/quant/tc-scratch/tc-backup-bin`（bin 2 个 + libs 4 个）保留，供重跑 G5a 使用。
+* `9c5a0801` 重跑会话（`17:33:28` 起 data-worker 一次性运行，`18:0x` 收尾）：同一 network/volume 复用，未新建实例；`stop -t 30` 后全部容器 `exited 0`（见 §4）。
 * 复验会话（HEAD `0716c4fc`）新增证据：`g1b-worker-baseline.txt`、`g1b-worker-lifecycle.txt`（data-worker `StartedAt`/`RestartCount`/日志连续性与 4 个检查点）、`g1c-out-of-scope-writes.txt`（scope 外 BTCUSDT 发布行快照）。
 * 起停命令：见 §1；G5a 与复验命令见 §7。
 
@@ -176,6 +236,9 @@ artifact：`results/track-c/g6-shadow.json`、`g6-activate.json`
 10. **gap 扫描的 `expected_minutes=0`**：种子目标品种没有 `calendar_profile`（未声明休市），`_closed()` 对每分钟都返回 false，所以"预期分钟"为 0、"缺失分钟"为空；这是数据形状的局限，不是判定被放宽。
 11. **批次 `completed` 不等于窗口清空**：执行批次在跳过全部受保护候选后以 `completed` 结束，同时 `remaining.source_minutes=1070`（B 侧受保护旧分钟）。若之后解除保护，需要新的 succeeded run 才能再清；这符合"只有 succeeded 运行解锁、且受保护修订永不删除"的设计，但值得在运维文档里写明。
 12. **未覆盖**：真实备用供应商与真实故障切换（Track C 明确不交付）；web 服务未启用；未做并发激活压测（只有 `test_switch_activation_postgres` 层面的 4 线程并发结论）；未对 SQLite 路径重复以上门槛。
+13. **清理只会删除「有组合行随它离开」的源分钟**（`_delete` 在 `touched` 为空时直接返回 0）。本次构造数据时先用无引用的「孤儿」源分钟试过：dry-run 把它们计为 `deletable`，但执行时 `deleted` 全 0，并且 `_pass` 会因为「有 deletable 但 passed==0」而 `break`，整趟清理停在那里。最终改为由一个不受保护修订持有这些旧分钟（`victim-old-minutes`）才得到可删除集合。建议：`_plan` 对 `references=={}` 的候选直接判为 blocked（带 `unreferenced_source_minute` 原因），或在 `_delete` 里允许删除无引用的源分钟/修订，避免这种"计划可删、执行不删、还提前结束"的状态。
+14. **新发布历史版本后的短窗口会让本组合 shadow 判 `binding_changed`**：publish 之后 data-worker 的发布循环会在数分钟内改写本组合范围内的 `chart_publications`（例如 `MD:99f1…:EURUSD` 六个周期），此时启动的 shadow 会按设计失败（`g6b-shadow.json`）。这不是回归（范围内改动必须失败），但运维上应把「发布新历史版本」和「周日 shadow」错开，或在发布完成后再开窗。
+15. **`9c5a0801` 上未重跑的两项**：(a) 日历不同的暂停分支——组合 B 的反向候选在本实例无法完成准备（data-worker 的真实供应商循环持有该 prep 行并写 `unavailable`，`g2d-calendar-pause-rerun.json`），本批也未改动 `relocatable()` 的日历比较，旧证据保留；(b) 备份/恢复演练沿用了 `0716c4fc` 的产品入口结果（本批未触及 `backup`/`retention_window` 的恢复门禁，只改了每块计数的持久化位置）。
 
 ## 7. 复现要点
 
@@ -214,4 +277,21 @@ bash results/track-c/g5-drill-commands.sh
 ... g1-shadow-tampered-run --days 0  # 运行期间写 scope 内的告警版本+发布行 → 必须 failed/binding_changed
 ... restore-scope ; ... g1-shadow    # 恢复后再跑一次干净 shadow
 ... run-report --run-id <failed run> # 归档失败报告
+
+# 复核修复后重跑（HEAD 9c5a0801，容器内需 -e MW_TC_HEAD=$(git rev-parse HEAD)）
+... add-pause-rule                       # 造一条 shadow 会判 will_pause 的规则（calculation_origin = 绑定版本起点）
+python /candidate/scripts/track_c_acceptance_seed.py --stage forward --days 3 --start-days 30 --key v8late
+... g1-shadow                            # G1：shadow 报告给出 will_pause=true
+... activate-candidate --run-id <shadow> # G2：成功切换 + 重绑 + paused_shadow_rule
+... activation-snapshot / report-stimulus --run-id <run> / activation-snapshot / restore-report
+... g3-shadow --days 0 ; ... g3-activate # G3：api 停机下的周日基线
+... g4-dry-run --run-id <run>            # G4：零删除
+python -m alerts.cli retention           # CLI 默认即 dry-run
+python -m alerts.cli retention --dry-run # 应报 unrecognized arguments
+... victim-old-minutes ; ... chunk-commit-then-die --run-id <run> --chunk 1500
+python -m alerts.cli retention --execute --run-id <run> --limit 5000 --chunk 500 --budget-ms 120000
+... g5-execute --run-id <run>            # 幂等零删除
+... g6-sequence --stages metrics --run-id <shadow> ; ... deliver-outbox --run-id <activation run>
+... g6-sequence --stages metrics ; ... outbox --run-id <activation run>
+... g6-sequence --stages fence   ; ... outbox --run-id <activation run>
 ```

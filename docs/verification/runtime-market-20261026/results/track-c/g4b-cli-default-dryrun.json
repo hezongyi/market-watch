@@ -1,0 +1,37 @@
+{
+  "batch": null,
+  "bytes": 0,
+  "candidates": {
+    "composite_input_events": 0,
+    "composite_inputs": 0,
+    "composite_minutes": 0,
+    "source_minutes": 0,
+    "source_revisions": 0
+  },
+  "deleted": {
+    "market_composite_input_events": 0,
+    "market_composite_minute_inputs": 0,
+    "market_composite_minutes": 0,
+    "market_source_minute_revisions": 0,
+    "market_source_minutes": 0
+  },
+  "dry_run": null,
+  "lower_bound": 1790617080598,
+  "now": 1793209080598,
+  "protected": {
+    "by_reason": {},
+    "detail": [],
+    "detail_truncated": false,
+    "revisions": 0
+  },
+  "remaining": null,
+  "rows": 0,
+  "run": null,
+  "skipped": [
+    {
+      "detail": "没有持久化的 succeeded 切换运行",
+      "reason": "no_succeeded_switch_run"
+    }
+  ],
+  "window_hours": 720
+}

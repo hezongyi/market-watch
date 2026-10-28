@@ -1,0 +1,259 @@
+{
+  "error": null,
+  "head": "9c5a08015b68868ab92c68bb5b15ae86eda16f67",
+  "window": {
+    "shadow_run_id": "0e0cf334-4cba-4b96-a6de-e8136a8c9fcb",
+    "previous_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+    "target_revision_id": "c8c7dd51-0116-4d6f-820b-69c6deb99a1f"
+  },
+  "run": {
+    "id": "8ad02acb-5850-4f79-a57c-947a83328da0",
+    "state": "succeeded",
+    "phase": "activated",
+    "attempts": 0,
+    "error_summary": null
+  },
+  "active_revision_id": "c8c7dd51-0116-4d6f-820b-69c6deb99a1f",
+  "activation": {
+    "event_boundary": 1793209020000,
+    "input_revision": 2,
+    "evidence": {
+      "run_id": "8ad02acb-5850-4f79-a57c-947a83328da0",
+      "source": {
+        "compatible": true,
+        "reasons": [],
+        "failures": [],
+        "checks": [
+          {
+            "field": "account_scope",
+            "label": "账户范围",
+            "previous": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+            "candidate": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+            "ok": true
+          },
+          {
+            "field": "environment",
+            "label": "环境",
+            "previous": "practice",
+            "candidate": "practice",
+            "ok": true
+          },
+          {
+            "field": "instrument",
+            "label": "品种",
+            "previous": "EURUSD",
+            "candidate": "EURUSD",
+            "ok": true
+          },
+          {
+            "field": "basis",
+            "label": "价格口径",
+            "previous": "bid",
+            "candidate": "bid",
+            "ok": true
+          },
+          {
+            "field": "confirmation",
+            "label": "确认语义",
+            "previous": "confirmed_minutes",
+            "candidate": "confirmed_minutes",
+            "ok": true
+          },
+          {
+            "field": "precision",
+            "label": "精度",
+            "previous": 5,
+            "candidate": 5,
+            "ok": true
+          },
+          {
+            "field": "freshness_ms",
+            "label": "新鲜度",
+            "previous": 5000,
+            "candidate": 5000,
+            "ok": true
+          }
+        ],
+        "switch": false,
+        "previous": {
+          "identity": "d00bcccac45564a6b05a416341b275805956c27e86417f9ae783a3b1db42118e",
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+          "instrument": "EURUSD",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "precision": 5,
+          "calendar_version": "candidate-ny17-v1",
+          "confirmation": "confirmed_minutes",
+          "freshness_ms": 5000
+        },
+        "candidate": {
+          "identity": "d00bcccac45564a6b05a416341b275805956c27e86417f9ae783a3b1db42118e",
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+          "instrument": "EURUSD",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "precision": 5,
+          "calendar_version": "candidate-ny17-v1",
+          "confirmation": "confirmed_minutes",
+          "freshness_ms": 5000
+        },
+        "required_freshness_ms": 15000
+      },
+      "alerts": {
+        "aligned": [],
+        "rebound": [
+          {
+            "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+            "revision_id": "c8c7dd51-0116-4d6f-820b-69c6deb99a1f",
+            "version": 4,
+            "previous_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d"
+          }
+        ],
+        "paused": [
+          {
+            "id": "a77a804c-5db9-4be6-a18d-51db05aa4ac0",
+            "revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d"
+          }
+        ],
+        "affected": [
+          {
+            "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+            "name": "组合穿越 1.1030",
+            "revision_id": "c8c7dd51-0116-4d6f-820b-69c6deb99a1f",
+            "previous_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+            "migration": "relocated_to_activated_revision"
+          },
+          {
+            "id": "a77a804c-5db9-4be6-a18d-51db05aa4ac0",
+            "name": "计算起点晚于候选历史（shadow 判不可迁移）",
+            "revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+            "migration": "paused_shadow_rule",
+            "reason": "候选固定历史起点晚于规则计算起点"
+          }
+        ],
+        "boundary": 1793209020000
+      },
+      "metrics": {
+        "input_revision": 2,
+        "frames": [
+          "D1",
+          "H1",
+          "H4",
+          "M1",
+          "M15",
+          "M30",
+          "M5",
+          "MN",
+          "W1"
+        ],
+        "indicators": [],
+        "boundary": 1793209020000,
+        "run_id": "8ad02acb-5850-4f79-a57c-947a83328da0",
+        "policy": "watermarks_consolidated_at_event_boundary"
+      },
+      "fence": {
+        "revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+        "waterline": 5,
+        "boundary": 1793209020000,
+        "at": 1793209035514,
+        "run_id": "8ad02acb-5850-4f79-a57c-947a83328da0"
+      }
+    }
+  },
+  "rules_before": [
+    {
+      "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+      "name": "组合穿越 1.1030",
+      "version": 3,
+      "status": "active",
+      "health": "warming",
+      "health_reason": "组合修订切换后建立新判定基准",
+      "bound_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d"
+    },
+    {
+      "id": "95c4ec91-3b35-41bf-93db-41eb4187a45b",
+      "name": "组合穿越 1.1030 (CAD)",
+      "version": 1,
+      "status": "paused",
+      "health": "blocked",
+      "health_reason": "组合修订切换后该规则暂不可迁移：目标修订服务日历 utc0，与规则绑定的 ny17 不兼容",
+      "bound_revision_id": "05694f9d-01a1-4572-9618-6e475833bfa3"
+    },
+    {
+      "id": "a77a804c-5db9-4be6-a18d-51db05aa4ac0",
+      "name": "计算起点晚于候选历史（shadow 判不可迁移）",
+      "version": 1,
+      "status": "active",
+      "health": "warming",
+      "health_reason": null,
+      "bound_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d"
+    }
+  ],
+  "rules_after": [
+    {
+      "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+      "name": "组合穿越 1.1030",
+      "version": 4,
+      "status": "active",
+      "health": "warming",
+      "health_reason": "组合修订切换后建立新判定基准",
+      "bound_revision_id": "c8c7dd51-0116-4d6f-820b-69c6deb99a1f"
+    },
+    {
+      "id": "95c4ec91-3b35-41bf-93db-41eb4187a45b",
+      "name": "组合穿越 1.1030 (CAD)",
+      "version": 1,
+      "status": "paused",
+      "health": "blocked",
+      "health_reason": "组合修订切换后该规则暂不可迁移：目标修订服务日历 utc0，与规则绑定的 ny17 不兼容",
+      "bound_revision_id": "05694f9d-01a1-4572-9618-6e475833bfa3"
+    },
+    {
+      "id": "a77a804c-5db9-4be6-a18d-51db05aa4ac0",
+      "name": "计算起点晚于候选历史（shadow 判不可迁移）",
+      "version": 1,
+      "status": "paused",
+      "health": "blocked",
+      "health_reason": "组合修订切换后该规则暂不可迁移：候选固定历史起点晚于规则计算起点",
+      "bound_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d"
+    }
+  ],
+  "notifications": [
+    {
+      "id": "0c955380-24cd-5a2a-bcc3-98181e97ac46",
+      "state": "succeeded",
+      "attempts": 0,
+      "errors": [
+        {
+          "key": "alerts|a77a804c-5db9-4be6-a18d-51db05aa4ac0|rule_paused_by_shadow",
+          "stage": "alerts",
+          "scope": "a77a804c-5db9-4be6-a18d-51db05aa4ac0",
+          "type": "rule_paused_by_shadow",
+          "reason": "候选固定历史起点晚于规则计算起点",
+          "at": 1793209035514,
+          "last_at": 1793209035514,
+          "seen": 1
+        }
+      ],
+      "counts": {
+        "sources": 1,
+        "rules": 2,
+        "paused": 1,
+        "active_revision_id": "c8c7dd51-0116-4d6f-820b-69c6deb99a1f"
+      }
+    }
+  ],
+  "outbox": [
+    {
+      "id": "dbb0992a-1a2a-5079-badc-f5f0da7a8a85",
+      "status": "pending",
+      "attempts": 0
+    }
+  ]
+}

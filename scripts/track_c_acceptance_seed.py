@@ -477,11 +477,11 @@ def build_utc_candidate():
             "dataset": utc_dataset, "version": utc_version}
 
 
-def publish_forward(end_days, key):
+def publish_forward(end_days, key, start_days=40):
     saved = state()
     end = saved["clock"] - end_days * DAY
-    history = publish_history(saved["a"]["series"]["dataset"], saved["clock"] - 40 * DAY, end,
-                              saved["clock"])
+    history = publish_history(saved["a"]["series"]["dataset"],
+                              saved["clock"] - start_days * DAY, end, saved["clock"])
     saved.setdefault("versions", {})[key] = history["version"]
     save_state(saved)
     return history
@@ -543,10 +543,13 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--stage", default="fixtures",
                         choices=("fixtures", "utc-candidate", "counts", "state", "judge",
-                                 "version3", "version4", "version5", "version6", "frames",
-                                 "break", "isolate"))
+                                 "version3", "version4", "version5", "version6", "version7",
+                                 "forward", "frames", "break", "isolate"))
     parser.add_argument("--alert", help="alert id for the judge stage")
     parser.add_argument("--version", help="history version id for the frames stage")
+    parser.add_argument("--days", type=float, default=5)
+    parser.add_argument("--start-days", type=float, default=40)
+    parser.add_argument("--key", default="forward")
     parser.add_argument("--stamp", type=int, help="explicit acceptance clock")
     args = parser.parse_args(argv)
     if args.stage == "fixtures":
@@ -565,6 +568,12 @@ def main(argv=None):
         result = publish_forward(6, "v4")
     elif args.stage == "version5":
         result = publish_forward(4, "v5")
+    elif args.stage == "forward":
+        result = publish_forward(args.days, args.key, start_days=args.start_days)
+    elif args.stage == "version7":
+        # A later fixed-history start: the deliberate case a rule bound earlier
+        # cannot be relocated onto, which the shadow must report as will_pause.
+        result = publish_forward(5, "v7late", start_days=30)
     elif args.stage == "version6":
         # A 30-day seam keeps the candidate preparation slow enough to change an
         # in-scope binding while the shadow run is still comparing.
