@@ -113,6 +113,46 @@ def minute(factory, start, *, revision="rev-old", source_id="src"):
         return source.id
 
 
+def orphan(factory, start, *, source_id="src"):
+    """A superseded price revision no source head row and no composite row uses."""
+    with factory.begin() as db:
+        revision = SourceMinuteRevision(id=uid(), source_id=source_id, start=start,
+                                        data={"close": "1.0900"}, observed_at=start)
+        db.add(revision)
+        db.flush()
+        return revision.id
+
+
+def bare(factory, start, *, source_id="src"):
+    """A confirmed source minute no composite minute ever consumed."""
+    with factory.begin() as db:
+        revision = SourceMinuteRevision(id=uid(), source_id=source_id, start=start,
+                                        data={"close": "1.0800"}, observed_at=start)
+        db.add(revision)
+        db.flush()
+        db.add(SourceMinute(source_id=source_id, start=start, revision_id=revision.id,
+                            last_observed_at=start))
+        return revision.id
+
+
+def suspended(factory, *, revision="rev-frozen", request_id="req-2"):
+    """A composite revision an active alert still points at, so it stays protected."""
+    with factory.begin() as db:
+        db.add(CompositeRevision(id=revision, composite_id="comp",
+                                 history_version_id="hist", mapping_id="map", seam=0,
+                                 rules={}, request_id=revision))
+        db.flush()
+        db.add(CompositePreparation(revision_id=revision, status="queried", cursor=0,
+                                    cutoff=0, confirmed_end=0, input_revision=0))
+        db.add(ChartAlert(id="alert-" + request_id, request_id=request_id, request_hash="hash",
+                          name="watch", status="active", effective_at=NOW))
+        db.add(ChartAlertVersion(alert_id="alert-" + request_id, version=1,
+                                 config={"series_kind": "composite"},
+                                 market_identity={"composite_revision_id": revision},
+                                 effective_at=NOW))
+    return revision
+
+
 def run(factory, state="succeeded"):
     with factory.begin() as db:
         row = MarketSwitchRun(kind="weekly", composite_id="comp", scheduled_for=NOW,
@@ -237,6 +277,69 @@ def contract_foreign_key_order_and_idempotent_rerun(factory):
                                "composite_inputs": 0, "events": 0}
 
 
+def contract_orphan_minutes_are_deleted(factory):
+    """An unreferenced candidate is deletable, and dry-run/execute agree."""
+    graph(factory, starts=())
+    orphan_id = orphan(factory, OLD - 60_000)
+    run_id = run(factory)
+    planned = window.dry_run(run_id, now=NOW)
+    assert planned["candidates"] == {"source_minutes": 0, "source_revisions": 1,
+                                     "composite_minutes": 0, "composite_inputs": 0,
+                                     "composite_input_events": 0}
+    assert planned["deletable_revisions"] == 1
+    assert planned["rows"] == 1
+    assert planned["bytes"] > 0
+    assert planned["deleted"] == ZERO
+    drill()
+    report = window.execute(run_id, now=NOW)
+    assert report["deleted"] == {**ZERO, "market_source_minute_revisions": 1}
+    assert report["rows"] == planned["rows"]
+    assert report["batch"]["state"] == "completed"
+    assert report["batch"]["stats"]["deleted"]["market_source_minute_revisions"] == 1
+    with factory.begin() as db:
+        assert db.get(SourceMinuteRevision, orphan_id) is None
+    assert window.execute(run_id, now=NOW)["idempotent"] is True
+
+
+def contract_unreferenced_head_is_deleted(factory):
+    """A head row with no composite reference loses its row and its revision."""
+    graph(factory, starts=())
+    revision_id = bare(factory, OLD - 90_000)
+    run_id = run(factory)
+    planned = window.dry_run(run_id, now=NOW)
+    assert planned["candidates"] == {"source_minutes": 1, "source_revisions": 1,
+                                     "composite_minutes": 0, "composite_inputs": 0,
+                                     "composite_input_events": 0}
+    assert planned["rows"] == 2
+    drill()
+    report = window.execute(run_id, now=NOW)
+    assert report["deleted"] == {**ZERO, "market_source_minutes": 1,
+                                 "market_source_minute_revisions": 1}
+    assert report["rows"] == planned["rows"]
+    assert report["batch"]["state"] == "completed"
+    assert counts(factory) == {"minutes": 0, "revisions": 0, "composite_minutes": 0,
+                               "composite_inputs": 0, "events": 0}
+    with factory.begin() as db:
+        assert db.get(SourceMinuteRevision, revision_id) is None
+
+
+def contract_orphan_next_to_protected_candidate(factory):
+    """An orphan is cleared while a protected neighbour stays, and the pass ends."""
+    graph(factory, starts=())
+    orphan_id = orphan(factory, OLD - 240_000)
+    suspended(factory)
+    minute(factory, OLD - 60_000, revision="rev-frozen")
+    run_id = run(factory)
+    drill()
+    report = window.execute(run_id, now=NOW)
+    assert report["deleted"] == {**ZERO, "market_source_minute_revisions": 1}
+    assert report["protected"]["by_reason"] == {"active_alert_old_revision": 1}
+    assert report["batch"]["state"] == "completed"
+    assert counts(factory)["minutes"] == 1
+    with factory.begin() as db:
+        assert db.get(SourceMinuteRevision, orphan_id) is None
+
+
 def contract_interrupted_pass_resumes(factory):
     """An interrupted batch resumes on the same batch without double counting."""
     graph(factory, starts=(OLD, OLD - 60_000, OLD - 120_000))
@@ -315,19 +418,7 @@ def contract_kill_between_commit_and_release_keeps_counts(factory):
 def contract_mixed_batch_deletes_only_unprotected(factory):
     """Protected candidates stay, safe ones leave, and one pass never rescans them."""
     graph(factory, starts=(OLD, OLD - 60_000))
-    with factory.begin() as db:
-        db.add(CompositeRevision(id="rev-frozen", composite_id="comp",
-                                 history_version_id="hist", mapping_id="map", seam=0,
-                                 rules={}, request_id="rev-frozen"))
-        db.flush()
-        db.add(CompositePreparation(revision_id="rev-frozen", status="queried", cursor=0,
-                                    cutoff=0, confirmed_end=0, input_revision=0))
-        db.add(ChartAlert(id="alert", request_id="req-2", request_hash="hash", name="watch",
-                          status="active", effective_at=NOW))
-        db.add(ChartAlertVersion(alert_id="alert", version=1,
-                                 config={"series_kind": "composite"},
-                                 market_identity={"composite_revision_id": "rev-frozen"},
-                                 effective_at=NOW))
+    suspended(factory)
     frozen = minute(factory, OLD - 120_000, revision="rev-frozen")
     run_id = run(factory)
     drill()
@@ -336,6 +427,7 @@ def contract_mixed_batch_deletes_only_unprotected(factory):
     assert report["deleted"]["market_source_minute_revisions"] == 2
     assert report["protected"]["by_reason"] == {"active_alert_old_revision": 1}
     assert report["batch"]["attempts"] <= 6
+    assert report["batch"]["state"] == "completed"
     with factory.begin() as db:
         survivor = db.get(SourceMinuteRevision, frozen)
         assert survivor is not None and survivor.start == OLD - 120_000
@@ -416,6 +508,18 @@ def test_window_boundary(runtime):
 
 def test_unlock_requires_persisted_success(runtime):
     contract_unlock_requires_persisted_success(runtime)
+
+
+def test_orphan_minutes_are_deleted(runtime):
+    contract_orphan_minutes_are_deleted(runtime)
+
+
+def test_unreferenced_head_is_deleted(runtime):
+    contract_unreferenced_head_is_deleted(runtime)
+
+
+def test_orphan_next_to_protected_candidate(runtime):
+    contract_orphan_next_to_protected_candidate(runtime)
 
 
 def test_dry_run_reports_and_deletes_nothing(runtime):

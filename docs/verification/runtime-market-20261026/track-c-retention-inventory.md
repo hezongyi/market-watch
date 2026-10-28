@@ -14,6 +14,8 @@
 
 删除单元是一个 `(source_id, start)` 源分钟：其本地最新修订（`market_source_minutes.revision_id` 指向）以及不再被任何头指针引用的历史价格修订（`market_source_minute_revisions`，orphan）。
 
+**无引用也可删**：候选若完全没有任何组合侧引用（孤儿价格修订，或从未被任何组合分钟消费过的头行），组合侧第 1–3 步自然为空，但第 4–5 步的源侧行仍需删除，否则已满 30 天且无有效引用的数据永远清不掉。孤儿判定 fail-closed：只要 `market_composite_minutes` 或 `market_composite_minute_inputs` 还有一行引用它，就不算孤儿、不删。
+
 | 顺序 | 表 | 删除条件 |
 |---|---|---|
 | 1 | `market_composite_minute_inputs` | `source_revision_id` 属于本批可删修订，且 `revision_id` 属于本批判定可删的允许清单（未受保护） |
@@ -84,6 +86,8 @@ schema_signature(connection=None) -> dict        # {tables, digest, alembic}
 - 单次 `execute` 处理不超过 `limit` 个候选分钟，按 `chunk` 分段提交。**每个分段的删除行数与累计 stats 在同一个事务内写回 `market_switch_runs.retention.stats`**，提交成功后才 `release_retention(outcome="interrupted")` + `claim_retention` 标记为可续跑；因此进程在“提交后、release 前”被杀也不会漏计，续跑的累计值恒等于数据库实际删除量（既不重复计数也不跳删）。
 - 批次进入 `completed` 后同 ID 重跑不再删除：返回 `skipped=[{reason: "batch_completed"}]`、`idempotent: true`，累计计数取 `batch.stats`。
 - dry-run 与真实批次按 `dry_run` 标志区分，交替调用会重置另一模式的批次（不会重复删除，只是重新规划）。
+- 单批额度按 **孤儿优先占 1/4（至少 1 个）**然后头行用剩余额度**分配，避免旧头行积压把孤儿饿死（`_candidate_orphans` 先选、`_candidate_minutes` 用剩余容量）。
+- 一趟 pass 只在“本块没有任何候选”时才判定完成；若本块全部是受保护/不可删候选、或本块删除 0 行但新分类了跳过键，则带着跳过集合继续向后规划，**不会因为前缀没活可干就提前结束整趟**。只有既不删行也没有新分类键时才退出（真正的停滞，批次保持可续跑）。
 
 ## 7. 首次真实删除的恢复门槛
 

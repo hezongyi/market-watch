@@ -197,10 +197,17 @@ def _candidate_orphans(db, lower, limit, deadline, skip=()):
 
 
 def _plan(db, *, lower, limit, now, deadline, skip_minutes=(), skip_revisions=()):
-    """Select at most one batch of candidate minutes and classify every reference."""
-    candidates = _candidate_minutes(db, lower, limit, deadline, skip_minutes)
-    candidates += _candidate_orphans(db, lower, max(0, limit - len(candidates)), deadline,
-                                     skip_revisions)
+    """Select at most one batch of candidate minutes and classify every reference.
+
+    A quarter of the batch is offered to orphan revisions first, so an old head
+    backlog cannot starve the superseded revisions behind it; the head selection
+    then uses whatever capacity is left.
+    """
+    orphans = _candidate_orphans(db, lower, min(limit, max(1, limit // 4)), deadline,
+                                 skip_revisions)
+    candidates = _candidate_minutes(db, lower, max(0, limit - len(orphans)), deadline,
+                                    skip_minutes)
+    candidates += orphans
     revisions = list(dict.fromkeys(candidate["revision_id"] for candidate in candidates))
     payload, references = {}, {}
     minute_rows, input_rows = {}, {}
@@ -306,12 +313,14 @@ def _delete(db, plan):
     deletable = plan["deletable"]
     touched = plan["touched"]
     counts = _zero_deleted()
-    if not deletable or not touched:
+    if not deletable:
         return counts
+    # A candidate with no references at all (an orphan price revision, or a head
+    # row no composite minute ever consumed) has an empty allowlist: its source
+    # side still goes, in the same foreign-key order, so such data can be cleared.
     # Every referencing revision of a deletable candidate is unprotected by
     # construction; the explicit allowlist keeps the statements fail-closed.
-
-    for chunk in _chunks(deletable):
+    for chunk in _chunks(deletable) if touched else ():
         counts["market_composite_minute_inputs"] += db.execute(delete(
             CompositeMinuteInput).where(
                 CompositeMinuteInput.source_revision_id.in_(chunk),
@@ -519,8 +528,10 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
                                                applied["bytes"])
             # A protected candidate cannot become deletable inside one pass, so the
             # rest of the pass skips it instead of rescanning the same prefix.
+            classified = len(skip_minutes) + len(skip_revisions)
             skip_minutes.update(applied["blocked_minutes"])
             skip_revisions.update(applied["blocked_revisions"])
+            advanced = len(skip_minutes) + len(skip_revisions) > classified
             candidates = summary["candidates"]
             for key, value in candidates.items():
                 report["candidates"][key] += value
@@ -538,17 +549,13 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
             report["rows"] += passed
             report["bytes"] += planned_bytes
             processed += candidates["source_minutes"] + candidates["source_revisions"]
-            if not summary["deletable_revisions"]:
-                if not (candidates["source_minutes"] or candidates["source_revisions"]):
-                    exhausted = True
-                    break
-                # Everything selected was protected. Those keys are skipped from now
-                # on, so keep planning instead of stopping on a protected prefix.
-                _checkpoint(run_id, totals)
-                if now_ms() > deadline:
-                    break
-                continue
-            if not passed:
+            if not summary["deletable_revisions"] and not (
+                    candidates["source_minutes"] or candidates["source_revisions"]):
+                exhausted = True
+                break
+            if not passed and not advanced:
+                # Nothing removed and nothing newly classified: a real stall, so
+                # keep the batch resumable instead of spinning.
                 break
             _checkpoint(run_id, totals)
             if now_ms() > deadline:
