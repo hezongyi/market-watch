@@ -1,0 +1,208 @@
+{
+  "minutes_recorded": 240,
+  "window": [
+    1793199420000,
+    1793213820000
+  ],
+  "applied_events": 1,
+  "before": {
+    "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+    "input_revision": 9,
+    "confirmed_end": 1793199420000,
+    "status": "queried",
+    "tasks": {
+      "M15": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "M30": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "M5": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "MN": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "W1": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "D1": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "H1": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "H4": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      },
+      "M1": {
+        "applied": 9,
+        "offset": 0,
+        "error": null
+      }
+    },
+    "judgments": 7
+  },
+  "after": {
+    "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+    "input_revision": 10,
+    "confirmed_end": 1793213820000,
+    "status": "queried",
+    "tasks": {
+      "H1": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "H4": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "M15": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "M30": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "M5": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "MN": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "W1": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "D1": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      },
+      "M1": {
+        "applied": 10,
+        "offset": 0,
+        "error": null
+      }
+    },
+    "judgments": 7
+  },
+  "waited_seconds": 4,
+  "judge_after_feed": {
+    "alert_id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+    "clock": 1793213820000,
+    "emitted": 0,
+    "health": "ready",
+    "reason": "恢复/接缝后已建立新基准，等待新事件",
+    "status": "active",
+    "judgments": 8,
+    "outcomes": [
+      "evaluated",
+      "initial_baseline",
+      "triggered"
+    ],
+    "signals": 1,
+    "events": [
+      {
+        "event_time": 1793190540000,
+        "outcome": "evaluated",
+        "signal_id": null
+      },
+      {
+        "event_time": 1793190600000,
+        "outcome": "evaluated",
+        "signal_id": null
+      },
+      {
+        "event_time": 1793190660000,
+        "outcome": "evaluated",
+        "signal_id": null
+      },
+      {
+        "event_time": 1793190720000,
+        "outcome": "triggered",
+        "signal_id": "2112c812-1f8c-4c43-8746-bb8bceb0b3de"
+      },
+      {
+        "event_time": 1793213820000,
+        "outcome": "initial_baseline",
+        "signal_id": null
+      }
+    ],
+    "runtime": {
+      "quote_health": "ready",
+      "observation_mode": "stream_quote",
+      "composite_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+      "input_revision": 10,
+      "history_version_id": "0f53dff4-0146-49a3-bda4-6179cdaf96d5",
+      "seam_policy": "reject",
+      "indicators": [],
+      "processed_input_revision": 10,
+      "confirmed_end": 1793213820000,
+      "epoch": 1,
+      "recovering": false,
+      "last_start": 1793213760000,
+      "readiness": {
+        "ready": true,
+        "status": "ready",
+        "dependencies": [
+          {
+            "kind": "price",
+            "start": 1793213760000,
+            "end": 1793213820000,
+            "coverage_complete": true,
+            "source_confirmed": true,
+            "seam_dependency": false
+          },
+          {
+            "kind": "line",
+            "geometry": {
+              "kind": "horizontal_line",
+              "points": [
+                {
+                  "time": 1793190420000,
+                  "index": 0,
+                  "price": "1.1030"
+                }
+              ],
+              "scale": "linear",
+              "extend_left": false,
+              "extend_right": false,
+              "mapping_version": "bar-index-v1"
+            },
+            "index": 1999
+          }
+        ],
+        "last_outcome": "initial_baseline"
+      },
+      "switch_run_id": "822ab313-6cec-4411-9572-8239794bd7fe",
+      "switch_boundary": 1793199540000
+    }
+  }
+}

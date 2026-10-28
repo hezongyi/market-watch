@@ -1,0 +1,38 @@
+== data-worker current container (fix rerun session) ==
+2026-10-28T15:42:29Z
+created=2026-10-28T14:59:46.00656418Z startedAt=2026-10-28T15:27:38.814140646Z restartCount=0 status=running
+--- first log lines (this container) ---
+2026-10-28T14:59:56.321688957Z 2026-10-28 14:59:56,321 INFO chart_aggregation_slice seconds=0.642
+2026-10-28T14:59:56.632965398Z 2026-10-28 14:59:56,632 INFO chart_aggregation_slice seconds=0.265
+2026-10-28T14:59:56.902341738Z 2026-10-28 14:59:56,902 INFO chart_aggregation_slice seconds=0.264
+--- last log lines (this container) ---
+2026-10-28T15:42:29.570881659Z 2026-10-28 15:42:29,570 INFO chart_aggregation_slice seconds=0.171
+2026-10-28T15:42:29.809664723Z 2026-10-28 15:42:29,809 INFO chart_aggregation_slice seconds=0.232
+2026-10-28T15:42:29.894642861Z 2026-10-28 15:42:29,894 INFO chart_aggregation_slice seconds=0.077
+--- uptime / restarts ---
+mw-track-c-20261028-data-worker-1 Up 14 minutes
+api status=exited exit=0
+market-runtime status=exited exit=0
+--- shadow runs created during this session ---
+                  id                  |    state     |     phase     | scheduled_for |  created_at   
+--------------------------------------+--------------+---------------+---------------+---------------
+ cd12f062-6809-4afc-8200-8c9565887eb0 | shadow_ready |               | 1800752400000 | 1793202106464
+ f7fa959d-a160-437b-af0d-adf3d7cd6322 | shadow_ready |               | 1800147600000 | 1793202072974
+ 33567e42-ef29-40bf-ace4-b455bf703df9 | failed       | shadow_failed | 1799542800000 | 1793202039240
+ cce0e75c-bc5e-463b-9318-1929c0ecbb61 | shadow_ready |               | 1798938000000 | 1793201946616
+ f37dd4c7-1364-41d3-8518-da5bdb6f991a | shadow_ready |               | 1798333200000 | 1793201929179
+ 79c90eba-b3ee-449d-bd66-616f58d10327 | shadow_ready |               | 1797728400000 | 1793201647850
+ 7b468c54-5faa-4814-bab9-039606324e4f | shadow_ready |               | 1797123600000 | 1793201587511
+ 8d7f5684-7c23-4325-a620-1c77c322b99e | shadow_ready |               | 1796518800000 | 1793201536270
+(8 rows)
+
+
+== data-worker lifecycle checkpoints (captured after each gate step) ==
+15:27:59 (session baseline, g1b-worker-baseline.txt): startedAt=2026-10-28T15:27:38.814140646Z restarts=0 status=running
+15:28:05 (after G1 rerun 543b5cae):                  startedAt=2026-10-28T15:27:38.814140646Z restarts=0 status=running
+15:30:04 (after G3 shadow rerun b2ff067e, api down):  startedAt=2026-10-28T15:27:38.814140646Z restarts=0
+15:41:59 (after reverse proof + forward proof):       startedAt=2026-10-28T15:27:38.814140646Z restarts=0 status=running
+
+Conclusion: the data-worker container was started once at 15:27:38 and never
+stopped or restarted during the whole fix re-verification (StartedAt constant,
+RestartCount=0, its own log stream spans 14:59:56Z .. current time without a gap).

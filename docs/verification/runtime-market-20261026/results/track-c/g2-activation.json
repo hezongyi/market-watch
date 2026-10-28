@@ -1,0 +1,506 @@
+{
+  "activation_cycle": {
+    "worked": false,
+    "candidates": []
+  },
+  "shadow_run": {
+    "id": "3082c3ce-8ef4-4231-830f-bfb11f80321e",
+    "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+    "target_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+    "state": "shadow_ready"
+  },
+  "run": {
+    "id": "822ab313-6cec-4411-9572-8239794bd7fe",
+    "state": "succeeded",
+    "phase": "activated",
+    "attempts": 0,
+    "activation": {
+      "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+      "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+      "input_revision": 8,
+      "event_boundary": 1793199540000,
+      "at": 1793199591321,
+      "run_id": "822ab313-6cec-4411-9572-8239794bd7fe"
+    },
+    "error_summary": null
+  },
+  "active_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+  "activation": {
+    "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+    "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+    "event_boundary": 1793199540000,
+    "input_revision": 8,
+    "evidence": {
+      "run_id": "822ab313-6cec-4411-9572-8239794bd7fe",
+      "source": {
+        "compatible": true,
+        "reasons": [],
+        "failures": [],
+        "checks": [
+          {
+            "field": "account_scope",
+            "label": "账户范围",
+            "previous": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+            "candidate": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+            "ok": true
+          },
+          {
+            "field": "environment",
+            "label": "环境",
+            "previous": "practice",
+            "candidate": "practice",
+            "ok": true
+          },
+          {
+            "field": "instrument",
+            "label": "品种",
+            "previous": "EURUSD",
+            "candidate": "EURUSD",
+            "ok": true
+          },
+          {
+            "field": "basis",
+            "label": "价格口径",
+            "previous": "bid",
+            "candidate": "bid",
+            "ok": true
+          },
+          {
+            "field": "confirmation",
+            "label": "确认语义",
+            "previous": "confirmed_minutes",
+            "candidate": "confirmed_minutes",
+            "ok": true
+          },
+          {
+            "field": "precision",
+            "label": "精度",
+            "previous": 5,
+            "candidate": 5,
+            "ok": true
+          },
+          {
+            "field": "freshness_ms",
+            "label": "新鲜度",
+            "previous": 5000,
+            "candidate": 5000,
+            "ok": true
+          }
+        ],
+        "switch": false,
+        "previous": {
+          "identity": "d00bcccac45564a6b05a416341b275805956c27e86417f9ae783a3b1db42118e",
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+          "instrument": "EURUSD",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "precision": 5,
+          "calendar_version": "candidate-ny17-v1",
+          "confirmation": "confirmed_minutes",
+          "freshness_ms": 5000
+        },
+        "candidate": {
+          "identity": "d00bcccac45564a6b05a416341b275805956c27e86417f9ae783a3b1db42118e",
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+          "instrument": "EURUSD",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "precision": 5,
+          "calendar_version": "candidate-ny17-v1",
+          "confirmation": "confirmed_minutes",
+          "freshness_ms": 5000
+        },
+        "required_freshness_ms": 15000
+      },
+      "alerts": {
+        "aligned": [],
+        "rebound": [
+          {
+            "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+            "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+            "version": 2,
+            "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142"
+          }
+        ],
+        "paused": [],
+        "affected": [
+          {
+            "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+            "name": "组合穿越 1.1030",
+            "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+            "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+            "migration": "relocated_to_activated_revision"
+          }
+        ],
+        "boundary": 1793199540000
+      },
+      "metrics": {
+        "input_revision": 8,
+        "frames": [
+          "D1",
+          "H1",
+          "H4",
+          "M1",
+          "M15",
+          "M30",
+          "M5",
+          "MN",
+          "W1"
+        ],
+        "indicators": [],
+        "boundary": 1793199540000,
+        "run_id": "822ab313-6cec-4411-9572-8239794bd7fe",
+        "policy": "watermarks_consolidated_at_event_boundary"
+      },
+      "fence": {
+        "revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+        "waterline": 15,
+        "boundary": 1793199540000,
+        "at": 1793199591321,
+        "run_id": "822ab313-6cec-4411-9572-8239794bd7fe"
+      }
+    }
+  },
+  "previous_frozen": true,
+  "previous_fence": {
+    "run_id": "822ab313-6cec-4411-9572-8239794bd7fe",
+    "at": 1793199591321,
+    "waterline": 15,
+    "boundary": 1793199540000,
+    "policy": "no_live_fanout; no_aggregate_registration; late commits refused"
+  },
+  "previous_waterline": 15,
+  "candidate_waterline": 8,
+  "alert_rows": [
+    {
+      "id": "95c4ec91-3b35-41bf-93db-41eb4187a45b",
+      "version": 1,
+      "status": "active",
+      "state": {},
+      "effective_at": 1793199000000,
+      "control_revision": 1,
+      "health": "warming",
+      "health_reason": null,
+      "runtime": {}
+    },
+    {
+      "id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+      "version": 2,
+      "status": "active",
+      "state": {},
+      "effective_at": 1793199540000,
+      "control_revision": 2,
+      "health": "warming",
+      "health_reason": "组合修订切换后建立新判定基准",
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+        "input_revision": 15,
+        "history_version_id": "76e1d73c-d3eb-44a1-ad78-7c2d667ab9aa",
+        "seam_policy": "reject",
+        "indicators": [],
+        "processed_input_revision": 15,
+        "confirmed_end": 1793190720000,
+        "epoch": 1,
+        "recovering": false,
+        "last_start": 1793190660000,
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 1793190660000,
+              "end": 1793190720000,
+              "coverage_complete": true,
+              "source_confirmed": true,
+              "seam_dependency": false
+            },
+            {
+              "kind": "line",
+              "geometry": {
+                "kind": "horizontal_line",
+                "points": [
+                  {
+                    "time": 1793190420000,
+                    "index": 0,
+                    "price": "1.1030"
+                  }
+                ],
+                "scale": "linear",
+                "extend_left": false,
+                "extend_right": false,
+                "mapping_version": "bar-index-v1"
+              },
+              "index": 1998
+            }
+          ],
+          "last_outcome": "evaluated"
+        },
+        "switch_run_id": "822ab313-6cec-4411-9572-8239794bd7fe",
+        "switch_boundary": 1793199540000
+      }
+    }
+  ],
+  "alert_versions": [
+    {
+      "alert_id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+      "version": 1,
+      "revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+      "condition": {
+        "relation": "cross_up",
+        "left": {
+          "kind": "price",
+          "value": null,
+          "indicator": null,
+          "line": null
+        },
+        "right": {
+          "kind": "line",
+          "value": null,
+          "indicator": null,
+          "line": {
+            "kind": "horizontal_line",
+            "points": [
+              {
+                "time": 1793190420000,
+                "index": 0,
+                "price": "1.1030"
+              }
+            ],
+            "scale": "linear",
+            "extend_left": false,
+            "extend_right": false,
+            "mapping_version": "bar-index-v1"
+          }
+        },
+        "lower": null,
+        "upper": null,
+        "offset": null
+      },
+      "geometry": "reject",
+      "composite_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142"
+    },
+    {
+      "alert_id": "45bfd944-1bbd-4e49-8451-d563e123c487",
+      "version": 2,
+      "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+      "condition": {
+        "relation": "cross_up",
+        "left": {
+          "kind": "price",
+          "value": null,
+          "indicator": null,
+          "line": null
+        },
+        "right": {
+          "kind": "line",
+          "value": null,
+          "indicator": null,
+          "line": {
+            "kind": "horizontal_line",
+            "points": [
+              {
+                "time": 1793190420000,
+                "index": 0,
+                "price": "1.1030"
+              }
+            ],
+            "scale": "linear",
+            "extend_left": false,
+            "extend_right": false,
+            "mapping_version": "bar-index-v1"
+          }
+        },
+        "lower": null,
+        "upper": null,
+        "offset": null
+      },
+      "geometry": "reject",
+      "composite_revision_id": "066483b8-95ba-4037-9852-09dce5266168"
+    },
+    {
+      "alert_id": "95c4ec91-3b35-41bf-93db-41eb4187a45b",
+      "version": 1,
+      "revision_id": "05694f9d-01a1-4572-9618-6e475833bfa3",
+      "condition": {
+        "relation": "cross_up",
+        "left": {
+          "kind": "price",
+          "value": null,
+          "indicator": null,
+          "line": null
+        },
+        "right": {
+          "kind": "line",
+          "value": null,
+          "indicator": null,
+          "line": {
+            "kind": "horizontal_line",
+            "points": [
+              {
+                "time": 1793198940000,
+                "index": 0,
+                "price": "1.1030"
+              }
+            ],
+            "scale": "linear",
+            "extend_left": false,
+            "extend_right": false,
+            "mapping_version": "bar-index-v1"
+          }
+        },
+        "lower": null,
+        "upper": null,
+        "offset": null
+      },
+      "geometry": "reject",
+      "composite_revision_id": "05694f9d-01a1-4572-9618-6e475833bfa3"
+    }
+  ],
+  "unlocked_runs": [
+    {
+      "id": "822ab313-6cec-4411-9572-8239794bd7fe",
+      "kind": "revision_activation",
+      "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+      "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+      "target_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+      "state": "succeeded",
+      "attempts": 0,
+      "phase": "activated",
+      "scheduled_for": 1793199591321,
+      "started_at": 1793199591321,
+      "finished_at": 1793199591321,
+      "error_summary": null,
+      "shadow_report": {
+        "compatible": true,
+        "reasons": [],
+        "failures": [],
+        "checks": [
+          {
+            "field": "account_scope",
+            "label": "账户范围",
+            "previous": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+            "candidate": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+            "ok": true
+          },
+          {
+            "field": "environment",
+            "label": "环境",
+            "previous": "practice",
+            "candidate": "practice",
+            "ok": true
+          },
+          {
+            "field": "instrument",
+            "label": "品种",
+            "previous": "EURUSD",
+            "candidate": "EURUSD",
+            "ok": true
+          },
+          {
+            "field": "basis",
+            "label": "价格口径",
+            "previous": "bid",
+            "candidate": "bid",
+            "ok": true
+          },
+          {
+            "field": "confirmation",
+            "label": "确认语义",
+            "previous": "confirmed_minutes",
+            "candidate": "confirmed_minutes",
+            "ok": true
+          },
+          {
+            "field": "precision",
+            "label": "精度",
+            "previous": 5,
+            "candidate": 5,
+            "ok": true
+          },
+          {
+            "field": "freshness_ms",
+            "label": "新鲜度",
+            "previous": 5000,
+            "candidate": 5000,
+            "ok": true
+          }
+        ],
+        "switch": false,
+        "previous": {
+          "identity": "d00bcccac45564a6b05a416341b275805956c27e86417f9ae783a3b1db42118e",
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+          "instrument": "EURUSD",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "precision": 5,
+          "calendar_version": "candidate-ny17-v1",
+          "confirmation": "confirmed_minutes",
+          "freshness_ms": 5000
+        },
+        "candidate": {
+          "identity": "d00bcccac45564a6b05a416341b275805956c27e86417f9ae783a3b1db42118e",
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:298554ec61db0c7b219ef84fd63c55220ce5f44fb883567df6f7288c46d5b7eb",
+          "instrument": "EURUSD",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "precision": 5,
+          "calendar_version": "candidate-ny17-v1",
+          "confirmation": "confirmed_minutes",
+          "freshness_ms": 5000
+        },
+        "required_freshness_ms": 15000
+      },
+      "activation": {
+        "revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+        "previous_revision_id": "483db6a3-d8eb-4628-a645-9260b41f9142",
+        "input_revision": 8,
+        "event_boundary": 1793199540000,
+        "at": 1793199591321,
+        "run_id": "822ab313-6cec-4411-9572-8239794bd7fe"
+      },
+      "retention": {
+        "batch_id": "99379a09-153d-448b-806a-ee80fc57db4e",
+        "state": "completed",
+        "dry_run": true,
+        "claimed_at": 1793199595780,
+        "released_at": 1793199596427,
+        "attempts": 1,
+        "stats": {
+          "planned_rows": 6201,
+          "planned_bytes": 469647,
+          "dry_run": true,
+          "at": 1793199595776
+        }
+      },
+      "created_at": 1793199591342,
+      "unlocked": true
+    }
+  ],
+  "judgments": {
+    "before": {
+      "judgments": 7,
+      "notifications": 4,
+      "outbox": 3
+    },
+    "after": {
+      "judgments": 7,
+      "notifications": 4,
+      "outbox": 3
+    }
+  }
+}

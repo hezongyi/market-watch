@@ -1,0 +1,133 @@
+{
+  "clock": 1793199060000,
+  "composite_a": {
+    "aggregates": {
+      "input_revision": 15,
+      "tasks": {
+        "D1": 15,
+        "H1": 15,
+        "H4": 15,
+        "M1": 15,
+        "M15": 15,
+        "M30": 15,
+        "M5": 15,
+        "MN": 15,
+        "W1": 15
+      }
+    },
+    "alert": "45bfd944-1bbd-4e49-8451-d563e123c487",
+    "composite": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+    "history_version": "76e1d73c-d3eb-44a1-ad78-7c2d667ab9aa",
+    "mapping": "75c8d4b0e7b7e5b9d314ffdaa1830bbc60159ec613d51fb6084caf3b83322950",
+    "preparation": {
+      "commits": 15,
+      "confirmed_end": 1793199060000,
+      "cursor": 1793199060000,
+      "cutoff": 1793199060000,
+      "input_revision": 15,
+      "status": "queried"
+    },
+    "revision": "483db6a3-d8eb-4628-a645-9260b41f9142",
+    "seam": 1789678800000
+  },
+  "composite_b": {
+    "alert": "95c4ec91-3b35-41bf-93db-41eb4187a45b",
+    "composite": "457527f5ec87b0047d238d5a42782cde5b77dbd064f730dd7af21fea7207b83a",
+    "revision": "05694f9d-01a1-4572-9618-6e475833bfa3",
+    "seam": 1789678800000
+  },
+  "counts_after_seed": {
+    "bars": 1249,
+    "history_artifacts": 27,
+    "history_chunks": 4,
+    "notifications": 1,
+    "outbox": 0,
+    "source_minutes_old": 2066,
+    "source_minutes_recent": 11134
+  },
+  "cross_up": 1793190600000,
+  "forward_version": "0f53dff4-0146-49a3-bda4-6179cdaf96d5",
+  "judged_at": [
+    1793190480000,
+    1793190720000
+  ],
+  "judgment_after_seed": [
+    {
+      "clock": 1793190360000,
+      "emitted": 0,
+      "health": "ready",
+      "judgments": 1,
+      "outcomes": [
+        "initial_baseline"
+      ],
+      "signals": 0
+    },
+    {
+      "clock": 1793190420000,
+      "emitted": 0,
+      "health": "ready",
+      "judgments": 2,
+      "outcomes": [
+        "initial_baseline"
+      ],
+      "signals": 0
+    },
+    {
+      "clock": 1793190480000,
+      "emitted": 0,
+      "health": "ready",
+      "judgments": 3,
+      "outcomes": [
+        "initial_baseline"
+      ],
+      "signals": 0
+    },
+    {
+      "clock": 1793190540000,
+      "emitted": 0,
+      "health": "ready",
+      "judgments": 4,
+      "outcomes": [
+        "evaluated",
+        "initial_baseline"
+      ],
+      "signals": 0
+    },
+    {
+      "clock": 1793190600000,
+      "emitted": 0,
+      "health": "ready",
+      "judgments": 5,
+      "outcomes": [
+        "evaluated",
+        "initial_baseline"
+      ],
+      "signals": 0
+    },
+    {
+      "clock": 1793190660000,
+      "emitted": 0,
+      "health": "ready",
+      "judgments": 6,
+      "outcomes": [
+        "evaluated",
+        "initial_baseline"
+      ],
+      "signals": 0
+    },
+    {
+      "clock": 1793190720000,
+      "emitted": 1,
+      "health": "ready",
+      "judgments": 7,
+      "outcomes": [
+        "evaluated",
+        "initial_baseline",
+        "triggered"
+      ],
+      "signals": 1
+    }
+  ],
+  "line": "1.1030",
+  "seeded_at": 1793199087828
+}

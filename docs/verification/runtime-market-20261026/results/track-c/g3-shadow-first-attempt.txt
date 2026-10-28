@@ -1,0 +1,25 @@
+First G3 shadow attempt for the next weekly window (run dedac8e8-1182-4d65-923c-56305290fe29).
+The attempt failed with a critical-binding change and the same run row was retried in place
+(baseline_shadow retries failed runs), so g3-shadow.json holds the successful retry. These are
+the values observed on the persisted run row and its report before the retry:
+
+run            : dedac8e8-1182-4d65-923c-56305290fe29
+state / phase  : failed / shadow_failed
+report.status  : failed, ready=false
+report.reasons : [{"code": "binding_changed", "detail": "有效绑定在 shadow 运行期间发生变化"}]
+bindings.tables:
+  alerts              rows=2  unchanged=true
+  alert_versions      rows=3  unchanged=true
+  publications        rows=12 unchanged=false
+  realtime_preferences rows=5 unchanged=true
+bindings.active_revision_id: before=066483b8-95ba-4037-9852-09dce5266168 after=same unchanged=true
+bindings.critical_unchanged: false
+
+Cause: the data-worker publication loop writes chart_publications rows every cycle (BTCUSDT M1/M5/
+M15/M30/H1/H4/D1/W1/MN and the USDCAD series), and baseline_shadow.bindings() treats publications
+as a critical binding. The accepted run therefore executed with the data-worker stopped (api was
+already stopped for G3). Observed publications after that first attempt (psql, updated_at ms):
+  BTCUSDT M1 1793199968884, M30 1793199968723, M5 1793199968323, M15 1793199967903,
+  H1 1793199967537, EURUSD M1 1793199872970, USDCAD(f94f7045) M1 1793199717269,
+  BTCUSDT W1 1793199657539, MN 1793199657425, H4 1793199656706, D1 1793199656361,
+  USDCAD(983eb247) M1 1793199597085

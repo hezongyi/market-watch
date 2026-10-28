@@ -1,0 +1,217 @@
+# Track C 验收：A04a shadow / A04b 一致激活 / A05 周日基线 / A13a-b-c 30 天清理
+
+验收执行任务（未改动 `backend/` 任何代码、迁移、其它任务 compose 或文档）。实际运行主机是**本机 Ubuntu Docker**（无远端实例、无 SSH 转发）。
+
+## 1. 实例与环境
+
+| 项 | 值 |
+|---|---|
+| 源码 | 分支 `feat/runtime-track-c-20261028`。首轮 G0–G6 在 `5f8e2c543a9fefac3b668bb0664a687815175e68` 上跑完；随后的 G5 产品入口重做在 `0716c4fce914cf6087e704940fdc2f52633b6021`（`fix: scope the shadow binding snapshot to this composite`）上执行，G1/G3 复验与反向证明也在该 HEAD 上 |
+| worktree | `/home/quant/repos/market-watch-runtime-track-c-20261028` |
+| Compose project | `mw-track-c-20261028`（labels `market-watch.task/project=mw-track-c-20261028`, `market-watch.purpose=acceptance`） |
+| overlay | `deploy/ubuntu/runtime-track-c.acceptance.yaml`（新增，固定 digest 依赖镜像 + 只读挂载本工作树；未构建新镜像） |
+| network | `mw-track-c-20261028`（bridge，标签同 project） |
+| volume | `mw-track-c-20261028-postgres`（标签同 project，保留）、`mw-track-c-20261028-artifacts`（备份产物，标签同 project，保留） |
+| 运行中 HEAD | `0716c4fce914cf6087e704940fdc2f52633b6021`（G5 产品入口重做 + G1/G3 复验 + 反向证明） |
+| 端口 | `127.0.0.1:15612` → postgres:5432，`127.0.0.1:18091` → api:8000（web 未启用） |
+| 后端镜像 | `market-watch-api:v1.29.1-rc.2` = `sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743` |
+| PostgreSQL | `postgres:14.24-bookworm` = `sha256:a389ed49344afc8f4444efd4eb512965df07aaa6ed84b239b54a23246e9fe347`（`server_version_num=140024`，`ALERTS_DATABASE_EXPECTED_VERSION=140024` 生效） |
+| 数据库 | `track_c_acceptance` / 角色 `track_c`（本任务专用） |
+| 服务 | postgres、migrate（一次性）、api、market-runtime、data-worker、notification-worker，以及 `backup`（`profiles: [maintenance]`，与 `compose.production.yaml` 的 backup 服务同形：同一 digest 应用镜像 + `ALERTS_POSTGRES_BIN_DIR=`指向 pg_dump/pg_restore 所在目录） |
+
+```bash
+# 启动
+cd /home/quant/repos/market-watch-runtime-track-c-20261028
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml up -d postgres
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml run --rm --no-deps -T migrate
+# 造数据（G0 之后、G1 之前，一次）
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml run --rm --no-deps -T \
+  data-worker python /candidate/scripts/track_c_acceptance_seed.py --stage fixtures
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml up -d \
+  api market-runtime data-worker notification-worker
+
+# 停止（本次实际执行，末尾已执行）
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml stop -t 30
+```
+
+数据库起点：`DROP SCHEMA public CASCADE; CREATE SCHEMA public;` → `alembic upgrade head`（head = `ba54_market_switch_runs`）→ `track_c_acceptance_seed.py --stage fixtures`。seed 在 `preferences` 写入 `track_c_acceptance:state`（含 `seeded_at=1793199087828`、验收时钟 `clock=1793199060000`、各 composite/revision/version/alert id），重复执行会直接返回该状态而不重复建图。重置方式：同一个 DROP/upgrade/seed 三步。
+
+G0 资源与归属（`results/track-c/g0-resources.txt`）：本机无其它运行中的 Compose project（其余均为 exited 的别任务容器）；启动前可用内存约 9.3 GiB、`/` 剩余 9.9 GiB（磁盘已用 93%，非本任务造成，本任务 volume 仅 544 MB）；`docker compose config` 展开为 6 个默认服务 + maintenance profile 的 `backup`，network/volume/容器标签全部属于本 project；端口 15612/18091 不在既有占用列表内。
+
+**backup 服务的工具来源（与 `deploy/Dockerfile.backup` 同款做法，只是不构建镜像）**：生产镜像在 `FROM \${APP_IMAGE}` 之后 `COPY --from=postgres` 两个二进制到 `/usr/local/bin` 并装 `libpq5 libreadline8 liblz4-1 libzstd1`。本任务未构建镜像，改为从**固定 digest 的 PostgreSQL 镜像**里取出同样的 `pg_dump`/`pg_restore`（`cp -L`，14.24）以及该应用镜像缺少的 4 个共享库（`libpq.so.5`、`libldap-2.5.so.0`、`liblber-2.5.so.0`、`libsasl2.so.2`），放到任务私有目录 `/home/quant/tc-scratch/tc-backup-bin`，只读挂载到 backup 容器 `/opt/pgbin`，并设 `ALERTS_POSTGRES_BIN_DIR=/opt/pgbin/bin`、`LD_LIBRARY_PATH=/opt/pgbin/libs`。在容器内以 uid 1000 验证：`pg_dump (PostgreSQL) 14.24 (Debian 14.24-1.pgdg12+2)`。备份目录是任务私有命名卷 `/artifacts/backups`。
+
+## 2. 造数据（真实形状，全部走应用代码路径）
+
+脚本：`scripts/track_c_acceptance_seed.py`（`--stage fixtures|utc-candidate|version3|version4|isolate|judge|counts|state`），走 `register_dataset → create_version → import_page → artifact_tick → save_mapping → first_use → composite_preparation.claim/commit → composite_aggregates.aggregate_tick → chart_alert_service.create → chart_alert_worker.evaluate`。
+
+* 组合 A：EURUSD（Dukascopy 历史 + OANDA 实时映射，ny17），固定历史 3 天，接缝在 40.7 天前，活分钟从接缝覆盖到 `clock`：前段 15 分钟网格、最后 2 天逐分钟（让判定柱有完整覆盖），共 6 700+ 源分钟；其中约 10 天超出 30 天窗口（清理候选），约 30 天在窗口内（必须保留）。
+* 组合 A 的告警：绑当前修订、`cross_up` + 水平线几何（`points=[{time,index:0,price:1.1030}]`）、`max_triggers=3`，用固定验收时钟逐分钟驱动 `evaluate` 产生 7 条 `market_composite_judgments`（`triggered` 1 条 + 对应 1 条 signal 与 1 条 signal 通知）。
+* 组合 A 的候选：再发布一个同数据集、同口径同日历、仅历史前移的已发布版本（end 20 天前），由 shadow 的 `candidate_plan` 自动选中。
+* 组合 B：USD/CAD（Dukascopy 历史 + OANDA 实时映射，ny17），同样 40 天活分钟与一条绑当前修订的告警；另用 `aggregation_policy.change_aggregation` 由同一父版本派生 utc0 数据集与版本（`agg-utc0-*`），作为「日历不同」的显式候选。
+* seed 之后：`source_minutes_old=2066`、`source_minutes_recent=11134`、`bars=1249`、`history_artifacts=27`（`results/track-c/g0-seed-record.json`）。
+
+## 3. 门槛结论
+
+### G1 · A04a shadow —— 通过
+
+* artifact：`results/track-c/g1-shadow.json`
+* 候选版本 ≠ 当前版本：candidate revision `066483b8…` ≠ active `483db6a3…`；candidate history version `0f53dff4…`（end 20 天前）≠ active `76e1d73c…`（end 40 天前），同一数据集（仅历史前移）。
+* `active_revision_id`/告警/告警版本/发布记录前后逐列不变：`bindings.tables.{alerts,alert_versions,publications,realtime_preferences}.unchanged=true`，`active_revision_id.before == after`，`critical_unchanged=true`。
+* run 记录：`baseline_shadow` 状态 `shadow_ready`，phase `shadow`，`scheduled_for=1792890000000`（本周日 01:00 UTC 窗口）。
+
+**修复后复验（不停 data-worker，HEAD `0716c4fc`）** —— artifact：`results/track-c/g1b-shadow-rerun.json`、`g1d-shadow-unrelated-write.json`、`g1d-restore-unrelated.json`、`g1b-worker-baseline.txt`、`g1b-worker-lifecycle.txt`
+
+* 运行方式：`data-worker` 全程不停（`StartedAt=2026-10-28T15:27:38.814140646Z` 恒定、`RestartCount=0`、自身日志 14:59:56Z→15:42:29Z 连续，四个检查点见 `g1b-worker-lifecycle.txt`）；`api` 保持 `exited 0`，`market-runtime` 保持 `exited`（未触碰）。shadow 用 `next_weekly` 显式开新窗口（脚本内 `fresh_slot`：跳过已有 run 的窗口）。
+* 结果：run `543b5cae-729a-48a8-babd-ef5573b6721b` `shadow_ready`；`status=ready`、`ready=true`、`reasons=[]`、`critical_unchanged=true`。`bindings.scope` 存在且只含本组合范围：`instruments=[MC:7e3cad2f…:EURUSD, MD:99f162c8…:EURUSD, MD:d00bccca…:EURUSD]`、`alert_ids=[45bfd944…]`、`realtime_keys=[3 条]`；快照 1 条告警 / 3 条告警版本 / 1 条发布行 / 2 条实时偏好。修复前导致失败的 `BTCUSDT` 发布行不再入快照。
+* 前向证明（无关品种写入不再导致失败）：shadow 运行期间由同进程线程改写**不在 scope 内**的 `BTCUSDT M1` 发布行（`revision 2145→2146`、`updated_at+1000`，见 `g1d-shadow-unrelated-write.json` 的 `tamper_outcome`），run `cd12f062-6809-4afc-8200-8c9565887eb0` 仍 `shadow_ready`、`critical_unchanged=true`；随后 `restore-unrelated` 写回原值（`2145|131|1793200916888`）。
+* 反向证明（scope 内改动仍必须失败）：见下面独立小节。
+
+**反向证明：范围收敛没有削弱保护** —— artifact：`results/track-c/g1c-shadow-tampered.json`、`g1c-shadow-tampered-report.json`、`g1c-restore-scope-after-proof.json`
+
+* 做法：shadow 运行期间（同进程线程 100ms 轮询，检测到本次窗口的 run 行后立即执行）改动**本组合自己**的两行：告警 `45bfd944…` 的当前 `chart_alert_versions.effective_at`（+1）与 `MD:99f162c8…:EURUSD` 的 `chart_publications.complete_count/updated_at`（+1/+1000）。原值先写入 `preferences.track_c_acceptance:tamper`，运行后由 `restore-scope` 逐列写回并删除该键。
+* 结果：run `33567e42-ef29-40bf-ace4-b455bf703df9` **`state=failed`、`phase=shadow_failed`**，`error_summary.reasons=[{"code":"binding_changed","detail":"有效绑定在 shadow 运行期间发生变化"}]`；`bindings.critical_unchanged=false`，其中 `alert_versions.unchanged=false`、`publications.unchanged=false`，`alerts`/`realtime_preferences` 仍为 `true`。
+* 恢复：`restore-scope` 写回后复核 `chart_publications=(complete_count 1, revision 4, updated_at 1793201334643)`、`chart_alert_versions.effective_at=1793199960000`、`preferences` 无临时键残留；随后一次干净 shadow（run `f7fa959d-a160-437b-af0d-adf3d7cd6322`）重新 `shadow_ready` / `critical_unchanged=true`。
+* 报告内容：`bars`（9 个周期，history/target 段均 `compared`；M1 target 段 60 根全同、`changed=0`，history 段 `missing=60` 因为候选历史起点更晚）、`indicators`（无指标规则 → 空，两端 `has_value=false`）、`gaps`（`observed_minutes=4675`，`missing_minutes=[]`，`uncovered=[history]`）、`paused_rules`（1 条规则，`will_pause=false`）、`preparation`（`ready=true`，`input_revision=5`，`periods_ready=true`）。
+
+### G2 · A04b 一致激活 —— 通过
+
+artifact：`results/track-c/g2-activation.json`、`g2-fencing.json`、`g2-pause.json`
+
+1. 一致激活（组合 A，由 market-runtime 的 `switch_activation` 循环执行）：run `822ab313…` 持久化 `state=succeeded`、`phase=activated`、`attempts=0`；`active_revision_id` 切换到 `066483b8…`；`CompositeActivation.event_boundary=1793199540000`、`input_revision=8`。
+2. 可重定位规则重绑为新版本行：告警 `45bfd944…` `version 1→2`，新版本行 `market_identity.composite_revision_id` 指向新修订，`evidence.alerts.rebound=[{id, revision_id, version:2, previous_revision_id:旧}]`；旧版本行（version 1）内容与绑定修订保持不变，条件/几何/`seam_policy` 原样保留；告警 `state={}`、`effective_at=boundary`、`control_revision=2`、`runtime.switch_run_id/switch_boundary` 写入，`health=warming`（"组合修订切换后建立新判定基准"）。
+3. 指标基线重建：`evidence.metrics={input_revision:8, frames:[9 个周期], boundary, run_id, policy:watermarks_consolidated_at_event_boundary}`，全部周期任务 `applied_input_revision>=8`。
+4. 旧修订冻结：`preparations[483db6a3].frozen=true`，`fence={waterline:15, boundary, run_id}`；迟到 `apply_minutes`（`late_minute=1793199360000`）结果 `applied_to_old=[]`（只写进了新修订，`input_revision 8→9`），`aggregate_claim_after_freeze=null`、`aggregate_tick_after_freeze=false`、`waterline_unchanged=true`、`CompositeAggregateBar` 前后同为 46970 行。
+5. 切换前数据不回放、无重复告警：激活前后 `judgments 7→7`、`notifications 4→4`、`outbox 3→3`；激活后第一次判定（G3 中）结果为 `initial_baseline`，没有把切换前的穿越重放成新事件。
+6. 成功后 `unlocked_runs` 出现该 run（`822ab313…`，`unlocked=true`）。
+7. 不可重定位（日历不同）分支（组合 B）：utc0 候选 `a0be0d03…`（`change_aggregation` 派生数据集 `f94f7045…`，版本 `2e28b0cf…`）激活 run `5024863b…` `succeeded/activated`，`active_revision_id` 切到候选；规则**未重绑**（仍是 `version 1`，绑旧修订 `05694f9d…`），状态 `paused/blocked`，`health_reason="组合修订切换后该规则暂不可迁移：目标修订服务日历 utc0，与规则绑定的 ny17 不兼容"`，并在同一次成功事务内写出 1 条汇总 system 消息（payload `topic=switch_run`, `run_id=5024863b…`, `stage=alerts`）。
+
+### G3 · A05 周日基线不依赖 API —— 通过
+
+artifact：`results/track-c/g3-feed.json`、`g3-shadow.json`、`g3-activate.json`
+
+* `api` 容器停止：`status=exited exit=0`（停止时刻 `2026-10-28T15:03:54Z`），shadow 与激活期间再次确认 `api status=exited exit=0`。
+* 输入→组合聚合→判定检查点继续推进：写入 240 条新源分钟（`window=[1793199420000,1793213820000]`，`apply_minutes` 产生新输入），`preparation.input_revision 9→10`、`confirmed_end` 前移，9 个周期任务在 4 秒内 `applied_input_revision 9→10`（data-worker 循环推进），判定检查点 `judgments 7→8`（新基准，无穿越重放）。
+* API 停止期间的 shadow：run `dedac8e8…` `shadow_ready`、`ready=true`、`reasons=[]`；激活：`activation_cycle` `status=activated`，`active_revision_id` 切到 `4271c8d0…`（run `85d9ea55…` `succeeded/activated`）。
+* 之后恢复 api：`api Up (healthy)`（`G4` 前）。
+
+**修复后复验（api 仍停机、不停 data-worker，HEAD `0716c4fc`）** —— artifact：`results/track-c/g3b-shadow-rerun.json`、`g3b-version-frames.json`、`g3-shadow-first-attempt.txt`（修复前失败证据，保留）
+
+* 做法：使用最新已发布历史版本（`5eef2e1b…`，end 4 天前，`--stage frames` 补齐 9 个周期产物）作为候选，用 `next_weekly` 显式开新窗口跑 shadow；期间 `api` 保持 `exited 0`、`data-worker` 保持运行（同一 `StartedAt`、`RestartCount=0`）。
+* 结果：run `b2ff067e-e032-4316-931c-b850e836e9cd` `shadow_ready`，`status=ready`、`ready=true`、`reasons=[]`、`critical_unchanged=true`；`bindings.scope` 同样只含 3 个本组合 instrument / 1 个 alert_id；候选 `e808c0a1…` 准备 `ready（input_revision=2，periods_ready=true）`。即 API 停机 + data-worker 正常发布并行时，周日候选仍能就绪。
+* 修复前的失败证据保留：`g3-shadow-first-attempt.txt`（`binding_changed`，`publications.rows=12`、`unchanged=false`，原因是 BTCUSDT 等无关品种的发布写）。
+
+### G4 · A13a/A13b dry-run —— 通过（零删除）
+
+artifact：`results/track-c/g4-dry-run.json`
+
+* 30 天下界：`lower_bound=1790608190341`（= now − 720 h），候选严格早于下界。
+* 候选：`source_minutes=2104`、`source_revisions=2104`、`composite_minutes=1034`、`composite_inputs=1034`、`composite_input_events=3`；估算 `bytes=471824`、`rows=6279`。
+* 保护明细与跳过原因：`protected.revisions=1070`，`by_reason={active_composite_revision: 1022, alert_bound_revision: 1034}`，`detail` 前 50 条给出具体 `source_id/start/revision_id/reasons`（例：`reasons=["alert_bound_revision"]` 属于被暂停规则仍绑定的旧修订）。
+* 零删除：前后逐表行数差全为 0（`zero_deletion=true`），`skipped=[]`（该 run 已解锁、dry-run 批次可认领）。
+* 单列断言：`source_minutes_inside_window=13438`（未满 30 天数据）前后不变；`history_chunks=9`、`history_artifacts=54` 前后不变。
+
+### G5 · A13c 备份真实恢复 + 首次真实删除 + 幂等/续跑 —— 通过（恢复演练已改用产品入口重做）
+
+**G5a 恢复演练（产品入口，重做版）** — artifact：`results/track-c/g5b-backup-cli.json`、`g5b-restore-check-cli.json`、`g5b-restore-drill-marker.json`、`g5b-retention-status.json`、`g5b-temporary-databases.txt`、`g5b-backup-files.txt`、`g5b-after-restart.json`（`g5b-backup-cli-first-run.json` 为卷重建前的一次同款运行，保留）
+
+1. 备份：容器内 `python -m alerts.backup --directory /artifacts/backups`（backup 服务，`ALERTS_POSTGRES_BIN_DIR=/opt/pgbin/bin`）→ `/artifacts/backups/alerts-20261028T152036231475Z.dump`，**7 043 323 字节**，`sha256=e1d55632acd6748bb410f42c5c851b3fd4dadcc25a02879d31a836f7cb8e33d6`，同目录写出 `format=1/backend=postgresql/bytes/counts` 的 manifest（`.dump.json`）。
+2. 恢复校验：容器内 `python -m alerts.backup --restore-check <dump>` → `{"verified": true, "backend": "postgresql", "tables": 103}`；`restore_check` 自己 `CREATE DATABASE "alerts_restore_<uuid>" TEMPLATE template0`、`pg_restore --exit-on-error`、用 `sql_counts` 比对后 `DROP DATABASE`。临时库名从 PostgreSQL 日志取到：**`alerts_restore_646afa65edf1484cb40d47e3bb16f672`**（15:20:39 建 / 15:20:44 删），事后 `select count(*) from pg_database where datname like 'alerts_restore%'` = **0**（无遗留）。
+3. 门禁标记（同一产品入口）：容器内 `python -m alerts.cli retention --restore-drill /artifacts/backups` → `retention_window.restore_drill` 自行再做一次备份 + 真实恢复 + 写标记：artifact `retention-restore-eddde0c35c914965a0125cbcaead8c5a.dump`（7 043 391 字节，`sha256=26e07eb9d19c2986f94344475fda0adc3414745ac2142f78b8fd48428d4dd03a`）、`tables=103`、`verified_at=1793200863185`、schema `{tables:104, digest:5eeb6d13…, alembic:ba54_market_switch_runs}`；对应临时库 `alerts_restore_fe035aaab7f540d68f4d938c0c0fa113`（15:20:54 建 / 15:21:03 删）。
+4. 状态入口：`python -m alerts.cli retention --status` 返回同一标记 + `deletion_order`（5 张活分钟表）+ `window_hours=720`。
+5. 门槛持久：重启 data-worker 后 `g5-status` 读回同一标记（同 sha256/verified_at），期间 `retention_cycle(mode=dry_run)` 仍只标批次、行数未变；随后再次停止 data-worker（exit 0）。
+
+**G5b 首次真实删除 / 中断 / 续跑 / 幂等（沿用首轮结果）** — artifact：`results/track-c/g5-execute-1.json`、`g5-interrupted.json`、`g5-execute-2.json`、`g5-execute-3-idempotent.json`、`g5-after-restart.json`
+
+6. 首次真实删除（`ALERTS_RETENTION_MODE=execute`，run `822ab313…`）：第 1 次 pass 删除 200 行（`source_minutes 50, source_minute_revisions 50, composite_minutes 50, composite_minute_inputs 50`），逐表 delta 与报告一致；`@old` 列 delta 与总 delta 相同（删除全部落在 30 天窗口外）。
+7. 人为中断：`docker kill --signal=SIGKILL` 中断正在执行的 pass（容器 `exit 137`，`oom=false`），持久批次 `state=running`、`attempts=12`、`stats.rows=900`（每表 225，含中断前第 1 次的 50）；库内实际 `source_minutes@old` 从 2104 降到 1879 = 225，**与累计 stats 完全一致，无重复计数**。
+8. 续跑：同一 run 再执行 → 删除 809 行/表 + 3 条 `composite_input_events`（`rows=3239`），批次 `state=completed`、累计 `stats.rows=4139`（每表 1034、events 3）；库内实际 `source_minutes@old` 2104→1070 = 1034，**累计 stats 与实际删除逐表相等（不重复、不跳删）**；剩余 1070 条全部是受保护修订（B 侧）的旧分钟（重做演练后同一列为 1072，因为 30 天下界随墙钟前移了 2 分钟）。
+9. 幂等：同一 run 第 3 次执行 → `rows=0`、`idempotent=true`、`batch.state=completed`、逐表 delta 全 0。
+10. 未满 30 天与历史表：三次 pass 的 `source_minutes_inside_window` 恒为 13438；`history_chunks=9`、`history_artifacts=54` 恒定；`bars` 5659→5661→5662 的 +3 行是 data-worker 发布循环写入的 BTCUSDT H1 新行（与清理无关，见偏差 9）。
+
+**对照：首轮的手工演练（历史记录，未删除）** — artifact：`g5-backup-counts.json`、`g5-restore-counts.json`、`g5-restore-verification.json`、`g5-marker.json`、`g5-drill-commands.sh`。首轮因为不知道/没使用产品备份入口（`deploy/Dockerfile.backup` + `ALERTS_POSTGRES_BIN_DIR`），改用 PostgreSQL 容器内的 `pg_dump/pg_restore` 手工完成：dump `/home/quant/tc-scratch/track-c.dump`（6 558 905 字节，`sha256=cce6bb5f…`）、临时库 `track_c_restore_1793200123`、103 表计数完全一致（`differences={}`）、标记经 `retention_window.save_restore_drill` 写入。结论与产品入口一致，但它绕过了产品入口，因此以 G5a 为准。
+
+### G6 · 失败安全 —— 通过
+
+artifact：`results/track-c/g6-shadow.json`、`g6-activate.json`
+
+* 触发：候选 `7b1a45b8…`（新历史版本 `f09b0945…`）shadow 到 `shadow_ready` 后，在 dry 环境里由驱动脚本把 `switch_activation.consolidate_metrics` 替换为抛错实现（注入，见偏差 7），连续激活 3 次，3 次均 `ValueError("验收注入：指标水位重建失败")`。
+* run：`ae9720ac…` `state=partial`、`phase=metrics`、`attempts=2`、`error_summary={stage:metrics, completed_stages:["alerts"], paused_alerts:[]}`（3 次尝试 = 首次建行 + 2 次原地重试，与 `attempts=2` 一致）。
+* 去重消息：按 run id 过滤 `notifications=1`（`ddd0d8f4…`, `attempts=2`, `state=partial`）、`outbox=1`（`518dfb3d…`），多次重试后仍各 1 条。
+* `unlocked_runs` 不含该 run（只含 3 个 succeeded 运行）。
+* retention 拒绝清理：`retention_window.dry_run(ae9720ac…)` → `skipped=[{reason:"switch_run_partial", detail:"只有持久化的 succeeded 切换运行解锁清理"}]`，`rows=0`。
+
+## 4. 容器退出状态
+
+| 容器 | 结束状态 |
+|---|---|
+| mw-track-c-20261028-postgres-1 | exited 0 |
+| mw-track-c-20261028-migrate-1 | exited 0 |
+| mw-track-c-20261028-api-1 | exited 0（G3 中被主动停止过 1 次，exit 0） |
+| mw-track-c-20261028-market-runtime-1 | exited 0（G6 前主动停止） |
+| mw-track-c-20261028-data-worker-1 | 首轮多次停/启均 exit 0；复验会话里自 `15:27:38` 起一次性运行至收尾（`RestartCount=0`），收尾 `stop -t 30` 后 exited 0 |
+| mw-track-c-20261028-notification-worker-1 | exited 0 |
+| mw-track-c-20261028-backup-1 | 仅 `created`/`exited 0`（maintenance profile 的一次性入口，G5a 用 `run --rm` 执行） |
+| tc-interrupt（G5 中断实验的一次性容器） | exit 137（SIGKILL，`oom=false`） |
+
+## 5. 残余资源与停止状态
+
+* 全部容器已停止：第一次 `docker compose stop -t 30` 在 `2026-10-28T15:14:07Z`，G5a 产品入口重做时再次起停（`2026-10-28T15:19:57Z` 起 postgres → `15:21` 后停 data-worker → 收尾再 `stop -t 30`）。未 `down -v`、未删 volume、未 prune、未动其它 project。
+* 保留：network `mw-track-c-20261028`、volume `mw-track-c-20261028-postgres`（544 MB）、volume `mw-track-c-20261028-artifacts`（13.7 MB，含两份产品路径 dump + manifest）、镜像 `sha256:995534fb…` 与 `sha256:a389ed49…`（共用依赖镜像，未删）。
+* 备份件保留在仓库外：`/home/quant/tc-scratch/track-c.dump`（首轮手工演练，6 558 905 B，sha256 `cce6bb5f…`）；产品路径的两份 dump 在任务命名卷 `mw-track-c-20261028-artifacts:/artifacts/backups`（`e1d55632…` 7 043 323 B、`26e07eb9…` 7 043 391 B），两者都未放入仓库。
+* `pg_dump/pg_restore` 的暂存目录 `/home/quant/tc-scratch/tc-backup-bin`（bin 2 个 + libs 4 个）保留，供重跑 G5a 使用。
+* 复验会话（HEAD `0716c4fc`）新增证据：`g1b-worker-baseline.txt`、`g1b-worker-lifecycle.txt`（data-worker `StartedAt`/`RestartCount`/日志连续性与 4 个检查点）、`g1c-out-of-scope-writes.txt`（scope 外 BTCUSDT 发布行快照）。
+* 起停命令：见 §1；G5a 与复验命令见 §7。
+
+## 6. 偏差、未覆盖与建议（如实）
+
+1. **服务以宿主 uid 运行**：worktree 是 `0700/0600`（uid 1000），镜像内 `app` 用户是 10001，无法遍历只读挂载；overlay 里给后端服务加了 `user: "1000:1000"`。不是代码问题，但属于与阶段 4 overlay 的差异。
+2. **关闭 market-runtime 的判定轮询**（`ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED=false`）：本实例没有任何供应商可达，真实判定轮次第一轮就会把种子告警判成 `stale/paused`。判定证据改为 seed 期内用 `chart_alert_worker.evaluate`（固定验收时钟 + 通过 storage 模型写入的 `LiveState/PricingOwner` 与实时开关）产生；因此"历史判定/信号"是真的应用判定路径产物，但驱动者是脚本而非容器循环。
+3. **组合 B 用 USD/CAD**：`composite_matching.product_rule` 只对 EUR_USD / USD_CAD / XAU_USD 有同产品规则，GBP_USD 无法建立可审核映射。B 的实时开关在建完告警后被显式关闭，避免 data-worker 的周日循环对没有可用候选基线的 B 反复空转。
+4. **日历不同候选是显式创建**：`candidate_plan` 只从组合自己的数据集挑最新已发布版本，拿不到 `change_aggregation` 派生到另一个数据集的 utc0 版本；因此 G2 暂停分支用 `composite_revisions.create` 显式建候选（与 `test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity` 同一路径）。
+5. **G1 的"将暂停规则"为空**：候选与当前修订同日历同口径，报告确有 `paused_rules` 段但 `will_pause=false`；真正的暂停证据在 G2 的组合 B（日历不同）。
+6. **备份/恢复：已用产品备份入口完成（更正前一版结论）**。前一版报告写成"后端镜像缺 pg_dump/pg_restore，因此走 maintenance 方式"——那只对不带备份工具的 api 镜像成立；产品路径是存在的：`deploy/Dockerfile.backup` 以应用镜像为基、从 PostgreSQL 镜像 `COPY` 两个二进制到 `/usr/local/bin`，`compose.production.yaml` 的 `backup` 服务再设 `ALERTS_POSTGRES_BIN_DIR=/usr/local/bin`。本次验收**未构建 `Dockerfile.backup`**（不在 Boundary 内，也不需要），而是在自己的 overlay 里加一个同形的 `backup` 服务：同一 digest 应用镜像 + 从固定 digest PostgreSQL 镜像取出的同版本 `pg_dump/pg_restore` 与 4 个缺失共享库（任务私有目录只读挂载到 `/opt/pgbin`）+ `ALERTS_POSTGRES_BIN_DIR=/opt/pgbin/bin` + `profiles: [maintenance]`。随后用**产品代码入口**跑完整个门禁：`python -m alerts.backup --directory /artifacts/backups`（备份 + manifest）、`python -m alerts.backup --restore-check <dump>`（真实恢复到临时库 + `sql_counts` 比对）、`python -m alerts.cli retention --restore-drill /artifacts/backups`（`retention_window.restore_drill` 自己再做一次备份+恢复并写标记）、`python -m alerts.cli retention --status`（读回标记）。结果见 G5a，均通过。首轮的 PostgreSQL 容器手工方式保留为对照（G5 末段），没有删除历史记录。遗留建议（非阻塞）：把"备份工具从哪儿来"写进验收文档模板，避免再次绕过产品入口；若要在验收里直接用 `Dockerfile.backup`，需要允许构建该镜像。
+7. **G6 的失败是脚本层注入**（替换 `switch_activation.consolidate_metrics`），未改仓库代码。原因：真实数据上 `create()/collection_identity` 已挡住 ask/更粗/未验证来源，能力闸门失败会发生在 `open_run` 之前（无法产生 run 行）；而 readiness 与 `consolidate_metrics` 共用同一水位判据，无法只让后者失败。注入点之后的一切（回滚、`partial`、去重通知、retention 拒绝、`unlocked_runs` 排除）都是真实代码路径。为了不让 market-runtime 的真实循环把这枚候选激活成功，G6 前停止了 market-runtime。
+8. **shadow 绑定范围（已修复并复验）**：首轮 G3 shadow 曾被 `binding_changed` 判失败——data-worker 的发布循环每周期都在写 `chart_publications`（BTCUSDT 等），而旧实现把整表当作 critical 绑定；当时只能让 shadow 窗口内停掉 data-worker（失败证据见 `g3-shadow-first-attempt.txt`，未删除）。HEAD `0716c4fc` 把快照收敛到 `scope`（本组合 instrument ∪ 固定历史数据集 instrument ∪ 实时映射目标 instrument、本组合告警的全部版本行、这些 instrument 的发布行、对应 `managed_realtime:*` 偏好），比较仍是逐列内容 + sha256。**复验结论**：不停 data-worker、不动 market-runtime 的前提下，(a) 干净 shadow 通过（`g1b-shadow-rerun.json`、`g3b-shadow-rerun.json`、`g1c-shadow-restored.json`）；(b) 运行期间改写 scope 外的 `BTCUSDT` 发布行仍通过（`g1d-shadow-unrelated-write.json`）；(c) 运行期间改写 scope 内的一行告警版本 + 一行发布仍失败于 `binding_changed`（`g1c-shadow-tampered.json`，run `33567e42…`）。修复后不再需要停 data-worker。
+9. **历史表计数不是全程恒定**：30 天清理只作用于 `DELETION_ORDER` 的五张活分钟表（报告里的 `deleted` 只有这五个键）；session 期间 `candles/history_chunks/history_artifacts` 的增长来自其它 worker（BTCUSDT 发布 + 后续版本发布），清理前后紧邻快照（G4/G5）显示 `history_chunks=9`、`history_artifacts=54` 不变，`bars` +3 为 BTCUSDT H1 新行。
+10. **gap 扫描的 `expected_minutes=0`**：种子目标品种没有 `calendar_profile`（未声明休市），`_closed()` 对每分钟都返回 false，所以"预期分钟"为 0、"缺失分钟"为空；这是数据形状的局限，不是判定被放宽。
+11. **批次 `completed` 不等于窗口清空**：执行批次在跳过全部受保护候选后以 `completed` 结束，同时 `remaining.source_minutes=1070`（B 侧受保护旧分钟）。若之后解除保护，需要新的 succeeded run 才能再清；这符合"只有 succeeded 运行解锁、且受保护修订永不删除"的设计，但值得在运维文档里写明。
+12. **未覆盖**：真实备用供应商与真实故障切换（Track C 明确不交付）；web 服务未启用；未做并发激活压测（只有 `test_switch_activation_postgres` 层面的 4 线程并发结论）；未对 SQLite 路径重复以上门槛。
+
+## 7. 复现要点
+
+```bash
+# G1（api/data-worker 未启动时执行，避免供应商桥接与发布写）
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml run --rm --no-deps -T \
+  data-worker python /candidate/scripts/track_c_acceptance_run.py g1-shadow
+# G2（起 api/market-runtime 后由周日激活循环完成，再取证据）
+... run --rm --no-deps -T data-worker python /candidate/scripts/track_c_acceptance_run.py g2-activation
+... g2-fencing / g2-pause（g2-pause 会先派生 utc0 数据集、准备并更新 utc0 候选）
+# G3（停 api，data-worker 用于推进聚合）
+... g3-feed ; ... g3-shadow ; ... g3-activate
+# G4/G5/G6
+... g4-dry-run --run-id <succeeded run>
+# G5a 产品备份入口（maintenance profile；ALERTS_POSTGRES_BIN_DIR 已在 overlay 内）
+docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptance.yaml \
+  --profile maintenance run --rm --no-deps -T backup                      # 备份 + manifest
+docker compose ... --profile maintenance run --rm --no-deps -T backup \
+  python -m alerts.backup --restore-check /artifacts/backups/<name>.dump   # 真实恢复 + 计数比对
+docker compose ... --profile maintenance run --rm --no-deps -T backup \
+  python -m alerts.cli retention --restore-drill /artifacts/backups        # 再演练一次并写标记
+docker compose ... --profile maintenance run --rm --no-deps -T backup \
+  python -m alerts.cli retention --status                                  # 读回标记
+# G5 首轮对照（PostgreSQL 容器手工方式，保留）
+bash results/track-c/g5-drill-commands.sh
+... g5-execute --run-id <run> --limit 200 --chunk 50      # 首次真实删除（execute 模式）
+... g5-execute --run-id <run> --limit 5000 --chunk 50     # 中断实验/续跑
+... g5-execute --run-id <run> --limit 5000 --chunk 50      # 幂等零删除
+... g6-shadow ; ... g6-activate --attempts 3
+... final
+# 修复后复验（HEAD 0716c4fc，data-worker 不停）
+... g1-shadow                        # fresh_slot + next_weekly，干净 shadow 通过
+... g1-shadow-unrelated-run --days 0  # 运行期间写 scope 外的 BTCUSDT 发布行 → 仍通过
+... restore-unrelated
+... g3-shadow --days 0               # api 停机 + data-worker 运行，新窗口 shadow 就绪
+... g1-shadow-tampered-run --days 0  # 运行期间写 scope 内的告警版本+发布行 → 必须 failed/binding_changed
+... restore-scope ; ... g1-shadow    # 恢复后再跑一次干净 shadow
+... run-report --run-id <failed run> # 归档失败报告
+```

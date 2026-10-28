@@ -1,0 +1,303 @@
+{
+  "failures": [
+    {
+      "type": "ValueError",
+      "detail": "验收注入：指标水位重建失败"
+    },
+    {
+      "type": "ValueError",
+      "detail": "验收注入：指标水位重建失败"
+    },
+    {
+      "type": "ValueError",
+      "detail": "验收注入：指标水位重建失败"
+    }
+  ],
+  "run": {
+    "id": "ae9720ac-7cb3-4497-9565-29ac2d7a8749",
+    "state": "partial",
+    "phase": "metrics",
+    "attempts": 2,
+    "error_summary": {
+      "stage": "metrics",
+      "type": "ValueError",
+      "reason": "验收注入：指标水位重建失败",
+      "completed_stages": [
+        "alerts"
+      ],
+      "paused_alerts": []
+    },
+    "retention": {}
+  },
+  "notifications": [
+    {
+      "id": "0e3e0546-bd8d-4d00-9f34-680be5290bc8",
+      "kind": "signal",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "6758d0f5-4951-46c7-a744-77f9cbac63c1",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "856e2b1f-68d5-4591-9e16-a1cd9ef8a03f",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "22455991-ac49-4080-94ae-0df3ee6b2880",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "76c9f0ed-6fa5-4946-b4e2-5d0d112d195c",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "8365e4ac-384b-5582-9c82-1dc507f22eb6",
+      "kind": "system",
+      "run_id": "5024863b-0b8c-4476-8c0f-2bab18e8a5e0",
+      "attempts": 0,
+      "state": "succeeded",
+      "errors": [
+        {
+          "key": "alerts|95c4ec91-3b35-41bf-93db-41eb4187a45b|rule_not_relocatable",
+          "stage": "alerts",
+          "scope": "95c4ec91-3b35-41bf-93db-41eb4187a45b",
+          "type": "rule_not_relocatable",
+          "reason": "目标修订服务日历 utc0，与规则绑定的 ny17 不兼容",
+          "at": 1793199797698,
+          "last_at": 1793199797698,
+          "seen": 1
+        }
+      ]
+    },
+    {
+      "id": "e52179a0-7e20-4a33-aed3-b27ea39a701b",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "2f8e4c90-eef4-42d9-b24a-7e61db50ce56",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "abb55df9-d6bb-42eb-9a30-4ca0701bfc0d",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "1191f9e0-04ef-4bd9-aefb-47caca12e0bd",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "36fdcda8-48f6-4da9-8291-0090f5559c73",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "17fdaa63-0243-4b2b-a847-0cbc4c5fc8d4",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "2bf33416-3207-4579-a99c-71e6848d4b99",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "1f93983d-0e0e-45ea-a03c-33978676ee09",
+      "kind": "system",
+      "run_id": null,
+      "attempts": null,
+      "state": null,
+      "errors": null
+    },
+    {
+      "id": "ddd0d8f4-ea5c-54c3-9503-faecfff33e99",
+      "kind": "system",
+      "run_id": "ae9720ac-7cb3-4497-9565-29ac2d7a8749",
+      "attempts": 2,
+      "state": "partial",
+      "errors": [
+        {
+          "key": "metrics|switch|ValueError",
+          "stage": "metrics",
+          "scope": "switch",
+          "type": "ValueError",
+          "reason": "验收注入：指标水位重建失败",
+          "at": 1793200361049,
+          "last_at": 1793200361197,
+          "seen": 3
+        }
+      ]
+    }
+  ],
+  "outbox": [
+    {
+      "id": "34cf7403-7eeb-44f0-b1aa-db2696e777e7",
+      "notification_id": "6758d0f5-4951-46c7-a744-77f9cbac63c1"
+    },
+    {
+      "id": "2e84d775-32fc-41c9-a40b-3d744e048986",
+      "notification_id": "856e2b1f-68d5-4591-9e16-a1cd9ef8a03f"
+    },
+    {
+      "id": "c1cead9f-647c-4592-8a8e-f3775bc962d4",
+      "notification_id": "22455991-ac49-4080-94ae-0df3ee6b2880"
+    },
+    {
+      "id": "d8412357-492c-4b53-90ea-d8eecd746277",
+      "notification_id": "76c9f0ed-6fa5-4946-b4e2-5d0d112d195c"
+    },
+    {
+      "id": "5504c162-720f-555e-a7ea-7ffcea65018e",
+      "notification_id": "8365e4ac-384b-5582-9c82-1dc507f22eb6"
+    },
+    {
+      "id": "0aa2e865-a7c0-48d6-a05d-c0ce70143711",
+      "notification_id": "e52179a0-7e20-4a33-aed3-b27ea39a701b"
+    },
+    {
+      "id": "70d70b72-b0a4-4e4e-be17-141d7f78bcb1",
+      "notification_id": "2f8e4c90-eef4-42d9-b24a-7e61db50ce56"
+    },
+    {
+      "id": "2af8c535-112f-4b6c-8f93-2190bfbab6e8",
+      "notification_id": "abb55df9-d6bb-42eb-9a30-4ca0701bfc0d"
+    },
+    {
+      "id": "6646b851-98e3-4ae3-b830-f9c0bd93aae1",
+      "notification_id": "1191f9e0-04ef-4bd9-aefb-47caca12e0bd"
+    },
+    {
+      "id": "ef632661-d8cb-458c-aee4-34e3c91364a1",
+      "notification_id": "36fdcda8-48f6-4da9-8291-0090f5559c73"
+    },
+    {
+      "id": "61001548-1578-42f8-808d-fb97dfd0d977",
+      "notification_id": "17fdaa63-0243-4b2b-a847-0cbc4c5fc8d4"
+    },
+    {
+      "id": "8c669e79-9e30-49bd-811e-b57a3d4fad95",
+      "notification_id": "2bf33416-3207-4579-a99c-71e6848d4b99"
+    },
+    {
+      "id": "c980639b-f819-4dd1-ad1c-87cf5bb9d455",
+      "notification_id": "1f93983d-0e0e-45ea-a03c-33978676ee09"
+    },
+    {
+      "id": "518dfb3d-7c62-517c-b38a-a826b6092eac",
+      "notification_id": "ddd0d8f4-ea5c-54c3-9503-faecfff33e99"
+    }
+  ],
+  "run_notifications": [
+    {
+      "id": "ddd0d8f4-ea5c-54c3-9503-faecfff33e99",
+      "run_id": "ae9720ac-7cb3-4497-9565-29ac2d7a8749",
+      "attempts": 2,
+      "state": "partial"
+    }
+  ],
+  "run_outbox": [
+    {
+      "id": "518dfb3d-7c62-517c-b38a-a826b6092eac",
+      "notification_id": "ddd0d8f4-ea5c-54c3-9503-faecfff33e99"
+    }
+  ],
+  "run_notification_rows": 1,
+  "run_outbox_rows": 1,
+  "unlocked_runs": [
+    "822ab313-6cec-4411-9572-8239794bd7fe",
+    "5024863b-0b8c-4476-8c0f-2bab18e8a5e0",
+    "85d9ea55-5c19-42c1-8999-db4bc6084279"
+  ],
+  "retention_refusal": {
+    "run": {
+      "id": "ae9720ac-7cb3-4497-9565-29ac2d7a8749",
+      "kind": "revision_activation",
+      "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+      "state": "partial",
+      "unlocked": false,
+      "finished_at": 1793200361197,
+      "batch": {}
+    },
+    "dry_run": true,
+    "window_hours": 720,
+    "lower_bound": 1790608361268,
+    "now": 1793200361268,
+    "deleted": {
+      "market_composite_minute_inputs": 0,
+      "market_composite_minutes": 0,
+      "market_composite_input_events": 0,
+      "market_source_minutes": 0,
+      "market_source_minute_revisions": 0
+    },
+    "rows": 0,
+    "bytes": 0,
+    "candidates": {
+      "source_minutes": 0,
+      "source_revisions": 0,
+      "composite_minutes": 0,
+      "composite_inputs": 0,
+      "composite_input_events": 0
+    },
+    "protected": {
+      "revisions": 0,
+      "by_reason": {},
+      "detail": [],
+      "detail_truncated": false
+    },
+    "remaining": null,
+    "batch": null,
+    "skipped": [
+      {
+        "reason": "switch_run_partial",
+        "detail": "只有持久化的 succeeded 切换运行解锁清理"
+      }
+    ],
+    "limit": 20000,
+    "chunk": 1000,
+    "budget_ms": 20000
+  }
+}
