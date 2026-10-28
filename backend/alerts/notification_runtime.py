@@ -169,8 +169,10 @@ def inspect_health(*, startup_grace_until=0):
         for fault_id in current:
             key_name = "runtime_incident:" + fault_id
             row = db.get(Preference, key_name)
-            value = row.value if row else {"state": "active", "opened_at": now,
-                                            "last_notified_at": 0}
+            # A copy, never the column's own dict: an in-place edit leaves the
+            # attribute unchanged and the reminder time never reaches the row.
+            value = dict(row.value) if row else {"state": "active", "opened_at": now,
+                                                 "last_notified_at": 0}
             newly_opened = row is None or value.get("state") != "active"
             group, role = fault_id.split(":", 1)
             category = next(category for fault_group, fault_role, category in faults
@@ -224,7 +226,7 @@ def main():
     action.add_argument("--maintenance-minutes", type=int,
                         help="bounded planned-maintenance window for this deployment")
     parser.add_argument("--maintenance-group", action="append", default=[],
-                        help="role group to pause (default: market, data, notifications)")
+                        help="role group to pause; omit to pause every group, including runtime")
     action.add_argument("--end-maintenance", action="store_true",
                         help="clear the maintenance window and resume checks")
     args = parser.parse_args()

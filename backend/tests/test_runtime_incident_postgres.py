@@ -123,3 +123,36 @@ def test_maintenance_window_is_durable_and_expires(incident_pg, monkeypatch):
         runtime_health.clear_maintenance(db)
     with transaction() as db:
         assert db.get(Preference, runtime_health.maintenance_key()) is None
+
+
+def test_active_fault_reminder_time_reaches_the_row(incident_pg, monkeypatch):
+    import json
+
+    from alerts import notification_runtime, runtime_health, storage
+    from alerts.storage import Notification, Preference, now_ms, transaction
+
+    scope(monkeypatch, market=("chart_alert",))
+    clock = [now_ms()]
+    monkeypatch.setattr(runtime_health, "now_ms", lambda: clock[0])
+    monkeypatch.setattr(storage, "now_ms", lambda: clock[0])
+
+    notification_runtime.inspect_health()
+    clock[0] += 900_000
+    notification_runtime.inspect_health()
+    with transaction() as db:
+        assert len(list(db.scalars(select(Notification)))) == 2
+        persisted = db.get(Preference, "runtime_incident:market:chart_alert").value
+    assert persisted["last_notified_at"] == clock[0]
+    assert persisted["observed_at"] == clock[0]
+
+    # An independent connection sees the same stored reminder time.
+    with incident_pg[1].connect() as connection:
+        raw = connection.execute(text("SELECT value FROM preferences WHERE key = :key"),
+                                 {"key": "runtime_incident:market:chart_alert"}).scalar_one()
+    assert (json.loads(raw) if isinstance(raw, str) else raw)["last_notified_at"] == clock[0]
+
+    for _ in range(5):
+        clock[0] += 15_000
+        notification_runtime.inspect_health()
+    with transaction() as db:
+        assert len(list(db.scalars(select(Notification)))) == 2

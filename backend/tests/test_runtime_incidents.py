@@ -370,3 +370,33 @@ def test_shared_default_window_would_report_a_sixty_second_poll_stale(database, 
     notification_runtime.inspect_health()
     assert "notifications / notification_retention" in notes(database)[0]["message"]
 
+
+
+def test_active_fault_reminder_time_is_persisted_for_the_next_cycle(database, monkeypatch):
+    """A reminder only counts once the row holds it; an edited alias would not."""
+    from alerts import notification_runtime, runtime_health, storage
+    from alerts.storage import Preference
+
+    scope(monkeypatch, market=("chart_alert",))
+    clock = [100_000_000]
+    monkeypatch.setattr(runtime_health, "now_ms", lambda: clock[0])
+    monkeypatch.setattr(storage, "now_ms", lambda: clock[0])
+
+    notification_runtime.inspect_health()
+    assert len(notes(database)) == 1
+
+    clock[0] += 900_000
+    notification_runtime.inspect_health()
+    assert len(notes(database)) == 2
+
+    # Only a fresh read of the row proves the write reached the JSON column.
+    with database.begin() as db:
+        db.expire_all()
+        persisted = db.get(Preference, "runtime_incident:market:chart_alert").value
+    assert persisted["last_notified_at"] == clock[0]
+    assert persisted["observed_at"] == clock[0]
+
+    for _ in range(5):
+        clock[0] += 15_000
+        notification_runtime.inspect_health()
+    assert len(notes(database)) == 2
