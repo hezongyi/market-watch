@@ -436,7 +436,7 @@ def api():
 
 
 # --------------------------------------------------------------- snapshots
-def snapshot(label):
+def snapshot(label, *, quiet=False):
     from alerts.config import settings
     from alerts.live_pricing import account_key
     from alerts.storage import (
@@ -512,6 +512,8 @@ def snapshot(label):
                 ChartAlertVersion.version == row.version))
             rules.append({"id": row.id, "health": row.health, "reason": row.health_reason,
                           "status": row.status, "count": row.count, "runtime": row.runtime,
+                          "run": row.run, "version": row.version,
+                          "control_revision": row.control_revision,
                           "state": row.state, "dataset": version.dataset_id if version else None})
         signals = [{"id": row.id, "rule": row.chart_alert_id, "occurred_at": row.occurred_at}
                    for row in db.scalars(select(SignalRow).order_by(SignalRow.id)).all()]
@@ -557,17 +559,19 @@ def snapshot(label):
             "demand": demand, "incidents": incidents,
         }
     write(ROOT / ("snapshot-" + label + ".json"), value)
-    print(json.dumps({
-        "label": label, "business_at": value["business_at"],
-        "roles": {role: {"state": row["state"], "error": row["error_type"],
-                         "boot": (row["boot_id"] or "")[:8]}
-                  for role, row in value["roles"].items()},
-        "source": value["source"], "interests": len(value["interests"]),
-        "signals": len(value["signals"]), "notifications": len(value["notifications"]),
-        "outbox": {status: sum(1 for row in value["outbox"] if row["status"] == status)
-                   for status in {row["status"] for row in value["outbox"]}},
-        "incidents": sorted(value["incidents"]),
-    }, ensure_ascii=False), flush=True)
+    if not quiet:
+        print(json.dumps({
+            "label": label, "business_at": value["business_at"],
+            "roles": {role: {"state": row["state"], "error": row["error_type"],
+                             "boot": (row["boot_id"] or "")[:8]}
+                      for role, row in value["roles"].items()},
+            "source": value["source"], "interests": len(value["interests"]),
+            "signals": len(value["signals"]), "notifications": len(value["notifications"]),
+            "outbox": {status: sum(1 for row in value["outbox"] if row["status"] == status)
+                       for status in {row["status"] for row in value["outbox"]}},
+            "incidents": sorted(value["incidents"]),
+        }, ensure_ascii=False), flush=True)
+    return value
 
 
 def session_states():
@@ -940,7 +944,7 @@ def main():
     parser.add_argument("action", choices=(
         "seed", "supplier", "runtime", "api", "snapshot", "chart", "slow-source",
         "price", "supplier-state", "provider-quiet", "test-notifications",
-        "notify", "projection-watch", "rules", "fence-old", "fence-new"))
+        "notify", "projection-watch", "rules", "fence-old", "fence-new", "a09"))
     parser.add_argument("--profile", choices=("market", "alert", "data", "notifications"),
                         default="market")
     parser.add_argument("--fault", choices=("exception", "stuck"))
@@ -999,6 +1003,10 @@ def main():
             notify_claim(args.phase)
     elif args.action == "projection-watch":
         projection_watch(args.seconds)
+    elif args.action == "a09":
+        from stage5_a09_probe import run
+
+        run(args.phase, args.seconds, sys.modules[__name__])
     elif args.action == "rules":
         rules(args.phase)
     elif args.action == "fence-old":
