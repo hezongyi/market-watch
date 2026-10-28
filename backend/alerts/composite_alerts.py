@@ -259,30 +259,62 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
     return resolved
 
 
-def shared_context(db, identities, now, *, clock=None):
-    """Read the state every rule in one composite revision group reuses.
+def static_context(db, identities):
+    """Read the composite baseline every rule of one turn shares.
 
-    Rules grouped by composite_revision_id share the dataset locks, the
-    post-lock production clock and the fixed input waterline. Anything that
-    depends on a rule's timeframe, mode, indicators or drawing stays in
-    evaluate; a rule bound after the group read falls back to that full path.
+    These rows are fixed for a turn: an import or an explicit edit inserts a new
+    revision, history version or mapping instead of rewriting one. So one
+    read-only pass per turn is enough, and it takes no lock and no production
+    clock -- each rule still locks its own datasets and reads the clock after.
     """
-    from .composite_quotes import live_snapshot
-    from .realtime_switch import enabled
-
     identity = identities[0]
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
     composite = db.get(MarketComposite, identity["composite_id"])
     mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
     target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
-    shared = {"revision": revision, "composite": composite, "mapping": mapping, "target": target}
+    return {"revision": revision, "composite": composite, "mapping": mapping, "target": target,
+            "history": db.get(HistoryVersion, revision.history_version_id) if revision else None,
+            "source": db.get(MarketDataset, identity["dataset_id"]),
+            "target_instrument": db.get(Instrument, target.instrument_id) if target else None}
+
+
+def bound(static, identity):
+    """True when the shared baseline is still the one this rule was bound to."""
+    revision, composite, target = static["revision"], static["composite"], static["target"]
+    return bool(revision and composite and target and static["history"] and static["target_instrument"]
+        and revision.id == identity["composite_revision_id"] and revision.composite_id == composite.id
+        and revision.history_version_id == identity["history_version_id"]
+        and revision.rules == identity["rules"] and revision.seam == identity["seam"]
+        and target.identity == identity["target_identity"])
+
+
+def rule_context(db, identity, static, now, *, clock=None):
+    """Lock one rule's datasets, read the clock, then read what can still move.
+
+    Runs inside the rule's own write transaction. The shared baseline is used
+    only while it still describes this rule: a rebound version, or a locked
+    dataset that no longer carries the shared identity, is re-read here instead
+    (returning None asks the caller to repeat the turn from a complete read).
+    """
+    from .composite_quotes import live_snapshot
+    from .live_session import session_status
+    from .realtime_switch import enabled
+
+    fresh = static is None or not bound(static, identity)
+    if fresh:
+        static = static_context(db, [identity])
+    shared = dict(static)
+    revision, target = static["revision"], static["target"]
     if revision is None or target is None:
         return shared  # This rule's own validation reports the changed baseline.
     # Evidence writers/reference protection take exclusive dataset locks. Take
     # them in order before shared artifact reads, avoiding reader lock upgrades.
-    dataset_ids = {item["dataset_id"] for item in identities} | {target.id}
-    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
-        sorted(dataset_ids))).order_by(MarketDataset.id).with_for_update()))
+    locked = {row.id: row for row in db.scalars(select(MarketDataset).where(
+        MarketDataset.id.in_(sorted({identity["dataset_id"], target.id}))).order_by(
+            MarketDataset.id).with_for_update())}
+    if not fresh and (target.id not in locked or locked[target.id].identity != target.identity):
+        return None  # The shared dataset read was overtaken; re-read for this rule.
+    target = locked.get(target.id, target)
     # Source writers take these dataset locks before LiveState. Capture the
     # production clock after lock acquisition, so a source commit while we
     # waited cannot look like future input and reset a valid crossing baseline.
@@ -290,22 +322,19 @@ def shared_context(db, identities, now, *, clock=None):
     stamp = now if now is not None else now_ms()
     if clock is not None:
         stamp = clock()
-    shared["now"] = stamp
-    source_dataset = db.get(MarketDataset, identity["dataset_id"])
-    if not enabled(db, source_dataset.instrument_id):
+    shared.update(now=stamp, target=target)
+    source = locked.get(identity["dataset_id"], static["source"])
+    if not enabled(db, source.instrument_id):
         shared["source_enabled"] = False
         return shared
     shared["source_enabled"] = True
     live_view = live_snapshot(db, revision, now=stamp)
     prep = db.get(CompositePreparation, revision.id)
     phase = revision.rules["aggregation_calendar"]
-    target_inst = db.get(Instrument, target.instrument_id)
-    profile = target_inst.calendar_profile
+    profile = static["target_instrument"].calendar_profile
     profiles = [(identity["history_start"], revision.seam,
-                 db.get(HistoryVersion, revision.history_version_id).manifest.get("calendar_profile", {})),
+                 static["history"].manifest.get("calendar_profile", {})),
                 (revision.seam, stamp + 1, profile)]
-    from .live_session import session_status
-
     is_open = session_status(target.identity, profile, stamp)['market_session'] != 'closed' and scheduled_open(
         instant(stamp), calendar_from(phase, profile, explicit=True), closures=closures_from(profile))
     stale_input = live_view.get("received_age_ms") is None or live_view["received_age_ms"] > 15000
@@ -323,7 +352,7 @@ def shared_context(db, identities, now, *, clock=None):
     return shared
 
 
-def evaluate(db, alert, version, config, now, *, clock=None, shared=None):
+def evaluate(db, alert, version, config, now, *, clock=None, static=None):
     from .chart_alert_service import consume
     from .composite_chart import chart_page
 
@@ -332,13 +361,12 @@ def evaluate(db, alert, version, config, now, *, clock=None, shared=None):
     runtime.pop("price_confirmation_request", None)
     if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
         return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
+    shared = rule_context(db, identity, static, now, clock=clock)
     if shared is None:
-        shared = shared_context(db, [identity], now, clock=clock)
-        now = shared["now"]
-    elif clock is not None:
-        # This group already holds the dataset locks; the rule keeps the
-        # transition time it read after them.
-        now = clock()
+        # The datasets changed while this turn was planned; judge from a read
+        # that this rule owns instead of the turn's shared baseline.
+        shared = rule_context(db, identity, None, now, clock=clock)
+    now = shared["now"]
     revision, composite, target = shared["revision"], shared["composite"], shared["target"]
     if (not composite or composite.permission_scope != "workspace:default" or not revision or
             revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or

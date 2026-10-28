@@ -81,3 +81,42 @@ PG 侧开 `log_lock_waits=on`（deadlock_timeout 20 ms）+ `log_min_duration_sta
 判定：等锁次数不变、**每次等待拉长 2.7–3.5 倍**，>100 ms 慢语句约 10 倍 —— 组事务把两个 `MarketDataset` 排他锁持有到整组提交，等待方为整组买单。这与第 5 节列出的首要风险一致，因此 **B1 形态不合并**。
 
 继续做的话，目标是 **B2**：保留 `shared_context()`（已抽出、可直接复用）的共享只读读取，但把写事务降回逐规则、锁按规则持有——预期保住 SQL/评估 46→29 的收益，同时把等锁窗口降回 A 的 50 ms 量级；代价是每条规则仍各自取一次锁（这是 A 已验证不构成瓶颈的部分）。验收判据沿用第 4 节，另加「等锁 p50 与 max 回到 A 量级」。
+
+## 9. B2 实施与实测（2026-10-28）：静态共享收益不足
+
+### 9.1 形态
+
+- 每轮每组一次**只读**读取（composite_alerts.static_context()）：无 FOR UPDATE、不读时钟。
+- 每条规则**自己的写事务**（chart_alert_worker._rule_turn()）：assert_current → 按 id 排序取两个 MarketDataset 排他锁（同一条语句顺便返回行）→ **锁后**读生产时钟 → 锁内重读 live_snapshot / prep.input_revision / AggregateTask / session_status / stale_input / LiveState / PricingOwner → 该规则的 chart_page/指标/ATR/evidence。
+- 静态基线与规则版本不符（revision/history_version_id/rules/seam/target_identity）或锁到的 dataset 身份已变 → 该规则丢弃共享基线、完整重读（rule_context() 返回 None 时再走一次；内容与 A 完全一致）。
+- 组事务、savepoint、组级失败降级全部移除；失败隔离回到逐规则事务，错误健康用原有 _store_error。
+
+### 9.2 静态 / 时间敏感切分
+
+| 段 | 归属 | 依据 |
+|---|---|---|
+| CompositeRevision / MarketComposite / RealtimeMapping / 两个 MarketDataset / Instrument(target,source) / HistoryVersion(manifest.calendar_profile) | 每轮共享（只读） | composite_alerts.py:262-278；这些行只插入不改写（composite_definitions.py:275 只移动 active_revision_id） |
+| 两个 MarketDataset 排他锁 | 每规则 | composite_alerts.py:310-314（B1 版 :283，A 版 :280-283） |
+| 生产时钟 | 每规则、锁后 | composite_alerts.py:318-324（B1 版 :286-292） |
+| live_snapshot、prep.input_revision、AggregateTask(revision,timeframe)、session_status/is_open、stale_input、LiveState/PricingOwner | 每规则、锁内 | composite_alerts.py:326-351 |
+| realtime_switch.enabled（Preference 开关） | 每规则 | 不在共享清单内（可被显式开关改写），保持 A 语义 |
+
+### 9.3 语句数（sqlite，同夹具：7 条同组合规则，一轮；方法见 9.4）
+
+| 场 | 判定轮（有新 K 线） | 空转轮 |
+|---|---|---|
+| A（每规则一事务） | 407 | 232 |
+| B1（组事务，本分支已裁定不合并） | 295 | 120-113 |
+| **B2（静态共享）** | **393** | **218-211** |
+
+B2 相对 A：判定轮 -3.4%，空转轮 -6.0~-6.2%（14 条/轮）。**远低于 15% 门槛。**
+
+原因（实测栈归属）：A 的每规则会话 identity map 已经把「共享基线先读一次」变成下游的免费读取——chart_page、live_snapshot 在 A 里读到的是同一会话已载入的行；B2 把基线挪到组会话后，这些下游各自重新读一次：mapping 7→15、revision/composite 7→8。共享真正省下的只有 instrument / history_version / dataset 三类共 14 条。若额外把 realtime_switch.enabled() 也共享（超出本任务清单），最好情况也只到 -9%。
+
+### 9.4 方法
+
+临时 pytest 夹具（未提交）：同一 ready_config 夹具建 7 条同组合规则 → step() 一次建立基线 → 追加一根新 K 线 → 计数 before_cursor_execute 语句数。A/B1 分别在 e41344f6、eb370688 的临时 worktree 用同一脚本测量；A 的空转轮 232 与第 7 节口径完全一致，故三列可比。
+
+### 9.5 结论
+
+B2 锁/时钟语义与 A 等价（回归全绿，含 test_runtime_observation_race.py 的锁后时钟断言），但只省 3-6% 语句、锁仍每规则一次，收益不足：**建议放弃 B2，不合并**。要继续降 SQL 必须动规则级读取（chart_page/指标/ATR/evidence）——每条规则 28 条里约 21 条在那里，不在共享基线上。

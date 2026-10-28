@@ -210,7 +210,7 @@ def geometry_indices(rows, line, *, meta=None, config=None):
     return [origin + i for i in range(len(rows))]
 
 
-def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None, shared=None):
+def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None, static=None):
     """Lock the run before reading its data; absent/incomplete data never advances it."""
     if now is None:
         clock = clock or now_ms
@@ -227,7 +227,7 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None, shared=No
     if config.series_kind == "composite":
         from .composite_alerts import evaluate as evaluate_composite
 
-        return evaluate_composite(db, alert, version, config, now, clock=clock, shared=shared)
+        return evaluate_composite(db, alert, version, config, now, clock=clock, static=static)
     try:
         rows, meta = stored_rows(db, version, config, now,
                                  fixed_origin=alert.runtime.get("origin"))
@@ -460,8 +460,8 @@ def _store_error(ident, reason):
             health(row, "error", "判定失败：" + reason)
 
 
-def _evaluate_rule(db, ident, *, revision_id, shared, now, clock, started):
-    """Judge one rule inside the caller's savepoint."""
+def _evaluate_rule(db, ident, *, revision_id, static, now, clock, started):
+    """Judge one rule inside its own transaction."""
     row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident)
         .with_for_update(skip_locked=True))
     if row is None or row.status != "active":
@@ -475,9 +475,10 @@ def _evaluate_rule(db, ident, *, revision_id, shared, now, clock, started):
         health(row, "blocked", "旧来源告警已退役；请改用组合行情重新创建")
     else:
         identity = version.market_identity or {}
-        # A rule rebound after the group read judges on its own fresh state.
-        reuse = shared if identity.get("composite_revision_id") == revision_id else None
-        evaluate(db, ident, now=now, values_cache=_VALUE_CACHE, clock=clock, shared=reuse)
+        # A rule rebound after the turn read judges on its own fresh state.
+        rebound = revision_id is None or identity.get("composite_revision_id") != revision_id
+        reuse = None if rebound else static
+        evaluate(db, ident, now=now, values_cache=_VALUE_CACHE, clock=clock, static=reuse)
         evaluated = True
     row = db.get(ChartAlert, ident)
     return evaluated, dict(alert_id=ident, read_started=started,
@@ -488,107 +489,62 @@ def _evaluate_rule(db, ident, *, revision_id, shared, now, clock, started):
         commit_started=time.monotonic())
 
 
-def _group_turn(revision_id, members, *, now):
-    """One transaction per revision group; every rule judges in its own savepoint."""
-    business_now = [now]
+def _static_read(revision_id, members):
+    """One read-only baseline read per revision group.
+
+    It takes no dataset lock and reads no clock, so nothing here can hold a
+    writer up or make a waited-on commit look like future input. A failed read
+    leaves every rule of the group on its own complete read.
+    """
+    identities = [identity for _, identity in members if identity]
+    if revision_id is None or not identities:
+        return None
+    from .composite_alerts import static_context
+
+    try:
+        with transaction() as db:
+            return static_context(db, identities)
+    except Exception:
+        log.exception("Chart alert static read failed for %s; judging rules alone", revision_id)
+        return None
+
+
+def _rule_turn(ident, *, revision_id, static, now, on_evaluated, on_error):
+    """One rule, one transaction: its own locks, clock, judgment and commit."""
+    started = time.monotonic()
+    business_now = [now_ms() if now is None else now]
     clock = None
     if now is None:
         def clock():
             business_now[0] = now_ms()
             return business_now[0]
-    evaluated, observations, failures = 0, [], []
-    with transaction() as db:
-        assert_current(db)
-        # The turn reads the clock once, then the shared read reads it again
-        # under the dataset locks and every rule in the group reports that one.
-        if clock is not None:
-            clock()
-        shared = None
-        if revision_id is not None:
-            from .composite_alerts import shared_context
-
-            shared = shared_context(db, [identity for _, identity in members],
-                                    business_now[0], clock=clock)
-        for ident, _identity in members:
-            started = time.monotonic()
-            try:
-                with db.begin_nested():
-                    counted, observation = _evaluate_rule(db, ident, revision_id=revision_id,
-                        shared=shared, now=business_now[0], clock=clock, started=started)
-            except RuntimeOwnershipLost:
-                raise
-            except Exception as exc:
-                # Only this rule's savepoint rolls back; the group still commits.
-                failures.append((ident, type(exc).__name__))
-                log.exception("Chart alert evaluation failed for %s", ident)
-                continue
-            evaluated += 1 if counted else 0
+    try:
+        with transaction() as db:
+            assert_current(db)
+            counted, observation = _evaluate_rule(db, ident, revision_id=revision_id,
+                static=static, now=business_now[0], clock=clock, started=started)
             if observation:
                 observation["business_now"] = business_now[0]
-                observations.append(observation)
-    return evaluated, observations, failures
-
-
-def _rule_turns(members, *, now, on_evaluated, on_error):
-    """Per-rule transactions: the isolation every rule had before grouping."""
-    evaluated = 0
-    for ident, _identity in members:
-        started = time.monotonic()
-        business_now = [now_ms() if now is None else now]
-        clock = None
-        if now is None:
-            def clock():
-                business_now[0] = now_ms()
-                return business_now[0]
-        try:
-            with transaction() as db:
-                assert_current(db)
-                counted, observation = _evaluate_rule(db, ident, revision_id=None, shared=None,
-                    now=business_now[0], clock=clock, started=started)
-                if observation:
-                    observation["business_now"] = business_now[0]
-        except RuntimeOwnershipLost:
-            raise
-        except Exception as exc:
-            if on_error:
-                on_error(type(exc).__name__)
-            log.exception("Chart alert evaluation failed for %s", ident)
-            _store_error(ident, type(exc).__name__)
-            continue
-        evaluated += 1 if counted else 0
-        if observation and on_evaluated:
-            on_evaluated(dict(**observation, committed=time.monotonic()))
-    return evaluated
-
-
-def _run_group(revision_id, members, *, now, on_evaluated, on_error):
-    try:
-        evaluated, observations, failures = _group_turn(revision_id, members, now=now)
     except RuntimeOwnershipLost:
         raise
-    except Exception:
-        # A failed group read or commit retries these rules one by one, which is
-        # the isolation they had before grouping.
-        log.exception("Chart alert group %s failed; retrying its rules alone",
-                      revision_id or members[0][0])
-        return _rule_turns(members, now=now, on_evaluated=on_evaluated, on_error=on_error)
-    for ident, reason in failures:
+    except Exception as exc:
         if on_error:
-            on_error(reason)
-        # Committed after the group, so a group rollback cannot discard it.
-        _store_error(ident, reason)
-    if on_evaluated:
-        # Evidence collection failures propagate to the monitor, without
-        # rewriting the already committed business state as an error.
-        for observation in observations:
-            on_evaluated(dict(**observation, committed=time.monotonic()))
-    return evaluated
+            on_error(type(exc).__name__)
+        log.exception("Chart alert evaluation failed for %s", ident)
+        # The failed transaction is gone; record the health outside of it.
+        _store_error(ident, type(exc).__name__)
+        return 0
+    if observation and on_evaluated:
+        on_evaluated(dict(**observation, committed=time.monotonic()))
+    return 1 if counted else 0
 
 
 def step(*, now=None, on_evaluated=None, on_error=None):
-    """Evaluate every active rule once, sharing one read per revision group."""
+    """Evaluate every active rule once, sharing only read-only baseline state."""
     evaluated_count = 0
     for revision_id, members in _active_groups():
-        evaluated_count += _run_group(revision_id, members, now=now,
-                                      on_evaluated=on_evaluated, on_error=on_error)
+        static = _static_read(revision_id, members)
+        for ident, _identity in members:
+            evaluated_count += _rule_turn(ident, revision_id=revision_id, static=static, now=now,
+                                          on_evaluated=on_evaluated, on_error=on_error)
     return evaluated_count
