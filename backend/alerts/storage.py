@@ -1718,6 +1718,31 @@ class NoticeIntakeBudget(Base):
     tokens: Mapped[float]
 
 
+class MarketSwitchRun(Base):
+    """Durable switch record; only a persisted succeeded row unlocks cleanup."""
+    __tablename__ = "market_switch_runs"
+    __table_args__ = (
+        Index("ix_market_switch_run_unlock", "state", "finished_at"),
+        Index("ix_market_switch_run_dedupe", "kind", "composite_id", "scheduled_for"),
+    )
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    kind: Mapped[str] = mapped_column(String(32))
+    composite_id: Mapped[str | None] = mapped_column(String(64))
+    previous_revision_id: Mapped[str | None] = mapped_column(String(36))
+    target_revision_id: Mapped[str | None] = mapped_column(String(36))
+    state: Mapped[str] = mapped_column(String(16), default="preparing")
+    attempts: Mapped[int] = mapped_column(default=0)
+    phase: Mapped[str | None] = mapped_column(String(32))
+    scheduled_for: Mapped[int] = mapped_column(BigInteger)
+    started_at: Mapped[int | None] = mapped_column(BigInteger)
+    finished_at: Mapped[int | None] = mapped_column(BigInteger)
+    error_summary: Mapped[dict | None] = mapped_column(JSON)
+    shadow_report: Mapped[dict | None] = mapped_column(JSON)
+    activation: Mapped[dict | None] = mapped_column(JSON)
+    retention: Mapped[dict] = mapped_column(JSON, default=dict, server_default="{}")
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
 # Capture writes only to the existing reliable Audit table in the source transaction.
 # It never accesses notification projections or calls external channels.
 from . import notification_sources as _notification_sources  # noqa: E402,F401
