@@ -75,7 +75,8 @@ def test_each_alert_uses_its_read_time_and_reports_committed_state(database, mon
 
     monkeypatch.setattr(chart_alert_worker,'evaluate',evaluate)
     chart_alert_worker.step(on_evaluated=committed)
-    assert seen==[stamp+1000,stamp+2000] and {row['alert_id'] for row in reports}==set(ids)
+    # 同一组合的多条规则共用一次锁后读取，整组报告同一个业务读时间。
+    assert seen==[stamp+2000]*2 and {row['alert_id'] for row in reports}==set(ids)
 
 
 def test_observer_failure_does_not_rewrite_committed_health(database,monkeypatch):

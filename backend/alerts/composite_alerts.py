@@ -259,7 +259,71 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
     return resolved
 
 
-def evaluate(db, alert, version, config, now, *, clock=None):
+def shared_context(db, identities, now, *, clock=None):
+    """Read the state every rule in one composite revision group reuses.
+
+    Rules grouped by composite_revision_id share the dataset locks, the
+    post-lock production clock and the fixed input waterline. Anything that
+    depends on a rule's timeframe, mode, indicators or drawing stays in
+    evaluate; a rule bound after the group read falls back to that full path.
+    """
+    from .composite_quotes import live_snapshot
+    from .realtime_switch import enabled
+
+    identity = identities[0]
+    revision = db.get(CompositeRevision, identity["composite_revision_id"])
+    composite = db.get(MarketComposite, identity["composite_id"])
+    mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
+    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+    shared = {"revision": revision, "composite": composite, "mapping": mapping, "target": target}
+    if revision is None or target is None:
+        return shared  # This rule's own validation reports the changed baseline.
+    # Evidence writers/reference protection take exclusive dataset locks. Take
+    # them in order before shared artifact reads, avoiding reader lock upgrades.
+    dataset_ids = {item["dataset_id"] for item in identities} | {target.id}
+    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+        sorted(dataset_ids))).order_by(MarketDataset.id).with_for_update()))
+    # Source writers take these dataset locks before LiveState. Capture the
+    # production clock after lock acquisition, so a source commit while we
+    # waited cannot look like future input and reset a valid crossing baseline.
+    # Explicit historical/test clocks stay fixed; no age is clamped to zero.
+    stamp = now if now is not None else now_ms()
+    if clock is not None:
+        stamp = clock()
+    shared["now"] = stamp
+    source_dataset = db.get(MarketDataset, identity["dataset_id"])
+    if not enabled(db, source_dataset.instrument_id):
+        shared["source_enabled"] = False
+        return shared
+    shared["source_enabled"] = True
+    live_view = live_snapshot(db, revision, now=stamp)
+    prep = db.get(CompositePreparation, revision.id)
+    phase = revision.rules["aggregation_calendar"]
+    target_inst = db.get(Instrument, target.instrument_id)
+    profile = target_inst.calendar_profile
+    profiles = [(identity["history_start"], revision.seam,
+                 db.get(HistoryVersion, revision.history_version_id).manifest.get("calendar_profile", {})),
+                (revision.seam, stamp + 1, profile)]
+    from .live_session import session_status
+
+    is_open = session_status(target.identity, profile, stamp)['market_session'] != 'closed' and scheduled_open(
+        instant(stamp), calendar_from(phase, profile, explicit=True), closures=closures_from(profile))
+    stale_input = live_view.get("received_age_ms") is None or live_view["received_age_ms"] > 15000
+    if live_view["observation_mode"] == "stream_quote":
+        stale_input = stale_input or live_view.get("quote_age_ms") is None or live_view["quote_age_ms"] > 15000
+    live = db.get(LiveState, target.id)
+    owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
+    shared.update(live_view=live_view, prep=prep, value=prep.input_revision if prep else None,
+                  phase=phase, profile=profile, profiles=profiles, is_open=is_open,
+                  stale_input=stale_input, live=live, owned=bool(
+                      owner and owner.error not in ('unauthorized', 'provider_maintenance')
+                      and owner.token and owner.expires > stamp and live and live.epoch == owner.epoch
+                      and live.connection in ("connected", "recovering")
+                      and 0 <= stamp - max(live.heartbeat_at, live.received_at) <= 15000))
+    return shared
+
+
+def evaluate(db, alert, version, config, now, *, clock=None, shared=None):
     from .chart_alert_service import consume
     from .composite_chart import chart_page
 
@@ -268,60 +332,35 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     runtime.pop("price_confirmation_request", None)
     if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
         return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
-    revision = db.get(CompositeRevision, identity["composite_revision_id"])
-    composite = db.get(MarketComposite, identity["composite_id"])
-    mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
-    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+    if shared is None:
+        shared = shared_context(db, [identity], now, clock=clock)
+        now = shared["now"]
+    elif clock is not None:
+        # This group already holds the dataset locks; the rule keeps the
+        # transition time it read after them.
+        now = clock()
+    revision, composite, target = shared["revision"], shared["composite"], shared["target"]
     if (not composite or composite.permission_scope != "workspace:default" or not revision or
             revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or
             revision.rules != identity["rules"] or revision.seam != identity["seam"] or
             not target or target.identity != identity["target_identity"] or target.identity["account_scope"] != account_scope()):
         return wait(alert, runtime, "blocked", "固定组合基线、映射或账户已改变，请显式编辑规则")
-    # Evidence writers/reference protection take exclusive dataset locks. Take
-    # them in order before shared artifact reads, avoiding reader lock upgrades.
-    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
-        sorted({identity["dataset_id"], target.id}))).order_by(MarketDataset.id).with_for_update()))
-    # Source writers take these dataset locks before LiveState. Capture the
-    # production clock after lock acquisition, so a source commit while we
-    # waited cannot look like future input and reset a valid crossing baseline.
-    # Explicit historical/test clocks stay fixed; no age is clamped to zero.
-    if clock is not None:
-        now = clock()
-    from .realtime_switch import enabled
-
-    source_dataset = db.get(MarketDataset, identity["dataset_id"])
-    if not enabled(db, source_dataset.instrument_id):
+    if not shared["source_enabled"]:
         alert.status, alert.control_revision = "paused", alert.control_revision + 1
         alert.health, alert.health_reason = "blocked", "自建品种实时流已关闭；告警已暂停，启用后需明确恢复"
         alert.updated_at = now
         return []
-    from .composite_quotes import (
-        json_safe,
-        live_snapshot,
-        observation_evidence,
-        sampled_observation,
-    )
+    from .composite_quotes import json_safe, observation_evidence, sampled_observation
 
-    live_view = live_snapshot(db, revision, now=now)
+    live_view = shared["live_view"]
     runtime["quote_health"] = "ready" if live_view.get("sample_ready") else "stale"
     runtime["observation_mode"] = live_view.get("observation_mode", "stream_quote")
-    prep = db.get(CompositePreparation, revision.id)
-    value = prep.input_revision
+    prep = shared["prep"]
+    value = shared["value"]
     runtime.update(composite_revision_id=revision.id, input_revision=value,
                    history_version_id=identity["history_version_id"], seam_policy=config.seam_policy)
-    phase = revision.rules["aggregation_calendar"]
-    target_inst = db.get(Instrument, target.instrument_id)
-    profile = target_inst.calendar_profile
-    profiles = [(identity["history_start"], revision.seam,
-                 db.get(HistoryVersion, revision.history_version_id).manifest.get("calendar_profile", {})),
-                (revision.seam, now + 1, profile)]
-    from .live_session import session_status
-
-    is_open = session_status(target.identity, profile, now)['market_session'] != 'closed' and scheduled_open(
-        instant(now), calendar_from(phase, profile, explicit=True), closures=closures_from(profile))
-    stale_input = live_view.get("received_age_ms") is None or live_view["received_age_ms"] > 15000
-    if live_view["observation_mode"] == "stream_quote":
-        stale_input = stale_input or live_view.get("quote_age_ms") is None or live_view["quote_age_ms"] > 15000
+    phase, profiles = shared["phase"], shared["profiles"]
+    is_open, stale_input = shared["is_open"], shared["stale_input"]
     if is_open and stale_input:
         runtime["demand_hold"] = "stale_input"
         alert.status, alert.control_revision = "paused", alert.control_revision + 1
@@ -333,11 +372,7 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     task = db.get(CompositeAggregateTask, (revision.id, config.timeframe))
     if not task or task.applied_input_revision < value:
         return wait(alert, runtime, "warming", "所需周期尚未处理完整固定输入；等待聚合水位", reset=False)
-    live = db.get(LiveState, target.id)
-    owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
-    owned = bool(owner and owner.error not in ('unauthorized', 'provider_maintenance')
-        and owner.token and owner.expires > now and live and live.epoch == owner.epoch
-        and live.connection in ("connected", "recovering") and 0 <= now - max(live.heartbeat_at, live.received_at) <= 15000)
+    live, owned = shared["live"], shared["owned"]
     if is_open and (not owned or not live.ready or live.error):
         return wait(alert, runtime, "stale", "确认来源断线、拥有者过期或恢复未就绪；等待补齐后建立新基准")
     if not is_open:
