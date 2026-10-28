@@ -517,4 +517,3 @@ def test_calendar_change_pauses_the_running_rule(database, monkeypatch):
         assert (payload["state"], payload["counts"]["paused"], payload["counts"]["rules"]) == (
             "succeeded", 1, 1)
         assert "日历" in payload["errors"][0]["reason"]
-

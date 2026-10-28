@@ -174,4 +174,3 @@ if revision and frozen(db.get(CompositePreparation, revision.id)):
   - `test_chart_alert_geometry.py`（1 项）：跨用例 `dependency_overrides` 污染，单独运行、与本切片测试同跑均通过；
   - 其余 `transport_observation / series_search* / imports / chart_export / native_mcp` 与本切片无关。
 - `ruff check` 全部改动文件通过；`git diff --check` 干净；`git status --short` 只出现本切片文件（`storage.py` / `switch_runs.py` / `test_switch_runs*.py` / `migrations/versions/ba54_*.py` / `test_alerts_mcp_migration.py` 属另一并行任务，本切片未改动）。
-
