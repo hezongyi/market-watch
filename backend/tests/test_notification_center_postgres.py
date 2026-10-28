@@ -109,9 +109,10 @@ def test_av49_to_aw50_is_additive_repeatable_and_retains_demands(postgres_alerts
     command.upgrade(config, 'head')
     after = set(inspect(postgres_alerts).get_table_names())
     assert before <= after
-    # head also includes the two additive history-mode tables after aw50/ax51.
-    assert len(after-before) == 11
-    assert {'notice_streams', 'notice_events', 'notice_source_receipts', 'notice_intakes', 'market_realtime_mapping_notes'} <= after
+    # head (now ba54_market_switch_runs) also adds the two history-mode tables after
+    # aw50/ax51 and the durable switch-run table after az53.
+    assert len(after-before) == 12
+    assert {'notice_streams', 'notice_events', 'notice_source_receipts', 'notice_intakes', 'market_realtime_mapping_notes', 'market_switch_runs'} <= after
     assert {'market_dataset_frame_sources', 'market_history_frame_runs'} <= after
     factory = sessionmaker(postgres_alerts)
     with factory.begin() as db:
