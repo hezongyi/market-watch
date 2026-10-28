@@ -1,0 +1,18 @@
+# Minimal Docker contract for the host-side runtime switch preflight.
+services:
+  notify-worker:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    entrypoint: [sleep]
+    command: ["180"]
+    cpus: 0.1
+    mem_limit: 64m
+    labels: {market-watch.task: mw-runtime-preflight-stage4-20261028}
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    entrypoint: [sleep]
+    command: ["180"]
+    cpus: 0.1
+    mem_limit: 64m
+    labels: {market-watch.task: mw-runtime-preflight-stage4-20261028}
+networks:
+  default: {internal: true}

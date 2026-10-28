@@ -147,13 +147,15 @@ def test_managed_quote_cancellation_releases_only_task_demand(database):
         assert [row.id for row in db.scalars(select(MarketDemand))] == ["managed-alert"]
 
 
-def test_managed_quotes_with_history_plan_deliver_confirmed_updates(database):
+def test_managed_quotes_with_history_plan_deliver_confirmed_updates(database, monkeypatch):
     from decimal import Decimal
 
+    from alerts import market_stream_worker
     from alerts.storage import Bar, ChartHistoryPlan, now_ms
 
     owner = session(database)
     start = now_ms() // 60000 * 60000 - 60000
+    monkeypatch.setattr(market_stream_worker, "now_ms", lambda: start + 30000)
     with database.begin() as db:
         db.add(ChartHistoryPlan(instrument_id="BTCUSDT", target_start=start,
             target_end=start+60000, cursor=start, status="ready"))

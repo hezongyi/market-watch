@@ -1,5 +1,17 @@
 # Ubuntu Docker 构建与资源生命周期
 
+## Runtime 切换前检查
+
+切换到监督式 market/data/notifications 运行组前，在 Docker 宿主机执行只读检查。新 project 和本次迁移清单中核实过的旧 project 都必须显式列出；不要将用户名单外的项目当作旧部署。
+
+```bash
+python deploy/ubuntu/runtime_preflight.py \\
+  --project market-watch-v2 \\
+  --legacy-project market-watch-v1
+```
+
+命令只查询运行中的 Compose 容器，不会停止、重启或修改资源。旧 API 或已知旧后台调度容器存活时返回 1 并列出 project/service/container；Docker 查询失败时返回 2，不能继续切换。PostgreSQL、web 等非调度服务不阻塞检查。旧运行心跳只作为辅助诊断，残留心跳不阻塞，已知存活容器也不会被过期心跳放行。该检查不能防止检查后旧部署被重新启动；切换时仍须收口旧启动入口与重启配置。
+
 本工具只连接 Ubuntu 本机 `/var/run/docker.sock`。Unraid仍为生产环境，不使用本工具创建开发/验收实例。所有构建明确指定专用 `market-watch-ubuntu` builder。
 
 并行开发、数据基线、镜像复用及发布提效的盘点与分阶段方案，见 [2026-10-15 提效方案](../../docs/development-acceptance-release-efficiency-plan-20261015.md)。本分支已实现下文的轻量 `preview`；镜像提升和新生产发布通道仍待实施。

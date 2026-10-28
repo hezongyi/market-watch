@@ -417,6 +417,20 @@ function SettingsPage({ health, instruments, previewSound }: { health: any; inst
         {section === "system" && <section className="panel settings-card">
           <Activity size={24} />
           <h2>后台运行状态</h2>
+          {[ ["行情运行组", health.market_runtime], ["数据运行组", health.data_runtime], ["通知运行组", health.notification_runtime] ].map(([label, roles]:any) => {
+            const fresh = roles?.filter((role:any) => !role.error_type && ["idle", "waiting_input", "disabled"].includes(role.state)).length ?? 0;
+            const total = roles?.length ?? 0;
+            return <section key={label}>
+              <h3>{label} · {fresh}/{total} 状态正常</h3>
+              <div className="history-service-status">
+                {roles?.map((role:any) => <div key={role.role}>
+                  <strong>{({pricing:"行情采集",realtime:"实时输入",composite_aggregate:"组合聚合",alert_indicator:"告警指标",chart_alert:"告警判定",market_ownership:"运行所有权",notification_projection:"通知投影",notification_retention:"通知保留维护",notification_delivery:"通知投递",notification_ownership:"通知所有权",notification_health:"运行巡检"} as Record<string,string>)[role.role] || role.role}</strong>
+                  <p>{role.error_type ? "循环异常" : ({idle:"循环正常",waiting_input:"等待输入",disabled:"未启用",stale:"心跳过期",starting:"启动中",stopped:"已停止",missing:"尚未收到心跳"} as Record<string,string>)[role.state] || role.state || "尚未收到心跳"}{role.error_type ? ` · ${role.error_type}` : ""}</p>
+                  <p>最近检查：{role.checked_at ? date(role.checked_at) : "尚未检查"} · 最近成功：{role.last_success_at ? date(role.last_success_at) : "尚未记录"}</p>
+                </div>)}
+              </div>
+            </section>;
+          })}
           {health.market_incidents?.map((item:any) => {
             const instrument = instruments.find(row=>row.id===item.instrument);
             return <div key={item.instrument}><p>{instrument ? `${instrumentName(instrument)} · ${instrumentIdentity(instrument)}` : item.instrument}：24 小时内 {item.errors_24h} 次行情异常{item.current_error ? '，当前仍有错误' : ''}{item.last_error_at ? `；最近异常 ${date(item.last_error_at)}` : ''}{item.last_recovered_at ? `；最近恢复 ${date(item.last_recovered_at)}` : ''}</p>{instrument && <InstrumentDetails instrument={instrument} />}</div>;
@@ -436,23 +450,7 @@ function SettingsPage({ health, instruments, previewSound }: { health: any; inst
           <dl>
             <dt>数据库备份</dt><dd>{health.backup?.status === 'recent' ? '最近一次备份成功' : health.backup?.status === 'failed' ? '最近一次备份失败，请检查服务' : health.backup?.status === 'stale' ? '超过 36 小时未成功备份' : '尚无定时备份记录'}</dd>
             <dt>备份最近执行时间</dt><dd>{health.backup?.at ? date(health.backup.at) : '尚未执行'}</dd>
-            <dt>行情后台状态</dt><dd>{health.worker_status?.market_heartbeat === "running" ? "运行中" : health.worker_status?.market_heartbeat === "stale" ? "心跳过期，请检查服务" : "尚未收到心跳"}</dd>
-            <dt>行情 worker 最近心跳</dt>
-            <dd>
-              {health.workers?.market_heartbeat
-                ? date(health.workers.market_heartbeat)
-                : "尚未上报"}
-            </dd>
-            <dt>兼容旧补数链路</dt><dd>{health.legacy_import?.status === "disabled" ? "未启用" : health.legacy_import?.status === "running" ? "业务心跳新鲜" : health.legacy_import?.status === "stale" ? "兼容链路心跳过期" : "兼容链路健康情况未知"}；不代表现行历史服务状态</dd>
-            <dt>兼容补数最近心跳</dt><dd>{health.legacy_import?.heartbeat_at ? date(health.legacy_import.heartbeat_at) : health.workers?.import_heartbeat ? `旧版记录 ${date(health.workers.import_heartbeat)}` : "尚未上报"}</dd>
-            <dt>通知后台状态</dt><dd>{health.worker_status?.notify_heartbeat === "running" ? "运行中" : health.worker_status?.notify_heartbeat === "stale" ? "心跳过期，请检查服务" : "尚未收到心跳"}</dd>
             <dt>凭证错误而暂停的投递</dt><dd>{health.blocked_notifications ?? 0}</dd>
-            <dt>通知 worker 最近心跳</dt>
-            <dd>
-              {health.workers?.notify_heartbeat
-                ? date(health.workers.notify_heartbeat)
-                : "尚未上报"}
-            </dd>
           </dl>
           <p className="muted">
             服务器接受消息不代表手机已经收到；点开通知停止声音，也不等于网站已确认。

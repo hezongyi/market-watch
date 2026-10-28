@@ -172,11 +172,16 @@ def test_quote_contract_postgres(provider_pg, monkeypatch, contract):
     quote_contracts.test_managed_quote_cancellation_releases_only_task_demand,
     quote_contracts.test_managed_quotes_with_history_plan_deliver_confirmed_updates,
 ])
-def test_managed_and_http_contract_postgres(provider_pg, contract):
+def test_managed_and_http_contract_postgres(provider_pg, monkeypatch, contract):
+    from inspect import signature
+
     from alerts import storage
 
     storage.bootstrap(provider_pg[1])
-    contract(provider_pg[0])
+    if "monkeypatch" in signature(contract).parameters:
+        contract(provider_pg[0], monkeypatch)
+    else:
+        contract(provider_pg[0])
 
 
 def test_binding_retirement_postgres(provider_pg,monkeypatch):

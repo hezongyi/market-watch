@@ -2,9 +2,15 @@
 
 ## 当前状态（2026-10-28，优先于下方历史记录）
 
-### 阶段 3B 当前切片
+### 阶段 3B / 阶段 4
 
-阶段3B 通知组已在独立分支 `refactor/runtime-notifications-stage3b-20261028` 实现并完成本地/Ubuntu隔离PG合同；详细证据见 [`stage-3b-notifications-acceptance.md`](stage-3b-notifications-acceptance.md)。默认及生产 Compose 已收敛到五个应用服务，测试与系统提醒走持久 Outbox。该切片尚未完成 PR review/CI；PR #109 后端 CI 仍在运行，按用户授权不等待其结果继续阶段开发。阶段4/5联合矩阵、真实 ntfy/A17a 与手机 A17b仍未签收。
+阶段3B 实现在 `refactor/runtime-notifications-stage3b-20261028`，最新修复 head `bcf77cce`。PR #110 stacked 在阶段3A PR #109 上；PR #109 CI 全绿但仍为 Draft。PR #110 的 `564d326d` CI 曾因通知迁移的 SQLite ALTER 不兼容和重复加列失败；已将迁移改为批量 ALTER 且只补缺少列，本地 SQLite 迁移路径回归 **11 passed**，Ruff 通过。新 head CI 正在排队/运行，按用户指示不等待它开始阶段4。因远端 CI 尚未验证新迁移，阶段3B 目前是实现与本地验收完成、PR 门槛待复验，不记为完整收口。手机 A17b 是独立签收项，不阻塞阶段3B核心交付。
+
+阶段4 worktree/branch：`/home/quant/repos/market-watch-runtime-deployment-stage4-20261028` / `refactor/runtime-deployment-stage4-20261028`，以 `bcf77cce` 为基线。首个切片补齐 API 的 notifications 运行组心跳，并将系统状态页改为展示 market/data/notifications 三组循环状态，移除页面上已退役的旧 worker 心跳展示；旧 API 字段暂留兼容。Draft PR #111 当前以 `main` 为 base（PR #110 已关闭且未合并）。已新增 `deploy/ubuntu/runtime_preflight.py`：宿主侧仅查询明确列出的旧 Compose project，发现旧 API/已知旧调度容器存活时拒绝切换，Docker 查询失败也失败关闭；不读取心跳作为锁，不操作容器。后端 health 定向 **14 passed**，前端 build:ui 成功，运维测试此前为 **109 passed，76 subtests passed**。Ubuntu Docker R1 真实标签/策略演练 **5 passed**，证据见 [`stage-4-preflight-acceptance.md`](stage-4-preflight-acceptance.md)。本轮五服务 Compose/preflight 定向回归 **12 passed，34 subtests passed**；默认/生产五应用服务数量、退役服务、所有生产后端 Yahoo=true、通知组仅依赖 migration 均通过。按用户授权忽略本机 swap/磁盘门槛后，Ubuntu 隔离五服务 project `mw-runtime-stage4-20261028` 已通过启动、PG14/JIT、API 停机期间后台继续运行、API 恢复和 preflight 冲突阻断验收。旧版模拟切换中，旧 API/projector可读 `az53` schema，旧 Alembic 仍不识别该 revision；使用旧版 ORM 在 `az53` 上插入、读取和更新旧字段也成功，新列由默认值保留 `kind=signal,payload={}`，临时行随后删除。首次未启用 init 的停止测试有三个 worker 在 30 秒后退出 **137 (OOMKilled=false)**；legacy fixture 增加 `init: true` 后重跑，五个容器均在 30 秒内停止，docker stop 返回成功，退出码为 **143/0 (OOMKilled=false)**。候选组随后恢复，API/web 健康，preflight 对停止的旧组返回 0。回退路径已验证旧通知表基本读写、旧 worker 停止和候选恢复，但未覆盖所有旧业务写路径；旧 Alembic 命令仍不得运行在 `az53` 数据库上，chart-history 因隔离 fixture 禁用外部供源而 degraded。具体证据和限制见 `stage-4-preflight-acceptance.md`。阶段5联合验收仍待完成。
+
+阶段3B验收记录见 [`stage-3b-notifications-acceptance.md`](stage-3b-notifications-acceptance.md)。阶段4/5联合矩阵、真实 ntfy/A17a 与生产切换准备仍未签收。
+
+阶段5本轮联合核对补记见 [`stage-5-joint-acceptance.md`](stage-5-joint-acceptance.md)：当前 head 下 stage3A PostgreSQL 全集 **153 passed**，stage3B 通知 PostgreSQL 合同 **17 passed**，五服务 synthetic crossing/API-offline/restart、Chromium SSE、阶段4隔离旧版读写与回退分别通过。复跑修正了 stage3A 测试跨分钟导致的时钟不确定性；仅修改测试时钟及合同 wrapper，没有生产代码变化。阶段5仍为分层证据联合核对，不冒称真实供应商、实际部署浏览器和手机通知的单次端到端；A17a/A17b、provider-disabled 下的供源状态和生产部署仍未验收。ATR门槛偏差依用户决定作为独立性能后续，不阻塞本轮核心交付；旧 Alembic 不得运行在 `az53` schema 上。
 
 ### 本轮最终证据与下一步
 

@@ -20,6 +20,10 @@ STALE_MS = 15000
 STARTUP_MS = 60000
 MARKET_ROLES = ("pricing", "realtime", "composite_aggregate", "alert_indicator",
                 "chart_alert", "market_ownership")
+NOTIFICATION_ROLES = (
+    "notification_projection", "notification_retention", "notification_delivery",
+    "notification_ownership", "notification_health",
+)
 
 
 def data_roles():

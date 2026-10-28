@@ -395,7 +395,7 @@ def readyz(response: Response):
 @app.get("/api/health", dependencies=[Depends(authenticated)])
 def health():
     from .chart_alert_health import summary as chart_alert_health
-    from .runtime_health import MARKET_ROLES, data_roles
+    from .runtime_health import MARKET_ROLES, NOTIFICATION_ROLES, data_roles
     from .runtime_health import summary as runtime_health
     from .worker_health import services
 
@@ -460,6 +460,7 @@ def health():
             "chart_alerts": chart_alert_health(db),
             "market_runtime": runtime_health(db, MARKET_ROLES),
             "data_runtime": runtime_health(db, data_roles()),
+            "notification_runtime": runtime_health(db, NOTIFICATION_ROLES),
             "backup": backup_health(db),
             "market_incidents": market_incidents(db),
             "last_notification_test": last_test_result,

@@ -1,0 +1,107 @@
+# Five-service stage-4 acceptance using the cached dependency image and this
+# worktree's backend source. No provider, Yahoo, or notification delivery IO.
+x-backend: &backend
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /candidate
+  volumes:
+    - ../..:/candidate:ro
+  environment: &backend-environment
+    PYTHONPATH: /candidate/backend
+    ALERTS_DATABASE_URL: postgresql+psycopg://runtime_stage4:stage4_acceptance_only@postgres/runtime_stage4
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+    ALERTS_DATABASE_JIT: "off"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    ALERTS_RUNTIME_DEPLOYMENT: stage4_acceptance
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_OANDA_STREAM_ENABLED: "false"
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+    ALERTS_YAHOO_ENABLED: "false"
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_HISTORY_HEALTH_WORKERS: '[]'
+  restart: unless-stopped
+  labels:
+    market-watch.task: mw-runtime-stage4-20261028
+    market-watch.project: mw-runtime-stage4-20261028
+    market-watch.purpose: acceptance
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: runtime_stage4
+      POSTGRES_USER: runtime_stage4
+      POSTGRES_PASSWORD: stage4_acceptance_only
+    volumes: [runtime-stage4-postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U runtime_stage4 -d runtime_stage4 && test \"$$(PGOPTIONS='-c jit=on' psql -U runtime_stage4 -d runtime_stage4 -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    labels:
+      market-watch.task: mw-runtime-stage4-20261028
+      market-watch.project: mw-runtime-stage4-20261028
+      market-watch.purpose: acceptance
+  migrate:
+    <<: *backend
+    command: [alembic, upgrade, head]
+    restart: "no"
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    <<: *backend
+    command: [python, -m, uvicorn, alerts.api:app, --host, 0.0.0.0, --port, "8000"]
+    environment:
+      <<: *backend-environment
+      ALERTS_COOKIE_SECURE: "false"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+      start_period: 15s
+  market-runtime:
+    <<: *backend
+    command: [python, -m, alerts.runtime, --profile, market]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: "6"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-stage4-market
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: "true"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  data-worker:
+    <<: *backend
+    command: [python, -m, alerts.runtime, --profile, data]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: "16"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-stage4-data
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  notification-worker:
+    <<: *backend
+    command: [python, -m, alerts.runtime, --profile, notifications]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: "4"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-stage4-notifications
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  web:
+    image: sha256:43c51c707e8c6fafc681bd4db1b23cc0b37ece546c04c15fc0df9d281657b870
+    ports: ["127.0.0.1:18089:80"]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+    labels:
+      market-watch.task: mw-runtime-stage4-20261028
+      market-watch.project: mw-runtime-stage4-20261028
+      market-watch.purpose: acceptance
+volumes:
+  runtime-stage4-postgres:
+    labels:
+      market-watch.task: mw-runtime-stage4-20261028
+      market-watch.project: mw-runtime-stage4-20261028
+      market-watch.purpose: acceptance

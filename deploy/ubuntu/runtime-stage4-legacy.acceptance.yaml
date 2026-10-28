@@ -1,0 +1,54 @@
+# Rollback-only legacy profile for the isolated stage-4 acceptance database.
+# Deliberately omits the old Alembic command: this image cannot resolve az53.
+x-legacy: &legacy
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /app
+  environment: &legacy-environment
+    ALERTS_DATABASE_URL: postgresql+psycopg://runtime_stage4:stage4_acceptance_only@postgres/runtime_stage4
+    ALERTS_DATABASE_JIT: "off"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_OANDA_STREAM_ENABLED: "false"
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+    ALERTS_YAHOO_ENABLED: "false"
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_COOKIE_SECURE: "false"
+  restart: "no"
+  init: true
+  stop_grace_period: 30s
+  mem_limit: 768m
+  cpus: 0.5
+  networks: [runtime-stage4]
+  labels:
+    market-watch.task: mw-runtime-stage4-20261028
+    market-watch.project: mw-runtime-stage4-legacy-20261028
+    market-watch.purpose: acceptance
+services:
+  api:
+    <<: *legacy
+    command: [uvicorn, alerts.api:app, --host, 0.0.0.0, --port, "8000"]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+      start_period: 15s
+  notification-projector:
+    <<: *legacy
+    command: [python, -m, alerts.notification_center_worker]
+    environment:
+      <<: *legacy-environment
+      ALERTS_NOTIFICATION_CENTER_PROJECTION_ENABLED: "true"
+  market-stream:
+    <<: *legacy
+    command: [python, -m, alerts.market_stream_worker]
+  chart-history:
+    <<: *legacy
+    command: [python, -m, alerts.chart_history_worker]
+  native-history:
+    <<: *legacy
+    command: [python, -m, alerts.native_history_loads]
+networks:
+  runtime-stage4:
+    external: true
+    name: mw-runtime-stage4-20261028_default

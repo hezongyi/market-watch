@@ -127,9 +127,7 @@ def inspect_health(*, startup_grace_until=0):
 
     expected = tuple(f"market:{role}" for role in MARKET_ROLES if role != "market_ownership")
     expected += tuple(f"data:{role}" for role in data_roles() if role != "data_ownership")
-    expected += tuple(f"notifications:{role}" for role in (
-        "notification_projection", "notification_retention", "notification_delivery",
-        "notification_ownership", "notification_health"))
+    expected += tuple(f"notifications:{role}" for role in runtime_health.NOTIFICATION_ROLES)
     now = now_ms()
     faults = []
     with transaction() as db:
