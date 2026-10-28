@@ -40,6 +40,14 @@ docker compose -f compose.production.yaml run --rm migrate alembic current
 
 3.1—3.3 已在本机用 docker compose 29.1.3 实跑验证（占位镜像与占位 `.env`）；3.4 需真实镜像与数据库，按发布目录执行。任一项不符预期即停止，不改写历史 release 清单。
 
+### 3.5 通知深链可被手机访问（A17b 阶段暴露的落地要求）
+
+ntfy 消息里的 `click` 与"确认"按钮都取自 `ALERTS_PUBLIC_URL`（`backend/alerts/notify.py:126-155`）：信号点击 = `{public_url}/advanced-charts?panel=notifications&signal=<id>`，确认 = `{public_url}/api/notification-actions/<id>/ack`。若它被设成 `http://127.0.0.1:...`，手机上点开的是**手机自身的回环地址**，点击与确认必然失败（阶段 5 验收实例上实测复现过）。
+
+- 发布前必须把 `ALERTS_PUBLIC_URL` 设成手机真能访问的地址（生产走 HTTPS 域名），并在发布后**用手机实际点一次**通知与确认按钮。
+- 生产必须保持 `ALERTS_COOKIE_SECURE=true`（配合 HTTPS）；只有局域网明文验收实例才允许临时置 false，且不得写入生产模板。
+- 该地址同时是登录 Cookie 的作用域来源，改域名/端口时需一并复核登录与 CSRF 行为。
+
 ## 4. 切换顺序
 
 1. 完成第 2、3 节，留档候选镜像 digest 与旧 project 名单。
