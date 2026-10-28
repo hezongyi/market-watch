@@ -1,0 +1,21 @@
+{
+  "database_size_bytes": 19694234971,
+  "mismatches": {},
+  "notification_columns": {
+    "kind": {
+      "default": "'signal'::character varying",
+      "nullable": false
+    },
+    "payload": {
+      "default": "'{}'::json",
+      "nullable": false
+    },
+    "signal_id": {
+      "default": null,
+      "nullable": true
+    }
+  },
+  "revision": "az53_notification_outbox_types",
+  "tables": 102,
+  "verified": true
+}

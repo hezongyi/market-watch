@@ -1,0 +1,111 @@
+{
+  "release_tag": "v2.0.0-rc.1",
+  "source_commit": "0eac4fe7548f5df32c43e26415d9cf7e2e0ff581",
+  "release_directory": "/mnt/user/appdata/market-watch/releases/v2.0.0-rc.1-0eac4fe",
+  "host": "unraid",
+  "ssh_command": "ssh unraid",
+  "project": "market-watch-v200rc1",
+  "public_url": "https://trade.kookvv.com:8443",
+  "risk_class": "F1",
+  "steady_services": [
+    "web",
+    "api",
+    "market-runtime",
+    "data-worker",
+    "notification-worker"
+  ],
+  "images": {
+    "api": "sha256:b158c95c0922ed77987992a9cda2b3e49cca5a1f2cc86664f7c66133ec6a6416",
+    "web": "sha256:e37af2a40486cf68d64f6e7f320103c717572a62482ee063cc3f64e65690b665",
+    "backup": "sha256:0343cdff2a11fbf239f730eb2c331d420122079180328fc08c0a1db0270b43f6"
+  },
+  "compose_sha256": "fa0ccd928b558bcb46e2f6a8fa944bde315e66324590627f7c55804ac1927f1e",
+  "database_backup": {
+    "file": "/mnt/user/backup/market-watch/market-watch-v2.0.0-rc.1-20261028.dump",
+    "sha256": "50e5ac08f3ecf0ba8ce0b9c87989639200484012604683abc5511cd2407f5128",
+    "bytes": 25570331962,
+    "tables": 102,
+    "archive_list_valid": true,
+    "full_restore_host": "Ubuntu",
+    "full_restore_verified": true,
+    "pre_migration_revision": "ay52_history_modes",
+    "post_migration_revision": "az53_notification_outbox_types"
+  },
+  "settings": {
+    "yahoo_enabled": true,
+    "oanda_acquisition_mode": "rest_batch",
+    "cookie_secure": true
+  },
+  "preserved": [
+    "previous production containers",
+    "previous images",
+    "database",
+    "backups",
+    "release directories"
+  ],
+  "known_limitations": [
+    "Existing automatic database backup times out after 900 seconds; release backup independently restored.",
+    "No active chart alerts in production; no new real signal or phone notification was triggered during this deployment.",
+    "OANDA market session remains unknown; no calendar verification claim."
+  ],
+  "evidence_directory": "docs/verification/v2.0.0-rc.1-production",
+  "configuration_backup": {
+    "archive": "/mnt/user/backup/market-watch/config-20261028T150906Z-XgDEue.tar.gz",
+    "sha256": "7588a09e848e0bb625209d347b9f0c30503029a3fafabe5dac65258301912894",
+    "bytes": 1586036710,
+    "hash_verified": true,
+    "restore_host": "Ubuntu",
+    "checked_entries": [
+      {
+        "path": ".env",
+        "restored_bytes": 2838,
+        "matches_live": true
+      },
+      {
+        "path": "releases/v2.0.0-rc.1-0eac4fe/.env",
+        "restored_bytes": 2838,
+        "matches_live": true
+      },
+      {
+        "path": "releases/v2.0.0-rc.1-0eac4fe/compose.release.yaml",
+        "restored_bytes": 4921,
+        "matches_live": true
+      },
+      {
+        "path": "releases/v2.0.0-rc.1-0eac4fe/release.env",
+        "restored_bytes": 527,
+        "matches_live": true
+      },
+      {
+        "path": "releases/v2.0.0-rc.1-0eac4fe/compose.sh",
+        "restored_bytes": 211,
+        "matches_live": true
+      },
+      {
+        "path": "deploy/active-release",
+        "restored_bytes": 29,
+        "matches_live": true
+      },
+      {
+        "path": "deploy/unraid-backup.sh",
+        "restored_bytes": 411,
+        "matches_live": true
+      },
+      {
+        "path": "deploy/unraid-config-backup.sh",
+        "restored_bytes": 1153,
+        "matches_live": true
+      }
+    ],
+    "archive_integrity_verified": true,
+    "boundary": "Selected active release/configuration files restored and byte-compared. No host disaster-recovery claim."
+  },
+  "maintenance": {
+    "active_release": "releases/v2.0.0-rc.1-0eac4fe",
+    "cron_runtime_file": "/etc/cron.d/root",
+    "daily_schedule": "03:00 Unraid host time",
+    "backup_timeout_seconds": 900,
+    "automatic_backup_status": "known_existing_failure"
+  },
+  "deployment_status": "deployed_runtime_verified_with_existing_automatic_backup_issue"
+}

@@ -1,0 +1,51 @@
+{
+  "archive": "/mnt/user/backup/market-watch/config-20261028T150906Z-XgDEue.tar.gz",
+  "sha256": "7588a09e848e0bb625209d347b9f0c30503029a3fafabe5dac65258301912894",
+  "bytes": 1586036710,
+  "hash_verified": true,
+  "restore_host": "Ubuntu",
+  "checked_entries": [
+    {
+      "path": ".env",
+      "restored_bytes": 2838,
+      "matches_live": true
+    },
+    {
+      "path": "releases/v2.0.0-rc.1-0eac4fe/.env",
+      "restored_bytes": 2838,
+      "matches_live": true
+    },
+    {
+      "path": "releases/v2.0.0-rc.1-0eac4fe/compose.release.yaml",
+      "restored_bytes": 4921,
+      "matches_live": true
+    },
+    {
+      "path": "releases/v2.0.0-rc.1-0eac4fe/release.env",
+      "restored_bytes": 527,
+      "matches_live": true
+    },
+    {
+      "path": "releases/v2.0.0-rc.1-0eac4fe/compose.sh",
+      "restored_bytes": 211,
+      "matches_live": true
+    },
+    {
+      "path": "deploy/active-release",
+      "restored_bytes": 29,
+      "matches_live": true
+    },
+    {
+      "path": "deploy/unraid-backup.sh",
+      "restored_bytes": 411,
+      "matches_live": true
+    },
+    {
+      "path": "deploy/unraid-config-backup.sh",
+      "restored_bytes": 1153,
+      "matches_live": true
+    }
+  ],
+  "archive_integrity_verified": true,
+  "boundary": "Selected active release/configuration files restored and byte-compared. No host disaster-recovery claim."
+}

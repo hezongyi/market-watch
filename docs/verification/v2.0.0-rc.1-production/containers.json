@@ -1,0 +1,57 @@
+[
+  {
+    "name": "market-watch-v200rc1-web-1",
+    "image_id": "sha256:e37af2a40486cf68d64f6e7f320103c717572a62482ee063cc3f64e65690b665",
+    "restarts": 0,
+    "oom_killed": false,
+    "status": "running",
+    "source_commit": "0eac4fe7548f5df32c43e26415d9cf7e2e0ff581",
+    "source_dirty": "false",
+    "compose_project": "market-watch-v200rc1",
+    "compose_service": "web"
+  },
+  {
+    "name": "market-watch-v200rc1-api-1",
+    "image_id": "sha256:b158c95c0922ed77987992a9cda2b3e49cca5a1f2cc86664f7c66133ec6a6416",
+    "restarts": 0,
+    "oom_killed": false,
+    "status": "running",
+    "source_commit": "0eac4fe7548f5df32c43e26415d9cf7e2e0ff581",
+    "source_dirty": "false",
+    "compose_project": "market-watch-v200rc1",
+    "compose_service": "api"
+  },
+  {
+    "name": "market-watch-v200rc1-market-runtime-1",
+    "image_id": "sha256:b158c95c0922ed77987992a9cda2b3e49cca5a1f2cc86664f7c66133ec6a6416",
+    "restarts": 0,
+    "oom_killed": false,
+    "status": "running",
+    "source_commit": "0eac4fe7548f5df32c43e26415d9cf7e2e0ff581",
+    "source_dirty": "false",
+    "compose_project": "market-watch-v200rc1",
+    "compose_service": "market-runtime"
+  },
+  {
+    "name": "market-watch-v200rc1-data-worker-1",
+    "image_id": "sha256:b158c95c0922ed77987992a9cda2b3e49cca5a1f2cc86664f7c66133ec6a6416",
+    "restarts": 0,
+    "oom_killed": false,
+    "status": "running",
+    "source_commit": "0eac4fe7548f5df32c43e26415d9cf7e2e0ff581",
+    "source_dirty": "false",
+    "compose_project": "market-watch-v200rc1",
+    "compose_service": "data-worker"
+  },
+  {
+    "name": "market-watch-v200rc1-notification-worker-1",
+    "image_id": "sha256:b158c95c0922ed77987992a9cda2b3e49cca5a1f2cc86664f7c66133ec6a6416",
+    "restarts": 0,
+    "oom_killed": false,
+    "status": "running",
+    "source_commit": "0eac4fe7548f5df32c43e26415d9cf7e2e0ff581",
+    "source_dirty": "false",
+    "compose_project": "market-watch-v200rc1",
+    "compose_service": "notification-worker"
+  }
+]

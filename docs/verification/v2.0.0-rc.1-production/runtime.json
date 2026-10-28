@@ -1,0 +1,292 @@
+{
+  "observed_at": 1793200180986,
+  "schema": "az53_notification_outbox_types",
+  "roles": [
+    {
+      "group": "market",
+      "role": "pricing",
+      "state": "running",
+      "checked_at": 1793200175436,
+      "last_success_at": 1793200175436,
+      "error_type": null
+    },
+    {
+      "group": "market",
+      "role": "realtime",
+      "state": "idle",
+      "checked_at": 1793200166568,
+      "last_success_at": 1793200166568,
+      "error_type": null
+    },
+    {
+      "group": "market",
+      "role": "composite_aggregate",
+      "state": "idle",
+      "checked_at": 1793200176436,
+      "last_success_at": 1793200176436,
+      "error_type": null
+    },
+    {
+      "group": "market",
+      "role": "alert_indicator",
+      "state": "idle",
+      "checked_at": 1793200180351,
+      "last_success_at": 1793200180351,
+      "error_type": null
+    },
+    {
+      "group": "market",
+      "role": "chart_alert",
+      "state": "idle",
+      "checked_at": 1793200180429,
+      "last_success_at": 1793200180429,
+      "error_type": null
+    },
+    {
+      "group": "market",
+      "role": "market_ownership",
+      "state": "idle",
+      "checked_at": 1793200178278,
+      "last_success_at": 1793200178278,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_live_binance",
+      "state": "idle",
+      "checked_at": 1793200180545,
+      "last_success_at": 1793200180545,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_binance",
+      "state": "idle",
+      "checked_at": 1793200180267,
+      "last_success_at": 1793200180267,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_live_yahoo",
+      "state": "idle",
+      "checked_at": 1793200178811,
+      "last_success_at": 1793200178811,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_yahoo",
+      "state": "idle",
+      "checked_at": 1793200178224,
+      "last_success_at": 1793200178224,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_live_dukascopy",
+      "state": "idle",
+      "checked_at": 1793200179810,
+      "last_success_at": 1793200179810,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_dukascopy",
+      "state": "idle",
+      "checked_at": 1793200179281,
+      "last_success_at": 1793200179281,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_oanda",
+      "state": "idle",
+      "checked_at": 1793200178299,
+      "last_success_at": 1793200178299,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_binance",
+      "state": "idle",
+      "checked_at": 1793200178995,
+      "last_success_at": 1793200178995,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_dukascopy",
+      "state": "idle",
+      "checked_at": 1793200178014,
+      "last_success_at": 1793200178014,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "provider_janitor",
+      "state": "idle",
+      "checked_at": 1793200132158,
+      "last_success_at": 1793200132158,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "chart_history",
+      "state": "idle",
+      "checked_at": 1793200180254,
+      "last_success_at": 1793200180254,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "history_network",
+      "state": "idle",
+      "checked_at": 1793200179884,
+      "last_success_at": 1793200179884,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "history_compute",
+      "state": "idle",
+      "checked_at": 1793200179996,
+      "last_success_at": 1793200179996,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "native_history",
+      "state": "idle",
+      "checked_at": 1793200176228,
+      "last_success_at": 1793200176228,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "chart_aggregation",
+      "state": "idle",
+      "checked_at": 1793200180752,
+      "last_success_at": 1793200180752,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "market_stream",
+      "state": "idle",
+      "checked_at": 1793200180480,
+      "last_success_at": 1793200180480,
+      "error_type": null
+    },
+    {
+      "group": "data",
+      "role": "data_ownership",
+      "state": "idle",
+      "checked_at": 1793200176272,
+      "last_success_at": 1793200176272,
+      "error_type": null
+    },
+    {
+      "group": "notifications",
+      "role": "notification_projection",
+      "state": "idle",
+      "checked_at": 1793200179358,
+      "last_success_at": 1793200179358,
+      "error_type": null
+    },
+    {
+      "group": "notifications",
+      "role": "notification_retention",
+      "state": "idle",
+      "checked_at": 1793200145252,
+      "last_success_at": 1793200145252,
+      "error_type": null
+    },
+    {
+      "group": "notifications",
+      "role": "notification_delivery",
+      "state": "idle",
+      "checked_at": 1793200178208,
+      "last_success_at": 1793200178208,
+      "error_type": null
+    },
+    {
+      "group": "notifications",
+      "role": "notification_ownership",
+      "state": "idle",
+      "checked_at": 1793200177280,
+      "last_success_at": 1793200177280,
+      "error_type": null
+    },
+    {
+      "group": "notifications",
+      "role": "notification_health",
+      "state": "idle",
+      "checked_at": 1793200168445,
+      "last_success_at": 1793200168445,
+      "error_type": null
+    }
+  ],
+  "instruments": [
+    {
+      "symbol": "XAUUSD",
+      "instrument_enabled": false,
+      "realtime_enabled": false,
+      "desired": false,
+      "connection": "inactive",
+      "ready": false,
+      "error": null
+    },
+    {
+      "symbol": "EURUSD",
+      "instrument_enabled": true,
+      "realtime_enabled": false,
+      "desired": true,
+      "connection": "connected",
+      "ready": true,
+      "error": null
+    }
+  ],
+  "backup_audit": [
+    {
+      "kind": "backup_failed",
+      "at": 1793196944847,
+      "error_type": "TimeoutExpired",
+      "bytes": null
+    },
+    {
+      "kind": "backup_failed",
+      "at": 1793128525039,
+      "error_type": "TimeoutExpired",
+      "bytes": null
+    },
+    {
+      "kind": "backup_completed",
+      "at": 1793055671893,
+      "error_type": null,
+      "bytes": 9777000675
+    }
+  ],
+  "settings": {
+    "yahoo_enabled": true,
+    "oanda_acquisition_mode": "rest_batch",
+    "cookie_secure": true,
+    "public_url": "https://trade.kookvv.com:8443",
+    "delivery_enabled": true
+  },
+  "live": [
+    {
+      "logical_symbol": "EURUSD",
+      "quality": "healthy",
+      "connection": "connected",
+      "recovery_ready": true,
+      "sample_ready": true,
+      "candle_ready": true,
+      "observation_mode": "candle_close_sample",
+      "candle_age_ms": 1739,
+      "confirmation_error": null,
+      "market_session": "unknown",
+      "error": null
+    }
+  ]
+}
