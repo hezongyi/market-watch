@@ -143,14 +143,30 @@ class DatabaseComposeTests(unittest.TestCase):
 
     def test_notification_runtime_is_one_of_five_default_application_services(self):
         services = self.render([Path('compose.yaml')])['services']
-        self.assertEqual(
-            {name for name in services if name in {
-                'web', 'api', 'market-runtime', 'data-worker', 'notification-worker'}},
-            {'web', 'api', 'market-runtime', 'data-worker', 'notification-worker'},
-        )
+        application_services = {'web', 'api', 'market-runtime', 'data-worker',
+                                'notification-worker'}
+        self.assertEqual(len(application_services & services.keys()), 5)
+        self.assertFalse({'notify-worker', 'notification-projector', 'projector',
+                          'market-stream-worker', 'history-worker'} & services.keys())
         notification = services['notification-worker']
         self.assertEqual(notification['command'],
                          ['python', '-m', 'alerts.runtime', '--profile', 'notifications'])
         self.assertEqual(notification['depends_on']['migrate']['condition'],
                          'service_completed_successfully')
         self.assertNotIn('api', notification['depends_on'])
+        self.assertEqual(services['api']['depends_on']['migrate']['condition'],
+                         'service_completed_successfully')
+
+    def test_production_has_five_application_services_and_yahoo_enabled_everywhere(self):
+        services = self.render([Path('compose.production.yaml')])['services']
+        application_services = {'web', 'api', 'market-runtime', 'data-worker',
+                                'notification-worker'}
+        self.assertEqual(len(application_services & services.keys()), 5)
+        self.assertFalse({'notify-worker', 'notification-projector', 'projector',
+                          'market-stream-worker', 'history-worker'} & services.keys())
+        for name in application_services - {'web'}:
+            with self.subTest(service=name):
+                self.assertEqual(services[name]['environment']['ALERTS_YAHOO_ENABLED'], 'true')
+        self.assertEqual(services['notification-worker']['depends_on']['migrate']['condition'],
+                         'service_completed_successfully')
+        self.assertNotIn('api', services['notification-worker']['depends_on'])

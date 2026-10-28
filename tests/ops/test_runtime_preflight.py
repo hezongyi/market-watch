@@ -23,10 +23,15 @@ def test_only_live_schedulers_in_explicit_legacy_projects_block_switch():
 
 
 def test_known_live_scheduler_conflicts_regardless_of_heartbeat_age():
-    output = "e5\told-history\tmarket-watch-v1\thistory-worker"
+    output = "e5\told-history\tmarket-watch-v1\thistory-worker\nf6\told-projector\tmarket-watch-v1\tprojector"
     assert preflight.conflicts(
         output, project="market-watch-v2", legacy_projects=["market-watch-v1"],
-    )[0]["service"] == "history-worker"
+    ) == [
+        {"id": "e5", "name": "old-history", "project": "market-watch-v1",
+         "service": "history-worker"},
+        {"id": "f6", "name": "old-projector", "project": "market-watch-v1",
+         "service": "projector"},
+    ]
 
 
 def test_clean_stop_with_residual_heartbeat_does_not_block():

@@ -24,6 +24,7 @@ LEGACY_RUNTIME_SERVICES = frozenset({
     "native-history-worker",
     "import-worker",
     "legacy-import-worker",
+    "projector",
     "notification-projector",
     "notify-worker",
 })
