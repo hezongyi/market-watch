@@ -10,12 +10,18 @@ depends_on = None
 
 
 def upgrade():
-    op.alter_column("notifications", "signal_id", existing_type=sa.String(length=36),
-                    nullable=True)
-    op.add_column("notifications", sa.Column(
-        "kind", sa.String(length=16), server_default="signal", nullable=False))
-    op.add_column("notifications", sa.Column(
-        "payload", sa.JSON(), server_default="{}", nullable=False))
+    bind = op.get_bind()
+    columns = {column["name"]: column for column in sa.inspect(bind).get_columns("notifications")}
+    with op.batch_alter_table("notifications") as batch:
+        signal_id = columns.get("signal_id")
+        if signal_id and not signal_id["nullable"]:
+            batch.alter_column("signal_id", existing_type=sa.String(length=36), nullable=True)
+        if "kind" not in columns:
+            batch.add_column(sa.Column(
+                "kind", sa.String(length=16), server_default="signal", nullable=False))
+        if "payload" not in columns:
+            batch.add_column(sa.Column(
+                "payload", sa.JSON(), server_default="{}", nullable=False))
 
 
 def downgrade():
