@@ -2,6 +2,16 @@
 
 ## 当前状态（2026-10-28，优先于下方历史记录）
 
+### 阶段 5 当前切片
+
+基线 `b4bd9d70`（PR #111 合并后的 `origin/main`），worktree `/home/quant/repos/market-watch-runtime-deployment-stage5-dsh-20261028`。本切片只做验收证据收口与切换准备，不改产品代码。
+
+- 新增 [`acceptance-matrix-index.md`](acceptance-matrix-index.md)：A01—A17b 逐项状态、证据路径与缺口。当前 6 项通过、7 项部分、1 项偏差（A08）、7 项未覆盖（A04a/A04b/A13a—A13c/A16/A17b）。
+- 新增 [`switch-rollback-runbook.md`](switch-rollback-runbook.md)：切换前留档与配置核对命令（服务图 6 项、后端 Yahoo 全 true、三组依赖 migrate）、preflight 三种退出码、互斥切换顺序、绕过旧迁移的回退命令集与 `init: true` 停止要求、回退后风险核对清单。
+- 覆盖索引固定归属：A16 与 A17a 属本阶段必须闭合项；A06/A09/A10/A11/A12 各补一次容器级核对；A08 保持非阻塞偏差，不放宽门槛；轨道 C/D 不并入本阶段。
+
+阶段 5 尚未签收。真实 ntfy/A17b、A08/A09 长稳容量、真实供应商与生产盘点仍待各自授权。
+
 ### 阶段 3B / 阶段 4
 
 阶段3B 实现在 `refactor/runtime-notifications-stage3b-20261028`，最新修复 head `bcf77cce`。PR #110 stacked 在阶段3A PR #109 上；PR #109 CI 全绿但仍为 Draft。PR #110 的 `564d326d` CI 曾因通知迁移的 SQLite ALTER 不兼容和重复加列失败；已将迁移改为批量 ALTER 且只补缺少列，本地 SQLite 迁移路径回归 **11 passed**，Ruff 通过。新 head CI 正在排队/运行，按用户指示不等待它开始阶段4。因远端 CI 尚未验证新迁移，阶段3B 目前是实现与本地验收完成、PR 门槛待复验，不记为完整收口。手机 A17b 是独立签收项，不阻塞阶段3B核心交付。
