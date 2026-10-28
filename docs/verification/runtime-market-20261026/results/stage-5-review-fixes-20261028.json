@@ -1,0 +1,121 @@
+{
+  "source_commit": "a49bce8a8208094af238a7c4937b1e7f3d239f9e",
+  "source_archive_sha256": "46cc043f142c09c0a9330e7235ca22db94e91752dc1bdc4ed95a6efe72242528",
+  "host": "quant-server (Ubuntu local Docker)",
+  "project": "mw-stage5-review-20261028",
+  "network": {
+    "Name": "mw-stage5-review-20261028_default",
+    "Id": "dc81a9d8a1b10982288db4c510a2c733efb2d9fd83193edbe3f5ee1791c65177",
+    "Driver": "bridge",
+    "Internal": true,
+    "Labels": {
+      "com.docker.compose.config-hash": "a2a42bd0cc5021b59eedf0359fc700d552b9d31536dd10ad03f7959b309bc12e",
+      "com.docker.compose.network": "default",
+      "com.docker.compose.project": "mw-stage5-review-20261028",
+      "com.docker.compose.version": "2.40.3",
+      "market-watch.purpose": "acceptance",
+      "market-watch.task": "stage5-review-20261028"
+    }
+  },
+  "lease_takeover": {
+    "before": {
+      "at": 166246444,
+      "task": "e9d3a761-78c9-4b57-bdcf-a97c1b1f5343",
+      "notification": "34e33e18-4812-429b-80ad-5d450b8dc049",
+      "attempts": 1,
+      "status": "sending",
+      "lease_until": 166297724,
+      "boot": "3d7c9338-ae0d-49f8-8253-c07ae6819199",
+      "notification_status": "pending",
+      "outbox_count": 1,
+      "receipts": []
+    },
+    "after": {
+      "at": 166299246,
+      "task": "e9d3a761-78c9-4b57-bdcf-a97c1b1f5343",
+      "notification": "34e33e18-4812-429b-80ad-5d450b8dc049",
+      "attempts": 2,
+      "status": "accepted",
+      "lease_until": null,
+      "boot": "d0914afc-eb28-4256-850a-6a3c390677b6",
+      "notification_status": "server_accepted",
+      "outbox_count": 1,
+      "receipts": [
+        "accepted"
+      ]
+    },
+    "samples": 40,
+    "before_expiry_samples": 38,
+    "passed": true
+  },
+  "supplier": {
+    "hits": {
+      "head/": {
+        "count": 8,
+        "last": [
+          166323341,
+          166323344,
+          166343931,
+          166345007,
+          166365027,
+          166366107,
+          166386127,
+          166387182
+        ]
+      },
+      "head/binance/": {
+        "count": 8,
+        "last": [
+          166323423,
+          166323425,
+          166344067,
+          166345140,
+          166365158,
+          166366233,
+          166386250,
+          166387311
+        ]
+      },
+      "catalog": {
+        "count": 1,
+        "last": [
+          166324229
+        ]
+      }
+    },
+    "slow_hits": 1,
+    "successful_stub_deliveries": 1
+  },
+  "final_containers": [
+    {
+      "name": "mw-stage5-review-20261028-notification-worker-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-review-20261028-data-worker-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-review-20261028-fixture-supplier-1",
+      "running": false,
+      "exit_code": 143,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-review-20261028-postgres-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    }
+  ],
+  "raw_artifacts_sha256": {
+    "lease-takeover.json": "7684fb1bb4fc1c5e2e350b2ec46d551e8180b7d3a63d007ad9fa4a455330ca36",
+    "network.json": "c32971e37f7aa76ca64c5eac2ab6cb5c6f10cc364a0d0a8be119653b40824b75",
+    "supplier-state.json": "2e1e405f3b137615abb2e6172288b38b3fa16433f863bf81b46bf11e27efa9fa",
+    "snapshot-review-isolation.json": "ac94038bb86852b4605f2c8d2445850ae36342a828df563ca74c5f6702760efe"
+  }
+}

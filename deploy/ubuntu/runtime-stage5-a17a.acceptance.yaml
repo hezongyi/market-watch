@@ -1,0 +1,186 @@
+# Stage 5 A17a real-channel acceptance (isolated, task-owned).
+#
+# Topology: five application services (web, api, market-runtime, data-worker,
+# notification-worker) with ChartAlert embedded in market-runtime, plus the
+# stage-2 synthetic OANDA wire fixture. The `internal` network has no route off
+# the host, so no market/data/api container can reach a provider, Yahoo or
+# OANDA; only notification-worker also joins `egress`, which it needs for the
+# real ntfy endpoint. The fixture additionally rewrites every OANDA destination
+# to the task-local fixture-supplier container inside the process, and the
+# OANDA credentials are synthetic.
+#
+# Real credentials and the admin hash live in MW_A17A_SECRETS (outside this
+# repository) and are injected with `env_file`; they never appear here.
+x-backend: &backend
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /candidate
+  volumes:
+    - '${MW_A17A_REPO:?}:/candidate:ro'
+    - '${MW_A17A_ARTIFACTS:?}:/artifacts'
+  init: true
+  environment: &backend-environment
+    PYTHONPATH: /candidate/backend:/candidate/backend/tests:/candidate/scripts
+    PYTHONDONTWRITEBYTECODE: '1'
+    MW_A17A_RUN: a17a
+    MW_A17A_DB: ${MW_A17A_DB:-runtime_stage5}
+    ALERTS_DATABASE_URL: postgresql+psycopg://runtime_stage5:${MW_A17A_DB_PASSWORD:?Set an acceptance-only password}@postgres/${MW_A17A_DB:-runtime_stage5}
+    ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+    ALERTS_DATABASE_JIT: 'off'
+    ALERTS_DATABASE_MAX_OVERFLOW: '0'
+    ALERTS_RUNTIME_DEPLOYMENT: stage5_a17a
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_OANDA_ACCOUNT_ID: composite-test-account
+    ALERTS_OANDA_TOKEN: synthetic-no-upstream-access
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ''
+    ALERTS_OANDA_ACQUISITION_MODE: stream
+    ALERTS_OANDA_RECOVERY_MINUTES: '120'
+    ALERTS_OANDA_CONFIRMATION_MARGIN_SECONDS: '10'
+    ALERTS_YAHOO_ENABLED: 'false'
+    ALERTS_HISTORY_HEALTH_WORKERS: '[]'
+    ALERTS_DELIVERY_ENABLED: 'false'
+    # Phones must be able to open the notification click/ack links, so this is
+    # the host LAN address, not loopback. Production must use a URL the handset
+    # can really reach; otherwise click and acknowledge both fail.
+    ALERTS_PUBLIC_URL: http://192.168.7.232:18090
+  restart: unless-stopped
+  labels: &labels
+    market-watch.task: mw-runtime-stage5-a17a-20261028
+    market-watch.project: mw-runtime-stage5-a17a-20261028
+    market-watch.purpose: acceptance
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: runtime_stage5
+      POSTGRES_USER: runtime_stage5
+      POSTGRES_PASSWORD: ${MW_A17A_DB_PASSWORD:?Set an acceptance-only password}
+    cpus: 0.75
+    mem_limit: 1536m
+    volumes: [runtime-stage5-a17a-postgres:/var/lib/postgresql/data]
+    networks: [internal]
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U runtime_stage5 -d runtime_stage5 && test "$$(PGOPTIONS=''-c jit=on'' psql -U runtime_stage5 -d runtime_stage5 -Atqc "SELECT current_setting(''server_version_num'') = ''140024'' AND pg_jit_available()")" = t']
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    labels: *labels
+  migrate:
+    <<: *backend
+    command: [alembic, upgrade, head]
+    cpus: 0.2
+    mem_limit: 192m
+    networks: [internal]
+    restart: 'no'
+    depends_on:
+      postgres: {condition: service_healthy}
+  fixture-seed:
+    <<: *backend
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [seed]
+    cpus: 0.5
+    mem_limit: 512m
+    networks: [internal]
+    restart: 'no'
+  fixture-supplier:
+    <<: *backend
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [supplier]
+    cpus: 0.1
+    mem_limit: 128m
+    networks: [internal]
+  api:
+    <<: *backend
+    # The API stamps test notifications and their outbox rows, so it needs the
+    # same fixture time base as the delivery loop that claims them.
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [api]
+    cpus: 0.3
+    mem_limit: 320m
+    networks: [internal]
+    env_file: ['${MW_A17A_SECRETS:?}']
+    environment:
+      <<: *backend-environment
+      ALERTS_COOKIE_SECURE: 'false'
+      ALERTS_DATABASE_POOL_SIZE: '4'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-a17a-api
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+      start_period: 20s
+  fixture-rebaseline:
+    <<: *backend
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [rebaseline, --timeout, '180']
+    cpus: 0.25
+    mem_limit: 192m
+    networks: [internal]
+    restart: 'no'
+  market-runtime:
+    <<: *backend
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [runtime, --profile, market]
+    cpus: 0.55
+    mem_limit: 512m
+    networks: [internal]
+    environment:
+      <<: *backend-environment
+      ALERTS_OANDA_STREAM_ENABLED: 'true'
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
+      ALERTS_DATABASE_POOL_SIZE: '6'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-a17a-market
+      MW_A17A_FAULT: '${MW_A17A_FAULT:-}'
+    stop_grace_period: 45s
+  data-worker:
+    <<: *backend
+    # Every fixture process needs the same time base: the market runtime stamps
+    # observations with the fixture clock, so the data and notification groups
+    # must compare heartbeat ages on that same clock.
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [runtime, --profile, data]
+    cpus: 0.25
+    mem_limit: 320m
+    networks: [internal]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: '8'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-a17a-data
+  notification-worker:
+    <<: *backend
+    entrypoint: [python, /candidate/scripts/acceptance/stage5_a17a_fixture.py]
+    command: [runtime, --profile, notifications]
+    cpus: 0.2
+    mem_limit: 256m
+    networks: [internal, egress]
+    env_file: ['${MW_A17A_SECRETS:?}']
+    environment:
+      <<: *backend-environment
+      ALERTS_DELIVERY_ENABLED: 'true'
+      ALERTS_DATABASE_POOL_SIZE: '4'
+      ALERTS_DATABASE_APPLICATION_NAME: mw-a17a-notifications
+  web:
+    image: sha256:43c51c707e8c6fafc681bd4db1b23cc0b37ece546c04c15fc0df9d281657b870
+    cpus: 0.1
+    mem_limit: 128m
+    init: true
+    # Docker does not publish ports for containers attached only to an
+    # internal network, so web also joins egress. It only proxies to api.
+    # Bind the LAN address only: loopback, the mh-tun address and the docker
+    # bridges must not publish the acceptance UI.
+    ports: ['192.168.7.232:18090:80']
+    networks: [internal, egress]
+    depends_on:
+      api: {condition: service_healthy}
+    restart: unless-stopped
+    labels: *labels
+networks:
+  internal:
+    internal: true
+    labels: *labels
+  egress:
+    labels: *labels
+volumes:
+  runtime-stage5-a17a-postgres:
+    labels: *labels

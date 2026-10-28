@@ -1,5 +1,9 @@
-"""Supervised projection, retention, delivery and health loops."""
+"""Supervised projection, retention, delivery and health loops.
 
+The module command records or clears one bounded planned-maintenance window.
+"""
+
+import argparse
 import hashlib
 from contextlib import contextmanager
 
@@ -7,6 +11,20 @@ from sqlalchemy import select, text
 
 from . import runtime_health
 from .runtime_supervisor import Loop, RuntimeGroupError, exit_if_unstopped, run_group
+
+# Each role's deadline must exceed its own idle period: retention polls once a
+# minute and the health loop every 15s. data and market set the same per role.
+LOOP_DEADLINES = {
+    "notification_projection": 60_000,
+    "notification_retention": 90_000,
+    "notification_delivery": 60_000,
+    "notification_ownership": 60_000,
+    "notification_health": 60_000,
+}
+
+
+def deadline_ms(role):
+    return LOOP_DEADLINES.get(role, 60_000)
 
 
 def build_loops():
@@ -58,14 +76,14 @@ def run(*, stop=None, loops=None, handle_signals=True):
     with ownership(engine) as verify_ownership:
         boot_id = runtime_health.boot()
         reporters = {
-            loop.role: runtime_health.Progress("notifications", loop.role, boot_id)
+            loop.role: runtime_health.Progress(
+                "notifications", loop.role, boot_id, deadline_ms=deadline_ms(loop.role))
             for loop in selected
         }
         reporters.update({
-            "notification_ownership": runtime_health.Progress(
-                "notifications", "notification_ownership", boot_id),
-            "notification_health": runtime_health.Progress(
-                "notifications", "notification_health", boot_id),
+            role: runtime_health.Progress(
+                "notifications", role, boot_id, deadline_ms=deadline_ms(role))
+            for role in ("notification_ownership", "notification_health")
         })
         for reporter in reporters.values():
             reporter.claim()
@@ -121,17 +139,16 @@ def run_health(stop):
 
 
 def inspect_health(*, startup_grace_until=0):
-    """Monitor fixed runtime roles and persist fault/recovery transitions."""
-    from .runtime_health import MARKET_ROLES, data_roles, key
+    """Monitor configured runtime roles and persist fault/recovery transitions."""
+    from .runtime_health import expected_roles, key, maintenance, paused, restarts
     from .storage import Preference, now_ms, transaction
 
-    expected = tuple(f"market:{role}" for role in MARKET_ROLES if role != "market_ownership")
-    expected += tuple(f"data:{role}" for role in data_roles() if role != "data_ownership")
-    expected += tuple(f"notifications:{role}" for role in runtime_health.NOTIFICATION_ROLES)
     now = now_ms()
-    faults = []
     with transaction() as db:
-        for item in expected:
+        # A bounded maintenance window pauses role checks; it is never recovery.
+        window = maintenance(db, at=now)
+        faults = []
+        for item in expected_roles():
             group, role = item.split(":", 1)
             row = db.get(Preference, key(role))
             value = row.value if row else {}
@@ -142,13 +159,20 @@ def inspect_health(*, startup_grace_until=0):
                 starting = not checked and value.get("state") == "starting"
                 if not ((category == "missing" or starting) and now < startup_grace_until):
                     faults.append((group, role, category))
+        # Retain the originating group so scoped maintenance also pauses restart
+        # incidents and never manufactures a recovery for a maintained group.
+        faults.extend((group, "boot_loop", "restart_loop")
+                      for group in {group for group, _role, _count in restarts(db, at=now)})
+        faults = [fault for fault in faults if not paused(window, fault[0])]
         current = {f"{group}:{role}" for group, role, _category in faults}
         notifications_due = []
         for fault_id in current:
             key_name = "runtime_incident:" + fault_id
             row = db.get(Preference, key_name)
-            value = row.value if row else {"state": "active", "opened_at": now,
-                                            "last_notified_at": 0}
+            # A copy, never the column's own dict: an in-place edit leaves the
+            # attribute unchanged and the reminder time never reaches the row.
+            value = dict(row.value) if row else {"state": "active", "opened_at": now,
+                                                 "last_notified_at": 0}
             newly_opened = row is None or value.get("state") != "active"
             group, role = fault_id.split(":", 1)
             category = next(category for fault_group, fault_role, category in faults
@@ -162,14 +186,17 @@ def inspect_health(*, startup_grace_until=0):
             else:
                 db.add(Preference(key=key_name, value=value))
         # Recovery is a durable state transition; it does not acknowledge an incident.
+        # A paused group keeps its incident open because maintenance is not recovery.
         recovered = []
         for row in db.scalars(select(Preference).where(
                 Preference.key.like("runtime_incident:%"))).all():
-            if row.value.get("state") == "active" and row.key.removeprefix("runtime_incident:") not in current:
-                fault_id = row.key.removeprefix("runtime_incident:")
-                if row.value.get("last_notified_at"):
-                    recovered.append(fault_id.replace(":", " / "))
-                row.value = {**row.value, "state": "recovered", "recovered_at": now}
+            fault_id = row.key.removeprefix("runtime_incident:")
+            if (row.value.get("state") != "active" or fault_id in current
+                    or paused(window, fault_id.split(":", 1)[0])):
+                continue
+            if row.value.get("last_notified_at"):
+                recovered.append(fault_id.replace(":", " / "))
+            row.value = {**row.value, "state": "recovered", "recovered_at": now}
         if notifications_due:
             _queue_system_notice(db, title="后台服务异常",
                 message="以下运行角色状态异常，请检查：\n" + "\n".join(notifications_due),
@@ -191,3 +218,33 @@ def _queue_system_notice(db, *, title, message, incident_id):
     db.add(Outbox(notification_id=note.id, status="pending", attempts=0,
                   next_at=now_ms(),
                   lease_until=None, error=None, provider_id=None))
+
+
+def main():
+    parser = argparse.ArgumentParser(description="Pause or resume runtime expectation checks.")
+    action = parser.add_mutually_exclusive_group(required=True)
+    action.add_argument("--maintenance-minutes", type=int,
+                        help="bounded planned-maintenance window for this deployment")
+    parser.add_argument("--maintenance-group", action="append", default=[],
+                        help="role group to pause; omit to pause every group, including runtime")
+    action.add_argument("--end-maintenance", action="store_true",
+                        help="clear the maintenance window and resume checks")
+    args = parser.parse_args()
+    if args.maintenance_minutes is not None and args.maintenance_minutes < 1:
+        parser.error("--maintenance-minutes must be positive")
+    from .runtime_health import clear_maintenance, maintain
+    from .storage import bootstrap, transaction
+
+    bootstrap()
+    with transaction() as db:
+        if args.end_maintenance:
+            clear_maintenance(db)
+            print("runtime maintenance window cleared")
+        else:
+            window = maintain(db, minutes=args.maintenance_minutes,
+                              groups=args.maintenance_group)
+            print(f"runtime maintenance until {window['until']}")
+
+
+if __name__ == "__main__":
+    main()

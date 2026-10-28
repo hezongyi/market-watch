@@ -2,6 +2,20 @@
 
 ## 当前状态（2026-10-28，优先于下方历史记录）
 
+### 阶段 5 当前切片
+
+基线 `b4bd9d70`（PR #111 合并后的 `origin/main`），worktree `/home/quant/repos/market-watch-runtime-deployment-stage5-dsh-20261028`。本切片只做验收证据收口与切换准备，不改产品代码。
+
+- 新增 [`acceptance-matrix-index.md`](acceptance-matrix-index.md)：A01—A17b 逐项状态、证据路径与缺口。当前 6 项通过、7 项部分、1 项偏差（A08）、7 项未覆盖（A04a/A04b/A13a—A13c/A16/A17b）。
+- 新增 [`switch-rollback-runbook.md`](switch-rollback-runbook.md)：切换前留档与配置核对命令（服务图 6 项、后端 Yahoo 全 true、三组依赖 migrate）、preflight 三种退出码、互斥切换顺序、绕过旧迁移的回退命令集与 `init: true` 停止要求、回退后风险核对清单。
+- 覆盖索引固定归属：A16 与 A17a 属本阶段必须闭合项；A06/A09/A10/A11/A12 各补一次容器级核对；A08 保持非阻塞偏差，不放宽门槛；轨道 C/D 不并入本阶段。
+
+阶段 5 实现与联合验收已收口（2026-10-28）：A16/A17a/A17b 关闭，A06/A10—A12 容器级关闭；矩阵现状 13 通过、2 部分（A05 周日基线属轨道 C、A09 信号级）、1 偏差（A08）、5 未覆盖（A04a/b、A13a—c，属轨道 C）。
+
+本阶段提交：41b8c054（矩阵索引与切换/回退手册）、42a1eb82（通知组 per-role deadline + A16 三缺口）、e67b556f（活动故障提醒时间不落库）、29854e45（A06/A10—A12 容器级补证）、f9408a5b（A17a 真实通道记录 + LAN 深链改造），汇总于 Draft PR #113。
+
+两个缺陷均由真实通道验收发现、测试级证据看不出来：通知组窗口小于自身循环周期导致假告警刷屏；活动故障分支原地改 JSON 列再赋回同一对象导致 `last_notified_at` 不落库、首次提醒后每 ~15 s 重推。修复以 126 passed 主机回归、4 passed 真实 PG 合同与红用例钉住，并由复跑库独立复核（`last_notified_at` 三次推进、healthy 663 s 零 system 通知）。
+
 ### 阶段 3B / 阶段 4
 
 阶段3B 实现在 `refactor/runtime-notifications-stage3b-20261028`，最新修复 head `bcf77cce`。PR #110 stacked 在阶段3A PR #109 上；PR #109 CI 全绿但仍为 Draft。PR #110 的 `564d326d` CI 曾因通知迁移的 SQLite ALTER 不兼容和重复加列失败；已将迁移改为批量 ALTER 且只补缺少列，本地 SQLite 迁移路径回归 **11 passed**，Ruff 通过。新 head CI 正在排队/运行，按用户指示不等待它开始阶段4。因远端 CI 尚未验证新迁移，阶段3B 目前是实现与本地验收完成、PR 门槛待复验，不记为完整收口。手机 A17b 是独立签收项，不阻塞阶段3B核心交付。
@@ -122,3 +136,9 @@ docker compose --env-file /home/quant/.local/share/market-watch-runtime-20261026
 本次服务拓扑已落实到正式 Compose：移除 `chart-alert-runtime` 独立服务和 `independent-alert` profile，market-runtime 默认装配 ChartAlert；独立 alert profile/Compose fixture 仅保留在阶段验收工具中，不属于正式五服务部署。
 
 五服务真实网络功能验收：新建隔离 project `mw-runtime-stage2-five-stream-20261028`，显式启用 market 内嵌告警，未启动独立 alert 容器；API 停止后通过 synthetic OANDA stream fixture 输入 crossing，7/7 规则均产生唯一预期 signal，检查耗时57.02秒，角色心跳/owner及规则状态均 ready。首次就绪轮因启动竞态先连接 supplier 失败并令 seed 输入过期，证据保留为 `five-service-network-ready-failure-20261028.json`；执行合同要求的显式 restart 后规则恢复 ready，再完成 crossing。本项不作为时延SLO或生产供源验收。数据见 `stage-2-network-acceptance.md` 和 `results/five-service-network-*-20261028.json`。运行容器已停止，独立 PG 容器保留且健康，未删除 volume。
+
+
+2026-10-28 PR #113 review 修复：已修正按组维护漏抑制 boot_loop、五分钟第 3 次启动阈值、topup 内部网络及 catalog 直连、发布 `.env` 操作说明；撤回旧 A11 不同 task 的接管结论并补同一 task 的真实到期接管。主机 39 passed / 43 subtests，容器内含 5 个真实 PG 合同的回归 36 passed、无 skip。新项目 `mw-stage5-review-20261028` 的同任务 attempts 1→2、原租约到期前不重领、新 boot 接管并由本地 stub 接受；网络 Internal=true，catalog fixture 命中 1 次。全部任务容器已停止，卷和证据保留。证据见 `stage-5-review-fixes.md`；A09 信号级仍部分覆盖，A08 仍为既决非阻塞偏差，轨道 C 独立交付，不把本轮 review 修复当作整个阶段 5 全矩阵通过。
+
+
+2026-10-28 A09 信号级补齐：独立 Ubuntu project `mw-stage5-a09-20261028`，API/web 缺席，Dukascopy 持续 ReadTimeout 的38个采样内，健康 OANDA 报价最大年龄584 ms，同一规则/boot 实际产生唯一 signal、notification、Outbox；撤销慢源订阅后链路继续且ID不变。证据见 `stage-5-a09-signal-acceptance.md` 与 `results/stage-5-a09-signal-20261028.json`。本轮没有复现供源重建后的长期断流，未修改产品重连逻辑；只补验收准备和真实事件断言。A09由部分转通过，A08既决偏差与轨道C范围不变。任务容器已stop、卷和证据保留。
