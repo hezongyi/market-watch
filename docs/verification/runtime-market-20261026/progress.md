@@ -2,9 +2,13 @@
 
 ## 当前状态（2026-10-28，优先于下方历史记录）
 
-### 阶段 3B 当前切片
+### 阶段 3B / 阶段 4
 
-阶段3B 通知组已在独立分支 `refactor/runtime-notifications-stage3b-20261028` 实现并完成本地/Ubuntu隔离PG合同；详细证据见 [`stage-3b-notifications-acceptance.md`](stage-3b-notifications-acceptance.md)。默认及生产 Compose 已收敛到五个应用服务，测试与系统提醒走持久 Outbox。该切片尚未完成 PR review/CI；PR #109 后端 CI 仍在运行，按用户授权不等待其结果继续阶段开发。阶段4/5联合矩阵、真实 ntfy/A17a 与手机 A17b仍未签收。
+阶段3B 实现在 `refactor/runtime-notifications-stage3b-20261028`，最新修复 head `bcf77cce`。PR #110 stacked 在阶段3A PR #109 上；PR #109 CI 全绿但仍为 Draft。PR #110 的 `564d326d` CI 曾因通知迁移的 SQLite ALTER 不兼容和重复加列失败；已将迁移改为批量 ALTER 且只补缺少列，本地 SQLite 迁移路径回归 **11 passed**，Ruff 通过。新 head CI 正在排队/运行，按用户指示不等待它开始阶段4。因远端 CI 尚未验证新迁移，阶段3B 目前是实现与本地验收完成、PR 门槛待复验，不记为完整收口。手机 A17b 是独立签收项，不阻塞阶段3B核心交付。
+
+阶段4 worktree/branch：`/home/quant/repos/market-watch-runtime-deployment-stage4-20261028` / `refactor/runtime-deployment-stage4-20261028`，以 `bcf77cce` 为基线。首个切片补齐 API 的 notifications 运行组心跳，并将系统状态页改为展示 market/data/notifications 三组循环状态，移除页面上已退役的旧 worker 心跳展示；旧 API 字段暂留兼容。当前仍在开发，阶段4部署 preflight、完整部署矩阵和阶段5联合验收未完成。
+
+阶段3B验收记录见 [`stage-3b-notifications-acceptance.md`](stage-3b-notifications-acceptance.md)。阶段4/5联合矩阵、真实 ntfy/A17a 与生产切换准备仍未签收。
 
 ### 本轮最终证据与下一步
 

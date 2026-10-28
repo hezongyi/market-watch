@@ -57,6 +57,28 @@ def test_health_exposes_both_runtime_groups_and_data_roles(database):
         "provider_janitor", "chart_history", "history_network", "history_compute",
         "native_history", "chart_aggregation", "market_stream", "data_ownership",
     }
+    assert {row["role"] for row in result["notification_runtime"]} == {
+        "notification_projection", "notification_retention", "notification_delivery",
+        "notification_ownership", "notification_health",
+    }
+
+
+def test_health_reports_notification_runtime_role_state(database):
+    from alerts import runtime_health
+    from alerts.storage import Preference, now_ms
+
+    with database.begin() as db:
+        db.add(Preference(key=runtime_health.key("notification_delivery"), value={
+            "group": "notifications", "role": "notification_delivery",
+            "started_at": now_ms() - 1000, "checked_at": now_ms() - 100,
+            "last_success_at": now_ms() - 100, "stale_after_ms": 15000,
+            "state": "idle", "error_type": None,
+        }))
+    result = api_module.health()
+    delivery = next(row for row in result["notification_runtime"]
+                    if row["role"] == "notification_delivery")
+    assert delivery["state"] == "idle"
+    assert delivery["last_success_at"] is not None
 
 
 def test_history_heartbeats_stop_independently_and_faults_are_visible(database, monkeypatch):
