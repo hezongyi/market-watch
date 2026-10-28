@@ -1,5 +1,5 @@
 import {spawnSync} from 'node:child_process';
-const checks=['single-app-routing.cjs','advanced-native-save-race.cjs','notifications-runtime.cjs','notifications-persistence.cjs',
+const checks=['single-app-routing.cjs','advanced-native-save-race.cjs','notifications-runtime.cjs','notifications-persistence.cjs','native-notification-header-ready.cjs',
  'advanced-market-stream.cjs','advanced-historical-reset.cjs','advanced-bar-range-lifecycle.cjs','chart-stream-fallback.cjs',
  'advanced-market-request-scheduling.cjs','advanced-inflight-cancellation.cjs','advanced-history-admission.cjs',
  'advanced-provider-request-lifetime.cjs','advanced-native-workspaces.cjs','advanced-preferences.cjs','advanced-preferences-conflict.cjs',

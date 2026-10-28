@@ -1,6 +1,6 @@
 """Managed real-time choice with compatible defaults and no history authorization."""
 
-from sqlalchemy import select
+from sqlalchemy import and_, or_, select
 
 from .chart_history_plan import lock_plan_instrument
 from .storage import (
@@ -9,6 +9,7 @@ from .storage import (
     ChartAlertVersion,
     ChartHistoryPlan,
     ChartPublication,
+    CompositeInputEvent,
     CompositeRevision,
     HistoryArtifact,
     HistoryVersion,
@@ -85,6 +86,8 @@ def initialize_defaults(db, *, now):
     """Snapshot compatibility once; lease expiry must not change a saved choice.
 
     Called under bootstrap's PostgreSQL advisory lock before runtime assembly.
+    Previously viewed, collecting composite heads survive expired browser
+    leases across upgrade downtime. Preparation alone never enables live data.
     New registered datasets default off. Legacy standalone instruments retain
     their persisted enabled flag until an explicit user choice replaces it.
     """
@@ -93,12 +96,31 @@ def initialize_defaults(db, *, now):
         lock_plan_instrument(db, instrument_id)
         value = configured(db, instrument_id)
         if value is None:
-            value = compatibility_default(db, instrument_id, now=now)
+            value = (compatibility_default(db, instrument_id, now=now)
+                     or _previously_collecting_composite(db, instrument_id))
             db.add(Preference(key=preference_key(instrument_id), value={"enabled": value, "updated_at": now}))
             plan = db.get(ChartHistoryPlan, instrument_id, populate_existing=True)
             if plan:
                 plan.realtime_enabled = value
     db.flush()
+
+
+def _previously_collecting_composite(db, instrument_id):
+    """One-time upgrade evidence, never a replacement for a saved user choice."""
+    previous_view = select(MarketDemand.id).where(or_(
+        MarketDemand.composite_revision_id == CompositeRevision.id,
+        and_(MarketDemand.composite_revision_id.is_(None),
+             MarketDemand.instrument_id == MarketComposite.instrument_id),
+    )).exists()
+    live_input = select(CompositeInputEvent.id).where(
+        CompositeInputEvent.revision_id == CompositeRevision.id,
+        CompositeInputEvent.input_manifest["reason"].as_string() == "live_confirmation",
+    ).exists()
+    return db.scalar(select(CompositeRevision.id).join(
+        MarketComposite, MarketComposite.active_revision_id == CompositeRevision.id).join(
+        HistoryVersion, HistoryVersion.id == CompositeRevision.history_version_id).join(
+        MarketDataset, MarketDataset.id == HistoryVersion.dataset_id).where(
+        MarketDataset.instrument_id == instrument_id, previous_view, live_input).limit(1)) is not None
 
 
 def revision_instrument_id(db, revision):

@@ -45,6 +45,16 @@ def test_switch_contract(switch_pg, monkeypatch, contract):
     contract(switch_pg, monkeypatch)
 
 
+@pytest.mark.parametrize('pinned', [True, False])
+def test_downtime_snapshot(switch_pg, monkeypatch, pinned):
+    contracts.test_first_bootstrap_preserves_previously_collected_composite_after_downtime(switch_pg, monkeypatch, pinned)
+
+
+@pytest.mark.parametrize('missing', ['view', 'live_input', 'active_head'])
+def test_downtime_snapshot_stays_off_without_evidence(switch_pg, monkeypatch, missing):
+    contracts.test_bootstrap_does_not_enable_unviewed_prepared_or_retired_composites(switch_pg, monkeypatch, missing)
+
+
 @pytest.mark.parametrize('consumer', ['none', 'expired', 'chart', 'alert'])
 def test_migration_defaults(switch_pg, monkeypatch, consumer):
     contracts.test_compatibility_default_requires_existing_live_consumers(switch_pg, monkeypatch, consumer)
