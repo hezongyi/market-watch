@@ -144,6 +144,10 @@ def commit(ownership, bars):
         task.offset += len(starts)
         if task.offset == ownership["total"]:
             task.applied_input_revision, task.offset = ownership["input_revision"], 0
+            # The transaction that moves this waterline is the one that makes
+            # the new input judgeable, so it is the one that wakes the rules.
+            from .publication_wakeup import notify
+            notify(db)
         task.lease_token, task.lease_until, task.next_at, task.attempts, task.error = None, 0, 0, 0, None
         task.updated_at = now_ms()
 

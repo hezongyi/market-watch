@@ -5,7 +5,12 @@ from alerts import composite_aggregates as cache
 from alerts.chart_data import FRAMES
 from alerts.composite_chart import chart_page
 from alerts.composite_series import read_window
-from alerts.storage import CompositeAggregateBar, CompositeAggregateTask, CompositeRevision
+from alerts.storage import (
+    CompositeAggregateBar,
+    CompositeAggregateTask,
+    CompositeInputEvent,
+    CompositeRevision,
+)
 from sqlalchemy import func, select
 from test_composite_chart import populated
 from test_fixed_series_revisions import correction
@@ -175,3 +180,46 @@ def test_materialized_page_overlays_only_valid_provisional_stream_and_never_pers
     with database.begin() as db:
         expired = chart_page(db, composite, "M1", count=3, provisional=True, now=200010000)
         assert expired["bars"] == sampled["bars"], 'accepted display prices survive owner expiry'
+
+
+def two_minute_input(database, revision_id, at, observed):
+    """One input revision whose event spans two M1 buckets."""
+    from alerts.composite_inputs import apply_minutes
+    from alerts.confirmed_minutes import record
+    from alerts.market_contracts import DatasetIdentity
+    from alerts.storage import MarketDataset, RealtimeMapping
+    from test_market_contracts import batch, minute
+
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, revision_id)
+        target = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
+        apply_minutes(db, record(db, batch(identity=DatasetIdentity.model_validate(target.identity),
+            window_start=at, window_end=at + 120000, checkpoint=at + 120000, observed_at=observed,
+            volume_kind="price_count", volume_unit="quotes", rows=(
+                minute(at, close="1.11", volume="3"), minute(at + 60000, close="1.12", volume="3")))))
+
+
+def test_only_the_commit_that_advances_the_waterline_wakes_alert_rules(database, monkeypatch):
+    from alerts import publication_wakeup
+
+    composite, revision, seam = populated(database, monkeypatch)
+    drain(revision, 'M1')
+    with database() as db:
+        latest = max(m['start'] for e in db.scalars(select(CompositeInputEvent).where(
+            CompositeInputEvent.revision_id == revision)) for m in e.input_manifest['minutes'])
+    two_minute_input(database, revision, latest + 60000, 200002000)
+    monkeypatch.setattr(cache, 'MAX_BUCKETS', 1)
+    notified = []
+    monkeypatch.setattr(publication_wakeup, 'notify', notified.append)
+    first = cache.claim(revision, 'M1')
+    assert first['total'] == 2, 'The chunked path is what this case exercises'
+    cache.commit(first, cache.build(first))
+    with database() as db:
+        assert db.get(CompositeAggregateTask, (revision, 'M1')).applied_input_revision == (
+            first['input_revision'] - 1)
+    # An unfinished chunk leaves applied_input_revision where it was, so rules
+    # still cannot judge this input and no hint is delivered.
+    assert notified == []
+    drain(revision, 'M1')
+    # The commit that moves the waterline is the one that wakes alert rules.
+    assert len(notified) == 1
