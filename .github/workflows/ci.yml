@@ -247,6 +247,7 @@ jobs:
         working-directory: web
         run: |
           npx playwright install --with-deps chromium
+          node tests/chart-stream-shared.browser.cjs
           node tests/advanced-watchlist-layout.browser.cjs
           node tests/advanced-watchlist-names.browser.cjs
           node tests/symbol-flags.browser.cjs

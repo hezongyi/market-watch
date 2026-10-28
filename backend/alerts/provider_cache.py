@@ -61,7 +61,8 @@ class LatestObservationPending(HistoryPending):
 
 def rest_batch_owner_active(key):
     """Whether an OANDA latest demand is owned by the account worker."""
-    if settings.oanda_acquisition_mode != "rest_batch":
+    if (settings.oanda_acquisition_mode != "rest_batch"
+            or settings.oanda_native_latest_owner != "pricing"):
         return False
     with budget_transaction() as db:
         return db.scalar(select(ProviderInterest.id).where(

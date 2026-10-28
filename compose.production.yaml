@@ -12,6 +12,7 @@ x-app: &app
     # accepted.
     ALERTS_OANDA_ACQUISITION_MODE: ${ALERTS_OANDA_ACQUISITION_MODE:-stream}
     ALERTS_OANDA_REST_INTERVAL_SECONDS: ${ALERTS_OANDA_REST_INTERVAL_SECONDS:-2}
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
     ALERTS_DATABASE_POOL_SIZE: "2"
     ALERTS_DATABASE_MAX_OVERFLOW: "0"
     ALERTS_DATABASE_JIT: ${MW_PRODUCTION_DATABASE_JIT:-off}
@@ -28,10 +29,12 @@ services:
   api:
     <<: *app
     environment:
+      <<: *app-environment
       ALERTS_YAHOO_ENABLED: "true"
       ALERTS_COOKIE_SECURE: "true"
       ALERTS_OANDA_ACQUISITION_MODE: ${ALERTS_OANDA_ACQUISITION_MODE:-stream}
       ALERTS_OANDA_REST_INTERVAL_SECONDS: ${ALERTS_OANDA_REST_INTERVAL_SECONDS:-2}
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
       ALERTS_OANDA_STREAM_ENABLED: "true"
       ALERTS_DATABASE_POOL_SIZE: "2"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
@@ -46,121 +49,52 @@ services:
       timeout: 5s
       retries: 5
       start_period: 20s
-  realtime-worker:
+  market-runtime:
     <<: *app
-    command: ["python", "-m", "alerts.realtime_worker"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_OANDA_ACQUISITION_MODE: ${ALERTS_OANDA_ACQUISITION_MODE:-stream}
-      ALERTS_OANDA_REST_INTERVAL_SECONDS: ${ALERTS_OANDA_REST_INTERVAL_SECONDS:-2}
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_REALTIME_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-realtime
-    depends_on:
-      api: {condition: service_healthy}
-  chart-history-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.chart_history_worker"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_CHART_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history
-    depends_on:
-      api: {condition: service_healthy}
-  chart-aggregation-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.chart_aggregation_worker"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_CHART_AGGREGATION_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-aggregation
-    depends_on:
-      api: {condition: service_healthy}
-  native-history-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.native_history_loads"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_NATIVE_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-native-history
-    depends_on:
-      api: {condition: service_healthy}
-  history-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history-versions
-    depends_on:
-      api: {condition: service_healthy}
-  composite-aggregate-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.composite_aggregate_worker"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_COMPOSITE_AGGREGATE_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-composite
-    depends_on:
-      api: {condition: service_healthy}
-  pricing-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.oanda_worker"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_OANDA_ACQUISITION_MODE: ${ALERTS_OANDA_ACQUISITION_MODE:-stream}
-      ALERTS_OANDA_REST_INTERVAL_SECONDS: ${ALERTS_OANDA_REST_INTERVAL_SECONDS:-2}
-      ALERTS_OANDA_STREAM_ENABLED: "true"
-      ALERTS_OANDA_RESIDENT_SYMBOLS: "EUR_USD,XAU_USD"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_PRICING_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-pricing
-    depends_on:
-      api: {condition: service_healthy}
-  market-stream-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.market_stream_worker"]
-    environment:
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_MARKET_STREAM_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
-    depends_on:
-      api: {condition: service_healthy}
-  notification-projector:
-    <<: *app
-    command: ["python", "-m", "alerts.notification_center_worker"]
-    depends_on:
-      api: {condition: service_healthy}
-  notify-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.notify"]
+    command: ["python", "-m", "alerts.runtime", "--profile", "market"]
     environment:
       <<: *app-environment
-      ALERTS_DATABASE_JIT: ${MW_NOTIFY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_OANDA_ACQUISITION_MODE: ${ALERTS_OANDA_ACQUISITION_MODE:-stream}
+      ALERTS_OANDA_REST_INTERVAL_SECONDS: ${ALERTS_OANDA_REST_INTERVAL_SECONDS:-2}
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
+      ALERTS_OANDA_STREAM_ENABLED: "true"
+      ALERTS_OANDA_RESIDENT_SYMBOLS: "EUR_USD,XAU_USD"
+      # Two ownership sessions; remaining connections shared by runtime work.
+      ALERTS_DATABASE_POOL_SIZE: "6"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_JIT: ${MW_REALTIME_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-market-runtime
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
     depends_on:
-      api: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
+  data-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.runtime", "--profile", "data"]
+    environment:
+      <<: *app-environment
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DELIVERY_ENABLED: "false"
+      ALERTS_DATABASE_POOL_SIZE: "16"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+      ALERTS_DATABASE_JIT: ${MW_DATA_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-data
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  notification-worker:
+    <<: *app
+    command: ["python", "-m", "alerts.runtime", "--profile", "notifications"]
+    environment:
+      <<: *app-environment
+      ALERTS_YAHOO_ENABLED: "true"
+      ALERTS_DATABASE_JIT: ${MW_NOTIFICATION_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-notifications
+      ALERTS_RUNTIME_STARTUP_GRACE_SECONDS: ${MW_RUNTIME_STARTUP_GRACE_SECONDS:-60}
+      ALERTS_DATABASE_POOL_SIZE: "4"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
   web:
     image: ${MW_WEB_IMAGE:?Set the immutable web release image}
     ports: ["192.168.7.33:18080:80"]

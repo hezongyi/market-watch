@@ -21,6 +21,25 @@ def test_subscription_updates_use_reserved_realtime_lane(database, monkeypatch):
     assert lanes == ["realtime"], "subscription updates cannot consume foreground chart reservations"
 
 
+def test_expired_browser_subscription_does_not_poll_provider(database, monkeypatch):
+    key = seed(META, "M5", 10000, page(1000, 10000))
+    subscribed(monkeypatch, "browser", "chart", 0)
+    with database.begin() as db:
+        interest = db.scalar(select(ProviderInterest).where(
+            ProviderInterest.client == "browser", ProviderInterest.dataset_id == key,
+            ProviderInterest.subscribed.is_(True)))
+        interest.expires = 1
+        interest.next_poll = 0
+    monkeypatch.setattr(upstream, "native_page",
+                        lambda *_args, **_kwargs: (_ for _ in ()).throw(
+                            AssertionError("expired browser lease must not fetch")))
+
+    service.realtime_step()
+
+    with database() as db:
+        assert db.get(ProviderInterest, interest.id).expires == 1
+
+
 def subscribed(monkeypatch, client, listener, cursor, revision=0, observed=0, indicators=None):
     monkeypatch.setattr(upstream, "metadata", lambda instrument: META)
     return service.subscribe(
@@ -249,6 +268,8 @@ def test_shared_cached_goals_do_not_delay_other_sessions_by_seconds(database, mo
     monkeypatch.setattr(service, "_FUTURES", [])
     monkeypatch.setattr(service, "ThreadPoolExecutor", Executor)
     START_PROVIDER()
+    assert len(submitted) == 2 * len(service.enabled_sources()) + 1
+    assert {worker.__name__ for worker, _args in submitted} == {"warmer", "live", "janitor"}
     worker,args = submitted[0]
     worker(*args)
     with database.begin() as db:

@@ -164,9 +164,11 @@ def chart_data(db, body, *, realtime=None):
         if body.provisional and body.input_revision is None and realtime_enabled:
             from .config import settings
             from .display_observations import handover_legacy
+            from .display_snapshots import lock_inputs
             from .live_pricing import account_key
             from .storage import LiveState, PricingOwner
 
+            lock_inputs(db, selected)
             mapping = db.get(RealtimeMapping, selected.mapping_id)
             # Preserve the browser's observation fence and lock order. Keep
             # strong references across capture; confirmed reads use immutable

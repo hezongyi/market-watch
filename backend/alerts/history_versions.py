@@ -402,15 +402,18 @@ def snapshot_rows(db, ident, *, start=None, end=None):
                 yield row
 
 
-def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False, pulse=None):
+def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False, pulse=None,
+                on_error=None, network_only=False, compute_only=False):
     """Isolate each role's failed round so unrelated runnable work still runs."""
     from .history_artifacts import artifact_tick
     from .worker_health import Pulse
 
     worked = False
     errors = []
-    pulse = pulse or Pulse("history_versions")
-    pulse.start()
+    if pulse is None:
+        pulse = Pulse("history_versions")
+    if pulse:
+        pulse.start()
 
     def phase(name, operation):
         nonlocal worked
@@ -418,13 +421,16 @@ def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False,
             worked = bool(operation()) or worked
         except Exception as error:
             errors.append(name + ":" + type(error).__name__)
+            if on_error:
+                on_error(error)
             # Only safe structural facts. Supplier payloads and SQL parameters
             # can contain private account configuration and are never printed.
             print(json.dumps({"component": "history_worker", "phase": name,
                 "error_type": type(error).__name__,
                 "sqlstate": getattr(getattr(error, "orig", None), "sqlstate", None)}), flush=True)
 
-    phase("artifacts", lambda: artifact_tick(version_id))
+    if not network_only:
+        phase("artifacts", lambda: artifact_tick(version_id))
     if not version_id:
         from .composite_aggregates import aggregate_tick
         from .composite_preparation import preparation_tick
@@ -433,15 +439,21 @@ def worker_tick(adapter, *, version_id=None, without_composite_aggregates=False,
         from .fixed_indicators import indicator_tick
         from .history_maintenance import schedule_tick
 
-        phase("schedule", schedule_tick)
-        phase("preparation", lambda: preparation_tick(adapter))
-        if not without_composite_aggregates:
-            phase("composite_aggregates", aggregate_tick)
-        phase("indicators", indicator_tick)
-        phase("display_indicators", display_indicator_tick)
-        phase("revisions", revision_tick)
-    phase("import", lambda: import_page(adapter, version_id=version_id))
-    pulse.finish(errors=errors, worked=worked)
+        if not network_only:
+            phase("schedule", schedule_tick)
+            if not compute_only:
+                phase("preparation", lambda: preparation_tick(adapter))
+            if not without_composite_aggregates:
+                phase("composite_aggregates", aggregate_tick)
+            phase("indicators", indicator_tick)
+            phase("display_indicators", display_indicator_tick)
+            phase("revisions", revision_tick)
+        if network_only and not compute_only:
+            phase("preparation", lambda: preparation_tick(adapter))
+    if not compute_only:
+        phase("import", lambda: import_page(adapter, version_id=version_id))
+    if pulse:
+        pulse.finish(errors=errors, worked=worked)
     return worked
 
 
@@ -462,6 +474,20 @@ def main():
                         help="Use a separate composite aggregate worker; keep legacy default otherwise")
     parser.add_argument("--report", action="store_true")
     args = parser.parse_args()
+    if args.create or args.report:
+        _run_cli(args, parser)
+        return
+    import threading
+
+    from .storage import bootstrap
+    from .swing_sr import register_indicator
+    register_indicator()
+    bootstrap()
+    run(threading.Event(), version_id=args.version,
+        without_composite_aggregates=args.without_composite_aggregates, once=args.once)
+
+
+def _run_cli(args, parser):
     bootstrap()
     version_id = args.version
     if args.create:
@@ -509,6 +535,60 @@ def main():
                 wake.wait(0.01 if worked else 5)
     finally:
         adapter.close()
+
+
+def run(stop, *, version_id=None, without_composite_aggregates=True, once=False):
+    from .publication_wakeup import PublicationWakeup
+    from .worker_health import Pulse
+
+    adapter = HistorySources()
+    pulse = Pulse("history_versions")
+    try:
+        with PublicationWakeup() as wake:
+            while not stop.is_set():
+                wake.prepare()
+                errors = []
+                worked = worker_tick(adapter, version_id=version_id,
+                    without_composite_aggregates=without_composite_aggregates, pulse=pulse,
+                    on_error=errors.append)
+                from .runtime_health import progress
+                progress(error=errors[-1] if errors else None)
+                if once:
+                    return
+                wake.wait(.01 if worked else 5, stop)
+    finally:
+        adapter.close()
+
+
+def _run_profile_loop(stop, *, network, version_id=None, without_composite_aggregates=True):
+    """Keep supplier reads and local preparation work on separate data roles."""
+    from .publication_wakeup import PublicationWakeup
+    from .worker_health import Pulse
+
+    adapter = HistorySources() if network else None
+    pulse = None if network else Pulse("history_versions")
+    try:
+        with PublicationWakeup() as wake:
+            while not stop.is_set():
+                wake.prepare()
+                errors = []
+                worked = worker_tick(adapter, version_id=version_id,
+                    without_composite_aggregates=without_composite_aggregates, pulse=pulse,
+                    on_error=errors.append, network_only=network, compute_only=not network)
+                from .runtime_health import progress
+                progress(error=errors[-1] if errors else None)
+                wake.wait(.01 if worked else 5, stop)
+    finally:
+        if adapter is not None:
+            adapter.close()
+
+
+def run_network(stop):
+    _run_profile_loop(stop, network=True)
+
+
+def run_compute(stop):
+    _run_profile_loop(stop, network=False)
 
 
 if __name__ == "__main__":

@@ -133,6 +133,10 @@ def handover_legacy(db, state):
     # an older session identity-map value cannot reconstruct a superseded quote.
     from .storage import LiveState
 
+    # Browser reads can perform this first adoption without a pricing owner.
+    # Match judgments' dataset -> LiveState order before inserting FK evidence.
+    db.scalar(select(MarketDataset.id).where(MarketDataset.id == state.dataset_id)
+        .with_for_update(read=True, key_share=True))
     state = db.scalar(select(LiveState).where(LiveState.dataset_id == state.dataset_id)
         .with_for_update().execution_options(populate_existing=True))
     if db.get(Preference, key):

@@ -1,5 +1,6 @@
 """Independent bounded CPU work; no provider requests or notification delivery."""
 import logging
+import threading
 import time
 
 from .chart_aggregation import aggregate_once
@@ -47,19 +48,27 @@ def wait_seconds(worked, published):
 
 def main():
     logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
+    run(threading.Event())
+
+
+def run(stop):
     from .publication_wakeup import PublicationWakeup
     with PublicationWakeup() as wakeup:
-        while True:
+        while not stop.is_set():
             wakeup.prepare()
             started = time.monotonic()
             try:
                 worked, published = cycle()
                 if worked:
                     logging.info('chart_aggregation_slice seconds=%.3f', time.monotonic()-started)
-                wakeup.wait(wait_seconds(worked, published))
+                from .runtime_health import progress
+                progress()
+                wakeup.wait(wait_seconds(worked, published), stop)
             except Exception as error:
                 logging.warning('chart_aggregation_cycle_failed type=%s', type(error).__name__)
-                time.sleep(5)
+                from .runtime_health import progress
+                progress(error=error)
+                stop.wait(5)
 
 
 if __name__ == '__main__':

@@ -419,10 +419,6 @@ export default function ChartApplicationPage() {
       void provider.established(instrument);
       establishedChannel?.postMessage(instrument);
     };
-    const legacyProvider = providerSubscriptions(api,
-      client => new EventSource('/api/charts/provider/events?client=' + encodeURIComponent(client)),
-      event => updateChart({type:'provider-event',event}),
-      error => setError(String(error)), undefined, observeSubscription);
       const readAlertDraft = (workspace: string | undefined) => {
         try {
           const value = JSON.parse(
@@ -553,8 +549,7 @@ export default function ChartApplicationPage() {
       if (
         m.type === "market-subscribe" ||
         m.type === "market-unsubscribe" ||
-        m.type === "market-accept" ||
-        m.type === "provider-subscribe" || m.type === "provider-unsubscribe"
+        m.type === "market-accept"
       ) {
         const args = m.args;
         if (
@@ -565,14 +560,13 @@ export default function ChartApplicationPage() {
         )
           return;
         try {
-          const transport = m.type.startsWith('provider-') ? legacyProvider : provider;
           if (m.type === 'market-accept') {
             await provider.accept(args);
           } else if (m.type.endsWith('-subscribe')) {
             subscriptionScopes.set(args, {workspace:current.current?.id || '',session:alertUiSession.current,epoch:nativeLoadEpoch.current});
-            await transport.subscribe(args);
+            await provider.subscribe(args);
           } else {
-            await transport.unsubscribe(args);
+            await provider.unsubscribe(args);
           }
         } catch (error) {
           setError(String(error));
@@ -827,7 +821,6 @@ export default function ChartApplicationPage() {
       if (m.type === "loaded") {
         alertUiSession.current = crypto.randomUUID();
         await provider.clear();
-        await legacyProvider.clear();
         try {
           if (!mobile) await api("/advanced-charts/preferences/migrate", {});
           const [catalog, preferences, capabilities] = await Promise.all([
@@ -1067,7 +1060,6 @@ export default function ChartApplicationPage() {
       chart.current?.dispose();chart.current=null;
       establishedChannel?.close();
       void provider.dispose();
-      void legacyProvider.dispose();
       for (const requests of marketRequests.values())
         for (const controller of requests.values()) controller.abort();
     };

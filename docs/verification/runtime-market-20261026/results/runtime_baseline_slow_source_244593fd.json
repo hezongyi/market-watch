@@ -1,0 +1,7197 @@
+{
+  "scenario": "slow-source",
+  "schema": "runtime_baseline_slow_source_244593fd",
+  "synthetic": true,
+  "source_evidence": {
+    "source_sha256": "375a647c13dff7d86c05ea3393d91dad75367e2ca2d9468111b2f78449bc4108",
+    "source_files": 177,
+    "cgroup_limits": {
+      "cpu.max": "150000 100000",
+      "memory.max": "1610612736"
+    }
+  },
+  "profile_runtime": true,
+  "independent_alert": false,
+  "baseline_sha": "78697159067e1c1bc6c38be8ca8218cd12c29179",
+  "clock": "wall-speed fixture stream_quote, confirmed M1 at minute boundary",
+  "samples": 61,
+  "interval_s": 2,
+  "history_pause_s": 1,
+  "wall_s": 124.5278038030956,
+  "inventory": {
+    "rules": [
+      {
+        "id": "dc80eb22-c8af-4f3f-87bf-fbbd26e0fde5",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166140000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166140000,
+                "end": 166200000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          }
+        }
+      },
+      {
+        "id": "2b212b17-d34d-435c-a838-8a4d796996f0",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166200000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166200000,
+                "end": 166260000,
+                "coverage_complete": false,
+                "source_confirmed": false,
+                "seam_dependency": false
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          }
+        }
+      },
+      {
+        "id": "c79a5fb3-d030-44b9-a12c-4fa518f5838b",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166140000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166140000,
+                "end": 166200000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          }
+        }
+      },
+      {
+        "id": "01665395-de68-41c0-ace1-c687b179216d",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166200000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166200000,
+                "end": 166260000,
+                "coverage_complete": false,
+                "source_confirmed": false,
+                "seam_dependency": false
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          }
+        }
+      },
+      {
+        "id": "9b2bdbc6-1c06-4666-ad63-c19832f564ee",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "offset_indicators": [
+            {
+              "id": "ATR",
+              "run_id": "b81757cdfe6aded39cbaedd240ff12a6e42fc7089aa655d90a60661a025106ce",
+              "status": "complete",
+              "cursor": 166200000,
+              "target_end": 166200000,
+              "input_revision": 1,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": null,
+              "reused_prefix_end": 158400000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 166080000,
+                  "end": 166140000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 166080000,
+                  "end": 166140000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                "input_revision": 1,
+                "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                "display_snapshot_id": null
+              },
+              "display_task_ids": []
+            }
+          ],
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166140000,
+                "end": 166200000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              },
+              {
+                "kind": "atr",
+                "version": "1",
+                "atr": "0.030000000000000027",
+                "signed_offset": "0.00030000000000000027",
+                "timeframe": "M1",
+                "period": 2,
+                "multiplier": "0.01",
+                "reference_start": 166080000,
+                "reference_end": 166140000,
+                "input_revision": null,
+                "confirmed_at": 166140000,
+                "evaluation_start": 166140000,
+                "algorithm": "fixed-indicator-state-v3",
+                "dependency": {
+                  "timeframe": "M1",
+                  "dataset_id": null,
+                  "origin": 158400000,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 1,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "calculation": {
+                    "id": "ATR",
+                    "run_id": "b81757cdfe6aded39cbaedd240ff12a6e42fc7089aa655d90a60661a025106ce",
+                    "status": "complete",
+                    "cursor": 166200000,
+                    "target_end": 166200000,
+                    "input_revision": 1,
+                    "algorithm": "fixed-indicator-state-v3",
+                    "error": null,
+                    "next_at": 0,
+                    "parent_run_id": null,
+                    "reused_prefix_end": 158400000,
+                    "calculation_origin": 158400000,
+                    "producer": "backend",
+                    "accuracy": "oracle_equivalent",
+                    "canonical_verified": true,
+                    "coverage": [
+                      {
+                        "start": 166080000,
+                        "end": 166140000
+                      }
+                    ],
+                    "required_coverage": [
+                      {
+                        "start": 166080000,
+                        "end": 166140000
+                      }
+                    ],
+                    "visible_complete": true,
+                    "input_evidence": {
+                      "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                      "input_revision": 1,
+                      "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                      "display_snapshot_id": null
+                    },
+                    "display_task_ids": []
+                  },
+                  "dependency": {
+                    "start": 166080000,
+                    "dependency_origin": 158400000,
+                    "seam_dependency": true,
+                    "initialized": true,
+                    "provisional": null
+                  }
+                },
+                "available_at": 166200010,
+                "confirmation_watermark": 166200000,
+                "confirmed_end": 166200000,
+                "base_target": "1.115",
+                "threshold": "1.11530000000000000027"
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          },
+          "atr_confirmation": {
+            "key": [
+              "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              1,
+              158400000,
+              166140000
+            ],
+            "watermark": 166200000
+          },
+          "offset": {
+            "kind": "atr",
+            "version": "1",
+            "atr": "0.030000000000000027",
+            "signed_offset": "0.00030000000000000027",
+            "timeframe": "M1",
+            "period": 2,
+            "multiplier": "0.01",
+            "reference_start": 166080000,
+            "reference_end": 166140000,
+            "input_revision": null,
+            "confirmed_at": 166140000,
+            "evaluation_start": 166140000,
+            "algorithm": "fixed-indicator-state-v3",
+            "dependency": {
+              "timeframe": "M1",
+              "dataset_id": null,
+              "origin": 158400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              "input_revision": 1,
+              "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+              "calculation": {
+                "id": "ATR",
+                "run_id": "b81757cdfe6aded39cbaedd240ff12a6e42fc7089aa655d90a60661a025106ce",
+                "status": "complete",
+                "cursor": 166200000,
+                "target_end": 166200000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 158400000,
+                "calculation_origin": 158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 166080000,
+                    "end": 166140000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 166080000,
+                    "end": 166140000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 1,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": []
+              },
+              "dependency": {
+                "start": 166080000,
+                "dependency_origin": 158400000,
+                "seam_dependency": true,
+                "initialized": true,
+                "provisional": null
+              }
+            },
+            "available_at": 166200010,
+            "confirmation_watermark": 166200000,
+            "confirmed_end": 166200000,
+            "base_target": "1.115",
+            "threshold": "1.11530000000000000027",
+            "baseline_translation": null
+          },
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166140000
+        }
+      },
+      {
+        "id": "da62d6ac-f6c8-46c3-953c-84ce6078d904",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "offset_indicators": [
+            {
+              "id": "ATR",
+              "run_id": "b81757cdfe6aded39cbaedd240ff12a6e42fc7089aa655d90a60661a025106ce",
+              "status": "complete",
+              "cursor": 166200000,
+              "target_end": 166200000,
+              "input_revision": 1,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": null,
+              "reused_prefix_end": 158400000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 166080000,
+                  "end": 166140000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 166080000,
+                  "end": 166140000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                "input_revision": 1,
+                "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                "display_snapshot_id": null
+              },
+              "display_task_ids": []
+            }
+          ],
+          "atr_confirmation": {
+            "key": [
+              "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              1,
+              158400000,
+              166140000
+            ],
+            "watermark": 166200000
+          },
+          "offset": {
+            "kind": "atr",
+            "version": "1",
+            "atr": "0.030000000000000027",
+            "signed_offset": "0.00030000000000000027",
+            "timeframe": "M1",
+            "period": 2,
+            "multiplier": "0.01",
+            "reference_start": 166080000,
+            "reference_end": 166140000,
+            "input_revision": null,
+            "confirmed_at": 166140000,
+            "evaluation_start": 166140000,
+            "algorithm": "fixed-indicator-state-v3",
+            "dependency": {
+              "timeframe": "M1",
+              "dataset_id": null,
+              "origin": 158400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              "input_revision": 1,
+              "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+              "calculation": {
+                "id": "ATR",
+                "run_id": "b81757cdfe6aded39cbaedd240ff12a6e42fc7089aa655d90a60661a025106ce",
+                "status": "complete",
+                "cursor": 166200000,
+                "target_end": 166200000,
+                "input_revision": 1,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": null,
+                "reused_prefix_end": 158400000,
+                "calculation_origin": 158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 166080000,
+                    "end": 166140000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 166080000,
+                    "end": 166140000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 1,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": []
+              },
+              "dependency": {
+                "start": 166080000,
+                "dependency_origin": 158400000,
+                "seam_dependency": true,
+                "initialized": true,
+                "provisional": null
+              }
+            },
+            "available_at": 166200010,
+            "confirmation_watermark": 166200000,
+            "confirmed_end": 166200000,
+            "base_target": "1.115",
+            "threshold": "1.11530000000000000027",
+            "baseline_translation": null
+          },
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166140000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166140000,
+                "end": 166200000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              },
+              {
+                "kind": "atr",
+                "version": "1",
+                "atr": "0.030000000000000027",
+                "signed_offset": "0.00030000000000000027",
+                "timeframe": "M1",
+                "period": 2,
+                "multiplier": "0.01",
+                "reference_start": 166080000,
+                "reference_end": 166140000,
+                "input_revision": null,
+                "confirmed_at": 166140000,
+                "evaluation_start": 166140000,
+                "algorithm": "fixed-indicator-state-v3",
+                "dependency": {
+                  "timeframe": "M1",
+                  "dataset_id": null,
+                  "origin": 158400000,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 1,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "calculation": {
+                    "id": "ATR",
+                    "run_id": "b81757cdfe6aded39cbaedd240ff12a6e42fc7089aa655d90a60661a025106ce",
+                    "status": "complete",
+                    "cursor": 166200000,
+                    "target_end": 166200000,
+                    "input_revision": 1,
+                    "algorithm": "fixed-indicator-state-v3",
+                    "error": null,
+                    "next_at": 0,
+                    "parent_run_id": null,
+                    "reused_prefix_end": 158400000,
+                    "calculation_origin": 158400000,
+                    "producer": "backend",
+                    "accuracy": "oracle_equivalent",
+                    "canonical_verified": true,
+                    "coverage": [
+                      {
+                        "start": 166080000,
+                        "end": 166140000
+                      }
+                    ],
+                    "required_coverage": [
+                      {
+                        "start": 166080000,
+                        "end": 166140000
+                      }
+                    ],
+                    "visible_complete": true,
+                    "input_evidence": {
+                      "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                      "input_revision": 1,
+                      "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                      "display_snapshot_id": null
+                    },
+                    "display_task_ids": []
+                  },
+                  "dependency": {
+                    "start": 166080000,
+                    "dependency_origin": 158400000,
+                    "seam_dependency": true,
+                    "initialized": true,
+                    "provisional": null
+                  }
+                },
+                "available_at": 166200010,
+                "confirmation_watermark": 166200000,
+                "confirmed_end": 166200000,
+                "base_target": "1.115",
+                "threshold": "1.11530000000000000027"
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          }
+        }
+      },
+      {
+        "id": "0ab9dbf4-e03d-4a59-9a53-e35be176fe95",
+        "status": "active",
+        "health": "ready",
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 1,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [
+            {
+              "id": "EMA",
+              "run_id": "7185dddc56681854b8d29c9cb19460288de8cbe303b9ce91ee6b741612ffc14e",
+              "status": "complete",
+              "cursor": 166200000,
+              "target_end": 166200000,
+              "input_revision": 1,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": null,
+              "reused_prefix_end": 158400000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 158400000,
+                  "end": 166260000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 158400000,
+                  "end": 166260000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                "input_revision": 1,
+                "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                "display_snapshot_id": "e8f94675f820cd6ec6df554055562a0dcee3c803b772fc1e3677d846b7b98cc4"
+              },
+              "display_task_ids": []
+            }
+          ],
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "indicator",
+                "spec": {
+                  "name": "EMA",
+                  "version": "1",
+                  "params": {
+                    "period": 2
+                  }
+                },
+                "output": "value",
+                "calculation": {
+                  "id": "EMA",
+                  "run_id": "7185dddc56681854b8d29c9cb19460288de8cbe303b9ce91ee6b741612ffc14e",
+                  "status": "complete",
+                  "cursor": 166200000,
+                  "target_end": 166200000,
+                  "input_revision": 1,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "error": null,
+                  "next_at": 0,
+                  "parent_run_id": null,
+                  "reused_prefix_end": 158400000,
+                  "calculation_origin": 158400000,
+                  "producer": "backend",
+                  "accuracy": "oracle_equivalent",
+                  "canonical_verified": true,
+                  "coverage": [
+                    {
+                      "start": 158400000,
+                      "end": 166260000
+                    }
+                  ],
+                  "required_coverage": [
+                    {
+                      "start": 158400000,
+                      "end": 166260000
+                    }
+                  ],
+                  "visible_complete": true,
+                  "input_evidence": {
+                    "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                    "input_revision": 1,
+                    "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                    "display_snapshot_id": "e8f94675f820cd6ec6df554055562a0dcee3c803b772fc1e3677d846b7b98cc4"
+                  },
+                  "display_task_ids": []
+                },
+                "dependency": {
+                  "start": 166200000,
+                  "dependency_origin": 158400000,
+                  "seam_dependency": true,
+                  "initialized": true,
+                  "provisional": true
+                },
+                "seam_dependency": true
+              }
+            ],
+            "last_outcome": "initial_baseline"
+          },
+          "processed_input_revision": 1,
+          "confirmed_end": 166200000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166200000
+        }
+      }
+    ],
+    "baseline_history": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+    "candidate_history": "f553215c-a00d-435c-a12e-d7bd8aa72064",
+    "download": "2ae8fce2-6820-420c-846b-d4f3b9ae32ac",
+    "candidate_revision": null,
+    "source_identity": {
+      "source": "oanda",
+      "channel": "v20",
+      "environment": "practice",
+      "account_scope": "sha256:3ced542ef82d272c891c06f15d7cf4f204c2d1f557b417ef2a80f805c9e5616c",
+      "provider_symbol": "EUR_USD",
+      "basis": "bid",
+      "calendar_version": "ny17-candidate-v1"
+    },
+    "history_versions": [
+      {
+        "id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+        "start": 158400000,
+        "end": 165660000,
+        "status": "published"
+      },
+      {
+        "id": "f553215c-a00d-435c-a12e-d7bd8aa72064",
+        "start": 0,
+        "end": 129600000,
+        "status": "published"
+      },
+      {
+        "id": "2ae8fce2-6820-420c-846b-d4f3b9ae32ac",
+        "start": 129600000,
+        "end": 1329600000,
+        "status": "pending"
+      }
+    ],
+    "live": true,
+    "rule_modes": {
+      "dc80eb22-c8af-4f3f-87bf-fbbd26e0fde5": "price_close",
+      "c79a5fb3-d030-44b9-a12c-4fa518f5838b": "price_close",
+      "01665395-de68-41c0-ace1-c687b179216d": "price_intrabar",
+      "2b212b17-d34d-435c-a838-8a4d796996f0": "price_intrabar",
+      "9b2bdbc6-1c06-4666-ad63-c19832f564ee": "atr_close",
+      "da62d6ac-f6c8-46c3-953c-84ce6078d904": "atr_close",
+      "0ab9dbf4-e03d-4a59-9a53-e35be176fe95": "ema_intrabar"
+    },
+    "candidate_queued_at": 1114987.570801831
+  },
+  "input_window_ended": 1115107.6645084,
+  "workers_stopped": 1115112.08047339,
+  "drain_started": 1115107.664508556,
+  "drain_ended": 1115111.664613023,
+  "drain_seconds": 4.000104466918856,
+  "drain_inputs": [],
+  "data_worker_paused_at": null,
+  "inputs": [
+    {
+      "sample": 0,
+      "issued": 1114987.592754099,
+      "committed": 1114987.669943684,
+      "end": 166200000,
+      "business_now": 166200029,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 1,
+      "issued": 1114989.573669717,
+      "committed": 1114989.60974639,
+      "end": 166200000,
+      "business_now": 166202010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 2,
+      "issued": 1114991.573642838,
+      "committed": 1114991.635957051,
+      "end": 166200000,
+      "business_now": 166204010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 3,
+      "issued": 1114993.573575372,
+      "committed": 1114993.607742718,
+      "end": 166200000,
+      "business_now": 166206010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 4,
+      "issued": 1114995.573812671,
+      "committed": 1114995.590275829,
+      "end": 166200000,
+      "business_now": 166208010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 5,
+      "issued": 1114997.573573744,
+      "committed": 1114997.683018333,
+      "end": 166200000,
+      "business_now": 166210010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 6,
+      "issued": 1114999.574514652,
+      "committed": 1114999.596389686,
+      "end": 166200000,
+      "business_now": 166212011,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 7,
+      "issued": 1115001.5772022,
+      "committed": 1115001.689640117,
+      "end": 166200000,
+      "business_now": 166214013,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 8,
+      "issued": 1115003.573566102,
+      "committed": 1115003.599057346,
+      "end": 166200000,
+      "business_now": 166216010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 9,
+      "issued": 1115005.573571012,
+      "committed": 1115005.586566115,
+      "end": 166200000,
+      "business_now": 166218010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 10,
+      "issued": 1115007.574055033,
+      "committed": 1115007.651771308,
+      "end": 166200000,
+      "business_now": 166220010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 11,
+      "issued": 1115009.573589307,
+      "committed": 1115009.586809537,
+      "end": 166200000,
+      "business_now": 166222010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 12,
+      "issued": 1115011.573587736,
+      "committed": 1115011.596559639,
+      "end": 166200000,
+      "business_now": 166224010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 13,
+      "issued": 1115013.573648662,
+      "committed": 1115013.584418729,
+      "end": 166200000,
+      "business_now": 166226010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 14,
+      "issued": 1115015.573635238,
+      "committed": 1115015.646011027,
+      "end": 166200000,
+      "business_now": 166228010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 15,
+      "issued": 1115017.573589402,
+      "committed": 1115017.589842163,
+      "end": 166200000,
+      "business_now": 166230010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 16,
+      "issued": 1115019.581730425,
+      "committed": 1115019.66213376,
+      "end": 166200000,
+      "business_now": 166232018,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 17,
+      "issued": 1115021.573600267,
+      "committed": 1115021.627768898,
+      "end": 166200000,
+      "business_now": 166234010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 18,
+      "issued": 1115023.573605817,
+      "committed": 1115023.583267598,
+      "end": 166200000,
+      "business_now": 166236010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 19,
+      "issued": 1115025.573572321,
+      "committed": 1115025.596438515,
+      "end": 166200000,
+      "business_now": 166238010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 20,
+      "issued": 1115027.573608276,
+      "committed": 1115027.600064727,
+      "end": 166200000,
+      "business_now": 166240010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 21,
+      "issued": 1115029.573604659,
+      "committed": 1115029.582956832,
+      "end": 166200000,
+      "business_now": 166242010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 22,
+      "issued": 1115031.573600313,
+      "committed": 1115031.644600828,
+      "end": 166200000,
+      "business_now": 166244010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 23,
+      "issued": 1115033.57356478,
+      "committed": 1115033.662055518,
+      "end": 166200000,
+      "business_now": 166246010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 24,
+      "issued": 1115035.573600612,
+      "committed": 1115035.583775798,
+      "end": 166200000,
+      "business_now": 166248010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 25,
+      "issued": 1115037.573571787,
+      "committed": 1115037.625086811,
+      "end": 166200000,
+      "business_now": 166250010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 26,
+      "issued": 1115039.573675209,
+      "committed": 1115039.582806216,
+      "end": 166200000,
+      "business_now": 166252010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.110"
+    },
+    {
+      "sample": 27,
+      "issued": 1115041.573567196,
+      "committed": 1115041.599980008,
+      "end": 166200000,
+      "business_now": 166254010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 28,
+      "issued": 1115043.573574518,
+      "committed": 1115043.63914463,
+      "end": 166200000,
+      "business_now": 166256010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 29,
+      "issued": 1115045.57360204,
+      "committed": 1115045.617903708,
+      "end": 166200000,
+      "business_now": 166258010,
+      "confirmed_minute": false,
+      "input_revision": 1,
+      "price": "1.119"
+    },
+    {
+      "sample": 30,
+      "issued": 1115047.573672285,
+      "committed": 1115047.649708517,
+      "end": 166260000,
+      "business_now": 166260010,
+      "confirmed_minute": true,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 31,
+      "issued": 1115049.573567373,
+      "committed": 1115049.586894928,
+      "end": 166260000,
+      "business_now": 166262010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 32,
+      "issued": 1115051.5736271,
+      "committed": 1115051.585980757,
+      "end": 166260000,
+      "business_now": 166264010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 33,
+      "issued": 1115053.573586997,
+      "committed": 1115053.631561128,
+      "end": 166260000,
+      "business_now": 166266010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 34,
+      "issued": 1115055.573615632,
+      "committed": 1115055.584344653,
+      "end": 166260000,
+      "business_now": 166268010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 35,
+      "issued": 1115057.573584433,
+      "committed": 1115057.585612914,
+      "end": 166260000,
+      "business_now": 166270010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 36,
+      "issued": 1115059.573611845,
+      "committed": 1115059.585448107,
+      "end": 166260000,
+      "business_now": 166272010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 37,
+      "issued": 1115061.573604823,
+      "committed": 1115061.62088115,
+      "end": 166260000,
+      "business_now": 166274010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 38,
+      "issued": 1115063.573570413,
+      "committed": 1115063.58388443,
+      "end": 166260000,
+      "business_now": 166276010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 39,
+      "issued": 1115065.573577433,
+      "committed": 1115065.657472987,
+      "end": 166260000,
+      "business_now": 166278010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 40,
+      "issued": 1115067.573569377,
+      "committed": 1115067.637888565,
+      "end": 166260000,
+      "business_now": 166280010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 41,
+      "issued": 1115069.573604727,
+      "committed": 1115069.582958087,
+      "end": 166260000,
+      "business_now": 166282010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 42,
+      "issued": 1115071.573615056,
+      "committed": 1115071.663816455,
+      "end": 166260000,
+      "business_now": 166284010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 43,
+      "issued": 1115073.573570269,
+      "committed": 1115073.593817877,
+      "end": 166260000,
+      "business_now": 166286010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 44,
+      "issued": 1115075.573609035,
+      "committed": 1115075.593418378,
+      "end": 166260000,
+      "business_now": 166288010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 45,
+      "issued": 1115077.573628836,
+      "committed": 1115077.615199843,
+      "end": 166260000,
+      "business_now": 166290010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 46,
+      "issued": 1115079.573729735,
+      "committed": 1115079.608974617,
+      "end": 166260000,
+      "business_now": 166292010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 47,
+      "issued": 1115081.573579736,
+      "committed": 1115081.585380798,
+      "end": 166260000,
+      "business_now": 166294010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 48,
+      "issued": 1115083.57360791,
+      "committed": 1115083.63367039,
+      "end": 166260000,
+      "business_now": 166296010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 49,
+      "issued": 1115085.573610768,
+      "committed": 1115085.620596998,
+      "end": 166260000,
+      "business_now": 166298010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 50,
+      "issued": 1115087.574167191,
+      "committed": 1115087.598663899,
+      "end": 166260000,
+      "business_now": 166300010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 51,
+      "issued": 1115089.573567921,
+      "committed": 1115089.587234933,
+      "end": 166260000,
+      "business_now": 166302010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 52,
+      "issued": 1115091.573561236,
+      "committed": 1115091.602661507,
+      "end": 166260000,
+      "business_now": 166304010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 53,
+      "issued": 1115093.573585644,
+      "committed": 1115093.610906077,
+      "end": 166260000,
+      "business_now": 166306010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 54,
+      "issued": 1115095.573617542,
+      "committed": 1115095.599322742,
+      "end": 166260000,
+      "business_now": 166308010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 55,
+      "issued": 1115097.573562689,
+      "committed": 1115097.600026075,
+      "end": 166260000,
+      "business_now": 166310010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 56,
+      "issued": 1115099.573571294,
+      "committed": 1115099.618317508,
+      "end": 166260000,
+      "business_now": 166312010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 57,
+      "issued": 1115101.573587819,
+      "committed": 1115101.622181416,
+      "end": 166260000,
+      "business_now": 166314010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.110"
+    },
+    {
+      "sample": 58,
+      "issued": 1115103.573567208,
+      "committed": 1115103.583579375,
+      "end": 166260000,
+      "business_now": 166316010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 59,
+      "issued": 1115105.573571745,
+      "committed": 1115105.597079144,
+      "end": 166260000,
+      "business_now": 166318010,
+      "confirmed_minute": false,
+      "input_revision": 2,
+      "price": "1.119"
+    },
+    {
+      "sample": 60,
+      "issued": 1115107.573854973,
+      "committed": 1115107.651042909,
+      "end": 166320000,
+      "business_now": 166320010,
+      "confirmed_minute": true,
+      "input_revision": 3,
+      "price": "1.119"
+    }
+  ],
+  "resources": [
+    {
+      "at": 1114987.72056671,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            2
+          ],
+          [
+            "pending",
+            9
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 8,
+        "xact_commit": 40133,
+        "blks_read": 3934,
+        "blks_hit": 1912949,
+        "tup_returned": 2978618,
+        "tup_fetched": 2477282,
+        "tup_inserted": 47577,
+        "tup_updated": 11029,
+        "tup_deleted": 110
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "157652 kB",
+          "threads": "1"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157600 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "156824 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "157692 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "156856 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.84375,
+        5.36376953125,
+        5.265625
+      ],
+      "cgroup_cpu_stat": "usage_usec 211496900\nuser_usec 192877397\nsystem_usec 18619503\nnr_periods 3893\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1114989.633898247,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            2
+          ],
+          [
+            "pending",
+            9
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 13,
+        "xact_commit": 40314,
+        "blks_read": 3982,
+        "blks_hit": 1935961,
+        "tup_returned": 2993427,
+        "tup_fetched": 2491751,
+        "tup_inserted": 47601,
+        "tup_updated": 11084,
+        "tup_deleted": 110
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161284 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157600 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "156824 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "157708 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159924 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.84375,
+        5.36376953125,
+        5.265625
+      ],
+      "cgroup_cpu_stat": "usage_usec 212613733\nuser_usec 193885700\nsystem_usec 18728033\nnr_periods 3912\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1114991.666183958,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            2
+          ],
+          [
+            "pending",
+            9
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 40504,
+        "blks_read": 3993,
+        "blks_hit": 1944412,
+        "tup_returned": 2998345,
+        "tup_fetched": 2496329,
+        "tup_inserted": 47749,
+        "tup_updated": 11135,
+        "tup_deleted": 110
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161384 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157768 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "156824 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "157708 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "160180 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.53564453125,
+        5.291015625,
+        5.24267578125
+      ],
+      "cgroup_cpu_stat": "usage_usec 213561294\nuser_usec 194745485\nsystem_usec 18815808\nnr_periods 3932\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1114993.629418581,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            4
+          ],
+          [
+            "pending",
+            7
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 40695,
+        "blks_read": 3994,
+        "blks_hit": 1952230,
+        "tup_returned": 3006589,
+        "tup_fetched": 2501457,
+        "tup_inserted": 47760,
+        "tup_updated": 11182,
+        "tup_deleted": 110
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161384 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157768 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "156824 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "157708 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "160180 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.53564453125,
+        5.291015625,
+        5.24267578125
+      ],
+      "cgroup_cpu_stat": "usage_usec 214739719\nuser_usec 195823808\nsystem_usec 18915910\nnr_periods 3952\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1114995.608316229,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            5
+          ],
+          [
+            "pending",
+            6
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 40890,
+        "blks_read": 4048,
+        "blks_hit": 1964367,
+        "tup_returned": 3014922,
+        "tup_fetched": 2509197,
+        "tup_inserted": 47824,
+        "tup_updated": 11244,
+        "tup_deleted": 110
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161636 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "160324 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.53564453125,
+        5.291015625,
+        5.24267578125
+      ],
+      "cgroup_cpu_stat": "usage_usec 215993248\nuser_usec 196975759\nsystem_usec 19017489\nnr_periods 3972\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1114997.714011,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            7
+          ],
+          [
+            "pending",
+            4
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 41144,
+        "blks_read": 4079,
+        "blks_hit": 1976140,
+        "tup_returned": 3021512,
+        "tup_fetched": 2515143,
+        "tup_inserted": 48258,
+        "tup_updated": 11334,
+        "tup_deleted": 113
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161660 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "160324 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.6943359375,
+        5.51904296875,
+        5.31689453125
+      ],
+      "cgroup_cpu_stat": "usage_usec 217268399\nuser_usec 198147742\nsystem_usec 19120656\nnr_periods 3993\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1114999.616666389,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            8
+          ],
+          [
+            "pending",
+            3
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 41284,
+        "blks_read": 4082,
+        "blks_hit": 1978885,
+        "tup_returned": 3024277,
+        "tup_fetched": 2517549,
+        "tup_inserted": 48266,
+        "tup_updated": 11365,
+        "tup_deleted": 113
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161712 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "160324 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.6943359375,
+        5.51904296875,
+        5.31689453125
+      ],
+      "cgroup_cpu_stat": "usage_usec 218107274\nuser_usec 198929782\nsystem_usec 19177491\nnr_periods 4012\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115001.705247812,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            10
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 41504,
+        "blks_read": 4092,
+        "blks_hit": 1986222,
+        "tup_returned": 3030296,
+        "tup_fetched": 2522949,
+        "tup_inserted": 48408,
+        "tup_updated": 11418,
+        "tup_deleted": 114
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161764 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.55859375,
+        5.49365234375,
+        5.3095703125
+      ],
+      "cgroup_cpu_stat": "usage_usec 219282786\nuser_usec 200002776\nsystem_usec 19280010\nnr_periods 4033\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115003.614451938,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 41705,
+        "blks_read": 4096,
+        "blks_hit": 1993087,
+        "tup_returned": 3036315,
+        "tup_fetched": 2528366,
+        "tup_inserted": 48549,
+        "tup_updated": 11468,
+        "tup_deleted": 115
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161772 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.55859375,
+        5.49365234375,
+        5.3095703125
+      ],
+      "cgroup_cpu_stat": "usage_usec 220214888\nuser_usec 200862403\nsystem_usec 19352485\nnr_periods 4052\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115005.601046239,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 41904,
+        "blks_read": 4103,
+        "blks_hit": 2000217,
+        "tup_returned": 3042622,
+        "tup_fetched": 2534074,
+        "tup_inserted": 48690,
+        "tup_updated": 11517,
+        "tup_deleted": 116
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161772 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.55859375,
+        5.49365234375,
+        5.3095703125
+      ],
+      "cgroup_cpu_stat": "usage_usec 221350376\nuser_usec 201892094\nsystem_usec 19458281\nnr_periods 4072\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115007.667117136,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 42096,
+        "blks_read": 4103,
+        "blks_hit": 2003780,
+        "tup_returned": 3046229,
+        "tup_fetched": 2537109,
+        "tup_inserted": 48698,
+        "tup_updated": 11553,
+        "tup_deleted": 116
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161772 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.83447265625,
+        5.55224609375,
+        5.32958984375
+      ],
+      "cgroup_cpu_stat": "usage_usec 222258621\nuser_usec 202700585\nsystem_usec 19558035\nnr_periods 4092\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115009.609197163,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 42262,
+        "blks_read": 4104,
+        "blks_hit": 2007385,
+        "tup_returned": 3049962,
+        "tup_fetched": 2540318,
+        "tup_inserted": 48706,
+        "tup_updated": 11592,
+        "tup_deleted": 116
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161828 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.83447265625,
+        5.55224609375,
+        5.32958984375
+      ],
+      "cgroup_cpu_stat": "usage_usec 223184884\nuser_usec 203549688\nsystem_usec 19635195\nnr_periods 4112\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115011.613129733,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 42470,
+        "blks_read": 4110,
+        "blks_hit": 2014202,
+        "tup_returned": 3056291,
+        "tup_fetched": 2546024,
+        "tup_inserted": 48846,
+        "tup_updated": 11639,
+        "tup_deleted": 117
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161828 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.32861328125,
+        5.65966796875,
+        5.36572265625
+      ],
+      "cgroup_cpu_stat": "usage_usec 224332266\nuser_usec 204612833\nsystem_usec 19719433\nnr_periods 4132\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115013.598256312,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 42675,
+        "blks_read": 4117,
+        "blks_hit": 2021020,
+        "tup_returned": 3062755,
+        "tup_fetched": 2551901,
+        "tup_inserted": 48986,
+        "tup_updated": 11688,
+        "tup_deleted": 118
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161884 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.32861328125,
+        5.65966796875,
+        5.36572265625
+      ],
+      "cgroup_cpu_stat": "usage_usec 225353914\nuser_usec 205489905\nsystem_usec 19864009\nnr_periods 4151\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115015.665540301,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 42882,
+        "blks_read": 4120,
+        "blks_hit": 2025769,
+        "tup_returned": 3067644,
+        "tup_fetched": 2556133,
+        "tup_inserted": 48994,
+        "tup_updated": 11732,
+        "tup_deleted": 118
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161884 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.32861328125,
+        5.65966796875,
+        5.36572265625
+      ],
+      "cgroup_cpu_stat": "usage_usec 226445338\nuser_usec 206498598\nsystem_usec 19946740\nnr_periods 4172\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115017.612277099,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 43042,
+        "blks_read": 4127,
+        "blks_hit": 2031577,
+        "tup_returned": 3073414,
+        "tup_fetched": 2561362,
+        "tup_inserted": 49134,
+        "tup_updated": 11770,
+        "tup_deleted": 119
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "161916 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.623046875,
+        5.73193359375,
+        5.390625
+      ],
+      "cgroup_cpu_stat": "usage_usec 227418603\nuser_usec 207388105\nsystem_usec 20030497\nnr_periods 4192\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115019.677289963,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 43269,
+        "blks_read": 4138,
+        "blks_hit": 2039334,
+        "tup_returned": 3081272,
+        "tup_fetched": 2568522,
+        "tup_inserted": 49274,
+        "tup_updated": 11825,
+        "tup_deleted": 120
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.623046875,
+        5.73193359375,
+        5.390625
+      ],
+      "cgroup_cpu_stat": "usage_usec 228734419\nuser_usec 208572166\nsystem_usec 20162253\nnr_periods 4212\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115021.641464055,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 43434,
+        "blks_read": 4138,
+        "blks_hit": 2043054,
+        "tup_returned": 3085110,
+        "tup_fetched": 2571845,
+        "tup_inserted": 49282,
+        "tup_updated": 11860,
+        "tup_deleted": 120
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.7333984375,
+        5.77001953125,
+        5.40478515625
+      ],
+      "cgroup_cpu_stat": "usage_usec 229729976\nuser_usec 209459176\nsystem_usec 20270799\nnr_periods 4232\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115023.597459148,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 43632,
+        "blks_read": 4144,
+        "blks_hit": 2049705,
+        "tup_returned": 3091927,
+        "tup_fetched": 2578039,
+        "tup_inserted": 49422,
+        "tup_updated": 11907,
+        "tup_deleted": 121
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.7333984375,
+        5.77001953125,
+        5.40478515625
+      ],
+      "cgroup_cpu_stat": "usage_usec 230748900\nuser_usec 210360149\nsystem_usec 20388751\nnr_periods 4251\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115025.600079332,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 43793,
+        "blks_read": 4152,
+        "blks_hit": 2059508,
+        "tup_returned": 3100665,
+        "tup_fetched": 2586121,
+        "tup_inserted": 49562,
+        "tup_updated": 11946,
+        "tup_deleted": 122
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.7333984375,
+        5.77001953125,
+        5.40478515625
+      ],
+      "cgroup_cpu_stat": "usage_usec 231726893\nuser_usec 211274489\nsystem_usec 20452403\nnr_periods 4272\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115027.621892524,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 44087,
+        "blks_read": 4180,
+        "blks_hit": 2079611,
+        "tup_returned": 3125750,
+        "tup_fetched": 2598967,
+        "tup_inserted": 49847,
+        "tup_updated": 12227,
+        "tup_deleted": 129
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.43408203125,
+        5.7236328125,
+        5.3916015625
+      ],
+      "cgroup_cpu_stat": "usage_usec 232837865\nuser_usec 212288329\nsystem_usec 20549536\nnr_periods 4292\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115029.596222614,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 44302,
+        "blks_read": 4185,
+        "blks_hit": 2087454,
+        "tup_returned": 3133341,
+        "tup_fetched": 2602861,
+        "tup_inserted": 49987,
+        "tup_updated": 12278,
+        "tup_deleted": 130
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.43408203125,
+        5.7236328125,
+        5.3916015625
+      ],
+      "cgroup_cpu_stat": "usage_usec 233791085\nuser_usec 213089540\nsystem_usec 20701544\nnr_periods 4311\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115031.664420223,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 44526,
+        "blks_read": 4186,
+        "blks_hit": 2093049,
+        "tup_returned": 3142134,
+        "tup_fetched": 2607478,
+        "tup_inserted": 49995,
+        "tup_updated": 12324,
+        "tup_deleted": 130
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.9599609375,
+        5.8447265625,
+        5.4326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 234827373\nuser_usec 214037066\nsystem_usec 20790306\nnr_periods 4332\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115033.676386972,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 44702,
+        "blks_read": 4187,
+        "blks_hit": 2097463,
+        "tup_returned": 3148971,
+        "tup_fetched": 2611002,
+        "tup_inserted": 50003,
+        "tup_updated": 12362,
+        "tup_deleted": 130
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163684 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.9599609375,
+        5.8447265625,
+        5.4326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 235781503\nuser_usec 214941486\nsystem_usec 20840016\nnr_periods 4352\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115035.597744129,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 44914,
+        "blks_read": 4199,
+        "blks_hit": 2108363,
+        "tup_returned": 3157779,
+        "tup_fetched": 2615365,
+        "tup_inserted": 50275,
+        "tup_updated": 12417,
+        "tup_deleted": 132
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163748 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.9599609375,
+        5.8447265625,
+        5.4326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 236861148\nuser_usec 215926589\nsystem_usec 20934559\nnr_periods 4371\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115037.640817388,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 45136,
+        "blks_read": 4202,
+        "blks_hit": 2116388,
+        "tup_returned": 3166215,
+        "tup_fetched": 2619658,
+        "tup_inserted": 50415,
+        "tup_updated": 12468,
+        "tup_deleted": 133
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163748 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.40234375,
+        5.74755859375,
+        5.4033203125
+      ],
+      "cgroup_cpu_stat": "usage_usec 237839615\nuser_usec 216816825\nsystem_usec 21022790\nnr_periods 4392\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115039.596460349,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 45342,
+        "blks_read": 4211,
+        "blks_hit": 2124026,
+        "tup_returned": 3174145,
+        "tup_fetched": 2623554,
+        "tup_inserted": 50555,
+        "tup_updated": 12517,
+        "tup_deleted": 134
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163748 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.40234375,
+        5.74755859375,
+        5.4033203125
+      ],
+      "cgroup_cpu_stat": "usage_usec 238871519\nuser_usec 217780677\nsystem_usec 21090842\nnr_periods 4411\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115041.625450758,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 45550,
+        "blks_read": 4217,
+        "blks_hit": 2132315,
+        "tup_returned": 3183336,
+        "tup_fetched": 2628152,
+        "tup_inserted": 50695,
+        "tup_updated": 12566,
+        "tup_deleted": 135
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163748 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.0498046875,
+        5.68505859375,
+        5.384765625
+      ],
+      "cgroup_cpu_stat": "usage_usec 239974465\nuser_usec 218773985\nsystem_usec 21200480\nnr_periods 4432\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115043.65327924,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 45758,
+        "blks_read": 4232,
+        "blks_hit": 2143518,
+        "tup_returned": 3192374,
+        "tup_fetched": 2633356,
+        "tup_inserted": 50901,
+        "tup_updated": 12641,
+        "tup_deleted": 136
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163796 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.0498046875,
+        5.68505859375,
+        5.384765625
+      ],
+      "cgroup_cpu_stat": "usage_usec 240994197\nuser_usec 219677203\nsystem_usec 21316993\nnr_periods 4452\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115045.631870838,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 45954,
+        "blks_read": 4243,
+        "blks_hit": 2151630,
+        "tup_returned": 3200816,
+        "tup_fetched": 2637627,
+        "tup_inserted": 51050,
+        "tup_updated": 12696,
+        "tup_deleted": 137
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163796 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.0498046875,
+        5.68505859375,
+        5.384765625
+      ],
+      "cgroup_cpu_stat": "usage_usec 242067919\nuser_usec 220692514\nsystem_usec 21375405\nnr_periods 4472\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115047.663711499,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            11
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 46168,
+        "blks_read": 4247,
+        "blks_hit": 2156909,
+        "tup_returned": 3208798,
+        "tup_fetched": 2641849,
+        "tup_inserted": 51058,
+        "tup_updated": 12738,
+        "tup_deleted": 137
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "163796 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.7666015625,
+        5.83984375,
+        5.4365234375
+      ],
+      "cgroup_cpu_stat": "usage_usec 243117057\nuser_usec 221675213\nsystem_usec 21441844\nnr_periods 4492\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115049.601042676,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 46475,
+        "blks_read": 4262,
+        "blks_hit": 2167123,
+        "tup_returned": 3220327,
+        "tup_fetched": 2648697,
+        "tup_inserted": 51171,
+        "tup_updated": 12850,
+        "tup_deleted": 138
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164412 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.7666015625,
+        5.83984375,
+        5.4365234375
+      ],
+      "cgroup_cpu_stat": "usage_usec 244512525\nuser_usec 222932610\nsystem_usec 21579915\nnr_periods 4512\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115051.599659734,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 46696,
+        "blks_read": 4267,
+        "blks_hit": 2172951,
+        "tup_returned": 3228753,
+        "tup_fetched": 2653173,
+        "tup_inserted": 51202,
+        "tup_updated": 12907,
+        "tup_deleted": 138
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164412 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.705078125,
+        5.8427734375,
+        5.43994140625
+      ],
+      "cgroup_cpu_stat": "usage_usec 245497616\nuser_usec 223832655\nsystem_usec 21664961\nnr_periods 4531\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115053.653535157,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 46923,
+        "blks_read": 4270,
+        "blks_hit": 2178583,
+        "tup_returned": 3237434,
+        "tup_fetched": 2657741,
+        "tup_inserted": 51210,
+        "tup_updated": 12952,
+        "tup_deleted": 138
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164444 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.705078125,
+        5.8427734375,
+        5.43994140625
+      ],
+      "cgroup_cpu_stat": "usage_usec 246526225\nuser_usec 224759664\nsystem_usec 21766560\nnr_periods 4552\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115055.598312679,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 47108,
+        "blks_read": 4273,
+        "blks_hit": 2182804,
+        "tup_returned": 3243296,
+        "tup_fetched": 2660930,
+        "tup_inserted": 51218,
+        "tup_updated": 12989,
+        "tup_deleted": 138
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164600 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.705078125,
+        5.8427734375,
+        5.43994140625
+      ],
+      "cgroup_cpu_stat": "usage_usec 247558472\nuser_usec 225694004\nsystem_usec 21864467\nnr_periods 4571\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115057.616619947,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 47344,
+        "blks_read": 4280,
+        "blks_hit": 2191829,
+        "tup_returned": 3252560,
+        "tup_fetched": 2666111,
+        "tup_inserted": 51358,
+        "tup_updated": 13038,
+        "tup_deleted": 139
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164600 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.408203125,
+        5.79541015625,
+        5.4267578125
+      ],
+      "cgroup_cpu_stat": "usage_usec 248533922\nuser_usec 226574695\nsystem_usec 21959227\nnr_periods 4592\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115059.599032889,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 47533,
+        "blks_read": 4281,
+        "blks_hit": 2196069,
+        "tup_returned": 3258166,
+        "tup_fetched": 2669202,
+        "tup_inserted": 51366,
+        "tup_updated": 13076,
+        "tup_deleted": 139
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164600 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        6.408203125,
+        5.79541015625,
+        5.4267578125
+      ],
+      "cgroup_cpu_stat": "usage_usec 249421754\nuser_usec 227391009\nsystem_usec 22030744\nnr_periods 4611\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115061.640171982,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 47741,
+        "blks_read": 4281,
+        "blks_hit": 2202444,
+        "tup_returned": 3267135,
+        "tup_fetched": 2674521,
+        "tup_inserted": 51374,
+        "tup_updated": 13118,
+        "tup_deleted": 139
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164600 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159696 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.89501953125,
+        5.69873046875,
+        5.3974609375
+      ],
+      "cgroup_cpu_stat": "usage_usec 250452285\nuser_usec 228348955\nsystem_usec 22103329\nnr_periods 4632\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115063.597800134,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 47991,
+        "blks_read": 4285,
+        "blks_hit": 2211695,
+        "tup_returned": 3276728,
+        "tup_fetched": 2679897,
+        "tup_inserted": 51514,
+        "tup_updated": 13172,
+        "tup_deleted": 140
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.89501953125,
+        5.69873046875,
+        5.3974609375
+      ],
+      "cgroup_cpu_stat": "usage_usec 251598481\nuser_usec 229404283\nsystem_usec 22194197\nnr_periods 4651\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115065.674690038,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 48197,
+        "blks_read": 4299,
+        "blks_hit": 2219769,
+        "tup_returned": 3284376,
+        "tup_fetched": 2684000,
+        "tup_inserted": 51654,
+        "tup_updated": 13217,
+        "tup_deleted": 141
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.89501953125,
+        5.69873046875,
+        5.3974609375
+      ],
+      "cgroup_cpu_stat": "usage_usec 252710404\nuser_usec 230448640\nsystem_usec 22261763\nnr_periods 4672\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115067.652964271,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 48390,
+        "blks_read": 4300,
+        "blks_hit": 2225274,
+        "tup_returned": 3291965,
+        "tup_fetched": 2688457,
+        "tup_inserted": 51662,
+        "tup_updated": 13257,
+        "tup_deleted": 141
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.6630859375,
+        5.65380859375,
+        5.38427734375
+      ],
+      "cgroup_cpu_stat": "usage_usec 253689505\nuser_usec 231336886\nsystem_usec 22352618\nnr_periods 4692\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115069.596612298,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 48590,
+        "blks_read": 4301,
+        "blks_hit": 2229837,
+        "tup_returned": 3298008,
+        "tup_fetched": 2691818,
+        "tup_inserted": 51670,
+        "tup_updated": 13296,
+        "tup_deleted": 141
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.6630859375,
+        5.65380859375,
+        5.38427734375
+      ],
+      "cgroup_cpu_stat": "usage_usec 254741292\nuser_usec 232307158\nsystem_usec 22434133\nnr_periods 4711\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115071.679586346,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 48841,
+        "blks_read": 4312,
+        "blks_hit": 2241923,
+        "tup_returned": 3308196,
+        "tup_fetched": 2697417,
+        "tup_inserted": 51942,
+        "tup_updated": 13353,
+        "tup_deleted": 143
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.52978515625,
+        5.6259765625,
+        5.37646484375
+      ],
+      "cgroup_cpu_stat": "usage_usec 255862163\nuser_usec 233312844\nsystem_usec 22549318\nnr_periods 4732\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115073.608076337,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 49029,
+        "blks_read": 4312,
+        "blks_hit": 2246196,
+        "tup_returned": 3314098,
+        "tup_fetched": 2700965,
+        "tup_inserted": 51950,
+        "tup_updated": 13393,
+        "tup_deleted": 143
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.52978515625,
+        5.6259765625,
+        5.37646484375
+      ],
+      "cgroup_cpu_stat": "usage_usec 256840177\nuser_usec 234196708\nsystem_usec 22643468\nnr_periods 4752\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115075.60752974,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 49208,
+        "blks_read": 4313,
+        "blks_hit": 2250747,
+        "tup_returned": 3320456,
+        "tup_fetched": 2704883,
+        "tup_inserted": 51958,
+        "tup_updated": 13430,
+        "tup_deleted": 143
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.52978515625,
+        5.6259765625,
+        5.37646484375
+      ],
+      "cgroup_cpu_stat": "usage_usec 257783686\nuser_usec 235054854\nsystem_usec 22728832\nnr_periods 4772\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115077.635149933,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 49435,
+        "blks_read": 4331,
+        "blks_hit": 2261593,
+        "tup_returned": 3328594,
+        "tup_fetched": 2709390,
+        "tup_inserted": 52230,
+        "tup_updated": 13481,
+        "tup_deleted": 145
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.3271484375,
+        5.58203125,
+        5.36328125
+      ],
+      "cgroup_cpu_stat": "usage_usec 258956883\nuser_usec 236117615\nsystem_usec 22839268\nnr_periods 4792\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115079.625269117,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 49672,
+        "blks_read": 4334,
+        "blks_hit": 2267877,
+        "tup_returned": 3337312,
+        "tup_fetched": 2714851,
+        "tup_inserted": 52238,
+        "tup_updated": 13530,
+        "tup_deleted": 145
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164624 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.3271484375,
+        5.58203125,
+        5.36328125
+      ],
+      "cgroup_cpu_stat": "usage_usec 260079392\nuser_usec 237124299\nsystem_usec 22955093\nnr_periods 4812\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115081.599498774,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 49880,
+        "blks_read": 4334,
+        "blks_hit": 2272608,
+        "tup_returned": 3343684,
+        "tup_fetched": 2718729,
+        "tup_inserted": 52246,
+        "tup_updated": 13570,
+        "tup_deleted": 145
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164716 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.220703125,
+        5.5556640625,
+        5.35595703125
+      ],
+      "cgroup_cpu_stat": "usage_usec 261021708\nuser_usec 237997593\nsystem_usec 23024114\nnr_periods 4831\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115083.648356214,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 50110,
+        "blks_read": 4334,
+        "blks_hit": 2278840,
+        "tup_returned": 3352518,
+        "tup_fetched": 2724281,
+        "tup_inserted": 52254,
+        "tup_updated": 13614,
+        "tup_deleted": 145
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164716 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.220703125,
+        5.5556640625,
+        5.35595703125
+      ],
+      "cgroup_cpu_stat": "usage_usec 262098029\nuser_usec 239030039\nsystem_usec 23067990\nnr_periods 4852\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115085.634423289,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 50348,
+        "blks_read": 4345,
+        "blks_hit": 2290667,
+        "tup_returned": 3369261,
+        "tup_fetched": 2730216,
+        "tup_inserted": 52493,
+        "tup_updated": 13726,
+        "tup_deleted": 151
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164900 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.220703125,
+        5.5556640625,
+        5.35595703125
+      ],
+      "cgroup_cpu_stat": "usage_usec 263063380\nuser_usec 239918610\nsystem_usec 23144770\nnr_periods 4872\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115087.632852122,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 50573,
+        "blks_read": 4356,
+        "blks_hit": 2303486,
+        "tup_returned": 3381102,
+        "tup_fetched": 2737133,
+        "tup_inserted": 52633,
+        "tup_updated": 13773,
+        "tup_deleted": 152
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164900 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.04248046875,
+        5.51318359375,
+        5.34326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 264006146\nuser_usec 240774562\nsystem_usec 23231584\nnr_periods 4892\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115089.601732089,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 50783,
+        "blks_read": 4362,
+        "blks_hit": 2311812,
+        "tup_returned": 3390581,
+        "tup_fetched": 2741710,
+        "tup_inserted": 52773,
+        "tup_updated": 13821,
+        "tup_deleted": 153
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164900 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.04248046875,
+        5.51318359375,
+        5.34326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 265147669\nuser_usec 241828910\nsystem_usec 23318759\nnr_periods 4912\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115091.61672696,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 51008,
+        "blks_read": 4363,
+        "blks_hit": 2317459,
+        "tup_returned": 3399060,
+        "tup_fetched": 2746202,
+        "tup_inserted": 52781,
+        "tup_updated": 13865,
+        "tup_deleted": 153
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164900 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.958984375,
+        5.48779296875,
+        5.3359375
+      ],
+      "cgroup_cpu_stat": "usage_usec 266116304\nuser_usec 242722780\nsystem_usec 23393524\nnr_periods 4932\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115093.625242296,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 51218,
+        "blks_read": 4364,
+        "blks_hit": 2322781,
+        "tup_returned": 3407245,
+        "tup_fetched": 2750533,
+        "tup_inserted": 52789,
+        "tup_updated": 13907,
+        "tup_deleted": 153
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164932 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.958984375,
+        5.48779296875,
+        5.3359375
+      ],
+      "cgroup_cpu_stat": "usage_usec 267238374\nuser_usec 243781285\nsystem_usec 23457089\nnr_periods 4952\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115095.61355363,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 51424,
+        "blks_read": 4370,
+        "blks_hit": 2330982,
+        "tup_returned": 3416646,
+        "tup_fetched": 2755076,
+        "tup_inserted": 52929,
+        "tup_updated": 13953,
+        "tup_deleted": 154
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164932 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.958984375,
+        5.48779296875,
+        5.3359375
+      ],
+      "cgroup_cpu_stat": "usage_usec 268254419\nuser_usec 244714020\nsystem_usec 23540398\nnr_periods 4972\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115097.616872058,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 51651,
+        "blks_read": 4380,
+        "blks_hit": 2339283,
+        "tup_returned": 3425984,
+        "tup_fetched": 2759489,
+        "tup_inserted": 53069,
+        "tup_updated": 14004,
+        "tup_deleted": 155
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164932 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.12255859375,
+        5.51318359375,
+        5.34521484375
+      ],
+      "cgroup_cpu_stat": "usage_usec 269297086\nuser_usec 245684451\nsystem_usec 23612635\nnr_periods 4992\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115099.632720463,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 51901,
+        "blks_read": 4387,
+        "blks_hit": 2347865,
+        "tup_returned": 3435869,
+        "tup_fetched": 2764140,
+        "tup_inserted": 53209,
+        "tup_updated": 14056,
+        "tup_deleted": 156
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "164932 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.12255859375,
+        5.51318359375,
+        5.34521484375
+      ],
+      "cgroup_cpu_stat": "usage_usec 270367207\nuser_usec 246644063\nsystem_usec 23723143\nnr_periods 5012\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115101.635962594,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 52118,
+        "blks_read": 4388,
+        "blks_hit": 2353476,
+        "tup_returned": 3444570,
+        "tup_fetched": 2768772,
+        "tup_inserted": 53217,
+        "tup_updated": 14099,
+        "tup_deleted": 156
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "165016 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.1123046875,
+        5.50439453125,
+        5.34326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 271408532\nuser_usec 247601470\nsystem_usec 23807062\nnr_periods 5032\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115103.628256397,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 52352,
+        "blks_read": 4390,
+        "blks_hit": 2359302,
+        "tup_returned": 3453449,
+        "tup_fetched": 2773447,
+        "tup_inserted": 53225,
+        "tup_updated": 14145,
+        "tup_deleted": 156
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "165016 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.1123046875,
+        5.50439453125,
+        5.34326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 272454920\nuser_usec 248562281\nsystem_usec 23892639\nnr_periods 5052\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115105.611513345,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 52556,
+        "blks_read": 4400,
+        "blks_hit": 2365758,
+        "tup_returned": 3461405,
+        "tup_fetched": 2777422,
+        "tup_inserted": 53312,
+        "tup_updated": 14217,
+        "tup_deleted": 156
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "165016 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        5.1123046875,
+        5.50439453125,
+        5.34326171875
+      ],
+      "cgroup_cpu_stat": "usage_usec 273571211\nuser_usec 249612299\nsystem_usec 23958912\nnr_periods 5072\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    },
+    {
+      "at": 1115107.664368058,
+      "backlog": {
+        "history": [
+          [
+            "published",
+            2
+          ],
+          [
+            "pending",
+            1
+          ]
+        ],
+        "indicators": [
+          [
+            "complete",
+            13
+          ]
+        ],
+        "aggregate_tasks": 9
+      },
+      "pg": {
+        "numbackends": 12,
+        "xact_commit": 52796,
+        "blks_read": 4411,
+        "blks_hit": 2376658,
+        "tup_returned": 3472232,
+        "tup_fetched": 2782070,
+        "tup_inserted": 53576,
+        "tup_updated": 14258,
+        "tup_deleted": 158
+      },
+      "processes": [
+        {
+          "role": "runtime",
+          "pid": 42,
+          "alive": true,
+          "rss": "165100 kB",
+          "threads": "7"
+        },
+        {
+          "role": "provider",
+          "pid": 43,
+          "alive": true,
+          "rss": "157784 kB",
+          "threads": "1"
+        },
+        {
+          "role": "notification",
+          "pid": 44,
+          "alive": true,
+          "rss": "157992 kB",
+          "threads": "1"
+        },
+        {
+          "role": "projection",
+          "pid": 45,
+          "alive": true,
+          "rss": "158108 kB",
+          "threads": "1"
+        },
+        {
+          "role": "history",
+          "pid": 46,
+          "alive": true,
+          "rss": "159796 kB",
+          "threads": "1"
+        }
+      ],
+      "host_loadavg": [
+        4.86279296875,
+        5.44580078125,
+        5.3251953125
+      ],
+      "cgroup_cpu_stat": "usage_usec 274621047\nuser_usec 250539844\nsystem_usec 24081202\nnr_periods 5092\nnr_throttled 4\nthrottled_usec 173788\n",
+      "cgroup_memory_events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\n"
+    }
+  ],
+  "final": {
+    "rules": [
+      {
+        "id": "dc80eb22-c8af-4f3f-87bf-fbbd26e0fde5",
+        "status": "active",
+        "health": "ready",
+        "count": 1,
+        "state": {
+          "sequence": 166320000,
+          "left": "1.119",
+          "right": "1.115",
+          "count": 1
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 3,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 3,
+          "confirmed_end": 166320000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166260000,
+                "end": 166320000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "2b212b17-d34d-435c-a838-8a4d796996f0",
+        "status": "completed",
+        "health": "ready",
+        "count": 3,
+        "state": {
+          "sequence": 166316010,
+          "left": "1.119",
+          "right": "1.115",
+          "count": 3
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 2,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 2,
+          "confirmed_end": 166260000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166260000,
+                "end": 166320000,
+                "coverage_complete": false,
+                "source_confirmed": false,
+                "seam_dependency": false
+              }
+            ],
+            "last_outcome": "evaluated"
+          }
+        }
+      },
+      {
+        "id": "01665395-de68-41c0-ace1-c687b179216d",
+        "status": "completed",
+        "health": "ready",
+        "count": 3,
+        "state": {
+          "sequence": 166316010,
+          "left": "1.119",
+          "right": "1.115",
+          "count": 3
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 2,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 2,
+          "confirmed_end": 166260000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166260000,
+                "end": 166320000,
+                "coverage_complete": false,
+                "source_confirmed": false,
+                "seam_dependency": false
+              }
+            ],
+            "last_outcome": "evaluated"
+          }
+        }
+      },
+      {
+        "id": "c79a5fb3-d030-44b9-a12c-4fa518f5838b",
+        "status": "active",
+        "health": "ready",
+        "count": 1,
+        "state": {
+          "sequence": 166320000,
+          "left": "1.119",
+          "right": "1.115",
+          "count": 1
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 3,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "processed_input_revision": 3,
+          "confirmed_end": 166320000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166260000,
+                "end": 166320000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "0ab9dbf4-e03d-4a59-9a53-e35be176fe95",
+        "status": "completed",
+        "health": "ready",
+        "count": 3,
+        "state": {
+          "sequence": 166316010,
+          "left": "1.118",
+          "right": "1.115",
+          "count": 3
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 2,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [
+            {
+              "id": "EMA",
+              "run_id": "fe87daf31a4f3798d72811c65d34f305dce62301f3af315378ba3d4636ab8f7f",
+              "status": "complete",
+              "cursor": 166260000,
+              "target_end": 166260000,
+              "input_revision": 2,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": "7185dddc56681854b8d29c9cb19460288de8cbe303b9ce91ee6b741612ffc14e",
+              "reused_prefix_end": 166200000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 158400000,
+                  "end": 166320000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 158400000,
+                  "end": 166320000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                "input_revision": 2,
+                "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                "display_snapshot_id": "bfa1e03464caf9a29c4ddb159ec6936c4bb04e7d80fad8e89bcc3e66511d9846"
+              },
+              "display_task_ids": []
+            }
+          ],
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "indicator",
+                "spec": {
+                  "name": "EMA",
+                  "version": "1",
+                  "params": {
+                    "period": 2
+                  }
+                },
+                "output": "value",
+                "calculation": {
+                  "id": "EMA",
+                  "run_id": "fe87daf31a4f3798d72811c65d34f305dce62301f3af315378ba3d4636ab8f7f",
+                  "status": "complete",
+                  "cursor": 166260000,
+                  "target_end": 166260000,
+                  "input_revision": 2,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "error": null,
+                  "next_at": 0,
+                  "parent_run_id": "7185dddc56681854b8d29c9cb19460288de8cbe303b9ce91ee6b741612ffc14e",
+                  "reused_prefix_end": 166200000,
+                  "calculation_origin": 158400000,
+                  "producer": "backend",
+                  "accuracy": "oracle_equivalent",
+                  "canonical_verified": true,
+                  "coverage": [
+                    {
+                      "start": 158400000,
+                      "end": 166320000
+                    }
+                  ],
+                  "required_coverage": [
+                    {
+                      "start": 158400000,
+                      "end": 166320000
+                    }
+                  ],
+                  "visible_complete": true,
+                  "input_evidence": {
+                    "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                    "input_revision": 2,
+                    "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                    "display_snapshot_id": "bfa1e03464caf9a29c4ddb159ec6936c4bb04e7d80fad8e89bcc3e66511d9846"
+                  },
+                  "display_task_ids": []
+                },
+                "dependency": {
+                  "start": 166260000,
+                  "dependency_origin": 158400000,
+                  "seam_dependency": true,
+                  "initialized": true,
+                  "provisional": true
+                },
+                "seam_dependency": true
+              }
+            ],
+            "last_outcome": "evaluated"
+          },
+          "processed_input_revision": 2,
+          "confirmed_end": 166260000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000
+        }
+      },
+      {
+        "id": "da62d6ac-f6c8-46c3-953c-84ce6078d904",
+        "status": "active",
+        "health": "ready",
+        "count": 1,
+        "state": {
+          "sequence": 166320000,
+          "left": "1.119",
+          "right": "1.11530000000000000027",
+          "count": 1
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 3,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "offset_indicators": [
+            {
+              "id": "ATR",
+              "run_id": "bbbf7f9d4673f424e19dc7ddc6f6cb904290310e4cd9bca4b43364f77bb7f6b1",
+              "status": "complete",
+              "cursor": 166320000,
+              "target_end": 166320000,
+              "input_revision": 3,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": "ad15ecfe9cb2fdc3a2ac528bd9c4a248b249633391f4a5b1e3a568b65090c35b",
+              "reused_prefix_end": 166260000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 166200000,
+                  "end": 166260000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 166200000,
+                  "end": 166260000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                "input_revision": 3,
+                "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                "display_snapshot_id": null
+              },
+              "display_task_ids": []
+            }
+          ],
+          "atr_confirmation": {
+            "key": [
+              "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              3,
+              158400000,
+              166260000
+            ],
+            "watermark": 166260010
+          },
+          "offset": {
+            "kind": "atr",
+            "version": "1",
+            "atr": "0.030000000000000027",
+            "signed_offset": "0.00030000000000000027",
+            "timeframe": "M1",
+            "period": 2,
+            "multiplier": "0.01",
+            "reference_start": 166200000,
+            "reference_end": 166260000,
+            "input_revision": null,
+            "confirmed_at": 166260000,
+            "evaluation_start": 166260000,
+            "algorithm": "fixed-indicator-state-v3",
+            "dependency": {
+              "timeframe": "M1",
+              "dataset_id": null,
+              "origin": 158400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              "input_revision": 3,
+              "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+              "calculation": {
+                "id": "ATR",
+                "run_id": "bbbf7f9d4673f424e19dc7ddc6f6cb904290310e4cd9bca4b43364f77bb7f6b1",
+                "status": "complete",
+                "cursor": 166320000,
+                "target_end": 166320000,
+                "input_revision": 3,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": "ad15ecfe9cb2fdc3a2ac528bd9c4a248b249633391f4a5b1e3a568b65090c35b",
+                "reused_prefix_end": 166260000,
+                "calculation_origin": 158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 166200000,
+                    "end": 166260000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 166200000,
+                    "end": 166260000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 3,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": []
+              },
+              "dependency": {
+                "start": 166200000,
+                "dependency_origin": 158400000,
+                "seam_dependency": true,
+                "initialized": true,
+                "provisional": null
+              }
+            },
+            "available_at": 166320828,
+            "confirmation_watermark": 166260010,
+            "confirmed_end": 166320000,
+            "base_target": "1.115",
+            "threshold": "1.11530000000000000027",
+            "baseline_translation": {
+              "previous_right": "1.11530000000000000027",
+              "translated_right": "1.11530000000000000027",
+              "offset_change": "0E-20"
+            }
+          },
+          "processed_input_revision": 3,
+          "confirmed_end": 166320000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000,
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166260000,
+                "end": 166320000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              },
+              {
+                "kind": "atr",
+                "version": "1",
+                "atr": "0.030000000000000027",
+                "signed_offset": "0.00030000000000000027",
+                "timeframe": "M1",
+                "period": 2,
+                "multiplier": "0.01",
+                "reference_start": 166200000,
+                "reference_end": 166260000,
+                "input_revision": null,
+                "confirmed_at": 166260000,
+                "evaluation_start": 166260000,
+                "algorithm": "fixed-indicator-state-v3",
+                "dependency": {
+                  "timeframe": "M1",
+                  "dataset_id": null,
+                  "origin": 158400000,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 3,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "calculation": {
+                    "id": "ATR",
+                    "run_id": "bbbf7f9d4673f424e19dc7ddc6f6cb904290310e4cd9bca4b43364f77bb7f6b1",
+                    "status": "complete",
+                    "cursor": 166320000,
+                    "target_end": 166320000,
+                    "input_revision": 3,
+                    "algorithm": "fixed-indicator-state-v3",
+                    "error": null,
+                    "next_at": 0,
+                    "parent_run_id": "ad15ecfe9cb2fdc3a2ac528bd9c4a248b249633391f4a5b1e3a568b65090c35b",
+                    "reused_prefix_end": 166260000,
+                    "calculation_origin": 158400000,
+                    "producer": "backend",
+                    "accuracy": "oracle_equivalent",
+                    "canonical_verified": true,
+                    "coverage": [
+                      {
+                        "start": 166200000,
+                        "end": 166260000
+                      }
+                    ],
+                    "required_coverage": [
+                      {
+                        "start": 166200000,
+                        "end": 166260000
+                      }
+                    ],
+                    "visible_complete": true,
+                    "input_evidence": {
+                      "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                      "input_revision": 3,
+                      "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                      "display_snapshot_id": null
+                    },
+                    "display_task_ids": []
+                  },
+                  "dependency": {
+                    "start": 166200000,
+                    "dependency_origin": 158400000,
+                    "seam_dependency": true,
+                    "initialized": true,
+                    "provisional": null
+                  }
+                },
+                "available_at": 166324035,
+                "confirmation_watermark": 166260010,
+                "confirmed_end": 166320000,
+                "base_target": "1.115",
+                "threshold": "1.11530000000000000027"
+              }
+            ]
+          }
+        }
+      },
+      {
+        "id": "9b2bdbc6-1c06-4666-ad63-c19832f564ee",
+        "status": "active",
+        "health": "ready",
+        "count": 1,
+        "state": {
+          "sequence": 166320000,
+          "left": "1.119",
+          "right": "1.11530000000000000027",
+          "count": 1
+        },
+        "runtime": {
+          "quote_health": "ready",
+          "observation_mode": "stream_quote",
+          "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+          "input_revision": 3,
+          "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+          "seam_policy": "accept_raw",
+          "indicators": [],
+          "offset_indicators": [
+            {
+              "id": "ATR",
+              "run_id": "bbbf7f9d4673f424e19dc7ddc6f6cb904290310e4cd9bca4b43364f77bb7f6b1",
+              "status": "complete",
+              "cursor": 166320000,
+              "target_end": 166320000,
+              "input_revision": 3,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": "ad15ecfe9cb2fdc3a2ac528bd9c4a248b249633391f4a5b1e3a568b65090c35b",
+              "reused_prefix_end": 166260000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 166200000,
+                  "end": 166260000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 166200000,
+                  "end": 166260000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                "input_revision": 3,
+                "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                "display_snapshot_id": null
+              },
+              "display_task_ids": []
+            }
+          ],
+          "readiness": {
+            "ready": true,
+            "status": "ready",
+            "dependencies": [
+              {
+                "kind": "price",
+                "start": 166260000,
+                "end": 166320000,
+                "coverage_complete": true,
+                "source_confirmed": true,
+                "seam_dependency": false
+              },
+              {
+                "kind": "atr",
+                "version": "1",
+                "atr": "0.030000000000000027",
+                "signed_offset": "0.00030000000000000027",
+                "timeframe": "M1",
+                "period": 2,
+                "multiplier": "0.01",
+                "reference_start": 166200000,
+                "reference_end": 166260000,
+                "input_revision": null,
+                "confirmed_at": 166260000,
+                "evaluation_start": 166260000,
+                "algorithm": "fixed-indicator-state-v3",
+                "dependency": {
+                  "timeframe": "M1",
+                  "dataset_id": null,
+                  "origin": 158400000,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 3,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "calculation": {
+                    "id": "ATR",
+                    "run_id": "bbbf7f9d4673f424e19dc7ddc6f6cb904290310e4cd9bca4b43364f77bb7f6b1",
+                    "status": "complete",
+                    "cursor": 166320000,
+                    "target_end": 166320000,
+                    "input_revision": 3,
+                    "algorithm": "fixed-indicator-state-v3",
+                    "error": null,
+                    "next_at": 0,
+                    "parent_run_id": "ad15ecfe9cb2fdc3a2ac528bd9c4a248b249633391f4a5b1e3a568b65090c35b",
+                    "reused_prefix_end": 166260000,
+                    "calculation_origin": 158400000,
+                    "producer": "backend",
+                    "accuracy": "oracle_equivalent",
+                    "canonical_verified": true,
+                    "coverage": [
+                      {
+                        "start": 166200000,
+                        "end": 166260000
+                      }
+                    ],
+                    "required_coverage": [
+                      {
+                        "start": 166200000,
+                        "end": 166260000
+                      }
+                    ],
+                    "visible_complete": true,
+                    "input_evidence": {
+                      "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                      "input_revision": 3,
+                      "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                      "display_snapshot_id": null
+                    },
+                    "display_task_ids": []
+                  },
+                  "dependency": {
+                    "start": 166200000,
+                    "dependency_origin": 158400000,
+                    "seam_dependency": true,
+                    "initialized": true,
+                    "provisional": null
+                  }
+                },
+                "available_at": 166324078,
+                "confirmation_watermark": 166260010,
+                "confirmed_end": 166320000,
+                "base_target": "1.115",
+                "threshold": "1.11530000000000000027"
+              }
+            ]
+          },
+          "atr_confirmation": {
+            "key": [
+              "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              3,
+              158400000,
+              166260000
+            ],
+            "watermark": 166260010
+          },
+          "offset": {
+            "kind": "atr",
+            "version": "1",
+            "atr": "0.030000000000000027",
+            "signed_offset": "0.00030000000000000027",
+            "timeframe": "M1",
+            "period": 2,
+            "multiplier": "0.01",
+            "reference_start": 166200000,
+            "reference_end": 166260000,
+            "input_revision": null,
+            "confirmed_at": 166260000,
+            "evaluation_start": 166260000,
+            "algorithm": "fixed-indicator-state-v3",
+            "dependency": {
+              "timeframe": "M1",
+              "dataset_id": null,
+              "origin": 158400000,
+              "algorithm": "fixed-indicator-state-v3",
+              "composite_revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+              "input_revision": 3,
+              "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+              "calculation": {
+                "id": "ATR",
+                "run_id": "bbbf7f9d4673f424e19dc7ddc6f6cb904290310e4cd9bca4b43364f77bb7f6b1",
+                "status": "complete",
+                "cursor": 166320000,
+                "target_end": 166320000,
+                "input_revision": 3,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": "ad15ecfe9cb2fdc3a2ac528bd9c4a248b249633391f4a5b1e3a568b65090c35b",
+                "reused_prefix_end": 166260000,
+                "calculation_origin": 158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 166200000,
+                    "end": 166260000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 166200000,
+                    "end": 166260000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": "df3d8f41-2d95-4cce-ab8a-a0a34522234b",
+                  "input_revision": 3,
+                  "history_version_id": "3bfa1c3d-648a-47c7-94d7-4e6d498b0c6b",
+                  "display_snapshot_id": null
+                },
+                "display_task_ids": []
+              },
+              "dependency": {
+                "start": 166200000,
+                "dependency_origin": 158400000,
+                "seam_dependency": true,
+                "initialized": true,
+                "provisional": null
+              }
+            },
+            "available_at": 166320907,
+            "confirmation_watermark": 166260010,
+            "confirmed_end": 166320000,
+            "base_target": "1.115",
+            "threshold": "1.11530000000000000027",
+            "baseline_translation": {
+              "previous_right": "1.11530000000000000027",
+              "translated_right": "1.11530000000000000027",
+              "offset_change": "0E-20"
+            }
+          },
+          "processed_input_revision": 3,
+          "confirmed_end": 166320000,
+          "epoch": 1,
+          "recovering": false,
+          "last_start": 166260000
+        }
+      }
+    ],
+    "signals": [
+      {
+        "id": "cd55ffde-6721-4506-85b8-2f1b655e7818",
+        "rule": "0ab9dbf4-e03d-4a59-9a53-e35be176fe95",
+        "occurred_at": 166206010
+      },
+      {
+        "id": "07c09640-4623-4150-a0be-52d8e660b40f",
+        "rule": "2b212b17-d34d-435c-a838-8a4d796996f0",
+        "occurred_at": 166206010
+      },
+      {
+        "id": "9bbe30f4-391b-4fdc-9c0d-a6df28026bae",
+        "rule": "01665395-de68-41c0-ace1-c687b179216d",
+        "occurred_at": 166206010
+      },
+      {
+        "id": "f0c6c7dd-17c5-4880-8149-2554784b9da4",
+        "rule": "2b212b17-d34d-435c-a838-8a4d796996f0",
+        "occurred_at": 166254010
+      },
+      {
+        "id": "b952efde-770c-4b46-83bd-922c7ca60174",
+        "rule": "01665395-de68-41c0-ace1-c687b179216d",
+        "occurred_at": 166254010
+      },
+      {
+        "id": "f44dab6b-48f6-42d5-a70f-11a566be1e63",
+        "rule": "0ab9dbf4-e03d-4a59-9a53-e35be176fe95",
+        "occurred_at": 166254010
+      },
+      {
+        "id": "d8ab4057-3522-40b2-a8a7-a0edb9a3c0f6",
+        "rule": "c79a5fb3-d030-44b9-a12c-4fa518f5838b",
+        "occurred_at": 166260000
+      },
+      {
+        "id": "cc1d7027-08e7-44ad-910b-66248d83dada",
+        "rule": "dc80eb22-c8af-4f3f-87bf-fbbd26e0fde5",
+        "occurred_at": 166260000
+      },
+      {
+        "id": "b00dc0ec-a426-4faf-b771-dcaa48e6beca",
+        "rule": "da62d6ac-f6c8-46c3-953c-84ce6078d904",
+        "occurred_at": 166260000
+      },
+      {
+        "id": "cf5f3cac-a51a-4249-a999-532660919512",
+        "rule": "9b2bdbc6-1c06-4666-ad63-c19832f564ee",
+        "occurred_at": 166260000
+      },
+      {
+        "id": "cf7d99a7-0a14-4465-b590-af4c71e681ff",
+        "rule": "01665395-de68-41c0-ace1-c687b179216d",
+        "occurred_at": 166316010
+      },
+      {
+        "id": "2ebdd784-7a31-420f-8320-71d143d90ea2",
+        "rule": "0ab9dbf4-e03d-4a59-9a53-e35be176fe95",
+        "occurred_at": 166316010
+      },
+      {
+        "id": "6560812b-3ea0-4f7f-87a4-95ad7404253f",
+        "rule": "2b212b17-d34d-435c-a838-8a4d796996f0",
+        "occurred_at": 166316010
+      }
+    ],
+    "notifications": [
+      {
+        "id": "854fd873-bdfb-400b-be0f-55ef3622433a",
+        "signal": "cd55ffde-6721-4506-85b8-2f1b655e7818",
+        "status": "server_accepted"
+      },
+      {
+        "id": "a7186306-ca83-4307-ae97-7a0a1ce3073a",
+        "signal": "07c09640-4623-4150-a0be-52d8e660b40f",
+        "status": "server_accepted"
+      },
+      {
+        "id": "9a9ca079-99ce-4f21-920a-f1f76a287677",
+        "signal": "9bbe30f4-391b-4fdc-9c0d-a6df28026bae",
+        "status": "server_accepted"
+      },
+      {
+        "id": "a66601a8-047f-4e45-be76-89af13a93eae",
+        "signal": "f0c6c7dd-17c5-4880-8149-2554784b9da4",
+        "status": "server_accepted"
+      },
+      {
+        "id": "03894e36-a4b0-4a94-9175-4547041b9ac4",
+        "signal": "b952efde-770c-4b46-83bd-922c7ca60174",
+        "status": "server_accepted"
+      },
+      {
+        "id": "8b01b45d-5f4c-4bee-a078-dc9198d1e3b6",
+        "signal": "f44dab6b-48f6-42d5-a70f-11a566be1e63",
+        "status": "server_accepted"
+      },
+      {
+        "id": "3a2ac769-e41b-48b6-9336-c6b67845e52e",
+        "signal": "d8ab4057-3522-40b2-a8a7-a0edb9a3c0f6",
+        "status": "server_accepted"
+      },
+      {
+        "id": "1b57916a-2b8e-4e4a-b8a9-27924b3519a2",
+        "signal": "cc1d7027-08e7-44ad-910b-66248d83dada",
+        "status": "server_accepted"
+      },
+      {
+        "id": "782cfe6f-0770-445f-a40b-cc3550ecf5fb",
+        "signal": "b00dc0ec-a426-4faf-b771-dcaa48e6beca",
+        "status": "server_accepted"
+      },
+      {
+        "id": "61c440c3-a21d-450d-838c-3e36d108ef30",
+        "signal": "cf5f3cac-a51a-4249-a999-532660919512",
+        "status": "server_accepted"
+      },
+      {
+        "id": "0d563231-246d-48aa-b98f-b7e4aa57f74e",
+        "signal": "cf7d99a7-0a14-4465-b590-af4c71e681ff",
+        "status": "server_accepted"
+      },
+      {
+        "id": "b39eb270-57e4-4a68-a8b1-9d38831ee0de",
+        "signal": "2ebdd784-7a31-420f-8320-71d143d90ea2",
+        "status": "server_accepted"
+      },
+      {
+        "id": "19f12f0f-6854-4f09-a926-12fe07419f76",
+        "signal": "6560812b-3ea0-4f7f-87a4-95ad7404253f",
+        "status": "server_accepted"
+      }
+    ],
+    "outbox": [
+      {
+        "id": "e3d94ec0-c272-494d-a61e-8fd1a541297b",
+        "note": "854fd873-bdfb-400b-be0f-55ef3622433a",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "455b7171-68e1-4c74-95be-3b0e2184935d",
+        "note": "a7186306-ca83-4307-ae97-7a0a1ce3073a",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "034b2f28-c271-47fc-8cb7-ebc601557c98",
+        "note": "9a9ca079-99ce-4f21-920a-f1f76a287677",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "c2d4b22e-c023-4e5d-b830-d692d91d7d97",
+        "note": "a66601a8-047f-4e45-be76-89af13a93eae",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "b8d57b51-0e47-4875-a6ed-ab80165f06e7",
+        "note": "03894e36-a4b0-4a94-9175-4547041b9ac4",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "580c4ecc-7494-4245-a93b-380cc7185bb1",
+        "note": "8b01b45d-5f4c-4bee-a078-dc9198d1e3b6",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "7c67b84f-8f0c-4f2c-ba34-f349ac87626e",
+        "note": "3a2ac769-e41b-48b6-9336-c6b67845e52e",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "2badc96d-e3c4-46f4-9577-eb8a7fcc0bb1",
+        "note": "1b57916a-2b8e-4e4a-b8a9-27924b3519a2",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "90993b69-4877-496b-a0d4-dd782e87e381",
+        "note": "782cfe6f-0770-445f-a40b-cc3550ecf5fb",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "466a41aa-885d-4d14-b98d-ca8174dbd7de",
+        "note": "61c440c3-a21d-450d-838c-3e36d108ef30",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "19319ec5-103d-4761-ab17-d11a136f30d1",
+        "note": "0d563231-246d-48aa-b98f-b7e4aa57f74e",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "8bc0b7d3-76f2-449d-92ae-38bcc9fa8dc6",
+        "note": "b39eb270-57e4-4a68-a8b1-9d38831ee0de",
+        "status": "accepted",
+        "attempts": 1
+      },
+      {
+        "id": "f2b67a07-7678-4127-ba34-39ad890a3a73",
+        "note": "19f12f0f-6854-4f09-a926-12fe07419f76",
+        "status": "accepted",
+        "attempts": 1
+      }
+    ],
+    "notices": [
+      {
+        "id": "s:9cb63049-57a7-5237-b8ad-d45d8403f7e7",
+        "source": "d8ab4057-3522-40b2-a8a7-a0edb9a3c0f6",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:875e5953-11df-5cdd-80d1-163cef6a1c7f",
+        "source": "07c09640-4623-4150-a0be-52d8e660b40f",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:465b9ec7-6cc8-5211-adea-e419dfd38b8f",
+        "source": "cd55ffde-6721-4506-85b8-2f1b655e7818",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:6d29ba8b-1c82-5715-9e72-f09013698d61",
+        "source": "9bbe30f4-391b-4fdc-9c0d-a6df28026bae",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:58517f03-6c0c-5ed3-b519-f4957fa91a94",
+        "source": "f44dab6b-48f6-42d5-a70f-11a566be1e63",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:18def54b-e76c-56a0-be39-83e2b52b3111",
+        "source": "f0c6c7dd-17c5-4880-8149-2554784b9da4",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:1742d1ff-df0a-518d-abb6-e09e7ce83681",
+        "source": "b952efde-770c-4b46-83bd-922c7ca60174",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:4a730a51-0b29-58e3-a1e2-bd516797bb47",
+        "source": "cc1d7027-08e7-44ad-910b-66248d83dada",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:72adc786-d8cc-5f46-ae28-479494c53a9e",
+        "source": "b00dc0ec-a426-4faf-b771-dcaa48e6beca",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:94effacb-5029-5743-a979-28e81fac0065",
+        "source": "cf5f3cac-a51a-4249-a999-532660919512",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:fab5e0b4-e266-5c21-9de8-bc29e13b4cfb",
+        "source": "6560812b-3ea0-4f7f-87a4-95ad7404253f",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:2cf0d4e8-9657-53e2-8152-f7b271502aec",
+        "source": "cf7d99a7-0a14-4465-b590-af4c71e681ff",
+        "kind": "chart_alert"
+      },
+      {
+        "id": "s:efc034f0-5c2d-52c7-a92d-d68677c12211",
+        "source": "2ebdd784-7a31-420f-8320-71d143d90ea2",
+        "kind": "chart_alert"
+      }
+    ]
+  },
+  "workers": {
+    "runtime": 0,
+    "provider": 0,
+    "notification": 0,
+    "projection": 0,
+    "history": 0
+  },
+  "limitations": [
+    "Fixture source identity/time origin; no real supplier SLA",
+    "No HTTP/browser transport in stage-zero process workload",
+    "Shared probe cgroup, separate owner processes; not final five-service profile"
+  ]
+}

@@ -1,0 +1,51 @@
+# Container acceptance for the stage-2 profiles using the locked v1.29.1 runtime
+# image with this worktree mounted read-only. No supplier or delivery IO.
+x-runtime: &runtime
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /candidate
+  volumes: ["${MW_RUNTIME_STAGE2_REPO:?}:/candidate:ro"]
+  environment: &runtime-environment
+    PYTHONPATH: /candidate/backend
+    ALERTS_DATABASE_URL: postgresql+psycopg://runtime_stage2@postgres/runtime_profile
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+    ALERTS_RUNTIME_DEPLOYMENT: stage2_acceptance
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_OANDA_STREAM_ENABLED: "false"
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+    ALERTS_YAHOO_ENABLED: "false"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    ALERTS_DATABASE_JIT: "off"
+    ALERTS_DATABASE_APPLICATION_NAME: stage2-acceptance
+    ALERTS_DATABASE_POOL_SIZE: "2"
+  restart: "no"
+  labels:
+    market-watch.task: runtime-market-stage2-20261027
+    market-watch.project: mw-runtime-stage2-20261027
+    market-watch.purpose: acceptance
+  depends_on:
+    postgres: {condition: service_healthy}
+services:
+  api:
+    <<: *runtime
+    command: [python, -m, uvicorn, alerts.api:app, --host, 0.0.0.0, --port, "8000"]
+    environment:
+      <<: *runtime-environment
+      ALERTS_HISTORY_HEALTH_WORKERS: '[]'
+  market-runtime:
+    <<: *runtime
+    command: [python, -m, alerts.runtime, --profile, market]
+    environment:
+      <<: *runtime-environment
+      ALERTS_DATABASE_POOL_SIZE: "6"
+      ALERTS_DATABASE_APPLICATION_NAME: stage2-acceptance-market
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: "false"
+  chart-alert-runtime:
+    <<: *runtime
+    command: [python, -m, alerts.runtime, --profile, alert]
+    environment:
+      <<: *runtime-environment
+      ALERTS_DATABASE_APPLICATION_NAME: stage2-acceptance-alert
+    profiles: [independent-alert]
+networks:
+  default: {internal: true}

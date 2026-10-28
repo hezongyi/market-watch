@@ -1,0 +1,13 @@
+# Five-service runtime acceptance: ChartAlert runs inside market-runtime.
+services:
+  postgres:
+    environment:
+      POSTGRES_DB: runtime_profile
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U runtime_stage2 -d runtime_profile && test \"$$(PGOPTIONS='-c jit=on' psql -U runtime_stage2 -d runtime_profile -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+  market-runtime:
+    stop_grace_period: 45s
+    environment:
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
+  chart-alert-runtime:
+    profiles: [independent-alert]

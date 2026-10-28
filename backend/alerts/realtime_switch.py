@@ -66,8 +66,19 @@ def compatibility_default(db, instrument_id, *, now):
         ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
     ).where(ChartAlert.status == "active", (ChartAlert.expires_at.is_(None) |
         (ChartAlert.expires_at > now))))
-    return any(version.config.get("series_kind") == "composite"
-        and version.market_identity.get("composite_revision_id") in revisions for version in versions)
+    if any(version.config.get("series_kind") == "composite"
+        and version.market_identity.get("composite_revision_id") in revisions for version in versions):
+        return True
+    held_rules = db.scalars(select(ChartAlert).where(ChartAlert.status == "paused",
+        ChartAlert.runtime["demand_hold"].as_string() == "stale_input",
+        (ChartAlert.expires_at.is_(None) | (ChartAlert.expires_at > now))))
+    for alert in held_rules:
+        version = db.scalar(select(ChartAlertVersion).where(
+            ChartAlertVersion.alert_id == alert.id, ChartAlertVersion.version == alert.version))
+        if (version and version.config.get("series_kind") == "composite"
+                and version.market_identity.get("composite_revision_id") in revisions):
+            return True
+    return False
 
 
 def initialize_defaults(db, *, now):

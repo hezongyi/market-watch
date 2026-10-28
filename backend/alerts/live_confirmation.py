@@ -3,7 +3,21 @@
 Additive Preference JSON keeps old databases/readers usable. No price, coverage
 or ready flag is derived from this record; only confirmed minute ingestion does that.
 """
-from .storage import Instrument, MarketDataset, Preference
+from sqlalchemy import select
+
+from .storage import Instrument, LiveState, MarketDataset, Preference, transaction
+
+
+def runtime_error(identities, epoch):
+    """Sampling and a skipped retry cannot close an unresolved confirmation."""
+    with transaction() as db:
+        return db.scalar(select(Preference.value["error"].as_string()).join(
+            LiveState, Preference.key == "live_confirmation:v1:" + LiveState.dataset_id).where(
+                LiveState.dataset_id.in_([identity.key for identity in identities.values()]),
+                LiveState.epoch == epoch,
+                Preference.value["epoch"].as_integer() == epoch,
+                Preference.value["open"].as_boolean().is_(True)).order_by(
+                    LiveState.dataset_id).limit(1))
 
 
 def health(db, state):

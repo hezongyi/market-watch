@@ -35,7 +35,9 @@ class DatabaseComposeTests(unittest.TestCase):
                     values[name] = f'market-watch-{component}:fixture'
                 elif name.endswith('PORT'):
                     values[name] = '18000'
-                elif name.endswith(('DIR', 'ENV', 'REPO')) or name == 'MW_JIT_RESULTS':
+                elif name.endswith('MEMORY'):
+                    values[name] = '768m'
+                elif name.endswith(('DIR', 'ENV', 'REPO', 'ARTIFACTS')) or name == 'MW_JIT_RESULTS':
                     values[name] = str(fixture) if name.endswith('ENV') else directory
                 elif 'DATABASE_URL' in name or name == 'TEST_POSTGRES_URL':
                     values[name] = 'postgresql+psycopg://fixture@postgres/fixture'
@@ -95,6 +97,15 @@ class DatabaseComposeTests(unittest.TestCase):
 
     def test_production_defaults_off_even_with_generic_inherit_setting(self):
         rendered = self.render([Path('compose.production.yaml')],ALERTS_DATABASE_JIT='inherit')
+        self.assertIn('market-runtime', rendered['services'])
+        self.assertNotIn('pricing-worker', rendered['services'])
+        self.assertNotIn('realtime-worker', rendered['services'])
+        self.assertNotIn('composite-aggregate-worker', rendered['services'])
+        runtime = rendered['services']['market-runtime']
+        self.assertEqual(runtime['command'], ['python', '-m', 'alerts.runtime', '--profile', 'market'])
+        self.assertEqual(runtime['depends_on']['migrate']['condition'], 'service_completed_successfully')
+        self.assertNotIn('chart-alert-runtime', rendered['services'])
+        self.assertEqual(runtime['environment']['ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED'], 'true')
         for name,service in rendered['services'].items():
             if name not in ('web','chart-origin'):
                 self.assertEqual(service['environment']['ALERTS_DATABASE_JIT'],'off',name)
@@ -102,7 +113,7 @@ class DatabaseComposeTests(unittest.TestCase):
                 self.assertNotIn('ALERTS_DATABASE_EXPECTED_VERSION',service['environment'])
 
     def test_only_selected_production_worker_can_enable_jit(self):
-        for selected in ('chart-aggregation-worker','notify-worker','migrate','backup'):
+        for selected in ('notification-worker','migrate','backup'):
             with self.subTest(selected=selected):
                 key = 'MW_'+selected.upper().replace('-','_')+'_DATABASE_JIT'
                 rendered = self.render([Path('compose.production.yaml')],**{key:'on'})
@@ -115,3 +126,27 @@ class DatabaseComposeTests(unittest.TestCase):
         rendered = self.render([Path('compose.yaml')])
         volumes = rendered['services']['postgres']['volumes']
         self.assertEqual([volume['source'] for volume in volumes],['postgres14-data'])
+
+    def test_default_compose_uses_supervised_data_profile_without_legacy_workers(self):
+        services = self.render([Path('compose.yaml')])['services']
+        self.assertIn('data-worker', services)
+        self.assertEqual(services['data-worker']['command'],
+                         ['python', '-m', 'alerts.runtime', '--profile', 'data'])
+        self.assertEqual(services['data-worker']['depends_on']['migrate']['condition'],
+                         'service_completed_successfully')
+        self.assertNotIn('market-stream-worker', services)
+        self.assertNotIn('import-worker', services)
+
+    def test_notification_runtime_is_one_of_five_default_application_services(self):
+        services = self.render([Path('compose.yaml')])['services']
+        self.assertEqual(
+            {name for name in services if name in {
+                'web', 'api', 'market-runtime', 'data-worker', 'notification-worker'}},
+            {'web', 'api', 'market-runtime', 'data-worker', 'notification-worker'},
+        )
+        notification = services['notification-worker']
+        self.assertEqual(notification['command'],
+                         ['python', '-m', 'alerts.runtime', '--profile', 'notifications'])
+        self.assertEqual(notification['depends_on']['migrate']['condition'],
+                         'service_completed_successfully')
+        self.assertNotIn('api', notification['depends_on'])

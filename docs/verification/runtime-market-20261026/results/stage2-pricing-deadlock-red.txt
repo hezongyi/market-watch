@@ -1,0 +1,363 @@
+time="2026-10-27T21:05:44Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-20261027-fixture-supplier-1 mw-runtime-stage2-20261027-api-1 mw-runtime-stage2-20261027-market-runtime-1 mw-runtime-stage2-20261027-chart-alert-runtime-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+F                                                                        [100%]
+=================================== FAILURES ===================================
+____ test_quote_publication_and_composite_judgment_keep_dataset_lock_order _____
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fc0cb0d9050>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7fc0cc52cad0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7fc0cb0f2090>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7fc0cb0f20d0>
+parameters = [{'dataset_id': '4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f', 'start': 166200000, 'expected': True, 'expectation': 'fresh_source_tradeable', ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres database=runtime_stage2) at 0x7fc0dd8e1780>
+query = 'INSERT INTO market_live_minutes (dataset_id, start, expected, expectation, attempts, failures, last_result, confirmed...INT, %(quote_count)s::INTEGER, %(age_histogram)s::JSON, %(max_interarrival)s::BIGINT) RETURNING market_live_minutes.id'
+params = {'dataset_id': '4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f', 'start': 166200000, 'expected': True, 'expectation': 'fresh_source_tradeable', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.DeadlockDetected: deadlock detected
+E           DETAIL:  Process 101428 waits for ShareLock on transaction 152817; blocked by process 101417.
+E           Process 101417 waits for ShareLock on transaction 152819; blocked by process 101428.
+E           HINT:  See server log for query details.
+E           CONTEXT:  while locking tuple (0,2) in relation "market_datasets"
+E           SQL statement "SELECT 1 FROM ONLY "provider_96716e4811884301b45cf91be59ec775"."market_datasets" x WHERE "id"::pg_catalog.text OPERATOR(pg_catalog.=) $1::pg_catalog.text FOR KEY SHARE OF x"
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DeadlockDetected
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fc0cddc8710>
+
+    def test_quote_publication_and_composite_judgment_keep_dataset_lock_order(provider_pg, monkeypatch):
+        """A real quote writer must not hold LiveState while waiting on its reader's dataset."""
+        from alerts.config import settings
+        from alerts.live_pricing import account_key, publish_event
+        from alerts.market_contracts import DatasetIdentity, QuoteEvent
+        from alerts.storage import CompositeRevision, LiveState, MarketDataset, PricingOwner, RealtimeMapping
+    
+        factory, engine = provider_pg
+        ident, _, revision, _, stamp = composite_contracts.armed(factory, monkeypatch, mode="intrabar")
+        with factory.begin() as db:
+            assert composite_contracts.evaluate(db, ident, now=stamp) == []
+            target = db.get(RealtimeMapping, db.get(CompositeRevision, revision).mapping_id).target_dataset_id
+            identity = DatasetIdentity.model_validate(db.get(MarketDataset, target).identity)
+            owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
+            ownership, epoch = (owner.id, owner.token), owner.epoch
+            # The semantic helper's legacy quote omits sequence/identity. A wire
+            # publication must begin with the complete preceding QuoteEvent.
+            db.get(LiveState, target).quote = QuoteEvent(identity=identity, bid="1.110", ask="1.111",
+                tradeable=True, source_time=stamp, received_at=stamp, sequence=stamp,
+                connection_epoch=epoch).model_dump(mode="json")
+            schema = db.scalar(text("SELECT current_schema()"))
+        observer = create_engine(engine.url.update_query_dict({"options": f"-csearch_path={schema}"}),
+                                 pool_size=1, max_overflow=0)
+        quoted = QuoteEvent(identity=identity, bid="1.119", ask="1.120", tradeable=True,
+            source_time=stamp + 1000, received_at=stamp + 1000, sequence=stamp + 1000,
+            connection_epoch=epoch)
+        reader_at_state, release_reader, writer_started = (threading.Event() for _ in range(3))
+        context = threading.local()
+        writer_pids = []
+    
+        def before(connection, _cursor, statement, _parameters, _execution, _many):
+            role = getattr(context, "role", None)
+            if role == "writer" and not writer_pids:
+                writer_pids.append(connection.connection.driver_connection.info.backend_pid)
+                writer_started.set()
+            if (role == "reader" and not reader_at_state.is_set()
+                    and "FROM market_live_states" in statement and "FOR SHARE" in statement):
+                reader_at_state.set()
+                assert release_reader.wait(10), "quote writer did not reach the contested lock"
+    
+        def reader():
+            context.role = "reader"
+            with factory.begin() as db:
+                return composite_contracts.evaluate(db, ident, now=stamp + 1000)
+    
+        def writer():
+            context.role = "writer"
+            return publish_event(ownership, epoch, quoted, {identity.provider_symbol: identity}, now=stamp + 1000)
+    
+        event.listen(engine, "before_cursor_execute", before)
+        try:
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                reading = pool.submit(reader)
+                try:
+                    assert reader_at_state.wait(5), "judgment did not reach its shared LiveState read"
+                    writing = pool.submit(writer)
+                    assert writer_started.wait(5)
+                    deadline = time.monotonic() + 5
+                    with observer.connect() as connection:
+                        while time.monotonic() < deadline:
+                            if writing.done():
+                                writing.result()
+                                pytest.fail("quote committed while the judgment held its dataset lock")
+                            waiting = connection.scalar(text(
+                                "SELECT wait_event_type = 'Lock' FROM pg_stat_activity WHERE pid = :pid"
+                            ), {"pid": writer_pids[0]})
+                            connection.commit()
+                            if waiting:
+                                break
+                            time.sleep(.01)
+                        else:
+                            pytest.fail("quote writer did not contend with the judgment transaction")
+                    release_reader.set()
+                    assert reading.result(timeout=5) == []
+>                   assert writing.result(timeout=5) == "accepted"
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_market_runtime_postgres.py:501: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/concurrent/futures/thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_market_runtime_postgres.py:474: in writer
+    return publish_event(ownership, epoch, quoted, {identity.provider_symbol: identity}, now=stamp + 1000)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/live_pricing.py:420: in publish_event
+    dataset = db.get(MarketDataset, event.identity.key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:3845: in get
+    return self._get_impl(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4032: in _get_impl
+    return db_load_fn(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/loading.py:702: in _load_on_pk_identity
+    session.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2473: in execute
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2336: in _execute_internal
+    ) = compile_state_cls.orm_pre_session_exec(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:591: in orm_pre_session_exec
+    session._autoflush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:3200: in _autoflush
+    raise e.with_traceback(sys.exc_info()[2])
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:3189: in _autoflush
+    self.flush()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4536: in flush
+    self._flush(objects)
+<sqlalchemy generated warned() wrapper for sqlalchemy.orm.session.Session._flush>:2: in _flush
+    return target(fn, self, objects=objects)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/deprecations.py:281: in warned
+    return fn(*args, **kwargs)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4679: in _flush
+    with util.safe_reraise():
+/usr/local/lib/python3.11/site-packages/sqlalchemy/util/langhelpers.py:166: in __exit__
+    raise exc_value.with_traceback(exc_tb)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:4640: in _flush
+    flush_context.execute()
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:467: in execute
+    rec.execute(self)
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/unitofwork.py:643: in execute
+    util.preloaded.orm_persistence._save_obj(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:92: in _save_obj
+    _emit_insert_statements(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/persistence.py:1237: in _emit_insert_statements
+    result = connection.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres database=runtime_stage2) at 0x7fc0dd8e1780>
+query = 'INSERT INTO market_live_minutes (dataset_id, start, expected, expectation, attempts, failures, last_result, confirmed...INT, %(quote_count)s::INTEGER, %(age_histogram)s::JSON, %(max_interarrival)s::BIGINT) RETURNING market_live_minutes.id'
+params = {'dataset_id': '4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f', 'start': 166200000, 'expected': True, 'expectation': 'fresh_source_tradeable', ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.OperationalError: (raised as a result of Query-invoked autoflush; consider using a session.no_autoflush block if this flush is occurring prematurely)
+E           (psycopg.errors.DeadlockDetected) deadlock detected
+E           DETAIL:  Process 101428 waits for ShareLock on transaction 152817; blocked by process 101417.
+E           Process 101417 waits for ShareLock on transaction 152819; blocked by process 101428.
+E           HINT:  See server log for query details.
+E           CONTEXT:  while locking tuple (0,2) in relation "market_datasets"
+E           SQL statement "SELECT 1 FROM ONLY "provider_96716e4811884301b45cf91be59ec775"."market_datasets" x WHERE "id"::pg_catalog.text OPERATOR(pg_catalog.=) $1::pg_catalog.text FOR KEY SHARE OF x"
+E           [SQL: INSERT INTO market_live_minutes (dataset_id, start, expected, expectation, attempts, failures, last_result, confirmed_at, first_attempt, last_attempt, quote_count, age_histogram, max_interarrival) VALUES (%(dataset_id)s::VARCHAR, %(start)s::BIGINT, %(expected)s, %(expectation)s::VARCHAR, %(attempts)s::INTEGER, %(failures)s::INTEGER, %(last_result)s::VARCHAR, %(confirmed_at)s::BIGINT, %(first_attempt)s::BIGINT, %(last_attempt)s::BIGINT, %(quote_count)s::INTEGER, %(age_histogram)s::JSON, %(max_interarrival)s::BIGINT) RETURNING market_live_minutes.id]
+E           [parameters: {'dataset_id': '4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f', 'start': 166200000, 'expected': True, 'expectation': 'fresh_source_tradeable', 'attempts': 0, 'failures': 0, 'last_result': 'pending', 'confirmed_at': None, 'first_attempt': 0, 'last_attempt': 0, 'quote_count': 1, 'age_histogram': Json({'0': 1}), 'max_interarrival': 1000}]
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: OperationalError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_quote_publication_and_composite_judgment_keep_dataset_lock_order
+1 failed in 4.21s
+

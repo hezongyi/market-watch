@@ -4,6 +4,7 @@ import threading
 from contextlib import nullcontext
 from types import SimpleNamespace
 
+import pytest
 from alerts import live_pricing as live
 from alerts import oanda_worker as worker
 from alerts.config import settings
@@ -13,6 +14,13 @@ from sqlalchemy import select
 from test_live_pricing import running as _running
 
 running = _running
+
+
+@pytest.fixture(autouse=True)
+def confirmation_health(monkeypatch):
+    # Transport/lifecycle tests substitute the confirmation path. Persisted
+    # confirmation health has its own database regression.
+    monkeypatch.setattr(worker, "confirmation_error", lambda *_: None)
 
 
 def test_confirmations_overlap_transport_but_commit_serially_with_owner_fencing(monkeypatch):

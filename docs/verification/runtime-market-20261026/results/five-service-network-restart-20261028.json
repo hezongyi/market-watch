@@ -1,0 +1,173 @@
+{
+  "at": 1127664.825183675,
+  "business_at": 166414750,
+  "roles": [
+    {
+      "group": "market",
+      "role": "pricing",
+      "deployment": "stage2_network_five_stream_20261028",
+      "boot_id": "c1d64d7c-6bd7-42bb-97df-02831e42ec64",
+      "started_at": 166370025,
+      "starts": [
+        166215218,
+        166370025
+      ],
+      "state": "running",
+      "checked_at": 166410699,
+      "last_success_at": 166410699,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "realtime",
+      "deployment": "stage2_network_five_stream_20261028",
+      "boot_id": "c1d64d7c-6bd7-42bb-97df-02831e42ec64",
+      "started_at": 166370085,
+      "starts": [
+        166215259,
+        166370085
+      ],
+      "state": "idle",
+      "checked_at": 166400457,
+      "last_success_at": 166400457,
+      "error_type": null,
+      "stale_after_ms": 60000
+    },
+    {
+      "group": "market",
+      "role": "composite_aggregate",
+      "deployment": "stage2_network_five_stream_20261028",
+      "boot_id": "c1d64d7c-6bd7-42bb-97df-02831e42ec64",
+      "started_at": 166370090,
+      "starts": [
+        166215264,
+        166370090
+      ],
+      "state": "idle",
+      "checked_at": 166413106,
+      "last_success_at": 166413106,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "alert_indicator",
+      "deployment": "stage2_network_five_stream_20261028",
+      "boot_id": "c1d64d7c-6bd7-42bb-97df-02831e42ec64",
+      "started_at": 166370094,
+      "starts": [
+        166215271,
+        166370094
+      ],
+      "state": "idle",
+      "checked_at": 166410654,
+      "last_success_at": 166410654,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "chart_alert",
+      "deployment": "stage2_network_five_stream_20261028",
+      "boot_id": "c1d64d7c-6bd7-42bb-97df-02831e42ec64",
+      "started_at": 166370096,
+      "starts": [
+        166215280,
+        166370096
+      ],
+      "state": "idle",
+      "checked_at": 166411699,
+      "last_success_at": 166411699,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "market_ownership",
+      "deployment": "stage2_network_five_stream_20261028",
+      "boot_id": "c1d64d7c-6bd7-42bb-97df-02831e42ec64",
+      "started_at": 166370104,
+      "starts": [
+        166215283,
+        166370104
+      ],
+      "state": "idle",
+      "checked_at": 166410338,
+      "last_success_at": 166410338,
+      "error_type": null,
+      "stale_after_ms": 15000
+    }
+  ],
+  "source": {
+    "ready": true,
+    "epoch": 3,
+    "owner_valid": true,
+    "revision": 383,
+    "confirmed_end": 166380000,
+    "observation_mode": "stream_quote",
+    "received_age_ms": 558
+  },
+  "aggregate_revision": 4,
+  "rules": [
+    {
+      "id": "75469258-53e9-4abe-89d0-ce56733e593b",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "f8642cb8-15fb-42ee-a8b2-c2f36564b591",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "2e537eea-f2cd-433c-84df-06116f03d87e",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "9ac74d6c-c679-492a-af11-9ca441962cbd",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "95e0d5fd-d5cb-422a-a948-ca1632ec5cea",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "a9a51291-4c38-4843-8d6b-b5c71b5e4b57",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "25578f48-4479-447a-9389-7c660eaeea97",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    }
+  ],
+  "signals": [],
+  "phase": "restart",
+  "synthetic": true
+}

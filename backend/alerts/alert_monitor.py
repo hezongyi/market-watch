@@ -7,10 +7,12 @@ Missed turns are coalesced, never overlapped or replayed in a catch-up burst.
 import logging
 import time
 
+from .runtime_health import RuntimeOwnershipLost, progress
+
 log = logging.getLogger(__name__)
 
 
-def run(stop, *, period=0.75, monotonic=time.monotonic, on_alert=None, on_turn=None, report_health=None):
+def run(stop, *, period=0.25, monotonic=time.monotonic, on_alert=None, on_turn=None, report_health=None):
     from .chart_alert_worker import step
 
     if period <= 0:
@@ -25,12 +27,17 @@ def run(stop, *, period=0.75, monotonic=time.monotonic, on_alert=None, on_turn=N
         error = None
         chart_done = started
         try:
-            step(on_evaluated=on_alert)
+            errors = []
+            step(on_evaluated=on_alert, on_error=lambda value: errors.append(value) if not errors else None)
+            error = errors[0] if errors else None
             chart_done = monotonic()
+        except RuntimeOwnershipLost:
+            raise
         except Exception as exc:
             error = type(exc).__name__
             log.exception('Chart alert monitor iteration failed')
         finished = monotonic()
+        progress(state="degraded" if error else "idle", error=error)
         deadline += period
         overrun = finished >= deadline
         if error:

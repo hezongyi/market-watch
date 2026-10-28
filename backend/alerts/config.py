@@ -11,6 +11,9 @@ class Settings(BaseSettings):
     database_max_overflow: int = Field(default=0, ge=0, le=20)
     database_pool_timeout: int = Field(default=15, ge=1, le=120)
     database_application_name: str = "market-watch"
+    runtime_deployment: str = Field(default="default", pattern=r"^[a-zA-Z0-9_-]{1,64}$")
+    runtime_startup_grace_seconds: int = Field(default=60, ge=0, le=600)
+    market_runtime_chart_alert_enabled: bool = True
     # Inherit the server/database/role policy unless this service opts in or out.
     database_jit: Literal['inherit', 'on', 'off'] = 'inherit'
     # Acceptance-only gate; production and explicit old-version rollback omit it.
@@ -74,6 +77,9 @@ class Settings(BaseSettings):
     oanda_acquisition_mode: Literal["stream", "rest_batch"] = "stream"
     oanda_rest_interval_seconds: float = Field(default=2, ge=1, le=60)
     oanda_stream_enabled: bool = False
+    # Legacy standalone pricing owns native latest polling. New profiles move
+    # provider chart work to the provider service (data profile in stage 3A).
+    oanda_native_latest_owner: Literal["pricing", "provider"] = "pricing"
     oanda_resident_symbols: str = "EUR_USD,XAU_USD"
     oanda_calendar_version: str = "ny17-candidate-v1"
     oanda_calendar_verified: bool = False

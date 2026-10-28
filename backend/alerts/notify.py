@@ -3,7 +3,7 @@
 import argparse
 import hashlib
 import secrets
-import time
+import threading
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -57,7 +57,7 @@ def quiet_until(moment: datetime, config: dict):
 
 
 def claim():
-    if not settings.delivery_enabled or not settings.ntfy_topic:
+    if not settings.ntfy_topic:
         return None
     now = now_ms()
     with transaction() as db:
@@ -67,8 +67,13 @@ def claim():
         candidate = db.execute(
             select(Outbox.id, Outbox.notification_id)
             .join(Notification, Notification.id == Outbox.notification_id)
-            .join(SignalRow, SignalRow.id == Notification.signal_id)
-            .where(eligible, SignalRow.chart_alert_id.is_not(None), SignalRow.watch_id.is_(None))
+            .outerjoin(SignalRow, SignalRow.id == Notification.signal_id)
+            .where(eligible, or_(
+                Notification.kind == "test",
+                (Notification.kind == "system") & settings.delivery_enabled,
+                (Notification.kind == "signal") & settings.delivery_enabled
+                & SignalRow.chart_alert_id.is_not(None) & SignalRow.watch_id.is_(None),
+            ))
             .order_by(Outbox.next_at)
             .limit(1)
         ).first()
@@ -89,8 +94,10 @@ def claim():
         )
         if not row:
             return None
-        signal = db.get(SignalRow, note.signal_id)
-        if note.ack_at or not current_signal(signal) or note.status == "retired":
+        signal = db.get(SignalRow, note.signal_id) if note.signal_id else None
+        if note.ack_at or note.status == "retired" or (
+            note.kind == "signal" and (not signal or not current_signal(signal))
+        ):
             row.status = "cancelled"
             return None
         pref = db.get(Preference, "notifications")
@@ -103,24 +110,48 @@ def claim():
         token = secrets.token_urlsafe(32)
         # Keep attempt-scoped hashes: an earlier accepted request may have timed out.
         # Its confirmation button must remain usable even after a retry.
-        note.ack_hash = hashlib.sha256(token.encode()).hexdigest()
-        db.add(AckGrant(token_hash=note.ack_hash, notification_id=note.id))
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        note.ack_hash = token_hash
+        if note.kind == "test":
+            test_id = note.payload["test_id"]
+            pref = db.get(Preference, "test_notification:" + test_id)
+            if not pref:
+                row.status = "cancelled"
+                return None
+            hashes = list(pref.value.get("token_hashes", []))
+            if token_hash not in hashes:
+                hashes.append(token_hash)
+            pref.value = {**pref.value, "token_hash": token_hash,
+                          "token_hashes": hashes, "expires": now + 86400000}
+            ack_url = f"{settings.public_url}/api/notification-tests/{test_id}/ack"
+            ack_label = "确认测试"
+        else:
+            db.add(AckGrant(token_hash=token_hash, notification_id=note.id))
+            ack_url = f"{settings.public_url}/api/notification-actions/{note.id}/ack"
+            ack_label = "确认"
         row.status = "sending"
         row.lease_until = now + 60_000
         row.attempts += 1
-        signal = db.get(SignalRow, note.signal_id)
-        occurred = instant(signal.occurred_at).astimezone(ZoneInfo("Asia/Shanghai")).isoformat()
+        if note.kind == "signal":
+            occurred = instant(signal.occurred_at).astimezone(ZoneInfo("Asia/Shanghai")).isoformat()
+            title = signal_title(signal)
+            message = signal_message(signal) if signal.evidence.get("chart_alert") else f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {occurred}\n信号 {signal.id}\n请使用“确认”停止后续提醒。"
+            click = f"{settings.public_url}/advanced-charts?panel=notifications&signal={signal.id}"
+        else:
+            title = note.payload.get("title", "守望运行通知")
+            message = note.payload.get("message", "")
+            click = settings.public_url + "/settings"
         body = {
             "topic": settings.ntfy_topic,
-            "title": signal_title(signal),
-            "message": signal_message(signal) if signal.evidence.get("chart_alert") else f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {occurred}\n信号 {signal.id}\n请使用“确认”停止后续提醒。",
+            "title": title,
+            "message": message,
             "priority": 1 if config["mode"] == "companion" else config["priority"],
-            "click": f"{settings.public_url}/advanced-charts?panel=notifications&signal={signal.id}",
+            "click": click,
             "actions": [
                 {
                     "action": "http",
-                    "label": "确认",
-                    "url": f"{settings.public_url}/api/notification-actions/{note.id}/ack",
+                    "label": ack_label,
+                    "url": ack_url,
                     "method": "POST",
                     "headers": {"Authorization": f"Bearer {token}"},
                     "clear": True,
@@ -162,17 +193,26 @@ def deliver_once(client=None):
             # Record the HTTP outcome, but a newer lease owns task state.
             return True
         row.lease_until = None
-        if note.ack_at or note.status == "retired" or row.status == "cancelled" or not current_signal(db.get(SignalRow, note.signal_id)):
+        signal = db.get(SignalRow, note.signal_id) if note.signal_id else None
+        if note.ack_at or note.status == "retired" or row.status == "cancelled" or (
+            note.kind == "signal" and (not signal or not current_signal(signal))
+        ):
             row.status = "cancelled"
         elif accepted:
             row.status = "accepted"
             row.provider_id = detail.get("provider_id")
             note.status = "server_accepted"
+            if note.kind == "test":
+                db.add(Audit(kind="notification_test_accepted",
+                             details={"test_id": note.payload["test_id"]}))
         else:
             row.error = str(detail)
             row.status = "blocked" if detail.get("status_code") in (401, 403) else "pending"
             row.next_at = now_ms() + min(300, 2 ** min(row.attempts, 8)) * 1000
             note.status = "delivery_error"
+            if note.kind == "test":
+                db.add(Audit(kind="notification_test_failed_or_unknown",
+                             details={"test_id": note.payload["test_id"]}))
     return True
 
 
@@ -187,21 +227,43 @@ class _Existing:
         return False
 
 
+def run(stop, client=None):
+    last = 0
+    owned_client = client is None
+    client = client or httpx.Client(timeout=15)
+    try:
+        while not stop.is_set():
+            error = None
+            try:
+                deliver_once(client)
+                if now_ms() - last > 60_000:
+                    with transaction() as db:
+                        db.add(Audit(kind="notify_heartbeat", details={}))
+                    last = now_ms()
+            except Exception as exc:
+                error = exc
+                import logging
+
+                logging.getLogger(__name__).exception("Notification delivery loop failed")
+            from .runtime_health import progress
+
+            progress(error=error)
+            stop.wait(2)
+    finally:
+        if owned_client:
+            client.close()
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--once", action="store_true")
     args = parser.parse_args()
     bootstrap()
-    last = 0
-    while True:
+    if args.once:
         deliver_once()
-        if now_ms() - last > 60_000:
-            with transaction() as db:
-                db.add(Audit(kind="notify_heartbeat", details={}))
-            last = now_ms()
-        if args.once:
-            return
-        time.sleep(2)
+        return
+    stopped = threading.Event()
+    run(stopped)
 
 
 if __name__ == "__main__":

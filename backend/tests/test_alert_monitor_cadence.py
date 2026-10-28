@@ -4,8 +4,12 @@ import pytest
 from alerts import alert_monitor, chart_alert_worker
 
 
-@pytest.mark.parametrize('cost,expected', [(.3, [0, .75, 1.5]), (1.3, [0, 1.5, 3])])
-def test_chart_monitor_deadlines_coalesce_overruns(monkeypatch, cost, expected):
+@pytest.mark.parametrize(
+    'period,cost,expected',
+    [(.75, .3, [0, .75, 1.5]), (.75, 1.3, [0, 1.5, 3]),
+     (.25, .1, [0, .25, .5]), (.25, .3, [0, .5, 1.0])],
+)
+def test_chart_monitor_deadlines_coalesce_overruns(monkeypatch, period, cost, expected):
     stop = Event()
     clock, starts, reports = [0.0], [], []
 
@@ -21,24 +25,27 @@ def test_chart_monitor_deadlines_coalesce_overruns(monkeypatch, cost, expected):
 
     monkeypatch.setattr(chart_alert_worker, 'step', step)
     monkeypatch.setattr(stop, 'wait', wait)
-    alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=reports.append, report_health=lambda *args, **kwargs: None)
+    alert_monitor.run(stop, period=period, monotonic=lambda: clock[0], on_turn=reports.append,
+                      report_health=lambda *args, **kwargs: None)
     assert starts == expected
-    assert all(row['overrun'] == (cost > .75) for row in reports)
+    assert all(row['overrun'] == (cost > period) for row in reports)
 
 
-def test_monitor_errors_back_off(monkeypatch):
+@pytest.mark.parametrize('period', [.25, .75])
+def test_monitor_errors_back_off(monkeypatch, period):
     stop, clock, turns = Event(), [0.0], []
 
     def failed(**kwargs):
         raise ValueError('test failure')
 
     def wait(seconds):
-        assert seconds >= .75
+        assert seconds >= period
         stop.set()
 
     monkeypatch.setattr(chart_alert_worker, 'step', failed)
     monkeypatch.setattr(stop, 'wait', wait)
-    alert_monitor.run(stop, monotonic=lambda: clock[0], on_turn=turns.append, report_health=lambda *args, **kwargs: None)
+    alert_monitor.run(stop, period=period, monotonic=lambda: clock[0], on_turn=turns.append,
+                      report_health=lambda *args, **kwargs: None)
     assert turns[0]['error'] == 'ValueError'
 
 

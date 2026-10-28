@@ -1,0 +1,129 @@
+...............................F........................................ [ 66%]
+....................................                                     [100%]
+=================================== FAILURES ===================================
+_________ test_api_independent_input_aggregate_and_alert_runtime_chain _________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7faf7c0a8dd0>
+
+    def test_api_independent_input_aggregate_and_alert_runtime_chain(provider_pg, monkeypatch):
+        """Actual runtime profiles consume a new PG input without an API owner."""
+        factory, _ = provider_pg
+        monkeypatch.setattr("alerts.storage.Session", factory)
+        from alerts import alert_runtime, storage
+    
+        monkeypatch.setattr("alerts.config.settings.database_pool_size", 8)
+        with factory() as db:
+            schema = db.scalar(text("SELECT current_schema()"))
+        runtime_url = factory.kw["bind"].url.update_query_dict(
+            {"options": f"-csearch_path={schema}"})
+        market_engine = storage.make_engine(str(runtime_url))
+        runtime_factory = sessionmaker(market_engine, expire_on_commit=False)
+        monkeypatch.setattr(storage, "engine", market_engine)
+        monkeypatch.setattr(storage, "Session", runtime_factory)
+        monkeypatch.setattr(storage, "bootstrap", lambda *_args, **_kwargs: None)
+        monkeypatch.setattr("alerts.config.settings.market_runtime_chart_alert_enabled", False)
+        monkeypatch.setattr("alerts.config.settings.oanda_native_latest_owner", "provider")
+        ident, _, revision, seam, stamp = composite_contracts.armed(factory, monkeypatch,
+            condition={"relation": "cross_up",
+                "left": {"kind": "price"},
+                "right": {"kind": "constant", "value": "1.112"}})
+        next_end = seam + 660010
+        clock = [stamp]
+        monkeypatch.setattr("alerts.chart_alert_worker.now_ms", lambda: clock[0])
+        stop_market, stop_alert = threading.Event(), threading.Event()
+        failures = []
+    
+        def run_profile(profile, stop):
+            try:
+                if profile == "market":
+                    market_runtime.run(stop=stop, handle_signals=False)
+                else:
+                    alert_runtime.run(stop=stop, handle_signals=False)
+            except BaseException as error:
+                failures.append((profile, error))
+    
+        market_thread = threading.Thread(target=run_profile, args=("market", stop_market))
+        alert_thread = threading.Thread(target=run_profile, args=("alert", stop_alert))
+        market_thread.start()
+        alert_thread.start()
+    
+        def wait_for(predicate, timeout=15):
+            deadline = time.monotonic() + timeout
+            while time.monotonic() < deadline:
+                if predicate():
+                    return
+                if failures:
+                    pytest.fail(f"Runtime profile failed: {failures!r}")
+                time.sleep(.05)
+            with factory() as db:
+                alert = db.get(ChartAlert, ident)
+                details = {
+                    "alert": {"status": alert.status, "health": alert.health,
+                              "reason": alert.health_reason, "runtime": alert.runtime},
+                    "runtime_roles": [db.get(Preference, runtime_health.key(role)).value
+                        for role in ("pricing", "realtime", "composite_aggregate",
+                                     "alert_indicator", "chart_alert", "market_ownership")],
+                    "aggregate": db.get(CompositeAggregateTask, (revision, "M1")).applied_input_revision,
+                    "input": db.get(CompositePreparation, revision).input_revision,
+                }
+            pytest.fail(f"Runtime profiles did not advance the expected input: {details!r}")
+    
+        try:
+            def prepared():
+                with factory() as db:
+                    row = db.get(ChartAlert, ident)
+                    return row.health == "ready"
+    
+            wait_for(prepared)
+            clock[0] = next_end
+            add_tail(factory, revision, [minute(seam + 600000, volume="3", close="1.119")],
+                     observed_at=next_end)
+            composite_contracts.live(factory, revision, next_end, seam + 660000)
+    
+            def signaled():
+                with factory() as db:
+                    return db.scalar(select(SignalRow.id).where(
+                        SignalRow.chart_alert_id == ident)) is not None
+    
+>           wait_for(signaled)
+
+backend/tests/test_market_runtime_postgres.py:533: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+predicate = <function test_api_independent_input_aggregate_and_alert_runtime_chain.<locals>.signaled at 0x7faf76ae6520>
+timeout = 15
+
+    def wait_for(predicate, timeout=15):
+        deadline = time.monotonic() + timeout
+        while time.monotonic() < deadline:
+            if predicate():
+                return
+            if failures:
+                pytest.fail(f"Runtime profile failed: {failures!r}")
+            time.sleep(.05)
+        with factory() as db:
+            alert = db.get(ChartAlert, ident)
+            details = {
+                "alert": {"status": alert.status, "health": alert.health,
+                          "reason": alert.health_reason, "runtime": alert.runtime},
+                "runtime_roles": [db.get(Preference, runtime_health.key(role)).value
+                    for role in ("pricing", "realtime", "composite_aggregate",
+                                 "alert_indicator", "chart_alert", "market_ownership")],
+                "aggregate": db.get(CompositeAggregateTask, (revision, "M1")).applied_input_revision,
+                "input": db.get(CompositePreparation, revision).input_revision,
+            }
+>       pytest.fail(f"Runtime profiles did not advance the expected input: {details!r}")
+E       Failed: Runtime profiles did not advance the expected input: {'alert': {'status': 'paused', 'health': 'blocked', 'reason': '组合实时输入已过期；告警已暂停，恢复后需明确重启', 'runtime': {'quote_health': 'ready', 'observation_mode': 'stream_quote', 'composite_revision_id': '7f646594-9594-45cf-939d-c61a7921b87b', 'input_revision': 1, 'history_version_id': '2f38452a-cf01-4265-8bdb-9874bf543436', 'seam_policy': 'reject', 'indicators': [], 'processed_input_revision': 1, 'confirmed_end': 166200000, 'epoch': 1, 'recovering': False, 'last_start': 166140000, 'readiness': {'ready': True, 'status': 'ready', 'dependencies': [{'kind': 'price', 'start': 166140000, 'end': 166200000, 'coverage_complete': True, 'source_confirmed': True, 'seam_dependency': False}], 'last_outcome': 'initial_baseline'}}}, 'runtime_roles': [{'group': 'market', 'role': 'pricing', 'deployment': 'default', 'boot_id': '6c12bc61-aa4c-4103-a531-6d8aa9310f92', 'started_at': 1793133588947, 'starts': [1793133588947], 'state': 'disabled', 'checked_at': 1793133604032, 'last_success_at': 1793133604032, 'error_type': None, 'stale_after_ms': 15000}, {'group': 'market', 'role': 'realtime', 'deployment': 'default', 'boot_id': '6c12bc61-aa4c-4103-a531-6d8aa9310f92', 'started_at': 1793133588958, 'starts': [1793133588958], 'state': 'idle', 'checked_at': 1793133604055, 'last_success_at': 1793133604055, 'error_type': None, 'stale_after_ms': 60000}, {'group': 'market', 'role': 'composite_aggregate', 'deployment': 'default', 'boot_id': '6c12bc61-aa4c-4103-a531-6d8aa9310f92', 'started_at': 1793133588961, 'starts': [1793133588961], 'state': 'idle', 'checked_at': 1793133602277, 'last_success_at': 1793133602277, 'error_type': None, 'stale_after_ms': 15000}, {'group': 'market', 'role': 'alert_indicator', 'deployment': 'default', 'boot_id': '6c12bc61-aa4c-4103-a531-6d8aa9310f92', 'started_at': 1793133588980, 'starts': [1793133588980], 'state': 'idle', 'checked_at': 1793133604498, 'last_success_at': 1793133604498, 'error_type': None, 'stale_after_ms': 15000}, {'group': 'market', 'role': 'chart_alert', 'deployment': 'default', 'boot_id': '82cd4c73-6fb7-412a-a51d-695f4c28fa0f', 'started_at': 1793133588949, 'starts': [1793133588949], 'state': 'idle', 'checked_at': 1793133599733, 'last_success_at': 1793133599733, 'error_type': None, 'stale_after_ms': 15000}, {'group': 'market', 'role': 'market_ownership', 'deployment': 'default', 'boot_id': '6c12bc61-aa4c-4103-a531-6d8aa9310f92', 'started_at': 1793133588984, 'starts': [1793133588984], 'state': 'idle', 'checked_at': 1793133604192, 'last_success_at': 1793133604192, 'error_type': None, 'stale_after_ms': 15000}], 'aggregate': 2, 'input': 2}
+
+backend/tests/test_market_runtime_postgres.py:514: Failed
+=============================== warnings summary ===============================
+backend/tests/test_chart_alert_postgres.py: 20 warnings
+  /usr/local/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_api_independent_input_aggregate_and_alert_runtime_chain
+1 failed, 107 passed, 20 warnings in 168.47s (0:02:48)
+

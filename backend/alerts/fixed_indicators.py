@@ -228,38 +228,52 @@ def gap_before(previous_end, start, phase, profiles):
     return False
 
 
-def input_rows(db, run):
+def input_rows(db, run, *, limit=None):
     """Forward indexed artifacts only; wait for complete composite waterline."""
     from .composite_aggregates import read
 
+    limit = PAGE_SIZE if limit is None else limit
     version, revision, phase, profiles = _context(db, run)
     seam_bucket = period(revision.seam, run.timeframe, phase)[0] if revision else run.target_end
     rows = []
     if run.cursor < min(seam_bucket, run.target_end):
         rows = read_artifact(db, version.id, run.timeframe, start=run.cursor,
-            end=min(seam_bucket, run.target_end), limit=PAGE_SIZE)
-    if revision and len(rows) < PAGE_SIZE and run.target_end > seam_bucket:
+            end=min(seam_bucket, run.target_end), limit=limit)
+    if revision and len(rows) < limit and run.target_end > seam_bucket:
         tail = read(db, revision.id, run.timeframe, run.input_revision, after=max(run.cursor, seam_bucket),
-            before=run.target_end, count=PAGE_SIZE - len(rows), now=run.target_end, newest_first=False)
+            before=run.target_end, count=limit - len(rows), now=run.target_end, newest_first=False)
         if tail is None:
             return None
         rows += tail
     return rows, phase, profiles
 
 
-def claim(run_id=None):
+def claim(run_id=None, *, alert_priority=False):
+    if alert_priority and not run_id:
+        raise ValueError("Realtime indicators require an exact active dependency")
     with transaction() as db:
+        from .runtime_health import assert_current
+
+        assert_current(db)
         stamp = now_ms()
         query = select(FixedIndicatorRun).where(FixedIndicatorRun.status == "pending", FixedIndicatorRun.algorithm.in_((*ALGORITHMS, *OBSERVED_ALGORITHMS)),
             FixedIndicatorRun.lease_until <= stamp, FixedIndicatorRun.next_at <= stamp)
         if run_id:
             query = query.where(FixedIndicatorRun.id == run_id)
-        from .indicator_demands import priority, warmup_capacity
-        order=priority(db,FixedIndicatorRun.id,stamp,kind='fixed')
-        query=query.where(warmup_capacity(FixedIndicatorRun,FixedIndicatorRun.id,stamp))
+        if alert_priority:
+            # Only a ready checkpoint's small live suffix may bypass display
+            # warmup capacity. History initialization/long repair stays in data.
+            order = FixedIndicatorRun.updated_at
+        else:
+            from .indicator_demands import priority, warmup_capacity
+
+            order = priority(db, FixedIndicatorRun.id, stamp, kind="fixed")
+            query = query.where(warmup_capacity(FixedIndicatorRun, FixedIndicatorRun.id, stamp))
         run = db.scalar(query.order_by(order, FixedIndicatorRun.updated_at, FixedIndicatorRun.id)
             .with_for_update(skip_locked=True).limit(1))
         if not run:
+            return None
+        if alert_priority and not realtime_suffix_ready(db, run):
             return None
         run.lease_token, run.lease_until, run.updated_at = uid(), stamp + 60000, stamp
         return {"id": run.id, "token": run.lease_token, "cursor": run.cursor}
@@ -342,6 +356,9 @@ def _lock(db, ownership):
 
 def commit(ownership, result):
     with transaction() as db:
+        from .runtime_health import assert_current
+
+        assert_current(db)
         run = _lock(db, ownership)
         if result is None:
             run.next_at = now_ms() + 1000
@@ -357,21 +374,28 @@ def commit(ownership, result):
         run.lease_token, run.lease_until, run.updated_at = None, 0, now_ms()
 
 
-def indicator_tick(run_id=None):
-    owner = claim(run_id)
+def indicator_tick(run_id=None, *, alert_priority=False, raise_errors=False):
+    owner = claim(run_id, alert_priority=alert_priority)
     if not owner:
         return False
     try:
         commit(owner, build(owner))
     except Exception as error:
         with transaction() as db:
+            from .runtime_health import assert_current
+
+            assert_current(db)
             try:
                 run = _lock(db, owner)
             except TimeoutError:
+                if raise_errors:
+                    raise error
                 return True
             run.attempts += 1
             run.error, run.next_at = type(error).__name__, now_ms() + min(60000, 1000 * 2 ** min(run.attempts, 6))
             run.lease_token, run.lease_until, run.updated_at = None, 0, now_ms()
+        if raise_errors:
+            raise
     return True
 
 
@@ -391,6 +415,47 @@ def outputs(db, run, start, end):
             raise ValueError("Fixed indicator output checksum mismatch")
         rows += [row for row in json.loads(raw) if left <= row["start"] < right]
     return sorted(rows, key=lambda row: row["start"])
+
+
+def realtime_suffix_ready(db, run):
+    """Admit at most eight live bars after an initialized durable checkpoint."""
+    from .composite_chart import SPAN
+
+    state = run.state.get("state") or {}
+    if (run.status != "pending" or not run.revision_id or not state
+            or state.get("last_end") != run.cursor
+            or not 0 <= run.target_end - run.cursor <= 8 * SPAN[run.timeframe]):
+        return False
+    previous = outputs(db, run, run.cursor - SPAN[run.timeframe], run.cursor)
+    if not previous or not previous[-1].get("initialized"):
+        return False
+    inputs = input_rows(db, run, limit=9)
+    if inputs is None:
+        return False
+    rows, _, _ = inputs
+    return len(rows) <= 8 and (not rows or rows[-1]["end"] >= run.target_end)
+
+
+def alert_append(db, run):
+    """Read-only short suffix from a verified checkpoint; never publish it.
+
+    Initialization and long repairs remain owned by the durable worker. Both
+    readers use the same fixed revision, gap checks and numerical calculation.
+    """
+    from .composite_chart import SPAN
+
+    if (run.status != "pending" or not run.revision_id or not run.parent_id or run.error
+            or not run.state.get("state")
+            or not 0 <= run.target_end - run.cursor <= 8 * SPAN[run.timeframe]):
+        return None
+    inputs = input_rows(db, run)
+    if inputs is None:
+        return None
+    rows, phase, profiles = inputs
+    if len(rows) > 8 or rows and rows[-1]["end"] < run.target_end:
+        return None
+    revision = db.get(CompositeRevision, run.revision_id)
+    return calculate_inputs(run, rows, phase, profiles, seam=revision.seam)
 
 
 def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='display', display_retry=None, client=None, consumers=(), foreground=False, input_policy=STRICT):
@@ -425,6 +490,13 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
             "cursor": run.cursor, "target_end": run.target_end, "input_revision": run.input_revision,
             "algorithm": run.algorithm, "error": run.error, "next_at": run.next_at,
             "parent_run_id": run.parent_id, "reused_prefix_end": run.prefix_end}
+        decision_state = run.state
+        appended = alert_append(db, run) if purpose == "alert" and provisional else None
+        if appended is not None:
+            rows += [row for row in appended["rows"] if start <= row["start"] < end]
+            decision_state = appended["state"]
+            status["execution"] = {"path": "alert-checkpoint-suffix",
+                                   "calculation_steps": len(appended["rows"])}
         if artifact_rows is not None:
             status['execution'] = {'path': 'durable-fixed', 'input_rows': artifact_rows,
                 'result_cache': 'hit' if run.status == 'complete' else
@@ -480,9 +552,9 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                     rows = [row for row in rows if row['start'] < repaired['affected']]
                     rows += [row for row in repaired['rows'] if start <= row['start'] < end]
                     display = repaired['display'] or display
-        elif run.status == "complete" and provisional and (end > run.target_end or tail is not page["bars"]):
+        elif (run.status == "complete" or appended is not None) and provisional and (end > run.target_end or tail is not page["bars"]):
             _, _, phase, profiles = _context(db, run)
-            engine = IndicatorState(run.spec, run.state)
+            engine = IndicatorState(run.spec, decision_state)
             for bar in tail:
                 if bar["start"] < run.target_end:
                     continue
@@ -500,13 +572,15 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                 if display is not None:
                     display = engine.last_presentation | {
                         "history_complete": True, "history_revision": run.id}
-                trial = IndicatorState(run.spec, run.state)
+                trial = IndicatorState(run.spec, decision_state)
                 trial.step({**row, "complete": True})
                 if start <= bar["start"] < end:
                     rows.append({"start": bar["start"], "values": values, "provisional": True,
                         **({"break_before": True} if row["gap_before"] else {}),
                         "dependency_origin": trial.state.get("origin"), "seam_dependency": trial.state.get("seam", False),
                         "initialized": trial.initialized(values)})
+                    if appended is not None:
+                        status["provisional_ready"] = trial.initialized(values)
                 break
         result = presentation(spec, rows, display)
         available = {row['start'] for row in rows}

@@ -1,11 +1,9 @@
 """Authenticated chart APIs with optimistic concurrency and bounded input."""
 
 import asyncio
-import json
-import re
 
 from fastapi import APIRouter, Depends, HTTPException, Request
-from fastapi.responses import JSONResponse, Response, StreamingResponse
+from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import delete, select
 
@@ -78,22 +76,6 @@ class ExportQuery(BaseModel):
     input_revision: int | None = Field(default=None, ge=0)
 
 
-class ProviderSubscription(BaseModel):
-    client: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
-    listener: str = Field(min_length=1, max_length=100)
-    instrument: str = Field(min_length=1, max_length=80)
-    timeframe: str
-    cursor: int = Field(default=0, ge=0)
-    revision: int = Field(default=0, ge=0)
-    observed_at: int = Field(default=0, ge=0)
-    indicators: list[dict] = Field(default_factory=list, max_length=1)
-
-
-class ProviderUnsubscribe(BaseModel):
-    client: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9_-]+$")
-    listener: str = Field(min_length=1, max_length=100)
-
-
 def router(authenticated):
     r = APIRouter(prefix="/api/charts", dependencies=[Depends(authenticated)])
 
@@ -134,50 +116,10 @@ def router(authenticated):
             raise HTTPException(422, str(error)) from None
 
     @r.post("/provider/subscribe")
-    def provider_subscribe(body: ProviderSubscription):
-        from .provider_service import subscribe
-
-        if body.timeframe not in FRAMES:
-            raise HTTPException(422, "不支持的周期")
-        try:
-            for spec in body.indicators:
-                validate(spec)
-                origin = spec.get("calculation_origin")
-                if origin is not None and (type(origin) is not int or origin < 0):
-                    raise ValueError("指标固定历史起点须为非负整数")
-            return subscribe(body.client, body.listener, body.instrument, body.timeframe,
-                             body.cursor, body.revision, body.observed_at, body.indicators)
-        except ValueError as exc:
-            raise HTTPException(422, str(exc)) from exc
-
     @r.post("/provider/unsubscribe")
-    def provider_unsubscribe(body: ProviderUnsubscribe):
-        from .provider_service import unsubscribe
-
-        unsubscribe(body.client, body.listener)
-        return {"ok": True}
-
     @r.get("/provider/events")
-    async def provider_events(request: Request, client: str):
-
-        from .provider_service import events, renew
-
-        if not re.fullmatch(r"[A-Za-z0-9_-]{1,64}", client):
-            raise HTTPException(422, "无效客户端")
-
-        async def stream():
-            cursors = {}
-            while not await request.is_disconnected():
-                await asyncio.to_thread(renew, client)
-                messages = await asyncio.to_thread(events, client, cursors)
-                for message in messages:
-                    yield "data: " + json.dumps(message) + "\n\n"
-                yield ": heartbeat\n\n"
-                await asyncio.sleep(2)
-
-        return StreamingResponse(stream(), media_type="text/event-stream", headers={
-            "Cache-Control": "no-cache", "X-Accel-Buffering": "no",
-        })
+    def retired_provider_stream():
+        raise HTTPException(410, "供应商图表通道已更新，请重新加载页面")
 
     @r.get("/catalog")
     def catalog():

@@ -1,0 +1,78 @@
+# Full six-owner container topology for measured stage-2 busy acceptance.
+# Total application budget: 1.5 CPU / 1536 MiB across six owner containers.
+x-compose-runtime-environment: &compose-runtime-environment
+  PYTHONPATH: /candidate/backend:/candidate/backend/tests:/candidate/scripts
+  PYTHONDONTWRITEBYTECODE: '1'
+  ALERTS_DATABASE_URL: postgresql+psycopg://runtime_stage2@postgres/runtime_stage2
+  ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+  ALERTS_RUNTIME_DEPLOYMENT: stage2_compose_acceptance
+  ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+  ALERTS_OANDA_ACCOUNT_ID: composite-test-account
+  ALERTS_OANDA_TOKEN: synthetic-no-upstream-access
+  ALERTS_DELIVERY_ENABLED: 'false'
+  ALERTS_OANDA_STREAM_ENABLED: 'false'
+  ALERTS_OANDA_RESIDENT_SYMBOLS: ''
+  ALERTS_YAHOO_ENABLED: 'false'
+  ALERTS_DATABASE_POOL_SIZE: '2'
+  ALERTS_DATABASE_MAX_OVERFLOW: '0'
+  ALERTS_DATABASE_JIT: 'off'
+  ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'false'
+  MW_RUNTIME_BASELINE_TASK: mw-runtime-stage2-20261027
+x-compose-volumes: &compose-volumes
+  - '${MW_RUNTIME_STAGE2_REPO:?}:/candidate:ro'
+  - '${MW_RUNTIME_STAGE2_ARTIFACTS:-/home/quant/.local/share/market-watch-runtime-stage2-20261027/artifacts}:/artifacts'
+x-compose-runner: &compose-runner
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /candidate
+  volumes: *compose-volumes
+  environment: *compose-runtime-environment
+  entrypoint: [python, /candidate/scripts/runtime_market_compose_acceptance.py]
+  stop_grace_period: 45s
+  restart: 'no'
+  labels:
+    market-watch.task: runtime-market-stage2-20261027
+    market-watch.project: mw-runtime-stage2-compose-20261028
+    market-watch.purpose: acceptance
+  depends_on:
+    postgres: {condition: service_healthy}
+services:
+  owner-runtime:
+    <<: *compose-runner
+    cpus: 0.5
+    mem_limit: 512m
+    command: [worker, --role, runtime]
+  owner-alert:
+    <<: *compose-runner
+    cpus: 0.5
+    mem_limit: 384m
+    command: [worker, --role, alert]
+  owner-provider:
+    <<: *compose-runner
+    cpus: 0.1
+    mem_limit: 128m
+    command: [worker, --role, provider]
+  owner-notification:
+    <<: *compose-runner
+    cpus: 0.1
+    mem_limit: 128m
+    command: [worker, --role, notification]
+  owner-projection:
+    <<: *compose-runner
+    cpus: 0.1
+    mem_limit: 128m
+    command: [worker, --role, projection]
+  owner-history:
+    <<: *compose-runner
+    cpus: 0.2
+    mem_limit: 256m
+    command: [worker, --role, history]
+  seed-compose:
+    <<: *compose-runner
+    cpus: 0.5
+    mem_limit: 1024m
+    command: [seed]
+  drive-compose:
+    <<: *compose-runner
+    cpus: 0.5
+    mem_limit: 1024m
+    command: [drive, --samples, "601", --interval, "2"]

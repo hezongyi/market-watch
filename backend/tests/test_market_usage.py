@@ -7,9 +7,12 @@ from alerts.market_data import renew_demand
 from alerts.storage import (
     ChartAlert,
     ChartAlertVersion,
+    HistoryVersion,
     Instrument,
     MarketComposite,
     MarketDemand,
+    Preference,
+    RealtimeMapping,
     Watch,
 )
 from sqlalchemy import func, select
@@ -78,6 +81,34 @@ def test_current_chart_alert_version_and_expiry_own_persistent_demand(database, 
     with database.begin() as db:
         db.get(ChartAlert, ident).expires_at = 1
     assert not live.desired_datasets(settings.oanda_account_id)
+
+
+def test_stale_paused_composite_alert_keeps_recovery_demand_only(database, monkeypatch):
+    from alerts.chart_alert_service import lifecycle
+    from alerts.live_pricing import desired_dataset_identities
+    from alerts.market_usage import composite_targets, wanted_instruments
+    from alerts.realtime_switch import preference_key
+    from alerts.storage import CompositeRevision, MarketDataset
+    from test_composite_alerts import armed
+
+    alert_id, _, revision_id, _, _ = armed(database, monkeypatch)
+    with database.begin() as db:
+        alert = db.get(ChartAlert, alert_id)
+        alert.runtime = {"demand_hold": "stale_input"}
+        alert.health, alert.health_reason = "blocked", "组合实时输入已过期"
+        alert.status = "paused"
+        row = db.get(CompositeRevision, revision_id)
+        target = db.get(MarketDataset, db.get(RealtimeMapping, row.mapping_id).target_dataset_id).id
+        db.delete(db.get(Preference, preference_key(
+            db.get(MarketDataset, db.get(HistoryVersion, row.history_version_id).dataset_id).instrument_id)))
+    assert {identity.key for identity in desired_dataset_identities(settings.oanda_account_id)} == {target}
+
+    with database.begin() as db:
+        alert = db.get(ChartAlert, alert_id)
+        lifecycle(db, alert_id, alert.version, "pause", expected_revision=alert.control_revision,
+                  request_id="explicit-pause-after-stale")
+    with database() as db:
+        assert target not in composite_targets(db, wanted_instruments(db))
 
 
 def test_empty_residents_and_account_catalog_other_assets_idle_cleanly(database, monkeypatch):

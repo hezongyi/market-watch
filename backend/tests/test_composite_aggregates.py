@@ -131,7 +131,9 @@ def test_failed_build_keeps_checkpoint_and_retry_recovers(database, monkeypatch)
     _, revision, _ = populated(database, monkeypatch)
     original = cache.build
     monkeypatch.setattr(cache, "build", lambda _: (_ for _ in ()).throw(RuntimeError("temporary failure")))
-    assert cache.aggregate_tick(revision, "H4")
+    errors = []
+    assert cache.aggregate_tick(revision, "H4", on_error=errors.append)
+    assert errors == ["RuntimeError"]
     with database.begin() as db:
         task = db.get(CompositeAggregateTask, (revision, "H4"))
         assert task.applied_input_revision == -1 and task.offset == 0

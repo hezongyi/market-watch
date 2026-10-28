@@ -1,0 +1,16 @@
+RUN /home/quant/.local/share/market-watch-runtime-stage2-20261027/network-compose.sh run -d --no-deps --name mw-runtime-stage2-20261027-fault-stuck market-runtime runtime --profile market --fault stuck
+time="2026-10-27T21:24:34Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-20261027-fault-exception]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+5f59ef170411548800930bfb8cf15740ba8869179adeb0a248132205199cb748
+RUN /home/quant/.local/share/market-watch-runtime-stage2-20261027/network-compose.sh run --rm --no-deps network-check check --phase stuck --timeout 45
+time="2026-10-27T21:24:35Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-20261027-fault-exception]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+{"phase": "stuck", "elapsed_s": 14.158344859955832, "signals": 7, "passed": true}
+RUN docker inspect mw-runtime-stage2-20261027-fault-stuck --format {{json .State}}
+{"Status":"running","Running":true,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":733357,"ExitCode":0,"Error":"","StartedAt":"2026-10-27T21:24:34.745352075Z","FinishedAt":"0001-01-01T00:00:00Z"}
+RUN docker logs --tail 25 mw-runtime-stage2-20261027-fault-stuck
+2026-10-27 21:24:38,090 INFO realtime_cycle seconds=0.079
+2026-10-27 21:24:53,035 INFO realtime_cycle seconds=0.024
+RUN docker stop --time 30 mw-runtime-stage2-20261027-fault-stuck
+Flag --time has been deprecated, use --timeout instead
+mw-runtime-stage2-20261027-fault-stuck
+RUN docker inspect mw-runtime-stage2-20261027-fault-stuck --format {{json .State}}
+{"Status":"exited","Running":false,"Paused":false,"Restarting":false,"OOMKilled":false,"Dead":false,"Pid":0,"ExitCode":0,"Error":"","StartedAt":"2026-10-27T21:24:34.745352075Z","FinishedAt":"2026-10-27T21:24:55.823859276Z"}

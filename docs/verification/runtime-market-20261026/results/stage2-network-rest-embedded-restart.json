@@ -1,0 +1,167 @@
+{
+  "at": 1119581.219870287,
+  "business_at": 166407234,
+  "roles": [
+    {
+      "group": "market",
+      "role": "pricing",
+      "deployment": "stage2_network_rest_embedded_e",
+      "boot_id": "0ddeed44-78b4-457b-8ee6-2fd7b09b34ed",
+      "started_at": 166236334,
+      "starts": [
+        166236334
+      ],
+      "state": "running",
+      "checked_at": 166402793,
+      "last_success_at": 166402793,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "realtime",
+      "deployment": "stage2_network_rest_embedded_e",
+      "boot_id": "0ddeed44-78b4-457b-8ee6-2fd7b09b34ed",
+      "started_at": 166236378,
+      "starts": [
+        166236378
+      ],
+      "state": "idle",
+      "checked_at": 166401665,
+      "last_success_at": 166401665,
+      "error_type": null,
+      "stale_after_ms": 60000
+    },
+    {
+      "group": "market",
+      "role": "composite_aggregate",
+      "deployment": "stage2_network_rest_embedded_e",
+      "boot_id": "0ddeed44-78b4-457b-8ee6-2fd7b09b34ed",
+      "started_at": 166236383,
+      "starts": [
+        166236383
+      ],
+      "state": "idle",
+      "checked_at": 166402445,
+      "last_success_at": 166402445,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "alert_indicator",
+      "deployment": "stage2_network_rest_embedded_e",
+      "boot_id": "0ddeed44-78b4-457b-8ee6-2fd7b09b34ed",
+      "started_at": 166236390,
+      "starts": [
+        166236390
+      ],
+      "state": "idle",
+      "checked_at": 166403800,
+      "last_success_at": 166403800,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "chart_alert",
+      "deployment": "stage2_network_rest_embedded_e",
+      "boot_id": "0ddeed44-78b4-457b-8ee6-2fd7b09b34ed",
+      "started_at": 166236401,
+      "starts": [
+        166236401
+      ],
+      "state": "idle",
+      "checked_at": 166405473,
+      "last_success_at": 166405473,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "market_ownership",
+      "deployment": "stage2_network_rest_embedded_e",
+      "boot_id": "0ddeed44-78b4-457b-8ee6-2fd7b09b34ed",
+      "started_at": 166236408,
+      "starts": [
+        166236408
+      ],
+      "state": "idle",
+      "checked_at": 166406944,
+      "last_success_at": 166406944,
+      "error_type": null,
+      "stale_after_ms": 15000
+    }
+  ],
+  "source": {
+    "ready": true,
+    "epoch": 2,
+    "owner_valid": true,
+    "revision": 91,
+    "confirmed_end": 166380000,
+    "observation_mode": "candle_close_sample",
+    "received_age_ms": 2559
+  },
+  "aggregate_revision": 4,
+  "rules": [
+    {
+      "id": "a420decc-23fb-4e04-8c91-845bcfd3c3bb",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "d4427ab6-a6b4-44f3-9999-3c37f0384121",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "acad9b7f-0996-4e93-b383-6ecebb9a243f",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "caa8f0ff-8a1a-4b5f-a723-2b8011580aa9",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "e4093465-71ae-46d3-838d-050dd6ee1649",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "d68fb4eb-e86c-4893-8d98-d4be951635e2",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    },
+    {
+      "id": "233357c8-b997-4aad-acfb-08dcc9160326",
+      "health": "warming",
+      "reason": "等待重新建立基准",
+      "count": 0,
+      "runtime": {},
+      "state": {}
+    }
+  ],
+  "signals": [],
+  "phase": "restart",
+  "synthetic": true
+}

@@ -20,6 +20,34 @@ class Adapter:
         return next(self.pages)
 
 
+def test_profile_history_roles_split_network_from_local_work(monkeypatch):
+    from alerts import (
+        composite_preparation,
+        composite_revisions,
+        display_indicator_jobs,
+        fixed_indicators,
+        history_artifacts,
+        history_maintenance,
+    )
+
+    calls = []
+    monkeypatch.setattr(history_artifacts, "artifact_tick", lambda *_: calls.append("artifact") or True)
+    monkeypatch.setattr(history_maintenance, "schedule_tick", lambda: calls.append("schedule") or True)
+    monkeypatch.setattr(composite_preparation, "preparation_tick",
+                        lambda _adapter: calls.append("preparation") or True)
+    monkeypatch.setattr(fixed_indicators, "indicator_tick", lambda: calls.append("indicator") or True)
+    monkeypatch.setattr(display_indicator_jobs, "tick", lambda: calls.append("display") or True)
+    monkeypatch.setattr(composite_revisions, "preparation_tick", lambda: calls.append("revision") or True)
+    monkeypatch.setattr(history, "import_page",
+                        lambda _adapter, **_kwargs: calls.append("import") or True)
+
+    assert history.worker_tick(object(), network_only=True, pulse=False)
+    assert calls == ["preparation", "import"]
+    calls.clear()
+    assert history.worker_tick(None, compute_only=True, pulse=False)
+    assert calls == ["artifact", "schedule", "indicator", "display", "revision"]
+
+
 def create(database, end=120000):
     with database.begin() as db:
         inst = register(db)

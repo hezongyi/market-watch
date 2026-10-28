@@ -1,0 +1,929 @@
+{
+  "at": 1129005.719124787,
+  "business_at": 166272310,
+  "roles": [
+    {
+      "group": "market",
+      "role": "pricing",
+      "deployment": "stage2_network_five_recovery28a",
+      "boot_id": "3ae0da20-b668-407c-ae94-e355cbc4d82c",
+      "started_at": 166204336,
+      "starts": [
+        166204336
+      ],
+      "state": "running",
+      "checked_at": 166269751,
+      "last_success_at": 166269751,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "realtime",
+      "deployment": "stage2_network_five_recovery28a",
+      "boot_id": "3ae0da20-b668-407c-ae94-e355cbc4d82c",
+      "started_at": 166204366,
+      "starts": [
+        166204366
+      ],
+      "state": "idle",
+      "checked_at": 166264764,
+      "last_success_at": 166264764,
+      "error_type": null,
+      "stale_after_ms": 60000
+    },
+    {
+      "group": "market",
+      "role": "composite_aggregate",
+      "deployment": "stage2_network_five_recovery28a",
+      "boot_id": "3ae0da20-b668-407c-ae94-e355cbc4d82c",
+      "started_at": 166204369,
+      "starts": [
+        166204369
+      ],
+      "state": "running",
+      "checked_at": 166271084,
+      "last_success_at": 166271084,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "alert_indicator",
+      "deployment": "stage2_network_five_recovery28a",
+      "boot_id": "3ae0da20-b668-407c-ae94-e355cbc4d82c",
+      "started_at": 166204373,
+      "starts": [
+        166204373
+      ],
+      "state": "idle",
+      "checked_at": 166272150,
+      "last_success_at": 166272150,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "chart_alert",
+      "deployment": "stage2_network_five_recovery28a",
+      "boot_id": "3ae0da20-b668-407c-ae94-e355cbc4d82c",
+      "started_at": 166204375,
+      "starts": [
+        166204375
+      ],
+      "state": "idle",
+      "checked_at": 166268751,
+      "last_success_at": 166268751,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "market_ownership",
+      "deployment": "stage2_network_five_recovery28a",
+      "boot_id": "3ae0da20-b668-407c-ae94-e355cbc4d82c",
+      "started_at": 166204379,
+      "starts": [
+        166204379
+      ],
+      "state": "idle",
+      "checked_at": 166269692,
+      "last_success_at": 166269692,
+      "error_type": null,
+      "stale_after_ms": 15000
+    }
+  ],
+  "source": {
+    "ready": true,
+    "epoch": 2,
+    "owner_valid": true,
+    "revision": 128,
+    "confirmed_end": 166260000,
+    "observation_mode": "stream_quote",
+    "received_age_ms": 135
+  },
+  "aggregate_revision": 2,
+  "rules": [
+    {
+      "id": "01a34a35-4b1c-4373-a51d-9dfb334e9871",
+      "health": "ready",
+      "reason": null,
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [],
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166200000,
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 166200000,
+              "end": 166260000,
+              "coverage_complete": true,
+              "source_confirmed": true,
+              "seam_dependency": false
+            }
+          ],
+          "last_outcome": "evaluated"
+        }
+      },
+      "state": {
+        "sequence": 166260000,
+        "left": "1.119",
+        "right": "1.115",
+        "count": 1
+      }
+    },
+    {
+      "id": "df6f26d7-1046-4982-8a3c-6ca082851405",
+      "health": "ready",
+      "reason": null,
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [],
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166200000,
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 166200000,
+              "end": 166260000,
+              "coverage_complete": true,
+              "source_confirmed": true,
+              "seam_dependency": false
+            }
+          ],
+          "last_outcome": "evaluated"
+        }
+      },
+      "state": {
+        "sequence": 166260000,
+        "left": "1.119",
+        "right": "1.115",
+        "count": 1
+      }
+    },
+    {
+      "id": "f8e75d32-ce55-4e37-aea1-85725b4f6d67",
+      "health": "ready",
+      "reason": null,
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [],
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166260000,
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 166260000,
+              "end": 166320000,
+              "coverage_complete": false,
+              "source_confirmed": false,
+              "seam_dependency": false
+            }
+          ],
+          "last_outcome": "evaluated"
+        }
+      },
+      "state": {
+        "sequence": 166271674,
+        "left": "1.119",
+        "right": "1.115",
+        "count": 1
+      }
+    },
+    {
+      "id": "6717f83d-5603-4375-b652-de79449a8c28",
+      "health": "ready",
+      "reason": null,
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [],
+        "offset_indicators": [
+          {
+            "id": "ATR",
+            "run_id": "07fcedeb0c482929c650ed50132dd5edfdaceca1b79e6ec6040901a116c051eb",
+            "status": "complete",
+            "cursor": 166260000,
+            "target_end": 166260000,
+            "input_revision": 2,
+            "algorithm": "fixed-indicator-state-v3",
+            "error": null,
+            "next_at": 0,
+            "parent_run_id": "3c21c800cac836d9afc0b4bce4950b6c49a1948b2b762770d752a93885e90cc9",
+            "reused_prefix_end": 166200000,
+            "calculation_origin": 158400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "coverage": [
+              {
+                "start": 166140000,
+                "end": 166200000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 166140000,
+                "end": 166200000
+              }
+            ],
+            "visible_complete": true,
+            "input_evidence": {
+              "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+              "input_revision": 2,
+              "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+              "display_snapshot_id": null
+            },
+            "display_task_ids": []
+          }
+        ],
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 166200000,
+              "end": 166260000,
+              "coverage_complete": true,
+              "source_confirmed": true,
+              "seam_dependency": false
+            },
+            {
+              "kind": "atr",
+              "version": "1",
+              "atr": "0.030000000000000027",
+              "signed_offset": "0.00030000000000000027",
+              "timeframe": "M1",
+              "period": 2,
+              "multiplier": "0.01",
+              "reference_start": 166140000,
+              "reference_end": 166200000,
+              "input_revision": null,
+              "confirmed_at": 166200000,
+              "evaluation_start": 166200000,
+              "algorithm": "fixed-indicator-state-v3",
+              "dependency": {
+                "timeframe": "M1",
+                "dataset_id": null,
+                "origin": 158400000,
+                "algorithm": "fixed-indicator-state-v3",
+                "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                "input_revision": 2,
+                "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                "calculation": {
+                  "id": "ATR",
+                  "run_id": "07fcedeb0c482929c650ed50132dd5edfdaceca1b79e6ec6040901a116c051eb",
+                  "status": "complete",
+                  "cursor": 166260000,
+                  "target_end": 166260000,
+                  "input_revision": 2,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "error": null,
+                  "next_at": 0,
+                  "parent_run_id": "3c21c800cac836d9afc0b4bce4950b6c49a1948b2b762770d752a93885e90cc9",
+                  "reused_prefix_end": 166200000,
+                  "calculation_origin": 158400000,
+                  "producer": "backend",
+                  "accuracy": "oracle_equivalent",
+                  "canonical_verified": true,
+                  "coverage": [
+                    {
+                      "start": 166140000,
+                      "end": 166200000
+                    }
+                  ],
+                  "required_coverage": [
+                    {
+                      "start": 166140000,
+                      "end": 166200000
+                    }
+                  ],
+                  "visible_complete": true,
+                  "input_evidence": {
+                    "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                    "input_revision": 2,
+                    "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                    "display_snapshot_id": null
+                  },
+                  "display_task_ids": []
+                },
+                "dependency": {
+                  "start": 166140000,
+                  "dependency_origin": 158400000,
+                  "seam_dependency": true,
+                  "initialized": true,
+                  "provisional": null
+                }
+              },
+              "available_at": 166272142,
+              "confirmation_watermark": 166200000,
+              "confirmed_end": 166260000,
+              "base_target": "1.115",
+              "threshold": "1.11530000000000000027"
+            }
+          ],
+          "last_outcome": "evaluated"
+        },
+        "atr_confirmation": {
+          "key": [
+            "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+            2,
+            158400000,
+            166200000
+          ],
+          "watermark": 166200000
+        },
+        "offset": {
+          "kind": "atr",
+          "version": "1",
+          "atr": "0.030000000000000027",
+          "signed_offset": "0.00030000000000000027",
+          "timeframe": "M1",
+          "period": 2,
+          "multiplier": "0.01",
+          "reference_start": 166140000,
+          "reference_end": 166200000,
+          "input_revision": null,
+          "confirmed_at": 166200000,
+          "evaluation_start": 166200000,
+          "algorithm": "fixed-indicator-state-v3",
+          "dependency": {
+            "timeframe": "M1",
+            "dataset_id": null,
+            "origin": 158400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+            "input_revision": 2,
+            "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+            "calculation": {
+              "id": "ATR",
+              "run_id": "07fcedeb0c482929c650ed50132dd5edfdaceca1b79e6ec6040901a116c051eb",
+              "status": "complete",
+              "cursor": 166260000,
+              "target_end": 166260000,
+              "input_revision": 2,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": "3c21c800cac836d9afc0b4bce4950b6c49a1948b2b762770d752a93885e90cc9",
+              "reused_prefix_end": 166200000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 166140000,
+                  "end": 166200000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 166140000,
+                  "end": 166200000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                "input_revision": 2,
+                "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                "display_snapshot_id": null
+              },
+              "display_task_ids": []
+            },
+            "dependency": {
+              "start": 166140000,
+              "dependency_origin": 158400000,
+              "seam_dependency": true,
+              "initialized": true,
+              "provisional": null
+            }
+          },
+          "available_at": 166272142,
+          "confirmation_watermark": 166200000,
+          "confirmed_end": 166260000,
+          "base_target": "1.115",
+          "threshold": "1.11530000000000000027",
+          "baseline_translation": {
+            "previous_right": "1.11530000000000000027",
+            "translated_right": "1.11530000000000000027",
+            "offset_change": "0E-20"
+          }
+        },
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166200000
+      },
+      "state": {
+        "sequence": 166260000,
+        "left": "1.119",
+        "right": "1.11530000000000000027",
+        "count": 1
+      }
+    },
+    {
+      "id": "7d373463-f3ed-4677-a3b4-d5414f470c20",
+      "health": "ready",
+      "reason": null,
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [],
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166260000,
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 166260000,
+              "end": 166320000,
+              "coverage_complete": false,
+              "source_confirmed": false,
+              "seam_dependency": false
+            }
+          ],
+          "last_outcome": "evaluated"
+        }
+      },
+      "state": {
+        "sequence": 166271173,
+        "left": "1.119",
+        "right": "1.115",
+        "count": 1
+      }
+    },
+    {
+      "id": "e8cf7885-7823-4508-920c-1b9dfa25b4c5",
+      "health": "ready",
+      "reason": "恢复/接缝后已建立新基准，等待新事件",
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [
+          {
+            "id": "EMA",
+            "run_id": "f6fed1cf892fdcc0ba6b0d039a41a09f63f33808893d35913caf508f56a2ad2c",
+            "status": "partial",
+            "cursor": 166200000,
+            "target_end": 166260000,
+            "input_revision": 2,
+            "algorithm": "fixed-indicator-state-v3",
+            "error": null,
+            "next_at": 0,
+            "parent_run_id": "fb569c9f4ee6a4c2b7ea6c6b9638433dce49f8a469803b504924c4ea56a061a6",
+            "reused_prefix_end": 166200000,
+            "execution": {
+              "path": "alert-checkpoint-suffix",
+              "calculation_steps": 1
+            },
+            "provisional_ready": true,
+            "calculation_origin": 158400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "coverage": [
+              {
+                "start": 158400000,
+                "end": 166320000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 158400000,
+                "end": 166320000
+              }
+            ],
+            "visible_complete": true,
+            "input_evidence": {
+              "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+              "input_revision": 2,
+              "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+              "display_snapshot_id": "eeea3a6b4cc8075566c0de4a7ab0263945120fc701f2d68e12988d415bd48295"
+            },
+            "display_task_ids": []
+          }
+        ],
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "indicator",
+              "spec": {
+                "name": "EMA",
+                "version": "1",
+                "params": {
+                  "period": 2
+                }
+              },
+              "output": "value",
+              "calculation": {
+                "id": "EMA",
+                "run_id": "f6fed1cf892fdcc0ba6b0d039a41a09f63f33808893d35913caf508f56a2ad2c",
+                "status": "partial",
+                "cursor": 166200000,
+                "target_end": 166260000,
+                "input_revision": 2,
+                "algorithm": "fixed-indicator-state-v3",
+                "error": null,
+                "next_at": 0,
+                "parent_run_id": "fb569c9f4ee6a4c2b7ea6c6b9638433dce49f8a469803b504924c4ea56a061a6",
+                "reused_prefix_end": 166200000,
+                "execution": {
+                  "path": "alert-checkpoint-suffix",
+                  "calculation_steps": 1
+                },
+                "provisional_ready": true,
+                "calculation_origin": 158400000,
+                "producer": "backend",
+                "accuracy": "oracle_equivalent",
+                "canonical_verified": true,
+                "coverage": [
+                  {
+                    "start": 158400000,
+                    "end": 166320000
+                  }
+                ],
+                "required_coverage": [
+                  {
+                    "start": 158400000,
+                    "end": 166320000
+                  }
+                ],
+                "visible_complete": true,
+                "input_evidence": {
+                  "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                  "input_revision": 2,
+                  "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                  "display_snapshot_id": "eeea3a6b4cc8075566c0de4a7ab0263945120fc701f2d68e12988d415bd48295"
+                },
+                "display_task_ids": []
+              },
+              "dependency": {
+                "start": 166260000,
+                "dependency_origin": 158400000,
+                "seam_dependency": true,
+                "initialized": true,
+                "provisional": true
+              },
+              "seam_dependency": true
+            }
+          ],
+          "last_outcome": "recovery_baseline"
+        },
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166260000
+      },
+      "state": {
+        "sequence": 166271674,
+        "left": "1.118",
+        "right": "1.115",
+        "count": 1
+      }
+    },
+    {
+      "id": "b471487b-913a-406a-876e-668621fbf258",
+      "health": "ready",
+      "reason": null,
+      "count": 1,
+      "runtime": {
+        "quote_health": "ready",
+        "observation_mode": "stream_quote",
+        "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+        "input_revision": 2,
+        "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+        "seam_policy": "accept_raw",
+        "indicators": [],
+        "offset_indicators": [
+          {
+            "id": "ATR",
+            "run_id": "07fcedeb0c482929c650ed50132dd5edfdaceca1b79e6ec6040901a116c051eb",
+            "status": "partial",
+            "cursor": 166200000,
+            "target_end": 166260000,
+            "input_revision": 2,
+            "algorithm": "fixed-indicator-state-v3",
+            "error": null,
+            "next_at": 0,
+            "parent_run_id": "3c21c800cac836d9afc0b4bce4950b6c49a1948b2b762770d752a93885e90cc9",
+            "reused_prefix_end": 166200000,
+            "calculation_origin": 158400000,
+            "producer": "backend",
+            "accuracy": "oracle_equivalent",
+            "canonical_verified": true,
+            "coverage": [
+              {
+                "start": 166140000,
+                "end": 166200000
+              }
+            ],
+            "required_coverage": [
+              {
+                "start": 166140000,
+                "end": 166200000
+              }
+            ],
+            "visible_complete": true,
+            "input_evidence": {
+              "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+              "input_revision": 2,
+              "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+              "display_snapshot_id": null
+            },
+            "display_task_ids": []
+          }
+        ],
+        "atr_confirmation": {
+          "key": [
+            "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+            2,
+            158400000,
+            166200000
+          ],
+          "watermark": 166200000
+        },
+        "offset": {
+          "kind": "atr",
+          "version": "1",
+          "atr": "0.030000000000000027",
+          "signed_offset": "0.00030000000000000027",
+          "timeframe": "M1",
+          "period": 2,
+          "multiplier": "0.01",
+          "reference_start": 166140000,
+          "reference_end": 166200000,
+          "input_revision": null,
+          "confirmed_at": 166200000,
+          "evaluation_start": 166200000,
+          "algorithm": "fixed-indicator-state-v3",
+          "dependency": {
+            "timeframe": "M1",
+            "dataset_id": null,
+            "origin": 158400000,
+            "algorithm": "fixed-indicator-state-v3",
+            "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+            "input_revision": 2,
+            "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+            "calculation": {
+              "id": "ATR",
+              "run_id": "07fcedeb0c482929c650ed50132dd5edfdaceca1b79e6ec6040901a116c051eb",
+              "status": "partial",
+              "cursor": 166200000,
+              "target_end": 166260000,
+              "input_revision": 2,
+              "algorithm": "fixed-indicator-state-v3",
+              "error": null,
+              "next_at": 0,
+              "parent_run_id": "3c21c800cac836d9afc0b4bce4950b6c49a1948b2b762770d752a93885e90cc9",
+              "reused_prefix_end": 166200000,
+              "calculation_origin": 158400000,
+              "producer": "backend",
+              "accuracy": "oracle_equivalent",
+              "canonical_verified": true,
+              "coverage": [
+                {
+                  "start": 166140000,
+                  "end": 166200000
+                }
+              ],
+              "required_coverage": [
+                {
+                  "start": 166140000,
+                  "end": 166200000
+                }
+              ],
+              "visible_complete": true,
+              "input_evidence": {
+                "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                "input_revision": 2,
+                "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                "display_snapshot_id": null
+              },
+              "display_task_ids": []
+            },
+            "dependency": {
+              "start": 166140000,
+              "dependency_origin": 158400000,
+              "seam_dependency": true,
+              "initialized": true,
+              "provisional": null
+            }
+          },
+          "available_at": 166271087,
+          "confirmation_watermark": 166200000,
+          "confirmed_end": 166260000,
+          "base_target": "1.115",
+          "threshold": "1.11530000000000000027",
+          "baseline_translation": {
+            "previous_right": "1.11530000000000000027",
+            "translated_right": "1.11530000000000000027",
+            "offset_change": "0E-20"
+          }
+        },
+        "processed_input_revision": 2,
+        "confirmed_end": 166260000,
+        "epoch": 2,
+        "recovering": false,
+        "last_start": 166200000,
+        "readiness": {
+          "ready": true,
+          "status": "ready",
+          "dependencies": [
+            {
+              "kind": "price",
+              "start": 166200000,
+              "end": 166260000,
+              "coverage_complete": true,
+              "source_confirmed": true,
+              "seam_dependency": false
+            },
+            {
+              "kind": "atr",
+              "version": "1",
+              "atr": "0.030000000000000027",
+              "signed_offset": "0.00030000000000000027",
+              "timeframe": "M1",
+              "period": 2,
+              "multiplier": "0.01",
+              "reference_start": 166140000,
+              "reference_end": 166200000,
+              "input_revision": null,
+              "confirmed_at": 166200000,
+              "evaluation_start": 166200000,
+              "algorithm": "fixed-indicator-state-v3",
+              "dependency": {
+                "timeframe": "M1",
+                "dataset_id": null,
+                "origin": 158400000,
+                "algorithm": "fixed-indicator-state-v3",
+                "composite_revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                "input_revision": 2,
+                "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                "calculation": {
+                  "id": "ATR",
+                  "run_id": "07fcedeb0c482929c650ed50132dd5edfdaceca1b79e6ec6040901a116c051eb",
+                  "status": "partial",
+                  "cursor": 166200000,
+                  "target_end": 166260000,
+                  "input_revision": 2,
+                  "algorithm": "fixed-indicator-state-v3",
+                  "error": null,
+                  "next_at": 0,
+                  "parent_run_id": "3c21c800cac836d9afc0b4bce4950b6c49a1948b2b762770d752a93885e90cc9",
+                  "reused_prefix_end": 166200000,
+                  "calculation_origin": 158400000,
+                  "producer": "backend",
+                  "accuracy": "oracle_equivalent",
+                  "canonical_verified": true,
+                  "coverage": [
+                    {
+                      "start": 166140000,
+                      "end": 166200000
+                    }
+                  ],
+                  "required_coverage": [
+                    {
+                      "start": 166140000,
+                      "end": 166200000
+                    }
+                  ],
+                  "visible_complete": true,
+                  "input_evidence": {
+                    "revision_id": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+                    "input_revision": 2,
+                    "history_version_id": "54c08151-3f3e-4d4d-a2eb-68ff9e23b6db",
+                    "display_snapshot_id": null
+                  },
+                  "display_task_ids": []
+                },
+                "dependency": {
+                  "start": 166140000,
+                  "dependency_origin": 158400000,
+                  "seam_dependency": true,
+                  "initialized": true,
+                  "provisional": null
+                }
+              },
+              "available_at": 166271087,
+              "confirmation_watermark": 166200000,
+              "confirmed_end": 166260000,
+              "base_target": "1.115",
+              "threshold": "1.11530000000000000027"
+            }
+          ],
+          "last_outcome": "evaluated"
+        }
+      },
+      "state": {
+        "sequence": 166260000,
+        "left": "1.119",
+        "right": "1.11530000000000000027",
+        "count": 1
+      }
+    }
+  ],
+  "signals": [
+    {
+      "id": "075e755e-3e18-410a-9ef3-f258d69aaf93",
+      "rule": "7d373463-f3ed-4677-a3b4-d5414f470c20",
+      "occurred_at": 166245159
+    },
+    {
+      "id": "0abc31a1-db41-4468-b310-62531622f195",
+      "rule": "f8e75d32-ce55-4e37-aea1-85725b4f6d67",
+      "occurred_at": 166245159
+    },
+    {
+      "id": "2a4d76f6-1464-4368-b6b8-24518fda7702",
+      "rule": "df6f26d7-1046-4982-8a3c-6ca082851405",
+      "occurred_at": 166260000
+    },
+    {
+      "id": "3522c1fb-cdec-4645-b0c8-cb3882b8c965",
+      "rule": "b471487b-913a-406a-876e-668621fbf258",
+      "occurred_at": 166260000
+    },
+    {
+      "id": "3709acea-eea5-4709-9320-f4cfe055628a",
+      "rule": "e8cf7885-7823-4508-920c-1b9dfa25b4c5",
+      "occurred_at": 166245159
+    },
+    {
+      "id": "e52b9ede-5df4-4538-b31c-c894b91e3a5f",
+      "rule": "6717f83d-5603-4375-b652-de79449a8c28",
+      "occurred_at": 166260000
+    },
+    {
+      "id": "f8041a52-0c73-4d4f-9fab-0ee2b079aefe",
+      "rule": "01a34a35-4b1c-4373-a51d-9dfb334e9871",
+      "occurred_at": 166260000
+    }
+  ],
+  "phase": "crossing",
+  "elapsed_s": 27.49717547581531,
+  "synthetic": true
+}

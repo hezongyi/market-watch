@@ -6,6 +6,7 @@ import signal
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
 
 from sqlalchemy import func, select
 
@@ -279,10 +280,26 @@ def tick(calculator):
     return calculate_work(calculator, work) if work else False
 
 
+def calculate_reported(calculator, work):
+    from .runtime_health import progress
+
+    try:
+        result = calculate_work(calculator, work)
+    except Exception as error:
+        progress(error=error)
+        raise
+    progress()
+    return result
+
+
 def main():
     stopped = threading.Event()
     for name in (signal.SIGTERM, signal.SIGINT):
         signal.signal(name, lambda *_: stopped.set())
+    run(stopped)
+
+
+def run(stopped):
     calculators, pending = {}, {}
     shared_buckets = {}
     owner = uid()
@@ -292,6 +309,7 @@ def main():
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="market-stream") as executor:
         while not stopped.is_set():
             worked = False
+            cycle_error = None
             try:
                 for key, future in list(pending.items()):
                     if future.done():
@@ -312,7 +330,8 @@ def main():
                             shared_buckets[base_key] = shared
                             calculator.buckets, calculator.bucket_lock = shared
                         calculators[key] = calculator
-                        pending[key] = executor.submit(calculate_work, calculator, work)
+                        context = copy_context()
+                        pending[key] = executor.submit(context.run, calculate_reported, calculator, work)
                         worked = True
                 if time.monotonic() >= cleanup_at:
                     stream.cleanup()
@@ -325,7 +344,11 @@ def main():
                         shared_buckets.pop(next(iter(shared_buckets)))
                     cleanup_at = time.monotonic() + 30
             except Exception as error:
+                cycle_error = error
                 log.warning("market worker failed: %s", type(error).__name__)
+            if not pending:
+                from .runtime_health import progress
+                progress(error=cycle_error)
             stopped.wait(.01 if worked else .1)
 
 

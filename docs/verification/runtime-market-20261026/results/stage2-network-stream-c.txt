@@ -1,0 +1,30 @@
+2026-10-27 21:11:04,098 INFO setup plugin alembic.autogenerate.schemas
+2026-10-27 21:11:04,099 INFO setup plugin alembic.autogenerate.tables
+2026-10-27 21:11:04,099 INFO setup plugin alembic.autogenerate.types
+2026-10-27 21:11:04,099 INFO setup plugin alembic.autogenerate.constraints
+2026-10-27 21:11:04,099 INFO setup plugin alembic.autogenerate.defaults
+2026-10-27 21:11:04,099 INFO setup plugin alembic.autogenerate.comments
+2026-10-27 21:11:04,099 INFO setup plugin alembic.ext.checkconstraint_byname
+{"seeded": "stream_c", "rules": 7, "synthetic": true}
+ Container mw-runtime-stage2-20261027-market-runtime-1  Recreate
+ Container mw-runtime-stage2-20261027-fixture-supplier-1  Recreate
+ Container mw-runtime-stage2-20261027-api-1  Recreate
+ Container mw-runtime-stage2-20261027-chart-alert-runtime-1  Recreate
+ Container mw-runtime-stage2-20261027-fixture-supplier-1  Recreated
+ Container mw-runtime-stage2-20261027-market-runtime-1  Recreated
+ Container mw-runtime-stage2-20261027-chart-alert-runtime-1  Recreated
+ Container mw-runtime-stage2-20261027-api-1  Recreated
+ Container mw-runtime-stage2-20261027-fixture-supplier-1  Starting
+ Container mw-runtime-stage2-20261027-chart-alert-runtime-1  Starting
+ Container mw-runtime-stage2-20261027-api-1  Starting
+ Container mw-runtime-stage2-20261027-market-runtime-1  Starting
+ Container mw-runtime-stage2-20261027-market-runtime-1  Started
+ Container mw-runtime-stage2-20261027-api-1  Started
+ Container mw-runtime-stage2-20261027-fixture-supplier-1  Started
+ Container mw-runtime-stage2-20261027-chart-alert-runtime-1  Started
+{"phase": "ready", "elapsed_s": 8.978890130994841, "signals": 0, "passed": true}
+api_ready 200
+ Container mw-runtime-stage2-20261027-api-1  Stopping
+ Container mw-runtime-stage2-20261027-api-1  Stopped
+api_running=false
+{"phase": "crossing", "elapsed_s": 48.388699629111215, "signals": 7, "passed": true}

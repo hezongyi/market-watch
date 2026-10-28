@@ -1,6 +1,7 @@
 """Small lifecycle supervisor for service-owned background loops."""
 
 import logging
+import os
 import signal
 import threading
 import time
@@ -24,6 +25,32 @@ class RuntimeGroupError(RuntimeError):
         details = [f"{role}: {type(error).__name__}" for role, error in failures.items()]
         details.extend(f"{role}: did not stop" for role in self.alive)
         super().__init__("Runtime group failed: " + "; ".join(details))
+
+
+def exit_if_unstopped(error):
+    """Exit inside the profile's ownership scope if threads still use resources.
+
+    No Python cleanup can safely release ownership or clients while those
+    threads may still publish. The process closing its sessions releases locks.
+    """
+    if error.alive:
+        log.error("%s", error)
+        logging.shutdown()
+        os._exit(1)
+
+
+class UnstoppedThreads(BaseException):
+    """Fatal shutdown failure; local business retries must not swallow it."""
+
+    def __init__(self, threads):
+        self.alive = tuple(thread.name for thread in threads if thread.is_alive())
+        super().__init__("Runtime resources still in use")
+
+
+def require_stopped(threads):
+    error = UnstoppedThreads(threads)
+    if error.alive:
+        raise error
 
 
 def run_steps(step, stop, *, idle_wait, work_wait=.01, on_cycle=None):
@@ -106,9 +133,11 @@ def run_group(loops, *, stop=None, on_state=None, join_timeout=30, handle_signal
         while any(thread.is_alive() for thread in threads) and not stop.wait(.05):
             pass
         stop.set()
+        deadline = time.monotonic() + join_timeout
         for thread in threads:
-            thread.join(join_timeout)
+            thread.join(max(0, deadline - time.monotonic()))
 
     alive = [loop.role for loop, thread in zip(loops, threads) if thread.is_alive()]
+    alive.extend(name for error in failures.values() for name in getattr(error, "alive", ()))
     if failures or alive:
         raise RuntimeGroupError(failures, alive)

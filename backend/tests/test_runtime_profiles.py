@@ -9,6 +9,7 @@ import pytest
 from alerts.runtime_supervisor import (
     Loop,
     RuntimeGroupError,
+    UnstoppedThreads,
     run_group,
     run_steps,
     signal_stops,
@@ -30,6 +31,24 @@ def test_simple_step_loop_reports_idle_checks_and_interrupts_wait():
     assert not timer.is_alive()
     assert len(cycles) == 1
     assert all(cycle["finished"] >= cycle["started"] for cycle in cycles)
+
+
+def test_data_profile_assembles_provider_and_data_roles_without_duplicate_stream(monkeypatch):
+    from alerts import data_runtime, provider_capabilities
+
+    expected_sources = ("oanda", "binance")
+    monkeypatch.setattr(provider_capabilities, "enabled_sources", lambda: expected_sources)
+    loops = data_runtime.build_loops()
+
+    roles = [loop.role for loop in loops]
+    assert len(roles) == len(set(roles))
+    assert roles == [
+        "provider_live_oanda", "provider_warm_oanda",
+        "provider_live_binance", "provider_warm_binance",
+        "provider_transport_oanda", "provider_transport_binance", "provider_transport_dukascopy",
+        "provider_janitor", "chart_history", "history_network", "history_compute",
+        "native_history", "chart_aggregation", "market_stream",
+    ]
 
 
 def test_complex_run_stop_interface_closes_resources():
@@ -139,3 +158,43 @@ run_group([Loop('fatal', fail)], handle_signals=False)
     assert result.returncode != 0
     assert "RuntimeGroupError" in result.stderr
     assert "private details" not in result.stderr
+
+
+def test_runtime_cli_exits_even_if_a_sibling_cannot_stop():
+    code = """import sys, threading
+from alerts import runtime
+from alerts.runtime_supervisor import Loop, run_group
+def broken(_stop):
+    raise ValueError('private details')
+def stuck(_stop):
+    threading.Event().wait()
+def run(*_args, **_kwargs):
+    run_group([Loop('broken', broken), Loop('stuck', stuck)],
+              join_timeout=.05, handle_signals=False)
+runtime.market_runtime.run = run
+sys.argv = ['runtime', '--profile', 'market']
+runtime.main()
+"""
+    root = Path(__file__).resolve().parents[2]
+    result = subprocess.run([sys.executable, "-c", code], cwd=root,
+        env={**os.environ, "PYTHONPATH": str(root / "backend")},
+        capture_output=True, text=True, timeout=10)
+    assert result.returncode == 1
+    assert "stuck: did not stop" in result.stderr
+    assert "private details" not in result.stderr
+
+
+def test_nested_threads_still_using_resources_make_group_shutdown_fail():
+    release = threading.Event()
+    nested = threading.Thread(target=release.wait, name="confirmation")
+    nested.start()
+    try:
+        def failed_shutdown(_stop):
+            raise UnstoppedThreads((nested,))
+
+        with pytest.raises(RuntimeGroupError) as result:
+            run_group([Loop("pricing", failed_shutdown)], handle_signals=False)
+        assert result.value.alive == ("confirmation",)
+    finally:
+        release.set()
+        nested.join(2)

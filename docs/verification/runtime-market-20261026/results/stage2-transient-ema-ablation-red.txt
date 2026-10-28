@@ -1,0 +1,45 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_________ test_transient_ema_cross_is_judged_while_indicator_run_warms _________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb0d93b2690>
+
+    def test_transient_ema_cross_is_judged_while_indicator_run_warms(provider_pg, monkeypatch):
+        factory, _ = provider_pg
+        monkeypatch.setattr("alerts.storage.Session", factory)
+        ident, _, revision, seam, stamp = composite_contracts.armed(factory, monkeypatch,
+            mode="intrabar", seam_policy="accept_raw",
+            condition={"relation": "cross_up",
+                "left": {"kind": "indicator", "indicator": {
+                    "name": "EMA", "params": {"period": 2}, "output": "value"}},
+                "right": {"kind": "constant", "value": "1.112"}})
+        composite_contracts.forming(factory, revision, seam + 600000, stamp)
+        assert composite_contracts.settle(factory, ident, stamp) == []
+        with factory() as db:
+            assert db.get(ChartAlert, ident).health == "ready"
+    
+        next_start = seam + 600000
+        observation_at = next_start + 60000
+        composite_contracts.forming(factory, revision, next_start, observation_at - 1000,
+                                    price="1.110")
+        with factory.begin() as db:
+            assert composite_contracts.evaluate(db, ident, now=observation_at - 1000) == []
+        composite_contracts.append(factory, revision, next_start, "1.110", observation_at + 10)
+        composite_contracts.forming(factory, revision, observation_at, observation_at + 20,
+                                    price="1.119")
+        with factory.begin() as db:
+            signal_ids = composite_contracts.evaluate(db, ident, now=observation_at + 20)
+            row = db.get(ChartAlert, ident)
+            signals = db.scalars(select(SignalRow).where(
+                SignalRow.chart_alert_id == ident)).all()
+>           assert len(signal_ids) == 1, (row.health, row.health_reason, row.state, row.runtime)
+E           AssertionError: ('warming', '指标完整初始化或修订修复尚未完成', {'sequence': 166259000, 'left': '1.11', 'right': '1.112', 'count': 0}, {'quote_health'...tion_mode': 'stream_quote', 'composite_revision_id': 'd2405657-9b82-433d-a215-da951b7d2982', 'input_revision': 2, ...})
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+backend/tests/test_market_runtime_postgres.py:161: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_transient_ema_cross_is_judged_while_indicator_run_warms
+1 failed in 2.21s
+

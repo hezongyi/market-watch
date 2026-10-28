@@ -1,0 +1,47 @@
+time="2026-10-28T01:41:19Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-20261027-fixture-supplier-1 mw-runtime-stage2-20261027-market-runtime-1 mw-runtime-stage2-20261027-fault-stuck mw-runtime-stage2-20261027-fault-exception mw-runtime-stage2-20261027-api-1 mw-runtime-stage2-20261027-chart-alert-runtime-1]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+.F...................................................................... [ 57%]
+......................................................                   [100%]
+=================================== FAILURES ===================================
+___________ test_role_health_with_real_postgres[realtime_collection] ___________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6686569510>
+contract = 'realtime_collection'
+
+    @pytest.mark.parametrize("contract", ["aggregate_backoff", "realtime_collection", "error_fencing"])
+    def test_role_health_with_real_postgres(provider_pg, monkeypatch, contract):
+        from test_market_runtime import (
+            test_aggregate_success_cannot_clear_other_period_in_backoff,
+            test_failed_old_alert_turn_cannot_overwrite_replacement_health,
+        )
+        from test_realtime_worker import (
+            test_handled_collection_fault_stays_visible_until_its_source_recovers,
+        )
+    
+        selected = {
+            "aggregate_backoff": test_aggregate_success_cannot_clear_other_period_in_backoff,
+            "realtime_collection": test_handled_collection_fault_stays_visible_until_its_source_recovers,
+            "error_fencing": test_failed_old_alert_turn_cannot_overwrite_replacement_health,
+        }
+>       selected[contract](provider_pg[0], monkeypatch)
+
+backend/tests/test_market_runtime_postgres.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+database = sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6686569510>
+
+>   ???
+E   AttributeError: 'NoneType' object has no attribute 'enabled'
+
+/home/quant/repos/market-watch-runtime-stage2-20261027/backend/tests/test_realtime_worker.py:42: AttributeError
+=============================== warnings summary ===============================
+backend/tests/test_chart_alert_postgres.py: 20 warnings
+  /usr/local/lib/python3.11/site-packages/alembic/config.py:604: DeprecationWarning: No path_separator found in configuration; falling back to legacy splitting on spaces, commas, and colons for prepend_sys_path.  Consider adding path_separator=os to Alembic config.
+    util.warn_deprecated(
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_role_health_with_real_postgres[realtime_collection]
+1 failed, 125 passed, 20 warnings in 175.60s (0:02:55)
+

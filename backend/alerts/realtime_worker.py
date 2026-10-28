@@ -4,20 +4,21 @@ Uses the existing ingestion, recovery and alert evaluation path. Replaces the
 ordinary market-worker in deployments opting into chart demand maintenance.
 """
 import logging
+import signal
+import threading
 import time
 from contextlib import ExitStack
 
 import httpx
 
 from .config import settings
-from .market import fetch_source, import_once, once
+from .market import fetch_source, import_once, once, realtime_error
 from .market_resources import lane
 from .providers import fetch_binance, fetch_oanda
+from .runtime_health import progress
 
 
-def main():
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    logging.getLogger("httpx").setLevel(logging.WARNING)
+def run(stop):
     with ExitStack() as stack:
         clients = {
             "oanda": stack.enter_context(httpx.Client(timeout=15,
@@ -38,17 +39,29 @@ def main():
         source_filter = None if settings.oanda_acquisition_mode == "stream" else (
             "binance", "dukascopy")
 
-        while True:
+        while not stop.is_set():
             started = time.monotonic()
             try:
                 with lane("realtime"):
-                    once(include_viewers=True, fetcher=fetch, source_filter=source_filter)
+                    once(include_viewers=False, fetcher=fetch, source_filter=source_filter)
                     import_once(realtime_only=True, fetcher=fetch, source_filter=source_filter)
                 logging.info("realtime_cycle seconds=%.3f", time.monotonic()-started)
+                error = realtime_error(source_filter)
+                progress(state="degraded" if error else "idle", error=error)
             except Exception as error:
                 # Provider/DB details can contain account identifiers.
                 logging.warning("realtime_cycle_failed type=%s", type(error).__name__)
-            time.sleep(max(1, settings.market_poll_seconds-(time.monotonic()-started)))
+                progress(state="degraded", error=error)
+            stop.wait(max(1, settings.market_poll_seconds-(time.monotonic()-started)))
+
+
+def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    stopped = threading.Event()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        signal.signal(sig, lambda *_: stopped.set())
+    run(stopped)
 
 
 if __name__ == "__main__":

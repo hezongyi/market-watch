@@ -18,7 +18,10 @@ from .storage import (
     CompositeInputEvent,
     CompositePreparation,
     CompositeRevision,
+    HistoryVersion,
     MarketComposite,
+    MarketDataset,
+    Preference,
     now_ms,
     transaction,
     uid,
@@ -35,12 +38,33 @@ def request(db, revision_id):
                 index_elements=["revision_id", "timeframe"]))
 
 
-def claim(revision_id=None, timeframe=None):
+def runtime_revisions():
+    return select(CompositeRevision.id).join(HistoryVersion,
+            HistoryVersion.id == CompositeRevision.history_version_id).join(MarketDataset,
+            MarketDataset.id == HistoryVersion.dataset_id).join(Preference,
+            Preference.key == "managed_realtime:" + MarketDataset.instrument_id).where(
+                Preference.value["enabled"].as_boolean().is_(True))
+
+
+def runtime_error():
+    """Keep a failed period visible while other periods continue or retry."""
     with transaction() as db:
+        return db.scalar(select(CompositeAggregateTask.error).where(
+            CompositeAggregateTask.revision_id.in_(runtime_revisions()),
+            CompositeAggregateTask.error.is_not(None)).order_by(
+                CompositeAggregateTask.revision_id, CompositeAggregateTask.timeframe).limit(1))
+
+
+def claim(revision_id=None, timeframe=None, *, runtime_only=False):
+    with transaction() as db:
+        eligible = runtime_revisions()
         # Backfill tasks for pre-upgrade composites without touching definitions
         # or creating chart/source demand. Each scan registers at most 20 revisions.
         missing = select(CompositeRevision.id).where(~select(CompositeAggregateTask.revision_id).where(
-            CompositeAggregateTask.revision_id == CompositeRevision.id).exists()).limit(20)
+            CompositeAggregateTask.revision_id == CompositeRevision.id).exists())
+        if runtime_only:
+            missing = missing.where(CompositeRevision.id.in_(eligible))
+        missing = missing.limit(20)
         for ident in db.scalars(missing):
             request(db, ident)
         stamp = now_ms()
@@ -52,6 +76,8 @@ def claim(revision_id=None, timeframe=None):
             query = query.where(CompositeAggregateTask.revision_id == revision_id)
         if timeframe:
             query = query.where(CompositeAggregateTask.timeframe == timeframe)
+        if runtime_only:
+            query = query.where(CompositeAggregateTask.revision_id.in_(eligible))
         task = db.scalar(query.order_by(CompositeAggregateTask.updated_at,
             CompositeAggregateTask.revision_id, CompositeAggregateTask.timeframe)
             .with_for_update(skip_locked=True, of=CompositeAggregateTask).limit(1))
@@ -122,13 +148,15 @@ def commit(ownership, bars):
         task.updated_at = now_ms()
 
 
-def aggregate_tick(revision_id=None, timeframe=None):
-    ownership = claim(revision_id, timeframe)
+def aggregate_tick(revision_id=None, timeframe=None, *, on_error=None, runtime_only=False):
+    ownership = claim(revision_id, timeframe, runtime_only=runtime_only)
     if not ownership:
         return False
     try:
         commit(ownership, build(ownership))
     except Exception as error:
+        if on_error:
+            on_error(type(error).__name__)
         with transaction() as db:
             try:
                 task = _lock(db, ownership)

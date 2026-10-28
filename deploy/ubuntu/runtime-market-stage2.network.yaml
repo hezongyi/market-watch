@@ -1,0 +1,69 @@
+# Overlay the task contracts file. Synthetic wire IO stays on the internal
+# network; these are functional probes, not a comparable R2 resource claim.
+x-probe: &probe
+  image: ${MW_RUNTIME_NETWORK_IMAGE:-sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743}
+  working_dir: /candidate
+  volumes:
+    - '${MW_RUNTIME_STAGE2_REPO:?}:/candidate:ro'
+    - '${MW_RUNTIME_STAGE2_ARTIFACTS:-/home/quant/.local/share/market-watch-runtime-stage2-20261027/artifacts}:/artifacts'
+  cpus: 0.5
+  mem_limit: 512m
+  restart: 'no'
+  labels:
+    market-watch.task: runtime-market-stage2-20261027
+    market-watch.project: mw-runtime-stage2-20261027
+    market-watch.purpose: acceptance
+  environment: &probe-environment
+    PYTHONPATH: ${MW_RUNTIME_NETWORK_PYTHONPATH:-/candidate/backend:/candidate/backend/tests:/candidate/scripts}
+    PYTHONDONTWRITEBYTECODE: '1'
+    ALERTS_DATABASE_URL: postgresql+psycopg://runtime_stage2@postgres/runtime_profile
+    ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+    ALERTS_DATABASE_POOL_SIZE: '2'
+    ALERTS_DATABASE_MAX_OVERFLOW: '0'
+    ALERTS_DATABASE_JIT: 'off'
+    ALERTS_DELIVERY_ENABLED: 'false'
+    ALERTS_OANDA_ACCOUNT_ID: composite-test-account
+    ALERTS_OANDA_TOKEN: synthetic-no-upstream-access
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ''
+    ALERTS_OANDA_STREAM_ENABLED: 'true'
+    ALERTS_OANDA_RECOVERY_MINUTES: '120'
+    ALERTS_OANDA_CONFIRMATION_MARGIN_SECONDS: '10'
+    ALERTS_OANDA_ACQUISITION_MODE: ${MW_RUNTIME_NETWORK_MODE:-stream}
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: ${MW_RUNTIME_NETWORK_EMBEDDED_ALERT:-false}
+    ALERTS_YAHOO_ENABLED: 'false'
+    ALERTS_HISTORY_HEALTH_WORKERS: '[]'
+    ALERTS_RUNTIME_DEPLOYMENT: stage2_network_${MW_RUNTIME_NETWORK_RUN:?}
+    MW_RUNTIME_NETWORK_RUN: ${MW_RUNTIME_NETWORK_RUN:?}
+  entrypoint: [python, /candidate/scripts/runtime_market_network_acceptance.py]
+  depends_on:
+    postgres: {condition: service_healthy}
+services:
+  fixture-seed:
+    <<: *probe
+    cpus: 1
+    mem_limit: 1024m
+    command: [seed]
+  fixture-supplier:
+    <<: *probe
+    cpus: 0.1
+    mem_limit: 128m
+    command: [supplier]
+  market-runtime:
+    <<: *probe
+    command: [runtime, --profile, market]
+    environment:
+      <<: *probe-environment
+      ALERTS_DATABASE_POOL_SIZE: '6'
+  chart-alert-runtime:
+    <<: *probe
+    mem_limit: 384m
+    command: [runtime, --profile, alert]
+  api:
+    <<: *probe
+    command: [api]
+  network-check:
+    <<: *probe
+    cpus: 0.25
+    mem_limit: 384m
+    command: [check, --phase, ready]

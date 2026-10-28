@@ -1,0 +1,63 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+_ test_indicator_failure_remains_degraded_during_backoff_and_clears_after_success _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f5677143750>
+
+    def test_indicator_failure_remains_degraded_during_backoff_and_clears_after_success(database, monkeypatch):
+        from alerts import alert_indicator_worker, fixed_indicators, runtime_health
+        from alerts.chart_alert_service import create
+        from alerts.storage import FixedIndicatorRun, Preference
+        from test_composite_alerts import config, live
+        from test_market_runtime_postgres import pending_suffix
+    
+        composite, revision, stamp = pending_suffix(database, monkeypatch,
+                                             {"name": "EMA", "params": {"period": 2}})
+        live(database, revision, stamp, stamp - 10)
+        from alerts.composite_chart import chart_page
+    
+        with database.begin() as db:
+            page = chart_page(db, composite, "M1", count=3, now=stamp, provisional=True)
+            run_id = fixed_indicators.request(db, page, {"name": "EMA", "params": {"period": 2}},
+                                              stamp=stamp).id
+            ident = create(db, "composite-rule", config(composite), at=stamp).id
+            db.get(ChartAlert, ident).runtime = {"indicators": [{"run_id": run_id, "status": "pending"}]}
+        reporter = runtime_health.Progress("market", "alert_indicator", "indicator-owner")
+        reporter.claim()
+        with runtime_health.reporting(reporter):
+            runtime_health.progress()
+        with database() as db:
+            initial_success = db.get(Preference, runtime_health.key("alert_indicator")).value["last_success_at"]
+        build = fixed_indicators.build
+        turns = []
+    
+        def broken(_owner):
+            raise ValueError("fixture calculation failure")
+    
+        monkeypatch.setattr(fixed_indicators, "build", broken)
+        stop = SimpleNamespace(is_set=lambda: len(turns) == 3)
+    
+        def next_turn(_delay):
+            with database() as db:
+                turns.append(dict(db.get(Preference, runtime_health.key("alert_indicator")).value))
+            if len(turns) == 1:
+                monkeypatch.setattr(fixed_indicators, "build", build)
+            elif len(turns) == 2:
+                with database.begin() as db:
+                    db.get(FixedIndicatorRun, run_id).next_at = 0
+    
+        stop.wait = next_turn
+        with runtime_health.reporting(reporter):
+            alert_indicator_worker.run(stop)
+>       assert [(item["state"], item["error_type"]) for item in turns] == [
+            ("degraded", "ValueError"), ("degraded", "ValueError"), ("running", None)]
+E       AssertionError: assert [('running', ...nning', None)] == [('degraded',...nning', None)]
+E         
+E         At index 0 diff: ('running', None) != ('degraded', 'ValueError')
+E         Use -v to get more diff
+
+backend/tests/test_market_runtime.py:233: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime.py::test_indicator_failure_remains_degraded_during_backoff_and_clears_after_success
+1 failed in 0.89s

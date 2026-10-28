@@ -8,6 +8,8 @@ from .notification_center import backfill, project, rebuild, reconcile_channels,
 from .storage import Preference, now_ms, transaction
 
 log = logging.getLogger(__name__)
+BUSY_POLL_SECONDS = .02
+IDLE_POLL_SECONDS = .5
 
 
 def once():
@@ -20,6 +22,47 @@ def once():
         if count == 0:
             count += reconcile_channels(db)
         return count
+
+
+def retain_once():
+    with transaction() as db:
+        return retain(db)
+
+
+def run_projection(stop):
+    last_report = 0
+    while not stop.is_set():
+        count, error = 0, None
+        try:
+            count = once()
+            if now_ms() - last_report > 30_000:
+                report('ok' if settings.notification_center_projection_enabled else 'paused', count)
+                last_report = now_ms()
+        except Exception as exc:
+            error = exc
+            log.exception('Notice projection unavailable')
+            try:
+                report('failed', error=error)
+            except Exception:
+                log.warning('Notice worker health unavailable')
+        from .runtime_health import progress
+
+        progress(error=error)
+        stop.wait(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
+
+
+def run_retention(stop):
+    while not stop.is_set():
+        error = None
+        try:
+            retain_once()
+        except Exception as exc:
+            error = exc
+            log.exception('Notice retention unavailable')
+        from .runtime_health import progress
+
+        progress(error=error)
+        stop.wait(60)
 
 
 def report(state, count=0, error=None):
@@ -67,7 +110,7 @@ def main():
                 raise
         if args.once:
             return
-        time.sleep(0.02 if count else 2)
+        time.sleep(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
 
 
 if __name__ == '__main__':

@@ -1,6 +1,7 @@
 """Dedicated low-concurrency chart import worker; no notification sending."""
 
 import logging
+import threading
 import time
 from contextlib import ExitStack
 
@@ -31,10 +32,10 @@ def main():
             if provider is None:
                 return fetch_source(source, symbol, start, end)
             return provider(symbol, start, end, client=clients.get(source))
-        run(fetch_page)
+        run(fetch_page, threading.Event())
 
 
-def run(fetch_page):
+def run(fetch_page, stop=None):
     from .worker_health import Pulse
 
     pulse = Pulse("chart_history")
@@ -42,7 +43,7 @@ def run(fetch_page):
     # process monotonic clock has not yet reached one day since boot.
     refreshed = float("-inf")
     catalog_error = None
-    while True:
+    while stop is None or not stop.is_set():
         try:
             pulse.start()
             if time.monotonic() - refreshed > 86400:
@@ -67,11 +68,21 @@ def run(fetch_page):
                     from .volume_jobs import once
                     worked = once(fetch_page)
             pulse.finish(worked=worked, errors=[catalog_error] if catalog_error else [])
-            time.sleep(0.2 if worked else 1)
+            from .runtime_health import progress
+            progress(error=catalog_error)
+            if stop is None:
+                time.sleep(0.2 if worked else 1)
+            else:
+                stop.wait(0.2 if worked else 1)
         except Exception as exc:
             pulse.finish(errors=[type(exc).__name__])
+            from .runtime_health import progress
+            progress(error=exc)
             logging.warning("chart history cycle failed: %s", type(exc).__name__)
-            time.sleep(5)
+            if stop is None:
+                time.sleep(5)
+            else:
+                stop.wait(5)
 
 
 if __name__ == "__main__":

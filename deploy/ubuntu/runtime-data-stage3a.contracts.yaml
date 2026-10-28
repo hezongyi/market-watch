@@ -1,0 +1,49 @@
+# Isolated PostgreSQL contracts for stage 3A. No host ports or external network.
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    cpus: 0.5
+    mem_limit: 512m
+    labels: {market-watch.task: mw-runtime-data-stage3a-20261028}
+    environment:
+      POSTGRES_DB: runtime_data
+      POSTGRES_USER: runtime_data
+      POSTGRES_PASSWORD: runtime_data_test_only
+    command: [postgres, -c, jit=off, -c, max_connections=30]
+    volumes: [data-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'pg_isready -U runtime_data -d runtime_data && test "$$(PGPASSWORD=runtime_data_test_only PGOPTIONS="-c jit=on" psql -U runtime_data -d runtime_data -Atqc "SELECT pg_jit_available()")" = t && test 140024 = 140024'
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  contracts:
+    image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+    cpus: 1
+    mem_limit: 768m
+    labels: {market-watch.task: mw-runtime-data-stage3a-20261028}
+    working_dir: /candidate
+    volumes: ['${MW_RUNTIME_DATA_STAGE3A_REPO:?}:/candidate:ro']
+    environment:
+      PYTHONPATH: /candidate/backend:/candidate/backend/tests
+      PYTHONDONTWRITEBYTECODE: '1'
+      TEST_POSTGRES_URL: postgresql+psycopg://runtime_data:runtime_data_test_only@postgres/runtime_data
+      CHART_ALERT_TEST_DATABASE_URL: postgresql+psycopg://runtime_data:runtime_data_test_only@postgres/runtime_data
+    depends_on:
+      postgres: {condition: service_healthy}
+    entrypoint: [python, -m, pytest, -q, -p, 'no:cacheprovider']
+    command:
+      - backend/tests/test_market_runtime_postgres.py
+      - backend/tests/test_history_worker_recovery_postgres.py
+      - backend/tests/test_history_artifacts_postgres.py
+      - backend/tests/test_market_stream_postgres.py
+      - backend/tests/test_market_stream_history_postgres.py
+      - backend/tests/test_market_stream_lifecycle_postgres.py
+      - backend/tests/test_composite_aggregates_postgres.py
+      - backend/tests/test_chart_alert_postgres.py
+networks:
+  default: {internal: true}
+volumes:
+  data-pg:
+    labels: {market-watch.task: mw-runtime-data-stage3a-20261028}

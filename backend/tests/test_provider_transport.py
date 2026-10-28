@@ -31,6 +31,23 @@ def test_idle_transport_maintenance_never_fetches_bars_and_yields_to_active_requ
         transport.close_clients()
 
 
+def test_transport_maintenance_runs_on_its_supervised_source_loop(monkeypatch):
+    import threading
+
+    calls = []
+    def maintain(source, _busy):
+        calls.append(source)
+        stop.set()
+    monkeypatch.setattr(transport, "maintain", maintain)
+    stop = threading.Event()
+    thread = threading.Thread(target=transport.run,
+                              args=(stop, lambda _source: False, "binance"))
+    thread.start()
+    thread.join(1)
+    assert not thread.is_alive()
+    assert calls == ["binance"]
+
+
 def test_pool_retains_all_allowed_connections_without_increasing_concurrency(monkeypatch):
     from alerts.market_resources import lane
     calls = []

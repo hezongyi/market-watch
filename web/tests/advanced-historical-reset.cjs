@@ -1,29 +1,50 @@
-const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const handlers=[],messages=[];
-const ctx=vm.createContext({URL,URLSearchParams,Map,Set,Promise,Date,Intl,Error,
- location:{search:'?parent=http://localhost'},parent:{postMessage:m=>messages.push(m)},
- crypto:{randomUUID:()=> 'listener'},addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn)},setTimeout,clearTimeout});
-for(const f of ['series.js','chart-runtime.js'])vm.runInContext(fs.readFileSync('../advanced-host/'+f,'utf8'),ctx);
+// Exercise the unified event handler and the actual historical reload dispatcher.
+const assert = require('node:assert/strict');
+const vm = require('node:vm');
+const path = require('node:path');
+const {read} = require('./fixtures/direct-runtime.cjs');
+const handlers = [], messages = [];
+const ctx = vm.createContext({URLSearchParams, Map, Set, Promise, Date, Intl, Error,
+  location:{search:''}, parent:{postMessage:value=>messages.push(value)},
+  crypto:{randomUUID:()=> 'listener'}, setTimeout, clearTimeout, queueMicrotask,
+  addEventListener:(name,fn)=>{if(name==='message')handlers.push(fn);}});
+for(const file of ['series.js','composite-display-batches.js','chart-runtime.js'])
+  vm.runInContext(read(path.join(__dirname,'../../advanced-host',file),'utf8'),ctx);
+const evaluate=code=>vm.runInContext(code,ctx);
+const deliver=event=>handlers[0]({data:{type:'market-event',event}});
 (async()=>{
- vm.runInContext(`globalThis.reloads=0;globalThis.reviews=[];globalThis.changed=false;globalThis.available=true;globalThis.active=true;
-  ready=true;const chart={resolution:()=> '5',symbol:()=> 'MWP:BTCUSDT',getAllStudies:()=>[]};
-  widget={chartsCount:()=>1,chart:()=>chart,activeChart:()=>chart};
-  globalThis.MWNativeNavigation={chartWindow:()=>({id:'historical'}),hasWindow:()=>active};
-  reloadHistory=async()=>{reloads++;return true};
-  query=async(symbol,res,args)=>{reviews.push(args);if(!available)throw Error('temporary failure');if(globalThis.delay)await delay;return {cache_revision:20,as_of:2000,history_revalidation:{changed},bars:[]}};
-  providerHistoryWork.set('MWP:BTCUSDT|5|historical',{symbol:'MWP:BTCUSDT',res:'5',window:'historical',observation:{first:100000,last:200000,observed_at:1000,revision:10}});
-  subscriptions.set('native',{providerListener:'listener',symbol:'MWP:BTCUSDT',res:'5',window:'historical',historical:true});`,ctx);
- const reset=(revision=11)=>handlers[0]({source:ctx.parent,origin:'http://localhost',data:{channel:'mw-chart-v1',type:'provider-event',event:{type:'reset',listener:'listener',revision,as_of:1100,cursor:9000000}}});
- await reset();
- assert.equal(ctx.reloads,0,'far-away latest rows must not rebuild an unchanged historical window');
- assert.equal(ctx.reviews.length,1);assert.equal(ctx.reviews[0].history_observation.first,100000);
- assert.equal(ctx.reviews[0].history_observation.last,200000);
- await reset();assert.equal(ctx.reloads,0);assert.equal(ctx.reviews.length,1,'already verified revision does not repeat review');
- vm.runInContext('changed=true',ctx);await reset(21);assert.equal(ctx.reloads,1,'confirmed historical revision still reloads');
- vm.runInContext('changed=false;available=false',ctx);await reset(22);assert.equal(ctx.reloads,1,'failed review cannot clear or rebuild valid bars');
- vm.runInContext('available=true;globalThis.delay=new Promise(ok=>globalThis.release=ok)',ctx);
- const a=reset(23),b=reset(24);await new Promise(ok=>setImmediate(ok));
- assert.equal(ctx.reviews.length,4,'overlapping reset events share one check');
- vm.runInContext('active=false;release()',ctx);await Promise.all([a,b]);assert.equal(ctx.reloads,1,'obsolete historical check cannot reload another window');
- console.log('Historical reset: latest gaps, real corrections, failures, coalescing and obsolete windows passed');
-})().catch(e=>{console.error(e);process.exitCode=1});
+  evaluate(`globalThis.reloads=0;globalThis.delivered=[];globalThis.currentRes='5';
+    ready=true;
+    const chart={symbol:()=> 'MWP:BTCUSDT',resolution:()=>currentRes,getAllStudies:()=>[],
+      getTimeScale:()=>({width:()=>960,barSpacing:()=>6})};
+    widget={chartsCount:()=>1,chart:()=>chart};
+    globalThis.MWNativeNavigation={historical:()=>true,coverage:()=>({last:200000}),
+      chartWindow:()=>({id:'historical'}),busy:()=>false,interacting:()=>false,
+      refreshChartWindow:async()=>{reloads++;
+        acceptMarketHistory('MWP:BTCUSDT','5',{bars:[{start:100000,end:200000}],as_of:2000},'historical');
+        return true;}};
+    acceptMarketHistory('MWP:BTCUSDT','5',{bars:[{start:100000,end:200000}],as_of:1000},'historical');
+    feed.subscribeBars({ticker:'MWP:BTCUSDT',mw_window:'historical'},'5',bar=>delivered.push(bar),'native',()=>{});`);
+  const initial=messages.filter(row=>row.type==='market-subscribe').at(-1).args;
+  assert.equal(initial.historical,true);
+  await deliver({listener:initial.listener,generation:initial.generation,sequence:1,
+    type:'status',status:'history_current'});
+  assert.equal(ctx.reloads,0,'unchanged historical proof must not reload');
+  await deliver({listener:initial.listener,generation:initial.generation,sequence:2,
+    type:'bars',bars:[{start:9000000,end:9300000,open:1,high:2,low:1,close:2}]});
+  assert.equal(ctx.delivered.length,0,'latest bars cannot cross a historical window gap');
+  await deliver({listener:initial.listener,generation:initial.generation,sequence:3,
+    type:'reset',reason:'history_changed'});
+  assert.equal(ctx.reloads,1,'verified historical correction must dispatch a window reload');
+  const rebound=messages.filter(row=>row.type==='market-subscribe').at(-1).args;
+  assert.ok(rebound.generation>initial.generation);
+  await deliver({listener:initial.listener,generation:initial.generation,sequence:99,
+    type:'reset',reason:'history_changed'});
+  assert.equal(ctx.reloads,1,'old generation cannot reload the new window');
+  evaluate("currentRes='1'");
+  await deliver({listener:rebound.listener,generation:rebound.generation,sequence:1,
+    type:'reset',reason:'history_changed'});
+  assert.equal(ctx.reloads,1,'hidden old-period cache cannot reload the current chart');
+  evaluate("feed.unsubscribeBars('native')");
+  console.log('PASS: unified historical proof, reset/reload, gap and generation fences');
+})().catch(error=>{console.error(error);process.exitCode=1});

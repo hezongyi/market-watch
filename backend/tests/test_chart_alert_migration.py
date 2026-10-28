@@ -101,9 +101,13 @@ def full_legacy_upgrade(engine, monkeypatch):
             occurred_at=300_000, created_at=300_001, direction="up", price=Decimal("11"),
             threshold=Decimal("10"), reason="legacy evidence", evidence={"legacy": ["kept", 1]},
         ))
+    with engine.begin() as connection:
+        legacy_notifications = Table("notifications", MetaData(), autoload_with=engine)
+        connection.execute(legacy_notifications.insert().values(
+            id="legacy-note", signal_id="legacy-signal", status="pending",
+            ack_at=None, ack_hash=None, created_at=0,
+        ))
     with factory.begin() as db:
-        db.add(Notification(id="legacy-note", signal_id="legacy-signal", status="pending"))
-        db.flush()
         db.add(Outbox(id="legacy-outbox", notification_id="legacy-note", status="pending",
                       attempts=2, next_at=600_000, error="isolated retry"))
     command.upgrade(alembic, "head")
@@ -111,7 +115,9 @@ def full_legacy_upgrade(engine, monkeypatch):
         old = db.get(SignalRow, "legacy-signal")
         assert old.watch_id == "legacy-watch" and old.event_key == old.id
         assert old.chart_alert_id is None and old.evidence == {"legacy": ["kept", 1]}
-        assert db.get(Notification, "legacy-note").signal_id == old.id
+        migrated_note = db.get(Notification, "legacy-note")
+        assert migrated_note.signal_id == old.id and migrated_note.kind == "signal"
+        assert migrated_note.payload == {}
         queue = db.get(Outbox, "legacy-outbox")
         assert (queue.notification_id, queue.attempts, queue.next_at, queue.error) == (
             "legacy-note", 2, 600_000, "isolated retry",

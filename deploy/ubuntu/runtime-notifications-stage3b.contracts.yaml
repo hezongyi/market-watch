@@ -1,0 +1,75 @@
+# Isolated PostgreSQL contracts for notification runtime stage 3B.
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    cpus: 0.5
+    mem_limit: 512m
+    labels: {market-watch.task: mw-runtime-notifications-stage3b-20261028}
+    environment:
+      POSTGRES_DB: runtime_notifications
+      POSTGRES_USER: runtime_notifications
+      POSTGRES_PASSWORD: runtime_notifications_test_only
+    command: [postgres, -c, jit=off, -c, max_connections=30]
+    volumes: [notifications-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - 'pg_isready -U runtime_notifications -d runtime_notifications && test "$$(PGPASSWORD=runtime_notifications_test_only PGOPTIONS="-c jit=on" psql -U runtime_notifications -d runtime_notifications -Atqc "SELECT current_setting(''server_version_num'') = ''140024'' AND pg_jit_available()")" = t'
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  contracts:
+    image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+    cpus: 1
+    mem_limit: 768m
+    labels: {market-watch.task: mw-runtime-notifications-stage3b-20261028}
+    working_dir: /candidate
+    volumes: ['${MW_RUNTIME_NOTIFICATIONS_STAGE3B_REPO:?}:/candidate:ro']
+    environment:
+      PYTHONPATH: /candidate/backend:/candidate/backend/tests
+      PYTHONDONTWRITEBYTECODE: '1'
+      TEST_POSTGRES_URL: postgresql+psycopg://runtime_notifications:runtime_notifications_test_only@postgres/runtime_notifications
+      CHART_ALERT_TEST_DATABASE_URL: postgresql+psycopg://runtime_notifications:runtime_notifications_test_only@postgres/runtime_notifications
+    depends_on:
+      postgres: {condition: service_healthy}
+    entrypoint: [python, -m, pytest, -q, -p, 'no:cacheprovider']
+    command:
+      - backend/tests/test_chart_alert_postgres.py
+      - backend/tests/test_notification_center_postgres.py
+      - backend/tests/test_notification_outbox_postgres.py
+  notification-runtime:
+    image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+    cpus: 1
+    mem_limit: 768m
+    labels: {market-watch.task: mw-runtime-notifications-stage3b-20261028}
+    working_dir: /candidate
+    volumes: ['${MW_RUNTIME_NOTIFICATIONS_STAGE3B_REPO:?}:/candidate:ro']
+    environment:
+      PYTHONPATH: /candidate/backend
+      PYTHONDONTWRITEBYTECODE: '1'
+      ALERTS_DATABASE_URL: postgresql+psycopg://runtime_notifications:runtime_notifications_test_only@postgres/runtime_notifications
+      ALERTS_RUNTIME_DEPLOYMENT: mw-runtime-notifications-stage3b
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_NTFY_TOPIC: ''
+    command: [python, -m, alerts.runtime, --profile, notifications]
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: 'no'
+  migrate-contracts:
+    image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+    labels: {market-watch.task: mw-runtime-notifications-stage3b-20261028}
+    working_dir: /candidate
+    volumes: ['${MW_RUNTIME_NOTIFICATIONS_STAGE3B_REPO:?}:/candidate:ro']
+    environment:
+      PYTHONPATH: /candidate/backend
+      ALERTS_DATABASE_URL: postgresql+psycopg://runtime_notifications:runtime_notifications_test_only@postgres/runtime_notifications
+    entrypoint: [alembic]
+    command: [upgrade, head]
+    depends_on:
+      postgres: {condition: service_healthy}
+    restart: 'no'
+networks:
+  default: {internal: true}
+volumes:
+  notifications-pg:
+    labels: {market-watch.task: mw-runtime-notifications-stage3b-20261028}

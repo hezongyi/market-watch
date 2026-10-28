@@ -1,0 +1,13 @@
+{"scenario": "normal", "artifact": "runtime_baseline_normal_74c50860.json", "workers": {"runtime": 0, "alert": 0, "provider": 0, "notification": 0, "projection": 0, "history": 0}}
+{"scenario": "busy", "artifact": "runtime_baseline_busy_209bd115.json", "workers": {"runtime": 0, "alert": 0, "provider": 0, "notification": 0, "projection": 0, "history": 0}}
+{"scenario": "candidate", "artifact": "runtime_baseline_candidate_33953fc6.json", "workers": {"runtime": 0, "alert": 0, "provider": 0, "notification": 0, "projection": 0, "history": 0}}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3107.61 timings_ms={'lease_wait': 21.91}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3027.59 timings_ms={'lease_wait': 2.19}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3016.51 timings_ms={'lease_wait': 1.81}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3044.41 timings_ms={'lease_wait': 6.71}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3080.57 timings_ms={'lease_wait': 11.75}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3030.21 timings_ms={'lease_wait': 3.14}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3018.68 timings_ms={'lease_wait': 1.84}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3012.11 timings_ms={'lease_wait': 2.06}
+Provider read failed source=binance frame=M1 count=3 type=TimeoutError status=None elapsed_ms=3031.68 timings_ms={'lease_wait': 4.09}
+{"scenario": "slow-source", "artifact": "runtime_baseline_slow_source_c198228e.json", "workers": {"runtime": 0, "alert": 0, "provider": 0, "notification": 0, "projection": 0, "history": 0}}

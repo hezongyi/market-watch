@@ -16,7 +16,7 @@ export function providerSubscriptions(
   connect: (client: string) => Stream,
   receive: (event: any) => void,
   failure: (error: unknown) => void,
-  paths = {subscribe: '/charts/provider/subscribe', unsubscribe: '/charts/provider/unsubscribe'},
+  paths = {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
   observe: (args: Subscription, kind: FailureKind, error: unknown | null, attempt: string, lifecycle?: 'ended', evidence?: TransportEvidence) => void = () => {},
   established: (args: Subscription) => Promise<boolean> = async () => true,
 ) {

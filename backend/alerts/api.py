@@ -6,7 +6,6 @@ from contextlib import asynccontextmanager
 from typing import Literal
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-import httpx
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
@@ -50,13 +49,6 @@ async def lifespan(app):
     from .swing_sr import register_indicator
     register_indicator()
     bootstrap()
-    from .provider_chart import warm_clients
-    await asyncio.to_thread(warm_clients)
-    from .provider_service import start, stop
-    start()
-    from .provider_cache import interactive_busy
-    from .provider_transport import start as start_transport
-    start_transport(interactive_busy)
     app.router.routes[:] = [r for r in app.router.routes if getattr(r, "name", "") != "native_mcp"]
     try:
         if settings.mcp_enabled:
@@ -74,7 +66,6 @@ async def lifespan(app):
         else:
             yield
     finally:
-        await asyncio.to_thread(stop)
         from .provider_chart import close_clients
         close_clients()
 
@@ -323,62 +314,64 @@ def send_notification_test():
         if last is not None and now_ms() - last < 60000:
             raise HTTPException(429, "请间隔一分钟再发送测试")
         test_id = secrets.token_hex(16)
-        token = secrets.token_urlsafe(32)
-        db.add(
-            Preference(
-                key="test_ack:" + test_id,
-                value={"token_hash": digest(token), "expires": now_ms() + 86400000, "ack_at": None},
-            )
-        )
         db.add(Audit(kind="notification_test_requested", details={"test_id": test_id}))
-    headers = {"Authorization": f"Bearer {settings.ntfy_token}"} if settings.ntfy_token else {}
-    body = {
-        "topic": settings.ntfy_topic,
-        "title": "守望 · 手机通知测试",
-        "message": "这是你在工作台主动发送的测试通知，不是交易信号。点击打开工作台。",
-        "priority": 5,
-        "click": settings.public_url + "/settings",
-        "actions": [
-            {
-                "action": "http",
-                "label": "确认测试",
-                "method": "POST",
-                "url": f"{settings.public_url}/api/notification-tests/{test_id}/ack",
-                "headers": {"Authorization": f"Bearer {token}"},
-                "clear": True,
-            }
-        ],
-    }
-    try:
-        with httpx.Client(timeout=15) as client:
-            response = client.post(settings.ntfy_url.rstrip("/"), json=body, headers=headers)
-            response.raise_for_status()
-    except httpx.HTTPError:
-        with transaction() as db:
-            db.add(Audit(kind="notification_test_failed_or_unknown", details={"test_id": test_id}))
-        raise HTTPException(502, "推送请求失败或结果未知，请先检查手机，避免重复发送")
-    with transaction() as db:
-        db.add(Audit(kind="notification_test_accepted", details={"test_id": test_id}))
-    return {"status": "server_accepted", "device_delivery": "unknown"}
+        note = Notification(kind="test", signal_id=None, status="pending", payload={
+            "test_id": test_id, "title": "守望 · 手机通知测试",
+            "message": "这是你在工作台主动发送的测试通知，不是交易信号。点击打开工作台。",
+            "test_authorized": True,
+        })
+        db.add(note)
+        db.flush()
+        db.add(Outbox(notification_id=note.id, status="pending", attempts=0,
+                      next_at=now_ms(), lease_until=None, error=None, provider_id=None))
+        db.add(Preference(key="test_notification:" + test_id,
+                          value={"notification_id": note.id, "ack_at": None}))
+        return {"status": "queued", "device_delivery": "unknown", "test_id": test_id}
 
 
 @app.post("/api/notification-tests/{test_id}/ack")
 def acknowledge_test(test_id: str, request: Request):
     token = request.headers.get("authorization", "").removeprefix("Bearer ")
     with transaction() as db:
-        row = db.scalar(
-            select(Preference).where(Preference.key == "test_ack:" + test_id).with_for_update()
-        )
+        row = db.scalar(select(Preference).where(
+            Preference.key == "test_notification:" + test_id).with_for_update())
+        legacy_row = None
+        if not row:
+            legacy_row = db.scalar(select(Preference).where(
+                Preference.key == "test_ack:" + test_id).with_for_update())
+        hashes = row.value.get("token_hashes", []) if row else []
+        token_hash = digest(token) if token else ""
+        valid_token = any(secrets.compare_digest(saved, token_hash) for saved in hashes)
+        if row and not hashes:
+            valid_token = secrets.compare_digest(row.value.get("token_hash", ""), token_hash)
+        if legacy_row:
+            valid_token = secrets.compare_digest(
+                legacy_row.value.get("token_hash", ""), token_hash)
         if (
             not token
-            or not row
-            or not secrets.compare_digest(row.value["token_hash"], digest(token))
+            or not (row or legacy_row)
+            or not valid_token
         ):
             raise HTTPException(403, "测试确认凭证无效")
-        if row.value["expires"] < now_ms():
+        credential = row or legacy_row
+        if credential.value.get("expires", 0) < now_ms():
             raise HTTPException(403, "测试确认凭证已过期")
+        if legacy_row:
+            if legacy_row.value["ack_at"] is None:
+                legacy_row.value = {**legacy_row.value, "ack_at": now_ms()}
+                db.add(Audit(kind="notification_test_acknowledged",
+                             details={"test_id": test_id}))
+            return {"status": "acknowledged"}
         if row.value["ack_at"] is None:
             row.value = {**row.value, "ack_at": now_ms()}
+            note = db.get(Notification, row.value["notification_id"])
+            if note:
+                note.ack_at = now_ms()
+                note.status = "acknowledged"
+                task = db.scalar(select(Outbox).where(
+                    Outbox.notification_id == note.id).with_for_update())
+                if task:
+                    task.status = "cancelled"
             db.add(Audit(kind="notification_test_acknowledged", details={"test_id": test_id}))
         return {"status": "acknowledged"}
 
@@ -402,6 +395,8 @@ def readyz(response: Response):
 @app.get("/api/health", dependencies=[Depends(authenticated)])
 def health():
     from .chart_alert_health import summary as chart_alert_health
+    from .runtime_health import MARKET_ROLES, data_roles
+    from .runtime_health import summary as runtime_health
     from .worker_health import services
 
     with transaction() as db:
@@ -436,7 +431,8 @@ def health():
         last_test_result = None
         if requested:
             test_id = requested.details.get("test_id")
-            grant = db.get(Preference, "test_ack:" + test_id) if test_id else None
+            grant = (db.get(Preference, "test_notification:" + test_id) or
+                     db.get(Preference, "test_ack:" + test_id)) if test_id else None
             outcomes = db.scalars(
                 select(Audit)
                 .where(
@@ -462,6 +458,8 @@ def health():
             "time": now_ms(),
             "pending_notifications": pending,
             "chart_alerts": chart_alert_health(db),
+            "market_runtime": runtime_health(db, MARKET_ROLES),
+            "data_runtime": runtime_health(db, data_roles()),
             "backup": backup_health(db),
             "market_incidents": market_incidents(db),
             "last_notification_test": last_test_result,

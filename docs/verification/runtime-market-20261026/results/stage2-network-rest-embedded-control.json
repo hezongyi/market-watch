@@ -1,0 +1,30 @@
+{
+  "run": "rest_embedded_e",
+  "schema": "runtime_network_rest_embedded_e",
+  "business_origin": 166200010,
+  "monotonic_origin": 1119373.995739239,
+  "rules": [
+    "acad9b7f-0996-4e93-b383-6ecebb9a243f",
+    "caa8f0ff-8a1a-4b5f-a723-2b8011580aa9",
+    "a420decc-23fb-4e04-8c91-845bcfd3c3bb",
+    "d4427ab6-a6b4-44f3-9999-3c37f0384121",
+    "e4093465-71ae-46d3-838d-050dd6ee1649",
+    "d68fb4eb-e86c-4893-8d98-d4be951635e2",
+    "233357c8-b997-4aad-acfb-08dcc9160326"
+  ],
+  "rule_modes": {
+    "acad9b7f-0996-4e93-b383-6ecebb9a243f": "price_close",
+    "caa8f0ff-8a1a-4b5f-a723-2b8011580aa9": "price_close",
+    "a420decc-23fb-4e04-8c91-845bcfd3c3bb": "price_close",
+    "d4427ab6-a6b4-44f3-9999-3c37f0384121": "price_close",
+    "e4093465-71ae-46d3-838d-050dd6ee1649": "atr_close",
+    "d68fb4eb-e86c-4893-8d98-d4be951635e2": "atr_close",
+    "233357c8-b997-4aad-acfb-08dcc9160326": "ema_intrabar"
+  },
+  "composite": "c5db3242329e9d30877572034f302c6735c179dbfccce8010fc93f4508c91885",
+  "revision": "546c8358-36dc-4284-b04d-4665789f7122",
+  "target": "4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f",
+  "seam": 165600000,
+  "calendar_version": "ny17-candidate-v1",
+  "synthetic": true
+}

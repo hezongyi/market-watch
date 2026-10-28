@@ -6,6 +6,7 @@ releases another consumer's dataset lease or removes its completed history.
 import hashlib
 import json
 import logging
+import threading
 import time
 from contextlib import contextmanager
 
@@ -271,15 +272,20 @@ def once():
 
 
 def main():
-    from .composite_price_confirmation import once as confirm_price
     from .provider_chart import warm_clients
+
+    warm_clients()
+    run(threading.Event())
+
+
+def run(stop):
+    from .composite_price_confirmation import once as confirm_price
     from .worker_health import Pulse
 
     pulse = Pulse("native_history")
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    warm_clients()
-    while True:
+    while not stop.is_set():
         try:
             pulse.start()
             confirmation_at, confirmation_started = now_ms(), time.monotonic()
@@ -293,11 +299,15 @@ def main():
             worked = once()
             worked = worked or confirmed
             pulse.finish(worked=worked)
+            from .runtime_health import progress
+            progress()
         except Exception as exc:
             pulse.finish(errors=[type(exc).__name__])
+            from .runtime_health import progress
+            progress(error=exc)
             log.warning("History worker turn failed type=%s", type(exc).__name__)
             worked = False
-        time.sleep(0.05 if worked else 1)
+        stop.wait(0.05 if worked else 1)
 
 
 if __name__ == "__main__":
