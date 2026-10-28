@@ -18,6 +18,10 @@ CURRENT = ContextVar("runtime_progress", default=None)
 WRITE_MS = 5000
 STALE_MS = 15000
 STARTUP_MS = 60000
+# A deploy restarts a role once or twice; more starts inside one window is a loop.
+RESTART_WINDOW_MS = 300_000
+RESTART_LIMIT = 3
+MAINTENANCE_PREFIX = "runtime_maintenance:"
 MARKET_ROLES = ("pricing", "realtime", "composite_aggregate", "alert_indicator",
                 "chart_alert", "market_ownership")
 NOTIFICATION_ROLES = (
@@ -38,8 +42,75 @@ def data_roles():
                         "market_stream", "data_ownership")
 
 
+def expected_roles():
+    """Roles the deployment configuration starts; a live heartbeat never adds one.
+
+    The independent alert profile reuses MARKET_ROLES' chart_alert slot, so its
+    deployment keeps ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED enabled here too.
+    """
+    market = tuple(role for role in MARKET_ROLES
+                   if role != "market_ownership"
+                   and (role != "chart_alert" or settings.market_runtime_chart_alert_enabled))
+    return (tuple(f"market:{role}" for role in market)
+            + tuple(f"data:{role}" for role in data_roles() if role != "data_ownership")
+            + tuple(f"notifications:{role}" for role in NOTIFICATION_ROLES))
+
+
 def key(role):
     return f"worker_health:runtime:{settings.runtime_deployment}:{role}"
+
+
+def restarts(db, *, at=None):
+    """Roles started more than RESTART_LIMIT times inside one restart window."""
+    stamp = now_ms() if at is None else at
+    prefix = key("")
+    hot = []
+    for row in db.scalars(select(Preference).where(
+            Preference.key.startswith(prefix, autoescape=True))).all():
+        starts = [value for value in row.value.get("starts", [])
+                  if value and value > stamp - RESTART_WINDOW_MS]
+        if len(starts) > RESTART_LIMIT:
+            hot.append((row.value.get("role") or row.key.removeprefix(prefix), len(starts)))
+    return hot
+
+
+def maintenance_key():
+    return MAINTENANCE_PREFIX + settings.runtime_deployment
+
+
+def maintenance(db, *, at=None):
+    """The bounded planned-maintenance window for this deployment, while it is open."""
+    stamp = now_ms() if at is None else at
+    row = db.get(Preference, maintenance_key())
+    window = row.value if row else {}
+    return window if window.get("until", 0) > stamp else None
+
+
+def paused(window, group):
+    """Whether a maintenance window pauses expectation checks for one group."""
+    if not window:
+        return False
+    groups = window.get("groups") or ()
+    return not groups or group in groups
+
+
+def maintain(db, *, minutes, groups=(), note="", at=None):
+    """Record an explicit maintenance window; it ends by itself at its until time."""
+    stamp = now_ms() if at is None else at
+    window = {"until": stamp + minutes * 60_000, "started_at": stamp,
+              "groups": list(groups), "note": note}
+    row = db.get(Preference, maintenance_key())
+    if row:
+        row.value = window
+    else:
+        db.add(Preference(key=maintenance_key(), value=window))
+    return window
+
+
+def clear_maintenance(db):
+    row = db.get(Preference, maintenance_key())
+    if row:
+        db.delete(row)
 
 
 class Progress:
@@ -64,7 +135,8 @@ class Progress:
                        .on_conflict_do_nothing(index_elements=["key"]))
             row = db.scalar(select(Preference).where(Preference.key == key(self.role)).with_for_update())
             previous = row.value
-            starts = [at for at in previous.get("starts", []) if at > stamp - 300000][-9:]
+            starts = [at for at in previous.get("starts", [])
+                      if at > stamp - RESTART_WINDOW_MS][-9:]
             row.value = dict(group=self.group, role=self.role,
                 deployment=settings.runtime_deployment, boot_id=self.boot_id,
                 started_at=stamp, starts=[*starts, stamp], state="starting",
