@@ -50,7 +50,7 @@ def test_restart_loop_is_deduplicated_across_worker_restarts(incident_pg, monkey
 
     scope(monkeypatch, market=("chart_alert",))
     boots = [runtime_health.Progress("market", "chart_alert", f"boot-{index}")
-             for index in range(4)]
+             for index in range(runtime_health.RESTART_LIMIT)]
     for reporter in boots:
         reporter.claim()
     boots[-1].record()
@@ -60,9 +60,9 @@ def test_restart_loop_is_deduplicated_across_worker_restarts(incident_pg, monkey
     notification_runtime.inspect_health()
     with transaction() as db:
         notes = list(db.scalars(select(Notification)))
-        assert len(notes) == 1 and "runtime / boot_loop" in notes[0].payload["message"]
+        assert len(notes) == 1 and "market / boot_loop" in notes[0].payload["message"]
         assert db.scalar(select(func.count()).select_from(Outbox)) == 1
-        incident = db.get(Preference, "runtime_incident:runtime:boot_loop")
+        incident = db.get(Preference, "runtime_incident:market:boot_loop")
         assert incident.value["state"] == "active"
         incident.value = {**incident.value, "last_notified_at": now_ms() - 900_000}
     notification_runtime.inspect_health()
@@ -75,7 +75,7 @@ def test_restart_loop_is_deduplicated_across_worker_restarts(incident_pg, monkey
         notes = list(db.scalars(select(Notification).order_by(Notification.created_at,
                                                              Notification.id)))
         assert len(notes) == 3 and "已恢复" in notes[-1].payload["message"]
-        assert db.get(Preference, "runtime_incident:runtime:boot_loop").value["state"] == "recovered"
+        assert db.get(Preference, "runtime_incident:market:boot_loop").value["state"] == "recovered"
 
 
 def test_concurrent_claims_keep_every_boot_inside_the_window(incident_pg):
@@ -156,3 +156,25 @@ def test_active_fault_reminder_time_reaches_the_row(incident_pg, monkeypatch):
         notification_runtime.inspect_health()
     with transaction() as db:
         assert len(list(db.scalars(select(Notification)))) == 2
+
+
+def test_scoped_restart_maintenance_survives_fresh_sessions(incident_pg, monkeypatch):
+    from alerts import notification_runtime, runtime_health
+    from alerts.storage import Notification, Preference, transaction
+
+    scope(monkeypatch, market=("chart_alert",))
+    with transaction() as db:
+        runtime_health.maintain(db, minutes=30, groups=("market",))
+    for index in range(3):
+        reporter = runtime_health.Progress("market", "chart_alert", f"boot-{index}")
+        reporter.claim()
+    reporter.record()
+    notification_runtime.inspect_health()
+    with transaction() as db:
+        assert db.scalar(select(Notification)) is None
+        runtime_health.clear_maintenance(db)
+    notification_runtime.inspect_health()
+    notification_runtime.inspect_health()
+    with transaction() as db:
+        assert db.scalar(select(func.count()).select_from(Notification)) == 1
+        assert db.get(Preference, "runtime_incident:market:boot_loop").value["state"] == "active"

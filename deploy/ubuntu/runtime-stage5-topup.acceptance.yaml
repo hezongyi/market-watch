@@ -11,9 +11,10 @@ x-probe: &probe
     - ${MW_TOPUP_HARNESS_DIR:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/harness}:/stage5:ro
     - ${MW_TOPUP_ARTIFACTS:-/home/quant/.local/share/market-watch-runtime-stage5-topup-20261028/artifacts}:/artifacts
   restart: 'no'
+  init: true
   labels:
-    market-watch.task: runtime-market-stage5-topup-20261028
-    market-watch.project: mw-runtime-stage5-topup-20261028
+    market-watch.task: ${MW_TOPUP_TASK:-runtime-market-stage5-topup-20261028}
+    market-watch.project: ${MW_TOPUP_PROJECT:-mw-runtime-stage5-topup-20261028}
     market-watch.purpose: acceptance
   environment: &probe-environment
     PYTHONPATH: /candidate/backend:/candidate/backend/tests:/candidate/scripts
@@ -64,8 +65,8 @@ services:
     restart: unless-stopped
     logging: *logging
     labels:
-      market-watch.task: runtime-market-stage5-topup-20261028
-      market-watch.project: mw-runtime-stage5-topup-20261028
+      market-watch.task: ${MW_TOPUP_TASK:-runtime-market-stage5-topup-20261028}
+      market-watch.project: ${MW_TOPUP_PROJECT:-mw-runtime-stage5-topup-20261028}
       market-watch.purpose: acceptance
   fixture-supplier:
     <<: *probe
@@ -143,9 +144,15 @@ services:
     command: [status]
     depends_on:
       postgres: {condition: service_healthy}
+networks:
+  default:
+    internal: true
+    labels:
+      market-watch.task: ${MW_TOPUP_TASK:-runtime-market-stage5-topup-20261028}
+      market-watch.purpose: acceptance
 volumes:
   runtime-topup-postgres:
     labels:
-      market-watch.task: runtime-market-stage5-topup-20261028
-      market-watch.project: mw-runtime-stage5-topup-20261028
+      market-watch.task: ${MW_TOPUP_TASK:-runtime-market-stage5-topup-20261028}
+      market-watch.project: ${MW_TOPUP_PROJECT:-mw-runtime-stage5-topup-20261028}
       market-watch.purpose: acceptance

@@ -18,7 +18,7 @@ CURRENT = ContextVar("runtime_progress", default=None)
 WRITE_MS = 5000
 STALE_MS = 15000
 STARTUP_MS = 60000
-# A deploy restarts a role once or twice; more starts inside one window is a loop.
+# A deploy starts a role once or twice; the third start inside one window is a loop.
 RESTART_WINDOW_MS = 300_000
 RESTART_LIMIT = 3
 MAINTENANCE_PREFIX = "runtime_maintenance:"
@@ -61,7 +61,7 @@ def key(role):
 
 
 def restarts(db, *, at=None):
-    """Roles started more than RESTART_LIMIT times inside one restart window."""
+    """Groups and roles reaching RESTART_LIMIT starts inside one restart window."""
     stamp = now_ms() if at is None else at
     prefix = key("")
     hot = []
@@ -69,8 +69,9 @@ def restarts(db, *, at=None):
             Preference.key.startswith(prefix, autoescape=True))).all():
         starts = [value for value in row.value.get("starts", [])
                   if value and value > stamp - RESTART_WINDOW_MS]
-        if len(starts) > RESTART_LIMIT:
-            hot.append((row.value.get("role") or row.key.removeprefix(prefix), len(starts)))
+        if len(starts) >= RESTART_LIMIT:
+            hot.append((row.value.get("group", "runtime"),
+                        row.value.get("role") or row.key.removeprefix(prefix), len(starts)))
     return hot
 
 

@@ -116,6 +116,15 @@ class DatabaseComposeTests(unittest.TestCase):
                 self.assertEqual(service['environment']['ALERTS_YAHOO_ENABLED'],'true',name)
                 self.assertNotIn('ALERTS_DATABASE_EXPECTED_VERSION',service['environment'])
 
+    def test_stage5_topup_has_no_external_network_or_host_ports(self):
+        rendered = self.render([Path('deploy/ubuntu/runtime-stage5-topup.acceptance.yaml')])
+        self.assertTrue(rendered['networks']['default']['internal'])
+        for name, service in rendered['services'].items():
+            with self.subTest(service=name):
+                self.assertEqual(set(service['networks']), {'default'})
+                self.assertFalse(service.get('ports'))
+                self.assertNotEqual(service.get('network_mode'), 'host')
+
     def test_only_selected_production_worker_can_enable_jit(self):
         for selected in ('notification-worker','migrate','backup'):
             with self.subTest(selected=selected):

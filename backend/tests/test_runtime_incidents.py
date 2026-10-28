@@ -139,7 +139,7 @@ def test_repeated_starts_inside_one_window_are_reported_once_and_recover(databas
 
     scope(monkeypatch, market=("chart_alert",))
     boots = [runtime_health.Progress("market", "chart_alert", f"boot-{index}")
-             for index in range(4)]
+             for index in range(runtime_health.RESTART_LIMIT)]
     for reporter in boots:
         reporter.claim()
     boots[-1].record()
@@ -147,7 +147,7 @@ def test_repeated_starts_inside_one_window_are_reported_once_and_recover(databas
     notification_runtime.inspect_health()
     with database.begin() as db:
         assert len(list(db.scalars(select(Notification)))) == 1
-        incident = db.get(Preference, "runtime_incident:runtime:boot_loop")
+        incident = db.get(Preference, "runtime_incident:market:boot_loop")
         assert incident.value["state"] == "active" and incident.value["category"] == "restart_loop"
         # Once the window rolls over the replacement is healthy again.
         row = db.get(Preference, runtime_health.key("chart_alert"))
@@ -163,7 +163,7 @@ def test_a_normal_redeploy_is_not_a_restart_loop(database, monkeypatch):
 
     scope(monkeypatch, market=("chart_alert",))
     boots = [runtime_health.Progress("market", "chart_alert", f"boot-{index}")
-             for index in range(runtime_health.RESTART_LIMIT)]
+             for index in range(runtime_health.RESTART_LIMIT - 1)]
     for reporter in boots:
         reporter.claim()
     boots[-1].record()
@@ -248,6 +248,53 @@ def test_scoped_maintenance_window_leaves_other_groups_checked(database, monkeyp
     message = notes(database)[0]["message"]
     assert "data / chart_history" in message
     assert "market / chart_alert" not in message
+
+
+def test_scoped_maintenance_suppresses_only_its_own_restart_loops(database, monkeypatch):
+    from alerts import notification_runtime, runtime_health
+    from alerts.storage import Preference
+
+    scope(monkeypatch, market=("chart_alert",), data=("chart_history",))
+    for group, role in (("market", "chart_alert"), ("data", "chart_history")):
+        for index in range(3):
+            reporter = runtime_health.Progress(group, role, f"{group}-{index}")
+            reporter.claim()
+        reporter.record()
+    with database.begin() as db:
+        runtime_health.maintain(db, minutes=30, groups=("market",))
+    notification_runtime.inspect_health()
+    assert "data / boot_loop" in notes(database)[0]["message"]
+    assert "market" not in notes(database)[0]["message"]
+    with database.begin() as db:
+        assert db.get(Preference, "runtime_incident:market:boot_loop") is None
+        runtime_health.clear_maintenance(db)
+    notification_runtime.inspect_health()
+    assert "market / boot_loop" in notes(database)[1]["message"]
+
+
+def test_scoped_maintenance_does_not_recover_an_existing_restart_incident(database, monkeypatch):
+    from alerts import notification_runtime, runtime_health
+    from alerts.storage import Preference, now_ms
+
+    scope(monkeypatch, market=("chart_alert",))
+    for index in range(3):
+        reporter = runtime_health.Progress("market", "chart_alert", f"boot-{index}")
+        reporter.claim()
+    reporter.record()
+    notification_runtime.inspect_health()
+    with database.begin() as db:
+        runtime_health.maintain(db, minutes=30, groups=("market",))
+        role = db.get(Preference, runtime_health.key("chart_alert"))
+        role.value = {**role.value, "starts": [now_ms()]}
+    notification_runtime.inspect_health()
+    with database.begin() as db:
+        assert db.get(Preference, "runtime_incident:market:boot_loop").value["state"] == "active"
+        runtime_health.maintain(db, minutes=1, groups=("market",), at=now_ms() - 120_000)
+    notification_runtime.inspect_health()
+    notification_runtime.inspect_health()
+    assert len(notes(database)) == 2
+    assert "market / boot_loop" in notes(database)[1]["message"]
+    assert "已恢复" in notes(database)[1]["message"]
 
 
 def test_restart_scan_is_scoped_to_this_deployment(database, monkeypatch):

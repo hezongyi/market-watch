@@ -18,7 +18,7 @@
 
 ## 3. 切换前配置核对（命令已验证可执行）
 
-在发布目录执行（`docker compose 29.1.3` 实测；`config` 需要该目录存在 `.env`，仅核对服务图时可先 `touch .env`，核对后删除）：
+在发布目录使用已有的生产私有 `.env` 执行（`docker compose 29.1.3` 实测）。**不得创建、清空或删除该目录的 `.env`**。仅使用占位配置核对服务图时，把模板复制到独立临时目录，并只在该临时目录创建占位 `.env`；真实发布核对必须使用实际配置。
 
 ```bash
 export MW_API_IMAGE=<api digest> MW_WEB_IMAGE=<web digest> MW_BACKUP_IMAGE=<backup digest>

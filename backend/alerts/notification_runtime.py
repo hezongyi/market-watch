@@ -159,10 +159,10 @@ def inspect_health(*, startup_grace_until=0):
                 starting = not checked and value.get("state") == "starting"
                 if not ((category == "missing" or starting) and now < startup_grace_until):
                     faults.append((group, role, category))
-        # Repeated starts inside one window are a deploy-independent fault of the
-        # replacement state itself, deduplicated across every churning role.
-        if restarts(db, at=now):
-            faults.append(("runtime", "boot_loop", "restart_loop"))
+        # Retain the originating group so scoped maintenance also pauses restart
+        # incidents and never manufactures a recovery for a maintained group.
+        faults.extend((group, "boot_loop", "restart_loop")
+                      for group in {group for group, _role, _count in restarts(db, at=now)})
         faults = [fault for fault in faults if not paused(window, fault[0])]
         current = {f"{group}:{role}" for group, role, _category in faults}
         notifications_due = []

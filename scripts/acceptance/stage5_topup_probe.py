@@ -255,8 +255,9 @@ def supplier(control):
                 self.respond({"account": {"id": ACCOUNT}})
                 return
             if path.endswith("/instruments"):
+                hit("catalog", path)
                 self.respond({"instruments": [
-                    {"name": "EUR_USD", "displayName": "Fixture EUR/USD", "displayPrecision": 5},
+                    {"name": "EUR_USD", "type": "CURRENCY", "displayName": "Fixture EUR/USD", "displayPrecision": 5},
                     {"name": "XAU_USD", "displayName": "Fixture XAU/USD", "displayPrecision": 3}]})
                 return
             if path.endswith("/candles/latest"):
@@ -334,13 +335,22 @@ def fixture_transport():
 
 
 def patch_runtime_io():
-    from alerts import oanda_worker, provider_transport
+    import httpx
+    from alerts import market_data, oanda_worker, provider_transport
     from alerts.oanda_rest_batch import OandaRestBatch
     from alerts.oanda_stream import OandaPractice
-    import httpx
 
     make = fixture_transport()
     provider_transport.deadline_transport = make
+    # Catalog refresh uses a direct client rather than provider_transport.
+    # Keep the production parser while routing that client through the fixture.
+    from alerts.providers import fetch_oanda_catalog
+
+    def catalog():
+        with httpx.Client(transport=make(), timeout=5) as client:
+            return fetch_oanda_catalog(client)
+
+    market_data.fetch_oanda_catalog = catalog
 
     class FixtureClients:
         def __init__(self, **kwargs):
@@ -367,10 +377,10 @@ CONTROL = {}
 
 
 # ------------------------------------------------------------------ runtime
-def runtime(profile, fault=None, slow_delivery=False):
+def runtime(profile, fault=None, slow_delivery=False, accept_delivery=False):
     patch_runtime_io()
-    if profile == "notifications" and slow_delivery:
-        return runtime_slow_delivery()
+    if profile == "notifications" and (slow_delivery or accept_delivery):
+        return runtime_delivery_stub(SLOW_STUB if slow_delivery else "/stub/notification")
     if fault:
         from alerts import market_runtime
         from alerts.runtime_health import progress
@@ -394,12 +404,12 @@ def runtime(profile, fault=None, slow_delivery=False):
     main()
 
 
-def runtime_slow_delivery():
+def runtime_delivery_stub(path):
     """Real notification group with only the delivery HTTP destination replaced.
 
     The environment keeps ALERTS_DELIVERY_ENABLED=false and no topic. The probe
-    sets the topic in-process and points the delivery client at a local stub that
-    never answers, then runs the same three supervised roles.
+    sets the topic in-process and points the delivery client at a local stub,
+    then runs the same three supervised roles.
     """
     import httpx
     from alerts import notification_center_worker, notification_runtime, notify
@@ -407,7 +417,7 @@ def runtime_slow_delivery():
     from alerts.runtime_supervisor import Loop
 
     settings.ntfy_topic = "stage5-topup-stub"
-    settings.ntfy_url = "http://" + SUPPLIER + ":8080" + SLOW_STUB
+    settings.ntfy_url = "http://" + SUPPLIER + ":8080" + path
     # The delivery destination is already the local stub, so no destination
     # rewrite is needed; a plain client keeps the real httpx timeout semantics.
     client = httpx.Client(timeout=20, trust_env=False)
@@ -427,7 +437,6 @@ def api():
 
 # --------------------------------------------------------------- snapshots
 def snapshot(label):
-    from alerts import runtime_health
     from alerts.config import settings
     from alerts.live_pricing import account_key
     from alerts.storage import (
@@ -724,6 +733,75 @@ def test_notifications(count):
                                      "expires": now_ms() + 86400000}))
             created.append(note.id)
     print(json.dumps({"test_notifications": len(created), "ids": created}), flush=True)
+    return created
+
+
+def notification_lease(action):
+    """Track one durable task across a killed owner and a real lease expiry.
+
+    Orchestration stops/restarts the task-owned notification container. This
+    probe only creates one test message and reads independent sessions; it never
+    edits a lease, attempts counter, clock or delivery outcome.
+    """
+    from alerts.runtime_health import key
+    from alerts.storage import DeliveryAttempt, Notification, Outbox, Preference, Session, now_ms
+    from sqlalchemy import func, select
+
+    path = ROOT / "lease-task.json"
+    if action == "lease-prepare":
+        ident = test_notifications(1)[0]
+        with Session() as db:
+            task = db.scalar(select(Outbox).where(Outbox.notification_id == ident))
+            value = {"task": task.id, "notification": ident, "initial_attempts": task.attempts}
+        write(path, value)
+    else:
+        tracked = json.loads(path.read_text())
+
+        def read():
+            with Session() as db:
+                task = db.get(Outbox, tracked["task"])
+                note = db.get(Notification, tracked["notification"])
+                reporter = db.get(Preference, key("notification_delivery"))
+                return {
+                    "at": now_ms(), "task": task.id, "notification": note.id,
+                    "attempts": task.attempts, "status": task.status,
+                    "lease_until": task.lease_until,
+                    "boot": reporter.value["boot_id"] if reporter else None,
+                    "notification_status": note.status,
+                    "outbox_count": db.scalar(select(func.count()).select_from(Outbox).where(
+                        Outbox.notification_id == note.id)),
+                    "receipts": list(db.scalars(select(DeliveryAttempt.status).where(
+                        DeliveryAttempt.notification_id == note.id))),
+                }
+
+        if action == "lease-captured":
+            value = read()
+            assert value["status"] == "sending" and value["attempts"] == 1, value
+            assert value["at"] < value["lease_until"] and not value["receipts"], value
+            write(ROOT / "lease-before.json", value)
+        elif action == "lease-verify":
+            before = json.loads((ROOT / "lease-before.json").read_text())
+            samples = []
+            deadline = time.monotonic() + 100
+            while time.monotonic() < deadline:
+                value = read()
+                samples.append(value)
+                if value["at"] < before["lease_until"]:
+                    assert value["attempts"] == 1 and not value["receipts"], value
+                if value["status"] == "accepted":
+                    break
+                time.sleep(1)
+            assert any(row["at"] < before["lease_until"] for row in samples), samples
+            assert value["at"] >= before["lease_until"], value
+            assert value["status"] == "accepted" and value["attempts"] == 2, value
+            assert value["notification_status"] == "server_accepted", value
+            assert value["task"] == before["task"] and value["boot"] != before["boot"], value
+            assert value["outbox_count"] == 1 and value["receipts"] == ["accepted"], value
+            value = {"before": before, "after": value, "samples": samples, "passed": True}
+            write(ROOT / "lease-takeover.json", value)
+        else:
+            raise ValueError("Unknown lease probe: " + action)
+    print(json.dumps(value, ensure_ascii=False), flush=True)
 
 
 def notify_claim(action):
@@ -866,7 +944,9 @@ def main():
     parser.add_argument("--profile", choices=("market", "alert", "data", "notifications"),
                         default="market")
     parser.add_argument("--fault", choices=("exception", "stuck"))
-    parser.add_argument("--slow-delivery", action="store_true")
+    delivery = parser.add_mutually_exclusive_group()
+    delivery.add_argument("--slow-delivery", action="store_true")
+    delivery.add_argument("--accept-delivery", action="store_true")
     parser.add_argument("--label", default="status")
     parser.add_argument("--phase", default="on")
     parser.add_argument("--value", default="1.119")
@@ -895,7 +975,7 @@ def main():
     if args.action == "supplier":
         supplier(CONTROL)
     elif args.action == "runtime":
-        runtime(args.profile, args.fault, args.slow_delivery)
+        runtime(args.profile, args.fault, args.slow_delivery, args.accept_delivery)
     elif args.action == "api":
         api()
     elif args.action == "snapshot":
@@ -913,7 +993,10 @@ def main():
     elif args.action == "test-notifications":
         test_notifications(args.count)
     elif args.action == "notify":
-        notify_claim(args.phase)
+        if args.phase.startswith("lease-"):
+            notification_lease(args.phase)
+        else:
+            notify_claim(args.phase)
     elif args.action == "projection-watch":
         projection_watch(args.seconds)
     elif args.action == "rules":
@@ -926,4 +1009,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
