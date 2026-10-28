@@ -11,6 +11,8 @@ from alerts.fixed_indicators import indicator_tick, request
 from alerts.history_artifacts import artifact_tick
 from alerts.market_contracts import DatasetIdentity
 from alerts.storage import (
+    ChartAlert,
+    ChartAlertVersion,
     ChartPublication,
     CompositePreparation,
     CompositeRevision,
@@ -146,8 +148,9 @@ def test_live_bindings_are_snapshotted_and_unchanged(database, monkeypatch):
     with database() as db:
         assert db.get(MarketComposite, composite).active_revision_id == active
         assert db.get(CompositeRevision, candidate).activated_at is None
-        assert len([row.key for row in db.scalars(select(Preference).where(
-            Preference.key.like("managed_realtime:%")))]) == len(before["realtime_preferences"])
+        assert sorted(row.key for row in db.scalars(select(Preference).where(
+            Preference.key.in_(before["scope"]["realtime_keys"])))) == sorted(
+                row["key"] for row in before["realtime_preferences"])
     assert after == before
     assert report["bindings"]["critical_unchanged"] is True
     assert report["bindings"]["active_revision_id"] == {"before": active, "after": active,
@@ -287,3 +290,93 @@ def test_gap_list_reports_missing_minutes_and_uncovered_intervals(database, monk
     assert gaps["scanned"]["observed_minutes"] == 5
     assert [item["segment"] for item in gaps["uncovered"]] == ["target"]
     assert gaps["uncovered"][0]["start"] == gap + 4 * 60000
+
+def unrelated_instrument(database):
+    """A symbol this composite does not own, with its own instrument row."""
+    with database.begin() as db:
+        db.add(Instrument(id="MD:OTHERUSDT", label="无关品种", source="dukascopy",
+                          symbol="OTHER/USDT", basis="bid", calendar="utc0",
+                          calendar_profile={}, precision=5))
+    return "MD:OTHERUSDT"
+
+
+def test_unrelated_instrument_writes_do_not_fail_this_composites_shadow(database, monkeypatch):
+    composite, active, candidate, plan, _ = candidate_fixture(database, monkeypatch)
+    other = unrelated_instrument(database)
+
+    def publish_elsewhere(*args, **kwargs):
+        with database.begin() as db:
+            db.add(ChartPublication(instrument_id=other, timeframe="H1", start=0, end=3600000,
+                                    complete_count=3, initialized=True))
+            alert = ChartAlert(request_id="unrelated-rule", request_hash="0" * 64,
+                               name="无关品种规则", effective_at=STAMP)
+            db.add(alert)
+            db.flush()
+            for version in (1, 2):
+                db.add(ChartAlertVersion(alert_id=alert.id, version=version, config={},
+                                         market_identity={"composite_id": "another-composite"},
+                                         effective_at=STAMP))
+
+    monkeypatch.setattr(baseline_shadow, "advance", publish_elsewhere)
+    report = baseline_shadow.shadow(composite, scheduled_for=STAMP)
+    assert report["status"] == "ready", report.get("error")
+    assert report["reasons"] == []
+    assert report["bindings"]["critical_unchanged"] is True
+    assert report["bindings"]["active_revision_id"]["unchanged"] is True
+    for name in ("alerts", "alert_versions", "publications", "realtime_preferences"):
+        assert report["bindings"]["tables"][name]["unchanged"] is True, name
+    assert other not in report["bindings"]["scope"]["instruments"]
+    with database() as db:
+        assert db.scalar(select(func.count()).select_from(ChartPublication)) == 2
+        assert db.scalar(select(func.count()).select_from(ChartAlert)) == 3
+    assert switch_runs.get(report["run"]["id"])["state"] == "shadow_ready"
+
+
+def test_this_composites_own_binding_changes_still_fail_the_shadow(database, monkeypatch):
+    composite, active, candidate, plan, rules = candidate_fixture(database, monkeypatch)
+    before = baseline_shadow.bindings(composite)
+    before_digest = baseline_shadow._digest(before["publications"])
+    mutated = [dict(row) for row in before["publications"]]
+    mutated[0]["end"] += 1
+    assert baseline_shadow._digest(mutated) != before_digest  # 逐列敏感，不是只比行数
+
+    def touch_own_bindings(*args, **kwargs):
+        with database.begin() as db:
+            publication = db.scalar(select(ChartPublication).order_by(
+                ChartPublication.instrument_id))
+            publication.end += 60000
+            current = db.scalar(select(ChartAlertVersion).where(
+                ChartAlertVersion.alert_id == rules[0],
+                ChartAlertVersion.version == 1))
+            db.add(ChartAlertVersion(alert_id=rules[0], version=2, config=current.config,
+                                     market_identity=current.market_identity,
+                                     effective_at=STAMP))
+
+    monkeypatch.setattr(baseline_shadow, "advance", touch_own_bindings)
+    report = baseline_shadow.shadow(composite, scheduled_for=STAMP)
+    assert report["status"] == "failed" and report["ready"] is False
+    assert {reason["code"] for reason in report["reasons"]} == {"binding_changed"}
+    assert report["bindings"]["critical_unchanged"] is False
+    assert report["bindings"]["active_revision_id"]["unchanged"] is True
+    assert report["bindings"]["tables"]["publications"]["unchanged"] is False
+    assert report["bindings"]["tables"]["alert_versions"]["unchanged"] is False
+    assert report["bindings"]["tables"]["publications"]["rows"] == len(before["publications"])
+    assert report["bindings"]["tables"]["publications"]["digest"] != before_digest
+    assert report["bindings"]["tables"]["alerts"]["unchanged"] is True
+    assert switch_runs.get(report["run"]["id"])["state"] == "failed"
+
+
+def test_external_active_revision_change_still_fails_the_shadow(database, monkeypatch):
+    composite, active, candidate, plan, _ = candidate_fixture(database, monkeypatch)
+
+    def switch_active_elsewhere(*args, **kwargs):
+        with database.begin() as db:
+            db.get(MarketComposite, composite).active_revision_id = candidate
+
+    monkeypatch.setattr(baseline_shadow, "advance", switch_active_elsewhere)
+    report = baseline_shadow.shadow(composite, scheduled_for=STAMP)
+    assert report["status"] == "failed"
+    assert {reason["code"] for reason in report["reasons"]} == {"binding_changed"}
+    assert report["bindings"]["active_revision_id"] == {
+        "before": active, "after": candidate, "unchanged": False}
+    assert report["bindings"]["critical_unchanged"] is False

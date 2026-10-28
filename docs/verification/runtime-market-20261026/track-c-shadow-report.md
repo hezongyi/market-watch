@@ -23,6 +23,7 @@ MAX_SCAN_MINUTES = 32 * 1440        # 缺口扫描窗口上限（分钟）
 BUDGET = 256                       # 单次 shadow 驱动的 worker tick 上限
 
 bindings(composite_id) -> dict                     # 有效绑定的内容快照
+scope(db, composite_id) -> dict                     # 本组合自己的行范围（instrument/告警）
 binding_report(before, after) -> dict              # 快照差异与 critical_unchanged
 candidate_plan(db, composite_id) -> dict           # 候选版本/映射/接缝；不可用时返回 {"blocked": reason}
 create_candidate(composite_id, plan) -> str        # 幂等建立未激活候选修订并请求周期产物
@@ -60,7 +61,8 @@ shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budget=BU
 | `gaps.missing_minutes[]` | 连续缺失段 `{start, end, minutes}`（仅统计日历判定为交易时段且候选未确认的分钟；日历无法证明交易分钟的窗口 `expected_minutes` 为 0，如实反映而不猜测） |
 | `gaps.uncovered[]` | 未覆盖区间 `{segment, start, end, reason}`：候选固定历史起点晚于当前修订，或 `confirmed_end` 到准备截止之间尚无线索确认 |
 | `paused_rules[]` | 每个受影响有效告警：`alert_id`、`name`、`alert_version`、`bound_revision_id`、`will_pause`、`reasons[]`（几何无法重定位/指标缺失/来源不兼容/绑定修订缺失，逐条给理由） |
-| `bindings.tables` | `alerts`/`alert_versions`/`publications`/`realtime_preferences` 的 `rows`、`digest`、`unchanged` |
+| `bindings.scope` | 本次快照的收敛范围：`instruments`（组合自身 + 固定历史 + 实时目标）、`alert_ids`（`market_identity.composite_id` 等于本组合的规则）、`realtime_keys`（`managed_realtime:<instrument>`） |
+| `bindings.tables` | 仅上述范围内的 `alerts`/`alert_versions`/`publications`/`realtime_preferences` 的 `rows`、`digest`、`unchanged` |
 | `bindings.active_revision_id` | `{before, after, unchanged}` |
 | `bindings.critical_unchanged` | `active_revision_id` + `chart_alert_versions` + `chart_publications` 全部未变；为 `false` 时报告强制 `failed` |
 
@@ -89,24 +91,52 @@ shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budget=BU
 
 `bindings()` 对四类行集合做**内容快照**（不是只比计数）：按主键排序后逐列取值，`digest` 取 `sha256(json(sort_keys))`；`shadow()` 在建立/推进候选前后各取一次，比较并要求关键集合完全相等。
 
+快照范围**只含本组合自己的行**（`scope()`）：`instruments` = 组合自身 instrument + 固定历史数据集 instrument + 实时映射目标 instrument；`alert_ids` = `market_identity.composite_id` 等于本组合的规则（其全部版本行）；`realtime_keys` = 上述 instrument 的 `managed_realtime:*` 偏好。其它品种在同一时间窗口发布图表、写入历史或修改自己的规则时，本组合的 shadow 不受影响——这条在真实实例里曾因全表 `chart_publications` 快照导致"停掉 data-worker 才跑得过"，已收敛。
+
 ```python
-def _snapshot(db, model):
-    order = [getattr(model, column.name) for column in model.__table__.primary_key.columns]
-    columns = [column.name for column in model.__table__.columns]
-    return [{name: getattr(row, name) for name in columns}
-            for row in db.scalars(select(model).order_by(*order))]
+def scope(db, composite_id):
+    composite = owned(db, composite_id)
+    instruments = {composite.instrument_id}
+    dataset = db.get(MarketDataset, composite.dataset_id)
+    if dataset is not None:
+        instruments.add(dataset.instrument_id)
+    mapping = db.get(RealtimeMapping, composite.mapping_id)
+    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+    if target is not None:
+        instruments.add(target.instrument_id)
+    ordered = sorted(instruments)
+    alert_ids = sorted({version.alert_id for version in db.scalars(
+        select(ChartAlertVersion).where(
+            ChartAlertVersion.market_identity["composite_id"].as_string() == composite_id))})
+    return {"instruments": ordered, "alert_ids": alert_ids,
+            "realtime_keys": ["managed_realtime:" + instrument for instrument in ordered]}
+
+def bindings(composite_id):
+    with transaction() as db:
+        bounds = scope(db, composite_id)
+        return {
+            "scope": bounds,
+            "active_revision_id": db.get(MarketComposite, composite_id).active_revision_id,
+            "alerts": _snapshot(db, ChartAlert, ChartAlert.id.in_(bounds["alert_ids"])),
+            "alert_versions": _snapshot(db, ChartAlertVersion,
+                                        ChartAlertVersion.alert_id.in_(bounds["alert_ids"])),
+            "publications": _snapshot(db, ChartPublication,
+                                      ChartPublication.instrument_id.in_(bounds["instruments"])),
+            "realtime_preferences": [...],
+        }
 
 def binding_report(before, after):
     tables = {name: {"rows": len(after[name]), "digest": _digest(after[name]),
                      "unchanged": before[name] == after[name]}
-              for name in ("alerts", "alert_versions", "publications", "realtime_preferences")}
+              for name in TABLES}
     active = {"before": before["active_revision_id"], "after": after["active_revision_id"]}
     active["unchanged"] = active["before"] == active["after"]
     critical = active["unchanged"] and all(tables[name]["unchanged"] for name in CRITICAL)
-    return {"tables": tables, "active_revision_id": active, "critical_unchanged": critical}
+    return {"tables": tables, "active_revision_id": active, "critical_unchanged": critical,
+            "scope": after.get("scope", {})}
 ```
 
-契约测试用同一快照做 `before == after` 断言，并额外断言 `MarketComposite.active_revision_id` 未变、候选修订 `activated_at is None`、`managed_realtime:*` 偏好条数不变（确保没有把候选误当运行修订而未改动 Preference）。`chart_alerts` 的运行时字段在真实常驻进程中可能被无关循环更新，因此只有 `active_revision_id`、`chart_alert_versions`、`chart_publications` 参与 `critical_unchanged` 强制失败判定；`alerts` 表仍如实记录差异。
+范围收敛不削弱保护：`before == after` 仍是逐列比较（行数相同、仅一列变化也会 `unchanged=False` 且 `digest` 变化），且 `critical_unchanged` 仍由本组合的 `active_revision_id`、本组合告警的 `chart_alert_versions`、本组合 instrument 的 `chart_publications` 决定。契约测试两侧都覆盖：无关品种写入（新发布行 + 无关规则的 v1/v2 版本）时报告仍 `ready` 且各项 `unchanged=true`；本组合发布行被改、本组合规则新增版本、本组合 `active_revision_id` 被外部改动时报告 `failed` + `binding_changed`，且"行数相同但内容不同"仍被判为变化。
 
 ## 6. 一次真实运行（隔离 PostgreSQL 14.24）
 
@@ -181,14 +211,14 @@ TEST_POSTGRES_URL=postgresql+psycopg://shadow:shadow@127.0.0.1:15610/shadow \
 ```bash
 cd /home/quant/repos/market-watch-runtime-track-c-20261028
 PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_baseline_shadow.py -q
-# 8 passed
+# 11 passed
 
 TEST_POSTGRES_URL=postgresql+psycopg://shadow:shadow@127.0.0.1:15610/shadow \
   PYTHONPATH=backend .venv/bin/python -m pytest backend/tests/test_baseline_shadow_postgres.py -q
-# 9 passed（PostgreSQL 14.24，真实运行）
+# 12 passed（PostgreSQL 14.24，真实运行）
 ```
 
-sqlite 合同覆盖：报告字段完整性、绑定不变快照断言、未就绪分类、版本超截止、运行期异常入档、重跑幂等（同 run 覆盖、failed→retry 原地恢复、`attempts` 递增）、将暂停规则计算（指标缺失）、重写历史价格的差异与最大价差、缺口清单（缺失分钟段 + 未覆盖区间）。PG 侧复用同一批合同并额外验证 `market_switch_runs` 的报告 JSON 往返与两个索引（`ix_market_switch_run_unlock`、`ix_market_switch_run_dedupe`）存在。
+sqlite 合同覆盖：报告字段完整性、绑定不变快照断言、未就绪分类、版本超截止、运行期异常入档、重跑幂等（同 run 覆盖、failed→retry 原地恢复、`attempts` 递增）、将暂停规则计算（指标缺失）、重写历史价格的差异与最大价差、缺口清单（缺失分钟段 + 未覆盖区间）、快照范围收敛（无关品种发布/规则写入不触发失败）与保护未削弱（本组合发布行/告警版本/active_revision_id 变化仍强制 failed）。PG 侧复用同一批合同并额外验证 `market_switch_runs` 的报告 JSON 往返与两个索引（`ix_market_switch_run_unlock`、`ix_market_switch_run_dedupe`）存在。
 
 相关回归：`test_composite_revisions/test_composite_aggregates/test_composite_chart/test_composite_preparation/test_composite_definitions` 与新增用例一起 37 passed。
 

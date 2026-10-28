@@ -49,6 +49,7 @@ from .storage import (
     HistoryReclamation,
     HistoryVersion,
     Instrument,
+    MarketComposite,
     MarketDataset,
     Preference,
     RealtimeMapping,
@@ -74,24 +75,55 @@ def _digest(rows):
     return hashlib.sha256(raw).hexdigest()
 
 
-def _snapshot(db, model):
+TABLES = ("alerts", "alert_versions", "publications", "realtime_preferences")
+
+
+def _snapshot(db, model, *where):
     order = [getattr(model, column.name) for column in model.__table__.primary_key.columns]
     columns = [column.name for column in model.__table__.columns]
-    return [{name: getattr(row, name) for name in columns}
-            for row in db.scalars(select(model).order_by(*order))]
+    query = select(model).order_by(*order) if not where else (
+        select(model).where(*where).order_by(*order))
+    return [{name: getattr(row, name) for name in columns} for row in db.scalars(query)]
+
+
+def scope(db, composite_id):
+    """Only this composite's own rows: its instruments and its bound alert versions.
+
+    Unrelated symbols publish charts and rules all day long; a Sunday candidate
+    must not fail because another instrument moved. Everything that belongs to
+    this composite stays inside the snapshot.
+    """
+    composite = owned(db, composite_id)
+    instruments = {composite.instrument_id}
+    dataset = db.get(MarketDataset, composite.dataset_id)
+    if dataset is not None:
+        instruments.add(dataset.instrument_id)
+    mapping = db.get(RealtimeMapping, composite.mapping_id)
+    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+    if target is not None:
+        instruments.add(target.instrument_id)
+    ordered = sorted(instruments)
+    alert_ids = sorted({version.alert_id for version in db.scalars(
+        select(ChartAlertVersion).where(
+            ChartAlertVersion.market_identity["composite_id"].as_string() == composite_id))})
+    return {"instruments": ordered, "alert_ids": alert_ids,
+            "realtime_keys": ["managed_realtime:" + instrument for instrument in ordered]}
 
 
 def bindings(composite_id):
-    """Content snapshot of every live binding this task must leave untouched."""
+    """Content snapshot of every live binding of this composite, and nothing else."""
     with transaction() as db:
-        composite = owned(db, composite_id)
+        bounds = scope(db, composite_id)
         return {
-            "active_revision_id": composite.active_revision_id,
-            "alerts": _snapshot(db, ChartAlert),
-            "alert_versions": _snapshot(db, ChartAlertVersion),
-            "publications": _snapshot(db, ChartPublication),
+            "scope": bounds,
+            "active_revision_id": db.get(MarketComposite, composite_id).active_revision_id,
+            "alerts": _snapshot(db, ChartAlert, ChartAlert.id.in_(bounds["alert_ids"])),
+            "alert_versions": _snapshot(db, ChartAlertVersion,
+                                        ChartAlertVersion.alert_id.in_(bounds["alert_ids"])),
+            "publications": _snapshot(db, ChartPublication,
+                                      ChartPublication.instrument_id.in_(bounds["instruments"])),
             "realtime_preferences": [{"key": row.key, "value": row.value} for row in db.scalars(
-                select(Preference).where(Preference.key.like("managed_realtime:%")).order_by(
+                select(Preference).where(Preference.key.in_(bounds["realtime_keys"])).order_by(
                     Preference.key))],
         }
 
@@ -99,11 +131,12 @@ def bindings(composite_id):
 def binding_report(before, after):
     tables = {name: {"rows": len(after[name]), "digest": _digest(after[name]),
                      "unchanged": before[name] == after[name]}
-              for name in ("alerts", "alert_versions", "publications", "realtime_preferences")}
+              for name in TABLES}
     active = {"before": before["active_revision_id"], "after": after["active_revision_id"]}
     active["unchanged"] = active["before"] == active["after"]
     critical = active["unchanged"] and all(tables[name]["unchanged"] for name in CRITICAL)
-    return {"tables": tables, "active_revision_id": active, "critical_unchanged": critical}
+    return {"tables": tables, "active_revision_id": active, "critical_unchanged": critical,
+            "scope": after.get("scope", {})}
 
 
 def _window(start, end, bars=None):

@@ -23,6 +23,9 @@ CONTRACTS = [
     contracts.test_rerun_reuses_one_run_and_overwrites_its_report,
     contracts.test_rewritten_history_price_is_counted_with_its_delta,
     contracts.test_gap_list_reports_missing_minutes_and_uncovered_intervals,
+    contracts.test_unrelated_instrument_writes_do_not_fail_this_composites_shadow,
+    contracts.test_this_composites_own_binding_changes_still_fail_the_shadow,
+    contracts.test_external_active_revision_change_still_fails_the_shadow,
 ]
 
 
