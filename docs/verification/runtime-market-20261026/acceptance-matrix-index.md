@@ -18,8 +18,8 @@
 
 | 状态 | 编号 | 数量 |
 |---|---|---:|
-| 通过 | A01、A02、A03、A06、A07、A10、A11、A12、A14、A15、A16、A17a | 12 |
-| 部分 | A05、A09、A17b | 3 |
+| 通过 | A01、A02、A03、A06、A07、A10、A11、A12、A14、A15、A16、A17a、A17b | 13 |
+| 部分 | A05、A09 | 2 |
 | 偏差 | A08 | 1 |
 | 未覆盖 | A04a、A04b、A13a、A13b、A13c | 5 |
 
@@ -47,13 +47,13 @@
 | A15 配置切换与回退 | 通过（隔离实例） | `stage-4-preflight-acceptance.md`：preflight 合同 5 passed；fixture 冲突返回 1 并点名 `notify-worker`，停止后返回 0；真实 preflight 对 `mw-single-frontend-20261026` 返回 1 并列出 `api`、`notification-projector`；隔离 old→new→old 演练与候选恢复 | 旧镜像无法解析 `az53`，回退必须绕过旧迁移（见 `switch-rollback-runbook.md`）；旧业务写路径未全覆盖 |
 | A16 运行故障主动提醒 | 通过（隔离实例） | 代码与合同：42a1eb82、e67b556f（应用级与真实 PG 套件）。真实通道：stage-5-a17a-channel-acceptance.md 第 8 节——同一活动故障 T0=166401062 → T0+901938 ms=167303000 仅两条提醒、零中间重推；last_notified_at 三次推进（166401046 → 167302980 → 168205820）不再冻结；healthy 663 s 内 system 通知新增 0 | 关闭 |
 | A17a ntfy 服务端持久链路 | 通过（隔离实例，真实 ntfy.sh） | stage-5-a17a-channel-acceptance.md 第 8 节：6 条消息全部服务端接受（测试 G3nsoYqJvcS1、信号 PO9zmT4tPqSD、故障 zk1xGctTf73x、提醒 31fVwXbjo8qy、恢复 W7MzTlpGGxZA、下轮提醒 qCfIPoubT1R7）；库内 delivery_attempts accepted=6、outbox accepted=1/cancelled=5（调度方独立复读） | 关闭；手机侧点击/确认单列 A17b |
-| A17b 手机端独立签收 | 部分 | 收取：用户确认手机收到。深链与回执链路：stage-5-a17a-channel-acceptance.md 第 9 节（click 为 LAN URL；api 日志有 5 次 POST /api/notification-actions/<id>/ack 200，ack_at 与消息一一对应） | 点击/确认是否由用户本人完成待用户确认；多设备、锁屏展示、到达率与时延不在范围 |
+| A17b 手机端独立签收 | 通过（单设备手机签收） | 用户于 2026-10-28 在手机上实测：收到通知、点开（click 指向 LAN 地址 `http://192.168.7.232:18090`）、点「确认」；api 记录 5 次 `POST /api/notification-actions/<id>/ack 200` 且 `ack_at` 与消息一一对应（见 `stage-5-a17a-channel-acceptance.md` 第 9 节） | 已关闭；多设备、锁屏展示效果、到达率与时延不在本轮范围 |
 
 ## 阶段 5 剩余关闭清单
 
 阶段 5 的实现与联合验收切片已完成（A16、A17a 关闭；A06、A10—A12 容器级关闭），下列项按归属另行处理：
 
-1. **A17b 点击/确认**：链路已实测（LAN URL + 5 次 ack 200），**待用户本人确认**是否由其手机操作；确认后升为通过，否则保持部分。
+1. ~~A17b 点击/确认~~：已由用户在手机实测签收（收取 + 点击 + 确认），见上表。
 2. **A09 信号级**：慢源注入需同时产出 crossing→signal 才能签收；当前只有来源级降级证据。
 3. **A05 周日基线部分**：属轨道 C，与 30 天清理一起独立 PR。
 4. **A08**：按 `performance-followup-20261028.md` 的分段口径独立复测，结果作为偏差更新，不放宽已确认门槛。
