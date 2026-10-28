@@ -18,8 +18,8 @@
 
 | 状态 | 编号 | 数量 |
 |---|---|---:|
-| 通过 | A01、A02、A03、A06、A07、A10、A11、A12、A14、A15、A16、A17a、A17b | 13 |
-| 部分 | A05、A09 | 2 |
+| 通过 | A01、A02、A03、A06、A07、A09、A10、A11、A12、A14、A15、A16、A17a、A17b | 14 |
+| 部分 | A05 | 1 |
 | 偏差 | A08 | 1 |
 | 未覆盖 | A04a、A04b、A13a、A13b、A13c | 5 |
 
@@ -36,7 +36,7 @@
 | A06 无浏览器 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（真实 provider 订阅 H1 计数 2→3→4；停续租后 30 s 窗口 6→6、provider_interests 归零、数据集修订冻结；同窗口 OANDA 源 ready、aggregate 8→10、判定序列推进，告警需求不随网页释放）。artifact：provider-quiet.json、snapshot-a06-*.json | 关闭 |
 | A07 OANDA 两种模式 | 通过（隔离实例） | `stage-2-network-acceptance.md`：stream 模式 `stream_c`/`five_health28b`；REST batch 嵌入模式 `rest_embedded_e`（probe7，独立 project `mw-runtime-stage2-rest-20261027`）；owner/epoch/fencing 合同见 `stage-1-realtime-switch.md` 与 OANDA recovery PG 套件 | 生产部署实际选用模式属切换时的配置核对项，不是本行缺口 |
 | A08 历史/指标积压及候选重建 | 偏差 | `baseline.md`（四场同预算可比负载 + candidate aggressive control 证明争用与事件正确性风险）；`performance-followup-20261028.md`（内嵌忙载 ATR 可见→判定 p95 1.197 s；六 owner Compose p95 1.163 s，n=40，目标约 1 s） | 门槛未达成，按 2026-10-28 决定保留为**非阻塞验收偏差**；关闭动作：按 `performance-followup` 的分段口径在最终源码同预算复测，结果作为偏差更新，不放宽门槛 |
-| A09 慢来源 | 部分 | stage-5-runtime-topup-acceptance.md（注入源 error=ReadTimeout、其他源与聚合继续、容器不退出；error/等待/休市三态同快照可区分，休市用真实墙钟 closed/周末 verified） | 该夹具未产出 crossing→signal，信号级判定仍未签收；需一次能触发信号的慢源注入才能关闭 |
+| A09 慢来源 | 通过（隔离实例） | `stage-5-a09-signal-acceptance.md`（慢源 ReadTimeout 期间38采样，健康报价最大年龄584 ms；同 boot、同规则版本/运行世代，真实穿越产生各一条 signal/notification/Outbox，撤销注入后无重复）。原 `stage-5-runtime-topup-acceptance.md` 的来源/日历状态证据保留 | 信号级缺口已关闭；单条价格 intrabar 规则，不扩大为依赖源自动切换或性能 SLO |
 | A10 慢通知 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（投递目的地改永不响应 stub：投递阻塞期间投影/保留 checked_at 持续推进 28 采样；停 API+data-worker+打包后仅通知组仍领取既有 Outbox，attempts 0→1；notifications 与 outbox 严格 1:1）。artifact：projection-watch.json、snapshot-a10-*.json | 关闭 |
 | A11 后台组分别重启 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（三组各自 stop -t 30 全部 exit 0 / OOMKilled=false；boot 各自更替且其他组 boot 不变；applied 36→37→38、confirmed_end 推进、通知与 Outbox 一对一增长；三组恢复）。同任务租约接管改引 `stage-5-review-fixes.md`（原租约到期前 38 个采样 attempts=1，新 boot 到期后同 task attempts=2、accepted、仅一行 Outbox）。artifact：snapshot-a11-*.json、results/stage-5-review-fixes-20261028.json | 关闭；signal ID 集合不变仍引用阶段 2 five_recovery28a |
 | A12 循环失败与健康 | 通过（隔离实例） | stage-5-runtime-topup-acceptance.md（7 规则全 paused 时 chart_alert 仍 idle、无假故障；旧 boot 迟到写入被围栏拒绝——fence-old.json 显示 stored_boot 已为新 boot、state idle、same_boot false；新实例 16 采样全 idle；关键循环抛错 → 真实 exit 1 且记录组失败） | 关闭 |
@@ -51,10 +51,10 @@
 
 ## 阶段 5 剩余关闭清单
 
-本 PR 的实现及联合验收切片已交付（A16、A17a 关闭；A06、A10—A12 容器级关闭；review 修复见 `stage-5-review-fixes.md`）。**A09 信号级仍未签收，不能宣布阶段 5 核心矩阵全部通过**；下列项按归属处理：
+本 PR 的实现及联合验收切片已交付（A16、A17a 关闭；A06、A10—A12 容器级关闭；review 修复见 `stage-5-review-fixes.md`）。A09 信号级已由 `stage-5-a09-signal-acceptance.md` 补齐；下列历史缺口及独立轨道按归属处理：
 
 1. ~~A17b 点击/确认~~：已由用户在手机实测签收（收取 + 点击 + 确认），见上表。
-2. **A09 信号级**：慢源注入需同时产出 crossing→signal 才能签收；当前只有来源级降级证据。
+2. ~~A09 信号级~~：已通过独立 Ubuntu 实例补齐持续 ReadTimeout 期间的 crossing→signal→notification→Outbox，见新增证据。
 3. **A05 周日基线部分**：属轨道 C，与 30 天清理一起独立 PR。
 4. **A08**：按 `performance-followup-20261028.md` 的分段口径独立复测，结果作为偏差更新，不放宽已确认门槛。
 5. **A02/A03/A14 真实供应商侧核对**：正式切换时按 `switch-rollback-runbook.md` 第 3 节执行。

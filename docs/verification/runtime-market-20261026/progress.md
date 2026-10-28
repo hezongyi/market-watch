@@ -139,3 +139,6 @@ docker compose --env-file /home/quant/.local/share/market-watch-runtime-20261026
 
 
 2026-10-28 PR #113 review 修复：已修正按组维护漏抑制 boot_loop、五分钟第 3 次启动阈值、topup 内部网络及 catalog 直连、发布 `.env` 操作说明；撤回旧 A11 不同 task 的接管结论并补同一 task 的真实到期接管。主机 39 passed / 43 subtests，容器内含 5 个真实 PG 合同的回归 36 passed、无 skip。新项目 `mw-stage5-review-20261028` 的同任务 attempts 1→2、原租约到期前不重领、新 boot 接管并由本地 stub 接受；网络 Internal=true，catalog fixture 命中 1 次。全部任务容器已停止，卷和证据保留。证据见 `stage-5-review-fixes.md`；A09 信号级仍部分覆盖，A08 仍为既决非阻塞偏差，轨道 C 独立交付，不把本轮 review 修复当作整个阶段 5 全矩阵通过。
+
+
+2026-10-28 A09 信号级补齐：独立 Ubuntu project `mw-stage5-a09-20261028`，API/web 缺席，Dukascopy 持续 ReadTimeout 的38个采样内，健康 OANDA 报价最大年龄584 ms，同一规则/boot 实际产生唯一 signal、notification、Outbox；撤销慢源订阅后链路继续且ID不变。证据见 `stage-5-a09-signal-acceptance.md` 与 `results/stage-5-a09-signal-20261028.json`。本轮没有复现供源重建后的长期断流，未修改产品重连逻辑；只补验收准备和真实事件断言。A09由部分转通过，A08既决偏差与轨道C范围不变。任务容器已stop、卷和证据保留。

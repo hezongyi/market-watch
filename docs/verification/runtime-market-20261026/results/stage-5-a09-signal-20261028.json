@@ -1,0 +1,272 @@
+{
+  "product_source": "e13b57b8eb77b9839813a9a9e671e6e00f18ec68",
+  "source_archive_sha256": "dba9295b66d1fe047f6cd1f184f38c42bdf3b828ddea448d0e6f176c5ca5caf8",
+  "harness_commit": "2b29bf932b622d5ac52b2ef0b8588e6bb42979bf",
+  "harness_sha256": {
+    "stage5_a09_probe.py": "b21fe8588fb1ba1cba5295eec981aea60983735b17e7050f5212c16d04e47a0d",
+    "stage5_topup_probe.py": "d654045bf17501f5a89c3f839d3d796e82250c2f908acc92d50df3c7ad5ddb51"
+  },
+  "host": "quant-server (Ubuntu local Docker)",
+  "project": "mw-stage5-a09-20261028",
+  "network": {
+    "name": "mw-stage5-a09-20261028_default",
+    "internal": true
+  },
+  "api_and_web_started": false,
+  "real_notification_delivery": false,
+  "rule": "284653a0-77a7-4b53-a2f2-18bfa52045ed",
+  "passed": true,
+  "samples": 38,
+  "max_quote_age_ms": 584,
+  "all_samples_slow_read_timeout": true,
+  "first_sample": {
+    "at": 166632523,
+    "source": {
+      "ready": true,
+      "epoch": 6,
+      "owner_valid": true,
+      "revision": 812,
+      "confirmed_end": 166620000,
+      "received_age_ms": 530
+    },
+    "slow_error": "ReadTimeout",
+    "signals": 0,
+    "notifications": 0,
+    "outbox": 0,
+    "count": 0
+  },
+  "last_sample": {
+    "at": 166652163,
+    "source": {
+      "ready": true,
+      "epoch": 6,
+      "owner_valid": true,
+      "revision": 852,
+      "confirmed_end": 166620000,
+      "received_age_ms": 154
+    },
+    "slow_error": "ReadTimeout",
+    "signals": 1,
+    "notifications": 1,
+    "outbox": 1,
+    "count": 1
+  },
+  "chain": {
+    "signals": [
+      {
+        "id": "fd508cfb-f884-44da-80d9-a017be23e501",
+        "rule": "284653a0-77a7-4b53-a2f2-18bfa52045ed",
+        "occurred_at": 166632993
+      }
+    ],
+    "notifications": [
+      {
+        "id": "c2d2d95c-d599-42e7-8430-45921fef2dc0",
+        "signal": "fd508cfb-f884-44da-80d9-a017be23e501",
+        "kind": "signal",
+        "status": "pending",
+        "ack_at": null,
+        "created_at": 166633223
+      }
+    ],
+    "outbox": [
+      {
+        "id": "84eb0be6-38e3-43a0-95c7-57c99ff08dff",
+        "notification": "c2d2d95c-d599-42e7-8430-45921fef2dc0",
+        "status": "pending",
+        "attempts": 0,
+        "lease_until": null,
+        "next_at": 166633223,
+        "error": null
+      }
+    ]
+  },
+  "supplier": {
+    "hits": {
+      "pricing_stream": {
+        "count": 1,
+        "last": [
+          166252194
+        ]
+      },
+      "candles:EUR_USD:M1": {
+        "count": 9,
+        "last": [
+          166252383,
+          166270120,
+          166330920,
+          166390959,
+          166450678,
+          166510354,
+          166570238,
+          166630240,
+          166690435
+        ]
+      },
+      "head/binance/": {
+        "count": 46,
+        "last": [
+          166319509,
+          166320552,
+          166340571,
+          166341649,
+          166361669,
+          166362774,
+          166382794,
+          166383897,
+          166403920,
+          166404978,
+          166424997,
+          166426055,
+          166446080,
+          166447140,
+          166467159,
+          166468217,
+          166488234,
+          166489312,
+          166509328,
+          166510378,
+          166530405,
+          166531480,
+          166551495,
+          166552561,
+          166572583,
+          166573645,
+          166593665,
+          166594729,
+          166614754,
+          166615842,
+          166635868,
+          166636874,
+          166656904,
+          166657978,
+          166677999,
+          166679075,
+          166699097,
+          166700165,
+          166720182,
+          166721275
+        ]
+      },
+      "head/": {
+        "count": 46,
+        "last": [
+          166319776,
+          166320826,
+          166340846,
+          166341914,
+          166361936,
+          166363010,
+          166383033,
+          166384128,
+          166404166,
+          166405225,
+          166425243,
+          166426309,
+          166446327,
+          166447385,
+          166467412,
+          166468480,
+          166488500,
+          166489566,
+          166509591,
+          166510660,
+          166530685,
+          166531743,
+          166551763,
+          166552822,
+          166572842,
+          166573898,
+          166593921,
+          166594992,
+          166615023,
+          166616104,
+          166636125,
+          166637213,
+          166657255,
+          166658311,
+          166678330,
+          166679417,
+          166699436,
+          166700510,
+          166720533,
+          166721541
+        ]
+      },
+      "catalog": {
+        "count": 1,
+        "last": [
+          166516668
+        ]
+      }
+    },
+    "slow_hits": 7,
+    "successful_stub_deliveries": 0
+  },
+  "raw_artifacts_sha256": {
+    "a09-baseline.json": "7c16c8912080ca4fcc5a2b04ec58c0d11f6ad831ce815002f74f494b2ee83f19",
+    "a09-signal-proof.json": "791b62d7f2b6aae4f4becffc2e2109f3a31f0783bf5bcbdf4477db215509c66c",
+    "a09-released.json": "ab5af27a485c9190f12e6d1367ea4bfef846081fccd88bd845b7149b4358656e",
+    "snapshot-before-rebuild.json": "42f2cd49b98491bd803be9e61da3fe0c7aa444b304bff925b8f6dc2a5069fa2a",
+    "snapshot-after-rebuild-settled.json": "3faa95774d7b4a7c97cf320fe2d562860370aad7a5fde069a222b471fc301540",
+    "supplier-state.json": "822e4b984586d57d1c66633a7cd7bad0f52b523f895e726722d1d2fddbb39fc4"
+  },
+  "source_rebuild_probe": {
+    "before-rebuild": {
+      "ready": true,
+      "epoch": 2,
+      "owner_valid": true,
+      "revision": 11,
+      "confirmed_end": 166200000,
+      "received_age_ms": 321
+    },
+    "after-rebuild": {
+      "ready": true,
+      "epoch": 6,
+      "owner_valid": true,
+      "revision": 71,
+      "confirmed_end": 166200000,
+      "received_age_ms": 224
+    },
+    "after-rebuild-settled": {
+      "ready": true,
+      "epoch": 6,
+      "owner_valid": true,
+      "revision": 182,
+      "confirmed_end": 166260000,
+      "received_age_ms": 322
+    }
+  },
+  "final_containers": [
+    {
+      "name": "mw-stage5-a09-20261028-market-runtime-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-a09-20261028-data-worker-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-a09-20261028-notification-worker-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-a09-20261028-fixture-supplier-1",
+      "running": false,
+      "exit_code": 143,
+      "oom_killed": false
+    },
+    {
+      "name": "mw-stage5-a09-20261028-postgres-1",
+      "running": false,
+      "exit_code": 0,
+      "oom_killed": false
+    }
+  ]
+}
