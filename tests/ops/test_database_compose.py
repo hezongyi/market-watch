@@ -72,7 +72,11 @@ class DatabaseComposeTests(unittest.TestCase):
     def test_maintained_acceptance_databases_and_connections_use_pg1424(self):
         candidates = list(ROOT.glob('compose*.yaml')) + list((ROOT/'deploy/ubuntu').glob('*.yaml')) + list((ROOT/'deploy/native-update').glob('*.yaml'))
         candidates.append(ROOT / BENCHMARK_COMPOSE)
-        entries = [[p.relative_to(ROOT)] for p in candidates if 'image: postgres:' in p.read_text()]
+        # The preflight fixture uses a cached PostgreSQL image as a bounded
+        # sleep container; it does not start or contract-test a database.
+        entries = [[p.relative_to(ROOT)] for p in candidates
+                   if 'image: postgres:' in p.read_text()
+                   and p.name != 'runtime-preflight.acceptance.yaml']
         entries.extend([[Path('compose.acceptance.yaml')],
                         [Path('deploy/native-update/compose.tests.yaml'),Path('deploy/native-update/compose.acceptance.yaml')]])
         self.assertGreaterEqual(len(entries),15)
