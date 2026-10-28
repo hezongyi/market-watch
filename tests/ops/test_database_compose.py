@@ -35,7 +35,9 @@ class DatabaseComposeTests(unittest.TestCase):
                     values[name] = f'market-watch-{component}:fixture'
                 elif name.endswith('PORT'):
                     values[name] = '18000'
-                elif name.endswith(('DIR', 'ENV', 'REPO')) or name == 'MW_JIT_RESULTS':
+                elif name.endswith('MEMORY'):
+                    values[name] = '768m'
+                elif name.endswith(('DIR', 'ENV', 'REPO', 'ARTIFACTS')) or name == 'MW_JIT_RESULTS':
                     values[name] = str(fixture) if name.endswith('ENV') else directory
                 elif 'DATABASE_URL' in name or name == 'TEST_POSTGRES_URL':
                     values[name] = 'postgresql+psycopg://fixture@postgres/fixture'
@@ -95,6 +97,15 @@ class DatabaseComposeTests(unittest.TestCase):
 
     def test_production_defaults_off_even_with_generic_inherit_setting(self):
         rendered = self.render([Path('compose.production.yaml')],ALERTS_DATABASE_JIT='inherit')
+        self.assertIn('market-runtime', rendered['services'])
+        self.assertNotIn('pricing-worker', rendered['services'])
+        self.assertNotIn('realtime-worker', rendered['services'])
+        self.assertNotIn('composite-aggregate-worker', rendered['services'])
+        runtime = rendered['services']['market-runtime']
+        self.assertEqual(runtime['command'], ['python', '-m', 'alerts.runtime', '--profile', 'market'])
+        self.assertEqual(runtime['depends_on']['migrate']['condition'], 'service_completed_successfully')
+        self.assertNotIn('chart-alert-runtime', rendered['services'])
+        self.assertEqual(runtime['environment']['ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED'], 'true')
         for name,service in rendered['services'].items():
             if name not in ('web','chart-origin'):
                 self.assertEqual(service['environment']['ALERTS_DATABASE_JIT'],'off',name)

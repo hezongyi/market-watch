@@ -7,8 +7,10 @@ import signal
 import threading
 import time
 from concurrent.futures import ThreadPoolExecutor
+from contextvars import copy_context
 
 from .config import settings
+from .live_confirmation import runtime_error as confirmation_error
 from .live_pricing import (
     begin_connection,
     claim,
@@ -40,6 +42,8 @@ from .oanda_rest_batch import (
     live_demand_revision,
 )
 from .oanda_stream import OandaPractice
+from .runtime_health import progress
+from .runtime_supervisor import UnstoppedThreads, require_stopped
 from .storage import now_ms, transaction
 
 log = logging.getLogger(__name__)
@@ -72,6 +76,8 @@ def desired_for_mode(account):
 
 def native_specs(account):
     """Resolve active provider interests to complete REST candle specs."""
+    if settings.oanda_native_latest_owner != "pricing":
+        return ()
     return tuple(
         (row.id, row.timeframe, CandleSpec.from_provider_metadata(row.metadata_json, row.timeframe))
         for row in desired_native_provider_datasets(account)
@@ -155,6 +161,16 @@ def collect_rest(adapter, ownership, identities, stopped, native=()):
     connection_stop = threading.Event()
     intentional_stop = threading.Event()
     closed_stop = threading.Event()
+    health_lock = threading.Lock()
+    confirmation_fault = [None]
+
+    def report_confirmation(error):
+        with health_lock:
+            if error is None and lost.is_set():
+                return
+            confirmation_fault[0] = error
+            if error:
+                progress(state="degraded", error=error)
     lost = threading.Event()
     maintenance_error = []
     sequence = 0
@@ -169,6 +185,7 @@ def collect_rest(adapter, ownership, identities, stopped, native=()):
             try:
                 if not renew(ownership):
                     lost.set()
+                    report_confirmation("ownership_lost")
                     return
                 if time.monotonic() - refreshed >= 10:
                     stage = "subscription"
@@ -191,16 +208,20 @@ def collect_rest(adapter, ownership, identities, stopped, native=()):
                     lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set(),
                 )
                 if failure:
+                    report_confirmation(failure.status)
                     maintenance_error.append(failure)
                     connection_stop.set()
                     return
-            except TimeoutError:
+                report_confirmation(confirmation_error(identities, epoch))
+            except TimeoutError as error:
                 lost.set()
+                report_confirmation(type(error).__name__)
                 return
             except Exception as error:
                 # Keep the fixed-cadence latest loop alive for transient page
                 # failures; the page path records its own retry state.
                 log_failure("pricing_maintenance_failed", error, stage=stage, epoch=epoch)
+                report_confirmation(type(error).__name__)
             connection_stop.wait(1)
 
     # Test doubles and non-OANDA adapters may expose only ``latest``.  The
@@ -208,7 +229,8 @@ def collect_rest(adapter, ownership, identities, stopped, native=()):
     maintenance_thread = None
     if hasattr(adapter, "page"):
         maintenance_thread = threading.Thread(
-            target=maintenance, name="oanda-rest-confirmation", daemon=True
+            target=copy_context().run, args=(maintenance,),
+            name="oanda-rest-confirmation", daemon=True
         )
         maintenance_thread.start()
     try:
@@ -261,6 +283,10 @@ def collect_rest(adapter, ownership, identities, stopped, native=()):
                     publish_rest_batch(ownership, epoch, batch, live, demand_revision=full_revision)
                 if group["native"]:
                     publish_native_rest_batch(ownership, epoch, batch, group["native"], demand_revision=full_revision)
+                with health_lock:
+                    error = ("ownership_lost" if lost.is_set() else confirmation_fault[0]) or (
+                        None if batch.result.status == "data" else batch.result.status)
+                    progress(state="degraded" if error else "running", error=error)
                 if batch.result.status in ('unauthorized', 'provider_maintenance'):
                     terminal_result = batch.result
                     connection_stop.set()
@@ -276,6 +302,7 @@ def collect_rest(adapter, ownership, identities, stopped, native=()):
         connection_stop.set()
         if maintenance_thread is not None:
             maintenance_thread.join(timeout=20)
+            require_stopped((maintenance_thread,))
         if maintenance_error:
             terminal_result = maintenance_error[-1]
         if lost.is_set():
@@ -385,6 +412,16 @@ def collect(adapter, ownership, identities, stopped):
     maintenance_error = []
     intentional_stop = threading.Event()
     closed_stop = threading.Event()
+    health_lock = threading.Lock()
+    confirmation_fault = [None]
+
+    def report_confirmation(error):
+        with health_lock:
+            if error is None and lost.is_set():
+                return
+            confirmation_fault[0] = error
+            if error:
+                progress(state="degraded", error=error)
 
     def guard():
         while not stopped.is_set() and not connection_stop.is_set():
@@ -392,11 +429,13 @@ def collect(adapter, ownership, identities, stopped):
                 if not renew(ownership):
                     log.warning("pricing_ownership_lost reason=lease_not_renewed stage=guard epoch=%s", epoch)
                     lost.set()
+                    report_confirmation("ownership_lost")
                     return
             except Exception as error:
                 # Any inability to prove ownership fences publishing immediately.
                 log_failure("pricing_ownership_lost", error, stage="guard", epoch=epoch)
                 lost.set()
+                report_confirmation(type(error).__name__)
                 return
             connection_stop.wait(5)
 
@@ -409,6 +448,7 @@ def collect(adapter, ownership, identities, stopped):
                 if not renew(ownership):
                     log.warning("pricing_ownership_lost reason=lease_not_renewed stage=maintenance epoch=%s", epoch)
                     lost.set()
+                    report_confirmation("ownership_lost")
                     return
                 if time.monotonic() - refreshed >= 10:
                     stage = "subscription"
@@ -434,21 +474,27 @@ def collect(adapter, ownership, identities, stopped):
                 error = confirm_pages(adapter, ownership, epoch, identities,
                     lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set())
                 if error:
+                    report_confirmation(error.status)
                     maintenance_error.append(error)
                     connection_stop.set()
                     return
+                report_confirmation(confirmation_error(identities, epoch))
             except TimeoutError as error:
                 log_failure("pricing_ownership_lost", error, stage=stage, epoch=epoch)
                 lost.set()
+                report_confirmation(type(error).__name__)
                 return
             except Exception as error:
                 log_failure("pricing_maintenance_failed", error, stage=stage, epoch=epoch)
+                report_confirmation(type(error).__name__)
             connection_stop.wait(1)
 
     # SDK REST requests have bounded timeouts. Network waits never hold a DB
     # transaction or the streaming client's single connection.
-    thread = threading.Thread(target=maintenance, name="oanda-confirmation", daemon=True)
-    guardian = threading.Thread(target=guard, name="oanda-lease", daemon=True)
+    thread = threading.Thread(target=copy_context().run, args=(maintenance,),
+                              name="oanda-confirmation", daemon=True)
+    guardian = threading.Thread(target=copy_context().run, args=(guard,),
+                                name="oanda-lease", daemon=True)
     guardian.start()
     thread.start()
     result = RequestResult(status="unavailable")
@@ -460,19 +506,25 @@ def collect(adapter, ownership, identities, stopped):
                 break
             stage = "publish"
             publish_event(ownership, epoch, event, identities)
+            with health_lock:
+                error_type = "ownership_lost" if lost.is_set() else confirmation_fault[0]
+                progress(state="degraded" if error_type else "running", error=error_type)
             stage = "stream"
     except Exception as error:
         result = log_failure("pricing_stream_ended", error, stage=stage, epoch=epoch)
+        progress(state="degraded", error=result.status)
         if result.status == "rate_limited":
             seconds = max(1, (result.retry_at - now_ms()) / 1000) if result.retry_at else None
             cooldown("oanda", retry_seconds=seconds)
     else:
         if not (stopped.is_set() or connection_stop.is_set() or lost.is_set()):
             log.info("pricing_stream_closed reason=eof epoch=%s", epoch)
+            progress(state="degraded", error=result.status)
     finally:
         connection_stop.set()
         thread.join(timeout=20)
         guardian.join(timeout=6)
+        require_stopped((thread, guardian))
         if not lost.is_set():
             try:
                 failure = (result if result.status == 'unauthorized' else
@@ -500,6 +552,7 @@ def run(adapter, stopped):
                 except TimeoutError:
                     # A dead/superseded probe cannot alter the new owner's hold.
                     pass
+            progress(state="waiting_input")
             stopped.wait(wait_delay(adapter.account_id))
             continue
         try:
@@ -513,6 +566,7 @@ def run(adapter, stopped):
             delay = closed_delay(identities)
             if delay is not None or (not identities and not native):
                 park_closed(ownership, identities, delay if delay is not None else 1)
+                progress(state="idle")
                 continue
             if settings.oanda_acquisition_mode == 'rest_batch':
                 collect_rest(adapter, ownership, identities, stopped, native)
@@ -520,6 +574,7 @@ def run(adapter, stopped):
                 collect(adapter, ownership, identities, stopped)
         except Exception as error:
             result = log_failure('pricing_start_failed', error, stage='startup')
+            progress(state="degraded", error=result.status)
             try:
                 startup_failed(ownership, adapter.account_id, result)
             except TimeoutError:
@@ -527,17 +582,16 @@ def run(adapter, stopped):
             catalog = None
 
 
-def main():
+def run_service(stopped):
     if settings.oanda_acquisition_mode == 'stream' and not settings.oanda_stream_enabled:
-        raise SystemExit("Set ALERTS_OANDA_STREAM_ENABLED=true for stream acquisition")
-    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
-    logging.getLogger("httpx").setLevel(logging.WARNING)
-    stopped = threading.Event()
-    for sig in (signal.SIGTERM, signal.SIGINT):
-        signal.signal(sig, lambda *_: stopped.set())
+        while not stopped.is_set():
+            progress(state="disabled")
+            stopped.wait(5)
+        return
     adapter_type = OandaRestBatch if settings.oanda_acquisition_mode == 'rest_batch' else OandaPractice
     adapter = adapter_type(token=settings.oanda_token, account_id=settings.oanda_account_id,
                            proxy=settings.oanda_proxy or settings.market_proxy)
+    safe_to_close = True
     try:
         while not stopped.is_set():
             try:
@@ -545,9 +599,23 @@ def main():
             except Exception as error:
                 # Auth/config faults remain quiet and bounded, without account URLs.
                 result = log_failure("pricing_start_failed", error, stage="startup")
+                progress(state="degraded", error=result.status)
                 stopped.wait(settings.oanda_auth_probe_seconds if result.status == 'unauthorized' else 15)
+    except UnstoppedThreads:
+        safe_to_close = False
+        raise
     finally:
-        adapter.close()
+        if safe_to_close:
+            adapter.close()
+
+
+def main():
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    logging.getLogger("httpx").setLevel(logging.WARNING)
+    stopped = threading.Event()
+    for sig in (signal.SIGTERM, signal.SIGINT):
+        signal.signal(sig, lambda *_: stopped.set())
+    run_service(stopped)
 
 
 if __name__ == "__main__":

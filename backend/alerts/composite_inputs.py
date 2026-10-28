@@ -16,6 +16,7 @@ from .storage import (
     CompositeRevision,
     Instrument,
     MarketDataset,
+    Preference,
     RealtimeMapping,
     SourceMinuteRevision,
     uid,
@@ -34,6 +35,15 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
     for revision, dataset in db.execute(query.order_by(CompositeRevision.id)):
         if collection_identity(dataset.identity).key != recorded["source_id"]:
             continue
+        if reason == "live_confirmation":
+            from .realtime_switch import revision_instrument_id
+
+            # Explicit off stops live fan-out even when another consumer keeps
+            # the shared source alive. Preparation/recheck remains historical.
+            source_id = revision_instrument_id(db, revision)
+            choice = db.get(Preference, "managed_realtime:" + source_id) if source_id else None
+            if choice and choice.value.get("enabled") is False:
+                continue
         selected = [item for item in recorded["minutes"] if item["start"] >= revision.seam]
         if not selected:
             continue

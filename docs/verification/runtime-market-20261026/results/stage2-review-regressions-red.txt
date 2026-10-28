@@ -1,0 +1,255 @@
+FFF..FF                                                                  [100%]
+=================================== FAILURES ===================================
+____ test_rejected_market_start_preserves_existing_alert_boot_and_judgment _____
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2671ed56d0>
+
+    def test_rejected_market_start_preserves_existing_alert_boot_and_judgment(provider_pg, monkeypatch):
+        factory, _ = provider_pg
+        from alerts import storage
+    
+        ident, _, revision, seam, stamp = composite_contracts.armed(factory, monkeypatch)
+        with factory() as db:
+            schema = db.scalar(text("SELECT current_schema()"))
+        url = factory.kw["bind"].url.update_query_dict({"options": f"-csearch_path={schema}"})
+        monkeypatch.setattr("alerts.config.settings.database_pool_size", 8)
+        engine = storage.make_engine(str(url))
+        monkeypatch.setattr(storage, "engine", engine)
+        monkeypatch.setattr(storage, "bootstrap", lambda: None)
+        monkeypatch.setattr("alerts.config.settings.oanda_native_latest_owner", "provider")
+        monkeypatch.setattr("alerts.provider_transport.close_clients", lambda: None)
+        owner = runtime_health.Progress("market", "chart_alert", "existing-alert")
+        try:
+            with market_runtime.chart_alert_ownership(engine):
+                owner.claim()
+                owner.record()
+                with factory() as db:
+                    before = copy.deepcopy(db.get(Preference, runtime_health.key("chart_alert")).value)
+                with pytest.raises(RuntimeError, match="Another ChartAlert runtime"):
+                    market_runtime.run(loops=[Loop("chart_alert", lambda stop: stop.wait())],
+                                       handle_signals=False)
+                with factory() as db:
+>                   assert db.get(Preference, runtime_health.key("chart_alert")).value == before
+E                   AssertionError: assert {'group': 'ma...6550ff2', ...} == {'group': 'ma...g-alert', ...}
+E                     
+E                     Omitting 5 identical items, use -vv to show
+E                     Differing items:
+E                     {'boot_id': '6f6c196e-6e75-4f0c-a425-bf5016550ff2'} != {'boot_id': 'existing-alert'}
+E                     {'started_at': 1793133416548} != {'started_at': 1793133416537}
+E                     {'checked_at': None} != {'checked_at': 1793133416541}
+E                     {'last_success_at': None} != {'last_success_at': 1793133416541}...
+E                     
+E                     ...Full output truncated (3 lines hidden), use '-vv' to show
+
+backend/tests/test_market_runtime_postgres.py:88: AssertionError
+_______ test_unstopped_runtime_exits_before_releasing_ownership[market] ________
+
+_args = ((Loop(role='pricing', run=<function run.<locals>.wrapped.<locals>.execute at 0x7f266ef56d40>), Loop(role='realtime', ...f266ef78b80>), Loop(role='market_ownership', run=<function run.<locals>.wrapped.<locals>.execute at 0x7f266ef79760>)),)
+_kwargs = {'stop': None, 'on_state': <function run.<locals>.state at 0x7f266ef574c0>, 'handle_signals': True}
+
+    def still_running(*_args, **_kwargs):
+>       raise RuntimeGroupError({}, alive=("nested-confirmation",))
+E       alerts.runtime_supervisor.RuntimeGroupError: Runtime group failed: nested-confirmation: did not stop
+
+backend/tests/test_market_runtime_postgres.py:122: RuntimeGroupError
+
+During handling of the above exception, another exception occurred:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2671ed5790>
+profile = 'market'
+
+    @pytest.mark.parametrize("profile", ["market", "alert"])
+    def test_unstopped_runtime_exits_before_releasing_ownership(provider_pg, monkeypatch, profile):
+        factory, _ = provider_pg
+        from alerts import alert_runtime, runtime, storage
+    
+        with factory() as db:
+            schema = db.scalar(text("SELECT current_schema()"))
+        url = factory.kw["bind"].url.update_query_dict({"options": f"-csearch_path={schema}"})
+        monkeypatch.setattr("alerts.config.settings.database_pool_size", 8)
+        engine = storage.make_engine(str(url))
+        monkeypatch.setattr(storage, "engine", engine)
+        monkeypatch.setattr(storage, "bootstrap", lambda: None)
+        monkeypatch.setattr("alerts.config.settings.oanda_native_latest_owner", "provider")
+        monkeypatch.setattr("alerts.config.settings.market_runtime_chart_alert_enabled", True)
+        monkeypatch.setattr("alerts.provider_transport.close_clients",
+                            lambda: pytest.fail("clients closed while threads still run"))
+        monkeypatch.setattr("sys.argv", ["runtime", "--profile", profile])
+        monkeypatch.setattr("logging.shutdown", lambda: None)
+    
+        def still_running(*_args, **_kwargs):
+            raise RuntimeGroupError({}, alive=("nested-confirmation",))
+    
+        monkeypatch.setattr(market_runtime if profile == "market" else alert_runtime,
+                            "run_group", still_running)
+    
+        class ProcessExit(BaseException):
+            pass
+    
+        def exit_while_locked(code):
+            assert code == 1
+            with pytest.raises(RuntimeError, match="Another ChartAlert runtime"):
+                with market_runtime.chart_alert_ownership(engine):
+                    pytest.fail("old alert threads still running after lock released")
+            if profile == "market":
+                with pytest.raises(RuntimeError, match="Another market-runtime"):
+                    with market_runtime.ownership(engine):
+                        pytest.fail("old market threads still running after lock released")
+            raise ProcessExit()
+    
+        monkeypatch.setattr("os._exit", exit_while_locked)
+        try:
+            with pytest.raises(ProcessExit):
+>               runtime.main()
+
+backend/tests/test_market_runtime_postgres.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/alerts/runtime.py:37: in main
+    os._exit(1)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 1
+
+    def exit_while_locked(code):
+        assert code == 1
+        with pytest.raises(RuntimeError, match="Another ChartAlert runtime"):
+            with market_runtime.chart_alert_ownership(engine):
+>               pytest.fail("old alert threads still running after lock released")
+E               Failed: old alert threads still running after lock released
+
+backend/tests/test_market_runtime_postgres.py:134: Failed
+------------------------------ Captured log call -------------------------------
+ERROR    root:runtime.py:31 Runtime group failed: nested-confirmation: did not stop
+________ test_unstopped_runtime_exits_before_releasing_ownership[alert] ________
+
+_args = ([Loop(role='chart_alert', run=<function run.<locals>.execute at 0x7f266f5c80e0>)],)
+_kwargs = {'stop': None, 'on_state': <function run.<locals>.<lambda> at 0x7f266f9267a0>, 'handle_signals': True}
+
+    def still_running(*_args, **_kwargs):
+>       raise RuntimeGroupError({}, alive=("nested-confirmation",))
+E       alerts.runtime_supervisor.RuntimeGroupError: Runtime group failed: nested-confirmation: did not stop
+
+backend/tests/test_market_runtime_postgres.py:122: RuntimeGroupError
+
+During handling of the above exception, another exception occurred:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f266f174d50>
+profile = 'alert'
+
+    @pytest.mark.parametrize("profile", ["market", "alert"])
+    def test_unstopped_runtime_exits_before_releasing_ownership(provider_pg, monkeypatch, profile):
+        factory, _ = provider_pg
+        from alerts import alert_runtime, runtime, storage
+    
+        with factory() as db:
+            schema = db.scalar(text("SELECT current_schema()"))
+        url = factory.kw["bind"].url.update_query_dict({"options": f"-csearch_path={schema}"})
+        monkeypatch.setattr("alerts.config.settings.database_pool_size", 8)
+        engine = storage.make_engine(str(url))
+        monkeypatch.setattr(storage, "engine", engine)
+        monkeypatch.setattr(storage, "bootstrap", lambda: None)
+        monkeypatch.setattr("alerts.config.settings.oanda_native_latest_owner", "provider")
+        monkeypatch.setattr("alerts.config.settings.market_runtime_chart_alert_enabled", True)
+        monkeypatch.setattr("alerts.provider_transport.close_clients",
+                            lambda: pytest.fail("clients closed while threads still run"))
+        monkeypatch.setattr("sys.argv", ["runtime", "--profile", profile])
+        monkeypatch.setattr("logging.shutdown", lambda: None)
+    
+        def still_running(*_args, **_kwargs):
+            raise RuntimeGroupError({}, alive=("nested-confirmation",))
+    
+        monkeypatch.setattr(market_runtime if profile == "market" else alert_runtime,
+                            "run_group", still_running)
+    
+        class ProcessExit(BaseException):
+            pass
+    
+        def exit_while_locked(code):
+            assert code == 1
+            with pytest.raises(RuntimeError, match="Another ChartAlert runtime"):
+                with market_runtime.chart_alert_ownership(engine):
+                    pytest.fail("old alert threads still running after lock released")
+            if profile == "market":
+                with pytest.raises(RuntimeError, match="Another market-runtime"):
+                    with market_runtime.ownership(engine):
+                        pytest.fail("old market threads still running after lock released")
+            raise ProcessExit()
+    
+        monkeypatch.setattr("os._exit", exit_while_locked)
+        try:
+            with pytest.raises(ProcessExit):
+>               runtime.main()
+
+backend/tests/test_market_runtime_postgres.py:144: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+backend/alerts/runtime.py:37: in main
+    os._exit(1)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+code = 1
+
+    def exit_while_locked(code):
+        assert code == 1
+        with pytest.raises(RuntimeError, match="Another ChartAlert runtime"):
+            with market_runtime.chart_alert_ownership(engine):
+>               pytest.fail("old alert threads still running after lock released")
+E               Failed: old alert threads still running after lock released
+
+backend/tests/test_market_runtime_postgres.py:134: Failed
+------------------------------ Captured log call -------------------------------
+ERROR    root:runtime.py:31 Runtime group failed: nested-confirmation: did not stop
+_ test_runtime_indicator_claim_leaves_initialization_and_long_repairs_to_data[9] _
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f2670d568d0>
+minutes = 9
+
+    @pytest.mark.parametrize("minutes", [1, 8, 9])
+    def test_runtime_indicator_claim_leaves_initialization_and_long_repairs_to_data(provider_pg, monkeypatch, minutes):
+        factory, _ = provider_pg
+        spec = {"name": "EMA", "params": {"period": 2}}
+        composite, _, stamp = pending_suffix(factory, monkeypatch, spec, minutes=minutes)
+        with factory.begin() as db:
+            page = chart_page(db, composite, "M1", count=3, now=stamp, provisional=True)
+            run_id = fixed_indicators.request(db, page, spec, stamp=stamp).id
+        owner = fixed_indicators.claim(run_id, alert_priority=True)
+        if minutes <= 8:
+            assert owner
+            fixed_indicators.commit(owner, fixed_indicators.build(owner))
+            with factory() as db:
+                assert db.get(FixedIndicatorRun, run_id).status == "complete"
+        else:
+>           assert owner is None
+E           AssertionError: assert {'id': '14cd8aaf0ca6219001555e48e92e83bf233c76348d0f2ae03ad2675e5ed0cc5c', 'token': 'b2ad991d-f552-475b-8cc7-93e18dd8d4d2', 'cursor': 166200000} is None
+
+backend/tests/test_market_runtime_postgres.py:164: AssertionError
+_______ test_runtime_indicator_cannot_claim_first_history_initialization _______
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f266eb642d0>
+
+    def test_runtime_indicator_cannot_claim_first_history_initialization(provider_pg, monkeypatch):
+        factory, _ = provider_pg
+        composite, revision, seam, stamp = composite_contracts.continuous(factory, monkeypatch)
+        composite_contracts.forming(factory, revision, seam + 600000, stamp)
+        with factory.begin() as db:
+            page = chart_page(db, composite, "M1", count=3, now=stamp, provisional=True)
+            run_id = fixed_indicators.request(db, page, {"name": "EMA", "params": {"period": 2}},
+                                              stamp=stamp).id
+>       assert fixed_indicators.claim(run_id, alert_priority=True) is None
+E       AssertionError: assert {'id': '664eea2a364694eb65c0b128e9923e52a398fb8580efaadce8b42a804341d267', 'token': '883a8f4e-9208-492e-9950-751787ec5b4c', 'cursor': 158400000} is None
+E        +  where {'id': '664eea2a364694eb65c0b128e9923e52a398fb8580efaadce8b42a804341d267', 'token': '883a8f4e-9208-492e-9950-751787ec5b4c', 'cursor': 158400000} = <function claim at 0x7f2672528fe0>('664eea2a364694eb65c0b128e9923e52a398fb8580efaadce8b42a804341d267', alert_priority=True)
+E        +    where <function claim at 0x7f2672528fe0> = fixed_indicators.claim
+
+backend/tests/test_market_runtime_postgres.py:178: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_rejected_market_start_preserves_existing_alert_boot_and_judgment
+FAILED backend/tests/test_market_runtime_postgres.py::test_unstopped_runtime_exits_before_releasing_ownership[market]
+FAILED backend/tests/test_market_runtime_postgres.py::test_unstopped_runtime_exits_before_releasing_ownership[alert]
+FAILED backend/tests/test_market_runtime_postgres.py::test_runtime_indicator_claim_leaves_initialization_and_long_repairs_to_data[9]
+FAILED backend/tests/test_market_runtime_postgres.py::test_runtime_indicator_cannot_claim_first_history_initialization
+5 failed, 2 passed in 8.70s
+

@@ -1,0 +1,72 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_failed_indicator_does_not_report_success_after_losing_its_lease[expired] _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb0d7959890>
+lost = 'expired'
+
+    @pytest.mark.parametrize("lost", ["expired", "replaced"])
+    def test_failed_indicator_does_not_report_success_after_losing_its_lease(database, monkeypatch, lost):
+        from alerts import fixed_indicators
+        from alerts.composite_chart import chart_page
+        from alerts.storage import FixedIndicatorRun
+        from test_market_runtime_postgres import pending_suffix
+    
+        spec = {"name": "EMA", "params": {"period": 2}}
+        composite, _, stamp = pending_suffix(database, monkeypatch, spec)
+        with database.begin() as db:
+            page = chart_page(db, composite, "M1", count=3, now=stamp, provisional=True)
+            run_id = fixed_indicators.request(db, page, spec, stamp=stamp).id
+    
+        def failed(owner):
+            with database.begin() as db:
+                run = db.get(FixedIndicatorRun, owner["id"])
+                if lost == "expired":
+                    run.lease_until = 0
+                else:
+                    run.lease_token = "replacement-lease"
+            raise ValueError("fixture calculation failure after lease loss")
+    
+        monkeypatch.setattr(fixed_indicators, "build", failed)
+>       with pytest.raises(ValueError, match="fixture calculation failure"):
+E       Failed: DID NOT RAISE ValueError
+
+backend/tests/test_market_runtime.py:264: Failed
+_ test_failed_indicator_does_not_report_success_after_losing_its_lease[replaced] _
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fb0dc1a9c10>
+lost = 'replaced'
+
+    @pytest.mark.parametrize("lost", ["expired", "replaced"])
+    def test_failed_indicator_does_not_report_success_after_losing_its_lease(database, monkeypatch, lost):
+        from alerts import fixed_indicators
+        from alerts.composite_chart import chart_page
+        from alerts.storage import FixedIndicatorRun
+        from test_market_runtime_postgres import pending_suffix
+    
+        spec = {"name": "EMA", "params": {"period": 2}}
+        composite, _, stamp = pending_suffix(database, monkeypatch, spec)
+        with database.begin() as db:
+            page = chart_page(db, composite, "M1", count=3, now=stamp, provisional=True)
+            run_id = fixed_indicators.request(db, page, spec, stamp=stamp).id
+    
+        def failed(owner):
+            with database.begin() as db:
+                run = db.get(FixedIndicatorRun, owner["id"])
+                if lost == "expired":
+                    run.lease_until = 0
+                else:
+                    run.lease_token = "replacement-lease"
+            raise ValueError("fixture calculation failure after lease loss")
+    
+        monkeypatch.setattr(fixed_indicators, "build", failed)
+>       with pytest.raises(ValueError, match="fixture calculation failure"):
+E       Failed: DID NOT RAISE ValueError
+
+backend/tests/test_market_runtime.py:264: Failed
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime.py::test_failed_indicator_does_not_report_success_after_losing_its_lease[expired]
+FAILED backend/tests/test_market_runtime.py::test_failed_indicator_does_not_report_success_after_losing_its_lease[replaced]
+2 failed in 1.45s

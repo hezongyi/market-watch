@@ -1,0 +1,34 @@
+time="2026-10-27T21:37:53Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-20261027-fault-stuck mw-runtime-stage2-20261027-fault-exception]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+F                                                                        [100%]
+=================================== FAILURES ===================================
+___ test_initialized_atr_reference_does_not_wait_for_unneeded_indicator_tail ___
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f295de9b490>
+
+    def test_initialized_atr_reference_does_not_wait_for_unneeded_indicator_tail(provider_pg, monkeypatch):
+        from alerts.chart_alert_service import create
+    
+        factory, _ = provider_pg
+        composite, revision, seam, stamp = composite_contracts.continuous(factory, monkeypatch)
+        condition = {"relation": "cross_up", "right": {"kind": "constant", "value": "1.115"},
+                     "offset": {"kind": "atr", "timeframe": "M1", "period": 2, "multiplier": ".01"}}
+        with factory.begin() as db:
+            ident = create(db, "atr-reference", composite_contracts.config(composite,
+                condition=condition, seam_policy="accept_raw"), at=stamp).id
+        assert composite_contracts.settle(factory, ident, stamp) == []
+        stamp = seam + 660010
+        composite_contracts.append(factory, revision, seam + 600000, "1.119", stamp)
+        with factory.begin() as db:
+            events = composite_contracts.evaluate(db, ident, now=stamp)
+            alert = db.get(ChartAlert, ident)
+>           assert len(events) == 1, (alert.health, alert.health_reason)
+E           AssertionError: ('warming', 'ATR 固定起点初始化或修订修复尚未完成')
+E           assert 0 == 1
+E            +  where 0 = len([])
+
+backend/tests/test_market_runtime_postgres.py:444: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_initialized_atr_reference_does_not_wait_for_unneeded_indicator_tail
+1 failed, 38 deselected in 3.30s
+

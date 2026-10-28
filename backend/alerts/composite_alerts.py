@@ -225,7 +225,11 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
         raise OffsetPending("最近预期 ATR 柱缺失，等待固定输入完整发布")
     page["bars"] = [reference]
     results, progress = chart_results(db, page, [spec.spec()], provisional=False, stamp=now)
-    if not progress or any(item["status"] != "complete" for item in progress):
+    runtime["offset_indicators"] = progress
+    # The offset joins the preceding completed bar. Its immutable, validated
+    # prefix can already cover that reference while a newer, unused suffix is
+    # pending. Do not wait for the whole target or call that suffix complete.
+    if not progress or any(item["cursor"] < end for item in progress):
         raise OffsetComputing("ATR 固定起点初始化或修订修复尚未完成")
     result = results[0]
     point = next((row for row in result["series"][0]["values"] if row["time"] == start), None)
@@ -255,7 +259,7 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
     return resolved
 
 
-def evaluate(db, alert, version, config, now):
+def evaluate(db, alert, version, config, now, *, clock=None):
     from .chart_alert_service import consume
     from .composite_chart import chart_page
 
@@ -277,6 +281,12 @@ def evaluate(db, alert, version, config, now):
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
         sorted({identity["dataset_id"], target.id}))).order_by(MarketDataset.id).with_for_update()))
+    # Source writers take these dataset locks before LiveState. Capture the
+    # production clock after lock acquisition, so a source commit while we
+    # waited cannot look like future input and reset a valid crossing baseline.
+    # Explicit historical/test clocks stay fixed; no age is clamped to zero.
+    if clock is not None:
+        now = clock()
     from .realtime_switch import enabled
 
     source_dataset = db.get(MarketDataset, identity["dataset_id"])
@@ -313,10 +323,11 @@ def evaluate(db, alert, version, config, now):
     if live_view["observation_mode"] == "stream_quote":
         stale_input = stale_input or live_view.get("quote_age_ms") is None or live_view["quote_age_ms"] > 15000
     if is_open and stale_input:
+        runtime["demand_hold"] = "stale_input"
         alert.status, alert.control_revision = "paused", alert.control_revision + 1
         alert.health, alert.health_reason = "blocked", "组合实时输入已过期；告警已暂停，恢复后需明确重启"
         alert.updated_at = now
-        return []
+        return wait(alert, runtime, "blocked", alert.health_reason)
     if prep.status != "queried" or prep.error:
         return wait(alert, runtime, "warming", "确认M1接续准备或恢复尚未完成")
     task = db.get(CompositeAggregateTask, (revision.id, config.timeframe))
@@ -407,7 +418,8 @@ def evaluate(db, alert, version, config, now):
         for index, operand in enumerate((config.condition.left, config.condition.right)):
             if operand and operand.kind == "price":
                 values[index] = live_sample["value"]
-    if any(item["status"] != "complete" for item in progress):
+    if any(item["status"] != "complete" and not item.get("provisional_ready")
+           for item in progress):
         return wait(alert, runtime, "warming", "指标完整初始化或修订修复尚未完成", reset=False)
     if values[0] is None or config.condition.right and values[1] is None:
         return wait(alert, runtime, "warming", "完整有效依赖尚不足以初始化指标或画线观察")

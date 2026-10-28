@@ -417,7 +417,8 @@ def cached_page(meta, frame, before, count, *, latest=False, quote=False, deadli
     # single-instrument OANDA request while that owner is refreshing the
     # ProviderDataset cache. Historical reads without an active subscription
     # retain their bounded page path.
-    if meta["source"] == "oanda" and settings.oanda_acquisition_mode == "rest_batch" and latest:
+    if (meta["source"] == "oanda" and settings.oanda_acquisition_mode == "rest_batch"
+            and settings.oanda_native_latest_owner == "pricing" and latest):
         from sqlalchemy import select
 
         from .provider_cache import LatestObservationPending, snapshot_transaction

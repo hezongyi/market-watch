@@ -7,6 +7,7 @@ monotonic time. A fresh confirmed M1 is inserted only at a minute boundary.
 """
 
 import argparse
+import hashlib
 import json
 import multiprocessing as mp
 import os
@@ -27,6 +28,21 @@ from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
 
 OUT = Path("/artifacts")
+
+
+def source_evidence():
+    root = Path(__file__).resolve().parents[1]
+    paths = sorted([*root.joinpath("backend/alerts").glob("*.py"),
+                    Path(__file__).resolve()])
+    digest = hashlib.sha256()
+    for path in paths:
+        digest.update(str(path.relative_to(root)).encode() + b"\0" + path.read_bytes())
+    limits = {}
+    for name in ("cpu.max", "memory.max"):
+        path = Path("/sys/fs/cgroup") / name
+        limits[name] = path.read_text().strip() if path.exists() else None
+    return {"source_sha256": digest.hexdigest(), "source_files": len(paths),
+            "cgroup_limits": limits}
 
 
 def emit(path, value):
@@ -138,7 +154,12 @@ def sample_quote(factory, revision, at, stamp, price):
         state.forming = dict(observed.content)
 
 
-def worker(role, schema, clock_origin, stopped, revision, scenario, log, history_pause, tracked):
+def worker(role, schema, clock_origin, stopped, revision, scenario, log, history_pause,
+           tracked, profile_runtime=False, independent_alert=False):
+    if profile_runtime and role == "runtime":
+        settings.database_pool_size = 6
+    elif profile_runtime and role == "alert":
+        settings.database_pool_size = 2
     engine, factory = connect(schema)
     measured = metrics(engine)
     started = time.monotonic()
@@ -172,7 +193,99 @@ def worker(role, schema, clock_origin, stopped, revision, scenario, log, history
                             "rule": item["alert_id"], "committed": item["committed"],
                             "observed_at": time.monotonic()})
 
-            run(stopped, on_alert=evaluated)
+            if independent_alert:
+                from alerts.runtime import run as run_profile
+
+                monkeypatch = pytest.MonkeyPatch()
+                monkeypatch.setattr("alerts.config.settings.oanda_native_latest_owner", "provider")
+                try:
+                    run_profile("alert", stop=stopped, handle_signals=False, on_alert=evaluated)
+                finally:
+                    monkeypatch.undo()
+            else:
+                run(stopped, on_alert=evaluated)
+        elif role == "runtime":
+            from alerts import alert_indicator_worker, alert_monitor, composite_aggregate_worker
+            from alerts.market_runtime import run as run_market
+            from alerts.runtime_supervisor import Loop
+            from alerts.storage import CompositeAggregateTask, Notification, Outbox, SignalRow
+
+            chart_alert_worker = __import__("alerts.chart_alert_worker", fromlist=["step"])
+            indicator_tick = alert_indicator_worker.tick
+
+            def measured_indicator_tick(*args, **kwargs):
+                progressed = indicator_tick(*args, **kwargs)
+                emit(log, {"type": "indicator", "at": time.monotonic(),
+                           "progressed": bool(progressed)})
+                return progressed
+
+            alert_indicator_worker.tick = measured_indicator_tick
+            chart_alert_worker.now_ms = lambda: clock_origin[0] + int(
+                (time.monotonic() - clock_origin[1]) * 1000)
+            aggregate_log = Path(str(log).replace("-runtime.jsonl", "-aggregate.jsonl"))
+            aggregate_tick = composite_aggregate_worker.aggregate_tick
+
+            def measured_aggregate_tick(*args, **kwargs):
+                progressed = aggregate_tick(*args, **kwargs)
+                with factory() as db:
+                    task = db.get(CompositeAggregateTask, (revision, "M1"))
+                    published = task.applied_input_revision if task else -1
+                emit(aggregate_log, {"type": "aggregate", "at": time.monotonic(),
+                    "progressed": bool(progressed), "published_revision": published})
+                return progressed
+
+            composite_aggregate_worker.aggregate_tick = measured_aggregate_tick
+            seen = set()
+
+            def evaluated(item):
+                emit(log, {"type": "evaluated", **item})
+                if not item["count"]:
+                    return
+                with factory() as db:
+                    rows = db.execute(select(SignalRow.id, SignalRow.occurred_at,
+                        Notification.id, Outbox.id).join(Notification,
+                        Notification.signal_id == SignalRow.id).join(Outbox,
+                        Outbox.notification_id == Notification.id).where(
+                        SignalRow.chart_alert_id == item["alert_id"])).all()
+                for signal, occurred, note, outbox in rows:
+                    if signal not in seen:
+                        seen.add(signal)
+                        emit(log, {"type": "signal", "signal": signal, "note": note,
+                            "outbox": outbox, "occurred_at": occurred,
+                            "rule": item["alert_id"], "committed": item["committed"],
+                            "observed_at": time.monotonic()})
+
+            def disabled_role(state):
+                def run_disabled(stop):
+                    from alerts.runtime_health import progress
+
+                    while not stop.is_set():
+                        progress(state=state)
+                        stop.wait(1)
+                return run_disabled
+
+            runtime_loops = (
+                Loop("pricing", disabled_role("disabled")),
+                Loop("realtime", disabled_role("idle")),
+                Loop("composite_aggregate", composite_aggregate_worker.run),
+                Loop("alert_indicator", alert_indicator_worker.run),
+            )
+            if not independent_alert:
+                runtime_loops += (Loop("chart_alert", lambda stop: alert_monitor.run(
+                    stop, on_alert=evaluated,
+                    report_health=lambda *_args, **_kwargs: None)),)
+            monkeypatch = pytest.MonkeyPatch()
+            monkeypatch.setattr("alerts.config.settings.oanda_stream_enabled", False)
+            monkeypatch.setattr("alerts.config.settings.oanda_native_latest_owner", "provider")
+            monkeypatch.setattr("alerts.config.settings.market_runtime_chart_alert_enabled",
+                                not independent_alert)
+            monkeypatch.setattr("alerts.market_runtime.build_loops", lambda: runtime_loops)
+            try:
+                run_market(stop=stopped, handle_signals=False)
+            finally:
+                monkeypatch.undo()
+                composite_aggregate_worker.aggregate_tick = aggregate_tick
+                alert_indicator_worker.tick = indicator_tick
         elif role == "aggregate":
             from alerts.composite_aggregates import aggregate_tick
             from alerts.storage import CompositeAggregateTask
@@ -261,7 +374,7 @@ def worker(role, schema, clock_origin, stopped, revision, scenario, log, history
                     emit(log, {"type": "delivery", "at": time.monotonic(), "worked": worked})
                     stopped.wait(.1 if worked else 1)
         elif role == "projection":
-            from alerts.notification_center_worker import once
+            from alerts.notification_center_worker import BUSY_POLL_SECONDS, IDLE_POLL_SECONDS, once
             from alerts.storage import NoticeEvent
 
             seen = set()
@@ -277,7 +390,7 @@ def worker(role, schema, clock_origin, stopped, revision, scenario, log, history
                         emit(log, {"type": "projected", "notice": ident, "source": source,
                                    "source_kind": kind, "committed": projected_at})
                 emit(log, {"type": "projection", "at": time.monotonic(), "count": count})
-                stopped.wait(.02 if count else 2)
+                stopped.wait(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
     except BaseException as error:
         emit(log, {"type": "error", "error_type": type(error).__name__})
         traceback.print_exc()
@@ -295,6 +408,7 @@ def worker(role, schema, clock_origin, stopped, revision, scenario, log, history
 def seed(schema, scenario):
     from alerts.chart_alert_service import create
     from alerts.chart_query import DataQuery, data_sync
+    from alerts.config import settings
     from alerts.history_artifacts import artifact_tick, request_artifacts
     from alerts.history_versions import create_version, import_page
     from alerts.storage import (
@@ -321,14 +435,19 @@ def seed(schema, scenario):
     composite, revision, seam, stamp = continuous(factory, patch)
     from alerts.chart_data import FRAMES
     from test_composite_aggregates import drain
-    from test_composite_alerts import forming
-    forming(factory, revision, stamp // 60000 * 60000, stamp)
+    # Creation now enforces source readiness. Use the same atomic observation
+    # publisher as the measured phase, including the connection epoch; the old
+    # two-phase forming test helper temporarily wrote a quote without one.
+    sample_quote(factory, revision, stamp // 60000 * 60000, stamp, "1.110")
     for frame in FRAMES:
         drain(revision, frame)
     ids = []
     modes = {}
     for index in range(7):
-        mode = "intrabar" if index in (2, 3, 6) else "close"
+        # REST batch exposes completed-candle samples, not stream quote ticks.
+        # Keep the seven-rule/ATR/EMA coverage while using its close-only mode.
+        mode = ("close" if settings.oanda_acquisition_mode == "rest_batch"
+                else "intrabar" if index in (2, 3, 6) else "close")
         condition = {"relation": "cross_up", "right": {"kind": "constant", "value": "1.115"}}
         if index in (4, 5):
             condition["offset"] = {"kind": "atr", "timeframe": "M1", "period": 2,
@@ -409,7 +528,10 @@ def seed(schema, scenario):
     return engine, factory, patch, ids, composite, revision, seam, stamp, target, inventory
 
 
-def scenario_run(name, samples, interval, history_pause):
+def scenario_run(name, samples, interval, history_pause, *, profile_runtime=False,
+                 independent_alert=False, pause_data_worker_after=None,
+                 drain_seconds=None, drain_inputs=False):
+    source = source_evidence()
     schema = "runtime_baseline_" + name.replace("-", "_") + "_" + uuid.uuid4().hex[:8]
     admin = storage.make_engine(settings.database_url)
     with admin.begin() as db:
@@ -418,19 +540,27 @@ def scenario_run(name, samples, interval, history_pause):
     engine, factory, patch, ids, composite, revision, seam, stamp, target, inventory = seed(schema, name)
     context = mp.get_context("fork")
     stopped = context.Event()
+    worker_stops = {role: context.Event() for role in (
+        "runtime", "alert", "aggregate", "provider", "notification", "projection", "history")}
     began = time.monotonic()
-    roles = ["alert", "aggregate", "provider", "notification", "projection", "history"]
+    roles = (["runtime", "alert", "provider", "notification", "projection", "history"]
+             if profile_runtime and independent_alert else
+             ["runtime", "provider", "notification", "projection", "history"]
+             if profile_runtime else
+             ["alert", "aggregate", "provider", "notification", "projection", "history"])
     prefix = OUT / (schema + "-")
     processes = []
     # Never inherit live DB connections across fork.
     engine.dispose()
     for role in roles:
         log = Path(str(prefix) + role + ".jsonl")
-        process = context.Process(target=worker, args=(role, schema, (stamp, began), stopped,
-            revision, name, log, history_pause, inventory), name=role)
+        process = context.Process(target=worker, args=(role, schema, (stamp, began), worker_stops[role],
+            revision, name, log, history_pause, inventory, profile_runtime,
+            independent_alert), name=role)
         process.start()
         processes.append(process)
     inputs, resources = [], []
+    data_worker_paused_at = None
     confirmed_end, previous_price = stamp // 60000 * 60000, "1.110"
     try:
         from alerts.storage import (
@@ -450,7 +580,11 @@ def scenario_run(name, samples, interval, history_pause):
         for index in range(samples):
             due = began + index * interval
             stopped.wait(max(0, due - time.monotonic()))
-            if any(not process.is_alive() for process in processes):
+            unexpected_exit = [process.name for role, process in zip(roles, processes)
+                if not process.is_alive() and not (
+                    role in ("provider", "history") and worker_stops[role].is_set()
+                    and process.exitcode == 0)]
+            if unexpected_exit:
                 raise RuntimeError("Baseline owner exited early")
             issued = time.monotonic()
             next_business = stamp + int((issued - began) * 1000)
@@ -485,20 +619,49 @@ def scenario_run(name, samples, interval, history_pause):
                     "FROM pg_stat_database WHERE datname=current_database()" )).mappings().one()
             processes_info = []
             for process in processes:
-                status = Path(f"/proc/{process.pid}/status").read_text()
+                status_path = Path(f"/proc/{process.pid}/status")
+                status = status_path.read_text() if process.is_alive() else ""
                 fields = {line.split(':')[0]: line.split(':')[1].strip()
                           for line in status.splitlines() if ':' in line}
                 processes_info.append({"role": process.name, "pid": process.pid,
-                    "rss": fields.get("VmRSS"), "threads": fields.get("Threads")})
+                    "alive": process.is_alive(), "rss": fields.get("VmRSS"),
+                    "threads": fields.get("Threads")})
             resources.append({"at": time.monotonic(), "backlog": backlog,
                               "pg": dict(pg), "processes": processes_info,
                               "host_loadavg": os.getloadavg(),
                               "cgroup_cpu_stat": Path("/sys/fs/cgroup/cpu.stat").read_text(),
                               "cgroup_memory_events": Path("/sys/fs/cgroup/memory.events").read_text()})
+            if pause_data_worker_after == index:
+                for role, process in zip(roles, processes):
+                    if role in ("provider", "history"):
+                        worker_stops[role].set()
+                        process.join(timeout=10)
+                        if process.is_alive() or process.exitcode != 0:
+                            raise RuntimeError(f"Data worker did not stop cleanly: {role}")
+                data_worker_paused_at = time.monotonic()
         input_window_ended = time.monotonic()
-        stopped.wait(interval + 2)
+        drain_started = time.monotonic()
+        drain_input_records = []
+        drain_deadline = drain_started + (interval + 2 if drain_seconds is None else drain_seconds)
+        while time.monotonic() < drain_deadline:
+            if not drain_inputs:
+                stopped.wait(drain_deadline - time.monotonic())
+                break
+            due = min(drain_deadline, time.monotonic() + interval)
+            stopped.wait(max(0, due - time.monotonic()))
+            if time.monotonic() >= drain_deadline:
+                break
+            issued = time.monotonic()
+            next_business = stamp + int((issued - began) * 1000)
+            sample_quote(factory, revision, confirmed_end, next_business, previous_price)
+            drain_input_records.append({"issued": issued, "committed": time.monotonic(),
+                                       "business_now": next_business, "end": confirmed_end,
+                                       "price": previous_price})
+        drain_ended = time.monotonic()
     finally:
         stopped.set()
+        for event in worker_stops.values():
+            event.set()
         for process in processes:
             process.join(timeout=25)
         alive = [process.name for process in processes if process.is_alive()]
@@ -525,12 +688,21 @@ def scenario_run(name, samples, interval, history_pause):
                                  for row in db.scalars(select(NoticeEvent))]}
         engine.dispose()
         patch.undo()
+    if source_evidence() != source:
+        raise RuntimeError("Workload source or cgroup limits changed during measurement")
     result = {"scenario": name, "schema": schema, "synthetic": True,
+              "source_evidence": source,
+              "profile_runtime": profile_runtime,
+              "independent_alert": independent_alert,
               "baseline_sha": "78697159067e1c1bc6c38be8ca8218cd12c29179",
               "clock": "wall-speed fixture stream_quote, confirmed M1 at minute boundary",
               "samples": samples, "interval_s": interval, "history_pause_s": history_pause,
               "wall_s": time.monotonic() - began, "inventory": inventory,
               "input_window_ended": input_window_ended, "workers_stopped": workers_stopped,
+              "drain_started": drain_started, "drain_ended": drain_ended,
+              "drain_seconds": drain_ended - drain_started,
+              "drain_inputs": drain_input_records,
+              "data_worker_paused_at": data_worker_paused_at,
               "inputs": inputs, "resources": resources, "final": final,
               "workers": {process.name: process.exitcode for process in processes},
               "limitations": ["Fixture source identity/time origin; no real supplier SLA",
@@ -547,17 +719,43 @@ def main():
     parser.add_argument("--samples", type=int, default=61)
     parser.add_argument("--interval", type=float, default=2)
     parser.add_argument("--history-pause", type=float, default=1)
+    parser.add_argument("--profile-runtime", action="store_true",
+                        help="Run aggregate, alert-indicator and alert loops in the fenced market profile")
+    parser.add_argument("--independent-alert", action="store_true",
+                        help="Run ChartAlert in its independent fenced profile alongside market-runtime")
+    parser.add_argument("--pause-data-worker-after", type=int,
+                        help="Stop the provider/history data owner after this sample while runtime continues")
+    parser.add_argument("--drain-seconds", type=float,
+                        help="Keep runtime owners alive after the final input before taking the final snapshot")
+    parser.add_argument("--drain-inputs", action="store_true",
+                        help="Continue fixture runtime quotes and heartbeats during the drain window")
     args = parser.parse_args()
     url = make_url(settings.database_url)
-    if (os.environ.get("MW_RUNTIME_BASELINE_TASK") != "mw-runtime-20261026"
-            or url.host != "postgres" or url.database != "runtime_baseline"
+    task = os.environ.get("MW_RUNTIME_BASELINE_TASK")
+    isolated_target = (
+        task == "mw-runtime-20261026" and url.database == "runtime_baseline"
+        or task == "mw-runtime-stage2-20261027" and args.profile_runtime
+        and url.database == "runtime_stage2"
+    )
+    if (not isolated_target or args.independent_alert and not args.profile_runtime
+            or url.host != "postgres"
             or settings.delivery_enabled or settings.oanda_stream_enabled or settings.yahoo_enabled):
         raise RuntimeError("Only the isolated task database with external delivery/sources off is allowed")
     if args.samples < 4 or args.interval < 1 or args.history_pause < .05:
         raise ValueError("At least four samples and a one-second interval are required")
+    if args.drain_seconds is not None and args.drain_seconds < 0:
+        raise ValueError("Drain duration must be non-negative")
+    if args.pause_data_worker_after is not None and not (
+            0 <= args.pause_data_worker_after < args.samples - 1):
+        raise ValueError("Data-worker pause sample must leave at least one later input")
     for scenario in (("normal", "busy", "candidate", "slow-source")
                      if args.scenario == "all" else (args.scenario,)):
-        scenario_run(scenario, args.samples, args.interval, args.history_pause)
+        scenario_run(scenario, args.samples, args.interval, args.history_pause,
+                     profile_runtime=args.profile_runtime,
+                     independent_alert=args.independent_alert,
+                     pause_data_worker_after=args.pause_data_worker_after,
+                     drain_seconds=args.drain_seconds,
+                     drain_inputs=args.drain_inputs)
 
 
 if __name__ == "__main__":

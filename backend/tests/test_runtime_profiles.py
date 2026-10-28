@@ -9,6 +9,7 @@ import pytest
 from alerts.runtime_supervisor import (
     Loop,
     RuntimeGroupError,
+    UnstoppedThreads,
     run_group,
     run_steps,
     signal_stops,
@@ -139,3 +140,43 @@ run_group([Loop('fatal', fail)], handle_signals=False)
     assert result.returncode != 0
     assert "RuntimeGroupError" in result.stderr
     assert "private details" not in result.stderr
+
+
+def test_runtime_cli_exits_even_if_a_sibling_cannot_stop():
+    code = """import sys, threading
+from alerts import runtime
+from alerts.runtime_supervisor import Loop, run_group
+def broken(_stop):
+    raise ValueError('private details')
+def stuck(_stop):
+    threading.Event().wait()
+def run(*_args, **_kwargs):
+    run_group([Loop('broken', broken), Loop('stuck', stuck)],
+              join_timeout=.05, handle_signals=False)
+runtime.market_runtime.run = run
+sys.argv = ['runtime', '--profile', 'market']
+runtime.main()
+"""
+    root = Path(__file__).resolve().parents[2]
+    result = subprocess.run([sys.executable, "-c", code], cwd=root,
+        env={**os.environ, "PYTHONPATH": str(root / "backend")},
+        capture_output=True, text=True, timeout=10)
+    assert result.returncode == 1
+    assert "stuck: did not stop" in result.stderr
+    assert "private details" not in result.stderr
+
+
+def test_nested_threads_still_using_resources_make_group_shutdown_fail():
+    release = threading.Event()
+    nested = threading.Thread(target=release.wait, name="confirmation")
+    nested.start()
+    try:
+        def failed_shutdown(_stop):
+            raise UnstoppedThreads((nested,))
+
+        with pytest.raises(RuntimeGroupError) as result:
+            run_group([Loop("pricing", failed_shutdown)], handle_signals=False)
+        assert result.value.alive == ("confirmation",)
+    finally:
+        release.set()
+        nested.join(2)

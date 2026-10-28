@@ -1,0 +1,39 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_failed_old_alert_turn_cannot_overwrite_replacement_health ________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f17552d6190>
+
+    def test_failed_old_alert_turn_cannot_overwrite_replacement_health(database, monkeypatch):
+        from alerts import runtime_health
+    
+        ident, *_ = armed(database, monkeypatch)
+        old = runtime_health.Progress("market", "chart_alert", "old")
+        old.claim()
+    
+        def fail(*_args, **_kwargs):
+            raise TimeoutError("controlled evaluation failure")
+    
+        def replace_after_rollback(_error):
+            runtime_health.Progress("market", "chart_alert", "replacement").claim()
+            with database.begin() as db:
+                row = db.get(ChartAlert, ident)
+                row.health, row.health_reason = "ready", None
+    
+        monkeypatch.setattr(chart_alert_worker, "evaluate", fail)
+>       with runtime_health.reporting(old), pytest.raises(runtime_health.RuntimeOwnershipLost):
+E       Failed: DID NOT RAISE RuntimeOwnershipLost
+
+backend/tests/test_market_runtime.py:38: Failed
+------------------------------ Captured log call -------------------------------
+ERROR    alerts.chart_alert_worker:chart_alert_worker.py:477 Chart alert evaluation failed for 609fe5c4-6f90-403b-bb95-aeacb6dbf825
+Traceback (most recent call last):
+  File "/home/quant/repos/market-watch-runtime-stage2-20261027/backend/alerts/chart_alert_worker.py", line 462, in step
+    evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE,
+  File "/home/quant/repos/market-watch-runtime-stage2-20261027/backend/tests/test_market_runtime.py", line 29, in fail
+    raise TimeoutError("controlled evaluation failure")
+TimeoutError: controlled evaluation failure
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime.py::test_failed_old_alert_turn_cannot_overwrite_replacement_health
+1 failed in 0.87s

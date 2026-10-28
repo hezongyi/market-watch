@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import httpx
 import pytest
 from alerts import oanda_worker as worker
+from alerts.runtime_health import reporting
 from sqlalchemy.exc import OperationalError
 
 
@@ -20,6 +21,7 @@ def collecting(monkeypatch):
     monkeypatch.setattr(worker, "renew", lambda _: True)
     monkeypatch.setattr(worker, "desired_datasets", lambda _: identities)
     monkeypatch.setattr(worker, "confirm_pages", lambda *_: None)
+    monkeypatch.setattr(worker, "confirmation_error", lambda *_: None)
     monkeypatch.setattr(worker, "publish_event", lambda *_: None)
     monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: disconnected.append((args, kwargs)))
     return identities, disconnected
@@ -126,3 +128,70 @@ def test_normal_stream_eof_is_visible_and_keeps_disconnect_backoff(collecting, c
     assert "pricing_stream_closed reason=eof epoch=7" in caplog.text
     assert disconnected[0][0][-1].status == "unavailable"
     assert not disconnected[0][1]["intentional"]
+
+
+@pytest.mark.parametrize("mode", ["stream", "rest_batch"])
+def test_confirmation_thread_reports_fault_and_quotes_cannot_clear_it(collecting, monkeypatch, mode):
+    from alerts.market_contracts import RequestResult
+    from test_oanda_stream import oanda_identity
+
+    identities, _ = collecting
+    reported = threading.Event()
+    stopped = threading.Event()
+    records = []
+
+    def record(**value):
+        records.append(value)
+        if value["error"] == "OperationalError":
+            reported.set()
+
+    def fail_confirmation(*_):
+        raise database_error()
+
+    class Adapter:
+        account_id = "synthetic-account"
+
+        def stream(self, *_args, **_kwargs):
+            assert reported.wait(2), "confirmation thread lost runtime reporting context"
+            yield {"type": "heartbeat"}
+            stopped.set()
+
+        def page(self, *_):
+            raise AssertionError("confirmation uses the patched owned entry point")
+
+        def latest(self, *_args, **_kwargs):
+            assert reported.wait(2), "REST confirmation lost runtime reporting context"
+            return SimpleNamespace(result=RequestResult(status="data"))
+
+    monkeypatch.setattr(worker, "confirm_pages", fail_confirmation)
+    monkeypatch.setattr(worker.settings, "oanda_acquisition_mode", "stream")
+    if mode == "rest_batch":
+        identity = oanda_identity()
+        identities = {identity.key: identity}
+        monkeypatch.setattr(worker, "desired_for_mode", lambda _: identities)
+        monkeypatch.setattr(worker, "closed_delay", lambda _: None)
+        monkeypatch.setattr(worker, "publish_rest_batch", lambda *_args, **_kwargs: stopped.set())
+    with reporting(SimpleNamespace(record=record)):
+        collect = worker.collect_rest if mode == "rest_batch" else worker.collect
+        collect(Adapter(), ("synthetic-account", "owner"), identities, stopped)
+    assert len(records) >= 2
+    assert all(row["state"] == "degraded" and row["error"] == "OperationalError" for row in records)
+
+
+@pytest.mark.parametrize("failure", ["timeout", "eof"])
+def test_stream_fault_is_preserved_during_waiting_for_retry(collecting, failure):
+    identities, _ = collecting
+    records = []
+
+    class Adapter:
+        account_id = "synthetic-account"
+
+        def stream(self, *_args, **_kwargs):
+            if failure == "timeout":
+                raise httpx.ReadTimeout("private-token")
+            return iter(())
+
+    with reporting(SimpleNamespace(record=lambda **value: records.append(value))):
+        worker.collect(Adapter(), ("synthetic-account", "owner"), identities, threading.Event())
+    assert records[-1]["state"] == "degraded"
+    assert records[-1]["error"] == ("timeout" if failure == "timeout" else "unavailable")

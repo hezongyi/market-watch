@@ -68,6 +68,12 @@ def summarize(path):
     schema = result["schema"]
     logs = {role: load_lines(path.parent / f"{schema}-{role}.jsonl")
             for role in result["workers"]}
+    if result.get("profile_runtime"):
+        runtime = logs["runtime"]
+        if not result.get("independent_alert"):
+            logs["alert"] = [item for item in runtime
+                             if item["type"] in ("evaluated", "signal")]
+        logs["aggregate"] = load_lines(path.parent / f"{schema}-aggregate.jsonl")
     if any(code != 0 for code in result["workers"].values()):
         raise RuntimeError("Worker failure in " + path.name)
     if any(item["type"] == "error" for rows in logs.values() for item in rows):
@@ -123,8 +129,8 @@ def summarize(path):
         for metric in ("input_to_evaluated_s", "input_commit_observer_to_evaluated_s",
                        "visible_to_evaluated_s"):
             group[metric] = distribution(group[metric])
-    metrics = {role: next(item for item in rows if item["type"] == "metrics")
-               for role, rows in logs.items()}
+    metrics = {role: next((item for item in logs[role] if item["type"] == "metrics"), None)
+               for role in result["workers"]}
     foreground = [item["at"] - item["started"] for item in logs["provider"]
                   if item["type"] == "provider"]
     projected = [item["at"] for item in logs["projection"]
@@ -163,8 +169,14 @@ def summarize(path):
     ready = next((item for item in candidate if item["readiness"] and item["readiness"]["ready"]), None)
     queued = result["inventory"]["candidate_queued_at"]
     return {"artifact": path.name, "scenario": result["scenario"],
+            "source_evidence": result.get("source_evidence"),
+            "profile_runtime": result.get("profile_runtime", False),
+            "independent_alert": result.get("independent_alert", False),
             "history_pause_s": result["history_pause_s"], "samples": result["samples"],
             "wall_s": result["wall_s"], "source_ingestion_s": distribution(source),
+            "data_worker_paused_at": result.get("data_worker_paused_at"),
+            "input_window_ended": result.get("input_window_ended"),
+            "workers": result.get("workers"),
             "input_to_M1_publication_observer_s": distribution(aggregate),
             "confirmed_inputs": confirmed_count,
             "unpublished_confirmed_inputs": confirmed_count - len(aggregate),
@@ -197,7 +209,9 @@ def summarize(path):
                                   for row in result["final"]["rules"]],
             "backlog_first": result["resources"][0]["backlog"],
             "backlog_last": result["resources"][-1]["backlog"],
-            "roles": metrics, "limitations": result["limitations"],
+            "roles": metrics, "limitations": result["limitations"] + (
+                ["One or more owner metric summaries were not emitted before container stop"]
+                if any(value is None for value in metrics.values()) else []),
             "note": "Percentiles exclude missing pairs only from numeric samples; missing denominator is explicit. "
                     "Input latency uses issued time for a conservative upper bound; actual commit is bracketed "
                     "by issued and committed observer. Observer-based lower bounds remain explicit. "
@@ -208,7 +222,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("directory", type=Path)
     args = parser.parse_args()
-    paths = sorted(args.directory.glob("runtime_baseline_*.json"))
+    paths = sorted([*args.directory.glob("runtime_baseline_*.json"),
+                    *args.directory.glob("runtime_compose_*.json")])
     if not paths:
         raise RuntimeError("No completed baseline artifacts")
     output = {"runs": [summarize(path) for path in paths]}

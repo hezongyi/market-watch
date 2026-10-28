@@ -1,4 +1,4 @@
-"""Bounded API-owned monitor heartbeat; rule data health is a separate fact."""
+"""Bounded monitor heartbeat; rule data health is a separate fact."""
 
 import os
 import uuid
@@ -14,7 +14,7 @@ STALE_MS = 60000
 
 class Heartbeat:
     def __init__(self):
-        self.owner = {"role": "api", "pid": os.getpid(), "run_id": str(uuid.uuid4())}
+        self.owner = {"role": "market-runtime", "pid": os.getpid(), "run_id": str(uuid.uuid4())}
         self.value = {"owner": self.owner, "started_at": now_ms(), "state": "starting",
                       "last_success_at": None, "recent_error": None, "recent_error_at": None}
         self.saved_at = None
@@ -41,12 +41,22 @@ class Heartbeat:
 
 
 def summary(db, *, at=None):
+    from .runtime_health import key
+    from .runtime_health import summary as runtime_summary
+
     stamp = now_ms() if at is None else at
     row = db.get(Preference, KEY)
-    loop = dict(row.value) if row else {"state": "unknown", "owner": {"role": "api"},
+    loop = dict(row.value) if row else {"state": "unknown", "owner": {"role": "market-runtime"},
         "last_success_at": None, "recent_error": None, "recent_error_at": None}
     if loop.get("state") in ("starting", "running", "error") and stamp - loop.get("heartbeat_at", 0) > STALE_MS:
         loop["state"] = "stale"
+    # Runtime records are fenced by boot ID. Retain the old shape for clients,
+    # and read the legacy key only when upgrading a pre-profile deployment.
+    if db.get(Preference, key("chart_alert")):
+        role = runtime_summary(db, ("chart_alert",), at=stamp)[0]
+        loop = {**role, "owner": {"role": "market-runtime", "run_id": role["boot_id"]},
+                "heartbeat_at": role.get("checked_at"),
+                "recent_error": role.get("error_type")}
     groups = dict(db.execute(select(ChartAlert.health, func.count()).where(
         ChartAlert.status == "active").group_by(ChartAlert.health)).all())
     backlog = select(Outbox).join(Notification, Notification.id == Outbox.notification_id).join(
@@ -58,4 +68,5 @@ def summary(db, *, at=None):
         "blocked": groups.get("blocked", 0), "stale": groups.get("stale", 0),
         "error": groups.get("error", 0), "waiting": groups.get("warming", 0),
         "ready": groups.get("ready", 0)}, "delivery": delivery,
-        "lifecycle": "API owns the monitor; API downtime pauses evaluation; persisted rules resume without replaying historical notifications."}
+        "runtime_roles": runtime_summary(db, at=stamp),
+        "lifecycle": "market-runtime owns the monitor; API downtime does not pause evaluation."}

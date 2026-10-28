@@ -11,7 +11,15 @@ from sqlalchemy import delete, func, select, text, update
 
 from .display_observations import read
 from .source_history_store import _insert
-from .storage import CompositePreparation, DisplaySnapshot, RealtimeMapping, Preference, LiveState
+from .storage import (
+    CompositePreparation,
+    DisplaySnapshot,
+    HistoryVersion,
+    LiveState,
+    MarketDataset,
+    Preference,
+    RealtimeMapping,
+)
 
 LEASE_MS = 120000
 MAX_SNAPSHOTS = 512
@@ -31,11 +39,23 @@ def renew(db, snapshot, stamp):
         .execution_options(synchronize_session=False))
 
 
+def lock_inputs(db, revision):
+    """Pin history and live payloads in the judgment's dataset order."""
+    history = db.get(HistoryVersion, revision.history_version_id)
+    mapping = db.get(RealtimeMapping, revision.mapping_id)
+    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+        {history.dataset_id, mapping.target_dataset_id})).order_by(MarketDataset.id)
+        .with_for_update(read=True)))
+
+
 def capture(db, revision, frame, stamp):
     from .composite_series import period
 
     # Confirmation writes use this same lock. An old fixed version must not be
     # paired with observations already reclaimed by a newer confirmation.
+    # Pin the historical prefix before adopting mutable legacy observations;
+    # taking only the live parent here can deadlock with a sorted judgment.
+    lock_inputs(db, revision)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     state = db.get(LiveState, mapping.target_dataset_id)
     if state:

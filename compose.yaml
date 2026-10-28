@@ -21,6 +21,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
     depends_on:
       postgres: {condition: service_healthy}
   api:
@@ -29,6 +30,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
       ALERTS_COOKIE_SECURE: "true"
       ALERTS_HISTORY_HEALTH_WORKERS: '["legacy_import"]'
     depends_on:
@@ -40,15 +42,21 @@ services:
       retries: 3
       start_period: 20s
     restart: unless-stopped
-  market-worker:
+  market-runtime:
     build: .
-    command: ["python", "-m", "alerts.market"]
+    command: ["python", "-m", "alerts.runtime", "--profile", "market"]
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-market-runtime
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
+      # Two ownership sessions; remaining connections shared by runtime work.
+      ALERTS_DATABASE_POOL_SIZE: "6"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
     depends_on:
-      api: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
     restart: unless-stopped
   market-stream-worker:
     build: .
@@ -57,6 +65,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -67,6 +76,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -77,6 +87,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped
@@ -87,6 +98,7 @@ services:
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
     depends_on:
       api: {condition: service_healthy}
     restart: unless-stopped

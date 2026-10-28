@@ -1,0 +1,26 @@
+time="2026-10-28T01:47:16Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-five-exception-20261028 mw-runtime-stage2-five-stuck-20261028]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+2026-10-28 01:47:20,111 INFO setup plugin alembic.autogenerate.schemas
+2026-10-28 01:47:20,112 INFO setup plugin alembic.autogenerate.tables
+2026-10-28 01:47:20,112 INFO setup plugin alembic.autogenerate.types
+2026-10-28 01:47:20,112 INFO setup plugin alembic.autogenerate.constraints
+2026-10-28 01:47:20,112 INFO setup plugin alembic.autogenerate.defaults
+2026-10-28 01:47:20,112 INFO setup plugin alembic.autogenerate.comments
+2026-10-28 01:47:20,112 INFO setup plugin alembic.ext.checkconstraint_byname
+{"seeded": "five_health28b", "rules": 7, "synthetic": true}
+time="2026-10-28T01:47:27Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-five-exception-20261028 mw-runtime-stage2-five-stuck-20261028]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+ Container mw-runtime-stage2-five-stream-20261028-market-runtime-1  Recreate
+ Container mw-runtime-stage2-five-stream-20261028-fixture-supplier-1  Recreate
+ Container mw-runtime-stage2-five-stream-20261028-market-runtime-1  Recreated
+ Container mw-runtime-stage2-five-stream-20261028-fixture-supplier-1  Recreated
+ Container mw-runtime-stage2-five-stream-20261028-market-runtime-1  Starting
+ Container mw-runtime-stage2-five-stream-20261028-fixture-supplier-1  Starting
+ Container mw-runtime-stage2-five-stream-20261028-market-runtime-1  Started
+ Container mw-runtime-stage2-five-stream-20261028-fixture-supplier-1  Started
+time="2026-10-28T01:47:28Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-five-exception-20261028 mw-runtime-stage2-five-stuck-20261028]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+{"phase": "ready", "elapsed_s": 11.232058162102476, "signals": 0, "passed": true}
+time="2026-10-28T01:48:09Z" level=warning msg="Found orphan containers ([mw-runtime-stage2-five-exception-20261028 mw-runtime-stage2-five-stuck-20261028]) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up."
+{"phase": "crossing", "elapsed_s": 26.572354659205303, "signals": 7, "passed": true}
+ Container mw-runtime-stage2-five-stream-20261028-fixture-supplier-1  Stopping
+ Container mw-runtime-stage2-five-stream-20261028-market-runtime-1  Stopping
+ Container mw-runtime-stage2-five-stream-20261028-market-runtime-1  Stopped
+ Container mw-runtime-stage2-five-stream-20261028-fixture-supplier-1  Stopped

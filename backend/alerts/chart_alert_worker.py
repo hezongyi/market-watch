@@ -18,6 +18,7 @@ from .chart_data import chart_rows
 from .chart_geometry_mapping import bar_indices
 from .chart_labels import managed_label
 from .domain import Calendar, scheduled_open
+from .runtime_health import RuntimeOwnershipLost, assert_current
 from .storage import (
     Bar,
     ChartAlert,
@@ -208,9 +209,11 @@ def geometry_indices(rows, line, *, meta=None, config=None):
     return [origin + i for i in range(len(rows))]
 
 
-def evaluate(db, alert_id, *, now=None, values_cache=None):
+def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
     """Lock the run before reading its data; absent/incomplete data never advances it."""
-    now = now_ms() if now is None else now
+    if now is None:
+        clock = clock or now_ms
+        now = clock()
     alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update(skip_locked=True))
     if not alert or alert.status != "active":
         return []
@@ -223,7 +226,7 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
     if config.series_kind == "composite":
         from .composite_alerts import evaluate as evaluate_composite
 
-        return evaluate_composite(db, alert, version, config, now)
+        return evaluate_composite(db, alert, version, config, now, clock=clock)
     try:
         rows, meta = stored_rows(db, version, config, now,
                                  fixed_origin=alert.runtime.get("origin"))
@@ -431,13 +434,14 @@ def evaluate(db, alert_id, *, now=None, values_cache=None):
     return results
 
 
-def step(*, now=None, on_evaluated=None):
+def step(*, now=None, on_evaluated=None, on_error=None):
     with transaction() as db:
         ids = list(db.scalars(select(ChartAlert.id).where(ChartAlert.status == "active")))
     for ident in ids:
         started = time.monotonic()
         try:
             with transaction() as db:
+                assert_current(db)
                 business_now = now_ms() if now is None else now
                 row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident)
                     .with_for_update(skip_locked=True))
@@ -450,18 +454,30 @@ def step(*, now=None, on_evaluated=None):
                     row.control_revision += 1
                     health(row, "blocked", "旧来源告警已退役；请改用组合行情重新创建")
                 else:
-                    evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE)
+                    def read_clock():
+                        nonlocal business_now
+                        business_now = now_ms()
+                        return business_now
+
+                    evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE,
+                             clock=read_clock if now is None else None)
                 if on_evaluated:
                     row = db.get(ChartAlert, ident)
                     observation = dict(alert_id=ident, read_started=started,
                         evaluation_finished=time.monotonic(),
                         business_now=business_now, sequence=row.state.get('sequence') if row else None,
                         count=row.count if row else None, health=row.health if row else None,
+                        health_reason=row.health_reason if row else None,
                         status=row.status if row else None, commit_started=time.monotonic())
+        except RuntimeOwnershipLost:
+            raise
         except Exception as exc:
+            if on_error:
+                on_error(type(exc).__name__)
             log.exception("Chart alert evaluation failed for %s", ident)
             with transaction() as db:
-                row = db.get(ChartAlert, ident)
+                assert_current(db)
+                row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident).with_for_update())
                 if row and row.status == "active":
                     health(row, "error", "判定失败：" + type(exc).__name__)
             continue

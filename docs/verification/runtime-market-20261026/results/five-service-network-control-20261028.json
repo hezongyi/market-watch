@@ -1,0 +1,30 @@
+{
+  "run": "five_stream_20261028",
+  "schema": "runtime_network_five_stream_20261028",
+  "business_origin": 166200010,
+  "monotonic_origin": 1127450.084568932,
+  "rules": [
+    "2e537eea-f2cd-433c-84df-06116f03d87e",
+    "9ac74d6c-c679-492a-af11-9ca441962cbd",
+    "75469258-53e9-4abe-89d0-ce56733e593b",
+    "f8642cb8-15fb-42ee-a8b2-c2f36564b591",
+    "95e0d5fd-d5cb-422a-a948-ca1632ec5cea",
+    "a9a51291-4c38-4843-8d6b-b5c71b5e4b57",
+    "25578f48-4479-447a-9389-7c660eaeea97"
+  ],
+  "rule_modes": {
+    "2e537eea-f2cd-433c-84df-06116f03d87e": "price_close",
+    "9ac74d6c-c679-492a-af11-9ca441962cbd": "price_close",
+    "75469258-53e9-4abe-89d0-ce56733e593b": "price_intrabar",
+    "f8642cb8-15fb-42ee-a8b2-c2f36564b591": "price_intrabar",
+    "95e0d5fd-d5cb-422a-a948-ca1632ec5cea": "atr_close",
+    "a9a51291-4c38-4843-8d6b-b5c71b5e4b57": "atr_close",
+    "25578f48-4479-447a-9389-7c660eaeea97": "ema_intrabar"
+  },
+  "composite": "41362112076c5545656eb1c323757e9585a965551afc65265c23c4584ccd2ae2",
+  "revision": "3e389721-3c27-49f7-a98a-ddbb7eadf6fe",
+  "target": "4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f",
+  "seam": 165600000,
+  "calendar_version": "ny17-candidate-v1",
+  "synthetic": true
+}

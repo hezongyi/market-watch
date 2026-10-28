@@ -20,6 +20,18 @@ def test_live_reads_require_authentication(database):
         assert client.post("/api/market-data/live/demand", json={}).status_code == 401
 
 
+def test_api_lifespan_does_not_start_chart_alert_monitor(database, monkeypatch):
+    from alerts import alert_monitor, provider_service
+
+    monkeypatch.setattr(provider_service, "start", lambda: None)
+    monkeypatch.setattr(provider_service, "stop", lambda: None)
+    monkeypatch.setattr(alert_monitor, "run", lambda *_args, **_kwargs: pytest.fail(
+        "API lifespan must not own ChartAlert evaluation"))
+
+    with TestClient(api_module.app):
+        pass
+
+
 def test_snapshot_hides_uncollected_catalog_and_browser_demands_extend_shared_union(running):
     factory, _, _, _ = running
     api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"

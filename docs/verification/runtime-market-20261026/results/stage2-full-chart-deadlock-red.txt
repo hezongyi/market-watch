@@ -1,0 +1,669 @@
+FF                                                                       [100%]
+=================================== FAILURES ===================================
+_ test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order[chart_data] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fe833eb1050>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7fe835343450>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7fe833d1f2d0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7fe834796690>
+parameters = [{'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres database=runtime_stage2) at 0x7fe835637b80>
+query = 'SELECT market_datasets.id \nFROM market_datasets \nWHERE market_datasets.id IN (%(id_1_1)s::VARCHAR, %(id_1_2)s::VARCHAR) ORDER BY market_datasets.id FOR UPDATE'
+params = {'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.DeadlockDetected: deadlock detected
+E           DETAIL:  Process 105424 waits for ShareLock on transaction 169733; blocked by process 105413.
+E           Process 105413 waits for ShareLock on transaction 169735; blocked by process 105424.
+E           HINT:  See server log for query details.
+E           CONTEXT:  while locking tuple (0,2) in relation "market_datasets"
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DeadlockDetected
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe836b6be90>
+query_kind = 'chart_data'
+
+    @pytest.mark.parametrize("query_kind", ["chart_data", "chart_page"])
+    def test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order(provider_pg, monkeypatch, query_kind):
+        """The complete first chart read also needs its fixed historical prefix."""
+        from alerts.chart_query import DataQuery
+        from alerts.config import settings
+        from alerts.series_access import chart_data
+        from alerts.storage import CompositeRevision, HistoryVersion, ObservedMinute, RealtimeMapping
+    
+        factory, engine = provider_pg
+        monkeypatch.setattr(settings, "oanda_calendar_version", "chart-lock-2")
+        ident, composite, revision, seam, stamp = composite_contracts.armed(factory, monkeypatch, mode="intrabar")
+        composite_contracts.forming(factory, revision, stamp // 60000 * 60000, stamp)
+        monkeypatch.setattr("alerts.series_access.now_ms", lambda: stamp)
+        with factory.begin() as db:
+            selected = db.get(CompositeRevision, revision)
+            target = db.get(RealtimeMapping, selected.mapping_id).target_dataset_id
+            history = db.get(HistoryVersion, selected.history_version_id).dataset_id
+            assert history < target, "fixture must exercise the target-before-history inversion"
+            assert composite_contracts.evaluate(db, ident, now=stamp) == []
+            db.execute(delete(Preference).where(Preference.key == "display_handover:" + target))
+            db.execute(delete(ObservedMinute).where(ObservedMinute.dataset_id == target))
+            schema = db.scalar(text("SELECT current_schema()"))
+        observer = create_engine(engine.url.update_query_dict({"options": f"-csearch_path={schema}"}),
+                                 pool_size=1, max_overflow=0)
+        browser_locked, release_browser, judgment_started = (threading.Event() for _ in range(3))
+        context = threading.local()
+        judgment_pids = []
+    
+        def before(connection, _cursor, _statement, _parameters, _execution, _many):
+            if getattr(context, "role", None) == "judgment" and not judgment_pids:
+                judgment_pids.append(connection.connection.driver_connection.info.backend_pid)
+                judgment_started.set()
+    
+        def after(_connection, _cursor, statement, _parameters, _execution, _many):
+            if (getattr(context, "role", None) == "browser" and not browser_locked.is_set()
+                    and "SELECT market_datasets.id" in statement and "FOR " in statement):
+                browser_locked.set()
+                assert release_browser.wait(10), "judgment did not contend with the chart read"
+    
+        def browser():
+            context.role = "browser"
+            with factory.begin() as db:
+                if query_kind == "chart_data":
+                    return chart_data(db, DataQuery(instrument=composite, series_kind="composite",
+                                                   timeframe="M1", limit=100, provisional=True))
+                return chart_page(db, composite, "M1", count=100, provisional=True, now=stamp)
+    
+        def judgment():
+            context.role = "judgment"
+            with factory.begin() as db:
+                return composite_contracts.evaluate(db, ident, now=stamp)
+    
+        event.listen(engine, "before_cursor_execute", before)
+        event.listen(engine, "after_cursor_execute", after)
+        try:
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                browsing = pool.submit(browser)
+                try:
+                    assert browser_locked.wait(5), "chart did not pin a dataset"
+                    judging = pool.submit(judgment)
+                    assert judgment_started.wait(5)
+                    with observer.connect() as connection:
+                        deadline = time.monotonic() + 5
+                        while time.monotonic() < deadline:
+                            if judging.done():
+                                judging.result()
+                                pytest.fail("judgment completed while the chart held its dataset lock")
+                            waiting = connection.scalar(text(
+                                "SELECT wait_event_type = 'Lock' AND wait_event IN ('transactionid', 'tuple') "
+                                "FROM pg_stat_activity WHERE pid = :pid"), {"pid": judgment_pids[0]})
+                            connection.commit()
+                            if waiting:
+                                break
+                            time.sleep(.01)
+                        else:
+                            pytest.fail("judgment did not wait for the chart transaction")
+                    release_browser.set()
+                    page = browsing.result(timeout=5)
+                    assert any(bar["start"] < seam for bar in page["bars"])
+>                   assert judging.result(timeout=5) == []
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_market_runtime_postgres.py:623: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/concurrent/futures/thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_market_runtime_postgres.py:594: in judgment
+    return composite_contracts.evaluate(db, ident, now=stamp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_alert_worker.py:229: in evaluate
+    return evaluate_composite(db, alert, version, config, now, clock=clock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/composite_alerts.py:279: in evaluate
+    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres database=runtime_stage2) at 0x7fe835637b80>
+query = 'SELECT market_datasets.id \nFROM market_datasets \nWHERE market_datasets.id IN (%(id_1_1)s::VARCHAR, %(id_1_2)s::VARCHAR) ORDER BY market_datasets.id FOR UPDATE'
+params = {'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.OperationalError: (psycopg.errors.DeadlockDetected) deadlock detected
+E           DETAIL:  Process 105424 waits for ShareLock on transaction 169733; blocked by process 105413.
+E           Process 105413 waits for ShareLock on transaction 169735; blocked by process 105424.
+E           HINT:  See server log for query details.
+E           CONTEXT:  while locking tuple (0,2) in relation "market_datasets"
+E           [SQL: SELECT market_datasets.id 
+E           FROM market_datasets 
+E           WHERE market_datasets.id IN (%(id_1_1)s::VARCHAR, %(id_1_2)s::VARCHAR) ORDER BY market_datasets.id FOR UPDATE]
+E           [parameters: {'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}]
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: OperationalError
+_ test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order[chart_page] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7fe83477e250>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7fe831d45ad0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7fe8327b2cd0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7fe832b352d0>
+parameters = [{'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres database=runtime_stage2) at 0x7fe835636bc0>
+query = 'SELECT market_datasets.id \nFROM market_datasets \nWHERE market_datasets.id IN (%(id_1_1)s::VARCHAR, %(id_1_2)s::VARCHAR) ORDER BY market_datasets.id FOR UPDATE'
+params = {'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.DeadlockDetected: deadlock detected
+E           DETAIL:  Process 105447 waits for ShareLock on transaction 169879; blocked by process 105436.
+E           Process 105436 waits for ShareLock on transaction 169882; blocked by process 105447.
+E           HINT:  See server log for query details.
+E           CONTEXT:  while locking tuple (0,2) in relation "market_datasets"
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DeadlockDetected
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://runtime_stage2@postgres/runtime_stage2))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7fe835314a90>
+query_kind = 'chart_page'
+
+    @pytest.mark.parametrize("query_kind", ["chart_data", "chart_page"])
+    def test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order(provider_pg, monkeypatch, query_kind):
+        """The complete first chart read also needs its fixed historical prefix."""
+        from alerts.chart_query import DataQuery
+        from alerts.config import settings
+        from alerts.series_access import chart_data
+        from alerts.storage import CompositeRevision, HistoryVersion, ObservedMinute, RealtimeMapping
+    
+        factory, engine = provider_pg
+        monkeypatch.setattr(settings, "oanda_calendar_version", "chart-lock-2")
+        ident, composite, revision, seam, stamp = composite_contracts.armed(factory, monkeypatch, mode="intrabar")
+        composite_contracts.forming(factory, revision, stamp // 60000 * 60000, stamp)
+        monkeypatch.setattr("alerts.series_access.now_ms", lambda: stamp)
+        with factory.begin() as db:
+            selected = db.get(CompositeRevision, revision)
+            target = db.get(RealtimeMapping, selected.mapping_id).target_dataset_id
+            history = db.get(HistoryVersion, selected.history_version_id).dataset_id
+            assert history < target, "fixture must exercise the target-before-history inversion"
+            assert composite_contracts.evaluate(db, ident, now=stamp) == []
+            db.execute(delete(Preference).where(Preference.key == "display_handover:" + target))
+            db.execute(delete(ObservedMinute).where(ObservedMinute.dataset_id == target))
+            schema = db.scalar(text("SELECT current_schema()"))
+        observer = create_engine(engine.url.update_query_dict({"options": f"-csearch_path={schema}"}),
+                                 pool_size=1, max_overflow=0)
+        browser_locked, release_browser, judgment_started = (threading.Event() for _ in range(3))
+        context = threading.local()
+        judgment_pids = []
+    
+        def before(connection, _cursor, _statement, _parameters, _execution, _many):
+            if getattr(context, "role", None) == "judgment" and not judgment_pids:
+                judgment_pids.append(connection.connection.driver_connection.info.backend_pid)
+                judgment_started.set()
+    
+        def after(_connection, _cursor, statement, _parameters, _execution, _many):
+            if (getattr(context, "role", None) == "browser" and not browser_locked.is_set()
+                    and "SELECT market_datasets.id" in statement and "FOR " in statement):
+                browser_locked.set()
+                assert release_browser.wait(10), "judgment did not contend with the chart read"
+    
+        def browser():
+            context.role = "browser"
+            with factory.begin() as db:
+                if query_kind == "chart_data":
+                    return chart_data(db, DataQuery(instrument=composite, series_kind="composite",
+                                                   timeframe="M1", limit=100, provisional=True))
+                return chart_page(db, composite, "M1", count=100, provisional=True, now=stamp)
+    
+        def judgment():
+            context.role = "judgment"
+            with factory.begin() as db:
+                return composite_contracts.evaluate(db, ident, now=stamp)
+    
+        event.listen(engine, "before_cursor_execute", before)
+        event.listen(engine, "after_cursor_execute", after)
+        try:
+            with ThreadPoolExecutor(max_workers=2) as pool:
+                browsing = pool.submit(browser)
+                try:
+                    assert browser_locked.wait(5), "chart did not pin a dataset"
+                    judging = pool.submit(judgment)
+                    assert judgment_started.wait(5)
+                    with observer.connect() as connection:
+                        deadline = time.monotonic() + 5
+                        while time.monotonic() < deadline:
+                            if judging.done():
+                                judging.result()
+                                pytest.fail("judgment completed while the chart held its dataset lock")
+                            waiting = connection.scalar(text(
+                                "SELECT wait_event_type = 'Lock' AND wait_event IN ('transactionid', 'tuple') "
+                                "FROM pg_stat_activity WHERE pid = :pid"), {"pid": judgment_pids[0]})
+                            connection.commit()
+                            if waiting:
+                                break
+                            time.sleep(.01)
+                        else:
+                            pytest.fail("judgment did not wait for the chart transaction")
+                    release_browser.set()
+                    page = browsing.result(timeout=5)
+                    assert any(bar["start"] < seam for bar in page["bars"])
+>                   assert judging.result(timeout=5) == []
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+
+backend/tests/test_market_runtime_postgres.py:623: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/concurrent/futures/_base.py:449: in result
+    return self.__get_result()
+           ^^^^^^^^^^^^^^^^^^^
+/usr/local/lib/python3.11/concurrent/futures/_base.py:401: in __get_result
+    raise self._exception
+/usr/local/lib/python3.11/concurrent/futures/thread.py:58: in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/tests/test_market_runtime_postgres.py:594: in judgment
+    return composite_contracts.evaluate(db, ident, now=stamp)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/chart_alert_worker.py:229: in evaluate
+    return evaluate_composite(db, alert, version, config, now, clock=clock)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/composite_alerts.py:279: in evaluate
+    list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres database=runtime_stage2) at 0x7fe835636bc0>
+query = 'SELECT market_datasets.id \nFROM market_datasets \nWHERE market_datasets.id IN (%(id_1_1)s::VARCHAR, %(id_1_2)s::VARCHAR) ORDER BY market_datasets.id FOR UPDATE'
+params = {'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.OperationalError: (psycopg.errors.DeadlockDetected) deadlock detected
+E           DETAIL:  Process 105447 waits for ShareLock on transaction 169879; blocked by process 105436.
+E           Process 105436 waits for ShareLock on transaction 169882; blocked by process 105447.
+E           HINT:  See server log for query details.
+E           CONTEXT:  while locking tuple (0,2) in relation "market_datasets"
+E           [SQL: SELECT market_datasets.id 
+E           FROM market_datasets 
+E           WHERE market_datasets.id IN (%(id_1_1)s::VARCHAR, %(id_1_2)s::VARCHAR) ORDER BY market_datasets.id FOR UPDATE]
+E           [parameters: {'id_1_1': '99f162c8154844e06f38715e618f64c5138b990fb39f801a5c64fb6a3960dbd0', 'id_1_2': 'eca7497d07f73dbefa082b4f72345fb687e8b890bef05f1180d1299fa4762f84'}]
+E           (Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: OperationalError
+=========================== short test summary info ============================
+FAILED backend/tests/test_market_runtime_postgres.py::test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order[chart_data]
+FAILED backend/tests/test_market_runtime_postgres.py::test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order[chart_page]
+2 failed, 34 deselected in 8.53s
+

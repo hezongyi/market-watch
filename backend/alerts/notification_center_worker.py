@@ -8,6 +8,8 @@ from .notification_center import backfill, project, rebuild, reconcile_channels,
 from .storage import Preference, now_ms, transaction
 
 log = logging.getLogger(__name__)
+BUSY_POLL_SECONDS = .02
+IDLE_POLL_SECONDS = .5
 
 
 def once():
@@ -67,7 +69,7 @@ def main():
                 raise
         if args.once:
             return
-        time.sleep(0.02 if count else 2)
+        time.sleep(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
 
 
 if __name__ == '__main__':

@@ -15,7 +15,7 @@ def test_empty_loop_is_healthy_and_heartbeat_writes_are_bounded(database, monkey
         first = db.get(Preference, health.KEY).value
         report = health.summary(db, at=clock[0])
         assert report["loop"]["state"] == "running"
-        assert report["loop"]["owner"]["role"] == "api"
+        assert report["loop"]["owner"]["role"] == "market-runtime"
         assert report["rules"]["active"] == 0
     clock[0] += 1000
     heartbeat.record()

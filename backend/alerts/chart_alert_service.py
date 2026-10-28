@@ -274,6 +274,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         if alert.status == "active":
             alert.status = "paused"
             alert.health_reason = "关联画线已明确删除" if action == "drawing_deleted" else "用户暂停"
+        alert.runtime = {key: value for key, value in alert.runtime.items() if key != "demand_hold"}
     elif action in ("resume", "restart", "rebaseline"):
         if alert.expires_at is not None and alert.expires_at <= at:
             raise ValueError("告警已到期，请先修改到期时间")

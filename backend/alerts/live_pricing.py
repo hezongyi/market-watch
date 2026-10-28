@@ -301,10 +301,23 @@ def recovery_requirements(identities):
     return {identity.key: settings.oanda_recovery_minutes for identity in identities.values()}
 
 
+def _lock_live_datasets(db, identities, *, confirmation=False):
+    # Composite judgments lock datasets before their shared LiveState read.
+    # Pin FK parents before changing LiveState or inserting minute evidence;
+    # acquiring them during autoflush would invert that order and deadlock.
+    query = select(MarketDataset.id).where(MarketDataset.id.in_(
+        sorted(identity.key for identity in identities))).order_by(MarketDataset.id)
+    # Confirmation later calls ingest(), which needs FOR UPDATE. Acquire that
+    # final mode now; upgrading after LiveState flush can deadlock chart reads.
+    list(db.scalars(query.with_for_update() if confirmation else
+                    query.with_for_update(read=True, key_share=True)))
+
+
 def begin_connection(ownership, identities, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, now=stamp)
+        _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance':
@@ -357,6 +370,7 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance':
@@ -460,6 +474,7 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance':
@@ -683,6 +698,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        _lock_live_datasets(db, (batch.identity,), confirmation=True)
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance' and batch.result.status != 'unauthorized':

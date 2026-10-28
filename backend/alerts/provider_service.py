@@ -633,14 +633,9 @@ def start():
                 log.exception("Provider cache cleanup failed")
             _STOP.wait(60)
 
-    def alerts():
-        from .alert_monitor import run
-        run(_STOP)
-
     _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources()]
     _FUTURES.extend(_EXECUTOR.submit(live, source) for source in enabled_sources())
     _FUTURES.append(_EXECUTOR.submit(janitor))
-    _FUTURES.append(_EXECUTOR.submit(alerts))
 
 
 def stop():

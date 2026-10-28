@@ -49,6 +49,20 @@ def composite_targets(db, wanted):
     ).where(MarketDemand.expires > stamp))
     targets.update(target for target, revision_id in demand_rows
                    if revision_enabled(db, db.get(CompositeRevision, revision_id)))
+    held_rules = db.execute(select(ChartAlert, ChartAlertVersion).join(ChartAlertVersion, (
+        ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
+    ).where(ChartAlert.status == "paused", ChartAlert.runtime["demand_hold"].as_string() == "stale_input",
+        or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp)))
+    for alert, version in held_rules:
+        if version.config.get("series_kind") != "composite":
+            continue
+        revision_id = version.market_identity.get("composite_revision_id")
+        revision = db.get(CompositeRevision, revision_id) if revision_id else None
+        if revision and revision_enabled(db, revision):
+            target = db.scalar(select(RealtimeMapping.target_dataset_id).where(
+                RealtimeMapping.id == revision.mapping_id))
+            if target:
+                targets.add(target)
     head_consumers.update(db.scalars(select(MarketDemand.instrument_id).where(
         MarketDemand.expires > stamp, MarketDemand.composite_revision_id.is_(None))))
     active_consumers = wanted & head_consumers

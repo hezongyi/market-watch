@@ -11,9 +11,29 @@ import logging
 import signal
 import threading
 
-from .composite_aggregates import aggregate_tick
+from .composite_aggregates import aggregate_tick, runtime_error
+from .runtime_health import progress
 
 log = logging.getLogger(__name__)
+
+
+def run(stopped):
+    last_error = None
+    while not stopped.is_set():
+        try:
+            errors = []
+            worked = aggregate_tick(on_error=errors.append, runtime_only=True)
+            last_error = errors[0] if errors else runtime_error()
+        except Exception as error:
+            # Preserve the existing bounded local retry for transient DB errors.
+            log.error("Composite aggregate scheduler failed: %s", type(error).__name__)
+            progress(state="degraded", error=error)
+            last_error = type(error).__name__
+            stopped.wait(2)
+            continue
+        progress(state="degraded" if last_error else "running" if worked else "idle",
+                 error=last_error)
+        stopped.wait(.05 if worked else .5)
 
 
 def main():
@@ -23,19 +43,10 @@ def main():
     stopped = threading.Event()
     for name in (signal.SIGINT, signal.SIGTERM):
         signal.signal(name, lambda *_: stopped.set())
-    while not stopped.is_set():
-        try:
-            worked = aggregate_tick()
-        except Exception as error:
-            # Never print database URLs, statements or supplier credentials.
-            log.error("Composite aggregate scheduler failed: %s", type(error).__name__)
-            if args.once:
-                raise
-            stopped.wait(2)
-            continue
-        if args.once:
-            return
-        stopped.wait(.05 if worked else .5)
+    if args.once:
+        aggregate_tick()
+        return
+    run(stopped)
 
 
 if __name__ == "__main__":

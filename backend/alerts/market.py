@@ -71,6 +71,34 @@ def ordinary_instruments():
     )
 
 
+def realtime_instruments():
+    return select(Instrument.id).outerjoin(
+        ChartHistoryPlan, ChartHistoryPlan.instrument_id == Instrument.id).where(
+            or_(ChartHistoryPlan.realtime_enabled.is_(True),
+                ChartHistoryPlan.instrument_id.is_(None) & Instrument.enabled.is_(True)))
+
+
+def realtime_error(source_filter=None):
+    """Report unresolved legacy live work, including work still in backoff.
+
+    Stored provider messages can contain credentials; health uses fixed codes.
+    Registered datasets, composites and historical imports have other owners.
+    """
+    scope = ordinary_instruments().where(
+        Instrument.source.in_(source_filter) if source_filter is not None else True)
+    with transaction() as db:
+        if db.scalar(scope.with_only_columns(Instrument.id).where(
+                Instrument.enabled.is_(True), Instrument.error.is_not(None)).limit(1)):
+            return "collection_failed"
+        if db.scalar(select(ImportJob.id).where(
+                ImportJob.instrument_id.in_(scope.with_only_columns(Instrument.id)),
+                ImportJob.instrument_id.in_(realtime_instruments()),
+                ImportJob.priority == 0, ImportJob.status.in_(("pending", "running", "failed")),
+                ImportJob.error.is_not(None)).limit(1)):
+            return "import_failed"
+    return None
+
+
 def clear_misrouted_composite_errors(db):
     for inst in db.scalars(select(Instrument).where(
             Instrument.source == "composite", Instrument.error == "Unknown source: composite"
@@ -642,12 +670,9 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
     with transaction() as db:
         from .storage import ChartAggregationJob
 
-        realtime_instruments = select(Instrument.id).outerjoin(
-            ChartHistoryPlan, ChartHistoryPlan.instrument_id == Instrument.id).where(
-                or_(ChartHistoryPlan.realtime_enabled.is_(True),
-                    ChartHistoryPlan.instrument_id.is_(None) & Instrument.enabled.is_(True)))
+        live_instruments = realtime_instruments()
         if history_only and db.scalar(select(ImportJob.id).where(
-                ImportJob.priority == 0, ImportJob.instrument_id.in_(realtime_instruments),
+                ImportJob.priority == 0, ImportJob.instrument_id.in_(live_instruments),
                 ImportJob.status.in_(['pending', 'running'])).limit(1)):
             return False
         # One history downloader feeds the independent aggregation executor.
@@ -679,7 +704,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 ),
                 ImportJob.next_at <= now_ms(),
                 ImportJob.priority == 0 if realtime_only else True,
-                or_(ImportJob.priority > 0, ImportJob.instrument_id.in_(realtime_instruments)),
+                or_(ImportJob.priority > 0, ImportJob.instrument_id.in_(live_instruments)),
                 ImportJob.priority > 0 if history_only else True,
                 ImportJob.priority >= 100 if chart_only else ImportJob.priority < 100,
                 or_(

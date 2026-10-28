@@ -1,0 +1,65 @@
+{
+  "captured_utc": "2026-10-28T01:49:45.604274+00:00",
+  "host": "quant-server",
+  "host_kind": "Ubuntu local Docker",
+  "base": "bb02c6e36c8da013d802bfc95c3651620b264545",
+  "source_sha256": "9c77d4dee4c1d3e7082d818d83de084a6ab3b9c37196d4a30d6fd3f91394da6a",
+  "source_files": 177,
+  "source_scope": "all backend/alerts/*.py plus scripts/runtime_market_baseline.py; same algorithm as source_evidence",
+  "dirty_worktree": true,
+  "applies_to": [
+    "five_health28b ready/crossing",
+    "stage2-role-health-final-20261028.txt",
+    "stage2-postgres-health-final-20261028.txt"
+  ],
+  "historical_recovery_run": "five_recovery28a predates final role-health changes; do not attribute this fingerprint to it",
+  "runtime_image": "market-watch-api:runtime-market-stage2-20261027-probe7",
+  "code_mount": "candidate worktree read-only; dependency image is not a final-source release image",
+  "containers": [
+    {
+      "name": "mw-runtime-stage2-five-stream-20261028-market-runtime-1",
+      "present": true,
+      "Running": false,
+      "ExitCode": 0,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-28T01:47:27.713247912Z",
+      "FinishedAt": "2026-10-28T01:49:28.225361587Z"
+    },
+    {
+      "name": "mw-runtime-stage2-five-stream-20261028-fixture-supplier-1",
+      "present": true,
+      "Running": false,
+      "ExitCode": 137,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-28T01:47:27.711325103Z",
+      "FinishedAt": "2026-10-28T01:49:36.4597918Z"
+    },
+    {
+      "name": "mw-runtime-stage2-five-stream-20261028-api-1",
+      "present": true,
+      "Running": false,
+      "ExitCode": 0,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-28T01:02:43.60951933Z",
+      "FinishedAt": "2026-10-28T01:06:43.615456526Z"
+    },
+    {
+      "name": "mw-runtime-stage2-five-stuck-20261028",
+      "present": true,
+      "Running": false,
+      "ExitCode": 0,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-28T01:29:40.681531065Z",
+      "FinishedAt": "2026-10-28T01:30:30.975534665Z"
+    },
+    {
+      "name": "mw-runtime-stage2-five-exception-20261028",
+      "present": true,
+      "Running": false,
+      "ExitCode": 1,
+      "OOMKilled": false,
+      "StartedAt": "2026-10-28T01:30:31.639007382Z",
+      "FinishedAt": "2026-10-28T01:30:41.499807782Z"
+    }
+  ]
+}

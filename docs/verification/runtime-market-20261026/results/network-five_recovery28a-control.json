@@ -1,0 +1,30 @@
+{
+  "run": "five_recovery28a",
+  "schema": "runtime_network_five_recovery28a",
+  "business_origin": 166200010,
+  "monotonic_origin": 1128933.418498817,
+  "rules": [
+    "df6f26d7-1046-4982-8a3c-6ca082851405",
+    "01a34a35-4b1c-4373-a51d-9dfb334e9871",
+    "7d373463-f3ed-4677-a3b4-d5414f470c20",
+    "f8e75d32-ce55-4e37-aea1-85725b4f6d67",
+    "6717f83d-5603-4375-b652-de79449a8c28",
+    "b471487b-913a-406a-876e-668621fbf258",
+    "e8cf7885-7823-4508-920c-1b9dfa25b4c5"
+  ],
+  "rule_modes": {
+    "df6f26d7-1046-4982-8a3c-6ca082851405": "price_close",
+    "01a34a35-4b1c-4373-a51d-9dfb334e9871": "price_close",
+    "7d373463-f3ed-4677-a3b4-d5414f470c20": "price_intrabar",
+    "f8e75d32-ce55-4e37-aea1-85725b4f6d67": "price_intrabar",
+    "6717f83d-5603-4375-b652-de79449a8c28": "atr_close",
+    "b471487b-913a-406a-876e-668621fbf258": "atr_close",
+    "e8cf7885-7823-4508-920c-1b9dfa25b4c5": "ema_intrabar"
+  },
+  "composite": "f638ff880dd8f992ebef7c3542a7ba2cea0f3b366c4ff160a036b75ca5121168",
+  "revision": "c60c8a31-a63e-4143-9f8e-eb1a1dcc6858",
+  "target": "4fcaaa4b805cc3bc8747a4af504ca961a718ae345d5af35532b92b93589de38f",
+  "seam": 165600000,
+  "calendar_version": "ny17-candidate-v1",
+  "synthetic": true
+}
