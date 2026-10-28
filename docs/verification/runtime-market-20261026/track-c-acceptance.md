@@ -60,10 +60,10 @@ G0 资源与归属（`results/track-c/g0-resources.txt`）：本机无其它运�
 | G2 激活 | `5f8e2c54`（`g2-*`） | — | `9c5a0801`（`g2b-*`/`g2c-*`） |
 | G3 周日基线 | `5f8e2c54`（`g3-*`） | `0716c4fc`（`g3b-*`） | `9c5a0801`（`g3c-*`） |
 | G4 dry-run | `5f8e2c54`（`g4-dry-run.json`） | — | `9c5a0801`（`g4b-*`/`g4c-*`） |
-| G5 清理 | `5f8e2c54`（`g5-*`） | `0716c4fc`（`g5b-*`） | `9c5a0801`（`g5c-*`/`g5d-*`） |
+| G5 清理 | `5f8e2c54`（`g5-*`） | `0716c4fc`（`g5b-*`） | `9c5a0801`（`g5c-*`/`g5d-*`）；孤儿候选专项复验 `93bbdec6`（`g5e-*`） |
 | G6 失败安全 | `5f8e2c54`（`g6-*`） | — | `9c5a0801`（`g6b-*`/`g6c-*`） |
 
-`9c5a0801` = `9c5a08015b68868ab92c68bb5b15ae86eda16f67`（`fix: close the review findings on activation, notice and cleanup`）。本批重跑都在**同一个既有隔离实例**（project `mw-track-c-20261028`、同一 DB/volume）上完成：`data-worker` 自 `17:33:28` 起一次性运行至收尾（`RestartCount=0`，见 `g8b-worker-lifecycle.txt`），`api` 全程 `exited 0`，`market-runtime` 保持 `exited` 未被触碰。
+`9c5a0801` = `9c5a08015b68868ab92c68bb5b15ae86eda16f67`（`fix: close the review findings on activation, notice and cleanup`）；`93bbdec6` = `93bbdec6d43195a01e9fd9de26e10067067b76c3`（含 `ace64f64 fix: delete unreferenced minutes instead of stalling the cleanup pass`，只用于 G5 孤儿候选的定点复验）。本批重跑都在**同一个既有隔离实例**（project `mw-track-c-20261028`、同一 DB/volume）上完成：`data-worker` 自 `17:33:28` 起一次性运行至收尾（`RestartCount=0`，见 `g8b-worker-lifecycle.txt`），`api` 全程 `exited 0`，`market-runtime` 保持 `exited` 未被触碰。
 
 ### G1 · A04a shadow —— 通过
 
@@ -179,6 +179,17 @@ artifact：`results/track-c/g4-dry-run.json`
 * 续跑（`python -m alerts.cli retention --execute --run-id <run>`）：删除 46 源分钟 + 54 源修订 + 46 组合分钟 + 46 组合输入 = **rows 192**，其批次 `stats` 与该批实际 delta 逐键相等；两个批次合计 `1858 + 192 = 2050` = 整个序列的库内实际删除总量。
 * 同 run 再跑（脚本 `g5-execute`）：`rows=0`、逐表 delta 全 0（无重复计数、无跳删）。
 * 未满 30 天数据与历史表：本批未触发这两张断言的变化（`source_minutes` 总量只按删除量下降；清理报告的 `deleted` 仍只有 5 张活分钟表）。
+
+**孤儿候选定点复验（HEAD `93bbdec6`）** —— artifact：`results/track-c/g5e-head.json`、`g5e-orphan-minutes.json`、`g5e-counts-before.json`、`g5e-dry-run.json`、`g5e-counts-after-dry-run.json`、`g5e-counts-before-execute.json`、`g5e-execute-orphans.json`、`g5e-counts-after-execute.json`、`g5e-status-after-execute.json`、`g5e-idempotent-rerun.json`、`g5e-counts-after-rerun.json`
+
+复验动机（保留的历史证据）：`9c5a0801` 上暴露过一个缺陷——无引用的孤儿源分钟在 dry-run 里被算作 `deletable`，但 `_delete` 因为「没有组合侧引用（`touched` 为空）」提前返回 0，随后 `_pass` 又因「有 deletable 但本节零删除」直接 `break`，整趟清理卡在那里。当时的现场保存在 **`g5c-drop-orphans.json`**（为绕开该缺陷而手工删除 60 条孤儿）与 `g5c-cli-execute*.json`（0 删除 + `interrupted`），均未删除。HEAD `93bbdec6`（含 `ace64f64 fix: delete unreferenced minutes instead of stalling the cleanup pass`）改为：只要存在可删候选就继续，组合侧第 1–2 步在没有 `touched` 时整体跳过；终止条件改为「确实没有任何候选」才算完成，「本块零删除且没有新的跳过分类」才算停滞；并且每批先给孤儿留 1/4 额度。
+
+* 场景：沿用同一实例与同一 succeeded 运行 `822ab313…`，重新用 `seed-orphans --minutes 120 --days-back 33` 造出 120 条**无任何组合引用**的 33 天前源分钟（`g5e-orphan-minutes.json`），与 1082 条受保护旧分钟混在一起。
+* dry-run（`g5e-dry-run.json`）：`dry_run=true`、`rows=2412`、候选 `{source_minutes:1204, source_revisions:1204, composite_minutes:2, composite_inputs:2, events:0}`、**`deletable_revisions=122`**、`protected=1082`（`by_reason={active_composite_revision:1034, alert_bound_revision:1046, incomplete_preparation:1046}`）、`skipped=[]`；`counts` 前后逐表**零变化**（`zero_deletion=true`）。
+* 执行（`g5e-execute-orphans.json`）：`deleted={source_minutes:122, source_minute_revisions:122, composite_minutes:2, composite_inputs:2, events:0}` = **rows 248**；`deletable_revisions(122)` 与 `deleted.market_source_minute_revisions(122)` **口径一致**；`batch.state=completed`（不再卡住）、`remaining={source_minutes:1082, source_revisions:0}`（受保护的旧分钟原样保留）、`skipped=[]`。
+* 对账：库内实际变化 `{source_minutes:−122, source_minute_revisions:−122, composite_minutes:−2, composite_inputs:−2, events:0}` 与 `deleted` **逐表相等**（`deleted == delta` → True）。
+* 幂等：同一 run 再执行（`g5e-idempotent-rerun.json`）→ `rows=0`、`idempotent=true`、批次仍 `completed`、逐表 delta 全 0（`g5e-counts-after-rerun.json` 与执行后完全一致）。
+* 本次会话只起 `postgres`（`data-worker` 保持 `exited`，避免它的 `retention_cycle(dry_run)` 与本次复验抢同一批次的认领）；证据里 `g5e-head.json` 记录 HEAD `93bbdec6d43195a01e9fd9de26e10067067b76c3`。
 
 ### G6 · 失败安全 —— 通过
 
