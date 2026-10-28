@@ -382,6 +382,57 @@ def test_compatibility_snapshot_survives_lease_expiry_and_repeated_bootstrap(dat
         assert not enabled(db, sid)
 
 
+@pytest.mark.parametrize('pinned', [True, False])
+def test_first_bootstrap_preserves_previously_collected_composite_after_downtime(database, monkeypatch, pinned):
+    from alerts.realtime_switch import configured, initialize_defaults
+
+    composite, revision, seam = populated(database, monkeypatch)
+    stamp = seam + 3600000
+    with database.begin() as db:
+        sid = source_id(db, revision)
+        db.delete(db.get(Preference, 'managed_realtime:' + sid))
+        db.add(MarketDemand(id='pre-upgrade-expired', instrument_id=db.get(MarketComposite, composite).instrument_id,
+            composite_revision_id=revision if pinned else None, expires=stamp - 60000))
+        assert db.get(CompositePreparation, revision).confirmed_end > seam
+        db.flush()
+        initialize_defaults(db, now=stamp)
+        assert configured(db, sid) is True, 'Downtime must not persist a previously collecting composite as off'
+        set_enabled(db, sid, False, now=stamp + 1)
+        initialize_defaults(db, now=stamp + 2)
+        assert configured(db, sid) is False, 'Explicit off must survive subsequent bootstraps'
+
+
+@pytest.mark.parametrize('missing', ['view', 'live_input', 'active_head'])
+def test_bootstrap_does_not_enable_unviewed_prepared_or_retired_composites(database, monkeypatch, missing):
+    from alerts.realtime_switch import configured, initialize_defaults
+
+    if missing == 'live_input':
+        from alerts.composite_preparation import claim, commit
+        from test_composite_preparation import answer, ready
+
+        revision = ready(database, monkeypatch)
+        ownership = claim(revision)
+        commit(ownership, answer(ownership))
+        with database.begin() as db:
+            row = db.get(CompositeRevision, revision)
+            composite, seam = row.composite_id, row.seam
+    else:
+        composite, revision, seam = populated(database, monkeypatch)
+    with database.begin() as db:
+        sid = source_id(db, revision)
+        preference = db.get(Preference, 'managed_realtime:' + sid)
+        if preference:
+            db.delete(preference)
+        if missing != 'view':
+            db.add(MarketDemand(id='expired-view', instrument_id=db.get(MarketComposite, composite).instrument_id,
+                composite_revision_id=revision, expires=seam - 1))
+        if missing == 'active_head':
+            db.get(MarketComposite, composite).active_revision_id = None
+        db.flush()
+        initialize_defaults(db, now=seam + 3600000)
+        assert configured(db, sid) is False
+
+
 def test_ordinary_collection_and_repairs_skip_off_but_history_is_not_starved(database, monkeypatch):
     stamp = START + 30 * 60000 + 5000
     monkeypatch.setattr(market, 'now_ms', lambda: stamp)

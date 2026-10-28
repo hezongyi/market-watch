@@ -5,27 +5,29 @@ async function nativeNotificationSurface(widget, report) {
   const version = globalThis.TradingView?.version?.();
   if (!version?.includes("6b804c486857f27920cf761aa7eb6e29d9bb6362"))
     throw Error("系统消息原生外壳版本尚未适配");
+  // onChartReady does not guarantee that the custom header is mounted.
+  await widget.headerReady();
   const common = await nativeAlertShell(widget, {
     page: null,
     mount: () => {},
     unmount: () => {},
     report,
   });
-  const slot = widget.createButton({
-    align: "right",
-    useTradingViewStyle: false,
-  });
-  const doc = slot.ownerDocument;
-  widget.removeButton(slot);
-  let req;
-  doc.defaultView.webpackChunktradingview.push([
-    [`mw-native-messages-${crypto.randomUUID()}`],
-    {},
-    (r) => {
-      req = r;
-    },
-  ]);
   try {
+    const slot = widget.createButton({
+      align: "right",
+      useTradingViewStyle: false,
+    });
+    const doc = slot.ownerDocument;
+    widget.removeButton(slot);
+    let req;
+    doc.defaultView.webpackChunktradingview.push([
+      [`mw-native-messages-${crypto.randomUUID()}`],
+      {},
+      (r) => {
+        req = r;
+      },
+    ]);
     // DialogSearch's own shared chunk. Do not load the symbol-search application.
     await nativeAlertChunks(req, [3854]);
     const R = req(779474),
