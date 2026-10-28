@@ -111,6 +111,24 @@ def test_quiet_defers_without_http(database, monkeypatch):
         assert db.get(Notification, note_id).status == "quiet"
 
 
+def test_system_notice_obeys_quiet_hours(database, monkeypatch):
+    from alerts.notification_runtime import _queue_system_notice
+
+    with database.begin() as db:
+        _queue_system_notice(db, title="runtime fault", message="database unavailable",
+                             incident_id="runtime-faults:test")
+        note_id = db.scalar(select(Notification).order_by(Notification.created_at.desc())).id
+        db.scalar(select(Outbox)).next_at = 0
+        db.add(Preference(key="notifications", value={
+            **notify.DEFAULTS, "quiet_enabled": True,
+        }))
+    configure(monkeypatch)
+    monkeypatch.setattr(notify, "now_ms", lambda: 1790611200000)  # 2026-09-28 16 UTC
+    assert notify.claim() is None
+    with database.begin() as db:
+        assert db.get(Notification, note_id).status == "quiet"
+
+
 def test_late_delivery_cannot_overwrite_new_owner(database, monkeypatch):
     note_id = pending(database)
     configure(monkeypatch)

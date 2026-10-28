@@ -110,3 +110,25 @@ def test_late_send_result_does_not_hide_confirmation(database):
         db.flush()
         db.add(Audit(kind="notification_test_acknowledged", details={"test_id": "one"}))
     assert api.health()["last_notification_test"]["status"] == "notification_test_requested"
+
+
+def test_legacy_test_ack_credential_remains_usable(database):
+    from alerts.storage import Audit, Preference, now_ms
+    from sqlalchemy import select
+    from starlette.requests import Request
+
+    token = "legacy-test-token"
+    with database.begin() as db:
+        db.add(Audit(kind="notification_test_requested", details={"test_id": "legacy"}))
+        db.add(Preference(key="test_ack:legacy", value={
+            "token_hash": api.digest(token), "expires": now_ms() + 60000, "ack_at": None,
+        }))
+
+    request = Request({"type": "http", "headers": [
+        (b"authorization", f"Bearer {token}".encode())]})
+    assert api.acknowledge_test("legacy", request)["status"] == "acknowledged"
+    with database.begin() as db:
+        row = db.get(Preference, "test_ack:legacy")
+        assert row.value["ack_at"] is not None
+        assert db.scalar(select(Audit).where(
+            Audit.kind == "notification_test_acknowledged"))

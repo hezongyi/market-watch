@@ -104,25 +104,32 @@ def run(*, stop=None, loops=None, handle_signals=True):
 
 
 def run_health(stop):
+    from .config import settings
     from .runtime_health import progress
+    from .storage import now_ms
 
+    started_at = now_ms()
+    startup_grace_until = started_at + settings.runtime_startup_grace_seconds * 1000
     while not stop.is_set():
         error = None
         try:
-            inspect_health()
+            inspect_health(startup_grace_until=startup_grace_until)
         except Exception as exc:
             error = exc
         progress(error=error)
         stop.wait(15)
 
 
-def inspect_health():
+def inspect_health(*, startup_grace_until=0):
     """Monitor fixed runtime roles and persist fault/recovery transitions."""
     from .runtime_health import MARKET_ROLES, data_roles, key
     from .storage import Preference, now_ms, transaction
 
     expected = tuple(f"market:{role}" for role in MARKET_ROLES if role != "market_ownership")
     expected += tuple(f"data:{role}" for role in data_roles() if role != "data_ownership")
+    expected += tuple(f"notifications:{role}" for role in (
+        "notification_projection", "notification_retention", "notification_delivery",
+        "notification_ownership", "notification_health"))
     now = now_ms()
     faults = []
     with transaction() as db:
@@ -134,7 +141,9 @@ def inspect_health():
             stale_after = value.get("stale_after_ms", 15000)
             if not value or not checked or now - checked >= stale_after or value.get("error_type"):
                 category = value.get("error_type") or ("missing" if not value else "stale")
-                faults.append((group, role, category))
+                starting = not checked and value.get("state") == "starting"
+                if not ((category == "missing" or starting) and now < startup_grace_until):
+                    faults.append((group, role, category))
         current = {f"{group}:{role}" for group, role, _category in faults}
         notifications_due = []
         for fault_id in current:

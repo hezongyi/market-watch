@@ -335,19 +335,33 @@ def acknowledge_test(test_id: str, request: Request):
     with transaction() as db:
         row = db.scalar(select(Preference).where(
             Preference.key == "test_notification:" + test_id).with_for_update())
+        legacy_row = None
+        if not row:
+            legacy_row = db.scalar(select(Preference).where(
+                Preference.key == "test_ack:" + test_id).with_for_update())
         hashes = row.value.get("token_hashes", []) if row else []
         token_hash = digest(token) if token else ""
         valid_token = any(secrets.compare_digest(saved, token_hash) for saved in hashes)
         if row and not hashes:
             valid_token = secrets.compare_digest(row.value.get("token_hash", ""), token_hash)
+        if legacy_row:
+            valid_token = secrets.compare_digest(
+                legacy_row.value.get("token_hash", ""), token_hash)
         if (
             not token
-            or not row
+            or not (row or legacy_row)
             or not valid_token
         ):
             raise HTTPException(403, "测试确认凭证无效")
-        if row.value.get("expires", 0) < now_ms():
+        credential = row or legacy_row
+        if credential.value.get("expires", 0) < now_ms():
             raise HTTPException(403, "测试确认凭证已过期")
+        if legacy_row:
+            if legacy_row.value["ack_at"] is None:
+                legacy_row.value = {**legacy_row.value, "ack_at": now_ms()}
+                db.add(Audit(kind="notification_test_acknowledged",
+                             details={"test_id": test_id}))
+            return {"status": "acknowledged"}
         if row.value["ack_at"] is None:
             row.value = {**row.value, "ack_at": now_ms()}
             note = db.get(Notification, row.value["notification_id"])
@@ -417,7 +431,8 @@ def health():
         last_test_result = None
         if requested:
             test_id = requested.details.get("test_id")
-            grant = db.get(Preference, "test_notification:" + test_id) if test_id else None
+            grant = (db.get(Preference, "test_notification:" + test_id) or
+                     db.get(Preference, "test_ack:" + test_id)) if test_id else None
             outcomes = db.scalars(
                 select(Audit)
                 .where(

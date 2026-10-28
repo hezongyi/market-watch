@@ -287,7 +287,7 @@ function SettingsPage({ health, instruments, previewSound }: { health: any; inst
   }), [registerGuard]);
   async function sendTest(){
     setBusy(true);setMessage('');
-    try{await api('/notification-tests',{});setMessage('推送服务已接受，请检查手机响铃；这不代表手机已收到。')}
+    try{const result=await api<{status:string;device_delivery:string}>('/notification-tests',{});setMessage(result.status==='queued'?'测试通知已排队；手机是否收到仍待确认。':`测试通知状态：${result.status}`)}
     catch(e){setMessage(String(e))}finally{setBusy(false)}
   }
   async function save(e: React.FormEvent) {

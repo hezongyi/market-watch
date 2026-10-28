@@ -102,7 +102,7 @@ def claim():
             return None
         pref = db.get(Preference, "notifications")
         config = {**DEFAULTS, **(pref.value if pref else {})}
-        quiet_end = quiet_until(instant(now), config) if note.kind == "signal" else None
+        quiet_end = quiet_until(instant(now), config)
         if quiet_end:
             row.next_at = int(quiet_end.timestamp() * 1000)
             note.status = "quiet"

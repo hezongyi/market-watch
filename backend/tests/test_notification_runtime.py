@@ -38,3 +38,32 @@ def test_notification_profile_owns_projection_retention_and_delivery_loops():
     assert roles == [
         "notification_projection", "notification_retention", "notification_delivery",
     ]
+
+
+def test_missing_runtime_roles_wait_for_startup_grace(database, monkeypatch):
+    from alerts import notification_runtime, runtime_health
+    from alerts.storage import Notification
+    from sqlalchemy import select
+
+    monkeypatch.setattr(runtime_health, "MARKET_ROLES", ("chart_alert",))
+    monkeypatch.setattr(runtime_health, "data_roles", lambda: ())
+    notification_runtime.inspect_health(startup_grace_until=10**15)
+    with database.begin() as db:
+        assert db.scalar(select(Notification)) is None
+
+
+def test_notification_worker_roles_are_in_health_scope(database, monkeypatch):
+    from alerts import notification_runtime, runtime_health
+    from alerts.storage import Notification, Preference, now_ms
+    from sqlalchemy import select
+
+    monkeypatch.setattr(runtime_health, "MARKET_ROLES", ())
+    monkeypatch.setattr(runtime_health, "data_roles", lambda: ())
+    with database.begin() as db:
+        db.add(Preference(key=runtime_health.key("notification_delivery"), value={
+            "state": "idle", "checked_at": now_ms(), "stale_after_ms": 15000,
+            "error_type": "RuntimeError",
+        }))
+    notification_runtime.inspect_health()
+    with database.begin() as db:
+        assert "notification_delivery" in db.scalar(select(Notification)).payload["message"]

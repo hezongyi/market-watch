@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     database_pool_timeout: int = Field(default=15, ge=1, le=120)
     database_application_name: str = "market-watch"
     runtime_deployment: str = Field(default="default", pattern=r"^[a-zA-Z0-9_-]{1,64}$")
+    runtime_startup_grace_seconds: int = Field(default=60, ge=0, le=600)
     market_runtime_chart_alert_enabled: bool = True
     # Inherit the server/database/role policy unless this service opts in or out.
     database_jit: Literal['inherit', 'on', 'off'] = 'inherit'
