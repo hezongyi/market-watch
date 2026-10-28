@@ -69,7 +69,7 @@ if (!base || !credentialsFile || !/^https:\/\/(localhost|127\.0\.0\.1):\d+$/.tes
       if (attempt) await page.reload({ waitUntil: 'domcontentloaded' });
       await expect.poll(() => page.frames().some(frame => frame.url().startsWith('blob:')), { timeout: 60000 }).toBe(true);
       const native = page.frames().find(frame => frame.url().startsWith('blob:'));
-      const entry = native.getByRole('button', { name: '系统消息', exact: true });
+      const entry = native.getByRole('button', { name: /^系统消息[，,]/ });
       await expect(entry).toBeVisible({ timeout: 60000 });
       await entry.click();
       await expect(native.locator('[data-name="mw-native-system-message-center"]')).toBeVisible();
