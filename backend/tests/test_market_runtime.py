@@ -14,6 +14,7 @@ def test_market_profile_has_one_fixed_owner_for_each_runtime_role():
 
     assert [loop.role for loop in loops] == [
         "pricing", "realtime", "composite_aggregate", "alert_indicator", "chart_alert",
+        "switch_activation",
     ]
     assert len({loop.role for loop in loops}) == len(loops)
 
@@ -96,6 +97,7 @@ def test_market_profile_can_leave_chart_alert_to_independent_owner(monkeypatch):
     monkeypatch.setattr(settings, "market_runtime_chart_alert_enabled", False)
     assert [loop.role for loop in market_runtime.build_loops()] == [
         "pricing", "realtime", "composite_aggregate", "alert_indicator",
+        "switch_activation",
     ]
 
 

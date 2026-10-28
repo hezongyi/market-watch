@@ -14,6 +14,14 @@ class Settings(BaseSettings):
     runtime_deployment: str = Field(default="default", pattern=r"^[a-zA-Z0-9_-]{1,64}$")
     runtime_startup_grace_seconds: int = Field(default=60, ge=0, le=600)
     market_runtime_chart_alert_enabled: bool = True
+    # Confirmed weekly policy: the Sunday 01:00 UTC window activates a candidate
+    # the shadow report marked ready, without a per-switch approval.
+    # ALERTS_SWITCH_AUTO_ACTIVATE_ENABLED (default: true).
+    switch_auto_activate_enabled: bool = True
+    # Cleanup mode: off does nothing, dry_run (default) reports and never
+    # deletes, execute deletes but retention_window still requires the
+    # restore-drill marker. ALERTS_RETENTION_MODE (default: dry_run).
+    retention_mode: Literal["off", "dry_run", "execute"] = "dry_run"
     # Inherit the server/database/role policy unless this service opts in or out.
     database_jit: Literal['inherit', 'on', 'off'] = 'inherit'
     # Acceptance-only gate; production and explicit old-version rollback omit it.
