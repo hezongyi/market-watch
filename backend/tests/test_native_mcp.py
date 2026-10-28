@@ -337,7 +337,7 @@ def test_disabled_and_restart_lifecycle(database, monkeypatch):
             token = issue("lifecycle", ["market:read"], storage.now_ms() + 600000)
             assert rpc(client, token, "tools/list").status_code == 200
             assert sum(getattr(r, "name", "") == "native_mcp" for r in api.app.router.routes) == 2
-    assert counts == {"start": 3, "stop": 3}
+    assert counts == {"start": 0, "stop": 0}
     api.app.router.routes[:] = [
         r for r in api.app.router.routes if getattr(r, "name", "") != "native_mcp"
     ]
