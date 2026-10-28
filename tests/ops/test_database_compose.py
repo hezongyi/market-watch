@@ -126,3 +126,13 @@ class DatabaseComposeTests(unittest.TestCase):
         rendered = self.render([Path('compose.yaml')])
         volumes = rendered['services']['postgres']['volumes']
         self.assertEqual([volume['source'] for volume in volumes],['postgres14-data'])
+
+    def test_default_compose_uses_supervised_data_profile_without_legacy_workers(self):
+        services = self.render([Path('compose.yaml')])['services']
+        self.assertIn('data-worker', services)
+        self.assertEqual(services['data-worker']['command'],
+                         ['python', '-m', 'alerts.runtime', '--profile', 'data'])
+        self.assertEqual(services['data-worker']['depends_on']['migrate']['condition'],
+                         'service_completed_successfully')
+        self.assertNotIn('market-stream-worker', services)
+        self.assertNotIn('import-worker', services)

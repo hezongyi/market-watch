@@ -47,6 +47,18 @@ def test_current_history_services_are_not_legacy_import_health(database):
     assert result["legacy_import"]["role"] == "compatibility"
 
 
+def test_health_exposes_both_runtime_groups_and_data_roles(database):
+    result = api_module.health()
+    assert result["market_runtime"]
+    assert {row["role"] for row in result["market_runtime"]} >= {"realtime", "chart_alert"}
+    assert result["data_runtime"]
+    assert {row["role"] for row in result["data_runtime"]} >= {
+        "provider_transport_oanda", "provider_transport_binance", "provider_transport_dukascopy",
+        "provider_janitor", "chart_history", "history_network", "history_compute",
+        "native_history", "chart_aggregation", "market_stream", "data_ownership",
+    }
+
+
 def test_history_heartbeats_stop_independently_and_faults_are_visible(database, monkeypatch):
     from alerts import worker_health as worker
 
@@ -119,6 +131,14 @@ def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch)
         chart_history_worker.run(lambda *args: None)
     monkeypatch.setattr(provider_chart, "warm_clients", lambda: None)
     monkeypatch.setattr(native_history_loads, "once", lambda: False)
+    class StopAfterWait:
+        def is_set(self):
+            return False
+
+        def wait(self, _seconds):
+            raise StopAfterCycle()
+
+    monkeypatch.setattr(native_history_loads.threading, "Event", StopAfterWait)
     with pytest.raises(StopAfterCycle):
         native_history_loads.main()
     with database() as db:
@@ -129,8 +149,9 @@ def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch)
 
 
 def test_catalog_fault_does_not_stop_import_or_report_false_success(database, monkeypatch):
-    from alerts import chart_history_worker as worker, worker_health
     import pytest
+    from alerts import chart_history_worker as worker
+    from alerts import worker_health
 
     class StopAfterCycle(BaseException):
         pass

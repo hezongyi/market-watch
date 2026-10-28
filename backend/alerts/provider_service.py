@@ -638,7 +638,54 @@ def start():
     _FUTURES.append(_EXECUTOR.submit(janitor))
 
 
+def run_live(stop, source):
+    """Serve demand-bound latest subscriptions for one provider source."""
+    while not stop.is_set():
+        error = None
+        try:
+            realtime_step(source)
+        except Exception as exc:
+            error = exc
+            log.exception("Provider realtime iteration failed for %s", source)
+        from .runtime_health import progress
+        progress(error=error)
+        stop.wait(1)
+
+
+def run_warm(stop, source):
+    """Advance one bounded historical page at a time for one source."""
+    after = None
+    while not stop.is_set():
+        progressed = False
+        error = None
+        try:
+            after, progressed = warm_step(source, after)
+        except Exception as exc:
+            error = exc
+            log.exception("Provider prewarm iteration failed for %s", source)
+        from .runtime_health import progress
+        progress(error=error)
+        stop.wait(0.05 if progressed else 1)
+
+
+def run_janitor(stop):
+    while not stop.is_set():
+        error = None
+        try:
+            cleanup()
+        except Exception as exc:
+            error = exc
+            log.exception("Provider cache cleanup failed")
+        from .runtime_health import progress
+        progress(error=error)
+        stop.wait(60)
+
+
 def stop():
+    stop_service()
+
+
+def stop_service():
     global _EXECUTOR
     _STOP.set()
     if _EXECUTOR:

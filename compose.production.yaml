@@ -69,71 +69,19 @@ services:
       ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
     depends_on:
       migrate: {condition: service_completed_successfully}
-  chart-history-worker:
+  data-worker:
     <<: *app
-    command: ["python", "-m", "alerts.chart_history_worker"]
+    command: ["python", "-m", "alerts.runtime", "--profile", "data"]
     environment:
       <<: *app-environment
       ALERTS_YAHOO_ENABLED: "true"
       ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
+      ALERTS_DATABASE_POOL_SIZE: "16"
       ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_CHART_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history
+      ALERTS_DATABASE_JIT: ${MW_DATA_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-data
     depends_on:
-      api: {condition: service_healthy}
-  chart-aggregation-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.chart_aggregation_worker"]
-    environment:
-      <<: *app-environment
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_CHART_AGGREGATION_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-aggregation
-    depends_on:
-      api: {condition: service_healthy}
-  native-history-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.native_history_loads"]
-    environment:
-      <<: *app-environment
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_NATIVE_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-native-history
-    depends_on:
-      api: {condition: service_healthy}
-  history-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.history_versions", "--without-composite-aggregates"]
-    environment:
-      <<: *app-environment
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_HISTORY_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-history-versions
-    depends_on:
-      api: {condition: service_healthy}
-  market-stream-worker:
-    <<: *app
-    command: ["python", "-m", "alerts.market_stream_worker"]
-    environment:
-      <<: *app-environment
-      ALERTS_YAHOO_ENABLED: "true"
-      ALERTS_DELIVERY_ENABLED: "false"
-      ALERTS_DATABASE_POOL_SIZE: "2"
-      ALERTS_DATABASE_MAX_OVERFLOW: "0"
-      ALERTS_DATABASE_JIT: ${MW_MARKET_STREAM_WORKER_DATABASE_JIT:-${MW_PRODUCTION_DATABASE_JIT:-off}}
-      ALERTS_DATABASE_APPLICATION_NAME: market-watch-production-stream
-    depends_on:
-      api: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
   notification-projector:
     <<: *app
     command: ["python", "-m", "alerts.notification_center_worker"]

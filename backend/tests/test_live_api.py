@@ -21,10 +21,12 @@ def test_live_reads_require_authentication(database):
 
 
 def test_api_lifespan_does_not_start_chart_alert_monitor(database, monkeypatch):
-    from alerts import alert_monitor, provider_service
+    from alerts import alert_monitor, provider_service, provider_transport
 
     monkeypatch.setattr(provider_service, "start", lambda: None)
     monkeypatch.setattr(provider_service, "stop", lambda: None)
+    monkeypatch.setattr(provider_transport, "start", lambda *_args: pytest.fail(
+        "API lifespan must not own provider transport maintenance"))
     monkeypatch.setattr(alert_monitor, "run", lambda *_args, **_kwargs: pytest.fail(
         "API lifespan must not own ChartAlert evaluation"))
 

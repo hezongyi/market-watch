@@ -14,13 +14,17 @@ def run(profile, *, stop=None, handle_signals=True, on_alert=None):
         alert_runtime.run(stop=stop, handle_signals=handle_signals, on_alert=on_alert)
     elif profile == "market":
         market_runtime.run(stop=stop, handle_signals=handle_signals)
+    elif profile == "data":
+        from . import data_runtime
+
+        data_runtime.run(stop=stop, handle_signals=handle_signals)
     else:
         raise ValueError(f"Unsupported runtime profile: {profile}")
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--profile", choices=("market", "alert"), required=True)
+    parser.add_argument("--profile", choices=("market", "alert", "data"), required=True)
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
     logging.getLogger("httpx").setLevel(logging.WARNING)

@@ -8,15 +8,15 @@
 
 统一 reset 在异步原生历史重载之前使旧bar-range mapping与generation失效；历史窗口仍不追加最新尾部。晚到HTTP历史页仍使用独立bounded revalidation。旧provider-event测试迁移至统一事件，覆盖服务端已核实历史不变、确认修订后原生reset/reload和取消/旧generation边界。
 
-## 验收
+## SSE 验收
 
 - provider subscriptions契约和单前端相关单测通过；`npm run build:ui`通过。
 - 本机 Chromium真实EventSource transport覆盖供应商/自建共连接、断线重连保留cursor、reset、切换generation和单路/全路取消。
 - 本机 Chromium加载仓库私有授权v31图表库、实际 `chart-runtime.js` 和真实EventSource；HTTP历史及事件为本机确定性fixture。分别执行supplier/composite真实widget回调、新bar可见、历史修订→真实reset→HTTP重新加载、切换、旧generation拒绝、重连、取消。无浏览器错误。
 - 旧HTTP端点认证退役合同通过。
-- 工作树中的隔离PostgreSQL市场流合同运行中；结果完成后更新本记录，不把启动中的进度当通过。
+- 隔离PostgreSQL市场流合同 `backend/tests/test_market_stream_postgres.py`、`test_market_stream_history_postgres.py`、`test_market_stream_lifecycle_postgres.py` 均通过（见阶段3A data profile 验收记录）。
 - 没有真实供应商/生产登录/ntfy投递；本测试不包含真实市场SLA，也不测试生产前端部署。
 
 ## 后续
 
-该切片通过后才可把服务端旧HTTP路径按410退役。data profile职责迁移是独立后续切片；整体阶段3A和方案核心仍未完成。Draft PR可以先用于审阅，CI按既有流程运行。
+统一 SSE 与 data profile 同属本阶段的堆叠变更。整体方案仍未完成；通知职责收敛、部署/状态清理和联合延迟门槛仍在后续阶段。Draft PR用于审阅，远端 CI 可在提交后继续运行。

@@ -32,7 +32,7 @@ services:
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
       ALERTS_COOKIE_SECURE: "true"
-      ALERTS_HISTORY_HEALTH_WORKERS: '["legacy_import"]'
+      ALERTS_HISTORY_HEALTH_WORKERS: '["history_versions","chart_history","native_history"]'
     depends_on:
       migrate: {condition: service_completed_successfully}
     healthcheck:
@@ -58,27 +58,19 @@ services:
     depends_on:
       migrate: {condition: service_completed_successfully}
     restart: unless-stopped
-  market-stream-worker:
+  data-worker:
     build: .
-    command: ["python", "-m", "alerts.market_stream_worker"]
+    command: ["python", "-m", "alerts.runtime", "--profile", "data"]
     env_file: .env
     environment:
       ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
       ALERTS_DATABASE_EXPECTED_VERSION: "140024"
       ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
+      ALERTS_DATABASE_APPLICATION_NAME: market-watch-data-worker
+      ALERTS_DATABASE_POOL_SIZE: "16"
+      ALERTS_DATABASE_MAX_OVERFLOW: "0"
     depends_on:
-      api: {condition: service_healthy}
-    restart: unless-stopped
-  import-worker:
-    build: .
-    command: ["python", "-m", "alerts.market", "--imports-only"]
-    env_file: .env
-    environment:
-      ALERTS_DATABASE_URL: postgresql+psycopg://alerts:${POSTGRES_PASSWORD}@postgres/alerts
-      ALERTS_DATABASE_EXPECTED_VERSION: "140024"
-      ALERTS_OANDA_NATIVE_LATEST_OWNER: "provider"
-    depends_on:
-      api: {condition: service_healthy}
+      migrate: {condition: service_completed_successfully}
     restart: unless-stopped
   notify-worker:
     build: .

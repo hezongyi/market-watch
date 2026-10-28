@@ -50,7 +50,7 @@ def test_publication_rotation_does_not_sleep_as_an_idle_worker(monkeypatch, publ
         raise SystemExit
     from alerts.publication_wakeup import PublicationWakeup
     monkeypatch.setattr(PublicationWakeup, "prepare", lambda self: None)
-    monkeypatch.setattr(PublicationWakeup, "wait", lambda self, seconds: sleep(seconds))
+    monkeypatch.setattr(PublicationWakeup, "wait", lambda self, seconds, stop=None: sleep(seconds))
     with pytest.raises(SystemExit):
         publisher.main()
     assert delays == [expected_sleep], "live publication work is not an empty aggregation queue"

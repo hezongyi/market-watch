@@ -33,6 +33,24 @@ def test_simple_step_loop_reports_idle_checks_and_interrupts_wait():
     assert all(cycle["finished"] >= cycle["started"] for cycle in cycles)
 
 
+def test_data_profile_assembles_provider_and_data_roles_without_duplicate_stream(monkeypatch):
+    from alerts import data_runtime, provider_capabilities
+
+    expected_sources = ("oanda", "binance")
+    monkeypatch.setattr(provider_capabilities, "enabled_sources", lambda: expected_sources)
+    loops = data_runtime.build_loops()
+
+    roles = [loop.role for loop in loops]
+    assert len(roles) == len(set(roles))
+    assert roles == [
+        "provider_live_oanda", "provider_warm_oanda",
+        "provider_live_binance", "provider_warm_binance",
+        "provider_transport_oanda", "provider_transport_binance", "provider_transport_dukascopy",
+        "provider_janitor", "chart_history", "history_network", "history_compute",
+        "native_history", "chart_aggregation", "market_stream",
+    ]
+
+
 def test_complex_run_stop_interface_closes_resources():
     entered, closed, stop = threading.Event(), threading.Event(), threading.Event()
 

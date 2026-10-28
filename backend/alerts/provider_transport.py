@@ -270,11 +270,18 @@ def start(busy):
         while not _STOP.wait(10):
             try:
                 maintain(source, busy)
-            except Exception:
+            except Exception as error:
                 # Maintenance must not make a healthy API unavailable. Actual
                 # candle requests preserve their normal observable failure path.
                 import logging
                 logging.getLogger(__name__).exception('Provider transport maintenance failed for %s', source)
+                from .runtime_health import progress
+
+                progress(error=error)
+            else:
+                from .runtime_health import progress
+
+                progress()
     for source in ORIGINS:
         thread = threading.Thread(target=worker, args=(source,), name='provider-transport-' + source,
                                   daemon=True)
@@ -282,15 +289,39 @@ def start(busy):
         thread.start()
 
 
+def run(stop, busy, source=None):
+    """Maintain one provider on its supervised runtime thread."""
+    from .runtime_health import progress
+
+    sources = (source,) if source else tuple(ORIGINS)
+    if len(sources) != 1:
+        raise ValueError("Provider transport runtime requires exactly one source")
+    source = sources[0]
+    while not stop.is_set():
+        error = None
+        try:
+            maintain(source, busy)
+        except Exception as exc:
+            error = exc
+            logging.getLogger(__name__).exception(
+                "Provider transport maintenance failed for %s", source)
+        progress(error=error)
+        stop.wait(10)
+
+
+def stop_maintenance():
+    _STOP.set()
+    for thread in _THREADS:
+        thread.join()
+    _THREADS.clear()
+
+
 def close_clients():
     from .provider_fxcm import close_session as close_fxcm
     from .provider_yahoo import close_session
     close_fxcm()
     close_session()
-    _STOP.set()
-    for thread in _THREADS:
-        thread.join()
-    _THREADS.clear()
+    stop_maintenance()
     with _LOCK:
         clients = [value['client'] for value in (*_CLIENTS.values(), *_RETIRED)]
         _CLIENTS.clear()

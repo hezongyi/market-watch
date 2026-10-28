@@ -50,13 +50,6 @@ async def lifespan(app):
     from .swing_sr import register_indicator
     register_indicator()
     bootstrap()
-    from .provider_chart import warm_clients
-    await asyncio.to_thread(warm_clients)
-    from .provider_service import start, stop
-    start()
-    from .provider_cache import interactive_busy
-    from .provider_transport import start as start_transport
-    start_transport(interactive_busy)
     app.router.routes[:] = [r for r in app.router.routes if getattr(r, "name", "") != "native_mcp"]
     try:
         if settings.mcp_enabled:
@@ -74,7 +67,6 @@ async def lifespan(app):
         else:
             yield
     finally:
-        await asyncio.to_thread(stop)
         from .provider_chart import close_clients
         close_clients()
 
@@ -402,6 +394,8 @@ def readyz(response: Response):
 @app.get("/api/health", dependencies=[Depends(authenticated)])
 def health():
     from .chart_alert_health import summary as chart_alert_health
+    from .runtime_health import MARKET_ROLES, data_roles
+    from .runtime_health import summary as runtime_health
     from .worker_health import services
 
     with transaction() as db:
@@ -462,6 +456,8 @@ def health():
             "time": now_ms(),
             "pending_notifications": pending,
             "chart_alerts": chart_alert_health(db),
+            "market_runtime": runtime_health(db, MARKET_ROLES),
+            "data_runtime": runtime_health(db, data_roles()),
             "backup": backup_health(db),
             "market_incidents": market_incidents(db),
             "last_notification_test": last_test_result,
