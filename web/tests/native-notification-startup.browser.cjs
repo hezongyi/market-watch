@@ -65,15 +65,23 @@ if (!base || !credentialsFile || !/^https:\/\/(localhost|127\.0\.0\.1):\d+$/.tes
     const login = page.waitForResponse(r => r.url() === base + '/api/login' && r.request().method() === 'POST');
     await page.getByRole('button', { name: /登录并/ }).click();
     assert.equal((await login).status(), 200);
+    await page.goto(base + '/advanced-charts/notification-startup-synthetic');
     for (let attempt = 0; attempt < 5; attempt++) {
       if (attempt) await page.reload({ waitUntil: 'domcontentloaded' });
       await expect.poll(() => page.frames().some(frame => frame.url().startsWith('blob:')), { timeout: 60000 }).toBe(true);
       const native = page.frames().find(frame => frame.url().startsWith('blob:'));
+      const chart = native.getByRole('region', { name: '图表 #1', exact: true });
+      await expect(chart).toContainText('BTCUSDT');
+      await expect(chart).toContainText(/开=\s*\d/, { timeout: 30000 });
       const entry = native.getByRole('button', { name: /^系统消息[，,]/ });
       await expect(entry).toBeVisible({ timeout: 60000 });
       await entry.click();
       await expect(native.locator('[data-name="mw-native-system-message-center"]')).toBeVisible();
       await native.locator('[data-name="mw-native-system-message-center"]').press('Escape');
+      await expect.poll(() => page.evaluate(() => {
+        const probes = window.__notificationHeaderChecks;
+        return probes.length > 0 && probes.every(probe => probe.waited && probe.ready && probe.buttons > 0);
+      }), { timeout: 10000 }).toBe(true);
       const probes = await page.evaluate(() => window.__notificationHeaderChecks);
       assert.ok(probes.length > 0);
       assert.ok(probes.every(probe => probe.waited && probe.ready && probe.buttons > 0), JSON.stringify(probes));

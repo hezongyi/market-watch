@@ -28,6 +28,13 @@
 ## 验证入口
 
 ```bash
+# 在已启动的本任务 Ubuntu preview 中生成当前日期的合成图表缓存。
+# 默认 D1 的旧 managed 品种未接入当前服务，不能将其作为价格渲染证据。
+docker compose --env-file /dev/null -p mw-chart-live-fix-20261028 \
+  -f /home/quant/.local/share/market-watch-docker/previews/mw-chart-live-fix-20261028/run.json \
+  run --rm --no-deps -T \
+  -v /home/quant/repos/market-watch-chart-live-fix-20261028/scripts/notification_startup_fixture.py:/fixture/notification_startup_fixture.py:ro \
+  --entrypoint python api /fixture/notification_startup_fixture.py
 PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q \
   backend/tests/test_realtime_switch.py backend/tests/test_composite_quotes.py \
   backend/tests/test_composite_realtime.py
@@ -54,7 +61,12 @@ docker compose --env-file /dev/null -p mw-chart-live-fix-20261028 \
 
 - 相关 SQLite 后端测试 116 passed；前端单元与交互回归通过；Ruff、diff check 通过。
 - 完整许可 Web 和 API 均通过 Ubuntu `mw-docker` 构建。
-- PostgreSQL 合约、真实浏览器重复启动、独立 review：进行中，完成后更新。
+- 独立 PostgreSQL 14.24 合约：30 passed（176 秒）。覆盖停机后首次快照、固定/跟随当前修订的过期需求、缺失证据仍关闭、显式开关及写入隔离。
+- 真实 Chromium + 完整许可图表：五次打开/刷新均有真实原生 K 线渲染（任务合成 BTC 缓存）、系统消息入口/面板可用；每次两个 notification surface 都等待延迟 750ms 的 headerReady。超过 26 秒没有中央提示，pageerror 为零。
+- 此浏览器验收只证明 UI 启动与交互，合成缓存不证明真实供源可用；生产两条冻结组合仍需上线后的真实尾部推进验证。
+- 候选截图：本机 `/tmp/mw-notification-startup-fixed-20261028.png`。
+- 独立 Standards review：0 findings；独立 Spec review：0 findings，另外独立运行 12 项后端 + 3 项通知回归通过。后续仅补充浏览器 probe 等待和隔离合成 fixture，没有修改产品行为。
+- 验收镜像（非正式发布候选 tag）：API `market-watch-api:chart-live-fix-20261028` / `sha256:cbdfb0c22a36a09472c580bb3723f6701741b5122472d524340f10edc844a63d`；Web `market-watch-web:chart-live-fix-20261028` / `sha256:1fafc4936072be6676a40c0c4cb0348f9ad25ade74b7a2730732656434c08b29`。产品源码与两个修复提交一致，构建时 worktree dirty 已由工具标签留档。
 - 尚未合并、发布正式 tag 或部署生产补丁。
 
 ## 生产恢复边界
