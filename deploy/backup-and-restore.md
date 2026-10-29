@@ -61,3 +61,16 @@ PostgreSQL 子进程不再硬编码 900 秒：`ALERTS_BACKUP_TIMEOUT_SECONDS`（
 
 `deploy/unraid-backup.sh` 的数据库导出与配置归档现在分段执行：任一失败整体返回非零，但不再互相静默跳过；锁被占用时打印 `skipped: backup lock held` 后退出。故障时间线与实测依据见 [自动备份超时排查](../docs/issues/automatic-backup-timeout-20261028.md)。
 
+## 备份保留与轮转（2026-10-28新增）
+
+`deploy/unraid-backup.sh` 在每晚数据库备份与配置归档之后按**份数**轮转：`market-watch-*.dump`（发布/回滚证据）与 `config-v*`（版本命名归档）永不由脚本删除。数据库备份失败的那晚同样执行轮转，避免连续失败时旧文件无限堆积。对同一份备份的成对文件一起删除（`.dump` 配 `.dump.json`，`config-*.tar.gz` 配 `.sha256`）。
+
+- `MW_BACKUP_KEEP_DAILY`（默认 `14`）：保留最新 N 份每日 dump，`0` 表示该项不轮转；
+- `MW_BACKUP_KEEP_CONFIG`（默认 `14`）：保留最新 N 份配置归档；
+- `MW_BACKUP_ROTATE_DRY_RUN=1`：只打印 `would remove` 清单，不删除。
+
+摘要行 `rotation: removed N files (X bytes)` 的 N 含成对删除的清单/校验文件。排序依据是文件名里的 UTC 时间戳（字母序即时间序），脚本不解析 `ls -t`，只处理备份目录的直接子项，不递归，不碰锁与日志；轮转失败只打印 `rotation failed`，不改变备份结果码。
+
+删除不可恢复（该 share 未启用回收站）。首次上线更新后的脚本前，用 `MW_BACKUP_ROTATE_DRY_RUN=1` 在只读影子目录预览真实待删清单；轮转只在 `deploy/unraid-backup.sh` 落到 `/mnt/user/appdata/market-watch/deploy/` 之后才生效，落盘前生产不会删除任何文件。回归脚本：`sh deploy/tests/test_unraid_backup_rotation.sh`。
+
+
