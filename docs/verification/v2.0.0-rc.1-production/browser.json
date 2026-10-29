@@ -1,0 +1,176 @@
+{
+  "health": {
+    "http": 200,
+    "time": 1793200188497,
+    "pending_notifications": 0,
+    "blocked_notifications": 0,
+    "delivery_enabled": true,
+    "ntfy_configured": true,
+    "chart_alert_rules": {
+      "active": 0,
+      "blocked": 0,
+      "stale": 0,
+      "error": 0,
+      "waiting": 0,
+      "ready": 0
+    },
+    "roles": [
+      {
+        "role": "pricing",
+        "state": "running",
+        "error_type": null
+      },
+      {
+        "role": "realtime",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "composite_aggregate",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "alert_indicator",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "chart_alert",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "market_ownership",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_binance",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_binance",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_yahoo",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_yahoo",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_dukascopy",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_dukascopy",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_transport_oanda",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_transport_binance",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_transport_dukascopy",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_janitor",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "chart_history",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "history_network",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "history_compute",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "native_history",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "chart_aggregation",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "market_stream",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "data_ownership",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_projection",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_retention",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_delivery",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_ownership",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_health",
+        "state": "idle",
+        "error_type": null
+      }
+    ],
+    "backup": {
+      "status": "failed",
+      "at": 1793196944847,
+      "bytes": null
+    }
+  },
+  "browser": {
+    "browser": "Playwriter",
+    "page_url": "https://trade.kookvv.com:8443/advanced-charts/9826f739-a3e8-471a-b852-2fdf1bf72947",
+    "page_errors": [],
+    "failed_requests": [
+      {
+        "path": "/api/session",
+        "status": 401
+      }
+    ]
+  }
+}

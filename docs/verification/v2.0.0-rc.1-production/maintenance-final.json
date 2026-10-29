@@ -1,0 +1,34 @@
+{
+  "observed_at": "2026-10-28T15:15:50.905598+00:00",
+  "readyz": {
+    "status": "ready",
+    "time": 1793200550728
+  },
+  "backend_settings": [
+    {
+      "container": "market-watch-v200rc1-api-1",
+      "yahoo_enabled": true,
+      "oanda_acquisition_mode": "rest_batch"
+    },
+    {
+      "container": "market-watch-v200rc1-market-runtime-1",
+      "yahoo_enabled": true,
+      "oanda_acquisition_mode": "rest_batch"
+    },
+    {
+      "container": "market-watch-v200rc1-data-worker-1",
+      "yahoo_enabled": true,
+      "oanda_acquisition_mode": "rest_batch"
+    },
+    {
+      "container": "market-watch-v200rc1-notification-worker-1",
+      "yahoo_enabled": true,
+      "oanda_acquisition_mode": "rest_batch"
+    }
+  ],
+  "active_release": "releases/v2.0.0-rc.1-0eac4fe",
+  "cron_runtime_file": "/etc/cron.d/root",
+  "cron": "0 3 * * * /mnt/user/appdata/market-watch/deploy/unraid-backup.sh >> /mnt/user/backup/market-watch/latest-run.log 2>&1",
+  "market_runtime_warning_error_count_last_15_minutes": 0,
+  "database_backup_schedule_success_not_yet_verified": true
+}
