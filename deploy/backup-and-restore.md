@@ -35,7 +35,7 @@ PostgreSQL 这条流程生成的是 **全量逻辑备份**（`pg_dump --format=c
 
 Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd目录中的timer供独立部署参考，并非当前生产执行方式。
 
-备份含账户状态和登录会话信息，应限制访问。当前工具不自动删除备份；需要配置异机副本与保留策略时再实施，现阶段同机备份不能防范磁盘损坏。
+备份含账户状态和登录会话信息，应限制访问。新备份的自动轮转见下文；旧备份保持保留，异机副本仍需另行配置，现阶段同机备份不能防范磁盘损坏。
 
 ## 旧Compose脚本
 
@@ -52,3 +52,31 @@ Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd�
 数据库和配置分别有恢复证据，不代表已经演练全新机器上的整站重建。反向代理域名/证书由现有服务维护，需使用其自身备份。配置归档保存在同一Unraid服务器，尚不提供异机容灾。网页备份状态目前来自数据库备份审计；配置归档失败会令脚本失败并进入cron日志，需要同时检查该日志。
 
 备份目录按用户要求独立放在 `/mnt/user/backup/trading-alerts`，与appdata分离。新部署先创建该目录，目录所有者设为容器应用UID/GID 10001:10001、权限0700；不要创建指向旧appdata备份目录的软链接。现有文件已按字节比较迁移，配置归档SHA256清单中的文件路径也已更新。
+
+## 备份耗时上限、压缩级别与分阶段计时（2026-10-28新增）
+
+PostgreSQL 子进程不再硬编码 900 秒：`ALERTS_BACKUP_TIMEOUT_SECONDS`（默认 3600，范围 60–21600）同时约束 `pg_dump`、`pg_restore --list` 和 `--restore-check` 的全量恢复；超时只报阶段名与秒数，不带连接或路径信息。归档压缩级别由 `ALERTS_BACKUP_COMPRESS_LEVEL`（默认 1，`0` 为不压缩）显式传入 `pg_dump --compress`，不再依赖 custom format 的隐式默认。
+
+每次成功备份在 `.dump.json` 清单与 `backup_completed` 审计中记录 `counts_ms` / `dump_ms` / `list_ms` / `sha256_ms` 与 `compress`；失败审计记录 `error_type` 与 `stage`（`prepare` / `sqlite_copy` / `counts` / `pg_dump` / `pg_restore_list` / `sha256` / `manifest`，SQLite 备份没有 list 阶段）。前置校验失败只有 `error_type`，没有 `stage`。
+
+`deploy/unraid-backup.sh` 的数据库导出与配置归档现在分段执行：任一失败整体返回非零，但不再互相静默跳过；锁被占用时打印 `skipped: backup lock held` 后退出。故障时间线与实测依据见 [自动备份超时排查](../docs/issues/automatic-backup-timeout-20261028.md)。
+
+## 备份保留与轮转（2026-10-28新增）
+
+`deploy/unraid-backup.sh` 在数据库备份与配置归档之后按**完成份数**轮转。数据库备份失败时仍可轮转已完成备份，任一备份阶段失败仍返回非零。
+
+- `MW_BACKUP_KEEP_DAILY`（默认 `14`）：保留最新 N 份已完成每日 dump，`0` 禁用该项轮转。
+- `MW_BACKUP_KEEP_CONFIG`（默认 `14`）：保留最新 N 份已完成 `config-daily-*.tar.gz` 配置归档，`0` 禁用。
+- 两项值须为 `0` 或不带前导零的正整数，最大 `999999999`。负数、空串、非数字、超长值会在任何删除之前拒绝整次轮转。
+- `MW_BACKUP_ROTATE_DRY_RUN=1`：只打印待删清单，不删除；只接受 `0`/`1`。
+- 以上为主机脚本环境变量，cron 需显式导出或在调用前赋值；应用 `.env` 不会自动向主机脚本导出这些变量。
+
+完成边界：新数据库备份在 dump 与完整 JSON 清单写入后生成私有 `.dump.complete`；新配置归档在 tar 校验、SHA256 文件写入成功后生成 `.tar.gz.complete`。轮转只统计同时有非空配套清单/校验文件及完成标记的普通文件，跳过软链接。标记表示写入已完成，不代替恢复时的 hash 与完整恢复验证。异常中止遗留的不完整文件不占保留名额，也不自动删除。
+
+保护边界：`market-watch-*.dump`、所有旧 `config-*.tar.gz`（包括时间戳命名的发布恢复点与 `config-v*`）及无完成标记的旧 dump 永不自动删除。配置归档器改用独立 `config-daily-*` 命名；现有 `config-20261028T150906Z-XgDEue.tar.gz` 不会进入轮转集合。旧文件不自动补标或迁移；确需清理时另行核对并授权。后续发布证据也应使用保留命名空间，不使用 `config-daily-*`。
+
+删除时一并移除数据、配套清单/校验文件与完成标记。摘要 N 包含三类文件。排序按文件名 UTC 时间戳，只处理备份目录直接子项，不递归、不碰锁与日志。轮转失败打印原因和 `rotation failed`，保持原有备份退出码语义。
+
+删除不可恢复。首次安装前先用 `MW_BACKUP_ROTATE_DRY_RUN=1` 在隔离影子目录预览；已有备份不会因本 PR 推送自动删除，生产脚本安装及轮转启用按单独部署授权执行。
+
+回归：`sh deploy/tests/test_unraid_backup_rotation.sh` 与 `TEST_SHELL="busybox sh" sh deploy/tests/test_unraid_backup_rotation.sh`。两种 shell 均执行真实轮转；配置归档检查使用宿主 sh 和生产所需的 GNU tar，不要求 BusyBox tar 支持 GNU 参数。包含负数/非法配置、真实发布归档保护、不完整文件、完成标记、真实配置归档与校验失败检查。

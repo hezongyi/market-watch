@@ -6,6 +6,7 @@ import json
 import os
 import sqlite3
 import subprocess
+import time
 import uuid
 from datetime import UTC, datetime
 from pathlib import Path
@@ -54,12 +55,28 @@ def pg_env(url, *, database=None):
     return env
 
 
-def pg_tool(name, args, env):
+class BackupStepTimeout(RuntimeError):
+    """A pg tool hit backup_timeout_seconds. The message carries the stage only."""
+
+    def __init__(self, stage, seconds):
+        self.stage = stage
+        self.seconds = seconds
+        super().__init__(f"{stage} timed out after {seconds}s")
+
+
+def pg_tool(name, args, env, *, stage):
     executable = str(Path(settings.postgres_bin_dir) / name)
-    result = subprocess.run([executable, *args], env=env, capture_output=True, timeout=900)
+    timeout = settings.backup_timeout_seconds
+    try:
+        result = subprocess.run([executable, *args], env=env, capture_output=True, timeout=timeout)
+    except subprocess.TimeoutExpired:
+        # TimeoutExpired carries the argv (paths included); report the stage only.
+        raise BackupStepTimeout(stage, timeout) from None
     if result.returncode:
         # Server diagnostics can contain connection details. Keep them out of the UI/log.
-        raise RuntimeError(f"{name} failed with exit status {result.returncode}")
+        error = RuntimeError(f"{name} failed with exit status {result.returncode}")
+        error.stage = stage
+        raise error
 
 
 def sql_counts(connection):
@@ -88,6 +105,9 @@ def backup(destination: Path):
         raise ValueError("Unsupported backup database")
     destination = destination.resolve()
     manifest = destination.with_name(destination.name + ".json")
+    completion = destination.with_name(destination.name + ".complete")
+    if completion.exists():
+        raise FileExistsError("Backup completion marker already exists")
     if manifest.exists():
         raise FileExistsError("Backup manifest already exists")
     if backend == "sqlite" and (
@@ -99,8 +119,12 @@ def backup(destination: Path):
         raise ValueError("Backup requires a distinct file-backed SQLite source")
     private_file(destination)
     owns_manifest = False
+    owns_completion = False
+    stage = "prepare"
     try:
         if backend == "sqlite":
+            stage = "sqlite_copy"
+            started = time.monotonic()
             with (
                 sqlite3.connect(
                     Path(url.database).resolve().as_uri() + "?mode=ro", uri=True
@@ -108,7 +132,12 @@ def backup(destination: Path):
                 sqlite3.connect(destination) as target,
             ):
                 source.backup(target)
+            dump_ms = round((time.monotonic() - started) * 1000)
+            stage = "counts"
+            started = time.monotonic()
             counts = sqlite_counts(destination)
+            counts_ms = round((time.monotonic() - started) * 1000)
+            list_ms = 0
         else:
             engine = create_engine(settings.database_url)
             try:
@@ -119,38 +148,71 @@ def backup(destination: Path):
                     connection.begin(),
                 ):
                     snapshot = connection.scalar(text("SELECT pg_export_snapshot()"))
+                    stage = "counts"
+                    started = time.monotonic()
                     counts = sql_counts(connection)
+                    counts_ms = round((time.monotonic() - started) * 1000)
+                    stage = "pg_dump"
+                    started = time.monotonic()
                     pg_tool(
                         "pg_dump",
                         [
                             "--format=custom",
                             "--no-owner",
+                            f"--compress={settings.backup_compress_level}",
+                            "--lock-wait-timeout=30s",
                             "--snapshot",
                             snapshot,
                             "--file",
                             str(destination),
                         ],
                         pg_env(url),
+                        stage="pg_dump",
                     )
-                pg_tool("pg_restore", ["--list", str(destination)], pg_env(url))
+                    dump_ms = round((time.monotonic() - started) * 1000)
+                stage = "pg_restore_list"
+                started = time.monotonic()
+                pg_tool(
+                    "pg_restore",
+                    ["--list", str(destination)],
+                    pg_env(url),
+                    stage="pg_restore_list",
+                )
+                list_ms = round((time.monotonic() - started) * 1000)
             finally:
                 engine.dispose()
+        stage = "sha256"
+        started = time.monotonic()
+        digest = sha256(destination)
+        sha256_ms = round((time.monotonic() - started) * 1000)
         record = {
             "format": 1,
             "backend": backend,
             "created_at": now_ms(),
-            "sha256": sha256(destination),
+            "sha256": digest,
             "bytes": destination.stat().st_size,
             "counts": counts,
+            "compress": settings.backup_compress_level,
+            "counts_ms": counts_ms,
+            "dump_ms": dump_ms,
+            "list_ms": list_ms,
+            "sha256_ms": sha256_ms,
         }
+        stage = "manifest"
         private_file(manifest)
         owns_manifest = True
         manifest.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
+        private_file(completion)
+        owns_completion = True
         return record
-    except Exception:
+    except Exception as error:
+        if owns_completion:
+            completion.unlink(missing_ok=True)
         destination.unlink(missing_ok=True)
         if owns_manifest:
             manifest.unlink(missing_ok=True)
+        # Attribute the failure to a stage so the audit says where it stopped.
+        error.stage = stage
         raise
 
 
@@ -177,6 +239,7 @@ def restore_check(path: Path):
                 "pg_restore",
                 ["--exit-on-error", "--no-owner", "--no-privileges", "--dbname", name, str(path)],
                 pg_env(url, database=name),
+                stage="pg_restore",
             )
             restored = create_engine(url.set(database=name))
             try:
@@ -205,7 +268,10 @@ def main():
         try:
             print(json.dumps(restore_check(args.restore_check)))
         except Exception as error:
-            print(json.dumps({"verified": False, "error_type": type(error).__name__}))
+            details = {"verified": False, "error_type": type(error).__name__}
+            if stage := getattr(error, "stage", None):
+                details["stage"] = stage
+            print(json.dumps(details))
             raise SystemExit(1) from None
         return
     name = datetime.now(UTC).strftime("alerts-%Y%m%dT%H%M%S%fZ")
@@ -214,12 +280,15 @@ def main():
     try:
         report = backup(destination)
     except Exception as error:
+        details = {"error_type": type(error).__name__}
+        if stage := getattr(error, "stage", None):
+            details["stage"] = stage
         try:
             with transaction() as db:
-                db.add(Audit(kind="backup_failed", details={"error_type": type(error).__name__}))
+                db.add(Audit(kind="backup_failed", details=details))
         except Exception:
             pass
-        print(json.dumps({"completed": False, "error_type": type(error).__name__}))
+        print(json.dumps({"completed": False, **details}))
         raise SystemExit(1) from None
     with transaction() as db:
         db.add(
@@ -230,6 +299,11 @@ def main():
                     "backend": report["backend"],
                     "sha256": report["sha256"],
                     "bytes": report["bytes"],
+                    "compress": report["compress"],
+                    "counts_ms": report["counts_ms"],
+                    "dump_ms": report["dump_ms"],
+                    "list_ms": report["list_ms"],
+                    "sha256_ms": report["sha256_ms"],
                 },
             )
         )
