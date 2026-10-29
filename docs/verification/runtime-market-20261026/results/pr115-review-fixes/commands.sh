@@ -24,3 +24,6 @@ pg_test=(-e TEST_POSTGRES_URL=postgresql+psycopg://track_c:track_c_acceptance_on
   backend/tests/test_live_pricing_migration.py
 "${compose[@]}" --profile maintenance run --rm --no-deps -T "${pg_test[@]}" \
   -e TEST_POSTGRES_BIN_DIR=/opt/pgbin/bin backup python -m pytest -q -p no:cacheprovider backend/tests/test_backup.py
+
+"${compose[@]}" run --rm --no-deps -T "${pg_test[@]}" data-worker python -m pytest --collect-only -q -p no:cacheprovider
+"${compose[@]}" run --rm --no-deps -T "${pg_test[@]}" data-worker python -m pytest -q -p no:cacheprovider backend/tests/test_composite_aggregates_postgres.py

@@ -35,6 +35,7 @@ docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptanc
 - 依赖回归：**209 passed**，见 `docker-dependent-final.txt`。
 - 新增边界验收：**31 passed**，见 `docker-boundary-final.txt`，含真实 PostgreSQL 旧产品删除与历史/有效引用保护。
 - 备份实际恢复：**5 passed**。`test_postgres_dump_restore_of_signal_and_outbox` 实际 pg_dump → 新库 pg_restore，比对全表计数及工作区、偏好、队列 JSON 内容；不是只读 dump 清单。
+- 全库测试收集：**3437 tests collected**；补跑 PostgreSQL 聚合兼容套件 **10 passed**。首轮远端 CI 发现测试改名后 PostgreSQL 合同引用未同步，已修正并补这两项检查。
 - Ruff、diff whitespace 检查通过。
 - Standards 与 Spec 独立复核均通过，无剩余阻塞。复核分别独立验证 25 项与 52 项；最终小幅测试预期调整由主 agent 在 Docker 验证。
 
