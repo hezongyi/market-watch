@@ -1,0 +1,611 @@
+{
+  "before": {
+    "market_source_minutes": 17317,
+    "market_source_minutes@old": 1204,
+    "market_source_minute_revisions": 17317,
+    "market_source_minute_revisions@old": 1204,
+    "market_composite_minutes": 59779,
+    "market_composite_minutes@old": 3128,
+    "market_composite_minute_inputs": 59779,
+    "market_composite_minute_inputs@old": 3128,
+    "market_composite_input_events": 99,
+    "lower_bound": 1790619120349
+  },
+  "after": {
+    "market_source_minutes": 17317,
+    "market_source_minutes@old": 1204,
+    "market_source_minute_revisions": 17317,
+    "market_source_minute_revisions@old": 1204,
+    "market_composite_minutes": 59779,
+    "market_composite_minutes@old": 3128,
+    "market_composite_minute_inputs": 59779,
+    "market_composite_minute_inputs@old": 3128,
+    "market_composite_input_events": 99,
+    "lower_bound": 1790619120941
+  },
+  "delta": {
+    "market_source_minutes": 0,
+    "market_source_minutes@old": 0,
+    "market_source_minute_revisions": 0,
+    "market_source_minute_revisions@old": 0,
+    "market_composite_minutes": 0,
+    "market_composite_minutes@old": 0,
+    "market_composite_minute_inputs": 0,
+    "market_composite_minute_inputs@old": 0,
+    "market_composite_input_events": 0
+  },
+  "zero_deletion": true,
+  "report": {
+    "run": {
+      "id": "822ab313-6cec-4411-9572-8239794bd7fe",
+      "kind": "revision_activation",
+      "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+      "state": "succeeded",
+      "unlocked": true,
+      "finished_at": 1793199591321,
+      "batch": {
+        "batch_id": "b85857e8-5a39-45b6-9f9c-2d712450e85b",
+        "state": "interrupted",
+        "dry_run": false,
+        "claimed_at": 1793209245494,
+        "released_at": 1793209245512,
+        "attempts": 4,
+        "stats": {
+          "rows": 0,
+          "bytes": 14400,
+          "deleted": {
+            "market_composite_minute_inputs": 0,
+            "market_composite_minutes": 0,
+            "market_composite_input_events": 0,
+            "market_source_minutes": 0,
+            "market_source_minute_revisions": 0
+          },
+          "remaining": {
+            "source_minutes": 1140,
+            "source_revisions": 0
+          },
+          "at": 1793209245509
+        }
+      }
+    },
+    "dry_run": true,
+    "window_hours": 720,
+    "lower_bound": 1790619120524,
+    "now": 1793211120524,
+    "deleted": {
+      "market_composite_minute_inputs": 0,
+      "market_composite_minutes": 0,
+      "market_composite_input_events": 0,
+      "market_source_minutes": 0,
+      "market_source_minute_revisions": 0
+    },
+    "rows": 2412,
+    "bytes": 81466,
+    "candidates": {
+      "source_minutes": 1204,
+      "source_revisions": 1204,
+      "composite_minutes": 2,
+      "composite_inputs": 2,
+      "composite_input_events": 0
+    },
+    "protected": {
+      "revisions": 1082,
+      "by_reason": {
+        "active_composite_revision": 1034,
+        "alert_bound_revision": 1046,
+        "incomplete_preparation": 1046
+      },
+      "detail": [
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789678800000,
+          "revision_id": "db026c6c-7c0a-4f17-964a-59a2fe5bb348",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789679700000,
+          "revision_id": "db533980-fbf8-42c0-8801-c01f7b518728",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789680600000,
+          "revision_id": "514bd145-0207-4fa9-b5fa-726e2b4b1eaa",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789681500000,
+          "revision_id": "0f5dab67-b3d2-48c3-9ca2-9ad8f0f3a508",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789682400000,
+          "revision_id": "2cd1a1e3-cad2-4837-9036-bec8e6f100d1",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789683300000,
+          "revision_id": "d0f0fd6f-5259-468d-8011-9c50596a211c",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789684200000,
+          "revision_id": "604cf931-bd93-46e1-b5b7-2e7a5f5bcff9",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789685100000,
+          "revision_id": "0aa039c4-1cc7-4787-b0bd-b437f502fa47",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789686000000,
+          "revision_id": "77729d98-6bb9-442d-ad0a-fa6ee786bbca",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789686900000,
+          "revision_id": "f16aeb8b-cc64-43e0-9316-8472f6409670",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789687800000,
+          "revision_id": "113968b0-5181-48da-84a9-8160c377d245",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789688700000,
+          "revision_id": "b87aaff8-9a81-40d8-b004-fef55cc0d667",
+          "reasons": [
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789689600000,
+          "revision_id": "c2c2b663-d0a3-43e5-80a9-f1c0dab990a4",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789690500000,
+          "revision_id": "86b0ceb2-c880-4b46-b601-521a22079629",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789691400000,
+          "revision_id": "85dbefbc-3ca8-44ff-8afa-78c0b595ff04",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789692300000,
+          "revision_id": "e6c4cba6-e1f5-40a0-a124-f9c4eeb9a6f1",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789693200000,
+          "revision_id": "8233986a-67b5-4cde-af00-a47501b25157",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789694100000,
+          "revision_id": "be94a6cf-0831-44c4-8438-ab4ffb60dffa",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789695000000,
+          "revision_id": "351257b3-5bf7-4164-a80f-6d043d94b860",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789695900000,
+          "revision_id": "9be57366-126d-4abd-82b2-bd1b1ff7cf12",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789696800000,
+          "revision_id": "c1fa57ab-92b5-40bf-95f4-ac99e0fd5095",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789697700000,
+          "revision_id": "a357f0a8-cadf-461c-88c8-7a8cdcb40bd5",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789698600000,
+          "revision_id": "1d1e5f81-dd49-4454-be68-31f717622ed8",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789699500000,
+          "revision_id": "ce7b075a-ded3-4e24-95f7-388fca5fbe67",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789700400000,
+          "revision_id": "c5dd1586-06c0-4e61-a63e-2b87f5298506",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789701300000,
+          "revision_id": "192be848-0b0b-4046-9410-658c769eafd4",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789702200000,
+          "revision_id": "ef850860-6be8-419c-8af0-b4e941c7c9cb",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789703100000,
+          "revision_id": "addd6b41-7b69-41d5-8b1c-32e417397926",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789704000000,
+          "revision_id": "2206cca0-0d07-471c-912d-5c7413988d70",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789704900000,
+          "revision_id": "6293bc1a-96c8-4082-9493-cb971f422e42",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789705800000,
+          "revision_id": "46ae214e-90a6-4546-88a2-f5b8ae170c24",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789706700000,
+          "revision_id": "b1cd535f-1462-457d-b76b-fe938d27c1aa",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789707600000,
+          "revision_id": "44c8d2c3-b971-4c16-ac17-47408a608c13",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789708500000,
+          "revision_id": "dc1857e2-725a-4790-b107-774c5abed302",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789709400000,
+          "revision_id": "5e0f690b-2005-4086-b069-2f83dc6ca135",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789710300000,
+          "revision_id": "85abfe67-24a8-48ac-bb49-ca9a3b7c6563",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789711200000,
+          "revision_id": "b80b4767-07d6-447b-a82b-f4c55b0293f2",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789712100000,
+          "revision_id": "d5a50899-7510-4dfd-80df-fff02f2b0cc9",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789713000000,
+          "revision_id": "34cd6213-f9da-4216-8e3d-f7fb695f66c0",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789713900000,
+          "revision_id": "373d9d46-7f99-4857-b396-265b84465b5f",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789714800000,
+          "revision_id": "68b3c925-2452-4c8a-bc3f-bd5eb6c5b080",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789715700000,
+          "revision_id": "05ffbb66-8d4c-4e62-9ac1-b0d07e320b80",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789716600000,
+          "revision_id": "694f3240-8a0f-4a13-906d-7593b339a3c4",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789717500000,
+          "revision_id": "33bc814d-5bac-4161-8b93-b49ef6c6c455",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789718400000,
+          "revision_id": "0ac1aec6-01f8-4043-a8bf-dfe89a0e5cac",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789719300000,
+          "revision_id": "f1672174-79bb-412b-83ef-446f6940812a",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789720200000,
+          "revision_id": "3c625fdd-aca8-48ef-aae7-2d021728c920",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789721100000,
+          "revision_id": "6003217b-66ea-4ea9-9a5d-a49adea367ac",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789722000000,
+          "revision_id": "31d87c94-a14e-48a2-b3c3-b9209a6f2627",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        },
+        {
+          "source_id": "3fe2ebff34bbff1005d26551752e0bace9a80550bb55a5f0492a6481feed234c",
+          "start": 1789722900000,
+          "revision_id": "28d13121-2be4-4e68-9907-dd7e6b1788ba",
+          "reasons": [
+            "active_composite_revision",
+            "alert_bound_revision",
+            "incomplete_preparation"
+          ]
+        }
+      ],
+      "detail_truncated": true
+    },
+    "remaining": null,
+    "batch": {
+      "id": "74ef032d-208f-4b72-8b13-6e2bfa15aa05",
+      "state": "running",
+      "dry_run": true,
+      "attempts": 1,
+      "stats": {}
+    },
+    "skipped": [],
+    "limit": 20000,
+    "chunk": 1000,
+    "budget_ms": 20000,
+    "payload_bytes": 23338,
+    "deletable_revisions": 122
+  },
+  "inside_window": {
+    "source_minutes_inside_window": 16113,
+    "bars": 43769,
+    "history_chunks": 40,
+    "history_artifacts": 135
+  }
+}

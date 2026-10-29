@@ -19,6 +19,7 @@ def build_loops():
         provider_cache,
         provider_service,
         provider_transport,
+        switch_schedule,
     )
     from .provider_capabilities import enabled_sources
 
@@ -44,6 +45,11 @@ def build_loops():
         Loop("native_history", native_history_loads.run),
         Loop("chart_aggregation", chart_aggregation_worker.run),
         Loop("market_stream", market_stream_worker.run),
+        # The weekly switch window and its bounded cleanup are data work: the
+        # shadow pass prepares candidates, the retention pass drains one batch
+        # inside this profile's ownership lock.
+        Loop("switch_shadow", switch_schedule.run_shadow),
+        Loop("retention", switch_schedule.run_retention),
     )
 
 
@@ -125,7 +131,7 @@ def run(*, stop=None, handle_signals=True):
                 deadline_ms=(
                     300_000 if loop.role in {
                         "chart_history", "history_network", "history_compute", "native_history", "market_stream",
-                        "chart_aggregation",
+                        "chart_aggregation", "switch_shadow", "retention",
                     }
                     else 90_000
                 ),

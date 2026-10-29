@@ -1,0 +1,7 @@
+usage: cli.py [-h] [--env ENV] [--run-id RUN_ID] [--limit LIMIT]
+              [--chunk CHUNK] [--budget-ms BUDGET_MS] [--execute] [--status]
+              [--restore-drill DIRECTORY]
+              {init,check,retention}
+cli.py: error: unrecognized arguments: --dry-run
+
+cli_dry_run_exit=2

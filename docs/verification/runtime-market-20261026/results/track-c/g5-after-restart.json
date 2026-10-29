@@ -1,0 +1,99 @@
+{
+  "marker": {
+    "artifact": "/home/quant/tc-scratch/track-c.dump",
+    "sha256": "cce6bb5f64e1486d8a781423caf011f763ca45f61eb47627483042066eaeafd1",
+    "verified_at": 1793200144000,
+    "tables": 103,
+    "backend": "postgresql",
+    "bytes": 6558905,
+    "schema": {
+      "tables": 104,
+      "digest": "5eeb6d1345cc62a9f84dd345cb1c685b5525edb3ed9c0a4b250b36a95d31958d",
+      "alembic": "ba54_market_switch_runs"
+    }
+  },
+  "runs": [
+    {
+      "id": "3082c3ce-8ef4-4231-830f-bfb11f80321e",
+      "state": "shadow_ready",
+      "retention": {}
+    },
+    {
+      "id": "822ab313-6cec-4411-9572-8239794bd7fe",
+      "state": "succeeded",
+      "retention": {
+        "batch_id": "99379a09-153d-448b-806a-ee80fc57db4e",
+        "state": "completed",
+        "dry_run": true,
+        "claimed_at": 1793199595780,
+        "released_at": 1793199596427,
+        "attempts": 1,
+        "stats": {
+          "planned_rows": 6201,
+          "planned_bytes": 469647,
+          "dry_run": true,
+          "at": 1793199595776
+        }
+      }
+    },
+    {
+      "id": "5024863b-0b8c-4476-8c0f-2bab18e8a5e0",
+      "state": "succeeded",
+      "retention": {
+        "batch_id": "855287f4-b82f-4444-bcc1-b781170ebc25",
+        "state": "completed",
+        "dry_run": true,
+        "claimed_at": 1793199825151,
+        "released_at": 1793199825954,
+        "attempts": 1,
+        "stats": {
+          "planned_rows": 6279,
+          "planned_bytes": 471824,
+          "dry_run": true,
+          "at": 1793199825148
+        }
+      }
+    },
+    {
+      "id": "dedac8e8-1182-4d65-923c-56305290fe29",
+      "state": "shadow_ready",
+      "retention": {}
+    },
+    {
+      "id": "85d9ea55-5c19-42c1-8999-db4bc6084279",
+      "state": "succeeded",
+      "retention": {
+        "batch_id": "c29acae0-448d-491b-973f-c5689e97f3c2",
+        "state": "completed",
+        "dry_run": true,
+        "claimed_at": 1793200169294,
+        "released_at": 1793200170047,
+        "attempts": 1,
+        "stats": {
+          "planned_rows": 6279,
+          "planned_bytes": 471824,
+          "dry_run": true,
+          "at": 1793200169264
+        }
+      }
+    }
+  ],
+  "counts": {
+    "market_source_minutes": 15542,
+    "market_source_minutes@old": 2104,
+    "market_source_minute_revisions": 15542,
+    "market_source_minute_revisions@old": 2104,
+    "market_composite_minutes": 32550,
+    "market_composite_minutes@old": 3090,
+    "market_composite_minute_inputs": 32550,
+    "market_composite_minute_inputs@old": 3090,
+    "market_composite_input_events": 65,
+    "lower_bound": 1790608190341
+  },
+  "inside_window": {
+    "source_minutes_inside_window": 13438,
+    "bars": 5661,
+    "history_chunks": 9,
+    "history_artifacts": 54
+  }
+}

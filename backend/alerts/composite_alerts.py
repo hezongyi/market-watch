@@ -11,8 +11,10 @@ from decimal import Decimal
 
 from sqlalchemy import func, select
 
+from . import switch_source
 from .calendar_profile import closures_from
 from .chart_alert_domain import Observation, line_value
+from .composite_inputs import frozen
 from .composite_series import period
 from .config import settings
 from .domain import calendar_from, scheduled_open
@@ -21,11 +23,15 @@ from .history_catalog import account_scope
 from .indicator_state import ALGORITHM
 from .live_pricing import account_key
 from .storage import (
+    Audit,
+    ChartAlert,
+    ChartAlertVersion,
     CompositeAggregateTask,
     CompositeJudgment,
     CompositeMinuteInput,
     CompositePreparation,
     CompositeRevision,
+    HistoryArtifact,
     HistoryVersion,
     Instrument,
     LiveState,
@@ -38,6 +44,32 @@ from .storage import (
 )
 
 CONTRACT = "composite-alert-input-v1"
+FROZEN_REASON = "组合已切换到新修订；旧修订输入已冻结，需显式改为新修订后恢复"
+
+
+def identity(db, composite, revision, config):
+    """The exact bound identity of one rule on one revision.
+
+    Shared by rule creation and by the switch rebind, so a relocated rule keeps
+    every other identity field byte-identical and only follows the revision.
+    """
+    version = db.get(HistoryVersion, revision.history_version_id)
+    mapping = db.get(RealtimeMapping, revision.mapping_id)
+    target = db.get(MarketDataset, mapping.target_dataset_id)
+    inst = db.get(Instrument, composite.instrument_id)
+    return {"instrument": composite.id, "instrument_id": inst.id, "series_kind": "composite",
+        "source": "composite", "symbol": db.get(MarketDataset, version.dataset_id).logical_symbol,
+        "basis": inst.basis, "calendar": revision.rules["aggregation_calendar"],
+        "timeframe": config.timeframe, "precision": max(
+            db.get(Instrument, db.get(MarketDataset, version.dataset_id).instrument_id).precision,
+            db.get(Instrument, target.instrument_id).precision),
+        "composite_id": composite.id, "composite_revision_id": revision.id,
+        "history_version_id": version.id, "history_checksum": version.manifest["checksum"],
+        "history_start": version.start, "dataset_id": version.dataset_id,
+        "mapping_id": mapping.id, "target_dataset_id": target.id, "target_identity": target.identity,
+        "seam": revision.seam, "rules": revision.rules, "seam_policy": config.seam_policy,
+        "calculation_algorithm": ALGORITHM, "contract": CONTRACT,
+        "initial_input_revision": db.get(CompositePreparation, revision.id).input_revision}
 
 
 def bind(db, config, *, now=None):
@@ -61,20 +93,7 @@ def bind(db, config, *, now=None):
         raise ValueError("实时映射不属于当前OANDA账户")
     if config.calculation_origin is not None and config.calculation_origin != version.start:
         raise ValueError("组合指标须从固定历史版本起点初始化")
-    inst = db.get(Instrument, composite.instrument_id)
-    return {"instrument": composite.id, "instrument_id": inst.id, "series_kind": "composite",
-        "source": "composite", "symbol": db.get(MarketDataset, version.dataset_id).logical_symbol,
-        "basis": inst.basis, "calendar": revision.rules["aggregation_calendar"],
-        "timeframe": config.timeframe, "precision": max(
-            db.get(Instrument, db.get(MarketDataset, version.dataset_id).instrument_id).precision,
-            db.get(Instrument, target.instrument_id).precision),
-        "composite_id": composite.id, "composite_revision_id": revision.id,
-        "history_version_id": version.id, "history_checksum": version.manifest["checksum"],
-        "history_start": version.start, "dataset_id": version.dataset_id,
-        "mapping_id": mapping.id, "target_dataset_id": target.id, "target_identity": target.identity,
-        "seam": revision.seam, "rules": revision.rules, "seam_policy": config.seam_policy,
-        "calculation_algorithm": ALGORITHM, "contract": CONTRACT,
-        "initial_input_revision": db.get(CompositePreparation, revision.id).input_revision}
+    return identity(db, composite, revision, config)
 
 
 def require_live_eligibility(db, revision, *, now, timeframe, lock=True):
@@ -106,6 +125,155 @@ def require_live_eligibility(db, revision, *, now, timeframe, lock=True):
     if (not prep or prep.status != "queried" or prep.error or not task or
             task.applied_input_revision < prep.input_revision or not artifact):
         raise ValueError("组合接缝或告警周期尚未准备就绪")
+
+
+def bound_rules(db, composite_id, *, lock=False):
+    """Active rules whose current version binds a revision of this composite."""
+    query = select(ChartAlertVersion, ChartAlert).join(
+        ChartAlert, (ChartAlertVersion.alert_id == ChartAlert.id) & (
+            ChartAlertVersion.version == ChartAlert.version)).where(
+                ChartAlert.status == "active",
+                ChartAlertVersion.market_identity["composite_id"].as_string() == composite_id)
+    if lock:
+        query = query.with_for_update()
+    return list(db.execute(query))
+
+
+def pause(db, rules, *, reason, run_id=None, now=None):
+    """Pause a rule that can no longer read a served revision; never migrate it."""
+    now = now_ms() if now is None else now
+    output = []
+    for version, alert in rules:
+        if alert.status != "active":
+            continue
+        alert.status, alert.control_revision = "paused", alert.control_revision + 1
+        alert.health, alert.health_reason = "blocked", reason[:250]
+        # The paused rule keeps holding its live target: the shared source stays
+        # subscribed for an explicit resume. The existing held-rule demand only
+        # recognises this value, so the switch reason is carried alongside it.
+        alert.runtime = {**alert.runtime, "demand_hold": "stale_input",
+                         "switch_reason": reason}
+        alert.updated_at = now
+        revision_id = version.market_identity.get("composite_revision_id")
+        db.add(Audit(kind="chart_alert_paused", details={"alert_id": alert.id,
+            "revision_id": revision_id, "reason": reason, "run_id": run_id}))
+        output.append({"id": alert.id, "revision_id": revision_id})
+    return output
+
+
+def pause_bound(db, composite_id, *, reason, run_id=None, now=None):
+    """Safe pause: no active rule keeps reading a revision that cannot serve it."""
+    rules = bound_rules(db, composite_id, lock=True)
+    return {"paused": pause(db, rules, reason=reason, run_id=run_id, now=now),
+            "bound": len(rules)}
+
+
+SHAPE_KEYS = ("aggregation", "selection", "tail_revisions")
+
+
+def relocatable(db, previous, target, config, bound, *, input_revision, source=None):
+    """Can this rule move onto the target revision without changing its shape?
+
+    Only a same-service-shape revision may take over a running rule: the same
+    aggregation calendar, the same stitching rules and seam policy, and the same
+    live price basis and precision. A calendar or price-basis change moves bucket
+    boundaries and price semantics, so the rule is paused explicitly instead of
+    being moved onto a different shape. The last checks are the period artifact
+    and the aggregate waterline the rule needs to read that revision at all.
+    """
+    served = (previous.rules.get("aggregation_calendar"),
+              target.rules.get("aggregation_calendar"))
+    if served[0] != served[1]:
+        return False, f"目标修订服务日历 {served[1]}，与规则绑定的 {served[0]} 不兼容"
+    for key in SHAPE_KEYS:
+        if previous.rules.get(key) != target.rules.get(key):
+            return False, f"目标修订的 {key} 规则与规则绑定修订不一致"
+    if bound.get("seam_policy") != config.seam_policy:
+        return False, "规则接缝策略与其固定身份不一致"
+    if source is not None and not source.get("compatible"):
+        return False, "候选来源能力闸门未通过"
+    before, after = switch_source.capabilities(db, previous), switch_source.capabilities(db, target)
+    if (before.basis, before.precision) != (after.basis, after.precision):
+        return False, (f"目标修订价格口径 {after.basis}/{after.precision} 位，"
+                       f"与规则绑定的 {before.basis}/{before.precision} 位不一致")
+    artifact = db.scalar(select(HistoryArtifact.id).where(
+        HistoryArtifact.version_id == target.history_version_id,
+        HistoryArtifact.timeframe == config.timeframe,
+        HistoryArtifact.status == "published").limit(1))
+    if not artifact:
+        return False, f"目标修订缺少 {config.timeframe} 固定周期产物"
+    task = db.get(CompositeAggregateTask, (target.id, config.timeframe))
+    if not task or task.applied_input_revision < input_revision:
+        return False, f"目标修订 {config.timeframe} 聚合水位未覆盖激活输入"
+    return True, None
+
+
+def rebind_active(db, composite, *, previous, target, boundary, run_id, now, input_revision,
+                  source=None, shadow=None):
+    """Move every active rule onto the activated revision at one event boundary.
+
+    A rule that the target revision can serve is relocated by a new immutable
+    version: same condition, geometry, limits and delivery choice, only the bound
+    revision changes. Its judgment baseline restarts at the boundary, so no
+    pre-switch value replays as a fresh crossing. A rule the target cannot serve
+    yet is paused with a concrete reason instead of silently kept on frozen input.
+
+    The shadow mapping carries the candidate's own shadow report: a rule it already
+    marks as will_pause (missing indicator, incompatible source, geometry that
+    cannot be relocated) was never allowed to move, because a shifted drawing or a
+    rebuilt ATR reference is a different rule. Both judgements are a union: either
+    one can only pause, never relocate.
+    """
+    from .chart_alert_service import AlertConfig
+
+    aligned, rebound, paused, affected = [], [], [], []
+    for version, alert in bound_rules(db, composite.id, lock=True):
+        config = AlertConfig.model_validate(version.config)
+        current = version.market_identity.get("composite_revision_id")
+        if current == target.id:
+            aligned.append({"id": alert.id, "revision_id": target.id, "version": alert.version})
+            affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
+                             "migration": "aligned_on_target"})
+        elif (shadow or {}).get(alert.id):
+            # The candidate's shadow report already proved this rule cannot move.
+            reason = shadow[alert.id]
+            paused.extend(pause(db, [(version, alert)],
+                reason="组合修订切换后该规则暂不可迁移：" + reason, run_id=run_id, now=now))
+            affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
+                             "migration": "paused_shadow_rule", "reason": reason})
+            continue
+        else:
+            ready, reason = relocatable(db, previous, target, config,
+                version.market_identity, input_revision=input_revision, source=source)
+            if not ready:
+                paused.extend(pause(db, [(version, alert)],
+                    reason="组合修订切换后该规则暂不可迁移：" + reason, run_id=run_id, now=now))
+                affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
+                                 "migration": "paused_target_not_ready", "reason": reason})
+                continue
+            db.add(ChartAlertVersion(alert_id=alert.id, version=alert.version + 1,
+                config={**version.config, "composite_revision_id": target.id},
+                market_identity=identity(db, composite, target, config),
+                dataset_id=version.dataset_id, effective_at=boundary))
+            db.add(Audit(kind="chart_alert_rebound", details={"alert_id": alert.id,
+                "run_id": run_id, "previous_revision_id": current, "revision_id": target.id,
+                "from_version": alert.version, "to_version": alert.version + 1,
+                "boundary": boundary}))
+            rebound.append({"id": alert.id, "revision_id": target.id,
+                            "version": alert.version + 1, "previous_revision_id": current})
+            affected.append({"id": alert.id, "name": alert.name, "revision_id": target.id,
+                             "previous_revision_id": current,
+                             "migration": "relocated_to_activated_revision"})
+            alert.version = alert.version + 1
+        # Both relocated and already-aligned rules start a new judgment baseline.
+        alert.state = {}
+        alert.runtime = {**alert.runtime, "switch_run_id": run_id, "switch_boundary": boundary}
+        alert.effective_at = boundary
+        alert.control_revision += 1
+        alert.health, alert.health_reason = "warming", "组合修订切换后建立新判定基准"
+        alert.updated_at = now
+    return {"aligned": aligned, "rebound": rebound, "paused": paused, "affected": affected,
+            "boundary": boundary}
 
 
 def geometry_rows(db, composite_id, frame, points, *, revision_id=None, input_revision=None, now=None):
@@ -270,6 +438,9 @@ def evaluate(db, alert, version, config, now, *, clock=None):
         return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
     composite = db.get(MarketComposite, identity["composite_id"])
+    if revision and frozen(db.get(CompositePreparation, revision.id)):
+        # Fencing: a judgment round for a switched-away revision writes nothing.
+        return wait(alert, runtime, "blocked", FROZEN_REASON)
     mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
     target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
     if (not composite or composite.permission_scope != "workspace:default" or not revision or
@@ -287,6 +458,11 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     # Explicit historical/test clocks stay fixed; no age is clamped to zero.
     if clock is not None:
         now = clock()
+    from .live_window import lower_bound
+
+    if revision.seam < lower_bound(now):
+        alert.status, alert.control_revision = "paused", alert.control_revision + 1
+        return wait(alert, runtime, "blocked", "实时基线超出30天可用窗口，等待更新历史基线")
     from .realtime_switch import enabled
 
     source_dataset = db.get(MarketDataset, identity["dataset_id"])

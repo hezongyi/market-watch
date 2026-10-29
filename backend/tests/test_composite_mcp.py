@@ -343,6 +343,10 @@ def test_r1_script_cold_to_ready_and_redacts_token(mcp, monkeypatch, tmp_path):
     import json
     from pathlib import Path
 
+    # seed() temporarily fixes the fixture clock, then restores the caller's
+    # clock. Keep the same business time for HTTP reads and indicator warmup.
+    monkeypatch.setattr('alerts.live_window.now_ms', lambda: 200010000)
+    monkeypatch.setattr('alerts.series_access.now_ms', lambda: 200010000)
     client, _, factory = mcp
     path = Path(__file__).resolve().parents[2] / 'scripts/verify_composite_indicators_mcp.py'
     spec = importlib.util.spec_from_file_location('verify_composite_r1', path)

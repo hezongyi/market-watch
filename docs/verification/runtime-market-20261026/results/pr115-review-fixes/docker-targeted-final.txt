@@ -1,0 +1,363 @@
+.....F..........................................FFFFFFF.FFFFFFFFFFFFFF.. [ 96%]
+FFF                                                                      [100%]
+=================================== FAILURES ===================================
+____________ test_long_outage_recovery_never_requests_expired_input ____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc024ca890>
+
+    def test_long_outage_recovery_never_requests_expired_input(database, monkeypatch):
+        from alerts import live_pricing as live
+        from alerts.storage import LiveState
+        from test_live_pricing import running
+    
+        context = running.__wrapped__(database, monkeypatch)
+        factory, ownership, epoch, identities = context
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_track_c_review_fixes.py:132: KeyError
+___ test_one_account_has_one_owner_and_old_owner_cannot_publish_after_expiry ___
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'd120e034-37e5-400c-aebd-d12bd04fe385'), 1, {})
+
+    def test_one_account_has_one_owner_and_old_owner_cannot_publish_after_expiry(running):
+        db_factory, ownership, epoch, identities = running
+        assert live.claim("test-account", now=125001) is None
+        second = live.claim("test-account", now=155001)
+        assert second and second[1] != ownership[1]
+        with pytest.raises(TimeoutError, match="expired"):
+>           live.publish_event(ownership, epoch, quote(identities["EUR_USD"], epoch), identities, now=155002)
+                                                       ^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:57: KeyError
+_ test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '460f3da0-5b02-4efa-81c7-e9e1ee31c064'), 1, {})
+
+    def test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner(running):
+        db_factory, _, _, identities = running
+>       assert set(identities) == {"EUR_USD", "XAU_USD"}
+E       AssertionError: assert set() == {'EUR_USD', 'XAU_USD'}
+E         
+E         Extra items in the right set:
+E         'EUR_USD'
+E         'XAU_USD'
+E         Use -v to get more diff
+
+backend/tests/test_live_pricing.py:65: AssertionError
+_______________ test_disabled_resident_is_not_owned_or_collected _______________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '79337a29-3a8e-479e-95e6-3a361d35aca3'), 1, {})
+
+    def test_disabled_resident_is_not_owned_or_collected(running):
+        factory, _, _, identities = running
+        from alerts.realtime_switch import set_enabled
+        from alerts.storage import MarketDataset
+        with factory.begin() as db:
+>           instrument = db.get(MarketDataset, identities['EUR_USD'].key).instrument_id
+                                               ^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:84: KeyError
+__ test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection ___
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'ce922000-5bd2-4af1-a639-2807b4a06f23'), 1, {})
+
+    def test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection(running):
+        factory, _, _, identities = running
+        from alerts.market_data import renew_demand
+        from alerts.realtime_switch import set_enabled
+        from alerts.storage import Instrument, MarketDataset
+    
+        with factory.begin() as db:
+>           dataset = db.get(MarketDataset, identities['EUR_USD'].key)
+                                            ^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:96: KeyError
+_ test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '9f6ac5a3-9b35-455b-9b8f-a8cebcd061d2'), 1, {})
+
+    def test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced(running):
+        db_factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:108: KeyError
+__ test_publish_reports_committed_outcomes_without_refreshing_rejected_quotes __
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'df453e5a-4cd2-4f34-ada9-0b9a1117412d'), 1, {})
+
+    def test_publish_reports_committed_outcomes_without_refreshing_rejected_quotes(running):
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:130: KeyError
+___ test_old_connection_epoch_messages_are_rejected_even_when_token_is_same ____
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '9c17240e-0dde-4306-954d-2f8525929aab'), 1, {})
+
+    def test_old_connection_epoch_messages_are_rejected_even_when_token_is_same(running):
+        _, ownership, epoch, identities = running
+        next_epoch = live.begin_connection(ownership, identities, now=126000)
+        assert next_epoch == epoch + 1
+        with pytest.raises(TimeoutError):
+>           live.publish_event(ownership, epoch, quote(identities["EUR_USD"], epoch), identities, now=126000)
+                                                       ^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:155: KeyError
+_________ test_expired_connection_cannot_report_candle_judgment_ready __________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '864ebde9-2fa8-49b7-aaf2-ea1df2b613c9'), 1, {})
+
+    def test_expired_connection_cannot_report_candle_judgment_ready(running):
+        _, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:170: KeyError
+_ test_recovery_and_confirmation_preserve_retired_watch_without_notifications __
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '63e792dc-49a1-4436-b7ab-9bf7ccdfa23c'), 1, {})
+
+    def test_recovery_and_confirmation_preserve_retired_watch_without_notifications(running):
+        db_factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:181: KeyError
+_ test_actual_confirmation_transaction_records_canonical_minutes_and_fences_old_epoch _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'aa1d2f1f-d8c5-4fa5-8620-92b354f53a66'), 1, {})
+
+    def test_actual_confirmation_transaction_records_canonical_minutes_and_fences_old_epoch(running):
+        factory, ownership, epoch, identities = running
+        from alerts.confirmed_minutes import rows
+        from alerts.source_registry import collection_identity
+        from alerts.storage import SourceMinuteRevision
+        from sqlalchemy import func
+    
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:210: KeyError
+_ test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_denominator _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'a63c1c3a-9f68-4827-85d5-6bd2fa6c7a23'), 1, {})
+
+    def test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_denominator(running):
+        _, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:226: KeyError
+_____ test_confirmation_timing_records_completed_ingestion_and_evaluation ______
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '79c4538a-71bd-4d54-99ef-69ce8488a197'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc00a04790>
+
+    def test_confirmation_timing_records_completed_ingestion_and_evaluation(running, monkeypatch):
+        from alerts.storage import LiveMinute
+    
+        db_factory, ownership, epoch, identities = running
+        clock = iter((125000, 125050, 125120))
+        monkeypatch.setattr(live, "now_ms", lambda: next(clock))
+>       live.commit_confirmation(ownership, epoch, candles(identities["EUR_USD"]))
+                                                           ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:245: KeyError
+_________ test_nontradeable_quote_cannot_certify_a_whole_closed_minute _________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'ca45ed5e-7527-40f8-9819-a816eb713a57'), 1, {})
+
+    def test_nontradeable_quote_cannot_certify_a_whole_closed_minute(running):
+        from alerts.storage import LiveMinute
+    
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:261: KeyError
+_______ test_small_latency_samples_do_not_hide_the_slowest_confirmation ________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'c9e86d10-11dc-4bd9-9d46-73068cc35e03'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc0098a3d0>
+
+    def test_small_latency_samples_do_not_hide_the_slowest_confirmation(running, monkeypatch):
+        from alerts.storage import LiveMinute
+    
+        factory, _, _, identities = running
+        monkeypatch.setattr(live, "now_ms", lambda: 400000)
+        with factory.begin() as db:
+            for index, delay in enumerate((1000, 2000, 3000, 4000, 50000)):
+                start = index * 60000
+>               db.add(LiveMinute(dataset_id=identities["EUR_USD"].key, start=start,
+                                             ^^^^^^^^^^^^^^^^^^^^^
+                    expected=True, expectation="observed_source_tradeable", quote_count=1,
+                    confirmed_at=start + 60000 + delay, first_attempt=start + 65000,
+                    last_attempt=start + 65000))
+E               KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:281: KeyError
+_______ test_quote_crossings_after_recovery_never_execute_retired_watch ________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '8b9694f9-d3e8-4f61-9ccc-4c715f734200'), 1, {})
+
+    def test_quote_crossings_after_recovery_never_execute_retired_watch(running):
+        db_factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:292: KeyError
+___________ test_single_symbol_quote_gap_cannot_create_fake_crossing ___________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '46586e96-bbc7-4b08-8b2f-7426b9a78f4c'), 1, {})
+
+    def test_single_symbol_quote_gap_cannot_create_fake_crossing(running):
+        db_factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:317: KeyError
+_____________ test_invalid_spread_breaks_tick_judgment_continuity ______________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'a3dfd0e9-4ccf-4276-ba41-b42f07c53247'), 1, {})
+
+    def test_invalid_spread_breaks_tick_judgment_continuity(running):
+        from alerts.storage import MarketDataset
+    
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:335: KeyError
+_ test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness __
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '845ef0f5-6ecc-4d1d-b323-c56b07845b59'), 1, {})
+
+    def test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness(running):
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:355: KeyError
+___ test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline ____
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'e5665cd3-b012-49f8-91bb-9a62c7549a6e'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc00c8c410>
+
+    def test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline(running, monkeypatch):
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:382: KeyError
+__ test_rest_batch_demand_revision_fences_inflight_response_before_any_write ___
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'bedf9d0c-d2e6-434b-b90c-c56e666bc03e'), 1, {})
+
+    def test_rest_batch_demand_revision_fences_inflight_response_before_any_write(running):
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:401: KeyError
+______ test_rest_batch_repeated_complete_head_skips_confirmation_rewrite _______
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '38e2f697-0ee1-4d27-9ccd-8d348a3bab52'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc01b1dc90>
+
+    def test_rest_batch_repeated_complete_head_skips_confirmation_rewrite(running, monkeypatch):
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:421: KeyError
+______ test_missing_quote_side_or_crossed_spread_cannot_report_tick_ready ______
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '8d1be1dd-c9ca-4457-b282-846c2eafde51'), 1, {})
+
+    def test_missing_quote_side_or_crossed_spread_cannot_report_tick_ready(running):
+        _, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:462: KeyError
+_____________ test_indicator_recovery_never_rewarms_retired_watch ______________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '10068a72-776f-476f-8295-7786e507ab31'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7efc00911910>
+
+    def test_indicator_recovery_never_rewarms_retired_watch(running, monkeypatch):
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:472: KeyError
+_ test_confirmation_with_unrelated_uncollectable_dataset_retires_only_same_source _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '0f4dc619-07c5-44ce-bb2b-6e6b9c0fce04'), 1, {})
+
+    def test_confirmation_with_unrelated_uncollectable_dataset_retires_only_same_source(running):
+        """Mixed-provider catalogs must not roll back OANDA confirmation commits."""
+        from alerts.market_contracts import DatasetIdentity
+        from alerts.market_datasets import register_dataset
+        from alerts.storage import ObservedMinute
+    
+        factory, ownership, epoch, identities = running
+>       identity = identities["EUR_USD"]
+                   ^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'EUR_USD'
+
+backend/tests/test_live_pricing.py:504: KeyError
+=========================== short test summary info ============================
+FAILED backend/tests/test_track_c_review_fixes.py::test_long_outage_recovery_never_requests_expired_input
+FAILED backend/tests/test_live_pricing.py::test_one_account_has_one_owner_and_old_owner_cannot_publish_after_expiry
+FAILED backend/tests/test_live_pricing.py::test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner
+FAILED backend/tests/test_live_pricing.py::test_disabled_resident_is_not_owned_or_collected
+FAILED backend/tests/test_live_pricing.py::test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection
+FAILED backend/tests/test_live_pricing.py::test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced
+FAILED backend/tests/test_live_pricing.py::test_publish_reports_committed_outcomes_without_refreshing_rejected_quotes
+FAILED backend/tests/test_live_pricing.py::test_old_connection_epoch_messages_are_rejected_even_when_token_is_same
+FAILED backend/tests/test_live_pricing.py::test_expired_connection_cannot_report_candle_judgment_ready
+FAILED backend/tests/test_live_pricing.py::test_recovery_and_confirmation_preserve_retired_watch_without_notifications
+FAILED backend/tests/test_live_pricing.py::test_actual_confirmation_transaction_records_canonical_minutes_and_fences_old_epoch
+FAILED backend/tests/test_live_pricing.py::test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_denominator
+FAILED backend/tests/test_live_pricing.py::test_confirmation_timing_records_completed_ingestion_and_evaluation
+FAILED backend/tests/test_live_pricing.py::test_nontradeable_quote_cannot_certify_a_whole_closed_minute
+FAILED backend/tests/test_live_pricing.py::test_small_latency_samples_do_not_hide_the_slowest_confirmation
+FAILED backend/tests/test_live_pricing.py::test_quote_crossings_after_recovery_never_execute_retired_watch
+FAILED backend/tests/test_live_pricing.py::test_single_symbol_quote_gap_cannot_create_fake_crossing
+FAILED backend/tests/test_live_pricing.py::test_invalid_spread_breaks_tick_judgment_continuity
+FAILED backend/tests/test_live_pricing.py::test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness
+FAILED backend/tests/test_live_pricing.py::test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline
+FAILED backend/tests/test_live_pricing.py::test_rest_batch_demand_revision_fences_inflight_response_before_any_write
+FAILED backend/tests/test_live_pricing.py::test_rest_batch_repeated_complete_head_skips_confirmation_rewrite
+FAILED backend/tests/test_live_pricing.py::test_missing_quote_side_or_crossed_spread_cannot_report_tick_ready
+FAILED backend/tests/test_live_pricing.py::test_indicator_recovery_never_rewarms_retired_watch
+FAILED backend/tests/test_live_pricing.py::test_confirmation_with_unrelated_uncollectable_dataset_retires_only_same_source
+25 failed, 50 passed in 54.11s
+

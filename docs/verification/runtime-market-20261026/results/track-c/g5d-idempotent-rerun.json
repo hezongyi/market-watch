@@ -1,0 +1,136 @@
+{
+  "before": {
+    "market_source_minutes": 17197,
+    "market_source_minutes@old": 1081,
+    "market_source_minute_revisions": 17197,
+    "market_source_minute_revisions@old": 1081,
+    "market_composite_minutes": 53161,
+    "market_composite_minutes@old": 2078,
+    "market_composite_minute_inputs": 53161,
+    "market_composite_minute_inputs@old": 2078,
+    "market_composite_input_events": 84,
+    "lower_bound": 1790617680342
+  },
+  "after": {
+    "market_source_minutes": 17197,
+    "market_source_minutes@old": 1081,
+    "market_source_minute_revisions": 17197,
+    "market_source_minute_revisions@old": 1081,
+    "market_composite_minutes": 53161,
+    "market_composite_minutes@old": 2078,
+    "market_composite_minute_inputs": 53161,
+    "market_composite_minute_inputs@old": 2078,
+    "market_composite_input_events": 84,
+    "lower_bound": 1790617680569
+  },
+  "delta": {
+    "market_source_minutes": 0,
+    "market_source_minutes@old": 0,
+    "market_source_minute_revisions": 0,
+    "market_source_minute_revisions@old": 0,
+    "market_composite_minutes": 0,
+    "market_composite_minutes@old": 0,
+    "market_composite_minute_inputs": 0,
+    "market_composite_minute_inputs@old": 0,
+    "market_composite_input_events": 0
+  },
+  "report": {
+    "run": {
+      "id": "2c49fa1b-3920-45af-9f91-864c54a7de79",
+      "kind": "revision_activation",
+      "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+      "state": "succeeded",
+      "unlocked": true,
+      "finished_at": 1793209172193,
+      "batch": {
+        "batch_id": "9ca2c28e-5656-4084-b9f0-0112c8f69575",
+        "state": "completed",
+        "dry_run": false,
+        "claimed_at": 1793209670798,
+        "released_at": 1793209670856,
+        "attempts": 4,
+        "stats": {
+          "rows": 192,
+          "bytes": 72149,
+          "deleted": {
+            "market_composite_minute_inputs": 46,
+            "market_composite_minutes": 46,
+            "market_composite_input_events": 0,
+            "market_source_minutes": 46,
+            "market_source_minute_revisions": 54
+          },
+          "remaining": {
+            "source_minutes": 1081,
+            "source_revisions": 0
+          },
+          "at": 1793209670853
+        }
+      }
+    },
+    "dry_run": false,
+    "window_hours": 720,
+    "lower_bound": 1790617680546,
+    "now": 1793209680546,
+    "deleted": {
+      "market_composite_minute_inputs": 0,
+      "market_composite_minutes": 0,
+      "market_composite_input_events": 0,
+      "market_source_minutes": 0,
+      "market_source_minute_revisions": 0
+    },
+    "rows": 0,
+    "bytes": 0,
+    "candidates": {
+      "source_minutes": 0,
+      "source_revisions": 0,
+      "composite_minutes": 0,
+      "composite_inputs": 0,
+      "composite_input_events": 0
+    },
+    "protected": {
+      "revisions": 0,
+      "by_reason": {},
+      "detail": [],
+      "detail_truncated": false
+    },
+    "remaining": null,
+    "batch": {
+      "id": "9ca2c28e-5656-4084-b9f0-0112c8f69575",
+      "state": "completed",
+      "dry_run": false,
+      "attempts": 4,
+      "stats": {
+        "rows": 192,
+        "bytes": 72149,
+        "deleted": {
+          "market_composite_minute_inputs": 46,
+          "market_composite_minutes": 46,
+          "market_composite_input_events": 0,
+          "market_source_minutes": 46,
+          "market_source_minute_revisions": 54
+        },
+        "remaining": {
+          "source_minutes": 1081,
+          "source_revisions": 0
+        },
+        "at": 1793209670853
+      }
+    },
+    "skipped": [
+      {
+        "reason": "batch_completed",
+        "detail": "该切换运行的清理批次已完成；同一运行 ID 重跑不再删除"
+      }
+    ],
+    "limit": 5000,
+    "chunk": 500,
+    "budget_ms": 20000,
+    "idempotent": true
+  },
+  "inside_window": {
+    "source_minutes_inside_window": 16116,
+    "bars": 39986,
+    "history_chunks": 33,
+    "history_artifacts": 126
+  }
+}

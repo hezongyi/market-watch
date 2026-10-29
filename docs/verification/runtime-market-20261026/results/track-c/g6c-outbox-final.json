@@ -1,0 +1,22 @@
+{
+  "run_id": "5cf1f9b2-b727-4862-b43e-08957d75b2b2",
+  "notification_id": "7e88bb2e-1fae-5839-a768-0b27bc88ccf6",
+  "outbox_rows": 1,
+  "outbox_id": "e12eaf20-10de-53ef-afd7-a918680e81fa",
+  "status": "pending",
+  "attempts": 0,
+  "errors": [
+    [
+      "metrics",
+      "ValueError",
+      2
+    ],
+    [
+      "fence",
+      "ValueError",
+      1
+    ]
+  ],
+  "payload_attempts": 2,
+  "payload_state": "partial"
+}

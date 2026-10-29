@@ -32,6 +32,16 @@ PROOF = {"underlying": "EUR", "quote_currency": "USD", "historical_product": "sp
 
 
 def prepare(database, monkeypatch):
+    # These fixture candles use an explicit 1970 business clock. Live-tail
+    # availability must use that same clock rather than the host wall clock.
+    monkeypatch.setattr("alerts.live_window.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.composite_preparation.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.baseline_shadow.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.composite_series.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.composite_chart.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.chart_alert_geometry.now_ms", lambda: 200010000)
+    monkeypatch.setattr("alerts.series_access.now_ms", lambda: 200010000)
     monkeypatch.setattr(settings, "oanda_account_id", "composite-test-account")
     monkeypatch.setattr(settings, "oanda_token", "test-token")
     catalog_id = "HC:" + "a" * 36

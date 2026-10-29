@@ -1,0 +1,24 @@
+total 13768
+-rw------- 1 1000 1000 7043323 Oct 28 15:20 alerts-20261028T152036231475Z.dump
+-rw------- 1 1000 1000    3514 Oct 28 15:20 alerts-20261028T152036231475Z.dump.json
+-rw------- 1 1000 1000 7043391 Oct 28 15:20 retention-restore-eddde0c35c914965a0125cbcaead8c5a.dump
+-rw------- 1 1000 1000    3514 Oct 28 15:20 retention-restore-eddde0c35c914965a0125cbcaead8c5a.dump.json
+---
+e1d55632acd6748bb410f42c5c851b3fd4dadcc25a02879d31a836f7cb8e33d6  /artifacts/backups/alerts-20261028T152036231475Z.dump
+26e07eb9d19c2986f94344475fda0adc3414745ac2142f78b8fd48428d4dd03a  /artifacts/backups/retention-restore-eddde0c35c914965a0125cbcaead8c5a.dump
+---manifest---
+{
+  "format": 1,
+  "backend": "postgresql",
+  "created_at": 1793200837934,
+  "sha256": "e1d55632acd6748bb410f42c5c851b3fd4dadcc25a02879d31a836f7cb8e33d6",
+  "bytes": 7043323,
+  "counts": {
+    "ack_grants": 0,
+    "advanced_chart_preferences": 0,
+    "advanced_chart_workspaces": 0,
+    "agent_credentials": 0,
+    "agent_operations": 0,
+    "audit_events": 323,
+    "candles": 5952,
+    "chart_aggre

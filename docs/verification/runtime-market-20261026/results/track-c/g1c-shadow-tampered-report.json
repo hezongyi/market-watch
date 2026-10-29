@@ -1,0 +1,214 @@
+{
+  "run": {
+    "id": "33567e42-ef29-40bf-ace4-b455bf703df9",
+    "kind": "baseline_shadow",
+    "state": "failed",
+    "phase": "shadow_failed",
+    "attempts": 0,
+    "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+    "previous_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+    "target_revision_id": "e808c0a1-6c1b-4362-8e1d-339451ee2498",
+    "scheduled_for": 1799542800000,
+    "started_at": 1793202039943,
+    "finished_at": 1793202039948,
+    "error_summary": {
+      "status": "failed",
+      "candidate_revision_id": "e808c0a1-6c1b-4362-8e1d-339451ee2498",
+      "reasons": [
+        {
+          "code": "binding_changed",
+          "detail": "有效绑定在 shadow 运行期间发生变化"
+        }
+      ]
+    }
+  },
+  "report": {
+    "schema": "baseline-shadow-v1",
+    "status": "failed",
+    "ready": false,
+    "reasons": [
+      {
+        "code": "binding_changed",
+        "detail": "有效绑定在 shadow 运行期间发生变化"
+      }
+    ],
+    "bindings": {
+      "tables": {
+        "alerts": {
+          "rows": 1,
+          "digest": "5001fc60f0f030ae68c64beb94751c9489c42c90dd68f3a82c643ebcda6a5d83",
+          "unchanged": true
+        },
+        "alert_versions": {
+          "rows": 3,
+          "digest": "6bb290bf519496093122188d5f65e41ee0d8456b922643b1d38a9f53dfc53f94",
+          "unchanged": false
+        },
+        "publications": {
+          "rows": 1,
+          "digest": "cb4b290d7c6c1b825e22170c3e539f119a821d23d79b1d1088c7f901efa98429",
+          "unchanged": false
+        },
+        "realtime_preferences": {
+          "rows": 2,
+          "digest": "64c9018629480175703152c2b85683bcae5fb73e1233a0f5370b6f51758c6523",
+          "unchanged": true
+        }
+      },
+      "active_revision_id": {
+        "before": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+        "after": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+        "unchanged": true
+      },
+      "critical_unchanged": false,
+      "scope": {
+        "instruments": [
+          "MC:7e3cad2f3c44fb5f880e3e47f:EURUSD",
+          "MD:99f162c8154844e06f38715e6:EURUSD",
+          "MD:d00bcccac45564a6b05a41634:EURUSD"
+        ],
+        "alert_ids": [
+          "45bfd944-1bbd-4e49-8451-d563e123c487"
+        ],
+        "realtime_keys": [
+          "managed_realtime:MC:7e3cad2f3c44fb5f880e3e47f:EURUSD",
+          "managed_realtime:MD:99f162c8154844e06f38715e6:EURUSD",
+          "managed_realtime:MD:d00bcccac45564a6b05a41634:EURUSD"
+        ]
+      }
+    },
+    "preparation": {
+      "ready": true,
+      "status": "ready",
+      "input_revision": 2,
+      "cutoff": 1793201400000,
+      "periods_ready": true,
+      "indicators": [],
+      "query_error": null,
+      "coverage": "per-bar; readiness does not certify all historical coverage",
+      "aggregates": [
+        {
+          "timeframe": "M1",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201454755
+        },
+        {
+          "timeframe": "M5",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201449409
+        },
+        {
+          "timeframe": "M15",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201445491
+        },
+        {
+          "timeframe": "M30",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201439303
+        },
+        {
+          "timeframe": "H1",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201424379
+        },
+        {
+          "timeframe": "H4",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201429778
+        },
+        {
+          "timeframe": "D1",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201427068
+        },
+        {
+          "timeframe": "W1",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201432709
+        },
+        {
+          "timeframe": "MN",
+          "status": "caught_up",
+          "applied_input_revision": 2,
+          "input_revision": 2,
+          "offset": 0,
+          "working": false,
+          "error": null,
+          "next_at": 0,
+          "updated_at": 1793201436258
+        }
+      ]
+    },
+    "run": {
+      "id": "33567e42-ef29-40bf-ace4-b455bf703df9",
+      "kind": "baseline_shadow",
+      "state": "preparing",
+      "attempts": 0,
+      "scheduled_for": 1799542800000
+    },
+    "history_version": {
+      "latest_available_version_id": "5eef2e1b-84e9-4e50-a0aa-da5a1b8f3bde",
+      "candidate_version_id": "5eef2e1b-84e9-4e50-a0aa-da5a1b8f3bde",
+      "active_version_id": "f4314218-1cbf-407c-ade7-d95226cd3961",
+      "same_version": false
+    },
+    "revision": {
+      "active_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+      "active_seam": 1792098000000,
+      "candidate_revision_id": "e808c0a1-6c1b-4362-8e1d-339451ee2498",
+      "candidate_seam": 1792789200000,
+      "request_id": "shadow:c63911ff2edc525a7470b64163655d34cacdcaeed0d72dd9629f1794",
+      "history_version_id": "5eef2e1b-84e9-4e50-a0aa-da5a1b8f3bde",
+      "mapping_id": "75c8d4b0e7b7e5b9d314ffdaa1830bbc60159ec613d51fb6084caf3b83322950"
+    }
+  }
+}

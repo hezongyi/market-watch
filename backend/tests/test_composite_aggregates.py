@@ -95,7 +95,7 @@ def test_partial_event_checkpoint_does_not_publish_stale_page(database, monkeypa
         assert db.get(CompositeAggregateTask, (revision, "M1")).offset == 0
 
 
-def test_sparse_long_tail_and_exclusive_pages_use_persisted_buckets(database, monkeypatch):
+def test_expired_persisted_buckets_are_not_served_and_pages_stay_exclusive(database, monkeypatch):
     composite, revision, seam = populated(database, monkeypatch)
     times = [seam + day * 86400000 for day in (50, 100, 150)]
     with database.begin() as db:
@@ -106,12 +106,15 @@ def test_sparse_long_tail_and_exclusive_pages_use_persisted_buckets(database, mo
         seen, before = [], None
         for _ in range(10):
             page = chart_page(db, composite, "MN", before=before, count=1, now=times[-1] + 100000)
-            assert page["materialized"] and page["bounded_partitions"] == 0
+            assert not page["materialized"] and page["bounded_partitions"] <= 4
             seen += [bar["start"] for bar in page["bars"]]
             before = page["next_before"]
             if before is None:
                 break
-        assert len(seen) == len(set(seen)) == 4
+        from alerts.composite_series import period
+
+        expected = {period(at, "MN", "ny17")[0] for at in (0, times[-1])}
+        assert len(seen) == len(set(seen)) == 2 and set(seen) == expected
 
 
 def test_bucket_time_closure_updates_without_new_input_and_pending_seam_is_retained(database, monkeypatch):

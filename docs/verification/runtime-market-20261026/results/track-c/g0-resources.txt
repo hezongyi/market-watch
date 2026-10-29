@@ -1,0 +1,62 @@
+== date ==
+2026-10-28T14:53:12Z
+== docker ps (all, with project label) ==
+mw-a08-gap-pg	postgres:14.24-bookworm	Up 14 minutes		
+mw-v200rc1-restore-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 7 minutes ago	mw-v200rc1-restore-20261028	
+mw-track-c-20261028-postgres-1	postgres:14.24-bookworm	Up 28 minutes (healthy)	mw-track-c-20261028	acceptance
+mw-stage5-a09-20261028-fixture-supplier-1	995534fb1c82	Exited (143) 3 hours ago	mw-stage5-a09-20261028	acceptance
+mw-stage5-a09-20261028-data-worker-1	995534fb1c82	Exited (0) 3 hours ago	mw-stage5-a09-20261028	acceptance
+mw-stage5-a09-20261028-market-runtime-1	995534fb1c82	Exited (0) 3 hours ago	mw-stage5-a09-20261028	acceptance
+mw-stage5-a09-20261028-notification-worker-1	995534fb1c82	Exited (0) 3 hours ago	mw-stage5-a09-20261028	acceptance
+mw-stage5-a09-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 3 hours ago	mw-stage5-a09-20261028	acceptance
+mw-stage5-review-20261028-data-worker-1	995534fb1c82	Exited (0) 3 hours ago	mw-stage5-review-20261028	acceptance
+mw-stage5-review-20261028-notification-worker-1	995534fb1c82	Exited (0) 3 hours ago	mw-stage5-review-20261028	acceptance
+mw-stage5-review-20261028-fixture-supplier-1	995534fb1c82	Exited (143) 3 hours ago	mw-stage5-review-20261028	acceptance
+mw-stage5-review-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 3 hours ago	mw-stage5-review-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-market-runtime-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-notification-worker-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-web-1	43c51c707e8c	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-api-1	995534fb1c82	Exited (143) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-data-worker-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-fixture-rebaseline-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-fixture-supplier-1	995534fb1c82	Exited (143) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-fixture-seed-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-a17a-20261028-migrate-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-topup-20261028-fixture-supplier-1	995534fb1c82	Exited (137) 4 hours ago	mw-runtime-stage5-topup-20261028	acceptance
+mw-runtime-stage5-topup-20261028-data-worker-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-topup-20261028	acceptance
+mw-runtime-stage5-topup-20261028-market-runtime-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-topup-20261028	acceptance
+mw-runtime-stage5-topup-20261028-api-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-topup-20261028	acceptance
+mw-runtime-stage5-topup-20261028-notification-worker-1	995534fb1c82	Exited (0) 4 hours ago	mw-runtime-stage5-topup-20261028	acceptance
+mw-runtime-stage5-topup-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 4 hours ago	mw-runtime-stage5-topup-20261028	acceptance
+mw-stage5-a16-k3b7-postgres-1	postgres:14-bookworm	Exited (0) 4 hours ago	mw-stage5-a16-k3b7	acceptance
+mw-runtime-stage5-a17a-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 4 hours ago	mw-runtime-stage5-a17a-20261028	acceptance
+mw-runtime-stage5-notifications-20261028-contracts-1	995534fb1c82	Exited (0) 7 hours ago	mw-runtime-stage5-notifications-20261028	
+mw-runtime-stage5-notifications-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 7 hours ago	mw-runtime-stage5-notifications-20261028	
+mw-runtime-stage5-data-20261028-contracts-1	995534fb1c82	Exited (0) 7 hours ago	mw-runtime-stage5-data-20261028	
+mw-runtime-stage5-data-20261028-postgres-1	postgres:14.24-bookworm	Exited (0) 7 hours ago	mw-runtime-stage5-data-20261028	
+buildx_buildkit_market-watch-ubuntu0	market-watch-buildkit:0.33.1-official	Up 12 days		
+== our project containers ==
+mw-track-c-20261028-postgres-1	Up 28 minutes (healthy)	127.0.0.1:15612->5432/tcp	mw-track-c-20261028	acceptance
+== networks ==
+mw-track-c-20261028	bridge	com.docker.compose.network=mw-track-c,com.docker.compose.project=mw-track-c-20261028,com.docker.compose.version=2.40.3,market-watch.project=mw-track-c-20261028,market-watch.purpose=acceptance,market-watch.task=mw-track-c-20261028,com.docker.compose.config-hash=3415e410bc622736069406b6345827df9b1a0dca7626881f2efcac7078b1223e
+== volumes ==
+mw-track-c-20261028-postgres	com.docker.compose.volume=mw-track-c-postgres,market-watch.project=mw-track-c-20261028,market-watch.purpose=acceptance,market-watch.task=mw-track-c-20261028,com.docker.compose.config-hash=56c1dd4842da9545e5d72e420191d1999fa20d58f2132d38736e2750982a569f,com.docker.compose.project=mw-track-c-20261028,com.docker.compose.version=2.40.3
+== images ==
+[market-watch-api:v1.29.1-rc.2] market-watch-api@sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743 sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+[postgres:14.24-bookworm] postgres@sha256:a389ed49344afc8f4444efd4eb512965df07aaa6ed84b239b54a23246e9fe347 sha256:a389ed49344afc8f4444efd4eb512965df07aaa6ed84b239b54a23246e9fe347
+== listening tcp ports ==
+22 53 111 1053 3080 3081 5500 7890 9090 15612 19988 34443 35057 38705 38951 40981 43015 43517 43885 44217 45309 45975 46345 
+== resources ==
+               total        used        free      shared  buff/cache   available
+Mem:           15984        6142         525         161        9316        9339
+/dev/mapper/ubuntu--vg-ubuntu--lv  142G  125G  9.9G  93% /
+4
+== compose services ==
+postgres
+migrate
+notification-worker
+api
+data-worker
+market-runtime
+== compose ports ==
+{"api": [{"host_ip": "127.0.0.1", "mode": "ingress", "protocol": "tcp", "published": "18091", "target": 8000}], "postgres": [{"host_ip": "127.0.0.1", "mode": "ingress", "protocol": "tcp", "published": "15612", "target": 5432}]}

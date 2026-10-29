@@ -2,9 +2,11 @@
 
 from sqlalchemy import or_, select
 
+from .composite_inputs import frozen
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
+    CompositePreparation,
     CompositeRevision,
     MarketComposite,
     MarketDemand,
@@ -58,7 +60,24 @@ def composite_targets(db, wanted):
             continue
         revision_id = version.market_identity.get("composite_revision_id")
         revision = db.get(CompositeRevision, revision_id) if revision_id else None
-        if revision and revision_enabled(db, revision):
+        # A frozen revision ends its own acquisition demand. Only the case the
+        # running revision needs the very same target keeps contributing it, where
+        # the demand is one and the same rather than an extra one. A source switch
+        # points at a different target, so the switched-away demand is dropped and
+        # the shared source keeps serving every other valid consumer.
+        if revision is None:
+            continue
+        if frozen(db.get(CompositePreparation, revision.id)):
+            running = db.get(CompositeRevision, db.scalar(select(
+                MarketComposite.active_revision_id).where(
+                MarketComposite.id == revision.composite_id)) or "")
+            if running is None or running.id == revision.id or db.scalar(
+                    select(RealtimeMapping.target_dataset_id).where(
+                        RealtimeMapping.id == running.mapping_id)) != db.scalar(
+                    select(RealtimeMapping.target_dataset_id).where(
+                        RealtimeMapping.id == revision.mapping_id)):
+                continue
+        if revision_enabled(db, revision):
             target = db.scalar(select(RealtimeMapping.target_dataset_id).where(
                 RealtimeMapping.id == revision.mapping_id))
             if target:

@@ -1,0 +1,143 @@
+# Track C acceptance (A04a/A04b/A05/A13a-b-c) in one isolated Compose project.
+# Backend services run the cached dependency image with this worktree's source
+# mounted read-only; no provider, Yahoo, or notification delivery IO is enabled.
+x-backend: &backend
+  image: sha256:995534fb1c8238b5a71f2155017bafe439000c6f0cb78708f17471d2c6542743
+  working_dir: /candidate
+  # This worktree is private (0700/0600, uid 1000); the image's "app" user is
+  # 10001 and cannot traverse it, so the services run as the host owner uid.
+  user: "1000:1000"
+  volumes:
+    - ../..:/candidate:ro
+  environment: &backend-environment
+    PYTHONPATH: /candidate/backend
+    ALERTS_DATABASE_URL: postgresql+psycopg://track_c:track_c_acceptance_only@postgres/track_c_acceptance
+    ALERTS_DATABASE_EXPECTED_VERSION: "140024"
+    ALERTS_DATABASE_JIT: "off"
+    ALERTS_DATABASE_MAX_OVERFLOW: "0"
+    ALERTS_RUNTIME_DEPLOYMENT: track_c_acceptance
+    ALERTS_OANDA_NATIVE_LATEST_OWNER: provider
+    ALERTS_OANDA_STREAM_ENABLED: "false"
+    ALERTS_OANDA_RESIDENT_SYMBOLS: ""
+    ALERTS_OANDA_ACCOUNT_ID: track-c-acceptance-account
+    ALERTS_OANDA_TOKEN: track-c-acceptance-token
+    ALERTS_YAHOO_ENABLED: "false"
+    ALERTS_DELIVERY_ENABLED: "false"
+    ALERTS_HISTORY_HEALTH_WORKERS: '[]'
+    # Track C switches: a ready candidate activates without a per-switch approval;
+    # retention only reports until the acceptance explicitly flips it to execute.
+    ALERTS_SWITCH_AUTO_ACTIVATE_ENABLED: "true"
+    ALERTS_RETENTION_MODE: dry_run
+  restart: unless-stopped
+  labels: &labels
+    market-watch.task: mw-track-c-20261028
+    market-watch.project: mw-track-c-20261028
+    market-watch.purpose: acceptance
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: track_c_acceptance
+      POSTGRES_USER: track_c
+      POSTGRES_PASSWORD: track_c_acceptance_only
+    ports: ["127.0.0.1:15612:5432"]
+    volumes: [mw-track-c-postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -U track_c -d track_c_acceptance && test \"$$(PGOPTIONS='-c jit=on' psql -U track_c -d track_c_acceptance -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+    labels: *labels
+    networks: [mw-track-c]
+  migrate:
+    <<: *backend
+    command: [alembic, upgrade, head]
+    restart: "no"
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [mw-track-c]
+  api:
+    <<: *backend
+    command: [python, -m, uvicorn, alerts.api:app, --host, 0.0.0.0, --port, "8000"]
+    environment:
+      <<: *backend-environment
+      ALERTS_COOKIE_SECURE: "false"
+    ports: ["127.0.0.1:18091:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 4s
+      retries: 12
+      start_period: 15s
+    networks: [mw-track-c]
+  market-runtime:
+    <<: *backend
+    command: [python, -m, alerts.runtime, --profile, market]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: "6"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-track-c-market
+      # No provider is reachable in this instance, so the live alert worker would
+      # pause every seeded rule on its first round. Judgment evidence is seeded
+      # explicitly instead; the switch and fencing paths do not depend on it.
+      ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: "false"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    networks: [mw-track-c]
+  data-worker:
+    <<: *backend
+    command: [python, -m, alerts.runtime, --profile, data]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: "16"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-track-c-data
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    networks: [mw-track-c]
+  notification-worker:
+    <<: *backend
+    command: [python, -m, alerts.runtime, --profile, notifications]
+    environment:
+      <<: *backend-environment
+      ALERTS_DATABASE_POOL_SIZE: "4"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-track-c-notifications
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    networks: [mw-track-c]
+  # Track C: the production backup entry (deploy/Dockerfile.backup) copies
+  # pg_dump/pg_restore into the app image and points ALERTS_POSTGRES_BIN_DIR at
+  # them. No image is built here, so the same two tools (plus the four shared
+  # libraries this image lacks) are staged from the pinned PostgreSQL image into
+  # a task-private directory and mounted read-only.
+  backup:
+    <<: *backend
+    command: [python, -m, alerts.backup, --directory, /artifacts/backups]
+    environment:
+      <<: *backend-environment
+      ALERTS_POSTGRES_BIN_DIR: /opt/pgbin/bin
+      LD_LIBRARY_PATH: /opt/pgbin/libs
+    volumes:
+      - ../..:/candidate:ro
+      - mw-track-c-artifacts:/artifacts
+      - ${MW_TC_PG_BIN:-/home/quant/tc-scratch/tc-backup-bin}:/opt/pgbin:ro
+    restart: "no"
+    # Same shape as compose.production.yaml: the backup entry only runs when the
+    # maintenance profile is selected explicitly.
+    profiles: [maintenance]
+    depends_on:
+      postgres: {condition: service_healthy}
+    networks: [mw-track-c]
+networks:
+  mw-track-c:
+    name: mw-track-c-20261028
+    labels: *labels
+volumes:
+  mw-track-c-postgres:
+    name: mw-track-c-20261028-postgres
+    labels: *labels
+  mw-track-c-artifacts:
+    name: mw-track-c-20261028-artifacts
+    labels: *labels

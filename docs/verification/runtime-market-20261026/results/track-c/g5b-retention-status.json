@@ -1,0 +1,23 @@
+{
+  "deletion_order": [
+    "market_composite_minute_inputs",
+    "market_composite_minutes",
+    "market_composite_input_events",
+    "market_source_minutes",
+    "market_source_minute_revisions"
+  ],
+  "marker": {
+    "artifact": "/artifacts/backups/retention-restore-eddde0c35c914965a0125cbcaead8c5a.dump",
+    "backend": "postgresql",
+    "bytes": 7043391,
+    "schema": {
+      "alembic": "ba54_market_switch_runs",
+      "digest": "5eeb6d1345cc62a9f84dd345cb1c685b5525edb3ed9c0a4b250b36a95d31958d",
+      "tables": 104
+    },
+    "sha256": "26e07eb9d19c2986f94344475fda0adc3414745ac2142f78b8fd48428d4dd03a",
+    "tables": 103,
+    "verified_at": 1793200863185
+  },
+  "window_hours": 720
+}

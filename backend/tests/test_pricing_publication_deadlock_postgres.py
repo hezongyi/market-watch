@@ -41,6 +41,7 @@ def test_publisher_plan_progress_does_not_deadlock_confirmed_pricing(
     monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD")
     monkeypatch.setattr(settings, "oanda_recovery_minutes", 2)
     monkeypatch.setattr(live, "now_ms", lambda: 125000)
+    monkeypatch.setattr("alerts.live_window.now_ms", lambda: 125000)
     monkeypatch.setattr(managed_dataset, "now_ms", lambda: 125000)
     monkeypatch.setattr(publication_schedule, "discover", lambda *_: None)
     live.ensure_catalog([
@@ -185,6 +186,7 @@ def test_plan_lifecycle_does_not_deadlock_confirmed_pricing(provider_pg, monkeyp
     monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD")
     monkeypatch.setattr(settings, "oanda_recovery_minutes", 2)
     monkeypatch.setattr(live, "now_ms", lambda: 125000)
+    monkeypatch.setattr("alerts.live_window.now_ms", lambda: 125000)
     live.ensure_catalog([{"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5}],
                         "plan-completion-account")
     with factory.begin() as db:

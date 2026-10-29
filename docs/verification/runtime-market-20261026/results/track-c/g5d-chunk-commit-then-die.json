@@ -1,0 +1,33 @@
+{
+  "chunk_bytes": 239104,
+  "chunk_deleted": {
+    "market_composite_input_events": 2,
+    "market_composite_minute_inputs": 464,
+    "market_composite_minutes": 464,
+    "market_source_minute_revisions": 464,
+    "market_source_minutes": 464
+  },
+  "claimed_batch": {
+    "attempts": 0,
+    "batch_id": null,
+    "dry_run": null,
+    "state": "succeeded"
+  },
+  "durable_state_after_commit": "running",
+  "durable_stats_after_commit": {
+    "at": 1793209661272,
+    "bytes": 239104,
+    "deleted": {
+      "market_composite_input_events": 2,
+      "market_composite_minute_inputs": 464,
+      "market_composite_minutes": 464,
+      "market_source_minute_revisions": 464,
+      "market_source_minutes": 464
+    },
+    "remaining": null,
+    "rows": 1858
+  },
+  "head": "9c5a08015b68868ab92c68bb5b15ae86eda16f67",
+  "note": "process exits immediately after the chunk commit, before release",
+  "run_id": "2c49fa1b-3920-45af-9f91-864c54a7de79"
+}

@@ -23,12 +23,27 @@ from .storage import (
 )
 
 
+def frozen(prep):
+    """A superseded revision keeps its waterline and accepts no new input."""
+    return bool(prep is not None and prep.state.get("revision_frozen"))
+
+
+def unfrozen():
+    """Live fan-out and aggregate claim skip frozen revisions; missing means live."""
+    return CompositePreparation.state["revision_frozen"].as_boolean().is_not(True)
+
+
 def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation"):
     if not recorded["minutes"]:
         return []
+    from .live_window import require_window
+
+    require_window(min(item["start"] for item in recorded["minutes"]))
     query = select(CompositeRevision, MarketDataset).join(
         RealtimeMapping, CompositeRevision.mapping_id == RealtimeMapping.id).join(
-        MarketDataset, RealtimeMapping.target_dataset_id == MarketDataset.id)
+        MarketDataset, RealtimeMapping.target_dataset_id == MarketDataset.id).join(
+        CompositePreparation, CompositePreparation.revision_id == CompositeRevision.id).where(
+        unfrozen())
     if revision_id:
         query = query.where(CompositeRevision.id == revision_id)
     output = []
@@ -51,6 +66,8 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
             CompositePreparation.revision_id == revision.id).with_for_update())
         if not prep:
             raise ValueError("Composite preparation missing")
+        if frozen(prep):
+            continue  # The switched-away revision keeps its fixed waterline.
         current = {row.start: row for row in db.scalars(select(CompositeMinute).where(
             CompositeMinute.revision_id == revision.id,
             CompositeMinute.start >= selected[0]["start"],
@@ -87,7 +104,7 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
     return output
 
 
-def rows(db, revision_id, start, end, *, input_revision=None):
+def rows(db, revision_id, start, end, *, input_revision=None, now=None):
     """Bounded immutable input reconstruction, indexed by revision/minute/version."""
     prep = db.get(CompositePreparation, revision_id)
     if not prep:
@@ -95,6 +112,11 @@ def rows(db, revision_id, start, end, *, input_revision=None):
     value = prep.input_revision if input_revision is None else input_revision
     if not 0 <= value <= prep.input_revision or start >= end:
         raise ValueError("Invalid composite input revision/window")
+    from .live_window import lower_bound
+
+    start = max(start, lower_bound(now))
+    if start >= end:
+        return
     revision = db.get(CompositeRevision, revision_id)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     dataset = db.get(MarketDataset, mapping.target_dataset_id)

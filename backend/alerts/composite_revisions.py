@@ -56,6 +56,9 @@ class ActivationRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
     request_id: str = Field(min_length=1, max_length=100, pattern=r"^[A-Za-z0-9:_-]+$")
     expected_revision_id: str = Field(min_length=36, max_length=36)
+    # Optional scheduled switch run; without it activation owns one run per
+    # candidate revision, so a retry reuses the same run and the same message.
+    switch_run_id: str | None = Field(default=None, min_length=36, max_length=36)
 
 
 def owned(db, composite_id, *, lock=False):
@@ -112,6 +115,9 @@ def create(db, composite_id, body):
     if version.status != "published" or not m1 or db.get(HistoryReclamation, version.id):
         raise ValueError("请选择已有可用固定M1的已发布历史版本")
     cutoff = (now_ms() - 5000) // 60000 * 60000
+    from .live_window import require_window
+
+    require_window(body.seam, now=now_ms())
     newest = history_page(db, version.id, "M1", count=1)["bars"][-1]
     if not version.start < body.seam <= min(version.end, newest["end"], cutoff):
         raise ValueError("拼接点必须在有效历史基线内且不超过准备截止")
@@ -269,6 +275,9 @@ def activate(db, composite_id, revision_id, body):
         if existing.request_id != body.request_id or existing.previous_revision_id != body.expected_revision_id:
             raise ValueError("修订已经通过其他请求启用")
         return existing
+    from .live_window import require_window
+
+    require_window(revision.seam, now=now_ms())
     if composite.active_revision_id != body.expected_revision_id or revision.parent_revision_id != body.expected_revision_id:
         raise ValueError("启用修订已改变，禁止覆盖并发切换；请重新建立修订")
     db.scalar(select(CompositePreparation).where(CompositePreparation.revision_id == revision.id).with_for_update())
@@ -278,17 +287,10 @@ def activate(db, composite_id, revision_id, body):
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     if db.get(MarketDataset, mapping.target_dataset_id).identity["account_scope"] != account_scope():
         raise ValueError("实时账户已改变，不能启用旧映射")
-    stamp = now_ms()
+    from .switch_activation import publish
 
-    activation = CompositeActivation(revision_id=revision.id, previous_revision_id=composite.active_revision_id,
-        request_id=body.request_id, input_revision=progress["input_revision"], event_boundary=stamp // 60000 * 60000,
-        at=stamp, evidence={"preparation": progress, "affected_rules": [
-            {"id": alert.id, "revision_id": saved.market_identity["composite_revision_id"],
-                "migration": "keeps_fixed_revision"} for saved, alert in affected_rules(db, composite.id)]})
-    db.add(activation)
-    composite.active_revision_id, revision.activated_at = revision.id, stamp
-    db.flush()
-    return activation
+    return publish(db, composite=composite, revision=revision, body=body, progress=progress,
+                   now=now_ms())
 
 
 def preparation_tick():
@@ -297,9 +299,11 @@ def preparation_tick():
     with transaction() as db:
         from sqlalchemy import or_
 
+        from .composite_inputs import unfrozen
+
         revisions = list(db.scalars(select(CompositeRevision.id).join(CompositeRevisionChange).join(
             CompositePreparation, CompositePreparation.revision_id == CompositeRevision.id).where(
-            CompositeRevision.activated_at.is_(None), or_(
+            CompositeRevision.activated_at.is_(None), unfrozen(), or_(
                 CompositePreparation.state["activation_ready"].as_boolean().is_(None),
                 CompositePreparation.state["activation_ready"].as_boolean().is_(False))
         ).order_by(cast(CompositePreparation.state["activation_checked_at"].as_string(), BigInteger).asc().nullsfirst(),

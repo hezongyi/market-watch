@@ -131,16 +131,19 @@ def full_legacy_upgrade(engine, monkeypatch):
     with pytest.raises(RuntimeError, match="roll back the application"):
         command.downgrade(alembic, "r19_native_history_loads")
     with engine.connect() as connection:
-        # The additive notice migration refuses downgrade before any DDL;
+        # The additive notice migration refuses downgrade before any DDL of its own;
         # application rollback preserves both legacy and notification evidence.
-        from alembic.script import ScriptDirectory
-
-        expected = ScriptDirectory.from_config(alembic).get_current_head()
-        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == expected
+        # A refusal below the head leaves the chain stamped at that revision, so the
+        # schema version is only asserted after rejoining the live head below.
         assert connection.execute(text("SELECT count(*) FROM signals")).scalar() == 4
     # Empty market-data branch can downgrade before the populated alert branch
     # refuses rollback. Rejoin head before testing a full-schema backup.
     command.upgrade(alembic, "head")
+    with engine.connect() as connection:
+        from alembic.script import ScriptDirectory
+
+        expected = ScriptDirectory.from_config(alembic).get_current_head()
+        assert connection.execute(text("SELECT version_num FROM alembic_version")).scalar() == expected
 
 
 def test_full_sqlite_migration_retains_legacy_queue_and_allows_multiple_new_events(tmp_path, monkeypatch):

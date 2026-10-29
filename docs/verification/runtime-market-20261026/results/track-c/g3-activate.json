@@ -1,0 +1,55 @@
+{
+  "activation_cycle": {
+    "worked": true,
+    "candidates": [
+      {
+        "run_id": "dedac8e8-1182-4d65-923c-56305290fe29",
+        "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+        "revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+        "previous_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+        "scheduled_for": 1793494800000,
+        "status": "activated"
+      }
+    ]
+  },
+  "active_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+  "runs": [
+    {
+      "id": "85d9ea55-5c19-42c1-8999-db4bc6084279",
+      "kind": "revision_activation",
+      "state": "succeeded",
+      "phase": "activated",
+      "target_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+      "created_at": 1793200002643
+    },
+    {
+      "id": "dedac8e8-1182-4d65-923c-56305290fe29",
+      "kind": "baseline_shadow",
+      "state": "shadow_ready",
+      "phase": "shadow",
+      "target_revision_id": "4271c8d0-d87d-468f-85fe-92a3bd95c60d",
+      "created_at": 1793199874255
+    },
+    {
+      "id": "822ab313-6cec-4411-9572-8239794bd7fe",
+      "kind": "revision_activation",
+      "state": "succeeded",
+      "phase": "activated",
+      "target_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+      "created_at": 1793199591342
+    },
+    {
+      "id": "3082c3ce-8ef4-4231-830f-bfb11f80321e",
+      "kind": "baseline_shadow",
+      "state": "shadow_ready",
+      "phase": "shadow",
+      "target_revision_id": "066483b8-95ba-4037-9852-09dce5266168",
+      "created_at": 1793199234172
+    }
+  ],
+  "unlocked_runs": [
+    "822ab313-6cec-4411-9572-8239794bd7fe",
+    "5024863b-0b8c-4476-8c0f-2bab18e8a5e0",
+    "85d9ea55-5c19-42c1-8999-db4bc6084279"
+  ]
+}

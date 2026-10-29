@@ -8,9 +8,10 @@ import hashlib
 
 from sqlalchemy import select
 
-from .composite_inputs import apply_minutes
+from .composite_inputs import apply_minutes, frozen, unfrozen
 from .confirmed_minutes import record
 from .history_sources import HistoryConfigurationError, page_end
+from .live_window import lower_bound
 from .market_contracts import DatasetIdentity, MarketRequestError, failed_request
 from .market_resources import lane
 from .source_history_store import AcquisitionBusy, shared_page
@@ -35,6 +36,7 @@ def claim(revision_id=None):
     with transaction() as db:
         stamp = now_ms()
         query = select(CompositePreparation).where(
+            unfrozen(),
             CompositePreparation.status.in_(("pending", "running", "retrying")),
             CompositePreparation.lease_until <= stamp, CompositePreparation.next_at <= stamp)
         if revision_id:
@@ -42,6 +44,10 @@ def claim(revision_id=None):
         prep = db.scalar(query.order_by(CompositePreparation.next_at, CompositePreparation.revision_id)
                          .with_for_update(skip_locked=True).limit(1))
         if not prep:
+            return None
+        if prep.cursor < lower_bound(stamp):
+            prep.status, prep.error = "expired", "live_window_expired"
+            prep.lease_token, prep.lease_until = None, 0
             return None
         # Interrupted read evidence is closed before a successor takes ownership.
         if prep.lease_token:
@@ -67,9 +73,12 @@ def claim(revision_id=None):
 def _lock(db, ownership):
     prep = db.scalar(select(CompositePreparation).where(
         CompositePreparation.revision_id == ownership["revision_id"]).with_for_update())
-    if (not prep or prep.lease_token != ownership["token"] or prep.lease_until <= now_ms()
+    if (not prep or frozen(prep) or prep.lease_token != ownership["token"] or prep.lease_until <= now_ms()
             or prep.cursor != ownership["start"]):
         raise TimeoutError("Composite preparation ownership expired or superseded")
+    from .live_window import require_window
+
+    require_window(ownership["start"], now=now_ms())
     return prep
 
 

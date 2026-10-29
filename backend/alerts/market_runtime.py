@@ -16,6 +16,7 @@ def build_loops():
         composite_aggregate_worker,
         oanda_worker,
         realtime_worker,
+        switch_schedule,
     )
     from .config import settings
 
@@ -27,6 +28,10 @@ def build_loops():
     ]
     if settings.market_runtime_chart_alert_enabled:
         loops.append(Loop("chart_alert", alert_monitor.run))
+    if settings.switch_auto_activate_enabled:
+        # A ready candidate is activated by this profile; the shadow pass that
+        # prepared it belongs to the data profile.
+        loops.append(Loop("switch_activation", switch_schedule.run_activation))
     return tuple(loops)
 
 
@@ -108,7 +113,8 @@ def run(*, stop=None, loops=None, handle_signals=True):
         boot_id = runtime_health.boot()
         reporters = {loop.role: runtime_health.Progress(
             "market", loop.role, boot_id,
-            deadline_ms=60000 if loop.role == "realtime" else runtime_health.STALE_MS,
+            deadline_ms=(60000 if loop.role in ("realtime", "switch_activation")
+                         else runtime_health.STALE_MS),
         ) for loop in selected}
         for reporter in reporters.values():
             reporter.claim()

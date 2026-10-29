@@ -1,0 +1,74 @@
+{
+  "candidate": {
+    "revision": "a0be0d03-1975-4262-b5ac-11707c80368f",
+    "seam": 1789689600000,
+    "reused": true,
+    "preparation": {
+      "commits": 0,
+      "status": "queried",
+      "cursor": 1793199660000,
+      "cutoff": 1793199660000,
+      "input_revision": 15,
+      "confirmed_end": 1793199660000
+    },
+    "aggregates": {
+      "input_revision": 15,
+      "tasks": {
+        "M5": 15,
+        "H1": 15,
+        "MN": 15,
+        "D1": 15,
+        "W1": 15,
+        "M1": 15,
+        "M15": 15,
+        "M30": 15,
+        "H4": 15
+      }
+    },
+    "readiness": {
+      "ready": true,
+      "status": "ready",
+      "input_revision": 15,
+      "cutoff": 1793199660000,
+      "periods_ready": true,
+      "indicators": [],
+      "query_error": null,
+      "coverage": "per-bar; readiness does not certify all historical coverage"
+    }
+  },
+  "error": null,
+  "run": {
+    "id": "5024863b-0b8c-4476-8c0f-2bab18e8a5e0",
+    "state": "succeeded",
+    "phase": "activated",
+    "attempts": 0,
+    "error_summary": null
+  },
+  "active_revision_id": "a0be0d03-1975-4262-b5ac-11707c80368f",
+  "rule": {
+    "status": "paused",
+    "health": "blocked",
+    "health_reason": "组合修订切换后该规则暂不可迁移：目标修订服务日历 utc0，与规则绑定的 ny17 不兼容",
+    "version": 1,
+    "runtime": {
+      "demand_hold": "stale_input",
+      "switch_reason": "组合修订切换后该规则暂不可迁移：目标修订服务日历 utc0，与规则绑定的 ny17 不兼容"
+    },
+    "before": {
+      "alert_version": 1,
+      "status": "active",
+      "versions": [
+        {
+          "version": 1,
+          "revision_id": "05694f9d-01a1-4572-9618-6e475833bfa3"
+        }
+      ]
+    }
+  },
+  "versions": [
+    {
+      "version": 1,
+      "revision_id": "05694f9d-01a1-4572-9618-6e475833bfa3"
+    }
+  ]
+}

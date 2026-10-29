@@ -126,7 +126,8 @@ def test_sparse_months_page_with_bounded_partitions_and_no_duplicate_buckets(dat
             cursor = page["next_before"]
             if cursor is None:
                 break
-        expected = {period(at, "MN", "ny17")[0] for at in [0, seam, *times]}
+        # Fixed Dukascopy history stays, expired live months are unavailable.
+        expected = {period(at, "MN", "ny17")[0] for at in [0, times[-1]]}
         assert len(seen) == len(set(seen)) and set(seen) == expected and cursor is None
 
 

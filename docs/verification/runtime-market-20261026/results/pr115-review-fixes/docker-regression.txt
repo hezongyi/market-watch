@@ -1,0 +1,3820 @@
+....F....FFF...................F.FFFFFFFFFFF............................ [ 26%]
+........................................................................ [ 53%]
+........................................................................ [ 80%]
+.FFFFFFF.FFFFFFFFFFFFFF..FFF..........................                   [100%]
+=================================== FAILURES ===================================
+____________ test_long_outage_recovery_never_requests_expired_input ____________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f386ab82490>
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_track_c_review_fixes.py:102: KeyError
+_____________ test_retention_regression[contract_unrelated_source] _____________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386a3cb090>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386a4b1b10>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386a4216d0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386a422550>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f387d9b4f40>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_unrelated_source at 0x7f386e155bc0>
+
+    @pytest.mark.parametrize("contract", [contracts.contract_unrelated_source,
+                                          contracts.contract_raw_page_cleanup,
+                                          contracts.contract_page_boundary_and_orphans])
+    def test_retention_regression(provider_pg, contract):
+>       contract(provider_pg[0])
+
+backend/tests/test_track_c_review_fixes_postgres.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_track_c_review_fixes.py:30: in contract_unrelated_source
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f387d9b4f40>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_____________ test_retention_regression[contract_raw_page_cleanup] _____________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386ad484d0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f3869c854d0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386a8c1410>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386a8c13d0>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f387d8fe200>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_raw_page_cleanup at 0x7f386b493c40>
+
+    @pytest.mark.parametrize("contract", [contracts.contract_unrelated_source,
+                                          contracts.contract_raw_page_cleanup,
+                                          contracts.contract_page_boundary_and_orphans])
+    def test_retention_regression(provider_pg, contract):
+>       contract(provider_pg[0])
+
+backend/tests/test_track_c_review_fixes_postgres.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_track_c_review_fixes.py:44: in contract_raw_page_cleanup
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f387d8fe200>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+________ test_retention_regression[contract_page_boundary_and_orphans] _________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386a40b1d0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f3869849e50>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386a838350>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386adefc50>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f387d57c1c0>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_page_boundary_and_orphans at 0x7f386b5062a0>
+
+    @pytest.mark.parametrize("contract", [contracts.contract_unrelated_source,
+                                          contracts.contract_raw_page_cleanup,
+                                          contracts.contract_page_boundary_and_orphans])
+    def test_retention_regression(provider_pg, contract):
+>       contract(provider_pg[0])
+
+backend/tests/test_track_c_review_fixes_postgres.py:21: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_track_c_review_fixes.py:61: in contract_page_boundary_and_orphans
+    ???
+backend/alerts/retention_window.py:753: in dry_run
+    return _pass(run_id, dry_run=True, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:601: in _pass
+    plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f387d57c1c0>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+__________ test_postgres_retention_contract[contract_window_boundary] __________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f3869ad8ed0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f3869e1d490>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386976d6d0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386976d290>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a56c0>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_window_boundary at 0x7f386b4820c0>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:219: in contract_window_boundary
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a56c0>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_ test_postgres_retention_contract[contract_dry_run_reports_and_deletes_nothing] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f3869e95e10>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386a1c1dd0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386962d410>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386962c350>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7640>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_dry_run_reports_and_deletes_nothing at 0x7f386b482200>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:252: in contract_dry_run_reports_and_deletes_nothing
+    ???
+backend/alerts/retention_window.py:753: in dry_run
+    return _pass(run_id, dry_run=True, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:601: in _pass
+    plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7640>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_ test_postgres_retention_contract[contract_foreign_key_order_and_idempotent_rerun] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f3869729ad0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f3869e1f890>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f38697cda50>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f38697cd090>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a5000>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_foreign_key_order_and_idempotent_rerun at 0x7f386b4822a0>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:272: in contract_foreign_key_order_and_idempotent_rerun
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a5000>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+____ test_postgres_retention_contract[contract_orphan_minutes_are_deleted] _____
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386968cd10>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386900ead0>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386973ee10>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386973c0d0>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7100>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_orphan_minutes_are_deleted at 0x7f386b482340>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:294: in contract_orphan_minutes_are_deleted
+    ???
+backend/alerts/retention_window.py:753: in dry_run
+    return _pass(run_id, dry_run=True, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:601: in _pass
+    plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7100>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+___ test_postgres_retention_contract[contract_unreferenced_head_is_deleted] ____
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f3869615f50>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f3869728f10>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f3869a34250>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f3869a35590>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a5000>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_unreferenced_head_is_deleted at 0x7f386b4823e0>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:319: in contract_unreferenced_head_is_deleted
+    ???
+backend/alerts/retention_window.py:753: in dry_run
+    return _pass(run_id, dry_run=True, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:601: in _pass
+    plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a5000>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_ test_postgres_retention_contract[contract_orphan_next_to_protected_candidate] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386acc3c10>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386a94eb10>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386a6fc810>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386acfab90>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a5b40>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_orphan_next_to_protected_candidate at 0x7f386b482480>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:345: in contract_orphan_next_to_protected_candidate
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a5b40>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR, %(revision_id_1_3)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR, %(revision_id_2_2)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_1_3': 'rev-frozen', 'revision_id_2_1': 'rev-active', 'revision_id_2_2': 'rev-frozen'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_____ test_postgres_retention_contract[contract_interrupted_pass_resumes] ______
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f3869fead50>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386adf2a50>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f38699d1210>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f38699d1010>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7280>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_interrupted_pass_resumes at 0x7f386b482520>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:371: in contract_interrupted_pass_resumes
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7280>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_ test_postgres_retention_contract[contract_kill_between_commit_and_release_keeps_counts] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386a3bf810>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386aad6650>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f3869db1b10>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386addb490>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7580>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_kill_between_commit_and_release_keeps_counts at 0x7f386b4825c0>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:403: in contract_kill_between_commit_and_release_keeps_counts
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7580>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+___ test_postgres_retention_contract[contract_active_alert_blocks_the_batch] ___
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386aaa49d0>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386aaf0c90>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f38697a6d90>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f38697a6590>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386aa9f640>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_active_alert_blocks_the_batch at 0x7f386b482700>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:460: in contract_active_alert_blocks_the_batch
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386aa9f640>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR, %(revision_id_2_2)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active', 'revision_id_2_2': 'rev-old'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_ test_postgres_retention_contract[contract_mixed_batch_deletes_only_unprotected] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386934db90>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f3868f42850>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386ab88fd0>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386ab8a050>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7e80>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_mixed_batch_deletes_only_unprotected at 0x7f386b482660>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:436: in contract_mixed_batch_deletes_only_unprotected
+    ???
+backend/alerts/retention_window.py:763: in execute
+    return _pass(run_id, dry_run=False, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:633: in _pass
+    applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
+backend/alerts/retention_window.py:734: in _apply_chunk
+    plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a7e80>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR, %(revision_id_1_3)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR, %(revision_id_2_2)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 1, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_1_3': 'rev-frozen', 'revision_id_2_1': 'rev-active', 'revision_id_2_2': 'rev-frozen'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_ test_postgres_retention_contract[contract_restore_gate_blocks_real_deletion] _
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f386a2a8b10>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386a9c0a50>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f3869a50750>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f3869a509d0>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a6500>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_restore_gate_blocks_real_deletion at 0x7f386b4827a0>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:481: in contract_restore_gate_blocks_real_deletion
+    ???
+backend/alerts/retention_window.py:753: in dry_run
+    return _pass(run_id, dry_run=True, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:601: in _pass
+    plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386b2a6500>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+_______ test_postgres_retention_contract[contract_tick_reports_reasons] ________
+
+self = <sqlalchemy.engine.base.Connection object at 0x7f3869b61450>
+dialect = <sqlalchemy.dialects.postgresql.psycopg.PGDialect_psycopg object at 0x7f386ab8a790>
+context = <sqlalchemy.dialects.postgresql.psycopg.PGExecutionContext_psycopg object at 0x7f386bb96610>
+statement = <sqlalchemy.dialects.postgresql.psycopg.PGCompiler_psycopg object at 0x7f386bb96b10>
+parameters = [{'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}]
+
+    def _exec_single_context(
+        self,
+        dialect: Dialect,
+        context: ExecutionContext,
+        statement: Union[str, Compiled],
+        parameters: Optional[_AnyMultiExecuteParams],
+    ) -> CursorResult[Unpack[TupleAny]]:
+        """continue the _execute_context() method for a single DBAPI
+        cursor.execute() or cursor.executemany() call.
+    
+        """
+        if dialect.bind_typing is BindTyping.SETINPUTSIZES:
+            generic_setinputsizes = context._prepare_set_input_sizes()
+    
+            if generic_setinputsizes:
+                try:
+                    dialect.do_set_input_sizes(
+                        context.cursor, generic_setinputsizes, context
+                    )
+                except BaseException as e:
+                    self._handle_dbapi_exception(
+                        e, str(statement), parameters, None, context
+                    )
+    
+        cursor, str_statement, parameters = (
+            context.cursor,
+            context.statement,
+            context.parameters,
+        )
+    
+        effective_parameters: Optional[_AnyExecuteParams]
+    
+        if not context.executemany:
+            effective_parameters = parameters[0]
+        else:
+            effective_parameters = parameters
+    
+        evt_handled: bool = False
+        try:
+            if self._has_events or self.engine._has_events:
+                for fn in self.dispatch.before_cursor_execute:
+                    str_statement, effective_parameters = fn(
+                        self,
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                        context.executemany,
+                    )
+    
+            if self._echo:
+                self._log_info(str_statement)
+    
+                stats = context._get_cache_stats()
+    
+                if not self.engine.hide_parameters:
+                    self._log_info(
+                        "[%s] %r",
+                        stats,
+                        sql_util._repr_params(
+                            effective_parameters,
+                            batches=10,
+                            ismulti=context.executemany,
+                        ),
+                    )
+                else:
+                    self._log_info(
+                        "[%s] [SQL parameters hidden due to "
+                        "hide_parameters=True]",
+                        stats,
+                    )
+            if context.execute_style is ExecuteStyle.EXECUTEMANY:
+                effective_parameters = cast(
+                    "_CoreMultiExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_executemany:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_executemany(
+                        cursor,
+                        str_statement,
+                        effective_parameters,
+                        context,
+                    )
+            elif not effective_parameters and context.no_parameters:
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute_no_params:
+                        if fn(cursor, str_statement, context):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+                    self.dialect.do_execute_no_params(
+                        cursor, str_statement, context
+                    )
+            else:
+                effective_parameters = cast(
+                    "_CoreSingleExecuteParams", effective_parameters
+                )
+                if self.dialect._has_events:
+                    for fn in self.dialect.dispatch.do_execute:
+                        if fn(
+                            cursor,
+                            str_statement,
+                            effective_parameters,
+                            context,
+                        ):
+                            evt_handled = True
+                            break
+                if not evt_handled:
+>                   self.dialect.do_execute(
+                        cursor, str_statement, effective_parameters, context
+                    )
+
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386aa9e380>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           psycopg.errors.NumericValueOutOfRange: integer out of range
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: NumericValueOutOfRange
+
+The above exception was the direct cause of the following exception:
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://track_c:***@postgres/track_c_acceptance))
+contract = <function contract_tick_reports_reasons at 0x7f386b482840>
+
+>   ???
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window_postgres.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_retention_window.py:507: in contract_tick_reports_reasons
+    ???
+backend/alerts/retention_window.py:817: in tick
+    report = _pass(target["id"], dry_run=dry_run, limit=limit, chunk=chunk,
+backend/alerts/retention_window.py:601: in _pass
+    plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+backend/alerts/retention_window.py:310: in _plan
+    for row in db.scalars(select(CompositeAggregateBar).where(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2594: in scalars
+    return self._execute_internal(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/session.py:2363: in _execute_internal
+    compile_state_cls.orm_execute_statement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/orm/context.py:316: in orm_execute_statement
+    result = conn.execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1448: in execute
+    return meth(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/sql/elements.py:533: in _execute_on_connection
+    return connection._execute_clauseelement(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1668: in _execute_clauseelement
+    ret = self._execute_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1822: in _execute_context
+    return self._exec_single_context(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1962: in _exec_single_context
+    self._handle_dbapi_exception(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:2332: in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/base.py:1943: in _exec_single_context
+    self.dialect.do_execute(
+/usr/local/lib/python3.11/site-packages/sqlalchemy/engine/default.py:1180: in do_execute
+    cursor.execute(statement, parameters)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ 
+
+self = <psycopg.Cursor [closed] [IDLE] (host=postgres user=track_c database=track_c_acceptance) at 0x7f386aa9e380>
+query = 'SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggre...TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start \n LIMIT %(param_2)s::INTEGER'
+params = {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, ...}
+prepare = None, binary = None
+
+    def execute(
+        self,
+        query: Query,
+        params: Params | None = None,
+        *,
+        prepare: bool | None = None,
+        binary: bool | None = None,
+    ) -> Self:
+        """
+        Execute a query or command to the database.
+        """
+        try:
+            with self._conn.lock:
+                self._conn.wait(
+                    self._execute_gen(query, params, prepare=prepare, binary=binary)
+                )
+        except e._NO_TRACEBACK as ex:
+>           raise ex.with_traceback(None)
+E           sqlalchemy.exc.DataError: (psycopg.errors.NumericValueOutOfRange) integer out of range
+E           [SQL: SELECT market_composite_aggregate_bars.revision_id, market_composite_aggregate_bars.timeframe, market_composite_aggregate_bars.start, market_composite_aggregate_bars.input_revision, market_composite_aggregate_bars.data, market_composite_aggregate_bars.created_at 
+E           FROM market_composite_aggregate_bars 
+E           WHERE market_composite_aggregate_bars.revision_id IN (%(revision_id_1_1)s::VARCHAR, %(revision_id_1_2)s::VARCHAR) AND (market_composite_aggregate_bars.revision_id NOT IN (%(revision_id_2_1)s::VARCHAR)) AND market_composite_aggregate_bars.start < %(start_1)s::BIGINT AND CAST((market_composite_aggregate_bars.data ->> %(data_1)s::TEXT) AS INTEGER) <= %(param_1)s::INTEGER ORDER BY market_composite_aggregate_bars.start 
+E            LIMIT %(param_2)s::INTEGER]
+E           [parameters: {'start_1': 1797408000000, 'data_1': 'end', 'param_1': 1797408000000, 'param_2': 20000, 'revision_id_1_1': 'rev-active', 'revision_id_1_2': 'rev-old', 'revision_id_2_1': 'rev-active'}]
+E           (Background on this error at: https://sqlalche.me/e/21/9h9h)
+
+/usr/local/lib/python3.11/site-packages/psycopg/cursor.py:117: DataError
+___ test_one_account_has_one_owner_and_old_owner_cannot_publish_after_expiry ___
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '22f0b415-e0b8-4879-aff0-24ac3c302697'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:56: KeyError
+_ test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '161bd5f1-9b70-4f1c-8382-819f0e2fbf85'), 1, {})
+
+>   ???
+E   AssertionError: assert set() == {'EUR_USD', 'XAU_USD'}
+E     
+E     Extra items in the right set:
+E     'XAU_USD'
+E     'EUR_USD'
+E     Use -v to get more diff
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:64: AssertionError
+_______________ test_disabled_resident_is_not_owned_or_collected _______________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '36575e99-93b3-4d63-b96c-afdca911623c'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:83: KeyError
+__ test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection ___
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'd28ab350-6e36-465c-a7c1-446985f284be'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:95: KeyError
+_ test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '1fb04eae-c58d-4ebc-8e8f-2bd9b41d45cb'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:107: KeyError
+__ test_publish_reports_committed_outcomes_without_refreshing_rejected_quotes __
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '8437349c-9612-4e8d-97d3-fe1d9f054f43'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:129: KeyError
+___ test_old_connection_epoch_messages_are_rejected_even_when_token_is_same ____
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '87c6426c-5276-4a7a-a9c6-77d646dc6ff6'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:154: KeyError
+_________ test_expired_connection_cannot_report_candle_judgment_ready __________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '6cff2a1e-40a5-49e4-80dc-4cefa71ba848'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:169: KeyError
+_ test_recovery_and_confirmation_preserve_retired_watch_without_notifications __
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '278b5482-701b-4d67-b6cd-cd70db645037'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:180: KeyError
+_ test_actual_confirmation_transaction_records_canonical_minutes_and_fences_old_epoch _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'cb2a8e2e-78cb-45a1-9614-251c71d22d31'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:209: KeyError
+_ test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_denominator _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '9e231b29-96bd-472b-876b-c3bb155f218b'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:225: KeyError
+_____ test_confirmation_timing_records_completed_ingestion_and_evaluation ______
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'b1ffdfda-dfb5-49cd-8de6-7895e99e2f37'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f385562f250>
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:244: KeyError
+_________ test_nontradeable_quote_cannot_certify_a_whole_closed_minute _________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'f1df9c69-80ca-43fc-bc8b-0062a48fd8f3'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:260: KeyError
+_______ test_small_latency_samples_do_not_hide_the_slowest_confirmation ________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '1e77763a-5651-44ee-92e8-ab57b69c1559'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3855639710>
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:280: KeyError
+_______ test_quote_crossings_after_recovery_never_execute_retired_watch ________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '9572b2ae-d028-4d6e-a733-c75ca57127cf'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:291: KeyError
+___________ test_single_symbol_quote_gap_cannot_create_fake_crossing ___________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '17b300d5-811b-4a3b-b41c-46716e6b2056'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:316: KeyError
+_____________ test_invalid_spread_breaks_tick_judgment_continuity ______________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'ca5d9553-8516-41ff-8503-744555016624'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:334: KeyError
+_ test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness __
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'cfbfd8db-0b22-4f2a-b125-3ebc63884c34'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:354: KeyError
+___ test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline ____
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '7fc29712-c7fd-477d-93fd-969a572a1691'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f38555e13d0>
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:381: KeyError
+__ test_rest_batch_demand_revision_fences_inflight_response_before_any_write ___
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', 'a4393a33-5207-413f-b616-1953e3883d99'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:400: KeyError
+______ test_rest_batch_repeated_complete_head_skips_confirmation_rewrite _______
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '5c48add5-a6b4-470d-be3f-7f9cc9b1d411'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f3868596490>
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:420: KeyError
+______ test_missing_quote_side_or_crossed_spread_cannot_report_tick_ready ______
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '6c66342b-2e45-4eec-b0c3-d96bf1420c15'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:461: KeyError
+_____________ test_indicator_recovery_never_rewarms_retired_watch ______________
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '6c639039-4b14-428e-a295-12b43159b8b7'), 1, {})
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f385615a490>
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:471: KeyError
+_ test_confirmation_with_unrelated_uncollectable_dataset_retires_only_same_source _
+
+running = (sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False), ('d247e2afbd3fe156c6263b539de011d684d6490708031458247cd0e3b3050803', '4cc94d2d-4b0a-4553-b184-4dac52707934'), 1, {})
+
+>   ???
+E   KeyError: 'EUR_USD'
+
+/home/quant/repos/market-watch-runtime-track-c-20261028/backend/tests/test_live_pricing.py:503: KeyError
+=========================== short test summary info ============================
+FAILED backend/tests/test_track_c_review_fixes.py::test_long_outage_recovery_never_requests_expired_input
+FAILED backend/tests/test_track_c_review_fixes_postgres.py::test_retention_regression[contract_unrelated_source]
+FAILED backend/tests/test_track_c_review_fixes_postgres.py::test_retention_regression[contract_raw_page_cleanup]
+FAILED backend/tests/test_track_c_review_fixes_postgres.py::test_retention_regression[contract_page_boundary_and_orphans]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_window_boundary]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_dry_run_reports_and_deletes_nothing]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_foreign_key_order_and_idempotent_rerun]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_orphan_minutes_are_deleted]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_unreferenced_head_is_deleted]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_orphan_next_to_protected_candidate]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_interrupted_pass_resumes]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_kill_between_commit_and_release_keeps_counts]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_active_alert_blocks_the_batch]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_mixed_batch_deletes_only_unprotected]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_restore_gate_blocks_real_deletion]
+FAILED backend/tests/test_retention_window_postgres.py::test_postgres_retention_contract[contract_tick_reports_reasons]
+FAILED backend/tests/test_live_pricing.py::test_one_account_has_one_owner_and_old_owner_cannot_publish_after_expiry
+FAILED backend/tests/test_live_pricing.py::test_browser_demand_and_alerts_join_resident_instruments_without_extra_owner
+FAILED backend/tests/test_live_pricing.py::test_disabled_resident_is_not_owned_or_collected
+FAILED backend/tests/test_live_pricing.py::test_disabled_managed_oanda_chart_demand_cannot_create_or_keep_collection
+FAILED backend/tests/test_live_pricing.py::test_quotes_are_source_isolated_forming_has_no_fake_volume_and_duplicate_order_is_fenced
+FAILED backend/tests/test_live_pricing.py::test_publish_reports_committed_outcomes_without_refreshing_rejected_quotes
+FAILED backend/tests/test_live_pricing.py::test_old_connection_epoch_messages_are_rejected_even_when_token_is_same
+FAILED backend/tests/test_live_pricing.py::test_expired_connection_cannot_report_candle_judgment_ready
+FAILED backend/tests/test_live_pricing.py::test_recovery_and_confirmation_preserve_retired_watch_without_notifications
+FAILED backend/tests/test_live_pricing.py::test_actual_confirmation_transaction_records_canonical_minutes_and_fences_old_epoch
+FAILED backend/tests/test_live_pricing.py::test_empty_success_cannot_restore_open_market_and_failed_attempts_remain_in_denominator
+FAILED backend/tests/test_live_pricing.py::test_confirmation_timing_records_completed_ingestion_and_evaluation
+FAILED backend/tests/test_live_pricing.py::test_nontradeable_quote_cannot_certify_a_whole_closed_minute
+FAILED backend/tests/test_live_pricing.py::test_small_latency_samples_do_not_hide_the_slowest_confirmation
+FAILED backend/tests/test_live_pricing.py::test_quote_crossings_after_recovery_never_execute_retired_watch
+FAILED backend/tests/test_live_pricing.py::test_single_symbol_quote_gap_cannot_create_fake_crossing
+FAILED backend/tests/test_live_pricing.py::test_invalid_spread_breaks_tick_judgment_continuity
+FAILED backend/tests/test_live_pricing.py::test_rest_batch_fences_complete_before_forming_and_reports_candle_readiness
+FAILED backend/tests/test_live_pricing.py::test_rest_forming_sample_during_recovery_does_not_advance_tick_baseline
+FAILED backend/tests/test_live_pricing.py::test_rest_batch_demand_revision_fences_inflight_response_before_any_write
+FAILED backend/tests/test_live_pricing.py::test_rest_batch_repeated_complete_head_skips_confirmation_rewrite
+FAILED backend/tests/test_live_pricing.py::test_missing_quote_side_or_crossed_spread_cannot_report_tick_ready
+FAILED backend/tests/test_live_pricing.py::test_indicator_recovery_never_rewarms_retired_watch
+FAILED backend/tests/test_live_pricing.py::test_confirmation_with_unrelated_uncollectable_dataset_retires_only_same_source
+40 failed, 230 passed in 263.86s (0:04:23)
+

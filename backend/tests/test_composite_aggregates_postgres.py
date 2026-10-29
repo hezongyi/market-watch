@@ -24,7 +24,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
     contracts.test_accepted_correction_invalidates_only_affected_buckets_and_old_inputs_remain,
     contracts.test_expired_owner_cannot_publish_after_successor_and_next_event_arrival_is_preserved,
     contracts.test_partial_event_checkpoint_does_not_publish_stale_page,
-    contracts.test_sparse_long_tail_and_exclusive_pages_use_persisted_buckets,
+    contracts.test_expired_persisted_buckets_are_not_served_and_pages_stay_exclusive,
     contracts.test_bucket_time_closure_updates_without_new_input_and_pending_seam_is_retained,
     contracts.test_failed_build_keeps_checkpoint_and_retry_recovers,
     contracts.test_materialized_page_overlays_only_valid_provisional_stream_and_never_persists_it,

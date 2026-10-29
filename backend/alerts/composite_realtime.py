@@ -134,7 +134,7 @@ class CurrentBuckets:
         self.limit = limit
         self.builds = self.delta_reads = 0
 
-    def state(self, db, revision, frame, left, right, value, version, segments):
+    def state(self, db, revision, frame, left, right, value, version, segments, *, now=None):
         from sqlalchemy import select
 
         from .composite_inputs import rows
@@ -146,6 +146,12 @@ class CurrentBuckets:
         if not old or old[0] != identity or value < old[1]:
             return None
         state, applied = old[2], old[1]
+        from .live_window import lower_bound
+
+        lower = lower_bound(now)
+        for at in list(state.rows):
+            if revision.seam <= at < lower:
+                state.remove(at)
         if applied < value:
             changed = list(db.scalars(select(CompositeMinuteInput.start).where(
                 CompositeMinuteInput.revision_id == revision.id,
@@ -153,7 +159,8 @@ class CurrentBuckets:
                 CompositeMinuteInput.input_revision <= value,
                 CompositeMinuteInput.start >= left, CompositeMinuteInput.start < right).distinct()))
             for at in changed:
-                confirmed = next(iter(rows(db, revision.id, at, at + 60000, input_revision=value)), None)
+                confirmed = next(iter(rows(db, revision.id, at, at + 60000,
+                                           input_revision=value, now=now)), None)
                 if confirmed:
                     state.replace({**confirmed, "segment": "target"})
             self.delta_reads += len(changed)
@@ -185,10 +192,14 @@ class CurrentBuckets:
 
         from .composite_chart import chart_page
         from .composite_series import read_window
-        from .storage import CompositeMinuteInput, LiveState, RealtimeMapping
+        from .storage import CompositeMinuteInput, RealtimeMapping
 
         key = (revision.id, frame, count)
         cached = self.pages.get(key)
+        from .live_window import lower_bound
+
+        if revision.seam < lower_bound(stamp):
+            cached = None  # Re-read the tail after its availability boundary moved.
         phase = revision.rules["aggregation_calendar"]
         valid = (version.manifest["checksum"], revision.rules)
         if not cached or cached[0] != valid or cached[1] > prep.input_revision:
@@ -225,7 +236,9 @@ class CurrentBuckets:
         from .display_observations import read as observed_rows
 
         observations = display_snapshot.content['observations'] if display_snapshot else observed_rows(
-            db, mapping.target_dataset_id, revision.id, prep.input_revision, revision.seam, stamp + 1)
+            db, mapping.target_dataset_id, revision.id, prep.input_revision,
+            max(revision.seam, lower_bound(stamp)), stamp + 1)
+        observations = [row for row in observations if row["start"] >= lower_bound(stamp)]
         candidates = [row['start'] for row in observations]
         # Also refresh the last confirmed bucket's time closure without a quote.
         if base["bars"] and not base["bars"][-1]["time_closed"]:

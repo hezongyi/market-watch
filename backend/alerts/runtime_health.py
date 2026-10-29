@@ -23,7 +23,7 @@ RESTART_WINDOW_MS = 300_000
 RESTART_LIMIT = 3
 MAINTENANCE_PREFIX = "runtime_maintenance:"
 MARKET_ROLES = ("pricing", "realtime", "composite_aggregate", "alert_indicator",
-                "chart_alert", "market_ownership")
+                "chart_alert", "switch_activation", "market_ownership")
 NOTIFICATION_ROLES = (
     "notification_projection", "notification_retention", "notification_delivery",
     "notification_ownership", "notification_health",
@@ -39,7 +39,7 @@ def data_roles():
     transports = tuple(f"provider_transport_{source}" for source in ORIGINS)
     return providers + transports + ("provider_janitor", "chart_history",
                         "history_network", "history_compute", "native_history", "chart_aggregation",
-                        "market_stream", "data_ownership")
+                        "market_stream", "switch_shadow", "retention", "data_ownership")
 
 
 def expected_roles():
@@ -47,10 +47,13 @@ def expected_roles():
 
     The independent alert profile reuses MARKET_ROLES' chart_alert slot, so its
     deployment keeps ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED enabled here too.
+    The weekly activation loop follows its own switch: switching it off is a
+    configuration choice, not a missing role.
     """
     market = tuple(role for role in MARKET_ROLES
                    if role != "market_ownership"
-                   and (role != "chart_alert" or settings.market_runtime_chart_alert_enabled))
+                   and (role != "chart_alert" or settings.market_runtime_chart_alert_enabled)
+                   and (role != "switch_activation" or settings.switch_auto_activate_enabled))
     return (tuple(f"market:{role}" for role in market)
             + tuple(f"data:{role}" for role in data_roles() if role != "data_ownership")
             + tuple(f"notifications:{role}" for role in NOTIFICATION_ROLES))

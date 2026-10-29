@@ -1,0 +1,187 @@
+{
+  "published_version": null,
+  "window": {
+    "requested_slot": 1804381200000,
+    "scheduled_for": 1804381200000
+  },
+  "cycle": {
+    "scheduled_for": 1804381200000,
+    "worked": true,
+    "composites": [
+      {
+        "composite_id": "7e3cad2f3c44fb5f880e3e47f5188aeb559b1739c259c2509577b49f137b0f9a",
+        "run_id": "de89814c-9077-4966-9002-5b1524facd7b",
+        "state": "shadow_ready",
+        "status": "ready",
+        "reasons": []
+      }
+    ]
+  },
+  "run": {
+    "id": "de89814c-9077-4966-9002-5b1524facd7b",
+    "state": "shadow_ready",
+    "phase": null,
+    "scheduled_for": 1804381200000,
+    "target_revision_id": "2cfe56b8-6ffe-404e-9b25-13c2b62e861b"
+  },
+  "status": "ready",
+  "ready": true,
+  "reasons": [],
+  "bindings": {
+    "tables": {
+      "alerts": {
+        "rows": 2,
+        "digest": "ea876217dc18b888d5069a1b79c0385f2f43b423b2cf655f63383b2d453b0824",
+        "unchanged": true
+      },
+      "alert_versions": {
+        "rows": 6,
+        "digest": "19a15967d163375914257a5b0b6d36cd7db7b850b540848d5c72326f2afd2ecf",
+        "unchanged": true
+      },
+      "publications": {
+        "rows": 6,
+        "digest": "9f4386ceeb5bf0e5987165d7d3ba611dd11fd6905881a6a1971d24c23ea2df88",
+        "unchanged": true
+      },
+      "realtime_preferences": {
+        "rows": 2,
+        "digest": "64c9018629480175703152c2b85683bcae5fb73e1233a0f5370b6f51758c6523",
+        "unchanged": true
+      }
+    },
+    "active_revision_id": {
+      "before": "e3af4bf5-a72d-4e89-a03b-276bdf48f359",
+      "after": "e3af4bf5-a72d-4e89-a03b-276bdf48f359",
+      "unchanged": true
+    },
+    "critical_unchanged": true,
+    "scope": {
+      "instruments": [
+        "MC:7e3cad2f3c44fb5f880e3e47f:EURUSD",
+        "MD:99f162c8154844e06f38715e6:EURUSD",
+        "MD:d00bcccac45564a6b05a41634:EURUSD"
+      ],
+      "alert_ids": [
+        "45bfd944-1bbd-4e49-8451-d563e123c487",
+        "a77a804c-5db9-4be6-a18d-51db05aa4ac0"
+      ],
+      "realtime_keys": [
+        "managed_realtime:MC:7e3cad2f3c44fb5f880e3e47f:EURUSD",
+        "managed_realtime:MD:99f162c8154844e06f38715e6:EURUSD",
+        "managed_realtime:MD:d00bcccac45564a6b05a41634:EURUSD"
+      ]
+    }
+  },
+  "preparation": {
+    "ready": true,
+    "status": "ready",
+    "input_revision": 1,
+    "cutoff": 1793209740000,
+    "periods_ready": true,
+    "indicators": [],
+    "query_error": null,
+    "coverage": "per-bar; readiness does not certify all historical coverage",
+    "aggregates": [
+      {
+        "timeframe": "M1",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209782606
+      },
+      {
+        "timeframe": "M5",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209777456
+      },
+      {
+        "timeframe": "M15",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209773432
+      },
+      {
+        "timeframe": "M30",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209761064
+      },
+      {
+        "timeframe": "H1",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209763041
+      },
+      {
+        "timeframe": "H4",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209765127
+      },
+      {
+        "timeframe": "D1",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209767098
+      },
+      {
+        "timeframe": "W1",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209769135
+      },
+      {
+        "timeframe": "MN",
+        "status": "caught_up",
+        "applied_input_revision": 1,
+        "input_revision": 1,
+        "offset": 0,
+        "working": false,
+        "error": null,
+        "next_at": 0,
+        "updated_at": 1793209771921
+      }
+    ]
+  }
+}
