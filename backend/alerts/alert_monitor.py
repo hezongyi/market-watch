@@ -2,7 +2,8 @@
 
 Monotonic deadlines control cadence; each alert obtains its own business clock.
 Missed turns are coalesced, never overlapped or replayed in a catch-up burst.
-Committed publications start the next turn early; the period stays a floor.
+Committed publications can interrupt healthy idle waits; errors and overruns
+retain their bounded cadence waits.
 """
 
 import logging
@@ -67,6 +68,12 @@ def run(stop, *, period=0.25, monotonic=time.monotonic, on_alert=None, on_turn=N
             if on_turn:
                 on_turn(dict(started=started, chart_finished=chart_done, finished=finished,
                              next_deadline=deadline, overrun=overrun, error=error))
+            # Publications cannot cancel an error backoff or the future turn
+            # selected after an overrun. A partly successful scan can still
+            # report a rule error, so evaluated_count is not a backoff gate.
+            if error or overrun:
+                stop.wait(max(0, deadline - monotonic()))
+                continue
             reason = listener.wait(max(0, deadline - monotonic()), stop)
             # No rule reached a judgment this turn: nothing is active, or every
             # active rule sits in the retired branch. No verdict is waiting, so

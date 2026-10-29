@@ -1,4 +1,4 @@
-"""Commit wakeups start the next alert turn early; the period stays the floor."""
+"""Commit wakeups preserve error backoff and overrun cadence."""
 
 from threading import Event
 
@@ -203,3 +203,72 @@ def test_empty_wakeup_degrades_to_one_bounded_sleep(monkeypatch):
     assert len(listener_waits) == 3
     assert [kind for kind, _ in events] == [
         'prepare', 'step', 'listener_wait', 'stop_wait'] * 3
+
+
+@pytest.mark.parametrize('period,cost,failure,expected', [
+    (.25, .01, 'partial', [0, .26, .52]),
+    (.75, .01, 'partial', [0, .76, 1.52]),
+    (.25, .01, 'raised', [0, .26, .52]),
+    (.25, .30, None, [0, .50, 1.00]),
+    (.25, .50, None, [0, .75, 1.50]),
+    (.75, 1.30, None, [0, 1.50, 3.00]),
+])
+def test_queued_publications_cannot_interrupt_error_or_overrun_waits(
+        monkeypatch, period, cost, failure, expected):
+    from types import SimpleNamespace
+
+    stop, clock, starts, waits = Event(), [0.0], [], []
+
+    class Connection:
+        def notifies(self, *, timeout, stop_after=None):
+            # prepare() drains old hints, but publications during the scan
+            # remain queued when the real PublicationWakeup enters wait().
+            return iter([object()] if timeout > 0 else [])
+
+        def close(self):
+            pass
+
+    wake = publication_wakeup.PublicationWakeup(
+        SimpleNamespace(dialect=SimpleNamespace(name='postgresql')),
+        monotonic=lambda: clock[0])
+    wake.connection = Connection()
+
+    def step(**kwargs):
+        starts.append(clock[0])
+        clock[0] += cost
+        if len(starts) == 3:
+            stop.set()
+        if failure == 'raised':
+            raise ValueError('Failed scan')
+        if failure == 'partial':
+            kwargs['on_error']('ValueError')
+        return 1
+
+    def wait(seconds):
+        waits.append(seconds)
+        clock[0] += seconds
+        return stop.is_set()
+
+    monkeypatch.setattr(chart_alert_worker, 'step', step)
+    monkeypatch.setattr(stop, 'wait', wait)
+    alert_monitor.run(stop, period=period, monotonic=lambda: clock[0], wakeup=wake,
+                      report_health=lambda *args, **kwargs: None)
+    assert starts == pytest.approx(expected)
+    assert all(seconds > 0 for seconds in waits)
+
+
+def test_ownership_loss_closes_listener_without_retry_or_stopped_health(monkeypatch):
+    from alerts.runtime_health import RuntimeOwnershipLost
+
+    stop, clock, events, reports = Event(), [0.0], [], []
+
+    def step(**kwargs):
+        raise RuntimeOwnershipLost('Replaced owner')
+
+    monkeypatch.setattr(chart_alert_worker, 'step', step)
+    with pytest.raises(RuntimeOwnershipLost):
+        alert_monitor.run(stop, wakeup=Listener(clock, .25, events),
+                          monotonic=lambda: clock[0],
+                          report_health=lambda *args, **kwargs: reports.append((args, kwargs)))
+    assert events == [('enter', None), ('prepare', 0.0), ('exit', None)]
+    assert reports == []
