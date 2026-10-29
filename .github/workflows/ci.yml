@@ -312,6 +312,12 @@ jobs:
           MW_PRIVATE_DIR="$acceptance_dir" MW_REPO="$GITHUB_WORKSPACE" \
             docker compose -f deploy/ubuntu/single-frontend.acceptance.yaml config --quiet
 
+      - name: Backup rotation regressions
+        run: |
+          sh deploy/tests/test_unraid_backup_rotation.sh
+          sudo apt-get update && sudo apt-get install -y busybox
+          TEST_SHELL="busybox sh" sh deploy/tests/test_unraid_backup_rotation.sh
+
   required:
     # Keep the protected contexts, including when heavy jobs are skipped.
     # always() also reports failure if classification failed or a job was cancelled.

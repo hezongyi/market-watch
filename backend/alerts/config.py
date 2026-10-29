@@ -111,6 +111,8 @@ class Settings(BaseSettings):
     ]
     initial_history_days: int = Field(default=180, ge=0, le=366)
     postgres_bin_dir: str = ""
+    backup_timeout_seconds: int = Field(default=3600, ge=60, le=21600)
+    backup_compress_level: int = Field(default=1, ge=0, le=9)
     provider_request_seconds: float = Field(default=8, ge=1, le=30)
     platform_native_update_diagnostics: bool = False
     provider_fresh_seconds: int = Field(default=15, ge=1, le=60)

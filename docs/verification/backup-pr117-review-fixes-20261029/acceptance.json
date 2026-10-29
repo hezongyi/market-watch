@@ -1,0 +1,18 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-pr117-fix-20261029",
+  "database_address": "127.0.0.1:25417",
+  "postgres_version": "140024",
+  "normal_cli": true,
+  "private_completion_marker": true,
+  "completed_audit": true,
+  "restore_verified": true,
+  "tables": 102,
+  "legacy_unmarked_restore": true,
+  "corrupt_archive_cli": {
+    "verified": false,
+    "error_type": "RuntimeError",
+    "stage": "pg_restore"
+  },
+  "temporary_databases_remaining": 0
+}
