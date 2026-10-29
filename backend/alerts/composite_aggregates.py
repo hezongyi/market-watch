@@ -188,6 +188,14 @@ def read(db, revision_id, frame, input_revision, *, before, count, now, after=No
         CompositeAggregateBar.revision_id == revision_id, CompositeAggregateBar.timeframe == frame,
         CompositeAggregateBar.input_revision <= input_revision, CompositeAggregateBar.start < before
     )
+    from .live_window import lower_bound
+
+    # A seam bucket may contain fixed history; reject a materialized mixed
+    # bucket whose live portion crossed the boundary and rebuild from inputs.
+    revision = db.get(CompositeRevision, revision_id)
+    floor = lower_bound(now)
+    if revision.seam < floor:
+        return None
     if after is not None:
         latest_query = latest_query.where(CompositeAggregateBar.start >= after)
     latest = latest_query.group_by(CompositeAggregateBar.start).subquery()

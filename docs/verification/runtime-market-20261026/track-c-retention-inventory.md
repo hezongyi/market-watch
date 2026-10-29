@@ -3,6 +3,16 @@
 分支 `feat/runtime-track-c-20261028`，基线 `0eac4fe7`（与 `4f72c306` tree 一致）。
 本文件只描述已实现的机制；周日调度、激活与重启后的循环接线由其它任务负责，本分支不接线。
 
+## 2026-10-29 PR #115 修订（优先于下文初版范围）
+
+- 清理只覆盖成功 run 的 previous/target revision 对应的实时 collection identity；完整 SourceSeries 身份必须匹配，不授权无关账户、来源或固定历史。
+- 删除顺序由原 5 张分钟/输入表扩展为 8 张：随后删除过期整页 SourceFetch、无有效引用的过期 SourceBlob，以及未受保护旧修订的整柱过期 CompositeAggregateBar。下文初版将这三项列为排除的描述已被此修订替代。
+- 整页/整柱 end 必须不超过 UTC 下界；跨界页、窗口内分钟、有效 fetch/history chunk/frame 引用继续保护。有效组合头和非 archived 告警绑定继续保护；冻结修订不因遗留任务被永久保留。
+- 孤立 blob 按 ID keyset 有界扫描。扫描游标存入 batch.stats.blob_scan，与删除及累计计数同事务提交；保留前缀不阻挡后续过期内容，未扫描到底不标 completed。
+- 清理、源分钟确认和 shared_page 短事务遵循来源锁顺序，网络请求仍在事务外。
+- 周日调度、激活与 data_runtime 接线已由 Track C 其它模块补齐，下文“其它任务负责”表示模块职责，不再表示未交付。
+- 验收修订入口：pr115-review-fixes.md。原始验收证据保留其原提交与时钟，不升级为本修订的证据。
+
 ## 1. 业务合同（实现依据）
 
 - 下界 = 当前 UTC 时间 − 30×24 小时；候选判定按行自身所属分钟的 `start`，**严格早于下界才算候选**，等于下界不删。不使用交易日、不用最后一条行情倒推。

@@ -10,6 +10,8 @@ import pytest
 from alerts import backup as backup_module
 from alerts import retention_window as window
 from alerts import storage, switch_runs
+from alerts.history_catalog import account_scope
+from alerts.source_registry import collection_identity
 from alerts.storage import (
     ChartAlert,
     ChartAlertVersion,
@@ -32,6 +34,7 @@ from alerts.storage import (
 from sqlalchemy import create_engine, event, func, select
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import StaticPool
+from test_market_contracts import identity
 
 NOW = 1_800_000_000_000
 DAY = 86_400_000
@@ -40,6 +43,10 @@ OLD = LOWER - 1
 BOUNDARY = LOWER
 RECENT = LOWER + 1
 ZERO = {name: 0 for name in window.DELETION_ORDER}
+
+LIVE_IDENTITY = identity(source="oanda", channel="v20", environment="practice",
+                         account_scope=account_scope()).model_dump()
+SOURCE = collection_identity(LIVE_IDENTITY)
 
 
 @pytest.fixture
@@ -68,9 +75,9 @@ def graph(factory, starts=(OLD,)):
                           calendar="forex", precision=5))
         db.flush()
         db.add(MarketDataset(id="ds", instrument_id="TRET", logical_symbol="TRET",
-                             identity={}, volume_kind="quantity"))
+                             identity=LIVE_IDENTITY, volume_kind="quantity"))
         db.flush()
-        db.add(SourceSeries(id="src", identity={"source": "oanda"}))
+        db.add(SourceSeries(id=SOURCE.key, identity=SOURCE.model_dump()))
         db.flush()
         db.add(RealtimeMapping(id="map", dataset_id="ds", target_dataset_id="ds",
                                permission_scope="market", match={}))
@@ -92,7 +99,7 @@ def graph(factory, starts=(OLD,)):
         minute(factory, start)
 
 
-def minute(factory, start, *, revision="rev-old", source_id="src"):
+def minute(factory, start, *, revision="rev-old", source_id=SOURCE.key):
     """A confirmed source minute plus the composite rows that reference it."""
     with factory.begin() as db:
         source = SourceMinuteRevision(id=uid(), source_id=source_id, start=start,
@@ -113,7 +120,7 @@ def minute(factory, start, *, revision="rev-old", source_id="src"):
         return source.id
 
 
-def orphan(factory, start, *, source_id="src"):
+def orphan(factory, start, *, source_id=SOURCE.key):
     """A superseded price revision no source head row and no composite row uses."""
     with factory.begin() as db:
         revision = SourceMinuteRevision(id=uid(), source_id=source_id, start=start,
@@ -123,7 +130,7 @@ def orphan(factory, start, *, source_id="src"):
         return revision.id
 
 
-def bare(factory, start, *, source_id="src"):
+def bare(factory, start, *, source_id=SOURCE.key):
     """A confirmed source minute no composite minute ever consumed."""
     with factory.begin() as db:
         revision = SourceMinuteRevision(id=uid(), source_id=source_id, start=start,
@@ -156,7 +163,8 @@ def suspended(factory, *, revision="rev-frozen", request_id="req-2"):
 def run(factory, state="succeeded"):
     with factory.begin() as db:
         row = MarketSwitchRun(kind="weekly", composite_id="comp", scheduled_for=NOW,
-                              state="preparing")
+                              state="preparing", previous_revision_id="rev-old",
+                              target_revision_id="rev-active")
         db.add(row)
         db.flush()
         run_id = row.id
@@ -210,7 +218,7 @@ def contract_window_boundary(factory):
     drill()
     report = window.execute(run_id, now=NOW)
     assert report["lower_bound"] == LOWER
-    assert report["deleted"] == {
+    assert report["deleted"] == {**ZERO,
         "market_composite_minute_inputs": 1,
         "market_composite_minutes": 1,
         "market_composite_input_events": 1,
@@ -245,7 +253,8 @@ def contract_dry_run_reports_and_deletes_nothing(factory):
     assert report["deleted"] == ZERO
     assert report["candidates"] == {"source_minutes": 2, "source_revisions": 2,
                                     "composite_minutes": 2, "composite_inputs": 2,
-                                    "composite_input_events": 2}
+                                    "composite_input_events": 2, "source_fetches": 0,
+                                    "source_blobs": 0, "aggregate_bars": 0}
     assert report["rows"] == 10
     assert report["bytes"] > report["payload_bytes"] > 0
     assert report["batch"]["dry_run"] is True
@@ -285,7 +294,8 @@ def contract_orphan_minutes_are_deleted(factory):
     planned = window.dry_run(run_id, now=NOW)
     assert planned["candidates"] == {"source_minutes": 0, "source_revisions": 1,
                                      "composite_minutes": 0, "composite_inputs": 0,
-                                     "composite_input_events": 0}
+                                     "composite_input_events": 0, "source_fetches": 0,
+                                     "source_blobs": 0, "aggregate_bars": 0}
     assert planned["deletable_revisions"] == 1
     assert planned["rows"] == 1
     assert planned["bytes"] > 0
@@ -309,7 +319,8 @@ def contract_unreferenced_head_is_deleted(factory):
     planned = window.dry_run(run_id, now=NOW)
     assert planned["candidates"] == {"source_minutes": 1, "source_revisions": 1,
                                      "composite_minutes": 0, "composite_inputs": 0,
-                                     "composite_input_events": 0}
+                                     "composite_input_events": 0, "source_fetches": 0,
+                                     "source_blobs": 0, "aggregate_bars": 0}
     assert planned["rows"] == 2
     drill()
     report = window.execute(run_id, now=NOW)
@@ -404,7 +415,7 @@ def contract_kill_between_commit_and_release_keeps_counts(factory):
     final = switch_runs.get(run_id)["retention"]
     assert final["state"] == "completed"
     assert final["stats"]["rows"] == 15
-    assert final["stats"]["deleted"] == {
+    assert final["stats"]["deleted"] == {**ZERO,
         "market_composite_minute_inputs": 3,
         "market_composite_minutes": 3,
         "market_composite_input_events": 3,

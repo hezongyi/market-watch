@@ -13,8 +13,11 @@ from test_market_contracts import minute
 
 @pytest.fixture
 def running(database, monkeypatch):
+    monkeypatch.setattr(settings, "oanda_account_id", "test-account")
+    monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD,XAU_USD")
     monkeypatch.setattr(settings, "oanda_recovery_minutes", 2)
     monkeypatch.setattr("alerts.live_pricing.now_ms", lambda: 125000)
+    monkeypatch.setattr("alerts.live_window.now_ms", lambda: 125000)
     live.ensure_catalog([
         {"name": "EUR_USD", "type": "CURRENCY", "displayPrecision": 5},
         {"name": "XAU_USD", "type": "METAL", "displayPrecision": 3},

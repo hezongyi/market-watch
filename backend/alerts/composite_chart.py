@@ -17,9 +17,7 @@ from .storage import (
     CompositePreparation,
     CompositeRevision,
     HistoryVersion,
-    LiveState,
     MarketComposite,
-    RealtimeMapping,
     now_ms,
 )
 
@@ -69,13 +67,13 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
     # Jump across missing intervals by indexed observed timestamps. Fixed input
     # versions filter revisions before selecting, so current heads cannot leak in.
     def latest_minute(bound):
+        from .live_window import lower_bound
+
         query = select(func.max(CompositeMinuteInput.start)).where(
             CompositeMinuteInput.revision_id == revision.id,
             CompositeMinuteInput.input_revision <= value,
-            CompositeMinuteInput.start < bound, CompositeMinuteInput.start >= seam)
+            CompositeMinuteInput.start < bound, CompositeMinuteInput.start >= max(seam, lower_bound(stamp)))
         return db.scalar(query)
-    mapping = db.get(RealtimeMapping, revision.mapping_id)
-    from .display_observations import latest as latest_observed, read as observed_rows
 
     def latest_display(bound):
         confirmed = latest_minute(bound)

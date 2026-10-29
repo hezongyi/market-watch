@@ -3,8 +3,16 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from sqlalchemy import select
 
 from .composite_revisions import owned
-from .storage import (CompositePreparation, CompositeReadAttempt, CompositeRevision, Instrument,
-                      MarketDataset, RealtimeMapping, now_ms, transaction)
+from .storage import (
+    CompositePreparation,
+    CompositeReadAttempt,
+    CompositeRevision,
+    Instrument,
+    MarketDataset,
+    RealtimeMapping,
+    now_ms,
+    transaction,
+)
 
 
 class RecheckRequest(BaseModel):
@@ -37,6 +45,9 @@ def recheck(composite_id, revision_id, body, adapter):
     body = RecheckRequest.model_validate(body)
     token = read_id("gap:" + revision_id + ":" + body.request_id)
     stamp = now_ms()
+    from .live_window import require_window
+
+    require_window(body.start, now=stamp)
     with transaction() as db:
         owned(db, composite_id, lock=True)
         revision = db.get(CompositeRevision, revision_id)
@@ -86,8 +97,8 @@ def recheck(composite_id, revision_id, body, adapter):
         if batch.identity != identity or (batch.window_start, batch.window_end) != (body.start, body.end):
             raise ValueError("来源复核身份或区间不匹配")
         with transaction() as db:
-            from .confirmed_minutes import record
             from .composite_inputs import apply_minutes
+            from .confirmed_minutes import record
             # The same source -> preparation lock order as live confirmation.
             recorded = record(db, batch)
             attempt = db.get(CompositeReadAttempt, token)

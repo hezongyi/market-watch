@@ -17,10 +17,8 @@ from .storage import (
     CompositeRevision,
     HistoryVersion,
     Instrument,
-    LiveState,
     MarketComposite,
     MarketDataset,
-    PricingOwner,
     RealtimeMapping,
     instant,
     ms,
@@ -149,17 +147,20 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
     segments = {"history": history_meta, "target": target_meta}
     # Only the shared worker supplies this cache. Public historical reads keep
     # their fixed-input behavior and never depend on mutable worker state.
-    state = realtime.state(db, revision, frame, left, right, value, version, segments) if realtime else None
+    state = realtime.state(db, revision, frame, left, right, value, version, segments,
+                           now=stamp) if realtime else None
     minutes = []
     history_left, history_right = max(left, version.start), min(right, revision.seam, version.end)
     if state is None and history_left < history_right:
         minutes.extend({**row, "segment": "history", "source_id": history_meta["source_id"],
             "volume_kind": history_meta["volume_kind"], "volume_unit": history_meta["volume_unit"]}
             for row in snapshot_rows(db, version.id, start=history_left, end=history_right))
-    tail_left = max(left, revision.seam)
+    from .live_window import lower_bound
+
+    tail_left = max(left, revision.seam, lower_bound(stamp))
     if state is None and tail_left < right:
         minutes.extend({**row, "segment": "target"} for row in tail_rows(db, revision.id, tail_left, right,
-                                                                         input_revision=value))
+                                                                         input_revision=value, now=stamp))
     if realtime and state is None:
         state = realtime.initialize(revision, frame, left, version, segments, value, minutes)
     if state:

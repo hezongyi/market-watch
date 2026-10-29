@@ -655,6 +655,12 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
             .order_by(ObservedMinute.start).limit(1))
         if pending is not None:
             start = min(start, pending)
+        from .live_window import lower_bound
+
+        # A restart must not re-download expired inputs from an old recovery
+        # cursor or a persistent unconfirmed observation.
+        floor = max(0, (lower_bound(stamp) + 59999) // 60000 * 60000)
+        start = max(start, floor)
         # Bound the fenced ingestion transaction so heartbeat publishing and
         # lease renewal do not wait behind an entire multi-day recovery.
         end = min(cutoff, start + 240 * 60000)

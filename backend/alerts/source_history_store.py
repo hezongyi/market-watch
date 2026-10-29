@@ -88,6 +88,7 @@ def shared_page(adapter, identity, start, end, *, fresh_after, evidence=None):
         insert = _insert(db)
         db.execute(insert(SourceSeries).values(id=source.key, identity=source.model_dump())
                    .on_conflict_do_nothing(index_elements=["id"]))
+        db.scalar(select(SourceSeries).where(SourceSeries.id == source.key).with_for_update())
         db.execute(insert(SourceFetch).values(id=key, source_id=source.key, start=start, end=end,
                                              fetched_at=0, lease_until=0)
                    .on_conflict_do_nothing(index_elements=["id"]))
@@ -119,6 +120,7 @@ def shared_page(adapter, identity, start, end, *, fresh_after, evidence=None):
             if batch.result.successful:
                 raise ValueError("Invalid shared source page or checkpoint")
         with transaction() as db:
+            db.scalar(select(SourceSeries).where(SourceSeries.id == source.key).with_for_update())
             fetch = db.scalar(select(SourceFetch).where(SourceFetch.id == key).with_for_update())
             if fetch.lease_token != token or fetch.lease_until <= now_ms():
                 raise AcquisitionBusy("source_page_lease_replaced")
@@ -132,8 +134,9 @@ def shared_page(adapter, identity, start, end, *, fresh_after, evidence=None):
         return batch
     except BaseException:
         with transaction() as db:
+            db.scalar(select(SourceSeries).where(SourceSeries.id == source.key).with_for_update())
             fetch = db.scalar(select(SourceFetch).where(SourceFetch.id == key).with_for_update())
-            if fetch.lease_token == token:
+            if fetch is not None and fetch.lease_token == token:
                 fetch.lease_token, fetch.lease_until = None, 0
         raise
 

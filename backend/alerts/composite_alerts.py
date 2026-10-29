@@ -131,11 +131,12 @@ def bound_rules(db, composite_id, *, lock=False):
     """Active rules whose current version binds a revision of this composite."""
     query = select(ChartAlertVersion, ChartAlert).join(
         ChartAlert, (ChartAlertVersion.alert_id == ChartAlert.id) & (
-            ChartAlertVersion.version == ChartAlert.version)).where(ChartAlert.status == "active")
+            ChartAlertVersion.version == ChartAlert.version)).where(
+                ChartAlert.status == "active",
+                ChartAlertVersion.market_identity["composite_id"].as_string() == composite_id)
     if lock:
         query = query.with_for_update()
-    return [(version, alert) for version, alert in db.execute(query)
-            if version.market_identity.get("composite_id") == composite_id]
+    return list(db.execute(query))
 
 
 def pause(db, rules, *, reason, run_id=None, now=None):
@@ -457,6 +458,11 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     # Explicit historical/test clocks stay fixed; no age is clamped to zero.
     if clock is not None:
         now = clock()
+    from .live_window import lower_bound
+
+    if revision.seam < lower_bound(now):
+        alert.status, alert.control_revision = "paused", alert.control_revision + 1
+        return wait(alert, runtime, "blocked", "实时基线超出30天可用窗口，等待更新历史基线")
     from .realtime_switch import enabled
 
     source_dataset = db.get(MarketDataset, identity["dataset_id"])

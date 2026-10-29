@@ -168,6 +168,11 @@ def candidate_plan(db, composite_id):
     if chosen["recommended_seam"] > cutoff:
         return {"blocked": _reason("candidate_beyond_cutoff",
                                    "最新历史版本尚未进入本轮准备截止")}
+    from .live_window import lower_bound
+
+    if chosen["recommended_seam"] < lower_bound(revision_now()):
+        return {"blocked": _reason("history_outside_live_window",
+                                   "最新历史未覆盖30天实时窗口，需更新历史基线")}
     chosen = {**chosen, "mapping_id": reviewed[0]["id"]}
     return {
         "active_revision_id": active.id,
@@ -562,11 +567,31 @@ def _finish(report, before, composite_id, record, candidate_id):
     if record is not None and record.get("state") not in LIVE_STATES:
         record = switch_runs.record_shadow(record["id"], report)
         if report["status"] != "ready":
-            switch_runs.set_state(record["id"], "failed", phase="shadow_" + report["status"],
+            record = switch_runs.set_state(record["id"], "failed", phase="shadow_" + report["status"],
                                   error_summary={"status": report["status"],
                                                  "candidate_revision_id": candidate_id,
                                                  "reasons": report["reasons"][:8]})
             report["run"] = {**report["run"], "state": "failed"}
+            from . import composite_alerts, switch_notice
+            from .live_window import lower_bound
+
+            with transaction() as db:
+                composite = db.get(MarketComposite, composite_id)
+                expired_rules = []
+                lower = lower_bound()
+                for version, alert in composite_alerts.bound_rules(db, composite_id, lock=True):
+                    revision = db.get(CompositeRevision,
+                                      version.market_identity.get("composite_revision_id"))
+                    if revision is None or revision.seam < lower:
+                        expired_rules.append((version, alert))
+                paused = composite_alerts.pause(db, expired_rules,
+                    reason="历史基线未覆盖实时窗口，暂停等待重建", run_id=record["id"])
+                switch_notice.record(db, run=record, stage="shadow",
+                    reasons=[{"stage": "shadow", "scope": composite_id,
+                              "type": item["code"], "reason": item["detail"]}
+                             for item in report["reasons"]],
+                    counts={"sources": 1, "rules": len(affected_rules(db, composite_id)),
+                            "paused": len(paused), "active_revision_id": composite.active_revision_id})
         else:
             report["run"] = {**report["run"], "state": record["state"]}
     return report

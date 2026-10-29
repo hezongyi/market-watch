@@ -15,6 +15,10 @@ from .storage import SourceMinute, SourceMinuteRevision, SourceSeries, uid
 
 def record(db, batch):
     source = collection_identity(batch.identity)
+    if source.source != "dukascopy":
+        from .live_window import require_window
+
+        require_window(batch.window_start)
     if (not batch.result.successful or batch.checkpoint is None or
             not batch.window_start < batch.checkpoint <= batch.window_end or
             any(not row.complete or row.timestamp + 60000 > batch.checkpoint for row in batch.rows)):

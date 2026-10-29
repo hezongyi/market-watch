@@ -9,28 +9,36 @@ Real foreign keys decide the deletion order, and a recorded restore drill gates
 the first real deletion.
 """
 
+import gzip
 import hashlib
 import json
 from pathlib import Path
 from uuid import uuid4
 
-from sqlalchemy import and_, delete, exists, func, inspect, or_, select, text
+from sqlalchemy import BigInteger, and_, cast, delete, exists, func, inspect, or_, select, text
 
 from . import backup, switch_runs
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
+    CompositeAggregateBar,
     CompositeAggregateTask,
     CompositeInputEvent,
     CompositeMinute,
     CompositeMinuteInput,
     CompositePreparation,
     CompositeRevision,
+    HistoryChunk,
     MarketComposite,
+    MarketDataset,
     MarketSwitchRun,
     Preference,
+    RealtimeMapping,
+    SourceBlob,
+    SourceFetch,
     SourceMinute,
     SourceMinuteRevision,
+    SourceSeries,
     now_ms,
     transaction,
 )
@@ -53,6 +61,9 @@ DELETION_ORDER = (
     "market_composite_input_events",
     "market_source_minutes",
     "market_source_minute_revisions",
+    "market_source_fetches",
+    "market_source_blobs",
+    "market_composite_aggregate_bars",
 )
 
 # Estimates for the dry-run byte report: source revision payloads are measured,
@@ -114,10 +125,14 @@ def _protected_revisions(db, now):
     for revision in active:
         mark(revision, "active_composite_revision")
     prepared = set()
+    frozen_revisions = set(db.scalars(select(CompositePreparation.revision_id).where(
+        CompositePreparation.state["revision_frozen"].as_boolean().is_(True))))
     for revision_id, status, error, lease_until in db.execute(select(
             CompositePreparation.revision_id, CompositePreparation.status,
             CompositePreparation.error, CompositePreparation.lease_until)):
         prepared.add(revision_id)
+        if revision_id in frozen_revisions:
+            continue
         if status != "queried" or error:
             mark(revision_id, "incomplete_preparation")
         elif lease_until > now:
@@ -127,6 +142,8 @@ def _protected_revisions(db, now):
             CompositeAggregateTask.lease_until, CompositePreparation.input_revision).join(
                 CompositePreparation,
                 CompositePreparation.revision_id == CompositeAggregateTask.revision_id)):
+        if revision_id in frozen_revisions:
+            continue
         if lease_until > now:
             mark(revision_id, "leased_task")
         elif applied < input_revision:
@@ -150,13 +167,14 @@ def _protected_revisions(db, now):
     return {revision: frozenset(value) for revision, value in reasons.items()}
 
 
-def _candidate_minutes(db, lower, limit, deadline, skip=()):
+def _candidate_minutes(db, lower, limit, deadline, skip=(), sources=()):
     """Bounded keyset selection of source head rows older than the bound."""
     output, cursor = [], None
     while len(output) < limit and now_ms() <= deadline:
         size = min(DEFAULT_CHUNK, limit - len(output))
         query = select(SourceMinute.source_id, SourceMinute.start,
-                       SourceMinute.revision_id).where(SourceMinute.start < lower)
+                       SourceMinute.revision_id).where(SourceMinute.start < lower,
+                                                       SourceMinute.source_id.in_(sources))
         if cursor:
             query = query.where(or_(
                 SourceMinute.start > cursor[0],
@@ -172,7 +190,7 @@ def _candidate_minutes(db, lower, limit, deadline, skip=()):
     return output
 
 
-def _candidate_orphans(db, lower, limit, deadline, skip=()):
+def _candidate_orphans(db, lower, limit, deadline, skip=(), sources=()):
     """Superseded price revisions whose source head row points at a newer one."""
     output, cursor = [], None
     head_pointer = exists().where(SourceMinute.revision_id == SourceMinuteRevision.id)
@@ -180,7 +198,8 @@ def _candidate_orphans(db, lower, limit, deadline, skip=()):
         size = min(DEFAULT_CHUNK, limit - len(output))
         query = select(SourceMinuteRevision.id, SourceMinuteRevision.source_id,
                        SourceMinuteRevision.start).where(
-            SourceMinuteRevision.start < lower, ~head_pointer)
+            SourceMinuteRevision.start < lower, ~head_pointer,
+            SourceMinuteRevision.source_id.in_(sources))
         if cursor:
             query = query.where(or_(
                 SourceMinuteRevision.start > cursor[0],
@@ -196,7 +215,8 @@ def _candidate_orphans(db, lower, limit, deadline, skip=()):
     return output
 
 
-def _plan(db, *, lower, limit, now, deadline, skip_minutes=(), skip_revisions=()):
+def _plan(db, *, lower, limit, now, deadline, skip_minutes=(), skip_revisions=(), sources=(),
+          blob_cursor=None):
     """Select at most one batch of candidate minutes and classify every reference.
 
     A quarter of the batch is offered to orphan revisions first, so an old head
@@ -204,9 +224,9 @@ def _plan(db, *, lower, limit, now, deadline, skip_minutes=(), skip_revisions=()
     then uses whatever capacity is left.
     """
     orphans = _candidate_orphans(db, lower, min(limit, max(1, limit // 4)), deadline,
-                                 skip_revisions)
+                                 skip_revisions, sources)
     candidates = _candidate_minutes(db, lower, max(0, limit - len(orphans)), deadline,
-                                    skip_minutes)
+                                    skip_minutes, sources)
     candidates += orphans
     revisions = list(dict.fromkeys(candidate["revision_id"] for candidate in candidates))
     payload, references = {}, {}
@@ -247,18 +267,78 @@ def _plan(db, *, lower, limit, now, deadline, skip_minutes=(), skip_revisions=()
     touched = sorted({revision for revision_id in deletable
                       for revision in references.get(revision_id, ())})
     events = _planned_events(db, touched, deletable)
+    pages = list(db.scalars(select(SourceFetch).where(
+        SourceFetch.source_id.in_(sources), SourceFetch.end <= lower,
+        SourceFetch.lease_until <= now).order_by(SourceFetch.id).limit(limit)
+        .with_for_update(skip_locked=True)))
+    page_ids = [page.id for page in pages]
+    blobs = []
+    from .history_retention import frame_content_ids
+
+    pending_content = frame_content_ids(db)
+    # Replaced page responses no longer have a fetch pointer. Inspect only
+    # bounded orphan payloads of the switched source; never infer a TTL from
+    # checksum order, nor remove a payload containing an in-window minute.
+    blob_query = select(SourceBlob).where(
+        SourceBlob.source_id.in_(sources),
+        ~exists().where(SourceFetch.content_id == SourceBlob.id),
+        ~exists().where(HistoryChunk.content_id == SourceBlob.id))
+    if blob_cursor:
+        blob_query = blob_query.where(SourceBlob.id > blob_cursor)
+    orphan_blobs = list(db.scalars(blob_query.order_by(SourceBlob.id).limit(limit)
+                                  .with_for_update()))
+    blob_scan = {"cursor": orphan_blobs[-1].id if orphan_blobs else blob_cursor,
+                 "scanned": len(orphan_blobs), "complete": len(orphan_blobs) < limit}
+    for blob in orphan_blobs:
+        if blob.id in pending_content:
+            continue
+        decoded = json.loads(gzip.decompress(blob.content))
+        if (isinstance(decoded, list) and decoded and all(
+                isinstance(row, dict) and isinstance(row.get("timestamp"), int)
+                and row["timestamp"] + 60000 <= lower for row in decoded)):
+            blobs.append(blob.id)
+    list(db.scalars(select(SourceBlob).where(SourceBlob.id.in_(
+        [page.content_id for page in pages if page.content_id])).order_by(SourceBlob.id).with_for_update()))
+    for blob_id in sorted({page.content_id for page in pages if page.content_id}):
+        if (blob_id not in pending_content and
+                not db.scalar(select(SourceFetch.id).where(SourceFetch.content_id == blob_id,
+                SourceFetch.id.not_in(page_ids)).limit(1)) and
+                not db.scalar(select(HistoryChunk.id).where(HistoryChunk.content_id == blob_id).limit(1))):
+            blobs.append(blob_id)
+    aggregates = []
+    from .source_registry import collection_identity
+    scoped_revisions = []
+    for revision_id, identity in db.execute(select(CompositeRevision.id, MarketDataset.identity).join(
+            RealtimeMapping, RealtimeMapping.id == CompositeRevision.mapping_id).join(
+            MarketDataset, MarketDataset.id == RealtimeMapping.target_dataset_id)):
+        if collection_identity(identity).key in sources:
+            scoped_revisions.append(revision_id)
+    for row in db.scalars(select(CompositeAggregateBar).where(
+            CompositeAggregateBar.revision_id.in_(scoped_revisions),
+            CompositeAggregateBar.revision_id.not_in(list(protected)),
+            CompositeAggregateBar.start < lower,
+            cast(CompositeAggregateBar.data["end"].as_string(), BigInteger) <= lower)
+            .order_by(CompositeAggregateBar.start).limit(limit)):
+        if row.data.get("end", lower + 1) <= lower:
+            aggregates.append((row.revision_id, row.timeframe, row.start, row.input_revision))
     counts = {
         "source_minutes": sum(1 for candidate in candidates if candidate["head"]),
         "source_revisions": len(revisions),
         "composite_minutes": sum(minute_rows.get(revision, 0) for revision in deletable),
         "composite_inputs": sum(input_rows.get(revision, 0) for revision in deletable),
         "composite_input_events": events,
+        "source_fetches": len(page_ids), "source_blobs": len(blobs),
+        "aggregate_bars": len(aggregates),
     }
     payload_bytes = sum(payload.get(revision, 0) for revision in deletable)
+    blobs = sorted(set(blobs))
+    cache_bytes = sum(len(content) for content in db.scalars(select(SourceBlob.content).where(
+        SourceBlob.id.in_(blobs))))
     estimated = (payload_bytes + counts["source_minutes"] * SOURCE_MINUTE_BYTES +
                  counts["composite_minutes"] * COMPOSITE_MINUTE_BYTES +
                  counts["composite_inputs"] * COMPOSITE_INPUT_BYTES +
-                 counts["composite_input_events"] * COMPOSITE_EVENT_BYTES)
+                 counts["composite_input_events"] * COMPOSITE_EVENT_BYTES + cache_bytes +
+                 counts["aggregate_bars"] * COMPOSITE_MINUTE_BYTES)
     detail, by_reason = [], {}
     for candidate in candidates:
         reasons = blocked.get(candidate["revision_id"])
@@ -276,6 +356,8 @@ def _plan(db, *, lower, limit, now, deadline, skip_minutes=(), skip_revisions=()
                          if not candidate["head"] and candidate["revision_id"] in blocked]
     return {
         "deletable": deletable,
+        "pages": page_ids, "blobs": blobs, "aggregates": aggregates,
+        "blob_scan": blob_scan,
         "blocked": blocked,
         "blocked_minutes": blocked_minutes,
         "blocked_revisions": blocked_revisions,
@@ -313,8 +395,6 @@ def _delete(db, plan):
     deletable = plan["deletable"]
     touched = plan["touched"]
     counts = _zero_deleted()
-    if not deletable:
-        return counts
     # A candidate with no references at all (an orphan price revision, or a head
     # row no composite minute ever consumed) has an empty allowlist: its source
     # side still goes, in the same foreign-key order, so such data can be cleared.
@@ -340,6 +420,13 @@ def _delete(db, plan):
         counts["market_source_minute_revisions"] += db.execute(delete(
             SourceMinuteRevision).where(
                 SourceMinuteRevision.id.in_(chunk))).rowcount
+    for ids, model in ((plan["pages"], SourceFetch), (plan["blobs"], SourceBlob)):
+        for chunk in _chunks(ids):
+            counts[model.__tablename__] += db.execute(delete(model).where(model.id.in_(chunk))).rowcount
+    for revision_id, frame, start, value in plan["aggregates"]:
+        counts["market_composite_aggregate_bars"] += db.execute(delete(CompositeAggregateBar).where(
+            CompositeAggregateBar.revision_id == revision_id, CompositeAggregateBar.timeframe == frame,
+            CompositeAggregateBar.start == start, CompositeAggregateBar.input_revision == value)).rowcount
     return counts
 
 
@@ -349,7 +436,8 @@ def _plan_report(plan):
         "rows": sum(plan["counts"].values()),
         "bytes": plan["bytes"],
         "payload_bytes": plan["payload_bytes"],
-        "deletable_revisions": len(plan["deletable"]),
+        "deletable_revisions": (len(plan["deletable"]) + len(plan["pages"]) +
+                                len(plan["blobs"]) + len(plan["aggregates"])),
         "protected": {
             "revisions": len(plan["blocked"]),
             "by_reason": dict(sorted(plan["by_reason"].items())),
@@ -437,14 +525,34 @@ def _gate():
     return {"ok": True, "reason": None, "marker": marker}
 
 
-def _remaining(lower):
+def _source_scope(db, run):
+    """Exact collection identities from this successful switch, never a global grant."""
+    from .source_registry import collection_identity
+
+    sources = set()
+    for revision_id in (run["previous_revision_id"], run["target_revision_id"]):
+        revision = db.get(CompositeRevision, revision_id) if revision_id else None
+        if revision is None or revision.composite_id != run["composite_id"]:
+            continue
+        mapping = db.get(RealtimeMapping, revision.mapping_id)
+        target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+        if target:
+            source = collection_identity(target.identity)
+            row = db.get(SourceSeries, source.key)
+            if source.source != "dukascopy" and row and row.identity == source.model_dump():
+                sources.add(source.key)
+    return sorted(sources)
+
+
+def _remaining(lower, sources):
     with transaction() as db:
         head_pointer = exists().where(
             SourceMinute.revision_id == SourceMinuteRevision.id)
         heads = db.scalar(select(func.count()).select_from(SourceMinute).where(
-            SourceMinute.start < lower))
+            SourceMinute.start < lower, SourceMinute.source_id.in_(sources)))
         orphans = db.scalar(select(func.count()).select_from(SourceMinuteRevision).where(
-            SourceMinuteRevision.start < lower, ~head_pointer))
+            SourceMinuteRevision.start < lower, ~head_pointer,
+            SourceMinuteRevision.source_id.in_(sources)))
         return int(heads or 0), int(orphans or 0)
 
 
@@ -459,7 +567,8 @@ def _blank_report(*, dry_run, stamp, lower):
         "rows": 0,
         "bytes": 0,
         "candidates": {"source_minutes": 0, "source_revisions": 0, "composite_minutes": 0,
-                       "composite_inputs": 0, "composite_input_events": 0},
+                       "composite_inputs": 0, "composite_input_events": 0,
+                       "source_fetches": 0, "source_blobs": 0, "aggregate_bars": 0},
         "protected": {"revisions": 0, "by_reason": {}, "detail": [], "detail_truncated": False},
         "remaining": None,
         "batch": None,
@@ -484,12 +593,19 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
             "reason": "switch_run_" + str(run["state"]),
             "detail": "只有持久化的 succeeded 切换运行解锁清理"})
         return report
+    with transaction() as db:
+        sources = _source_scope(db, run)
+    report["source_ids"] = sources
+    if not sources:
+        report["skipped"].append({"reason": "switch_source_scope_missing",
+                                  "detail": "成功切换未绑定可核对的实时来源，不清理"})
+        return report
     if dry_run:
         claimed = switch_runs.claim_retention(run_id, dry_run=True)
         report["batch"] = _batch_summary(claimed)
         deadline = now_ms() + budget_ms
         with transaction() as db:
-            plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline)
+            plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
         report.update(_plan_report(plan))
         switch_runs.release_retention(run_id, outcome="completed", stats={
             "planned_rows": report["rows"], "planned_bytes": report["bytes"],
@@ -514,6 +630,7 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
         "bytes": int(previous.get("bytes") or 0),
         "deleted": {name: int((previous.get("deleted") or {}).get(name) or 0)
                     for name in DELETION_ORDER},
+        "blob_scan": dict(previous.get("blob_scan") or {}),
     }
     deadline = now_ms() + budget_ms
     processed, exhausted = 0, False
@@ -532,6 +649,7 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
             skip_minutes.update(applied["blocked_minutes"])
             skip_revisions.update(applied["blocked_revisions"])
             advanced = len(skip_minutes) + len(skip_revisions) > classified
+            advanced |= applied["blob_scan"]["scanned"] > 0
             candidates = summary["candidates"]
             for key, value in candidates.items():
                 report["candidates"][key] += value
@@ -548,9 +666,13 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
             passed = sum(deleted.values())
             report["rows"] += passed
             report["bytes"] += planned_bytes
-            processed += candidates["source_minutes"] + candidates["source_revisions"]
+            processed += max(1, candidates["source_minutes"] + candidates["source_revisions"] +
+                             candidates["source_fetches"] + candidates["aggregate_bars"] +
+                             applied["blob_scan"]["scanned"])
             if not summary["deletable_revisions"] and not (
-                    candidates["source_minutes"] or candidates["source_revisions"]):
+                    candidates["source_minutes"] or candidates["source_revisions"] or
+                    candidates["source_fetches"] or candidates["source_blobs"] or candidates["aggregate_bars"]
+                    or not applied["blob_scan"]["complete"]):
                 exhausted = True
                 break
             if not passed and not advanced:
@@ -563,9 +685,9 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
     except Exception:
         switch_runs.release_retention(run_id, outcome="interrupted", stats=_stats(totals, None))
         raise
-    heads, orphans = _remaining(lower)
+    heads, orphans = _remaining(lower, sources)
     report["remaining"] = {"source_minutes": heads, "source_revisions": orphans}
-    finished = exhausted or (heads == 0 and orphans == 0)
+    finished = exhausted
     released = switch_runs.release_retention(
         run_id, outcome="completed" if finished else "interrupted",
         stats=_stats(totals, report["remaining"]))
@@ -578,6 +700,7 @@ def _stats(totals, remaining):
         "rows": totals["rows"],
         "bytes": totals["bytes"],
         "deleted": dict(totals["deleted"]),
+        "blob_scan": dict(totals.get("blob_scan") or {}),
         "remaining": remaining,
         "at": now_ms(),
     }
@@ -616,13 +739,20 @@ def _apply_chunk(*, run_id, lower, limit, now, deadline, skip_minutes, skip_revi
     already removed; the resumed totals stay equal to what the database lost.
     """
     with transaction() as db:
-        plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline,
-                     skip_minutes=skip_minutes, skip_revisions=skip_revisions)
+        run = switch_runs._record(db.get(MarketSwitchRun, run_id))
+        sources = _source_scope(db, run)
+        list(db.scalars(select(SourceSeries).where(SourceSeries.id.in_(sources))
+                        .order_by(SourceSeries.id).with_for_update()))
+        plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
+                     skip_minutes=skip_minutes, skip_revisions=skip_revisions,
+                     blob_cursor=totals.get("blob_scan", {}).get("cursor"))
         summary = _plan_report(plan)
         deleted = _delete(db, plan)
         projected = _project(totals, deleted, plan["bytes"])
+        projected["blob_scan"] = plan["blob_scan"]
         _persist(db, run_id, projected)
         applied = {"summary": summary, "deleted": deleted, "bytes": plan["bytes"],
+                   "blob_scan": plan["blob_scan"],
                    "blocked_minutes": plan["blocked_minutes"],
                    "blocked_revisions": plan["blocked_revisions"]}
     totals.update(projected)

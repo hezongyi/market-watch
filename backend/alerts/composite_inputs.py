@@ -36,6 +36,9 @@ def unfrozen():
 def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation"):
     if not recorded["minutes"]:
         return []
+    from .live_window import require_window
+
+    require_window(min(item["start"] for item in recorded["minutes"]))
     query = select(CompositeRevision, MarketDataset).join(
         RealtimeMapping, CompositeRevision.mapping_id == RealtimeMapping.id).join(
         MarketDataset, RealtimeMapping.target_dataset_id == MarketDataset.id).join(
@@ -101,7 +104,7 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
     return output
 
 
-def rows(db, revision_id, start, end, *, input_revision=None):
+def rows(db, revision_id, start, end, *, input_revision=None, now=None):
     """Bounded immutable input reconstruction, indexed by revision/minute/version."""
     prep = db.get(CompositePreparation, revision_id)
     if not prep:
@@ -109,6 +112,11 @@ def rows(db, revision_id, start, end, *, input_revision=None):
     value = prep.input_revision if input_revision is None else input_revision
     if not 0 <= value <= prep.input_revision or start >= end:
         raise ValueError("Invalid composite input revision/window")
+    from .live_window import lower_bound
+
+    start = max(start, lower_bound(now))
+    if start >= end:
+        return
     revision = db.get(CompositeRevision, revision_id)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     dataset = db.get(MarketDataset, mapping.target_dataset_id)

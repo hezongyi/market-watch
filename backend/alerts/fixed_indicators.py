@@ -234,6 +234,10 @@ def input_rows(db, run, *, limit=None):
 
     limit = PAGE_SIZE if limit is None else limit
     version, revision, phase, profiles = _context(db, run)
+    if revision:
+        from .live_window import require_window
+
+        require_window(revision.seam)
     seam_bucket = period(revision.seam, run.timeframe, phase)[0] if revision else run.target_end
     rows = []
     if run.cursor < min(seam_bucket, run.target_end):

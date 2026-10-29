@@ -124,6 +124,7 @@ def freeze_previous(db, previous, *, run_id, boundary, now):
     if prep is None:
         raise ValueError("旧修订缺少准备记录，不能安全冻结")
     waterline = prep.input_revision
+    prep.lease_token, prep.lease_until = None, 0
     prep.state = {**prep.state, "revision_frozen": True, "fence": {
         "run_id": run_id, "at": now, "waterline": waterline, "boundary": boundary,
         "policy": "no_live_fanout; no_aggregate_registration; late commits refused"}}
@@ -244,6 +245,14 @@ def publish(db, *, composite, revision, body, progress, now):
         completed.append("metrics")
         stage = "fence"
         fence = freeze_previous(db, previous, run_id=run.id, boundary=boundary, now=now)
+        # Other candidates of this composite were prepared against the old
+        # head. They cannot activate after this commit and must stop consuming.
+        discarded = list(db.scalars(select(CompositeRevision).where(
+            CompositeRevision.composite_id == composite.id,
+            CompositeRevision.id.not_in((previous.id, revision.id)),
+            CompositeRevision.activated_at.is_(None)).order_by(CompositeRevision.id)))
+        for candidate in discarded:
+            freeze_previous(db, candidate, run_id=run.id, boundary=boundary, now=now)
         completed.append("fence")
         stage = "activation"
         activation = CompositeActivation(revision_id=revision.id,
