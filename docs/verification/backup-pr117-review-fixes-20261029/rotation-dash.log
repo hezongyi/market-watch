@@ -1,0 +1,128 @@
+== default run (keep 14/14) ==
+PASS database backup exit code passes through
+PASS 14 newest dumps kept
+PASS their manifests kept
+PASS oldest dump removed
+PASS oldest manifest removed with it
+PASS 6th oldest dump removed
+PASS 7th oldest dump kept
+PASS newest dump kept
+PASS 14 newest config archives kept
+PASS 14 config checksums kept
+PASS oldest config archive removed
+PASS oldest config checksum removed with it
+PASS release evidence dump exempt
+PASS versioned config archive exempt (release)
+PASS versioned config archive exempt (rc)
+PASS lock file untouched
+PASS log file untouched
+PASS summary counts every removed file
+PASS per-file removal line
+PASS companion removal line
+PASS no dry-run marker without the switch
+== second run is idempotent ==
+PASS second run exit code
+PASS second run removes nothing
+PASS still 14 dumps
+== dry-run ==
+PASS dry-run exit code
+PASS dry-run deletes no dump
+PASS dry-run deletes no manifest
+PASS dry-run deletes no config archive
+PASS dry-run keeps the oldest dump
+PASS dry-run summary
+PASS dry-run lists candidates
+PASS dry-run does not claim removal
+== keep 0 disables the series ==
+PASS keep 0 exit code
+PASS keep 0 keeps every dump
+PASS keep 0 keeps every manifest
+PASS keep 0 still trims config archives
+PASS keep 0 summary
+== custom keep ==
+PASS custom keep exit code
+PASS custom keep keeps all dumps
+PASS custom keep trims to 3 configs
+PASS custom keep summary
+== empty backup directory ==
+PASS no-match exit code
+PASS no-match summary
+PASS no-match keeps lock
+PASS no-match keeps log
+== rotation still runs when the dump fails ==
+PASS failed dump keeps a non-zero exit code
+PASS failed dump is reported
+PASS failed dump night still trims to 14
+PASS failed dump night still trims configs
+PASS failed dump night still logs rotation
+== invalid retention fails before either series is deleted ==
+PASS MW_BACKUP_KEEP_DAILY=-1 is rejected
+PASS MW_BACKUP_KEEP_DAILY=-1 leaves all dumps
+PASS MW_BACKUP_KEEP_DAILY=-1 leaves all configs
+PASS MW_BACKUP_KEEP_CONFIG=-1 is rejected
+PASS MW_BACKUP_KEEP_CONFIG=-1 leaves all dumps
+PASS MW_BACKUP_KEEP_CONFIG=-1 leaves all configs
+PASS MW_BACKUP_KEEP_DAILY=bad is rejected
+PASS MW_BACKUP_KEEP_DAILY=bad leaves all dumps
+PASS MW_BACKUP_KEEP_DAILY=bad leaves all configs
+PASS MW_BACKUP_KEEP_CONFIG=bad is rejected
+PASS MW_BACKUP_KEEP_CONFIG=bad leaves all dumps
+PASS MW_BACKUP_KEEP_CONFIG=bad leaves all configs
+PASS MW_BACKUP_KEEP_DAILY=1.5 is rejected
+PASS MW_BACKUP_KEEP_DAILY=1.5 leaves all dumps
+PASS MW_BACKUP_KEEP_DAILY=1.5 leaves all configs
+PASS MW_BACKUP_KEEP_CONFIG=1.5 is rejected
+PASS MW_BACKUP_KEEP_CONFIG=1.5 leaves all dumps
+PASS MW_BACKUP_KEEP_CONFIG=1.5 leaves all configs
+PASS MW_BACKUP_KEEP_DAILY=01 is rejected
+PASS MW_BACKUP_KEEP_DAILY=01 leaves all dumps
+PASS MW_BACKUP_KEEP_DAILY=01 leaves all configs
+PASS MW_BACKUP_KEEP_CONFIG=01 is rejected
+PASS MW_BACKUP_KEEP_CONFIG=01 leaves all dumps
+PASS MW_BACKUP_KEEP_CONFIG=01 leaves all configs
+PASS MW_BACKUP_KEEP_DAILY= is rejected
+PASS MW_BACKUP_KEEP_DAILY= leaves all dumps
+PASS MW_BACKUP_KEEP_DAILY= leaves all configs
+PASS MW_BACKUP_KEEP_CONFIG= is rejected
+PASS MW_BACKUP_KEEP_CONFIG= leaves all dumps
+PASS MW_BACKUP_KEEP_CONFIG= leaves all configs
+PASS MW_BACKUP_KEEP_DAILY=999999999999999999999999999999999999 is rejected
+PASS MW_BACKUP_KEEP_DAILY=999999999999999999999999999999999999 leaves all dumps
+PASS MW_BACKUP_KEEP_DAILY=999999999999999999999999999999999999 leaves all configs
+PASS MW_BACKUP_KEEP_CONFIG=999999999999999999999999999999999999 is rejected
+PASS MW_BACKUP_KEEP_CONFIG=999999999999999999999999999999999999 leaves all dumps
+PASS MW_BACKUP_KEEP_CONFIG=999999999999999999999999999999999999 leaves all configs
+== invalid dry-run never enables deletion ==
+PASS invalid dry-run rejected
+PASS invalid dry-run leaves all dumps
+PASS invalid dry-run leaves all configs
+PASS invalid dry-run rejected
+PASS invalid dry-run leaves all dumps
+PASS invalid dry-run leaves all configs
+PASS invalid dry-run rejected
+PASS invalid dry-run leaves all dumps
+PASS invalid dry-run leaves all configs
+== timestamp-named release archives are protected ==
+PASS actual release configuration archive retained
+PASS actual release configuration checksum retained
+== incomplete files do not consume recovery-point slots ==
+PASS newest completed dump survives partial dump
+PASS newest completed dump marker survives
+PASS newest completed config survives partial archive
+PASS incomplete dump preserved for diagnosis
+PASS incomplete config preserved for diagnosis
+== legacy unmarked dumps are protected ==
+PASS legacy dump without completion marker retained
+PASS legacy dump manifest retained
+== real configuration archiver completion boundary ==
+PASS real config archiver succeeds
+PASS real config archiver uses daily namespace
+PASS real config archiver writes checksum
+PASS real config archiver writes completion last
+PASS real config archive checksum matches
+PASS real config archive is readable
+== failed configuration checksum never marks completion ==
+PASS failed configuration checksum fails archive stage
+PASS failed checksum leaves no completion marker
+
+112 passed, 0 failed

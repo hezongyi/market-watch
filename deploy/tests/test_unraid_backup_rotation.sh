@@ -3,7 +3,10 @@
 # Runs the real script against a throwaway appdata/backup tree. The configuration
 # archiver is stubbed so the fixture's file set stays deterministic; everything
 # else (lock, active release, compose entrypoint, rotation) is the shipped script.
+# TEST_SHELL selects the rotation shell. The real archiver uses the host shell
+# and GNU tar, as on Unraid; BusyBox tar need not implement GNU --exclude.
 set -u
+TEST_SHELL=${TEST_SHELL:-sh}
 
 here=$(cd "$(dirname "$0")" && pwd)
 source_script=$here/../unraid-backup.sh
@@ -76,8 +79,10 @@ fill() {  # 20 dumps + manifests, 20 config archives + checksums, 3 exemptions
     fill_stamp=$(printf '2026%02d01T000000000000Z' "$fill_i")
     printf '0123456789' > "$backup/alerts-$fill_stamp.dump"
     printf '{}' > "$backup/alerts-$fill_stamp.dump.json"
-    printf '0123456789' > "$backup/config-$fill_stamp-abc.tar.gz"
-    printf 'xx' > "$backup/config-$fill_stamp-abc.tar.gz.sha256"
+    : > "$backup/alerts-$fill_stamp.dump.complete"
+    printf '0123456789' > "$backup/config-daily-$fill_stamp-abc.tar.gz"
+    printf 'xx' > "$backup/config-daily-$fill_stamp-abc.tar.gz.sha256"
+    : > "$backup/config-daily-$fill_stamp-abc.tar.gz.complete"
     fill_i=$((fill_i + 1))
   done
   printf '0123456789' > "$backup/market-watch-v2.0.0-rc.1-20261028.dump"
@@ -86,7 +91,7 @@ fill() {  # 20 dumps + manifests, 20 config archives + checksums, 3 exemptions
 }
 
 run_backup() {  # optional environment assignments are passed by the caller
-  output=$(sh "$root/backup.sh" 2>&1)
+  output=$($TEST_SHELL "$root/backup.sh" 2>&1)
   status=$?
 }
 
@@ -109,12 +114,12 @@ check 'oldest manifest removed with it' no "$(exists "$backup/$oldest.dump.json"
 check '6th oldest dump removed' no "$(exists "$backup/alerts-20260601T000000000000Z.dump")"
 check '7th oldest dump kept' yes "$(exists "$backup/alerts-20260701T000000000000Z.dump")"
 check 'newest dump kept' yes "$(exists "$backup/$newest.dump")"
-check '14 newest config archives kept' 14 "$(count_of "$backup" 'config-2*.tar.gz')"
-check '14 config checksums kept' 14 "$(count_of "$backup" 'config-2*.sha256')"
+check '14 newest config archives kept' 14 "$(count_of "$backup" 'config-daily-2*.tar.gz')"
+check '14 config checksums kept' 14 "$(count_of "$backup" 'config-daily-2*.sha256')"
 check 'oldest config archive removed' no \
-  "$(exists "$backup/config-20260101T000000000000Z-abc.tar.gz")"
+  "$(exists "$backup/config-daily-20260101T000000000000Z-abc.tar.gz")"
 check 'oldest config checksum removed with it' no \
-  "$(exists "$backup/config-20260101T000000000Z-abc.tar.gz.sha256")"
+  "$(exists "$backup/config-daily-20260101T000000000000Z-abc.tar.gz.sha256")"
 check 'release evidence dump exempt' yes \
   "$(exists "$backup/market-watch-v2.0.0-rc.1-20261028.dump")"
 check 'versioned config archive exempt (release)' yes \
@@ -124,7 +129,7 @@ check 'versioned config archive exempt (rc)' yes \
 check 'lock file untouched' yes "$(exists "$backup/.backup.lock")"
 check 'log file untouched' 'previous run ok' "$(cat "$backup/latest-run.log")"
 contains 'summary counts every removed file' \
-  'rotation: removed 24 files (144 bytes); kept 14 dumps, 14 configs' "$output"
+  'rotation: removed 36 files (144 bytes); kept 14 dumps, 14 configs' "$output"
 contains 'per-file removal line' \
   'rotation: remove alerts-20260101T000000000000Z.dump (10 bytes)' "$output"
 contains 'companion removal line' \
@@ -141,15 +146,15 @@ teardown
 printf '== dry-run ==\n'
 setup 0
 fill
-output=$(MW_BACKUP_ROTATE_DRY_RUN=1 sh "$root/backup.sh" 2>&1)
+output=$(MW_BACKUP_ROTATE_DRY_RUN=1 $TEST_SHELL "$root/backup.sh" 2>&1)
 status=$?
 check 'dry-run exit code' 0 "$status"
 check 'dry-run deletes no dump' 20 "$(count_of "$backup" 'alerts-*.dump')"
 check 'dry-run deletes no manifest' 20 "$(count_of "$backup" 'alerts-*.json')"
-check 'dry-run deletes no config archive' 20 "$(count_of "$backup" 'config-2*.tar.gz')"
+check 'dry-run deletes no config archive' 20 "$(count_of "$backup" 'config-daily-2*.tar.gz')"
 check 'dry-run keeps the oldest dump' yes "$(exists "$backup/$oldest.dump")"
 contains 'dry-run summary' \
-  'rotation(dry-run): would remove 24 files (144 bytes); kept 14 dumps, 14 configs' "$output"
+  'rotation(dry-run): would remove 36 files (144 bytes); kept 14 dumps, 14 configs' "$output"
 contains 'dry-run lists candidates' \
   'rotation: remove alerts-20260101T000000000000Z.dump (10 bytes)' "$output"
 lacks 'dry-run does not claim removal' 'rotation: removed' "$output"
@@ -158,23 +163,23 @@ teardown
 printf '== keep 0 disables the series ==\n'
 setup 0
 fill
-output=$(MW_BACKUP_KEEP_DAILY=0 sh "$root/backup.sh" 2>&1)
+output=$(MW_BACKUP_KEEP_DAILY=0 $TEST_SHELL "$root/backup.sh" 2>&1)
 status=$?
 check 'keep 0 exit code' 0 "$status"
 check 'keep 0 keeps every dump' 20 "$(count_of "$backup" 'alerts-*.dump')"
 check 'keep 0 keeps every manifest' 20 "$(count_of "$backup" 'alerts-*.json')"
-check 'keep 0 still trims config archives' 14 "$(count_of "$backup" 'config-2*.tar.gz')"
+check 'keep 0 still trims config archives' 14 "$(count_of "$backup" 'config-daily-2*.tar.gz')"
 contains 'keep 0 summary' 'kept 20 dumps, 14 configs' "$output"
 teardown
 
 printf '== custom keep ==\n'
 setup 0
 fill
-output=$(MW_BACKUP_KEEP_DAILY=20 MW_BACKUP_KEEP_CONFIG=3 sh "$root/backup.sh" 2>&1)
+output=$(MW_BACKUP_KEEP_DAILY=20 MW_BACKUP_KEEP_CONFIG=3 $TEST_SHELL "$root/backup.sh" 2>&1)
 status=$?
 check 'custom keep exit code' 0 "$status"
 check 'custom keep keeps all dumps' 20 "$(count_of "$backup" 'alerts-*.dump')"
-check 'custom keep trims to 3 configs' 3 "$(count_of "$backup" 'config-2*.tar.gz')"
+check 'custom keep trims to 3 configs' 3 "$(count_of "$backup" 'config-daily-2*.tar.gz')"
 contains 'custom keep summary' 'kept 20 dumps, 3 configs' "$output"
 teardown
 
@@ -195,8 +200,114 @@ run_backup
 check 'failed dump keeps a non-zero exit code' 1 "$status"
 contains 'failed dump is reported' 'Database backup failed' "$output"
 check 'failed dump night still trims to 14' 14 "$(count_of "$backup" 'alerts-*.dump')"
-check 'failed dump night still trims configs' 14 "$(count_of "$backup" 'config-2*.tar.gz')"
-contains 'failed dump night still logs rotation' 'rotation: removed 24 files' "$output"
+check 'failed dump night still trims configs' 14 "$(count_of "$backup" 'config-daily-2*.tar.gz')"
+contains 'failed dump night still logs rotation' 'rotation: removed 36 files' "$output"
+teardown
+
+printf '== invalid retention fails before either series is deleted ==\n'
+for invalid in -1 bad 1.5 01 "" 999999999999999999999999999999999999; do
+  for setting in MW_BACKUP_KEEP_DAILY MW_BACKUP_KEEP_CONFIG; do
+    setup 0
+    fill
+    output=$(env "$setting=$invalid" $TEST_SHELL "$root/backup.sh" 2>&1)
+    status=$?
+    contains "$setting=$invalid is rejected" 'Invalid retention' "$output"
+    check "$setting=$invalid leaves all dumps" 20 "$(count_of "$backup" 'alerts-*.dump')"
+    check "$setting=$invalid leaves all configs" 20 "$(count_of "$backup" 'config-daily-*.tar.gz')"
+    teardown
+  done
+done
+
+printf '== invalid dry-run never enables deletion ==\n'
+for invalid in '' 2 yes; do
+  setup 0
+  fill
+  output=$(MW_BACKUP_ROTATE_DRY_RUN="$invalid" $TEST_SHELL "$root/backup.sh" 2>&1)
+  contains 'invalid dry-run rejected' 'Invalid retention dry-run switch' "$output"
+  check 'invalid dry-run leaves all dumps' 20 "$(count_of "$backup" 'alerts-*.dump')"
+  check 'invalid dry-run leaves all configs' 20 "$(count_of "$backup" 'config-daily-*.tar.gz')"
+  teardown
+done
+
+printf '== timestamp-named release archives are protected ==\n'
+setup 0
+fill
+published=config-20261028T150906Z-XgDEue.tar.gz
+printf 'release evidence' > "$backup/$published"
+printf 'checksum' > "$backup/$published.sha256"
+run_backup
+check 'actual release configuration archive retained' yes "$(exists "$backup/$published")"
+check 'actual release configuration checksum retained' yes "$(exists "$backup/$published.sha256")"
+teardown
+
+printf '== incomplete files do not consume recovery-point slots ==\n'
+setup 0
+fill
+for candidate in alerts-20270101T000000000000Z.dump config-daily-20270101T000000Z-abc.tar.gz; do
+  printf partial > "$backup/$candidate"
+done
+printf '{' > "$backup/alerts-20270101T000000000000Z.dump.json"
+printf partial > "$backup/config-daily-20270101T000000Z-abc.tar.gz.sha256"
+output=$(MW_BACKUP_KEEP_DAILY=1 MW_BACKUP_KEEP_CONFIG=1 $TEST_SHELL "$root/backup.sh" 2>&1)
+status=$?
+check 'newest completed dump survives partial dump' yes "$(exists "$backup/$newest.dump")"
+check 'newest completed dump marker survives' yes "$(exists "$backup/$newest.dump.complete")"
+check 'newest completed config survives partial archive' yes \
+  "$(exists "$backup/config-daily-20262001T000000000000Z-abc.tar.gz")"
+check 'incomplete dump preserved for diagnosis' yes "$(exists "$backup/alerts-20270101T000000000000Z.dump")"
+check 'incomplete config preserved for diagnosis' yes "$(exists "$backup/config-daily-20270101T000000Z-abc.tar.gz")"
+teardown
+
+printf '== legacy unmarked dumps are protected ==\n'
+setup 0
+fill
+printf legacy > "$backup/alerts-20250101T000000000000Z.dump"
+printf '{}' > "$backup/alerts-20250101T000000000000Z.dump.json"
+run_backup
+check 'legacy dump without completion marker retained' yes \
+  "$(exists "$backup/alerts-20250101T000000000000Z.dump")"
+check 'legacy dump manifest retained' yes \
+  "$(exists "$backup/alerts-20250101T000000000000Z.dump.json")"
+teardown
+
+printf '== real configuration archiver completion boundary ==\n'
+setup 0
+printf 'placeholder=test-only\n' > "$app/.env"
+printf 'services: {}\n' > "$app/compose.external-db.yaml"
+printf 'services: {}\n' > "$app/compose.release.yaml"
+sed -e "s#/mnt/user/appdata/market-watch#$app#" \
+    -e "s#/mnt/user/backup/market-watch#$backup#" \
+    "$here/../unraid-config-backup.sh" > "$root/config.sh"
+output=$(sh "$root/config.sh" 2>&1)
+status=$?
+if [ "$status" -ne 0 ]; then printf '%s\n' "$output"; fi
+check 'real config archiver succeeds' 0 "$status"
+check 'real config archiver uses daily namespace' 1 "$(count_of "$backup" 'config-daily-*.tar.gz')"
+check 'real config archiver writes checksum' 1 "$(count_of "$backup" 'config-daily-*.tar.gz.sha256')"
+check 'real config archiver writes completion last' 1 "$(count_of "$backup" 'config-daily-*.tar.gz.complete')"
+for archive in "$backup"/config-daily-*.tar.gz; do
+  sha256sum -c "$archive.sha256" >/dev/null 2>&1
+  check 'real config archive checksum matches' 0 "$?"
+  tar -tzf "$archive" >/dev/null 2>&1
+  check 'real config archive is readable' 0 "$?"
+done
+teardown
+
+printf '== failed configuration checksum never marks completion ==\n'
+setup 0
+printf 'placeholder=test-only\n' > "$app/.env"
+printf 'services: {}\n' > "$app/compose.external-db.yaml"
+printf 'services: {}\n' > "$app/compose.release.yaml"
+sed -e "s#/mnt/user/appdata/market-watch#$app#" \
+    -e "s#/mnt/user/backup/market-watch#$backup#" \
+    "$here/../unraid-config-backup.sh" > "$root/config.sh"
+mkdir "$root/bin"
+printf '#!/bin/sh\nprintf partial\nexit 1\n' > "$root/bin/sha256sum"
+chmod 755 "$root/bin/sha256sum"
+output=$(PATH="$root/bin:$PATH" sh "$root/config.sh" 2>&1)
+status=$?
+check 'failed configuration checksum fails archive stage' 1 "$status"
+check 'failed checksum leaves no completion marker' 0 "$(count_of "$backup" 'config-daily-*.tar.gz.complete')"
 teardown
 
 printf '\n%s passed, %s failed\n' "$pass" "$fail"

@@ -24,6 +24,7 @@ def test_sqlite_backup_checks_contents_permissions_and_refuses_overwrite(tmp_pat
     assert report["counts"]["instruments"] == 4
     assert stat.S_IMODE(target.stat().st_mode) == 0o600
     assert stat.S_IMODE(target.with_name("backup.db.json").stat().st_mode) == 0o600
+    assert stat.S_IMODE(target.with_name("backup.db.complete").stat().st_mode) == 0o600
     assert backup.restore_check(target)["verified"]
     original = target.read_bytes()
     with pytest.raises(FileExistsError):
@@ -43,6 +44,7 @@ def test_failed_backup_removes_partial_artifact(tmp_path, monkeypatch):
     with pytest.raises(Exception):
         backup.backup(target)
     assert not target.exists() and not target.with_name("backup.db.json").exists()
+    assert not target.with_name("backup.db.complete").exists()
 
 
 def test_backup_health_does_not_expose_file_path(database):
@@ -382,6 +384,7 @@ def test_postgres_backup_records_stage_timings_and_audit(postgres_backend, monke
     )
     backup.main()
     (dump,) = list(postgres_backend.directory.glob("*.dump"))
+    assert dump.with_name(dump.name + ".complete").is_file()
     record = json.loads(dump.with_name(dump.name + ".json").read_text())
     assert record["format"] == 1 and record["backend"] == "postgresql"
     assert record["bytes"] == dump.stat().st_size == 5
@@ -449,3 +452,49 @@ def test_restore_check_timeout_uses_configured_timeout(tmp_path, postgres_backen
     assert error.value.stage == "pg_restore"
     assert str(error.value) == "pg_restore timed out after 1s"
 
+
+def test_restore_check_nonzero_exit_reports_stage_and_cleans_database(
+    tmp_path, postgres_backend, monkeypatch, capsys
+):
+    postgres_backend.tool("pg_restore", "printf 'private diagnostic' >&2\nexit 7\n")
+    dump = tmp_path / "restore.dump"
+    dump.write_bytes(b"PGDMP")
+    dump.with_name(dump.name + ".json").write_text(
+        json.dumps(
+            {"format": 1, "backend": "postgresql", "sha256": backup.sha256(dump),
+             "counts": {"instruments": 4}}
+        )
+    )
+    statements = []
+    monkeypatch.setattr(FakeConnection, "execute", lambda self, query: statements.append(str(query)))
+    monkeypatch.setattr(sys, "argv", ["backup", "--restore-check", str(dump)])
+    with pytest.raises(SystemExit) as exit_info:
+        backup.main()
+    assert exit_info.value.code == 1
+    assert json.loads(capsys.readouterr().out) == {
+        "verified": False, "error_type": "RuntimeError", "stage": "pg_restore"
+    }
+    assert len(statements) == 2
+    assert statements[0].startswith('CREATE DATABASE "alerts_restore_')
+    assert statements[1].startswith('DROP DATABASE "alerts_restore_')
+    assert postgres_backend.engines[0].disposed
+
+
+def test_completion_marker_failure_removes_unfinished_backup(
+    postgres_backend, monkeypatch, capsys
+):
+    postgres_backend.tool("pg_dump", DUMP_TO_FILE)
+    postgres_backend.tool("pg_restore", "exit 0\n")
+    private_file = backup.private_file
+
+    def fail_on_marker(path):
+        if path.name.endswith(".complete"):
+            raise OSError(28, "No space left on device")
+        return private_file(path)
+
+    monkeypatch.setattr(backup, "private_file", fail_on_marker)
+    monkeypatch.setattr(sys, "argv", ["backup", "--directory", str(postgres_backend.directory)])
+    with pytest.raises(SystemExit):
+        backup.main()
+    assert json.loads(capsys.readouterr().out)["stage"] == "manifest"
+    assert postgres_backend.outputs() == []

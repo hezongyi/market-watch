@@ -74,7 +74,9 @@ def pg_tool(name, args, env, *, stage):
         raise BackupStepTimeout(stage, timeout) from None
     if result.returncode:
         # Server diagnostics can contain connection details. Keep them out of the UI/log.
-        raise RuntimeError(f"{name} failed with exit status {result.returncode}")
+        error = RuntimeError(f"{name} failed with exit status {result.returncode}")
+        error.stage = stage
+        raise error
 
 
 def sql_counts(connection):
@@ -103,6 +105,9 @@ def backup(destination: Path):
         raise ValueError("Unsupported backup database")
     destination = destination.resolve()
     manifest = destination.with_name(destination.name + ".json")
+    completion = destination.with_name(destination.name + ".complete")
+    if completion.exists():
+        raise FileExistsError("Backup completion marker already exists")
     if manifest.exists():
         raise FileExistsError("Backup manifest already exists")
     if backend == "sqlite" and (
@@ -114,6 +119,7 @@ def backup(destination: Path):
         raise ValueError("Backup requires a distinct file-backed SQLite source")
     private_file(destination)
     owns_manifest = False
+    owns_completion = False
     stage = "prepare"
     try:
         if backend == "sqlite":
@@ -196,8 +202,12 @@ def backup(destination: Path):
         private_file(manifest)
         owns_manifest = True
         manifest.write_text(json.dumps(record, ensure_ascii=False, indent=2) + "\n")
+        private_file(completion)
+        owns_completion = True
         return record
     except Exception as error:
+        if owns_completion:
+            completion.unlink(missing_ok=True)
         destination.unlink(missing_ok=True)
         if owns_manifest:
             manifest.unlink(missing_ok=True)

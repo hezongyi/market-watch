@@ -35,7 +35,7 @@ PostgreSQL 这条流程生成的是 **全量逻辑备份**（`pg_dump --format=c
 
 Ubuntu旧生产备份timer已停止禁用，避免与开发.env混用。systemd目录中的timer供独立部署参考，并非当前生产执行方式。
 
-备份含账户状态和登录会话信息，应限制访问。当前工具不自动删除备份；需要配置异机副本与保留策略时再实施，现阶段同机备份不能防范磁盘损坏。
+备份含账户状态和登录会话信息，应限制访问。新备份的自动轮转见下文；旧备份保持保留，异机副本仍需另行配置，现阶段同机备份不能防范磁盘损坏。
 
 ## 旧Compose脚本
 
@@ -63,14 +63,20 @@ PostgreSQL 子进程不再硬编码 900 秒：`ALERTS_BACKUP_TIMEOUT_SECONDS`（
 
 ## 备份保留与轮转（2026-10-28新增）
 
-`deploy/unraid-backup.sh` 在每晚数据库备份与配置归档之后按**份数**轮转：`market-watch-*.dump`（发布/回滚证据）与 `config-v*`（版本命名归档）永不由脚本删除。数据库备份失败的那晚同样执行轮转，避免连续失败时旧文件无限堆积。对同一份备份的成对文件一起删除（`.dump` 配 `.dump.json`，`config-*.tar.gz` 配 `.sha256`）。
+`deploy/unraid-backup.sh` 在数据库备份与配置归档之后按**完成份数**轮转。数据库备份失败时仍可轮转已完成备份，任一备份阶段失败仍返回非零。
 
-- `MW_BACKUP_KEEP_DAILY`（默认 `14`）：保留最新 N 份每日 dump，`0` 表示该项不轮转；
-- `MW_BACKUP_KEEP_CONFIG`（默认 `14`）：保留最新 N 份配置归档；
-- `MW_BACKUP_ROTATE_DRY_RUN=1`：只打印 `would remove` 清单，不删除。
+- `MW_BACKUP_KEEP_DAILY`（默认 `14`）：保留最新 N 份已完成每日 dump，`0` 禁用该项轮转。
+- `MW_BACKUP_KEEP_CONFIG`（默认 `14`）：保留最新 N 份已完成 `config-daily-*.tar.gz` 配置归档，`0` 禁用。
+- 两项值须为 `0` 或不带前导零的正整数，最大 `999999999`。负数、空串、非数字、超长值会在任何删除之前拒绝整次轮转。
+- `MW_BACKUP_ROTATE_DRY_RUN=1`：只打印待删清单，不删除；只接受 `0`/`1`。
+- 以上为主机脚本环境变量，cron 需显式导出或在调用前赋值；应用 `.env` 不会自动向主机脚本导出这些变量。
 
-摘要行 `rotation: removed N files (X bytes)` 的 N 含成对删除的清单/校验文件。排序依据是文件名里的 UTC 时间戳（字母序即时间序），脚本不解析 `ls -t`，只处理备份目录的直接子项，不递归，不碰锁与日志；轮转失败只打印 `rotation failed`，不改变备份结果码。
+完成边界：新数据库备份在 dump 与完整 JSON 清单写入后生成私有 `.dump.complete`；新配置归档在 tar 校验、SHA256 文件写入成功后生成 `.tar.gz.complete`。轮转只统计同时有非空配套清单/校验文件及完成标记的普通文件，跳过软链接。标记表示写入已完成，不代替恢复时的 hash 与完整恢复验证。异常中止遗留的不完整文件不占保留名额，也不自动删除。
 
-删除不可恢复（该 share 未启用回收站）。首次上线更新后的脚本前，用 `MW_BACKUP_ROTATE_DRY_RUN=1` 在只读影子目录预览真实待删清单；轮转只在 `deploy/unraid-backup.sh` 落到 `/mnt/user/appdata/market-watch/deploy/` 之后才生效，落盘前生产不会删除任何文件。回归脚本：`sh deploy/tests/test_unraid_backup_rotation.sh`。
+保护边界：`market-watch-*.dump`、所有旧 `config-*.tar.gz`（包括时间戳命名的发布恢复点与 `config-v*`）及无完成标记的旧 dump 永不自动删除。配置归档器改用独立 `config-daily-*` 命名；现有 `config-20261028T150906Z-XgDEue.tar.gz` 不会进入轮转集合。旧文件不自动补标或迁移；确需清理时另行核对并授权。后续发布证据也应使用保留命名空间，不使用 `config-daily-*`。
 
+删除时一并移除数据、配套清单/校验文件与完成标记。摘要 N 包含三类文件。排序按文件名 UTC 时间戳，只处理备份目录直接子项，不递归、不碰锁与日志。轮转失败打印原因和 `rotation failed`，保持原有备份退出码语义。
 
+删除不可恢复。首次安装前先用 `MW_BACKUP_ROTATE_DRY_RUN=1` 在隔离影子目录预览；已有备份不会因本 PR 推送自动删除，生产脚本安装及轮转启用按单独部署授权执行。
+
+回归：`sh deploy/tests/test_unraid_backup_rotation.sh` 与 `TEST_SHELL="busybox sh" sh deploy/tests/test_unraid_backup_rotation.sh`。两种 shell 均执行真实轮转；配置归档检查使用宿主 sh 和生产所需的 GNU tar，不要求 BusyBox tar 支持 GNU 参数。包含负数/非法配置、真实发布归档保护、不完整文件、完成标记、真实配置归档与校验失败检查。

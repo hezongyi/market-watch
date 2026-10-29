@@ -9,7 +9,7 @@ if ! flock -n 8; then
   printf 'skipped: configuration backup lock held\n'
   exit 0
 fi
-archive_tmp=$(mktemp "$backup_dir/config-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX.tar.gz.tmp")
+archive_tmp=$(mktemp "$backup_dir/config-daily-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX")
 trap 'rm -f "$archive_tmp"' EXIT
 active_release=$(cat deploy/active-release)
 printf '%s\n' "$active_release" | grep -Eq '^releases/v[0-9]+\.[0-9]+\.[0-9]+(-rc\.[0-9]+)?-[0-9a-f]{7,40}$' || {
@@ -21,7 +21,8 @@ tar --exclude=node_modules --exclude=__pycache__ --exclude=.pytest_cache \
   --exclude='*.log' --exclude=images.tar.gz --exclude=source-with-licensed-library.tar.gz \
   -czf "$archive_tmp" .env compose.external-db.yaml compose.release.yaml deploy "$active_release"
 tar -tzf "$archive_tmp" >/dev/null
-archive=${archive_tmp%.tmp}
+archive=$archive_tmp.tar.gz
 mv "$archive_tmp" "$archive"
 sha256sum "$archive" >"$archive.sha256"
+: >"$archive.complete"
 printf 'Configuration/source backup: %s\n' "$archive"
