@@ -46,3 +46,15 @@ docker compose -p mw-track-c-20261028 -f deploy/ubuntu/runtime-track-c.acceptanc
 本次验证为应用代码与真实数据库验收；供应商使用 fixture，没有真实备用供应商自动切换、外部通知送达或生产删除证据。原 Track C 验收历史保留原提交、时钟和范围；其中超过 30 天接缝场景不再作为当前可用性规则的通过依据。A04b 的真实来源切换仍按既有部分交付状态记录。
 
 修复更新 PR #115；合并与生产发布仍是独立操作。
+
+## 最新 CI 时钟修复（2026-10-29，基线 bda46b3c）
+
+远端 run 40820398011：17 failed / 3428 passed / 3 skipped。16 项是确认/恢复/死锁测试使用 1970 固定行情时钟，但新 live_window 检查仍读取真实时间；1 项是 MCP synthetic seed 的临时时钟在返回时恢复，后续指标 drain 无法服务过期接缝。
+
+本补丁风险 P0，仅调整四个测试文件的局部 monkeypatch：固定窗口校验与原采集时钟一致，MCP HTTP 查询与指标准备使用同一 fixture 时间。生产可用性校验、schema、后台链路均不修改。复用现有失败用例，不增加镜像实现细节的测试。
+
+Ubuntu 本机 Docker project mw-track-c-20261028（独立 PostgreSQL 127.0.0.1:15612），先复现 confirmation 与 MCP 两项：2 failed in 5.40s。修复后运行四个完整受影响套件：55 passed in 92.49s；再运行 test_track_c_review_fixes.py 与其 PostgreSQL 套件：23 passed in 32.02s，包括超窗拒绝、40 天离线、清理范围和通知/fencing 合同。Ruff 与 git diff --check 通过。
+
+复现命令使用现有 deploy/ubuntu/runtime-track-c.acceptance.yaml 的 data-worker 一次性容器，显式将 ALERTS_OANDA_ACCOUNT_ID 置空、ALERTS_OANDA_RESIDENT_SYMBOLS 设为 EUR_USD,XAU_USD，与 CI 默认配置一致；TEST_POSTGRES_URL 指向本任务 postgres。四个套件：test_confirmation_session.py、test_composite_mcp.py、test_oanda_recovery_postgres.py、test_pricing_publication_deadlock_postgres.py。
+
+此轮仅启动 postgres 与一次性测试容器；完成后 stop postgres，保留原数据库/volume。未做生产操作。远端全量 CI 由补丁推送后重新运行。

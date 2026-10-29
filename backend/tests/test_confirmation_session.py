@@ -67,6 +67,7 @@ def running(confirmation_database, monkeypatch):
     monkeypatch.setattr(settings, 'oanda_resident_symbols', 'EUR_USD')
     monkeypatch.setattr(settings, 'oanda_recovery_minutes', 2)
     monkeypatch.setattr('alerts.live_pricing.now_ms', lambda: 125000)
+    monkeypatch.setattr('alerts.live_window.now_ms', lambda: 125000)
     live.ensure_catalog([{'name': 'EUR_USD', 'type': 'CURRENCY', 'displayPrecision': 5}], 'test-account')
     from alerts.realtime_switch import set_enabled
     with confirmation_database.begin() as db:

@@ -32,6 +32,7 @@ def catalog(account='test-account'):
 def test_maintenance_fences_all_symbols_and_recovers_only_in_new_epoch(provider_pg, monkeypatch):
     factory, _ = provider_pg
     monkeypatch.setattr(live, 'now_ms', lambda: 125000)
+    monkeypatch.setattr('alerts.live_window.now_ms', lambda: 125000)
     identities = catalog()
     ownership = live.claim('test-account', now=125000)
     epoch = live.begin_connection(ownership, identities, now=125000)
