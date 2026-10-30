@@ -66,3 +66,25 @@ def test_additive_migration_preserves_existing_inputs_and_rejects_snapshot_loss(
         migration.op = Operations(MigrationContext.configure(conn))
         with pytest.raises(RuntimeError, match="backup"):
             migration.downgrade()
+
+
+def test_only_completed_waterline_commit_delivers_notification(provider_pg, monkeypatch):
+    from alerts.publication_wakeup import PublicationWakeup
+    from alerts.storage import CompositeInputEvent
+
+    factory, engine = provider_pg
+    _, revision, _ = populated(factory, monkeypatch)
+    contracts.drain(revision, 'M1')
+    with factory() as db:
+        latest = max(m['start'] for e in db.scalars(select(CompositeInputEvent).where(
+            CompositeInputEvent.revision_id == revision)) for m in e.input_manifest['minutes'])
+    contracts.two_minute_input(factory, revision, latest + 60000, 200002000)
+    monkeypatch.setattr(cache, 'MAX_BUCKETS', 1)
+    with PublicationWakeup(engine) as wake:
+        assert wake.connection is not None
+        first = cache.claim(revision, 'M1')
+        assert first['total'] == 2
+        cache.commit(first, cache.build(first))
+        assert wake.wait(.05) == 'timer'
+        contracts.drain(revision, 'M1')
+        assert wake.wait(2) == 'notification'

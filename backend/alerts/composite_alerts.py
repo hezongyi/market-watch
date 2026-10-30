@@ -595,8 +595,8 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     # full path below reuses it instead of sampling the same snapshot twice.
     live_sample = sampled_observation(live_view)
     gated, window = input_gate()
-    waterline = gate_key(config, revision, task, prep, live_view, live_sample, now=now, phase=phase)
     if gated and gateable(alert, runtime, mode=config.mode, sample=live_sample):
+        waterline = gate_key(config, revision, task, prep, live_view, live_sample, now=now, phase=phase)
         if gate_matched(alert, runtime, now, waterline, window):
             # Same waterline already judged: no new bucket, sample, confirmation
             # or input revision exists, so re-reading them cannot change a

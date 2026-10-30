@@ -730,3 +730,27 @@ def test_gate_keeps_pending_native_price_request_and_intrabar_is_gated(database,
         alert = db.get(ChartAlert, ident)
         assert alert.runtime["input_gate"]["skipped_at"] == stamp + 3001
         assert alert.runtime.get("price_confirmation_request") == "ohlc:probe"
+
+
+@pytest.mark.parametrize("gate", ["0", "1"])
+def test_untradeable_intrabar_quote_keeps_recovery_guard(database, monkeypatch, gate):
+    monkeypatch.setenv("ALERTS_CHART_ALERT_INPUT_GATE", gate)
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar")
+    forming(database, revision, seam + 600000, stamp)
+    settle(database, ident, stamp)
+    with database.begin() as db:
+        rev = db.get(CompositeRevision, revision)
+        target = db.get(RealtimeMapping, rev.mapping_id).target_dataset_id
+        state = db.get(LiveState, target)
+        state.quote = {**state.quote, "tradeable": False}
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 100) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.health == "stale" and alert.runtime.get("recovering")
+    # The first valid crossing after unavailable input establishes a baseline.
+    forming(database, revision, seam + 600000, stamp + 200, price="1.119")
+    assert settle(database, ident, stamp + 200) == []
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        assert alert.count == 0
+        assert alert.runtime["readiness"]["last_outcome"] == "recovery_baseline"
