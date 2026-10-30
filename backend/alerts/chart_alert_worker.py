@@ -437,6 +437,7 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
 def step(*, now=None, on_evaluated=None, on_error=None):
     with transaction() as db:
         ids = list(db.scalars(select(ChartAlert.id).where(ChartAlert.status == "active")))
+    evaluated_count = 0
     for ident in ids:
         started = time.monotonic()
         try:
@@ -461,6 +462,7 @@ def step(*, now=None, on_evaluated=None, on_error=None):
 
                     evaluate(db, ident, now=business_now, values_cache=_VALUE_CACHE,
                              clock=read_clock if now is None else None)
+                    evaluated_count += 1
                 if on_evaluated:
                     row = db.get(ChartAlert, ident)
                     observation = dict(alert_id=ident, read_started=started,
@@ -485,3 +487,4 @@ def step(*, now=None, on_evaluated=None, on_error=None):
             # Evidence collection failures propagate to the monitor, without
             # rewriting the already committed business state as an error.
             on_evaluated(dict(**observation, committed=time.monotonic()))
+    return evaluated_count

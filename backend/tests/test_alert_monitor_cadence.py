@@ -95,3 +95,19 @@ def test_observer_failure_does_not_rewrite_committed_health(database,monkeypatch
         chart_alert_worker.step(on_evaluated=observe)
     with database.begin() as db:
         assert db.get(ChartAlert,ident).health=='ready'
+
+def test_every_active_rule_is_evaluated_on_every_turn(database, monkeypatch):
+    from alerts.chart_alert_service import AlertConfig, create
+    from test_composite_alerts import ready_config
+
+    make = ready_config(database, monkeypatch)
+    with database.begin() as db:
+        ids = [create(db, 'step-count-' + str(i), AlertConfig.model_validate(make()), at=make.at).id
+               for i in range(2)]
+    calls = []
+    monkeypatch.setattr(chart_alert_worker, 'evaluate',
+                        lambda db, ident, **kwargs: calls.append(ident))
+    # 每轮都是完整判定：隐式跳过会让计数变 0，把 monitor 的空唤醒抑制错用到真判定上。
+    assert chart_alert_worker.step() == 2
+    assert chart_alert_worker.step() == 2
+    assert calls == ids + ids

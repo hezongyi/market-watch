@@ -421,6 +421,62 @@ def test_intrabar_quote_gap_without_worker_stale_check_rebuilds_baseline(databas
             assert db.scalar(select(func.count()).select_from(model)) == 1
 
 
+def switching_rule(database, monkeypatch):
+    """An evaluating intrabar EMA rule sampled once per second inside one M1 bucket."""
+    composite, revision, seam, stamp = continuous(database, monkeypatch)
+    condition = {"relation": "cross_up", "left": {"kind": "indicator", "indicator":
+        {"name": "EMA", "params": {"period": 2}}}, "right": {"kind": "constant", "value": "1.115"}}
+    with database.begin() as db:
+        ident = create(db, "minute-switch", config(composite, condition=condition,
+            seam_policy="accept_raw", mode="intrabar"), at=stamp).id
+    settle(database, ident, stamp)
+    boundary = seam + 660000
+    for at in range(stamp, boundary, 1000):
+        forming(database, revision, seam + 600000, at, price="1.11")
+        assert settle(database, ident, at) == []
+    return ident, revision, seam, boundary
+
+
+def test_new_bucket_indicator_point_within_freshness_still_evaluates_crossing(database, monkeypatch):
+    # The next M1 bucket opens before its indicator point is published.  That is a
+    # healthy bounded dependency wait, so the crossing that follows must be judged.
+    ident, revision, seam, boundary = switching_rule(database, monkeypatch)
+    forming(database, revision, boundary, boundary + 10, price="1.119")
+    with database.begin() as db:
+        assert evaluate(db, ident, now=boundary + 10) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.health == "warming" and "完整有效依赖" in alert.health_reason
+        assert not alert.runtime.get("recovering")
+    add_tail(database, revision, [minute(seam + 600000, volume="3", close="1.113")])
+    aggregate(revision, "M1")
+    forming(database, revision, boundary, boundary + 4000, price="1.119")
+    assert len(settle(database, ident, boundary + 4000)) == 1
+    with database.begin() as db:
+        judgment = db.scalar(select(CompositeJudgment).where(
+            CompositeJudgment.event_time == boundary + 4000))
+        alert = db.get(ChartAlert, ident)
+        assert not judgment.evidence["recovery"] and judgment.evidence["baseline_reason"] is None
+        assert alert.runtime["readiness"]["last_outcome"] == "evaluated" and alert.count == 1
+
+
+def test_new_bucket_point_beyond_freshness_still_rebuilds_baseline(database, monkeypatch):
+    # The same crossing observed after a dependency gap keeps its recovery semantics.
+    ident, revision, seam, boundary = switching_rule(database, monkeypatch)
+    forming(database, revision, boundary, boundary + 10, price="1.119")
+    with database.begin() as db:
+        assert evaluate(db, ident, now=boundary + 10) == []
+    add_tail(database, revision, [minute(seam + 600000, volume="3", close="1.113")])
+    aggregate(revision, "M1")
+    forming(database, revision, boundary, boundary + 16000, price="1.119")
+    assert settle(database, ident, boundary + 16000) == []
+    with database.begin() as db:
+        judgment = db.scalar(select(CompositeJudgment).where(
+            CompositeJudgment.event_time == boundary + 16000))
+        assert judgment.outcome == "recovery_baseline" and judgment.evidence["recovery"]
+        assert judgment.evidence["observation_gap_ms"] > 15000
+        assert db.get(ChartAlert, ident).count == 0 and db.scalar(select(SignalRow)) is None
+
+
 def test_missed_and_expired_events_establish_baseline_without_notifications(database, monkeypatch):
     ident, _, revision, seam, stamp = armed(database, monkeypatch, notify_ntfy=True, late_delivery="notify")
     with database.begin() as db:
@@ -504,3 +560,197 @@ def test_pure_capabilities_and_authenticated_fixed_creation_geometry_judgments(d
             assert record.status_code == 200 and record.json()[0]["outcome"] == "initial_baseline"
     finally:
         api.app.dependency_overrides.clear()
+
+
+def gate_counters(monkeypatch):
+    """Count the expensive composite readers a full evaluation performs."""
+    from alerts import composite_alerts, composite_chart, fixed_indicators
+
+    counts = {"chart_page": 0, "operands": 0, "chart_results": 0}
+    page = composite_chart.chart_page
+    operands = composite_alerts.operands
+    results = fixed_indicators.chart_results
+
+    def counted_page(*args, **kwargs):
+        counts["chart_page"] += 1
+        return page(*args, **kwargs)
+
+    def counted_operands(*args, **kwargs):
+        counts["operands"] += 1
+        return operands(*args, **kwargs)
+
+    def counted_results(*args, **kwargs):
+        counts["chart_results"] += 1
+        return results(*args, **kwargs)
+
+    monkeypatch.setattr(composite_chart, "chart_page", counted_page)
+    monkeypatch.setattr(composite_alerts, "operands", counted_operands)
+    monkeypatch.setattr(fixed_indicators, "chart_results", counted_results)
+    return counts
+
+
+def gated(database, ident, stamp):
+    """Run full passes until the gate is armed; return the last audit state.
+
+    The initial baseline and any unconfirmed baseline round must always run in
+    full, so arming takes a second full pass that reaches a stable verdict.
+    """
+    for offset in range(6):
+        with database.begin() as db:
+            assert evaluate(db, ident, now=stamp + offset) == []
+            if db.get(ChartAlert, ident).runtime.get("input_gate"):
+                return copy.deepcopy(db.get(ChartAlert, ident).state), stamp + offset
+    raise AssertionError("the input gate never armed")
+
+
+def test_unchanged_waterline_skips_the_expensive_majority(database, monkeypatch):
+    ident, _, _, _, stamp = armed(database, monkeypatch)
+    counts = gate_counters(monkeypatch)
+    state, armed_at = gated(database, ident, stamp)
+    armed_counts = dict(counts)
+    assert armed_counts["chart_page"] == armed_counts["operands"] >= 2
+    for offset in range(armed_at - stamp + 1, armed_at - stamp + 4):
+        with database.begin() as db:
+            assert evaluate(db, ident, now=stamp + offset) == []
+            alert = db.get(ChartAlert, ident)
+            assert dict(counts) == armed_counts, "a repeated waterline must not redo the expensive pass"
+            assert alert.state == state, "the gate must not touch the audit state"
+            assert alert.health == "ready"
+            assert alert.runtime["input_gate"]["skipped_at"] == stamp + offset
+            assert alert.runtime["input_gate"]["full_at"] == armed_at
+
+
+def test_advanced_waterline_evaluates_and_can_produce_an_event(database, monkeypatch):
+    ident, _, revision, seam, stamp = armed(database, monkeypatch)
+    counts = gate_counters(monkeypatch)
+    gated(database, ident, stamp)
+    before = dict(counts)
+    append(database, revision, seam + 600000, "1.119", seam + 660010)
+    with database.begin() as db:
+        assert len(evaluate(db, ident, now=seam + 660010)) == 1
+    assert counts["chart_page"] == before["chart_page"] + 1, "new input must still take the full path"
+    assert counts["operands"] == before["operands"] + 1
+    with database.begin() as db:
+        assert db.get(ChartAlert, ident).count == 1
+
+
+def test_gate_never_skips_unhealthy_or_recovering_runtime(database, monkeypatch):
+    ident, _, _, _, stamp = armed(database, monkeypatch)
+    counts = gate_counters(monkeypatch)
+    gated(database, ident, stamp)
+    with database.begin() as db:
+        db.get(ChartAlert, ident).health = "stale"
+    before = dict(counts)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 100) == []
+    assert counts["operands"] == before["operands"] + 1, "an unhealthy rule is never gated"
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        alert.health, alert.health_reason = "ready", None
+        alert.runtime = {**alert.runtime, "recovering": True}
+    before = dict(counts)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 200) == []
+    assert counts["operands"] == before["operands"] + 1, "a residual recovering flag is never gated"
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        alert.runtime = {key: value for key, value in alert.runtime.items() if key != "recovering"}
+        alert.runtime["readiness"] = {**alert.runtime["readiness"], "last_outcome": "recovery_baseline"}
+    before = dict(counts)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 300) == []
+    assert counts["operands"] == before["operands"] + 1, "an unconfirmed baseline is never gated"
+
+
+def test_gate_force_full_round_runs_after_the_configured_interval(database, monkeypatch):
+    from alerts import composite_alerts
+
+    monkeypatch.setenv(composite_alerts.GATE_FULL_SECONDS_ENV, "1")
+    ident, _, _, _, stamp = armed(database, monkeypatch)
+    counts = gate_counters(monkeypatch)
+    _, armed_at = gated(database, ident, stamp)
+    before = dict(counts)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=armed_at + 500) == []
+        assert counts["operands"] == before["operands"], "inside the interval the gate holds"
+    with database.begin() as db:
+        assert evaluate(db, ident, now=armed_at + 1001) == []
+    assert counts["operands"] == before["operands"] + 1, "the forced full round must run"
+    with database.begin() as db:
+        assert db.get(ChartAlert, ident).runtime["input_gate"]["full_at"] == armed_at + 1001
+
+
+def test_gate_can_be_disabled_for_an_a_b_comparison(database, monkeypatch):
+    from alerts import composite_alerts
+
+    monkeypatch.setenv(composite_alerts.GATE_ENABLED_ENV, "0")
+    ident, _, _, _, stamp = armed(database, monkeypatch)
+    counts = gate_counters(monkeypatch)
+    for offset in (0, 1, 2):
+        with database.begin() as db:
+            assert evaluate(db, ident, now=stamp + offset) == []
+    before = dict(counts)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 100) == []
+        assert counts["operands"] == before["operands"] + 1
+        assert "input_gate" not in db.get(ChartAlert, ident).runtime
+
+
+def test_gate_keeps_pending_native_price_request_and_intrabar_is_gated(database, monkeypatch):
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar")
+    counts = gate_counters(monkeypatch)
+    at = seam + 600000
+    forming(database, revision, at, stamp)
+    for offset in (0, 1, 2):
+        with database.begin() as db:
+            assert evaluate(db, ident, now=stamp + offset) == []
+    armed_counts = dict(counts)
+    with database.begin() as db:
+        assert "skipped_at" not in db.get(ChartAlert, ident).runtime["input_gate"]
+    for offset in (3, 4):
+        with database.begin() as db:
+            assert evaluate(db, ident, now=stamp + offset) == []
+            alert = db.get(ChartAlert, ident)
+            assert alert.runtime["input_gate"]["skipped_at"] == stamp + offset
+            # The judgement checkpoint is the sampled quote time, not the bucket start.
+            assert alert.state["sequence"] == stamp
+    assert dict(counts) == armed_counts, "an unchanged live sample must not be re-read"
+    # The full path must still run once the sampled waterline moves.
+    forming(database, revision, at, stamp + 3000, price="1.119")
+    with database.begin() as db:
+        assert len(evaluate(db, ident, now=stamp + 3000)) == 1
+    assert counts["operands"] == armed_counts["operands"] + 1
+    # A pending native-price request must survive a gated skip: that background
+    # worker claims requests by scanning this active runtime field.
+    with database.begin() as db:
+        db.get(ChartAlert, ident).runtime = {**db.get(ChartAlert, ident).runtime,
+                                            "price_confirmation_request": "ohlc:probe"}
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 3001) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.runtime["input_gate"]["skipped_at"] == stamp + 3001
+        assert alert.runtime.get("price_confirmation_request") == "ohlc:probe"
+
+
+@pytest.mark.parametrize("gate", ["0", "1"])
+def test_untradeable_intrabar_quote_keeps_recovery_guard(database, monkeypatch, gate):
+    monkeypatch.setenv("ALERTS_CHART_ALERT_INPUT_GATE", gate)
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar")
+    forming(database, revision, seam + 600000, stamp)
+    settle(database, ident, stamp)
+    with database.begin() as db:
+        rev = db.get(CompositeRevision, revision)
+        target = db.get(RealtimeMapping, rev.mapping_id).target_dataset_id
+        state = db.get(LiveState, target)
+        state.quote = {**state.quote, "tradeable": False}
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp + 100) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.health == "stale" and alert.runtime.get("recovering")
+    # The first valid crossing after unavailable input establishes a baseline.
+    forming(database, revision, seam + 600000, stamp + 200, price="1.119")
+    assert settle(database, ident, stamp + 200) == []
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        assert alert.count == 0
+        assert alert.runtime["readiness"]["last_outcome"] == "recovery_baseline"
