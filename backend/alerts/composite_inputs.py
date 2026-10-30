@@ -2,7 +2,11 @@
 
 Every writer acquires the source lock before preparation locks. Current composite
 heads allow indexed reads; immutable event deltas retain prior judgment inputs.
+A changed input publishes its commit hint from this transaction, so the period
+worker discovers the new revision instead of waiting for its next poll.
 """
+
+import logging
 
 from sqlalchemy import and_, func, or_, select
 
@@ -21,6 +25,29 @@ from .storage import (
     SourceMinuteRevision,
     uid,
 )
+
+log = logging.getLogger(__name__)
+
+
+def _wake_aggregation(db):
+    """Publish this transaction's input hint without letting it fail the input.
+
+    The hint is advisory: PostgreSQL delivers it only if this transaction commits,
+    so a rolled-back confirmation never wakes a worker and the durable task
+    waterline stays the source of truth. The savepoint contains a failed hint
+    (aborted statement or lost connection) so confirmed minutes this transaction
+    already holds are still committed.
+    """
+    from .publication_wakeup import notify
+
+    # Flush first: the savepoint may only discard the hint, never input rows this
+    # transaction already decided to write.
+    db.flush()
+    try:
+        with db.begin_nested():
+            notify(db)
+    except Exception as error:
+        log.warning("composite_input_wakeup_failed type=%s", type(error).__name__)
 
 
 def frozen(prep):
@@ -101,6 +128,11 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
     from .display_observations import retire_confirmed
 
     retire_confirmed(db, recorded['source_id'], [item['start'] for item in recorded['minutes']])
+    if output:
+        # Only a changed input can make a period task due; an unchanged
+        # confirmation would wake the worker for an empty scan. The hint rides
+        # this transaction, so it is delivered only if the input commits.
+        _wake_aggregation(db)
     return output
 
 

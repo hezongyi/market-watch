@@ -7,6 +7,7 @@ never replays missed/expired events as fresh notifications.
 """
 
 import copy
+import os
 from decimal import Decimal
 
 from sqlalchemy import func, select
@@ -70,6 +71,69 @@ def identity(db, composite, revision, config):
         "seam": revision.seam, "rules": revision.rules, "seam_policy": config.seam_policy,
         "calculation_algorithm": ALGORITHM, "contract": CONTRACT,
         "initial_input_revision": db.get(CompositePreparation, revision.id).input_revision}
+# Cheap waterline gate: on by default, with environment knobs so a deployment can
+# A/B the cost without any schema or settings change.
+GATE_ENABLED_ENV = "ALERTS_CHART_ALERT_INPUT_GATE"
+GATE_FULL_SECONDS_ENV = "ALERTS_CHART_ALERT_INPUT_GATE_FULL_SECONDS"
+GATE_FULL_MS = 5000
+# A runtime still carrying one of these may need a full pass to leave that wait.
+RESIDUAL_WAITS = ("recovering", "closed", "demand_hold", "offset_recovering", "coverage_dependency")
+
+
+def input_gate():
+    """Return whether the gate is on and its forced full-round interval in ms."""
+    value = os.environ.get(GATE_ENABLED_ENV, "").strip().lower()
+    enabled = value not in ("0", "false", "no", "off")
+    try:
+        seconds = float(os.environ.get(GATE_FULL_SECONDS_ENV, "") or GATE_FULL_MS / 1000)
+    except ValueError:
+        seconds = GATE_FULL_MS / 1000
+    return enabled, max(0, int(seconds * 1000))
+
+
+def gateable(alert, runtime, *, mode, sample):
+    """Any health, wait or unconfirmed-baseline state still needs a full pass."""
+    readiness = runtime.get("readiness") or {}
+    if alert.health != "ready" or not alert.state or readiness.get("ready") is not True:
+        return False
+    if mode == "intrabar" and sample is None:
+        return False  # the sampling stale/alignment branches live past the expensive read
+    if str(readiness.get("last_outcome") or "").endswith("_baseline"):
+        return False
+    return not any(runtime.get(key) for key in RESIDUAL_WAITS)
+
+
+def gate_key(config, revision, task, prep, live_view, sample, *, now, phase):
+    """Waterlines that advance only when the judgeable input itself advances.
+
+    Close mode judges the newest fixed bucket of this rule's own timeframe. Its
+    visible bars are aggregate rows ending at or before now, so a verdict can
+    only change when new confirmed input is published: applied_input_revision is
+    written by the aggregate commit that publishes a bucket, confirmed_end only
+    by confirmed minutes. It can also change when now enters the next bucket and
+    thereby makes a finished bucket judgeable, so the now bucket joins the key.
+    Intrabar mode judges a live sample, so the sampled sequence and price are its
+    waterline; the fixed waterlines stay in the key because the provisional page
+    and its coverage depend on them.
+    """
+    applied = task.applied_input_revision if task else -1
+    epoch = live_view.get("connection_epoch")
+    if config.mode == "intrabar":
+        return ["intrabar", revision.id, config.timeframe, epoch, sample["kind"], sample["sequence"],
+                str(sample["value"]), applied, prep.confirmed_end]
+    # A reconnect or a source-confirmation change moves judgeability without
+    # moving the input revision, so both are keyed in either mode.
+    return ["close", revision.id, config.timeframe, epoch, applied, prep.confirmed_end,
+            live_view.get("source_confirmed_end"), period(now, config.timeframe, phase)[0]]
+
+
+def gate_matched(alert, runtime, now, key, window):
+    """True when this exact waterline was fully evaluated inside the window."""
+    record = runtime.get("input_gate") or {}
+    if record.get("version") != alert.version or record.get("key") != key:
+        return False
+    full_at = record.get("full_at")
+    return isinstance(full_at, int) and 0 <= now - full_at <= window
 
 
 def bind(db, config, *, now=None):
@@ -433,7 +497,9 @@ def evaluate(db, alert, version, config, now, *, clock=None):
 
     identity = version.market_identity
     runtime = dict(alert.runtime)
-    runtime.pop("price_confirmation_request", None)
+    # A D1 close rule keeps its native-price request registered between passes;
+    # the gated path below must not unregister it.
+    price_request = runtime.pop("price_confirmation_request", None)
     if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
         return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
@@ -521,6 +587,33 @@ def evaluate(db, alert, version, config, now, *, clock=None):
         runtime["closed"] = True
         alert.runtime = runtime
         return []
+    # Cheap waterline gate. Everything above is a single-row read; the page,
+    # operand and offset readers below are the expensive part of a full pass.
+    # The row lock and this transaction stay, so the run is still visibly
+    # checked, and any wait/baseline/health state bypasses the gate entirely.
+    # Computed before the gate so the key can carry the sampled waterline; the
+    # full path below reuses it instead of sampling the same snapshot twice.
+    live_sample = sampled_observation(live_view)
+    gated, window = input_gate()
+    waterline = gate_key(config, revision, task, prep, live_view, live_sample, now=now, phase=phase)
+    if gated and gateable(alert, runtime, mode=config.mode, sample=live_sample):
+        if gate_matched(alert, runtime, now, waterline, window):
+            # Same waterline already judged: no new bucket, sample, confirmation
+            # or input revision exists, so re-reading them cannot change a
+            # verdict. Keep the checkpoint narrowing and the native-price
+            # request, record that the run was checked, and leave the audit
+            # state untouched.
+            runtime["input_gate"] = {"key": waterline, "full_at": runtime["input_gate"]["full_at"],
+                                     "version": alert.version, "skipped_at": now}
+            runtime["processed_input_revision"] = value
+            if price_request is not None:
+                runtime["price_confirmation_request"] = price_request
+            alert.runtime = runtime
+            alert.health, alert.health_reason = "ready", None
+            return []
+        runtime["input_gate"] = {"key": waterline, "full_at": now, "version": alert.version}
+    else:
+        runtime.pop("input_gate", None)
     page = chart_page(db, composite.id, config.timeframe, revision_id=revision.id,
         input_revision=None if config.mode == "intrabar" else value, provisional=config.mode == "intrabar",
         count=2000, now=now)
@@ -569,7 +662,6 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     if config.mode == "close" and live.confirmed_end < bar["end"]:
         return wait(alert, runtime, "stale", "实时来源确认水位尚未覆盖判定柱")
     quote = live.quote if live else {}
-    live_sample = sampled_observation(live_view)
     if config.mode == "intrabar":
         if not owned or live_sample is None:
             return wait(alert, runtime, "stale", "当前价格采样过期或来源未就绪；不重建未观测触价")
@@ -598,7 +690,15 @@ def evaluate(db, alert, version, config, now, *, clock=None):
            for item in progress):
         return wait(alert, runtime, "warming", "指标完整初始化或修订修复尚未完成", reset=False)
     if values[0] is None or config.condition.right and values[1] is None:
-        return wait(alert, runtime, "warming", "完整有效依赖尚不足以初始化指标或画线观察")
+        # A new bucket publishes its indicator/line point a moment after the
+        # bucket opens.  Freshness, ownership and waterline were verified above,
+        # so that bounded wait keeps the baseline; a missing price-derived
+        # operand or an unidentified cause still establishes recovery.
+        missing = {operand.kind for operand, operand_value in
+                   ((config.condition.left, values[0]), (config.condition.right, values[1]))
+                   if operand and operand_value is None}
+        return wait(alert, runtime, "warming", "完整有效依赖尚不足以初始化指标或画线观察",
+                    reset=not (missing and missing <= {"indicator", "line"}))
     if config.seam_policy == "reject" and any(item.get("seam_dependency") for item in dependencies):
         return wait(alert, runtime, "blocked", "指标依赖包含原价接缝；需明确接受接缝影响或等待完整同源窗口")
     resolved = None
