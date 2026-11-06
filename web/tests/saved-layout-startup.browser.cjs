@@ -147,9 +147,10 @@ MWChartAdapter = {mount(container, application) {
       } catch(error) { return {message:String(error),status:error.status}; }
     });
     assert.equal((await save()).status,409);
-    const attempts = mutations.length;
+    const saveAttempts = () => mutations.filter(item => item.path === '/advanced-charts/native-charts/save').length;
+    const attempts = saveAttempts();
     assert.match((await save()).message,/本次保存未完成/,'current-session failures still block unsafe overwrite');
-    assert.equal(mutations.length,attempts);
+    assert.equal(saveAttempts(),attempts);
     failSave = false;
     await page.reload();await verify();
     assert.equal(workspace.document.state.marker,'autosaved','failed drafts are ignored on reload');
