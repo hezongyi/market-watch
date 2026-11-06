@@ -5,8 +5,7 @@ import {sessionRuntime} from "../runtime/session";
 import {alertRuntime} from "../runtime/alerts";
 import {marketRuntime} from "../runtime/market";
 import {mountChart,type ChartAdapter,type ChartApplication,type ChartUpdate} from "../runtime/chart";
-import {preferenceDrafts,recoverablePreferenceDrafts,workspaceDraftKey,workspaceDraft,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft,type PreferenceDraft} from "./localDrafts";
-import {PreferenceDraftDialog} from "./PreferenceDraftDialog";
+import {workspaceDraftKey,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft} from "./localDrafts";
 import {useNotices,useNoticeState} from "../notifications/context";
 import {setChartTime} from "../time/ChartTimeContext";
 import {operationFault} from "../notifications/operations";
@@ -70,11 +69,6 @@ export default function ChartApplicationPage() {
   const openNotices=(event?:string)=>{const url=new URL(location.href);url.searchParams.set('panel','notifications');if(event)url.searchParams.set('event',event);else url.searchParams.delete('event');navigate(url.pathname+url.search+url.hash,{replace:true});};
   const app = useApp(), appRef = useRef(app); appRef.current = app;
   const urlRef = useRef(appLocation); urlRef.current = appLocation;
-  const [savedPreferenceDrafts,setSavedPreferenceDrafts]=useState<PreferenceDraft[]>(()=>{try{return recoverablePreferenceDrafts();}catch{return [];}});
-  const [preferenceDraftsOpen,setPreferenceDraftsOpen]=useState(false);
-  const [preferenceReopenRequired,setPreferenceReopenRequired]=useState(()=>savedPreferenceDrafts.length>0);
-  const preferenceRecovery=useRef(new Map<string,{resolve:()=>void;reject:(error:Error)=>void}>());
-  const refreshPreferenceDrafts=()=>{try{setSavedPreferenceDrafts(recoverablePreferenceDrafts());}catch{setError("无法读取本机设置草稿，请勿关闭页面");}};
   const capturing = useRef<{resolve: () => void; reject: (error: Error) => void} | null>(null);
   const titleTimer = useRef<ReturnType<typeof setTimeout> | null>(null), titleText = useRef(""), titleQuote = useRef(""), titleLast = useRef(0), titleIdentity = useRef("");
   const titleHistorical = useRef(false);
@@ -125,9 +119,9 @@ export default function ChartApplicationPage() {
   const [, setHistoryProgress] = useState<
     Record<string, string>
   >({});
-  const [feedError, setFeedError] = useState("");
-  const [syncNotices, setSyncNotices] = useState<Record<string, string>>({});
-  const [pollErrors, setPollErrors] = useState<Record<string, string>>({});
+  const [, setFeedError] = useState("");
+  const [, setSyncNotices] = useState<Record<string, string>>({});
+  const [, setPollErrors] = useState<Record<string, string>>({});
   const [chartTheme, setChartTheme] = useState("dark");
   const [nativeReady, setNativeReady] = useState(false);
   const alertUiSession = useRef("");
@@ -152,7 +146,7 @@ export default function ChartApplicationPage() {
     capabilities: HistoryCapabilities;
     usage: number;
   } | null>(null);
-  const [status, setStatus] = useState("正在加载工作区"),
+  const [, setStatus] = useState("正在加载工作区"),
     [error, setError] = useState("");
   const chartContainer = useRef<HTMLDivElement>(null),
     chart = useRef<ChartAdapter|null>(null),
@@ -221,51 +215,14 @@ export default function ChartApplicationPage() {
     titleIdentity.current = "";
     updateTitle(true);
     alertUiSession.current = "";
-    blocked.current =
-      !mobile && !!workspaceDraft(row.id);
+    // Always open the server-saved layout. Older local drafts are ignored.
+    blocked.current = false;
     setActive(row);
     setFrameKey((key) => key + 1);
-    setError(
-      blocked.current
-        ? "存在未保存草稿，请点击复制恢复为独立工作区；原工作区自动保存已暂停"
-        : "",
-    );
+    setError("");
     setStatus("正在加载图表");
     remember(row.id, !workspaceId);
   };
-  const noticeMessages = [
-    ...(blocked.current
-      ? [
-          {
-            id: "draft",
-            text: "草稿尚未保存，自动保存已暂停。是否复制恢复为独立工作区？",
-            recover: true,
-          },
-        ]
-      : []),
-    ...(!blocked.current && error ? [{ id: "workspace", text: error }] : []),
-    ...(feedError &&
-    !(blocked.current && /未保存草稿|保存已暂停/.test(feedError))
-      ? [{ id: "feed", text: feedError }]
-      : []),
-    ...Object.entries(pollErrors).map(([id, text]) => ({
-      id: "poll:" + id,
-      text,
-    })),
-    ...Object.entries(syncNotices).map(([id, text]) => ({
-      id: "viewport:" + id,
-      text,
-    })),
-  ];
-  const notificationState = JSON.stringify(noticeMessages.filter(row=>row.recover));
-  useEffect(() => {
-    if (nativeReady)
-      updateChart({
-        type: "notifications",
-        notices: JSON.parse(notificationState),
-        draftBlocked: blocked.current,
-      });
-  }, [nativeReady, notificationState]);
   async function refresh(limit?: number) {
     const list = await api<Workspace[]>(
       "/advanced-charts/workspaces" + (limit ? "?limit=" + limit : ""),
@@ -571,12 +528,6 @@ export default function ChartApplicationPage() {
         } catch (error) {
           setError(String(error));
         }
-        return;
-      }
-      if (m.type === 'preference-draft-result') {
-        if(!m.error)setPreferenceReopenRequired(true);
-        const waiter=preferenceRecovery.current.get(m.request);
-        if(waiter){preferenceRecovery.current.delete(m.request);m.error?waiter.reject(Error(m.error)):waiter.resolve();refreshPreferenceDrafts();}
         return;
       }
       if (m.type === "history-progress") {
@@ -888,7 +839,8 @@ export default function ChartApplicationPage() {
             workspace: current.current,
             readonly: mobile,
             catalog,
-            preference_draft_keys: preferenceDrafts().map(draft=>draft.key),
+            // Saved settings remain editable even when this browser has old drafts.
+            preference_draft_keys: [],
             preferences: localStorage.getItem("mw.app-theme") ? [
               ...preferences.filter((p:any)=>!(p.kind === "setting" && p.name === "mw.theme")),
               {...preferences.find((p:any)=>p.kind === "setting" && p.name === "mw.theme"),kind:"setting",name:"mw.theme",tool:"",content:{value:appRef.current.theme}},
@@ -918,7 +870,6 @@ export default function ChartApplicationPage() {
         else if (m.action === "logout") {
           try { await appRef.current.logout(); } catch(e) { setError(String(e)); }
         } else if (!mobile && m.action === "create") await create();
-        else if (!mobile && m.action === "recover") await copy();
       } else if (m.type === "theme-changed") {
         if (typeof m.theme === "string" && /^(dark|light)$/i.test(m.theme))
           { setChartTheme(m.theme.toLowerCase()); appRef.current.setTheme(m.theme.toLowerCase() as "dark" | "light"); }
@@ -979,7 +930,7 @@ export default function ChartApplicationPage() {
           return;
         const waiters = flushWaiters.current.splice(0);
         if (blocked.current) {
-          waiters.forEach((w) => w.reject(Error("存在未保存草稿，请复制恢复")));
+          waiters.forEach((w) => w.reject(Error("本次保存未完成，请重新打开图表加载已保存布局")));
           return;
         }
         if (
@@ -1033,7 +984,7 @@ export default function ChartApplicationPage() {
     const market = marketRuntime({api,marketRequests,inflight,historyCapabilities,setNativeLoads,current,nativeLoadEpoch,chart,compositeEstablished,updateChart});
     const workspace = workspaceRuntime({api,mobile,queue,blocked,current,setError,notices,select,setFeedError,setStatus,setActive,remember,alertUiSession,readAlertDraft,setRows,refresh,unsaved,updateChart});
     const dataCenter = dataCenterRuntime({api,mobile,session:()=>centerSession.current,requests:marketRequests});
-    const session = sessionRuntime({mobile,api,rawAPI:requestAPI,draftsChanged:refreshPreferenceDrafts});
+    const session = sessionRuntime({mobile,api,rawAPI:requestAPI});
     const alerts = alertRuntime({api,mobile,scope:()=>({workspace_id:current.current?.id || '',session:alertUiSession.current})});
     const valid = (source:ChartAdapter,workspace:string|undefined,session:string)=>source===chart.current && workspace===current.current?.id && session===alertUiSession.current;
     application.current = {
@@ -1073,7 +1024,6 @@ export default function ChartApplicationPage() {
     }).catch(error=>{if(!cancelled){setError(String(error));setNotificationFailed(true);}});
     return ()=>{cancelled=true;if(chart.current===instance)chart.current=null;instance?.dispose();};
   }, [Boolean(active),frameKey]);
-  useEffect(()=>{const update=()=>refreshPreferenceDrafts();addEventListener('storage',update);return()=>removeEventListener('storage',update);},[]);
   async function create() {
     const name = prompt("工作区名称", "我的图表");
     if (!name?.trim()) return;
@@ -1084,36 +1034,6 @@ export default function ChartApplicationPage() {
       });
       setRows((p) => [row, ...p]);
       select(row);
-    } catch (e) {
-      setError(String(e));
-    }
-  }
-  async function copy() {
-    try {
-      if (!blocked.current) await flush();
-      const old = current.current;
-      if (!old) return;
-      const entries=workspaceDraftEntries(old.id);
-      let selectedDraft=entries[0];
-      if(entries.length>1) {
-        const choice=prompt('发现多个独立工作区草稿，请选择要复制恢复的编号：\n'+entries.map((entry,index)=>`${index+1}. ${entry.at?new Date(entry.at).toLocaleString():'旧版本草稿'} · 基线版本 ${entry.baseRevision ?? '未知'}`).join('\n'),'1');
-        if(choice===null)return;
-        const index=Number(choice)-1;
-        if(!Number.isInteger(index)||index<0||index>=entries.length)throw Error('请选择有效的草稿编号');
-        selectedDraft=entries[index];
-      }
-      const draft = selectedDraft?.raw || null;
-      const document = draft ? JSON.parse(draft) : old.document;
-      const row = await api<Workspace>("/advanced-charts/workspaces", {
-        name: old.name + " 副本",
-      });
-      const saved = await api<Workspace>(
-        `/advanced-charts/workspaces/${row.id}/save`,
-        { name: row.name, revision: row.revision, document },
-      );
-      if(selectedDraft)dropWorkspaceDraft(selectedDraft);
-      setRows((p) => [saved, ...p]);
-      select(saved);
     } catch (e) {
       setError(String(e));
     }
@@ -1154,16 +1074,6 @@ export default function ChartApplicationPage() {
       {!Object.keys(nativeLoads).length && !Object.keys(capacityNotices).length && !chartFailures.length && <p>当前没有进行中的加载任务。</p>}
         </div>
       )}
-      {!mobile && (savedPreferenceDrafts.length>0 || preferenceReopenRequired) && <div className="preference-draft-banner" role="status">
-        {savedPreferenceDrafts.length>0 && <><span>有 {savedPreferenceDrafts.length} 项设置草稿未保存</span><button onClick={()=>setPreferenceDraftsOpen(true)}>处理设置草稿</button></>}
-        {preferenceReopenRequired && <><span>设置已暂停自动保存；草稿处理后请重新打开图表继续修改。</span><button onClick={()=>location.reload()}>重新打开图表</button></>}
-      </div>}
-      {preferenceDraftsOpen && <PreferenceDraftDialog drafts={savedPreferenceDrafts} onClose={()=>setPreferenceDraftsOpen(false)} onResolve={(draft,action,revision)=>new Promise<void>((resolve,reject)=>{
-        const request=crypto.randomUUID();
-        const timer=setTimeout(()=>{preferenceRecovery.current.delete(request);reject(Error('处理尚未确认，草稿仍保留；请重新核对服务器设置'));},30000);
-        preferenceRecovery.current.set(request,{resolve:()=>{clearTimeout(timer);resolve();},reject:error=>{clearTimeout(timer);reject(error);}});
-        updateChart({type:'preference-draft-resolve',request,draft,action,revision});
-      })}/>}
       {capacityDialog && (
         <HistoryCapacityDialog
           request={api}
@@ -1203,14 +1113,6 @@ export default function ChartApplicationPage() {
           onClose={() => setExportSelection(null)}
         />
       )}
-      <div
-        className="advanced-status"
-        role="status"
-        aria-live="polite"
-        data-idle={/^(行情已加载|已加载|已保存|已另存)/.test(status)}
-      >
-        {status}
-      </div>
       {notificationFailed && !notificationReady && (
         <div className="advanced-shell-recovery" role="status">
           <span>图表界面接入未完成，请重新加载。</span>
