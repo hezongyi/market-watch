@@ -1,5 +1,5 @@
 /** Saved layout operations own draft preservation and stale-result rejection. */
-import {putWorkspaceDraft,dropWorkspaceDraft,workspaceDraft} from '../advanced/localDrafts';
+import {putWorkspaceDraft,dropWorkspaceDraft,ownWorkspaceDraft} from '../advanced/localDrafts';
 import type {api as requestAPI} from '../api';
 import type {Dispatch,SetStateAction} from 'react';
 import type {useNotices} from '../notifications/context';
@@ -35,7 +35,7 @@ return async (q:any,valid:()=>boolean)=>{
             blocked.current &&
             (q.op === "load" || (q.op === "save" && q.args?.id))
           )
-            throw Error("存在未保存草稿，请先复制恢复为独立工作区");
+            throw Error("本次保存未完成，请重新打开图表加载已保存布局");
           const draftId = q.op === "save" ? q.args?.id : null;
           const draft = draftId
             ? JSON.stringify({
@@ -151,10 +151,10 @@ return async (q:any,valid:()=>boolean)=>{
           if (
             q.op === "save" &&
             q.args?.id &&
-            workspaceDraft(q.args.id)
+            ownWorkspaceDraft(q.args.id)
           ) {
             blocked.current = true;
-            setStatus("保存已暂停 · 草稿已保留，请复制恢复");
+            setStatus("保存已暂停，请重新打开图表加载已保存布局");
           }
           setError(String(e));
           throw e;
