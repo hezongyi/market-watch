@@ -274,7 +274,7 @@ const report = { checks: [], errors: [], passed: false },
     // Current-account directory missing and refresh failure are separate states.
     let empty = true,
       refreshes = 0;
-    const catalogPattern = "**/api/market-data/history-catalog?*";
+    const catalogPattern = "**/api/market-data/history-catalog/search?*";
     const catalogHandler = async (r) => {
       if (empty)
         await r.fulfill({
@@ -444,7 +444,7 @@ const report = { checks: [], errors: [], passed: false },
     await expect(dc().getByRole("checkbox")).toBeEnabled();
     await dc().getByRole("checkbox").check();
     const exactQuery =
-      "**/api/market-data/history-catalog?source=oanda&query=EUR_USD&page_size=100";
+      "**/api/market-data/history-catalog/search?source=oanda&query=EUR_USD&limit=100";
     const disappeared = async (r) =>
       r.fulfill({ json: { items: [], total: 0, requires_refresh: false } });
     await page.route(exactQuery, disappeared);

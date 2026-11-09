@@ -11,6 +11,16 @@ def account_scope():
     return "sha256:" + hashlib.sha256(settings.oanda_account_id.encode()).hexdigest()
 
 
+def oanda_catalog_id(symbol):
+    return "HC:" + hashlib.sha256((account_scope() + "|" + symbol).encode()).hexdigest()[:36]
+
+
+def oanda_entry(db, symbol):
+    from .storage import MarketCatalog
+
+    return db.get(MarketCatalog, oanda_catalog_id(symbol))
+
+
 def asset_class(kind, symbol):
     if symbol in ("XAU_USD", "XAG_USD", "XAU/USD", "XAG/USD") or "METAL" in kind:
         return "metal"
@@ -80,18 +90,17 @@ def creation_entry(row):
 
 
 def catalog(db, *, source, query="", page=1, page_size=25, symbol_type=""):
-    from .instrument_directory import SOURCES, has_entries, search
-    from .search_types import TYPES
+    from .history_creation_check import search_catalog
+    from .instrument_directory import SOURCES
 
-    if symbol_type not in TYPES or source not in SOURCES or page < 1 or not 1 <= page_size <= 100:
+    if source not in SOURCES or page < 1 or not 1 <= page_size <= 100:
         raise ValueError("无效的自建来源目录查询")
-    asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
-    result = search(db, source=source, query=query, asset=asset, managed=True,
-                    offset=(page - 1) * page_size, limit=page_size)
-    requires_refresh = not has_entries(db, source)
-    return {**result, "items": [creation_entry(row) for row in result["items"]],
+    result = search_catalog(db, source=source, query=query, symbol_type=symbol_type,
+                            offset=(page - 1) * page_size, limit=page_size)
+    status = result.pop("sources")[0]
+    return {**result,
         "page": page, "page_size": page_size, "source": source,
-        "requires_refresh": requires_refresh,
+        "requires_refresh": status["requires_refresh"],
         "coverage_policy": "actual confirmed observations determine availability"}
 
 
@@ -116,7 +125,7 @@ def refresh_oanda():
     from .catalog_sync import publish
 
     scope = account_scope()
-    records = [{"id": "HC:" + hashlib.sha256((scope + "|" + item["name"]).encode()).hexdigest()[:36],
+    records = [{"id": oanda_catalog_id(item["name"]),
         "symbol": item["name"], "label": item.get("displayName", item["name"]),
         "asset_type": item.get("type", "UNKNOWN"), "precision": item["displayPrecision"],
         "calendar": "ny17", "metadata_json": {"history_account_scope": scope,

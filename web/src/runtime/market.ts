@@ -15,7 +15,7 @@ export function marketRuntime({api,marketRequests,inflight,historyCapabilities,s
 async function market(q:any,source:ChartAdapter,context:{id:number;history_client?:string}) {
 
         const endpoints: Record<string, string> = {
-          search: "/market-data/series/search",
+          search: "/market-data/series/page",
           searchPage: "/market-data/series/page",
           resolve: "/market-data/resolve",
           viewport: "/market-data/viewport-session",
@@ -94,7 +94,7 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
                     page_size:String(Number.isSafeInteger(q.args?.page_size) ? Math.max(1,Math.min(100,q.args.page_size)) : 25),
                     offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
                   : q.op === "search"
-                    ? "?query=" +
+                    ? "?include_total=false&page_size=100&query=" +
                       encodeURIComponent(String(q.args?.query || "")) +
                       "&kind=" +
                       encodeURIComponent(
@@ -113,7 +113,7 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
               ["search", "searchPage"].includes(q.op) ? undefined : q.args,
               controller.signal,
             );
-          return result;
+          return q.op === "search" ? result.items : result;
         } catch (e) {
           throw Object.assign(Error(errorMessage(e)),apiErrorDetails(e));
         } finally {

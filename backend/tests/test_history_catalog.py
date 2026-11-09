@@ -92,7 +92,9 @@ def test_history_catalogue_does_not_enter_native_routes_or_get_disabled_by_legac
         db.add(MarketCatalog(id=ident, source="oanda", symbol="EUR_USD", label="Euro",
             asset_type="CURRENCY", precision=5, calendar="ny17",
             metadata_json={"history_account_scope": "old-account"}))
-    monkeypatch.setattr(market_data, "fetch_oanda_catalog", lambda: [
+    monkeypatch.setattr(settings, "oanda_token", "test-token")
+    monkeypatch.setattr(settings, "oanda_account_id", "test-account")
+    monkeypatch.setattr("alerts.providers.fetch_oanda_catalog", lambda: [
         {"name": "EUR_USD", "displayName": "Euro", "displayPrecision": 5, "type": "CURRENCY"}])
     market_data.refresh_catalog()
     with database.begin() as db:

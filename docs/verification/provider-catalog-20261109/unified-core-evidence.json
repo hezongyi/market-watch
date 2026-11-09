@@ -1,0 +1,161 @@
+{
+  "classification": "F0: compatible directory API/frontend/worker consolidation; no schema change",
+  "backend_passed": 286,
+  "frontend_build": "passed",
+  "single_frontend_unit": "passed",
+  "ruff": "passed",
+  "matched_backend_python_files": 205,
+  "http": {
+    "checks": [
+      "Both refresh endpoints fetched the real OANDA account directory successfully",
+      "Legacy mixed search matches the same bounded paged results and order",
+      "Legacy scoped source picker matches creation search including canonical catalog identity",
+      "Native OANDA identity resolves after unified refresh",
+      "Shared directory status exposes the same successful snapshot"
+    ],
+    "refreshes": [
+      {
+        "path": "/history-catalog/refresh",
+        "count": 127,
+        "elapsed_ms": 1339
+      },
+      {
+        "path": "/catalog/refresh",
+        "count": 127,
+        "elapsed_ms": 1224
+      }
+    ]
+  },
+  "browser": {
+    "passed": true,
+    "checks": [
+      "main symbol search requests only 50 rows without total",
+      "watchlist add uses same count-free page endpoint",
+      "two real provider pages have no duplicate identities",
+      "mapping source selection loads the canonical creation search; no legacy source-list request"
+    ],
+    "requests": [
+      {
+        "path": "/api/market-data/series/page",
+        "query": "BTCUSDT",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "EURUSD",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "XAUUSD",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "ETHUSDT",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "EURUSD",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "XAUUSD",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/series/page",
+        "query": "BTCUSDT",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "path": "/api/market-data/history-catalog/search",
+        "source": "oanda",
+        "query": "EUR/USD",
+        "symbol_type": "forex",
+        "offset": "0",
+        "limit": "50"
+      }
+    ],
+    "errors": []
+  },
+  "images": {
+    "api": "sha256:d201fc9b27de3dd7a992b183b4d39dbdf29b64cba2630c598f309648d21106b5",
+    "web": "sha256:79ad6ce5ed932454e444112251f676deff26cf3747c2dda8fc1ddb2a4268fa8f"
+  }
+}

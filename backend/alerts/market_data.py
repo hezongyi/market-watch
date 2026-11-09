@@ -20,8 +20,7 @@ from .domain import (
 )
 from .market import stored_coverage
 from .market_calendar import session_status
-from .market_names import display_code, pair_query
-from .providers import fetch_oanda_catalog
+from .market_names import display_code
 from .query_errors import QueryError
 from .quote_presentation import describe, fixed_snapshot
 from .storage import (
@@ -55,33 +54,27 @@ DAY = 86400000
 
 
 def refresh_catalog():
-    items = fetch_oanda_catalog()
-    with transaction() as db:
-        for old in db.scalars(select(MarketCatalog).where(
-            MarketCatalog.source == "oanda", ~MarketCatalog.id.startswith("HC:")
-        )):
-            old.available = False
-        for item in items:
-            symbol = item["name"]
-            ident = {"EUR_USD": "EURUSD", "XAU_USD": "XAUUSD"}.get(symbol, "OANDA:" + symbol)
-            row = db.get(MarketCatalog, ident)
-            if not row:
-                row = MarketCatalog(id=ident, source="oanda", symbol=symbol)
-                db.add(row)
-            row.label = item.get("displayName", symbol)
-            row.asset_type = item.get("type", "UNKNOWN")
-            row.precision = item["displayPrecision"]
-            row.calendar = "ny17" if row.asset_type == "CURRENCY" or symbol == "XAU_USD" else None
-            row.updated_at = now_ms()
-            row.available = True
-    return len(items)
+    """Legacy count response over the same scoped snapshot used by every refresh."""
+    from .catalog_sync import refresh
+
+    return refresh("oanda")["count"]
 
 
 def resolve(db, ident):
     inst = db.get(Instrument, ident)
     entry = db.get(MarketCatalog, ident)
-    if entry and entry.id.startswith("HC:"):
+    if entry is None and ident.startswith("OANDA:"):
+        from .history_catalog import oanda_entry
+
+        entry = oanda_entry(db, ident[6:])
+    if entry and ident.startswith("HC:"):
         raise HTTPException(422, "自建来源目录仅用于登记历史，不作为平台或实时身份")
+    if entry and entry.source == "oanda":
+        from .history_catalog import account_scope
+
+        scope = (entry.metadata_json or {}).get("history_account_scope")
+        if scope is not None and scope != account_scope():
+            raise HTTPException(422, "此品种不属于当前账户目录，历史保留")
     if entry and entry.source == "fxcm":
         raise HTTPException(422, "FXCM仅支持平台原生或显式自建历史，不支持实时身份")
     if entry and entry.source == "yahoo":
@@ -606,7 +599,12 @@ def router(authenticated):
 
     @r.post("/catalog/refresh")
     def sync_catalog():
-        return {"count": refresh_catalog()}
+        try:
+            return {"count": refresh_catalog()}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+        except Exception:
+            raise HTTPException(502, "来源目录刷新失败；原目录保留，请检查连接") from None
 
     @r.post("/resolve")
     def symbol(body: HistoryQuery):
@@ -951,48 +949,14 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
         "has_more": has_more, "next_offset": offset + len(items) if has_more else None}
 
 
-def _provider_series(query, *, source=None, symbol_type=""):
-    return _provider_series_page(query, source=source, symbol_type=symbol_type, page_size=1_000_000)["items"]
-
-
 def search_series(query="", *, kind="all", limit=100, source=None, calendar=None):
+    """Compatibility list response; ranking and merging belong to paged search."""
     if kind not in ("all", "provider", "history", "composite") or not 1 <= limit <= 250:
         raise HTTPException(422, "无效行情搜索范围")
-    if kind != "all":
-        return search_series_page(query, kind=kind, page_size=limit, source=source, calendar=calendar)["items"]
-    if source or calendar:
+    if kind == "all" and (source or calendar):
         raise HTTPException(422, "筛选请明确平台、自建或组合范围")
-    from itertools import zip_longest
-
-    from .series_access import search_page
-    providers = _provider_series(query)
-    with transaction() as db:
-        histories = search_page(db, query, kind="history", page_size=limit)["items"]
-        composites = search_page(db, query, kind="composite", page_size=limit)["items"]
-    result = [row for group in zip_longest(providers, histories, composites) for row in group if row]
-    return result[:limit]
-
-
-def _rank_catalog(rows, query):
-    """Prefer code matches; interleave equal-ranked sources to avoid starvation."""
-    from collections import defaultdict
-
-    term = (pair_query(query) or query.strip()).casefold()
-    groups = defaultdict(lambda: defaultdict(list))
-    for row in rows:
-        row["display_symbol"] = display_code(row["symbol"], row["source"], row.get("asset_type"))
-        codes = [row["display_symbol"].casefold(), row["display_symbol"].replace("/", "").casefold(), row.get("symbol", "").casefold(), (row.get("logical_symbol") or "").casefold(),
-                 row.get("symbol", "").replace("_", "").replace("/", "").replace("-", "").casefold()]
-        rank = 0 if term and term in codes else 1 if term and any(c.startswith(term) for c in codes) else 2
-        groups[rank][row["source"]].append(row)
-    result = []
-    for rank in sorted(groups):
-        sources = groups[rank]
-        for index in range(max(map(len, sources.values()))):
-            for rows in sources.values():
-                if index < len(rows):
-                    result.append(rows[index])
-    return result
+    return search_series_page(query, kind=kind, page_size=limit, source=source,
+                              calendar=calendar, include_total=False)["items"]
 
 
 def instrument_catalog(query: str = "", *, limit=250, source=None, managed_status=True):
@@ -1022,7 +986,7 @@ def instrument_catalog(query: str = "", *, limit=250, source=None, managed_statu
             '失败，已发布历史保留' if entry['id'] in failures else
             '部分已发布，范围见历史任务' if entry['id'] in published else '处理中')
         result.append(entry)
-    return _rank_catalog(result, query)
+    return result
 
 
 def _session_observation(source, symbol, session, event_at, metadata, *, event_end=None):

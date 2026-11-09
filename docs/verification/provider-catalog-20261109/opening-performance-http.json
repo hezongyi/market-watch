@@ -1,0 +1,149 @@
+{
+  "samples": 20,
+  "page_size": 50,
+  "host_load": [
+    6.2724609375,
+    6.75,
+    6.998046875
+  ],
+  "note": "Current Ubuntu candidate, sequential HTTP requests, one warmup per case, no synthetic rows. p95 = nearest rank 19/20. HTTP time includes response transfer.",
+  "measurements": {
+    "all_first_page": {
+      "median_ms": 252.55,
+      "p95_ms": 348.69,
+      "min_ms": 214.95,
+      "max_ms": 440.61,
+      "response_bytes": 75125,
+      "items": 50,
+      "path": "/series/page",
+      "params": {
+        "kind": "all",
+        "page_size": 50,
+        "include_total": "false"
+      }
+    },
+    "provider_first_page": {
+      "median_ms": 240.04,
+      "p95_ms": 303.7,
+      "min_ms": 187.83,
+      "max_ms": 312.63,
+      "response_bytes": 78106,
+      "items": 50,
+      "path": "/series/page",
+      "params": {
+        "kind": "provider",
+        "page_size": 50,
+        "include_total": "false"
+      }
+    },
+    "all_code": {
+      "median_ms": 49.72,
+      "p95_ms": 68.18,
+      "min_ms": 31.99,
+      "max_ms": 72.08,
+      "response_bytes": 4741,
+      "items": 4,
+      "path": "/series/page",
+      "params": {
+        "kind": "all",
+        "page_size": 50,
+        "include_total": "false",
+        "query": "BTCUSDT"
+      }
+    },
+    "all_chinese": {
+      "median_ms": 37.21,
+      "p95_ms": 48.24,
+      "min_ms": 30.33,
+      "max_ms": 59.5,
+      "response_bytes": 13801,
+      "items": 10,
+      "path": "/series/page",
+      "params": {
+        "kind": "all",
+        "page_size": 50,
+        "include_total": "false",
+        "query": "比特币"
+      }
+    },
+    "all_second_page": {
+      "median_ms": 218.22,
+      "p95_ms": 341.19,
+      "min_ms": 181.66,
+      "max_ms": 357.64,
+      "response_bytes": 77498,
+      "items": 50,
+      "path": "/series/page",
+      "params": {
+        "kind": "all",
+        "page_size": 50,
+        "include_total": "false",
+        "cursor": "eyJwIjpbNDQsbnVsbCxudWxsXSwidCI6MSwicyI6IjAyYjQ2MzBmZjE0ZTc2ZDIifQ"
+      }
+    },
+    "platform_first_page": {
+      "median_ms": 301.69,
+      "p95_ms": 415.68,
+      "min_ms": 261.45,
+      "max_ms": 427.78,
+      "response_bytes": 71441,
+      "items": 50,
+      "path": "/center/platform",
+      "params": {
+        "page_size": 50,
+        "page": 1
+      }
+    },
+    "platform_code": {
+      "median_ms": 51.21,
+      "p95_ms": 115.11,
+      "min_ms": 27.82,
+      "max_ms": 132.1,
+      "response_bytes": 3668,
+      "items": 3,
+      "path": "/center/platform",
+      "params": {
+        "page_size": 50,
+        "query": "BTCUSDT"
+      }
+    },
+    "platform_chinese": {
+      "median_ms": 38.99,
+      "p95_ms": 60.1,
+      "min_ms": 26.13,
+      "max_ms": 62.39,
+      "response_bytes": 12760,
+      "items": 10,
+      "path": "/center/platform",
+      "params": {
+        "page_size": 50,
+        "query": "比特币"
+      }
+    },
+    "creation_first_page": {
+      "median_ms": 255.25,
+      "p95_ms": 319.46,
+      "min_ms": 215.08,
+      "max_ms": 342.32,
+      "response_bytes": 25379,
+      "items": 50,
+      "path": "/history-catalog/search",
+      "params": {
+        "limit": 50
+      }
+    },
+    "creation_code": {
+      "median_ms": 62.09,
+      "p95_ms": 120.51,
+      "min_ms": 45.66,
+      "max_ms": 138.84,
+      "response_bytes": 1286,
+      "items": 2,
+      "path": "/history-catalog/search",
+      "params": {
+        "limit": 50,
+        "query": "BTCUSDT"
+      }
+    }
+  }
+}

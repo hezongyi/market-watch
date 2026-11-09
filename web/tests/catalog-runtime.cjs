@@ -11,5 +11,17 @@ function load(file,extra={}){const context={exports:{},AbortController,AbortSign
  await center.api('/market-data/history-catalog/refresh?market=a',{source:'yahoo'});
  await center.api('/market-data/catalog/directory-status');
  assert.deepEqual(budgets,[70000,120000,20000]);
+ const paths=[],rows=[{ticker:'MWP:BINANCE:BTCUSDT'}];
+ const {marketRuntime}=load('src/runtime/market.ts',{require:()=>({}),URLSearchParams});
+ const marketRequests=new Map(),inflight={current:0},source={};
+ const {market}=marketRuntime({api:async(path)=>{paths.push(path);return {items:rows,has_more:false}},marketRequests,inflight});
+ assert.deepEqual(await market({op:'search',args:{query:'BTCUSDT',kind:'provider',source:'binance'}},source,{id:1}),rows);
+ const url=new URL(paths[0],'http://localhost');
+ assert.equal(url.pathname,'/market-data/series/page');
+ assert.equal(url.searchParams.get('include_total'),'false');
+ assert.equal(url.searchParams.get('page_size'),'100');
+ assert.equal(url.searchParams.get('source'),'binance');
+ assert.equal((await market({op:'searchPage',args:{kind:'provider'}},source,{id:2})).items,rows);
+ assert.equal(inflight.current,0);assert.equal(marketRequests.size,0);
  console.log('Catalog RPC endpoints stay session-scoped and provider refresh budgets cover query strings');
 })().catch(error=>{console.error(error);process.exitCode=1});

@@ -9,7 +9,7 @@ from .storage import HistoryVersion, ImportJob, NativeHistoryLoad, Preference, n
 
 ROLES = {
     "history_versions": ("自建历史发布", "历史导入、派生与发布可能延迟"),
-    "chart_history": ("图表历史补齐", "来源目录刷新、旧绑定图表历史与导入任务可能延迟"),
+    "chart_history": ("图表历史补齐", "旧绑定图表历史与导入任务可能延迟"),
     "native_history": ("平台图表加载", "平台原生历史分页可能等待或过期"),
     "legacy_import": ("兼容补数链路", "旧版自动补数可能延迟；不代表现行历史服务故障"),
 }

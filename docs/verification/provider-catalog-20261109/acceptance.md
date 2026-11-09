@@ -102,3 +102,7 @@ PostgreSQL 兼容回归使用 `TEST_POSTGRES_URL` 指向本任务独立数据库
 后续可优化空查询去重排序、混合分支少取无用候选和返回字段；本次未同时改动这些规则。最新代码全量结果以PR最终CI为准，不把此前应用提交的3505 passed直接计为本次分页补丁全量通过。
 
 浏览器实际检查商品代码搜索和自选表添加商品：两者均发送 `include_total=false`、`page_size=50`，真实Binance连续两页共100个身份无重复，浏览器无pageerror。先选择有效BTCUSDT以消除候选初始无效工作区的图表提示遮挡；本次未修改基线登录回跳规则。
+
+## 商品目录兼容入口收敛补充
+
+用户授权迁移旧调用后，已删除旧 OANDA 独立刷新、旧搜索全量合并/重排和图表历史 worker 的目录刷新调度；兼容接口仅适配统一查询/刷新核心，前端剩余旧目录调用已迁移。F0 补丁无 schema 变更，286 项后端回归、前端 build/unit、Ruff、真实 OANDA 双入口刷新和浏览器 R1 均通过。最新固定镜像、调用边界与证据见 [unified-core-acceptance.md](unified-core-acceptance.md)。全量 CI 以本补丁提交为准。

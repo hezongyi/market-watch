@@ -144,7 +144,6 @@ def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch)
     def stop(_seconds):
         raise StopAfterCycle()
 
-    monkeypatch.setattr(chart_history_worker, "refresh_catalog", lambda: None)
     monkeypatch.setattr(chart_history_worker, "advance_pending_plans", lambda: None)
     monkeypatch.setattr(chart_history_worker, "import_once", lambda **kw: True)
     monkeypatch.setattr(chart_history_worker.time, "sleep", stop)
@@ -170,7 +169,7 @@ def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch)
     assert rows["history_versions"]["status"] == "unknown"
 
 
-def test_catalog_fault_does_not_stop_import_or_report_false_success(database, monkeypatch):
+def test_history_import_does_not_run_directory_refresh(database, monkeypatch):
     import pytest
     from alerts import chart_history_worker as worker
     from alerts import worker_health
@@ -185,7 +184,8 @@ def test_catalog_fault_does_not_stop_import_or_report_false_success(database, mo
         raise StopAfterCycle()
 
     imported = []
-    monkeypatch.setattr(worker, "refresh_catalog", failed)
+    monkeypatch.setattr("alerts.catalog_sync.refresh", failed)
+    monkeypatch.setattr("alerts.providers.fetch_oanda_catalog", failed)
     monkeypatch.setattr(worker, "advance_pending_plans", lambda: None)
     monkeypatch.setattr(worker, "import_once", lambda **kw: imported.append(True) or True)
     monkeypatch.setattr(worker.time, "sleep", stop)
@@ -194,6 +194,6 @@ def test_catalog_fault_does_not_stop_import_or_report_false_success(database, mo
     with database() as db:
         row = next(row for row in worker_health.services(db) if row["id"] == "chart_history")
     assert imported == [True]
-    assert row["status"] == "degraded"
-    assert row["errors"] == ["catalog:TimeoutError"]
-    assert row["last_success_at"] is None
+    assert row["status"] == "running"
+    assert row["errors"] == []
+    assert row["last_success_at"] is not None

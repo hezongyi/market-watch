@@ -1,0 +1,418 @@
+{
+  "note": "Five fresh application pages in one authenticated browser context. Assets/DB may be warm; runtime can prefetch search data. Times start at actual pointerdown event and end after Playwright confirms first real row visible, including assertion polling overhead. command_ms additionally includes automation actionability wait and is excluded from primary results. Watchlist opens after main search and reuses cached results. Not website cold start; five samples are not a page p95.",
+  "samples": [
+    {
+      "main_command_ms": 1170,
+      "main_open_ms": 587,
+      "main_requests": [
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "BTCUSDT",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "EURUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "XAUUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        }
+      ],
+      "watch_command_ms": 184,
+      "watch_open_ms": 128,
+      "watch_requests": [],
+      "platform_command_ms": 766,
+      "platform_open_ms": 644,
+      "platform_requests": [
+        {
+          "path": "/api/market-data/center/platform",
+          "params": {
+            "query": "",
+            "source": "",
+            "asset_class": "",
+            "page": "1",
+            "page_size": "50"
+          }
+        }
+      ]
+    },
+    {
+      "main_command_ms": 988,
+      "main_open_ms": 936,
+      "main_requests": [
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "BTCUSDT",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "EURUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "XAUUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        }
+      ],
+      "watch_command_ms": 309,
+      "watch_open_ms": 212,
+      "watch_requests": [],
+      "platform_command_ms": 1367,
+      "platform_open_ms": 1226,
+      "platform_requests": [
+        {
+          "path": "/api/market-data/center/platform",
+          "params": {
+            "query": "",
+            "source": "",
+            "asset_class": "",
+            "page": "1",
+            "page_size": "50"
+          }
+        }
+      ]
+    },
+    {
+      "main_command_ms": 1190,
+      "main_open_ms": 353,
+      "main_requests": [
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "BTCUSDT",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "EURUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "XAUUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        }
+      ],
+      "watch_command_ms": 277,
+      "watch_open_ms": 206,
+      "watch_requests": [],
+      "platform_command_ms": 720,
+      "platform_open_ms": 625,
+      "platform_requests": [
+        {
+          "path": "/api/market-data/center/platform",
+          "params": {
+            "query": "",
+            "source": "",
+            "asset_class": "",
+            "page": "1",
+            "page_size": "50"
+          }
+        }
+      ]
+    },
+    {
+      "main_command_ms": 1171,
+      "main_open_ms": 1027,
+      "main_requests": [
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "BTCUSDT",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "EURUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "XAUUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        }
+      ],
+      "watch_command_ms": 392,
+      "watch_open_ms": 121,
+      "watch_requests": [],
+      "platform_command_ms": 735,
+      "platform_open_ms": 678,
+      "platform_requests": [
+        {
+          "path": "/api/market-data/center/platform",
+          "params": {
+            "query": "",
+            "source": "",
+            "asset_class": "",
+            "page": "1",
+            "page_size": "50"
+          }
+        }
+      ]
+    },
+    {
+      "main_command_ms": 899,
+      "main_open_ms": 358,
+      "main_requests": [
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "BTCUSDT",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "EURUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        },
+        {
+          "path": "/api/market-data/series/page",
+          "params": {
+            "query": "XAUUSD",
+            "include_total": "false",
+            "kind": "all",
+            "source": "",
+            "calendar": "",
+            "symbol_type": "",
+            "cursor": "",
+            "page_size": "50",
+            "offset": "0"
+          }
+        }
+      ],
+      "watch_command_ms": 238,
+      "watch_open_ms": 154,
+      "watch_requests": [],
+      "platform_command_ms": 627,
+      "platform_open_ms": 530,
+      "platform_requests": [
+        {
+          "path": "/api/market-data/center/platform",
+          "params": {
+            "query": "",
+            "source": "",
+            "asset_class": "",
+            "page": "1",
+            "page_size": "50"
+          }
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "summary": {
+    "main_open_ms": {
+      "median_ms": 587,
+      "min_ms": 353,
+      "max_ms": 1027
+    },
+    "watch_open_ms": {
+      "median_ms": 154,
+      "min_ms": 121,
+      "max_ms": 212
+    },
+    "platform_open_ms": {
+      "median_ms": 644,
+      "min_ms": 530,
+      "max_ms": 1226
+    }
+  }
+}

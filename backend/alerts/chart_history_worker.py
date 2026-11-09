@@ -10,7 +10,6 @@ import httpx
 from .chart_history_plan import advance_pending_plans
 from .config import settings
 from .market import fetch_source, import_once
-from .market_data import refresh_catalog
 from .market_resources import lane
 from .providers import fetch_binance, fetch_oanda
 
@@ -39,22 +38,10 @@ def run(fetch_page, stop=None):
     from .worker_health import Pulse
 
     pulse = Pulse("chart_history")
-    # Force the first loop to refresh the provider catalog even when the
-    # process monotonic clock has not yet reached one day since boot.
-    refreshed = float("-inf")
-    catalog_error = None
+    # Directory scheduling belongs to catalog_runtime, not history imports.
     while stop is None or not stop.is_set():
         try:
             pulse.start()
-            if time.monotonic() - refreshed > 86400:
-                try:
-                    refresh_catalog()
-                    refreshed = time.monotonic()
-                    catalog_error = None
-                except Exception as exc:
-                    logging.warning("catalog refresh failed: %s",type(exc).__name__)
-                    catalog_error = "catalog:" + type(exc).__name__
-                    refreshed = time.monotonic()-86400+300
             # Reevaluate after every completed page; do not idle for the
             # maintenance timer while a foreground window is still incomplete.
             advance_pending_plans()
@@ -67,9 +54,9 @@ def run(fetch_page, stop=None):
                 if not worked:
                     from .volume_jobs import once
                     worked = once(fetch_page)
-            pulse.finish(worked=worked, errors=[catalog_error] if catalog_error else [])
+            pulse.finish(worked=worked)
             from .runtime_health import progress
-            progress(error=catalog_error)
+            progress()
             if stop is None:
                 time.sleep(0.2 if worked else 1)
             else:

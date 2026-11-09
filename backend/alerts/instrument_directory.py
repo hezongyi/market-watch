@@ -61,6 +61,7 @@ def _statement(db, *, source=None, managed=False, query="", asset=None):
     c = MarketCatalog
     scope = c.metadata_json["history_account_scope"].as_string()
     visible = or_(~c.id.startswith("HC:"), (c.source == "oanda") & (scope == account_scope()))
+    visible &= or_(c.source != "oanda", scope.is_(None), scope == account_scope())
     visible &= or_(c.source != "fxcm", scope == (fxcm_scope() if configured() else "disabled"))
     visible &= or_(c.source != "fxcm", c.available.is_(True))
     # User-selected Yahoo scope excludes mainland and Hong Kong equities.
@@ -72,6 +73,7 @@ def _statement(db, *, source=None, managed=False, query="", asset=None):
             and_(c.asset_type.in_(("FUTURE", "FUTURES")), ~c.symbol.startswith("HKEX:")))))
     if managed:
         visible &= c.available.is_(True)
+        visible &= or_(c.source != "oanda", c.id.startswith("HC:"))
         visible &= or_(~c.source.in_(("oanda", "fxcm")),
                        scope == case((c.source == "oanda", account_scope()),
                                      else_=fxcm_scope() if configured() else "disabled"))

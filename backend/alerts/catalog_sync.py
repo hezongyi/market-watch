@@ -15,6 +15,11 @@ def _key(source, scope, partition):
     return f"instrument-directory:{source}:{scope}:{partition}"
 
 
+def _oanda_alias(row):
+    return row.source == "oanda" and row.id in (
+        "OANDA:" + row.symbol, {"EUR_USD": "EURUSD", "XAU_USD": "XAUUSD"}.get(row.symbol))
+
+
 def localized(source, symbol, label, kind, info):
     """Reliable names first; unknown foreign names keep their original text."""
     if info.get("name_zh_origin") == "manual":
@@ -36,7 +41,9 @@ def belongs_to_partition(row, scope, partition):
         return (info.get("directory_scope"), info["directory_partition"]) == (scope, partition)
     # Upgrade existing catalog rows without rewriting their source/history identities.
     if row.source in ("oanda", "fxcm"):
-        return partition == "all" and info.get("history_account_scope") == scope
+        account = info.get("history_account_scope")
+        return partition == "all" and (account == scope or (
+            account is None and _oanda_alias(row)))
     if row.source == "akshare":
         market = "a" if row.symbol.startswith(("SSE:", "SZSE:")) else "hk" if row.symbol.startswith("HKEX:") else "futures"
         return scope == "public" and market == partition
@@ -59,6 +66,13 @@ def publish(source, records, *, scope="public", partition="all", complete=False,
         ids = {item["id"] for item in records}
         old_rows = list(db.scalars(select(MarketCatalog).where(MarketCatalog.source == source).with_for_update()))
         previous = {row.id: row for row in old_rows}
+        aliases = {}
+        if source == "oanda":
+            # Retain existing legacy identities as projections of this snapshot.
+            # They share the same fetch, transaction and missing-row policy.
+            for row in old_rows:
+                if _oanda_alias(row):
+                    aliases.setdefault(row.symbol, []).append(row)
         for item in records:
             row = previous.get(item["id"])
             if row is not None and (row.source != source or row.symbol != item["symbol"]):
@@ -66,19 +80,21 @@ def publish(source, records, *, scope="public", partition="all", complete=False,
             if row is None:
                 row = MarketCatalog(id=item["id"], source=source, symbol=item["symbol"])
                 db.add(row)
-            info = {**(row.metadata_json or {}), **item.get("metadata_json", {})}
-            if (row.metadata_json or {}).get("name_zh_origin") == "manual":
-                info.update({key: row.metadata_json[key] for key in ("name_zh", "name_zh_origin")})
-            label = item.get("label") or item["symbol"]
-            kind = item.get("asset_type", "OTHER")
-            name, name_origin = localized(source, item["symbol"], label, kind, info)
-            row.label, row.asset_type = label[:200], kind
-            row.precision = item.get("precision", row.precision if row.precision is not None else 8)
-            row.calendar = item.get("calendar", row.calendar)
-            row.available, row.updated_at = item.get("available", True), stamp
-            row.metadata_json = {**info, "name_zh": name[:200], "name_zh_origin": name_origin,
-                "directory_scope": scope, "directory_partition": partition,
-                "directory_origin": origin, "directory_complete": complete}
+            for target in [row, *(alias for alias in aliases.get(item["symbol"], []) if alias.id != row.id)]:
+                ids.add(target.id)
+                info = {**(target.metadata_json or {}), **item.get("metadata_json", {})}
+                if (target.metadata_json or {}).get("name_zh_origin") == "manual":
+                    info.update({key: target.metadata_json[key] for key in ("name_zh", "name_zh_origin")})
+                label = item.get("label") or item["symbol"]
+                kind = item.get("asset_type", "OTHER")
+                name, name_origin = localized(source, item["symbol"], label, kind, info)
+                target.label, target.asset_type = label[:200], kind
+                target.precision = item.get("precision", target.precision if target.precision is not None else 8)
+                target.calendar = item.get("calendar", target.calendar)
+                target.available, target.updated_at = item.get("available", True), stamp
+                target.metadata_json = {**info, "name_zh": name[:200], "name_zh_origin": name_origin,
+                    "directory_scope": scope, "directory_partition": partition,
+                    "directory_origin": origin, "directory_complete": complete}
         if complete and mark_missing:
             for row in old_rows:
                 info = row.metadata_json or {}
