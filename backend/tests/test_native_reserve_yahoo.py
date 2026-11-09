@@ -23,7 +23,9 @@ def test_yahoo_reserve_never_refreshes_metadata(database, monkeypatch, expired, 
         seed(meta, 'M5', 1000000, page(900000, 1000000))
     with database.begin() as db:
         if expired:
-            db.get(storage.MarketCatalog, ident).updated_at = 0
+            row = db.get(storage.MarketCatalog, ident)
+            row.updated_at = 0
+            row.metadata_json = {**row.metadata_json, 'metadata_observed_at': 0}
     def no_provider(*args, **kwargs):
         pytest.fail('PG-only reserve called the provider')
     monkeypatch.setattr(yahoo, 'metadata', no_provider)
@@ -45,7 +47,9 @@ def test_yahoo_mandatory_read_still_refreshes_expired_metadata(database, monkeyp
                               'exchangeTimezoneName': 'America/New_York'})
     ident = yahoo_catalog._store(details)
     with database.begin() as db:
-        db.get(storage.MarketCatalog, ident).updated_at = 0
+        row = db.get(storage.MarketCatalog, ident)
+        row.updated_at = 0
+        row.metadata_json = {**row.metadata_json, 'metadata_observed_at': 0}
     refreshed = []
     monkeypatch.setattr(yahoo, 'metadata', lambda *args, **kwargs: refreshed.append(args) or details)
     assert upstream.metadata(ident)['symbol'] == 'CL=F'

@@ -50,14 +50,14 @@ Dukascopy 原始响应中 17 项无 groupId、46 项无 priceScale：保留未�
 - PostgreSQL 14.24：基线升级、重复升级、降级后升级通过；旧 BSE 历史身份和人工中文逐字保留；两项普通索引和两项 GIN 索引存在。独立 schema 中 `public.gin_trgm_ops` 可用性原失败项复跑通过。
 - Standards 和 Spec 独立复审均无阻断项，分别补充 29 和 65 项相关回归。
 - 修改的 Python 文件 Ruff、`git diff --check`、前端构建、`test:single-frontend -- --unit` 通过。
-- 全量后端运行 68 分钟，结果为 3474 passed、8 failed、21 skipped。进程在最终改动前已启动，期间导入旧模块；8 项失败均在最新代码复跑通过（5 项 SQLite 包含于 199 项相关回归，3 项 PostgreSQL 独立复跑通过）。不把这次旧进程结果称为最终代码全量通过；最终提交由 PR CI 再检查。
+- 全量后端运行 68 分钟，结果为 3474 passed、8 failed、21 skipped。进程在最终改动前已启动，期间导入旧模块；8 项失败均在最新代码复跑通过（5 项 SQLite 包含于 199 项相关回归，3 项 PostgreSQL 独立复跑通过）。不把这次旧进程结果称为最终代码全量通过；首轮 PR CI 跑完全量，3489 passed、16 failed、3 skipped；16 项失败均属于 Yahoo 缓存兼容：恢复已知 adjustment 缓存对未知时区/时段的既有读取行为，过期测试改用独立元信息时间。包含全部失败项的相关回归 86 passed；后续最终提交结果见 PR CI。
 - 全站 `single-frontend.browser.cjs` 在测试工作区保存断言失败。已确认测试请求 `D1_BTCUSDT`，实际登录回跳到 `D1_EURUSD`：基线 `safeNext` 不允许带下划线的工作区 ID，且测试只断言通用 URL。该规则在本次没有修改；清单专用浏览器流程独立通过。此限制保留，不为本次任务扩大修改图表导航。
 
 ## 候选现场及复核
 
 实际主机：Ubuntu 本机 Docker。project/task：`mw-catalog-20261109`。地址：<https://localhost:19653>。独立数据库、volume、网络、凭据及端口，保留 `mw-dev`。私有配置不入库。
 
-API/data-worker 镜像：`sha256:d874cfdf07ec965ade1283cbbfb8f1c2971c8ef058e11377c13fe4e22520ae47`。
+API/data-worker 镜像：`sha256:e13515044d542497dcc7d5756e217364fd0ba7fc57e31f004ecf980b2b6d1eff`。
 
 Web 镜像：`sha256:6d6ab7a5d2fe97a2a03e85f0ff91b9b54c58674f160ce97ed5f71ab6d37238c0`。
 

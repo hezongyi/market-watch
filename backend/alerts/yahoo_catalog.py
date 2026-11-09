@@ -135,10 +135,11 @@ def chart_metadata(ident, *, deadline=None, cached_only=False):
             row.precision,
         )
         expired = (
-            now_ms() - details.get("metadata_observed_at", 0) >= settings.yahoo_metadata_ttl_seconds * 1000
-            or not all(details.get(key) for key in ("adjustment", "timezone", "session"))
+            now_ms() - details.get("metadata_observed_at", details.get("updated_at", row.updated_at))
+            >= settings.yahoo_metadata_ttl_seconds * 1000
+            or not details.get("adjustment")
         )
-    if cached_only and not all(details.get(key) for key in ("adjustment", "timezone", "session")):
+    if cached_only and not details.get("adjustment"):
         raise QueryError(503, 'Yahoo 本地元信息尚未就绪，请先加载图表')
     if expired and not cached_only:
         with _LOCK:
