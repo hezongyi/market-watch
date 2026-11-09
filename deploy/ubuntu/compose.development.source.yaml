@@ -1,0 +1,21 @@
+# Optional source iteration. PYTHONPATH makes the mounted code take precedence
+# over the installed wheel. Workers restart explicitly to avoid replaying work.
+x-source: &source
+  environment:
+    PYTHONPATH: /app/backend
+  volumes:
+    - ../../backend:/app/backend:ro
+    - ../../migrations:/app/migrations:ro
+    - ../../alembic.ini:/app/alembic.ini:ro
+services:
+  migrate:
+    <<: *source
+  api:
+    <<: *source
+    command: [uvicorn, 'alerts.api:app', --host, 0.0.0.0, --port, '8000', --reload, --reload-dir, /app/backend]
+  market-runtime:
+    <<: *source
+  data-worker:
+    <<: *source
+  notification-worker:
+    <<: *source
