@@ -1,0 +1,29 @@
+services:
+  frontend:
+    image: node:22-bookworm-slim@sha256:89b30bf5b6a8d1d0c7f0b1b77e12794a81924120740a724cd73bb270d3528f6c
+    user: ${MW_APP_UID:?}:${MW_APP_GID:?}
+    working_dir: /candidate/web
+    entrypoint: [sh, /candidate/deploy/ubuntu/frontend-dev.sh]
+    environment:
+      MARKET_WATCH_API_URL: http://api:8000
+      MW_DEV_NATIVE_ASSETS: /native-assets
+      npm_config_cache: /tmp/npm-cache
+    volumes:
+      - ../../:/candidate:ro
+      - ${MW_PRIVATE_DIR:?}/web-node-modules:/candidate/web/node_modules
+      - ${MW_PRIVATE_DIR:?}/native-assets:/native-assets:ro
+    mem_limit: 1536m
+    cpus: 1
+    restart: unless-stopped
+    logging: {driver: json-file, options: {max-size: 10m, max-file: '3'}}
+    healthcheck:
+      test: [CMD, node, -e, "fetch('http://127.0.0.1:5173/@vite/client').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+  web:
+    volumes:
+      - ./development-vite.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      frontend: {condition: service_healthy}
