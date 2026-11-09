@@ -8,6 +8,8 @@ x-app: &app
   image: ${MW_API_IMAGE:?}
   user: ${MW_APP_UID:?}:${MW_APP_GID:?}
   env_file: ${MW_PRIVATE_DIR:?}/backend.env
+  environment: &app-environment
+    ALERTS_DATABASE_EXPECTED_VERSION: '140024'
   volumes:
     - ${MW_PRIVATE_DIR:?}/fxcm:/opt/market-watch/fxcm:ro
   depends_on:
@@ -46,6 +48,7 @@ services:
     <<: *app
     command: [python, -m, alerts.runtime, --profile, market]
     environment:
+      <<: *app-environment
       ALERTS_DATABASE_APPLICATION_NAME: mw-dev-market
       ALERTS_DATABASE_POOL_SIZE: '6'
       ALERTS_MARKET_RUNTIME_CHART_ALERT_ENABLED: 'true'
@@ -56,6 +59,7 @@ services:
     mem_limit: 2560m
     cpus: 2
     environment:
+      <<: *app-environment
       ALERTS_DATABASE_APPLICATION_NAME: mw-dev-data
       ALERTS_DATABASE_POOL_SIZE: '16'
       ALERTS_DELIVERY_ENABLED: 'false'
@@ -65,6 +69,7 @@ services:
     mem_limit: 768m
     cpus: 0.5
     environment:
+      <<: *app-environment
       ALERTS_DATABASE_APPLICATION_NAME: mw-dev-notifications
       ALERTS_DATABASE_POOL_SIZE: '4'
   web:

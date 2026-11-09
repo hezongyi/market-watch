@@ -31,10 +31,13 @@ class DatabaseComposeTests(unittest.TestCase):
                 if name.endswith('DATABASE_JIT'):
                     continue
                 if name.endswith('IMAGE'):
-                    component = 'web' if 'WEB' in name else 'chart-origin' if 'CHART' in name else 'backup' if 'BACKUP' in name else 'api'
+                    component = ('web' if 'WEB' in name else 'chart-origin' if 'CHART' in name
+                                 else 'backup' if 'BACKUP' in name else 'ntfy' if 'NTFY' in name else 'api')
                     values[name] = f'market-watch-{component}:fixture'
                 elif name.endswith('PORT'):
                     values[name] = '18000'
+                elif name.endswith('BIND_ADDRESS'):
+                    values[name] = '127.0.0.1'
                 elif name.endswith('MEMORY'):
                     values[name] = '768m'
                 elif name.endswith(('DIR', 'ENV', 'REPO', 'ARTIFACTS')) or name == 'MW_JIT_RESULTS':
