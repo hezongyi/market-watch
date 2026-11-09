@@ -51,6 +51,7 @@ Dukascopy 原始响应中 17 项无 groupId、46 项无 priceScale：保留未�
 - Standards 和 Spec 独立复审均无阻断项，分别补充 29 和 65 项相关回归。
 - 修改的 Python 文件 Ruff、`git diff --check`、前端构建、`test:single-frontend -- --unit` 通过。
 - 全量后端运行 68 分钟，结果为 3474 passed、8 failed、21 skipped。进程在最终改动前已启动，期间导入旧模块；8 项失败均在最新代码复跑通过（5 项 SQLite 包含于 199 项相关回归，3 项 PostgreSQL 独立复跑通过）。不把这次旧进程结果称为最终代码全量通过；首轮 PR CI 跑完全量，3489 passed、16 failed、3 skipped；16 项失败均属于 Yahoo 缓存兼容：恢复已知 adjustment 缓存对未知时区/时段的既有读取行为，过期测试改用独立元信息时间。包含全部失败项的相关回归 86 passed；后续最终提交结果见 PR CI。
+- 应用提交 `6867d6e574d1eb3a6b2a717848984907b865b02c` 的最终后端 CI 实际全量 **3505 passed、3 skipped**，耗时 1563.89 秒；结构/运维检查 110 passed、88 subtests，附加 PostgreSQL 检查 1 passed、8 passed。Web、Compose 和分类 job 全部 success。该 [run 42667285132](https://github.com/hezongyi/market-watch/actions/runs/42667285132) 在生成 required 汇总矩阵时遇到 GitHub `Internal server error`；轻量重跑再次出现内部错误，后续整轮重试的分类状态为 `abandoned`。因此实际测试通过与工作流总状态分别记录，不宣称这条 run 全绿。本次只补充验收记录，重新触发独立 CI，结果以 PR 最终检查为准。
 - 全站 `single-frontend.browser.cjs` 在测试工作区保存断言失败。已确认测试请求 `D1_BTCUSDT`，实际登录回跳到 `D1_EURUSD`：基线 `safeNext` 不允许带下划线的工作区 ID，且测试只断言通用 URL。该规则在本次没有修改；清单专用浏览器流程独立通过。此限制保留，不为本次任务扩大修改图表导航。
 
 ## 候选现场及复核
@@ -61,7 +62,7 @@ API/data-worker 镜像：`sha256:e13515044d542497dcc7d5756e217364fd0ba7fc57e31f0
 
 Web 镜像：`sha256:6d6ab7a5d2fe97a2a03e85f0ff91b9b54c58674f160ce97ed5f71ab6d37238c0`。
 
-镜像由 `mw-docker build` 构建并带任务/用途标签。API、data-worker 实际引用固定镜像 ID。data-worker 的 Compose healthcheck 仅检查数据库连通，不能代替业务 loop 健康证据；六源维护实际完成是本次业务验证依据。
+镜像由 `mw-docker build` 构建并带任务/用途标签。API、data-worker 实际引用固定镜像 ID。data-worker 的 Compose healthcheck 仅检查数据库连通，不能代替业务 loop 健康证据；六源维护实际完成是本次业务验证依据。 最终实查 `catalog_runtime` 为 idle，心跳间隔 60 秒、实际期限 90 秒，观测年龄 25.5 秒；六源样本固定版本仍全部为 published。末次 AKShare 港股及主力连续手动刷新成功，分别为 2,800 和 82 条。候选镜像中 205 个后端 Python 文件逐一哈希与应用提交 `6867d6e5` 一致。
 
 ```bash
 cd /home/quant/repos/market-watch-provider-catalog

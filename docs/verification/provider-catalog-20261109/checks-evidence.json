@@ -37,5 +37,39 @@
     "passed": 86,
     "failed": 0,
     "seconds": 15.19
+  },
+  "final_application_ci": {
+    "commit": "6867d6e574d1eb3a6b2a717848984907b865b02c",
+    "url": "https://github.com/hezongyi/market-watch/actions/runs/42667285132",
+    "passed": 3505,
+    "failed": 0,
+    "skipped": 3,
+    "seconds": 1563.89,
+    "jobs": {
+      "Classify changes": "success",
+      "Backend checks": "success",
+      "Compose checks": "success",
+      "Web checks": "success"
+    },
+    "workflow_conclusion": "failure",
+    "platform_error": "Internal server error while creating required matrix",
+    "correlation_ids": [
+      "11973b79-1a90-4b61-84b0-fb2764c21699",
+      "631d5fe1-87a4-4023-a6a3-e5e564f72b26"
+    ],
+    "rerun_observation": "Attempt 2 created no jobs; attempt 3 reported CLASSIFICATION_RESULT=abandoned. Fresh CI required."
+  },
+  "final_runtime": {
+    "backend_files_hash_matched": 205,
+    "catalog_health": {
+      "state": "idle",
+      "age_ms": 25491,
+      "stale_after_ms": 90000
+    },
+    "published_samples": 6,
+    "akshare_manual_refresh": {
+      "hk": 2800,
+      "futures": 82
+    }
   }
 }
