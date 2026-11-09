@@ -572,9 +572,10 @@ def router(authenticated):
     @r.get("/series/page")
     def series_page(query: str = "", kind: str = "history", page_size: int = 25,
                     offset: int = 0, source: str | None = None, calendar: str | None = None,
-                    symbol_type: str = "", cursor: str | None = None):
+                    symbol_type: str = "", cursor: str | None = None, include_total: bool = True):
         return search_series_page(query, kind=kind, page_size=page_size, offset=offset,
-                                  source=source or None, calendar=calendar or None, symbol_type=symbol_type, cursor=cursor)
+                                  source=source or None, calendar=calendar or None, symbol_type=symbol_type, cursor=cursor,
+                                  include_total=include_total)
 
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
@@ -842,7 +843,8 @@ def router(authenticated):
     return r
 
 
-def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None, symbol_type="", cursor=None):
+def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None,
+                       symbol_type="", cursor=None, include_total=True):
     from .search_types import TYPES
     if (kind not in ("all", "provider", "history", "composite") or symbol_type not in TYPES
             or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
@@ -860,7 +862,7 @@ def search_series_page(query="", *, kind="history", page_size=25, offset=0, sour
         if calendar:
             raise HTTPException(422, "平台搜索不接受自建聚合日界")
         return _provider_series_page(query, source=source, symbol_type=symbol_type,
-                                     offset=offset, page_size=page_size)
+                                     offset=offset, page_size=page_size, include_total=include_total)
     from .series_access import search_page
     try:
         with transaction() as db:
@@ -897,7 +899,7 @@ def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor)
             raise HTTPException(422, "无效搜索游标") from None
     p = positions[0] or 0
     provider_page = (_provider_series_page(query, source=source, symbol_type=symbol_type,
-        offset=p, page_size=page_size) if positions[0] is not None and not calendar
+        offset=p, page_size=page_size, include_total=False) if positions[0] is not None and not calendar
         else {"items": [], "next_offset": None})
     pages = [{**provider_page, "item_offsets": list(range(p + 1, p + len(provider_page["items"]) + 1))}]
     with transaction() as db:
@@ -926,7 +928,7 @@ def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor)
     return {"items": items, "has_more": has_more, "next_cursor": next_cursor}
 
 
-def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25):
+def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25, include_total=True):
     from .chart_series import encode
     from .instrument_directory import search
     from .platform_catalog import _entry
@@ -934,7 +936,8 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
 
     asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
     with transaction() as db:
-        page = search(db, query=query, source=source, asset=asset, offset=offset, limit=page_size)
+        page = search(db, query=query, source=source, asset=asset, offset=offset, limit=page_size,
+                      include_total=include_total)
     items = []
     for row in page["items"]:
         item = _entry(row)
@@ -943,8 +946,8 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
             "type": search_type(item["asset_class"]),
             "description": "平台 · " + item.get("provider_name", item["source"]) + " · 原生周期"})
         items.append(item)
-    has_more = offset + len(items) < page["total"]
-    return {"items": items, "total": page["total"], "offset": offset, "page_size": page_size,
+    has_more = offset + len(items) < page["total"] if include_total else page["has_more"]
+    return {"items": items, **({"total": page["total"]} if include_total else {}), "offset": offset, "page_size": page_size,
         "has_more": has_more, "next_offset": offset + len(items) if has_more else None}
 
 

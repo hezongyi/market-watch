@@ -288,3 +288,23 @@ def test_dukascopy_live_directory_keeps_instruments_without_group(database, monk
         assert search(db, source="dukascopy", query="SPY.US")["items"][0]["metadata_json"]["precision_status"] == "manual_required"
         DatasetRequest(source="dukascopy", logical_symbol=item["logical_symbol"],
             provider_symbol=item["symbol"], asset_class=item["asset_class"], precision=3)
+
+
+def test_countless_pages_keep_exact_ranking_when_sdk_fallback_is_merged(database, monkeypatch):
+    monkeypatch.setattr("alerts.provider_dukascopy.catalog", lambda: [
+        {"id": f"DUKA:{symbol}", "symbol": symbol, "label": "EUR match",
+         "source": "dukascopy", "asset_type": "CURRENCY", "asset_class": "forex",
+         "metadata_origin": "sdk"} for symbol in ("EUR/USD", "EUR/JPY", "EUR/GBP")])
+    publish("binance", [{"id": "BINANCE:" + symbol, "symbol": symbol,
+        "label": "EUR match", "asset_type": "CRYPTO"} for symbol in ("EUR", "EURA", "AEUR")])
+    with database() as db:
+        for query in ("", "EUR", "EUR/USD", "missing"):
+            expected = search(db, query=query, limit=100)["items"]
+            items, offset = [], 0
+            while True:
+                page = search(db, query=query, offset=offset, limit=2, include_total=False)
+                items.extend(page["items"])
+                if not page["has_more"]:
+                    break
+                offset += len(page["items"])
+            assert items == expected

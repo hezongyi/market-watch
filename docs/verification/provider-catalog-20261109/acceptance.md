@@ -58,9 +58,9 @@ Dukascopy 原始响应中 17 项无 groupId、46 项无 priceScale：保留未�
 
 实际主机：Ubuntu 本机 Docker。project/task：`mw-catalog-20261109`。地址：<https://localhost:19653>。独立数据库、volume、网络、凭据及端口，保留 `mw-dev`。私有配置不入库。
 
-API/data-worker 镜像：`sha256:e13515044d542497dcc7d5756e217364fd0ba7fc57e31f004ecf980b2b6d1eff`。
+API/data-worker 镜像：`sha256:82cad17f395cc62ed230e11b74e0363b6b8bbc3ce0058d1ab5b5bd7d679421d9`。
 
-Web 镜像：`sha256:6d6ab7a5d2fe97a2a03e85f0ff91b9b54c58674f160ce97ed5f71ab6d37238c0`。
+Web 镜像：`sha256:fcd3eb79273aaa2560ba5279bc649326eadf7cec421d373e4410592ca7ab62cd`。
 
 镜像由 `mw-docker build` 构建并带任务/用途标签。API、data-worker 实际引用固定镜像 ID。data-worker 的 Compose healthcheck 仅检查数据库连通，不能代替业务 loop 健康证据；六源维护实际完成是本次业务验证依据。 最终实查 `catalog_runtime` 为 idle，心跳间隔 60 秒、实际期限 90 秒，观测年龄 25.5 秒；六源样本固定版本仍全部为 published。末次 AKShare 港股及主力连续手动刷新成功，分别为 2,800 和 82 条。候选镜像中 205 个后端 Python 文件逐一哈希与应用提交 `6867d6e5` 一致。
 
@@ -90,3 +90,15 @@ git diff --check
 PostgreSQL 兼容回归使用 `TEST_POSTGRES_URL` 指向本任务独立数据库，凭据由私有文件注入，勿在命令输出或仓库中展开。主要用例为 `test_market_datasets_postgres.py`、`test_history_creation_check_postgres.py` 和 `test_history_modes_postgres.py`。浏览器测试依赖已安装 Chromium；私有 CA/登录信息通过 `MW_ACCEPTANCE_CREDENTIALS_FILE` 注入。
 
 性能、迁移、真实行情和浏览器原始日志保留在 Ubuntu `/tmp/mw-catalog-*.log`；结构化脱敏证据随本目录保存。候选数据库、迁移兼容数据库及镜像继续保留，未执行永久删除。
+
+## 用户确认的分页提速补充
+
+商品代码搜索与自选表添加商品原本已每页请求50条；本次进一步使用 `include_total=false`，平台目录底层多查1条身份判断下一页，只为本页组装详情，省掉精确总数查询。全部类型搜索内部也省去平台分支计数。默认API及平台行情管理列表仍保留准确total，兼容既有客户端；本项不改变全目录搜索范围、去重规则及准确代码排序，不将旧4.7万行平台列表569ms视为本次搜索弹窗测量。
+
+本次为F0兼容API/前端调用优化，无schema变更。相关回归88 passed（含101条按50/50/1翻页无重复丢失、无COUNT查询、SDK备用目录混合排序），Ruff、前端完整构建及single-frontend unit通过。Ubuntu沿用同一隔离候选，API/data-worker与Web均更新固定镜像；205个后端Python文件与当前应用工作树逐一哈希一致。
+
+在当前22,232条真实目录下，交替测量同一 `/series/page?kind=provider&page_size=50` 的准确计数和免计数两种模式，各20次。空关键词HTTP p95从522.00ms降到316.78ms，中位数321.96→261.15ms；BTCUSDT p95为38.47→29.22ms，中位数28.84→22.46ms。返回品种及顺序逐次相同，翻页标记相同。宿主进程直接查询对照空关键词中位数270.13→187.98ms；该项不是容器HTTP指标，准确代码的直接查询未观察到稳定收益。共享主机上的这组短测不作为任意负载的保证。结构化数据见 `search-page-evidence.json`。
+
+后续可优化空查询去重排序、混合分支少取无用候选和返回字段；本次未同时改动这些规则。最新代码全量结果以PR最终CI为准，不把此前应用提交的3505 passed直接计为本次分页补丁全量通过。
+
+浏览器实际检查商品代码搜索和自选表添加商品：两者均发送 `include_total=false`、`page_size=50`，真实Binance连续两页共100个身份无重复，浏览器无pageerror。先选择有效BTCUSDT以消除候选初始无效工作区的图表提示遮挡；本次未修改基线登录回跳规则。

@@ -1,0 +1,168 @@
+{
+  "scope": "F0 follow-up: symbol search and watchlist add request count-free provider pages; existing exact-total API default retained; no schema change",
+  "http": {
+    "endpoint": "/api/market-data/series/page",
+    "kind": "provider",
+    "page_size": 50,
+    "samples": 20,
+    "note": "Current real directory, paired exact-total vs count-free HTTP requests; no synthetic data added. Not the earlier 47232-row platform-list benchmark.",
+    "empty_query": {
+      "True": {
+        "median_ms": 321.96,
+        "p95_ms": 522.0
+      },
+      "False": {
+        "median_ms": 261.15,
+        "p95_ms": 316.78
+      }
+    },
+    "BTCUSDT": {
+      "True": {
+        "median_ms": 28.84,
+        "p95_ms": 38.47
+      },
+      "False": {
+        "median_ms": 22.46,
+        "p95_ms": 29.22
+      }
+    }
+  },
+  "query_profile": [
+    {
+      "query": "",
+      "rows": 22232,
+      "measurements": {
+        "True": {
+          "median_ms": 270.13,
+          "p95_ms": 355.22,
+          "sql_median_ms": 261.71,
+          "sql_count": 4
+        },
+        "False": {
+          "median_ms": 187.98,
+          "p95_ms": 325.78,
+          "sql_median_ms": 181.86,
+          "sql_count": 3
+        }
+      }
+    },
+    {
+      "query": "BTCUSDT",
+      "rows": 22232,
+      "measurements": {
+        "True": {
+          "median_ms": 27.09,
+          "p95_ms": 42.39,
+          "sql_median_ms": 13.48,
+          "sql_count": 5
+        },
+        "False": {
+          "median_ms": 28.06,
+          "p95_ms": 112.84,
+          "sql_median_ms": 10.92,
+          "sql_count": 4
+        }
+      }
+    },
+    {
+      "query": "比特币",
+      "rows": 22232,
+      "measurements": {
+        "True": {
+          "median_ms": 42.54,
+          "p95_ms": 92.48,
+          "sql_median_ms": 18.33,
+          "sql_count": 4
+        },
+        "False": {
+          "median_ms": 30.07,
+          "p95_ms": 45.81,
+          "sql_median_ms": 10.15,
+          "sql_count": 3
+        }
+      }
+    }
+  ],
+  "tests": {
+    "related_backend_passed": 88,
+    "frontend_build": "passed",
+    "single_frontend_unit": "passed",
+    "ruff": "passed"
+  },
+  "images": {
+    "api": "sha256:82cad17f395cc62ed230e11b74e0363b6b8bbc3ce0058d1ab5b5bd7d679421d9",
+    "web": "sha256:fcd3eb79273aaa2560ba5279bc649326eadf7cec421d373e4410592ca7ab62cd"
+  },
+  "remaining_opportunities": [
+    "reduce full-directory identity sorting for an empty query",
+    "fetch only the mixed-series candidates needed for the visible page without changing fairness",
+    "return only row fields needed by symbol pickers",
+    "use seek pagination if deep offset paging becomes material"
+  ],
+  "browser": {
+    "passed": true,
+    "checks": [
+      "main symbol search requests only 50 rows without total",
+      "watchlist add uses same count-free page endpoint",
+      "two real provider pages have no duplicate identities"
+    ],
+    "requests": [
+      {
+        "query": "BTCUSDT",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "query": "",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "query": "EURUSD",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "query": "XAUUSD",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      },
+      {
+        "query": "ETHUSDT",
+        "include_total": "false",
+        "kind": "all",
+        "source": "",
+        "calendar": "",
+        "symbol_type": "",
+        "cursor": "",
+        "page_size": "50",
+        "offset": "0"
+      }
+    ],
+    "errors": []
+  }
+}

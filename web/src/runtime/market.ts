@@ -87,6 +87,7 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
               endpoints[q.op] +
                 (q.op === "searchPage"
                   ? "?" + new URLSearchParams({query:String(q.args?.query || ""),
+                    include_total:"false",
                     kind:["provider","history","composite","all"].includes(q.args?.kind) ? q.args.kind : "provider",
                     source:String(q.args?.source || ""),calendar:String(q.args?.calendar || ""),
                     symbol_type:String(q.args?.symbol_type || ""),cursor:String(q.args?.cursor || ""),

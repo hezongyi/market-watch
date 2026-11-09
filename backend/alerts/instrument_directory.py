@@ -152,15 +152,16 @@ def _present(row):
     return item
 
 
-def search(db, *, query="", source=None, asset=None, managed=False, offset=0, limit=25):
+def search(db, *, query="", source=None, asset=None, managed=False, offset=0, limit=25, include_total=True):
     if source not in (None, *SOURCES) or asset not in (None, *ASSETS) or offset < 0 or limit < 1:
         raise ValueError("无效品种目录查询")
     statement, rows = _statement(db, source=source, managed=managed, query=query, asset=asset)
     # Counting identities does not need window ordering or supplier metadata.
-    tencent = rows.c.id.startswith("TENCENT:")
-    identities = select(rows.c.source, rows.c.symbol, tencent).group_by(
-        rows.c.source, rows.c.symbol, tencent).subquery()
-    total = db.scalar(select(func.count()).select_from(identities))
+    if include_total:
+        tencent = rows.c.id.startswith("TENCENT:")
+        identities = select(rows.c.source, rows.c.symbol, tencent).group_by(
+            rows.c.source, rows.c.symbol, tencent).subquery()
+        total = db.scalar(select(func.count()).select_from(identities))
     # Until the first runtime sync, keep the pinned SDK directory discoverable.
     # It is explicitly marked unverified and never performs network I/O.
     fallback = []
@@ -184,8 +185,9 @@ def search(db, *, query="", source=None, asset=None, managed=False, offset=0, li
         (or_(func.upper(rows.c.symbol).startswith(term, autoescape=True),
              compact_symbol.startswith(compact_term, autoescape=True)), 1), else_=2) if term else literal(0)
     statement = statement.order_by(rank, rows.c.symbol, rows.c.source, rows.c.id)
+    fetch_limit = limit if include_total else limit + 1
     if fallback:
-        fetched = _hydrate(db, db.execute(statement.limit(offset + limit)).mappings())
+        fetched = _hydrate(db, db.execute(statement.limit(offset + fetch_limit)).mappings())
         def order(row):
             symbol = row["symbol"].upper()
             compact = re.sub(r"[/_-]", "", symbol)
@@ -193,9 +195,11 @@ def search(db, *, query="", source=None, asset=None, managed=False, offset=0, li
                 1 if term and (symbol.startswith(term) or compact.startswith(compact_term)) else 2)
             return rank, row["symbol"], row["source"], row["id"]
         items = sorted(fetched + fallback, key=order)
-        return {"items": items[offset:offset + limit], "total": total + len(fallback)}
-    return {"items": _hydrate(db, db.execute(statement.offset(offset).limit(limit)).mappings()),
-            "total": total}
+        return {"items": items[offset:offset + limit], **(
+            {"total": total + len(fallback)} if include_total else {"has_more": len(items) > offset + limit})}
+    records = list(db.execute(statement.offset(offset).limit(fetch_limit)).mappings())
+    return {"items": _hydrate(db, records[:limit]), **(
+        {"total": total} if include_total else {"has_more": len(records) > limit})}
 
 
 def has_entries(db, source):

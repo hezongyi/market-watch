@@ -214,6 +214,41 @@ def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, m
     assert any(r["series_kind"] == "provider" for r in mixed)
 
 
+def test_provider_picker_can_page_without_counting_the_directory(database):
+    with database.begin() as db:
+        db.add_all(MarketCatalog(id=f"OANDA:P{i:04}", source="oanda", symbol=f"P{i:04}",
+            label=f"Picker {i}", asset_type="CURRENCY", precision=5) for i in range(101))
+    statements = []
+    engine = database.kw["bind"]
+
+    def capture(connection, cursor, statement, parameters, context, executemany):
+        statements.append(statement.lower())
+
+    event.listen(engine, "before_cursor_execute", capture)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            items, offset = [], 0
+            while True:
+                response = client.get("/api/market-data/series/page", params={
+                    "kind": "provider", "source": "oanda", "query": "Picker",
+                    "page_size": 50, "offset": offset, "include_total": "false"})
+                assert response.status_code == 200
+                page = response.json()
+                assert "total" not in page
+                assert len(page["items"]) <= 50
+                items.extend(row["id"] for row in page["items"])
+                if not page["has_more"]:
+                    assert page["next_offset"] is None
+                    break
+                offset = page["next_offset"]
+            assert len(items) == len(set(items)) == 101
+        assert not any("count(" in statement for statement in statements)
+    finally:
+        event.remove(engine, "before_cursor_execute", capture)
+        api.app.dependency_overrides.clear()
+
+
 def test_composite_pages_use_known_mapping_without_scanning_other_products(database, monkeypatch):
     from alerts.composite_definitions import first_use
     from alerts.storage import CompositeRevision, RealtimeMapping
