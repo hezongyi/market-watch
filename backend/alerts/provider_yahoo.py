@@ -195,6 +195,8 @@ def allowed(info):
     kind = info.get("quoteType")
     symbol = str(info.get("symbol") or "").upper()
     exchange = info.get("exchange")
+    if kind == "CRYPTOCURRENCY":
+        return exchange == "CCC" and symbol.endswith("-USD")
     if kind not in {"INDEX", "ETF", "EQUITY", "CURRENCY", "FUTURE"}:
         return False
     if kind in {"EQUITY", "ETF"}:
@@ -229,6 +231,8 @@ def _metadata(info):
     elif kind == "CURRENCY":
         # Yahoo's London labels are source labels, never OANDA NY17 buckets.
         session = "0000-0000:23456"
+    elif kind == "CRYPTOCURRENCY":
+        session = "24x7"
     raw_delay = info.get("exchangeDataDelayedBy")
     reported = int(raw_delay) * 60 if raw_delay is not None else None
     declared = _EXCHANGE_DELAY.get(exchange)
@@ -365,7 +369,7 @@ def _rows(meta, frame, data, before):
         end = (
             int((stamp + offset).timestamp() * 1000)
             if offset
-            else start + {"M1": 60000, "M5": 300000, "M15": 900000, "H1": 3600000}[frame]
+            else start + {"M1": 60000, "M5": 300000, "M15": 900000, "M30": 1800000, "H1": 3600000}[frame]
         )
         value = row.get("Volume")
         # SDK missing Volume becomes 0: no positive evidence => unavailable.
@@ -503,6 +507,7 @@ def native_page(meta, frame, before, count, *, deadline=None, optional=0):
         "M1": 60000,
         "M5": 300000,
         "M15": 900000,
+        "M30": 1800000,
         "H1": 3600000,
         "D1": 86400000,
         "W1": 604800000,

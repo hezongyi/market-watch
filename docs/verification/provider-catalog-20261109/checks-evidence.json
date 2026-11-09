@@ -1,0 +1,29 @@
+{
+  "full_run": {
+    "passed": 3474,
+    "failed": 8,
+    "skipped": 21,
+    "seconds": 4119.44,
+    "final_code": false,
+    "note": "Started before final fixes; modules imported before edits. All eight failures rechecked on final code."
+  },
+  "final_focused": {
+    "passed": 199,
+    "failed": 0,
+    "seconds": 50.11
+  },
+  "final_postgres_failed_case_recheck": {
+    "passed": 3,
+    "failed": 0,
+    "seconds": 12.72
+  },
+  "frontend_unit_command": "npm --prefix web run test:single-frontend -- --unit",
+  "frontend_unit_passed": true,
+  "changed_python_ruff_passed": true,
+  "independent_reviews": {
+    "standards": "no blockers",
+    "spec": "no blockers",
+    "final_ranking_pagination": "no blockers, 30 passed"
+  },
+  "broad_browser_limit": "Baseline safeNext rejects underscore fixture ID; focused catalog browser passed."
+}

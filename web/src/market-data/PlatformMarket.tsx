@@ -1,3 +1,4 @@
+import { DirectoryTools } from "./DirectoryTools";
 import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import { NativeInput, NativeSelect, NativeSlot, NativeUiContext } from "./NativeControls";
@@ -18,7 +19,9 @@ type Instrument = {
   provider_name?: string;
   asset_class: string; available: boolean; updated_at: number | null; history_precision: number | null;
   logical_symbol?: string;
-  capabilities: { native_periods: string[]; history_m1: boolean; native_confirmation: string };
+  history_catalog_id: string; name_zh: string;
+  managed_datasets?: {id: string; mode: string; calendar: string}[];
+  capabilities: { native_periods: string[]; history_m1: boolean; native_confirmation: string; supported_modes?: string[] };
 };
 type SearchRequest = { text?: string; type?: string; exchange?: string; start?: number; signal: AbortSignal };
 const rowId = (id: string) => `platform-${id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`;
@@ -29,6 +32,14 @@ export function PlatformMarket() {
   const [params, setParams] = useSearchParams();
   const [detail, setDetail] = useState<Instrument | null>(null), [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
+  const [description, setDescription] = useState(""), [saving, setSaving] = useState(false);
+  useEffect(() => { setDescription(detail?.name_zh || ""); }, [detail]);
+  async function saveDescription() {
+    if (!detail) return;
+    setSaving(true); setError("");
+    try { await api("/market-data/catalog/description", {id: detail.history_catalog_id, name_zh: description}); setDetail({...detail, label: description, name_zh: description}); setRefresh(v => v + 1); }
+    catch(e) { setError(String(e)); } finally { setSaving(false); }
+  }
   const [revision, setRevision] = useState(0);
   const panel = useDetailPanel();
   const known = useRef(new Map<string, Instrument>()), active = useRef("");
@@ -82,6 +93,7 @@ export function PlatformMarket() {
   useCenterRowRestore(revision);
   return <section className="data-center dc-platform">
     <h1 className="dc-platform-title">平台行情</h1>
+    <DirectoryTools source={source} refreshed={() => setRefresh(v => v + 1)} />
     {error && <p role="alert" className="error">{error}</p>}
     {ui ? <NativeSlot key={refresh} kind="platformSearch" className="dc-platform-search" props={{
       query, source, asset: Object.entries(assetTypes).find(([, value]) => value === asset)?.[0] || asset,
@@ -92,11 +104,14 @@ export function PlatformMarket() {
       <p>来源：{detail.provider_name || names[detail.source] || detail.source} · 原生周期：{detail.capabilities.native_periods.join(" · ") || "尚未接入"}</p>
       <p>M1 历史：{detail.capabilities.history_m1 ? "支持" : "未开放"} · 目录更新时间：{time(detail.updated_at)}</p>
       {detail.capabilities.native_confirmation === "not_supplied" && <p>来源未提供确认标记；按周期结束时间显示。</p>}
+      <label>中文描述<NativeInput aria-label="中文描述" maxLength={200} value={description} onChange={e => setDescription(e.target.value)} /></label>
+      <button disabled={saving || !description.trim()} onClick={() => void saveDescription()}>{saving ? "保存中…" : "保存中文描述"}</button>
       <div className="dc-actions">
         {detail.available && detail.source === "oanda" && <Link to={centerLink(`/market-data/platform/configure?instrument=${encodeURIComponent(detail.id)}`, params, rowId(detail.id))}>配置原生参数</Link>}
-        {["dukascopy", "oanda", "fxcm"].includes(detail.source) && detail.capabilities.history_m1 && (!detail.logical_symbol || detail.logical_symbol.length <= 10) &&
+        {["dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm"].includes(detail.source) && (detail.capabilities.history_m1 || !!detail.capabilities.supported_modes?.length) &&
           <Link to={centerLink(`/market-data/datasets/new?source=${detail.source}&symbol=${encodeURIComponent(detail.provider_symbol)}${detail.history_precision == null ? "" : `&precision=${detail.history_precision}`}`, params, rowId(detail.id))}>添加为自建行情</Link>}
-        <button onClick={() => { setDetail(null); panel.close(); setRefresh(value => value + 1); }}>刷新目录</button>
+        <button onClick={() => { setDetail(null); panel.close(); setRefresh(value => value + 1); }}>刷新列表</button>
+        {detail.managed_datasets?.map(item => <Link key={item.id} to={`/market-data/datasets/${item.id}`}>管理已有维护 · {item.mode} · {item.calendar}</Link>)}
       </div>
     </DetailPanel>}
   </section>;

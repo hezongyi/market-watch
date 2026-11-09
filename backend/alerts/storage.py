@@ -1287,6 +1287,10 @@ class MarketCoverageQuarantine(Base):
 
 class MarketCatalog(Base):
     __tablename__ = "market_instrument_catalog"
+    __table_args__ = (
+        Index("ix_market_instrument_catalog_source_symbol", "source", "symbol"),
+        Index("ix_market_instrument_catalog_source_available", "source", "available"),
+    )
     id: Mapped[str] = mapped_column(String(80), primary_key=True)
     source: Mapped[str] = mapped_column(String(32))
     symbol: Mapped[str] = mapped_column(String(64))

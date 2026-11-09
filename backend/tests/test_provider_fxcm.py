@@ -45,13 +45,12 @@ def test_directory_search_is_local_and_account_scoped(database, fxcm_config, mon
 def test_native_symbol_search_accepts_unmapped_fxcm_directory(
     database, fxcm_config, monkeypatch, kind, query
 ):
-    from alerts import api, market_data
+    from alerts import api
     from fastapi.testclient import TestClient
 
     directory(database, monkeypatch)
     # Keep unrelated providers offline, but exercise the real FXCM catalog,
     # provider merge, ranking and authenticated native-search HTTP endpoint.
-    monkeypatch.setattr(market_data, "instrument_catalog", lambda *a, **k: [])
     monkeypatch.setattr(
         fxcm_history.FxcmHistory, "catalog", lambda _: pytest.fail("search performed broker IO")
     )
@@ -60,12 +59,12 @@ def test_native_symbol_search_accepts_unmapped_fxcm_directory(
         with TestClient(api.app) as client:
             response = client.get(
                 "/api/market-data/series/page",
-                params={"kind": kind, "query": query, "page_size": 50},
+                params={"kind": kind, "query": query, "page_size": 50, "source": "fxcm"},
             )
             assert response.status_code == 200
             rows = response.json()["items"]
             assert rows and all(row["source"] == "fxcm" for row in rows)
-            assert all(row["logical_symbol"] is None for row in rows)
+            assert all(row["logical_symbol"] for row in rows)
             assert all(row["ticker"].startswith("MWP:FXCM:") for row in rows)
             if query:
                 assert [row["symbol"] for row in rows] == ["EUR/USD"]

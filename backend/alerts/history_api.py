@@ -26,7 +26,7 @@ from .storage import (
 
 class CatalogRefreshRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    source: Literal["oanda", "fxcm"] = "oanda"
+    source: Literal["dukascopy", "oanda", "binance", "akshare", "fxcm", "yahoo"] = "oanda"
 
 
 class VersionRequest(BaseModel):
@@ -37,9 +37,9 @@ class VersionRequest(BaseModel):
 
 class DatasetRequest(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    source: Literal["dukascopy", "oanda", "akshare", "fxcm", "yahoo"] = "dukascopy"
+    source: Literal["dukascopy", "oanda", "akshare", "fxcm", "yahoo", "binance"] = "dukascopy"
     logical_symbol: str = Field(pattern=r"^[A-Z0-9]{1,10}$")
-    provider_symbol: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9/_.:^=-]+$")
+    provider_symbol: str = Field(min_length=1, max_length=64, pattern=r"^[A-Za-z0-9/_.:^=+\-]+$")
     asset_class: AssetClass
     precision: int = Field(ge=0, le=10, strict=True)
     aggregation_calendar: AggregationCalendar | None = None
@@ -233,7 +233,7 @@ def router(authenticated):
             raise HTTPException(409, str(error)) from None
 
     @routes.get("/center/creations/{request_id}")
-    def creation_result(request_id: str, source: Literal["dukascopy", "oanda", "akshare", "fxcm", "yahoo"],
+    def creation_result(request_id: str, source: Literal["dukascopy", "oanda", "akshare", "fxcm", "yahoo", "binance"],
                         provider_symbol: str = Query(min_length=1, max_length=64),
                         asset_class: AssetClass = "forex", aggregation_calendar: AggregationCalendar | None = None,
                         mode: HistoryMode = "base_m1", adjustment: str = "none"):
@@ -290,6 +290,41 @@ def router(authenticated):
 
         return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")]
 
+    @routes.get("/catalog/directory-status")
+    def directory_status(source: str | None = None):
+        from .catalog_sync import statuses
+
+        with transaction() as db:
+            return statuses(db, source)
+
+    @routes.post("/catalog/description")
+    def catalog_description(body: dict):
+        ident, name = body.get("id"), body.get("name_zh")
+        if not isinstance(ident, str) or not isinstance(name, str):
+            raise HTTPException(422, "请提供目录身份和中文描述")
+        from .catalog_sync import describe
+
+        try:
+            with transaction() as db:
+                return describe(db, ident, name)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
+    @routes.post("/catalog/discover")
+    def discover_symbol(body: dict):
+        from .history_mode_sources import dataset_identity
+        from .provider_yahoo import metadata
+        from .yahoo_catalog import _store
+
+        symbol = body.get("symbol", "").strip().upper()
+        try:
+            dataset_identity("yahoo", symbol, "native_periods", "none")
+            return {"id": _store(metadata(symbol))}
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+        except Exception:
+            raise HTTPException(502, "精确代码补录失败，请检查来源后重试") from None
+
     @routes.get("/history-catalog")
     def history_catalog(source: str, query: str = "", page: int = 1, page_size: int = 25, symbol_type: str = ""):
         from .history_catalog import catalog
@@ -322,18 +357,11 @@ def router(authenticated):
 
     @routes.post("/history-catalog/refresh")
     def refresh_history_catalog(body: CatalogRefreshRequest | None = None,
-                                source: Literal["oanda", "akshare", "fxcm"] = "oanda", market: str = "a"):
-        from .history_catalog import refresh_fxcm, refresh_oanda
+                                source: Literal["dukascopy", "oanda", "binance", "akshare", "fxcm", "yahoo"] = "oanda", market: str = "a"):
+        from .catalog_sync import refresh
 
         try:
-            selected = body.source if body else source
-            if selected == "fxcm":
-                return refresh_fxcm()
-            if selected == "akshare":
-                from .akshare_catalog import refresh
-
-                return refresh(market)
-            return refresh_oanda()
+            return refresh(body.source if body else source, market=market)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
         except Exception:

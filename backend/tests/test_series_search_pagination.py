@@ -10,6 +10,7 @@ from alerts.storage import (
     HistoryArtifact,
     HistoryReclamation,
     HistoryVersion,
+    MarketCatalog,
     MarketComposite,
     MarketDemand,
 )
@@ -195,14 +196,16 @@ def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, m
         }
         for i in range(600)
     ]
-    monkeypatch.setattr(market_data, "instrument_catalog",
-                        lambda query, *, limit=None, source=None, managed_status=True: provider)
-    first = market_data.search_series_page(kind="provider", page_size=250)
+    with database.begin() as db:
+        db.add_all(MarketCatalog(id=row["id"], symbol=row["symbol"], source=row["source"],
+            label=row["label"], asset_type="CURRENCY", precision=5, calendar="ny17") for row in provider)
+    monkeypatch.setattr("alerts.provider_dukascopy.catalog", lambda: [])
+    first = market_data.search_series_page("Ticker", kind="provider", source="oanda", page_size=250)
     second = market_data.search_series_page(
-        kind="provider", page_size=250, offset=first["next_offset"]
+        "Ticker", kind="provider", source="oanda", page_size=250, offset=first["next_offset"]
     )
     third = market_data.search_series_page(
-        kind="provider", page_size=250, offset=second["next_offset"]
+        "Ticker", kind="provider", source="oanda", page_size=250, offset=second["next_offset"]
     )
     assert first["total"] == 600 and third["next_offset"] is None
     assert len({r["id"] for p in (first, second, third) for r in p["items"]}) == 600
@@ -277,8 +280,10 @@ def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_q
     providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
                   "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
                   "available": True, "supported": True} for i in range(600)]
-    monkeypatch.setattr(market_data, "instrument_catalog",
-                        lambda query, *, limit=None, source=None, managed_status=True: providers)
+    with database.begin() as db:
+        db.add_all(MarketCatalog(id=row["id"], symbol=row["symbol"], source=row["source"],
+            label=row["label"], asset_type=row["asset_type"], precision=5, calendar="ny17") for row in providers)
+    monkeypatch.setattr("alerts.provider_dukascopy.catalog", lambda: [])
     rows, cursor = [], None
     for _ in range(80):
         page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)

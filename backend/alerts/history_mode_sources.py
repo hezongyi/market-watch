@@ -12,8 +12,9 @@ def dataset_identity(source, symbol, mode, adjustment):
     if mode not in ("base_d1", "native_periods") or source not in ("akshare", "yahoo"):
         raise ValueError("该来源尚未验证此历史维护模式")
     if source == "akshare":
-        from .provider_akshare import symbol_rules
-
+        from .provider_akshare import catalog_allowed, symbol_rules
+        if not catalog_allowed(symbol):
+            raise ValueError("新建仅支持既有新浪/腾讯股票及新浪主力连续目录")
         info = symbol_rules(symbol)
         family, rule = info["source_family"], info["trading_date_rule"]
         if info["source_family"] == "eastmoney-a":
@@ -23,7 +24,7 @@ def dataset_identity(source, symbol, mode, adjustment):
         if adjustment not in ("none", "qfq", "hfq"):
             raise ValueError("AKShare 不支持此价格口径")
     else:
-        if not re.fullmatch(r"[A-Z0-9^=._-]{1,64}", symbol):
+        if symbol.upper().endswith((".SS", ".SZ", ".BJ", ".HK")) or not re.fullmatch(r"[A-Z0-9^=._-]{1,64}", symbol):
             raise ValueError("请选择准确的 Yahoo 品种代码")
         family, rule = "yfinance", "yahoo-exchange-date-v1"
         if adjustment not in ("none", "supplier"):
@@ -130,18 +131,23 @@ def probe_yahoo(symbol, frames, adjustment="none"):
     results = {}
     for frame in frames:
         try:
-            batch = archive_page(source_identity(parent, frame, info), 946684800000, now_ms())
+            from .provider_capabilities import history_policy
+
+            right = now_ms()
+            days, _ = history_policy(frame)
+            left = right - min(days or 30, 30) * 86400000 if frame not in ("D1", "W1", "MN") else 946684800000
+            batch = archive_page(source_identity(parent, frame, info), left, right)
             valid = [row for row in batch.rows if row.complete]
             results[frame] = {"status": "verified" if valid else "unavailable",
                 "observed_at": batch.observed_at, "rows": len(valid),
                 "first": valid[0].start if valid else None, "last": valid[-1].end if valid else None}
         except Exception:
-            results[frame] = {"status": "unavailable", "reason": "本次未返回可验证的有效闭合行情"}
+            results[frame] = {"status": "error", "reason": "本次请求失败，保留已验证周期，可稍后重试"}
     with transaction() as db:
         _, row = local_details(db, "yahoo", symbol)
         metadata = dict(row.metadata_json)
         verified = dict(metadata.get("archive_verified_frames", {}))
-        current = set(verified.get(adjustment, [])) - set(frames)
+        current = set(verified.get(adjustment, [])) - {frame for frame, result in results.items() if result["status"] != "error"}
         current.update(frame for frame, value in results.items() if value["status"] == "verified")
         verified[adjustment] = [frame for frame in HISTORY_FRAMES if frame in current]
         row.metadata_json = {**metadata, "archive_verified_frames": verified,

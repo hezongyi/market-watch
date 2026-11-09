@@ -1,0 +1,14 @@
+{
+  "database_version": "140024",
+  "baseline": "ba54_market_switch_runs",
+  "head": "bb55_provider_catalog_indexes",
+  "legacy_row_preserved": true,
+  "upgrade_repeat": true,
+  "downgrade_upgrade": true,
+  "indexes": [
+    "ix_market_instrument_catalog_source_available",
+    "ix_market_instrument_catalog_source_symbol",
+    "ix_provider_directory_compact_search",
+    "ix_provider_directory_search"
+  ]
+}

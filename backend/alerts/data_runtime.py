@@ -12,6 +12,7 @@ from .runtime_supervisor import Loop, RuntimeGroupError, exit_if_unstopped, run_
 
 def build_loops():
     from . import (
+        catalog_runtime,
         chart_aggregation_worker,
         history_versions,
         market_stream_worker,
@@ -39,6 +40,7 @@ def build_loops():
     )
     return providers + transports + (
         Loop("provider_janitor", provider_service.run_janitor),
+        Loop("catalog_runtime", catalog_runtime.run),
         Loop("chart_history", _chart_history),
         Loop("history_network", history_versions.run_network),
         Loop("history_compute", history_versions.run_compute),

@@ -15,6 +15,7 @@ def test_platform_includes_legacy_binance_and_prefers_catalog_identity(database)
         assert result["items"][0]["id"] == legacy.id
         assert result["items"][0]["provider_symbol"] == legacy.symbol
         assert result["items"][0]["asset_class"] == "crypto"
+        assert catalog(db, source="", query="BTC")["items"]
         assert catalog(db, source="binance", query="missing")["total"] == 0
         assert catalog(db, source="binance", page=2, page_size=1)["items"] == []
         db.add(MarketCatalog(id="CAT:BTCUSDT", source="binance", symbol="BTCUSDT",
