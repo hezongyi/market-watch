@@ -119,13 +119,14 @@ class SourceProbeRequest(BaseModel):
 
 
 def dataset_report(row, inst):
-    return {"id": row.id, "instrument_id": row.instrument_id,
+    from .market_presentation import present
+    return present({"name": inst.label, "series_kind": "managed", "id": row.id, "instrument_id": row.instrument_id,
             "logical_symbol": row.logical_symbol, "identity": row.identity,
             "display_symbol": display_code(row.logical_symbol, asset_type=row.asset_class),
             "provider_display_symbol": display_code(row.identity["provider_symbol"], row.identity["source"], row.asset_class),
             "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
             "precision": inst.precision, "asset_class": row.asset_class,
-            "aggregation_calendar": inst.calendar}
+            "aggregation_calendar": inst.calendar}, identity=row.identity)
 
 
 def router(authenticated):

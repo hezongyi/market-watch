@@ -17,6 +17,7 @@ from .chart_data import FRAMES, future_grid
 from .chart_series import encode
 from .composite_definitions import baseline, definition, first_use
 from .market_names import code_search, display_code, pair_query
+from .market_presentation import present
 from .storage import (
     CompositeMinuteInput,
     CompositePreparation,
@@ -93,7 +94,8 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
             inst = db.get(Instrument, dataset.instrument_id)
             version, seam = baseline(db, dataset.id, inst.calendar)
         mapping = db.get(RealtimeMapping, mapping_id)
-        target = db.get(Instrument, db.get(MarketDataset, mapping.target_dataset_id).instrument_id)
+        target_dataset = db.get(MarketDataset, mapping.target_dataset_id)
+        target = db.get(Instrument, target_dataset.instrument_id)
         frames = FRAMES
         binding = {"composite_id": ident, "dataset_id": dataset.id, "mapping_id": mapping_id,
                    "history_version_id": version.id, "seam": seam, "created": composite is not None}
@@ -103,7 +105,7 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
         volume_kind, volume_unit = "unavailable", None
     else:
         raise ValueError("需要明确的固定历史或组合行情类型")
-    return {"id": ident, "symbol": dataset.logical_symbol, "name": inst.label,
+    result = {"id": ident, "symbol": dataset.logical_symbol, "name": inst.label,
         "display_symbol": display_code(dataset.logical_symbol, asset_type=dataset.asset_class),
         "series_kind": kind, "source": dataset.identity["source"] if kind == "history" else "composite",
         "historical_source": dataset.identity["source"], "basis": inst.basis,
@@ -121,6 +123,8 @@ def _metadata(db, ident, kind, *, composite_context=None, selected_revision=None
                            "index": "INDEX", "crypto": "CRYPTO"}.get(dataset.asset_class, "OTHER")}
            if kind == "history" and inst.calendar == "source_date" else {}),
         **binding}
+    return present(result, identity=dataset.identity,
+                   realtime_identity=target_dataset.identity if kind == "composite" else None)
 
 
 def chart_data(db, body, *, realtime=None):
@@ -419,8 +423,7 @@ def search_page(db, query="", *, kind="history", page_size=25, offset=0, source=
         inst = db.get(Instrument, dataset.instrument_id)
         from .search_types import symbol_type as asset_type
         items.append({**meta, "type": asset_type(dataset.asset_class), "ticker": encode(ident, kind), "label": inst.label,
-            "description": f"{'自建' if kind == 'history' else '组合'} · {dataset.identity['source']}"
-                f"{'→OANDA Practice' if kind == 'composite' else ''} · {inst.basis} · {meta['calendar']}", "available": True})
+            "description": " · ".join((meta["series_kind_display"], meta["source_display"], meta["price_basis_display"])), "available": True})
         item_offsets.append(offset + examined)
         if len(items) == page_size:
             break

@@ -1216,12 +1216,15 @@ function seriesPresentationRows(symbols) {
     const identity = decode(ticker);
     const meta = presentationFor(ticker);
     const shown = meta?.display_symbol || meta?.symbol || MWSeries.display(identity.symbol);
-    const base = meta?.source === 'yahoo' ? (meta.name || shown) + " · Yahoo 市场报价" +
+    const prefix = meta?.presentation_description || (meta?.source === 'yahoo' ? (meta.name || shown) + " · Yahoo 市场报价" +
       (meta.delay_seconds > 0 ? " · 延迟 " + Math.floor(meta.delay_seconds / 60) + " 分钟" :
         meta.delay_seconds === 0 ? " · 实时" : " · 延迟未知") :
-      identity.series_kind === 'provider' ? shown + " · 平台行情" + (meta?.price_description ? " · " + meta.price_description : "") :
-      identity.series_kind === 'history' ? (meta?.name || shown) + " · 固定历史" :
-      identity.series_kind === 'composite' ? (meta?.name || shown) + " · 组合行情" : shown + " · 自建行情";
+      identity.series_kind === 'provider' ? shown + " · 平台" + (meta?.price_description ? " · " + meta.price_description : "") :
+      identity.series_kind === 'history' ? (meta?.name || shown) + " · 自建" :
+      identity.series_kind === 'composite' ? (meta?.name || shown) + " · 组合" : shown + " · 自建");
+    const base = prefix + (meta?.presentation_description && meta.source === "yahoo" ?
+      (meta.delay_seconds > 0 ? " · 延迟 " + Math.floor(meta.delay_seconds / 60) + " 分钟" :
+        meta.delay_seconds === 0 ? " · 实时" : " · 延迟未知") : "");
     return meta ? [{s:"ok",n:ticker,v:{short_name:shown,description:base,description_base:base,
       market_session:"unknown",time_type:identity.series_kind === "history" ? "fixed_history" : null,
       exchange:meta.exchange || meta.source?.toUpperCase()}}].map(presentQuote) : [];
@@ -1277,7 +1280,7 @@ async function searchNativeSymbols(options) {
   if(position != null) pages.set(start+page.items.length,position);
   while(pages.size>256) pages.delete(pages.keys().next().value);
   return {items:page.items.map(s=>({symbol:s.display_symbol || s.symbol,ticker:s.ticker,
-    description:s.label+" · "+s.description,exchange:s.source === "composite" ? (s.historical_source || "").toUpperCase() : s.source.toUpperCase(),
+    description:(s.instrument_name || s.label)+" · "+s.description,exchange:s.source === "composite" ? (s.historical_source || "").toUpperCase() : s.source.toUpperCase(),
     type:s.type || "other"})),remaining:position != null ? 1 : 0};
 }
 
@@ -1474,7 +1477,7 @@ const feed = {
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
-        description: (meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台行情 · " : series_kind === "composite" ? " · 组合行情 · " : " · 自建行情 · ") + (meta.price_description || meta.basis) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "tick_count" ? " · 价格变动次数" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
+        description: (meta.presentation_description || ((meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台 · " : series_kind === "composite" ? " · 组合 · " : " · 自建 · ") + (meta.price_description || meta.basis))) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "tick_count" ? " · 价格变动次数" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
@@ -2654,9 +2657,9 @@ function boot(
       },
     },
     compare_symbols: [
-      { symbol: "MWP:EURUSD", title: "EURUSD · 平台行情" },
-      { symbol: "MWP:XAUUSD", title: "XAUUSD · 平台行情" },
-      { symbol: "MWP:BTCUSDT", title: "BTCUSDT · 平台行情" },
+      { symbol: "MWP:EURUSD", title: "EURUSD · 平台" },
+      { symbol: "MWP:XAUUSD", title: "XAUUSD · 平台" },
+      { symbol: "MWP:BTCUSDT", title: "BTCUSDT · 平台" },
     ],
     // A constructor symbol overrides the first MainSeries in saved_data.
     // Existing layouts may have stale/display-only top-level metadata; the
@@ -2675,6 +2678,8 @@ function boot(
     },
     autosize: true,
     theme: selectedTheme,
+    overrides: {"mainSeriesProperties.statusViewStyle.showExchange": false},
+    settings_overrides: {"mainSeriesProperties.statusViewStyle.showExchange": false},
     saved_data: chartState,
     saved_data_meta_info: workspace
       ? { uid: workspace.id, name: workspace.name, description: workspace.name }

@@ -155,7 +155,7 @@ function ManagedRow({
           {d.display_symbol || d.logical_symbol}
         </button>
         <span>
-          {names[d.identity.source]} · {d.identity.basis} ·{" "}
+          {d.source_display || names[d.identity.source]} · {d.price_basis_display || d.identity.basis} ·{" "}
           {phase(d.aggregation_calendar)}
         </span>
         <small>
@@ -214,7 +214,7 @@ function ManagedRow({
               <span className="dc-detail-muted">{maintenanceStatus}</span>
             </div>
             <dl className="dc-detail-facts">
-              <div><dt>来源</dt><dd>{names[d.identity.source]} · {d.identity.basis.toUpperCase()}</dd></div>
+              <div><dt>来源</dt><dd>{d.source_display || names[d.identity.source]} · {d.price_basis_display || d.identity.basis.toUpperCase()}</dd></div>
               <div><dt>聚合日界</dt><dd>{phase(d.aggregation_calendar)}</dd></div>
               <div><dt>可用历史</dt><dd>{d.available_end ? `${time(d.available_start)} 至 ${time(d.available_end)}` : "尚未发布"}</dd></div>
               <div><dt>可用周期</dt><dd>{d.usable_timeframes.join(" · ") || "尚无可用周期"}</dd></div>

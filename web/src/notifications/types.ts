@@ -132,7 +132,7 @@ export const sourceLabels: Record<string, string> = {
 };
 
 export const seriesKindLabels: Record<string, string> = {
-  composite: "组合行情", history: "固定历史", managed: "自建行情", provider: "平台行情",
+  composite: "组合", history: "自建", managed: "自建", provider: "平台",
 };
 /** Presentation only; opaque storage IDs stay in the expandable diagnostics. */
 export function noticeInstrument(notice: Notice): string {

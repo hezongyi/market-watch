@@ -634,9 +634,12 @@ def router(authenticated):
                     raise HTTPException(422, str(error)) from None
         with transaction() as db:
             inst = resolve(db, body.instrument)
-            return {
+            from .market_presentation import present
+            dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
+            return present({
                 "id": inst.id,
                 "name": inst.label,
+                "series_kind": "managed",
                 "symbol": inst.symbol,
                 "display_symbol": display_code(inst.symbol, inst.source),
                 "source": inst.source,
@@ -645,7 +648,7 @@ def router(authenticated):
                 "calendar": inst.calendar,
                 "frames": FRAMES,
                 **volume_metadata(inst.source, inst.symbol),
-            }
+            }, identity=dataset.identity if dataset else {"source": inst.source})
 
     @r.post("/viewport-session")
     def viewport(body: ViewportQuery):
@@ -942,7 +945,7 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
         item.update({"series_kind": "provider", "ticker": encode(item["id"], "provider"),
             "supported": bool(item["capabilities"]["native_periods"]),
             "type": search_type(item["asset_class"]),
-            "description": "平台 · " + item.get("provider_name", item["source"]) + " · 原生周期"})
+            "description": " · ".join((item["series_kind_display"], item["source_display"], item["price_basis_display"], "原生周期"))})
         items.append(item)
     has_more = offset + len(items) < page["total"] if include_total else page["has_more"]
     return {"items": items, **({"total": page["total"]} if include_total else {}), "offset": offset, "page_size": page_size,
@@ -1030,8 +1033,7 @@ def quote_snapshot(body: QuoteQuery):
                 try:
                     meta = metadata(db, ident, kind)
                     shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
-                    values = {"short_name": shown, "description": meta["name"] + (
-                        " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
+                    values = {"short_name": shown, "description": meta.get("presentation_description", meta["name"] + (" · 自建" if kind == "history" else " · 组合")), "exchange": meta["source"].upper()}
                     facts = None
                     if kind == "history":
                         values.update(fixed_snapshot(db, ident, meta))
@@ -1111,7 +1113,7 @@ def quote_snapshot(body: QuoteQuery):
                 delay = snapshot["delay_seconds"]
                 read_at = now_ms()
                 session = session_status(meta["source"], meta["symbol"], now_ms(), metadata=meta)
-                description = meta["name"] + " · Yahoo 市场报价"
+                description = meta.get("presentation_description", meta["name"] + " · Yahoo 市场报价")
 
                 description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
                 conflict = _session_observation(meta["source"], meta["symbol"], session, stamp, meta)
@@ -1143,7 +1145,7 @@ def quote_snapshot(body: QuoteQuery):
             quote_time_type = "source_d1" if quote_frame == "D1" else "source_m1"
             fetch_status = page.get("fetch_status", "ok")
             read_at = page.get("read_at", page.get("as_of"))
-            values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
+            values = {"short_name": shown, "description": meta.get("presentation_description", shown + " · 平台" + (" · " + meta["price_description"] if meta.get("price_description") else "")),
                       "exchange": meta["source"].upper(), **session, **conflict,
                       "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
                       **{key:page[key] for key in ("wait_reason", "last_success_at", "cache_age_ms") if key in page},
@@ -1213,12 +1215,16 @@ def quote_snapshot(body: QuoteQuery):
             dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == ident)) if inst else None
             session_meta = {"calendar_profile": inst.calendar_profile, "calendar_verified": bool(inst.calendar_profile),
                             "source_identity": dataset.identity if dataset else None} if inst else {}
+            from .market_presentation import present
+            presentation = present({"symbol": inst.symbol, "name": inst.label, "source": inst.source,
+                                    "basis": inst.basis, "series_kind": "managed"},
+                                   identity=dataset.identity if dataset else None) if inst else None
             if not bar:
                 if inst:
                     session = session_status(inst.source, inst.symbol, now_ms(), metadata=session_meta)
                     result.append({"s": "ok", "n": ident, "quality": "pending", **session, "v": {
-                        "short_name": display_code(inst.symbol, inst.source),
-                        "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
+                        "short_name": presentation["display_symbol"],
+                        "description": presentation["presentation_description"] + " · 报价准备中",
                         "exchange": inst.source.upper(),
                         **session, "time_type": None, "quote_time": None, "data_start": None,
                     }})
@@ -1228,8 +1234,8 @@ def quote_snapshot(body: QuoteQuery):
                 continue
             values = {
                 "lp": float(bar.close),
-                "short_name": display_code(inst.symbol, inst.source),
-                "description": display_code(inst.symbol, inst.source) + " · " + inst.basis + " · M1",
+                "short_name": presentation["display_symbol"],
+                "description": presentation["presentation_description"],
                 "exchange": inst.source.upper(),
             }
             if inst.basis == "bid":

@@ -60,10 +60,13 @@ def product_metadata(kind, asset):
 
 def creation_entry(row):
     from .instrument_directory import logical_symbol
+    from .market_presentation import source_name
 
     source, symbol, info = row["source"], row["symbol"], row["metadata_json"]
     verified = info.get("verified_frames" if source == "akshare" else "archive_verified_frames", {})
+    family = "sina-a" if info.get("source_family") == "eastmoney-a" else info.get("source_family")
     result = {"source": source, "provider_symbol": symbol, "catalog_id": row["id"],
+        "source_display": source_name(source, family=family, environment="practice" if source == "oanda" else "demo" if source == "fxcm" else "public"),
         "logical_symbol": logical_symbol(source, symbol), "label": row["label"],
         "display_symbol": row["display_symbol"], "asset_class": row["asset_class"],
         "precision": None if info.get("precision_status") == "manual_required" else row["precision"],

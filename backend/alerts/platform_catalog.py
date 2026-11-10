@@ -2,6 +2,7 @@
 
 from .config import settings
 from .instrument_directory import search
+from .market_presentation import present
 from .source_registry import capabilities
 
 
@@ -19,10 +20,7 @@ def _entry(row):
     if tencent:
         native = {**native, "native_periods": ["D1"], "supported_modes": []}
     ident = "OANDA:" + row["symbol"] if row["id"].startswith("HC:") else row["id"]
-    return {**row, "id": ident, "label": row["label"] + (" · 腾讯" if tencent else ""),
-        **({"provider_name": "腾讯 (AKShare)" if tencent else "新浪 (AKShare)"}
-           if source == "akshare" and info.get("source_family") in (
-               "sina-a", "sina-hk", "sina-futures", "eastmoney-a") else {}),
+    result = {**row, "id": ident, "label": row["label"],
         "logical_symbol": None if tencent else row["logical_symbol"],
         "history_precision": None if info.get("precision_status") == "manual_required" else row["precision"],
         "precision_status": info.get("precision_status", "source_catalog"),
@@ -31,6 +29,16 @@ def _entry(row):
         "updated_at": row["updated_at"] or None,
         "capabilities": native, "history_catalog_id": row.get("physical_id", row["id"]),
         "verified_frames": info.get("verified_frames", info.get("archive_verified_frames", {}))}
+    family = "tencent-a" if tencent else "sina-a" if info.get("source_family") == "eastmoney-a" else info.get("source_family")
+    adjustment = info.get("adjustment")
+    if source == "akshare" and family in ("sina-a", "sina-hk", "tencent-a"):
+        adjustment = "qfq"
+    elif source == "yahoo" and not adjustment:
+        adjustment = "auto" if row["asset_class"] in ("equity", "etf") else "supplier"
+    result = present({**result, "adjustment": adjustment,
+        "basis": info.get("basis") or native.get("bases", ["last"])[0]}, identity={**info, "source": source, "source_family": family,
+        "environment": "practice" if source == "oanda" else "demo" if source == "fxcm" else "public"})
+    return {**result, "label": result["instrument_name"], "provider_name": result["source_display"]}
 
 
 def entries(db, *, query="", source=None, asset=None):

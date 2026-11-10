@@ -18,6 +18,7 @@ import { useSnapshot } from "./useSnapshot";
 import { frames, names, phase, time, type Dataset, type Page } from "./types";
 
 type Mapping = {
+  target_source_display?: string;
   id: string;
   current_account: boolean;
   target_display_symbol?: string;
@@ -25,6 +26,10 @@ type Mapping = {
   match: any;
 };
 type Composite = {
+  source_display?: string;
+  historical_source_display?: string;
+  live_source_display?: string;
+  price_basis_display?: string;
   id: string;
   instrument_id: string;
   dataset_id: string;
@@ -237,14 +242,15 @@ function CandidateRow({
 }) {
   const d = item.dataset,
     id = `candidate-${d.id}`,
-    detail = useDetailPanel();
+    detail = useDetailPanel(),
+    liveSource = item.mappings.find(m => m.id === item.recommended_mapping_id)?.target_source_display || "待配置";
   return (
     <article className="dc-market-row" key={d.id} id={id} tabIndex={-1}>
       <div className="dc-market-main">
         <button className="dc-symbol-button" onClick={detail.open}>
           {d.display_symbol || d.logical_symbol}
         </button>
-        <span>{names[d.identity.source]} → OANDA Practice · Bid</span>
+        <span>历史：{d.source_display || names[d.identity.source]} → 实时：{liveSource} · 买价</span>
       </div>
       <span>{phase(d.aggregation_calendar)}</span>
       <span>{statusNames[item.status] || item.status}</span>
@@ -314,7 +320,7 @@ function CompositeRow({
         <button className="dc-symbol-button" onClick={detail.open}>
           {row.display_symbol || row.logical_symbol}
         </button>
-        <span>{names[row.historical_source]} → OANDA Practice · Bid</span>
+        <span>{row.source_display || `${names[row.historical_source]} → OANDA Practice`} · {row.price_basis_display || "买价"}</span>
       </div>
       <span>{phase(row.calendar)}</span>
       <span>
@@ -333,7 +339,7 @@ function CompositeRow({
           close={detail.close}
         >
           <p>
-            来源：{names[row.historical_source]} → OANDA Practice · Bid ·{" "}
+            来源：{row.source_display || `${names[row.historical_source]} → OANDA Practice`} · {row.price_basis_display || "买价"} ·{" "}
             {phase(row.calendar)}
           </p>
           <p>
@@ -411,7 +417,7 @@ export function CompositeDetail() {
             <div>
               <h1>{row.display_symbol || row.logical_symbol} 组合行情</h1>
               <p>
-                {names[row.historical_source]} → OANDA Practice · Bid ·{" "}
+                {row.source_display || `${names[row.historical_source]} → OANDA Practice`} · {row.price_basis_display || "买价"} ·{" "}
                 {phase(row.calendar)}
               </p>
             </div>
@@ -512,7 +518,7 @@ export function CompositeDetail() {
                   <tbody>
                     <tr>
                       <td>历史基线</td>
-                      <td>{names[row.historical_source]}</td>
+                      <td>{row.historical_source_display || names[row.historical_source]}</td>
                       <td>
                         [{time(row.revision.history_start)},{" "}
                         {time(row.revision.seam)})
@@ -521,14 +527,14 @@ export function CompositeDetail() {
                     <tr>
                       <td>确认尾部</td>
                       <td>
-                        OANDA Practice ·{" "}
+                        {row.live_source_display || "OANDA"} ·{" "}
                         {row.mapping.target_display_symbol || row.mapping.target_identity.provider_symbol}
                       </td>
                       <td>[{time(row.revision.seam)}, 最新确认观测)</td>
                     </tr>
                     <tr>
                       <td>临时分钟</td>
-                      <td>OANDA采样流</td>
+                      <td>{row.live_source_display || "OANDA"} 采样流</td>
                       <td>未确认分钟，缺失极值不可追认</td>
                     </tr>
                   </tbody>

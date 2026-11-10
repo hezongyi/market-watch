@@ -14,7 +14,7 @@ type ReferenceReport = {
   requires_archive: boolean;
   retains: string;
   impact: {
-    dataset: {display_symbol?: string; provider_display_symbol?: string; logical_symbol: string; aggregation_calendar: string;
+    dataset: {price_basis_display?: string; source_display?: string; display_symbol?: string; provider_display_symbol?: string; logical_symbol: string; aggregation_calendar: string;
       identity: {source: string; provider_symbol: string; basis: string; environment: string}};
     versions: {version_id: string; start: number; end: number; status: string;
       disposition: string; observed_minutes: number | null; unknown_minutes: number | null;
@@ -50,7 +50,7 @@ export function DatasetReferences({
     target_display_symbol?: string; target_identity: {provider_symbol: string; environment: string}; match: {rationale: string}}[]}>(`/market-data/datasets/${id}/mappings`, refresh);
   const [page, setPage] = useState(1);
   const composites = useSnapshot<{items: {id: string; calendar: string; active_revision_id: string;
-    historical_source: string; mapping: {target_display_symbol?: string; target_identity: {provider_symbol: string}}}[]; total: number}>(
+    historical_source: string; source_display?: string; mapping: {target_display_symbol?: string; target_identity: {provider_symbol: string}}}[]; total: number}>(
     `/market-data/center/composites?dataset_id=${id}&page=${page}&page_size=25`, refresh);
   const [review, setReview] = useState<ReferenceReport | null>(null),
     [busy, setBusy] = useState(false);
@@ -169,7 +169,7 @@ export function DatasetReferences({
           <Feedback error={composites.error} loading={composites.loading} empty={!composites.data}/>
           {composites.data && <><h3>组合引用（{composites.data.total}）</h3>
             {composites.data.items.length ? composites.data.items.map(c => <p key={c.id}>
-              <Link to={`/market-data/composites/${c.id}`}>{c.historical_source} → OANDA {c.mapping.target_display_symbol || c.mapping.target_identity.provider_symbol} · {c.calendar.toUpperCase()} · 查看组合与固定修订</Link>
+              <Link to={`/market-data/composites/${c.id}`}>{c.source_display || `${c.historical_source} → OANDA`} {c.mapping.target_display_symbol || c.mapping.target_identity.provider_symbol} · {c.calendar.toUpperCase()} · 查看组合与固定修订</Link>
             </p>) : <p>尚未建立组合；首次实际使用时准备。</p>}
             <Pager total={composites.data.total} page={page} size={25} change={setPage}/>
           </>}
@@ -208,7 +208,7 @@ export function DatasetReferences({
           ) : (
             <section className="panel" aria-label="确认历史回收">
               <h3 ref={reviewHeading} tabIndex={-1}>删除影响清单</h3>
-              <p>{review.impact.dataset.display_symbol || review.impact.dataset.logical_symbol} · {names[review.impact.dataset.identity.source]} · {review.impact.dataset.provider_display_symbol || review.impact.dataset.identity.provider_symbol} · {review.impact.dataset.identity.basis.toUpperCase()} · {phase(review.impact.dataset.aggregation_calendar)} · {review.impact.dataset.identity.environment}</p>
+              <p>{review.impact.dataset.display_symbol || review.impact.dataset.logical_symbol} · {review.impact.dataset.source_display || names[review.impact.dataset.identity.source]} · {review.impact.dataset.provider_display_symbol || review.impact.dataset.identity.provider_symbol} · {review.impact.dataset.price_basis_display || review.impact.dataset.identity.basis.toUpperCase()} · {phase(review.impact.dataset.aggregation_calendar)} · {review.impact.dataset.identity.environment}</p>
               <div className="dc-table"><table><caption>所列固定版本与价格范围</caption>
                 <thead><tr><th>版本与范围</th><th>观测 / 未知分钟</th><th>周期</th><th>处理</th></tr></thead>
                 <tbody>{review.impact.versions.map(v => <tr key={v.version_id}>

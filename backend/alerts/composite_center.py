@@ -5,6 +5,7 @@ from sqlalchemy import func, or_, select
 from .composite_definitions import baseline, latest_note
 from .history_catalog import account_scope
 from .market_names import code_search, display_code
+from .market_presentation import present, source_name
 from .market_usage import wanted_instruments
 from .storage import (
     ChartAlert,
@@ -46,6 +47,7 @@ def mapping_report(db, row):
         pass
     return {"id": row.id, "dataset_id": row.dataset_id, "created_at": row.created_at,
         "target_dataset_id": target.id, "target_identity": identity, "match": row.match,
+        "target_source_display": source_name(identity["source"], family=identity.get("source_family"), environment=identity.get("environment")),
         "note": {"version": note.version, **note.content} if note else None,
         "valid_for_selection": valid,
         "target_display_symbol": display_code(identity["provider_symbol"], identity["source"], target.asset_class),
@@ -107,6 +109,9 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
         "display_symbol": display_code(dataset.logical_symbol, asset_type=dataset.asset_class),
         "precision": inst.precision, "calendar": revision.rules["aggregation_calendar"],
         "historical_source": dataset.identity["source"], "live_source": "oanda",
+        **present(
+            {"symbol": dataset.logical_symbol, "name": inst.label, "series_kind": "composite", "basis": inst.basis},
+            identity=dataset.identity, realtime_identity=db.get(MarketDataset, mapping.target_dataset_id).identity),
         "basis": inst.basis, "status": status, "created_at": composite.created_at,
         "periods": report(db, revision.id, prep.input_revision),
         "mapping": mapping_report(db, mapping), "active_revision_id": revision.id,
