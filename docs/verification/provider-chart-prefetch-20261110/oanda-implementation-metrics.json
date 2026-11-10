@@ -1,0 +1,225 @@
+{
+  "status": "implementation_deployed_performance_target_not_met",
+  "host": "Ubuntu quant-server",
+  "url": "https://192.168.7.232:18443/",
+  "timeframe": "D1",
+  "method": "New browser context per full-page sample. Every instrument had no ProviderDataset in any timeframe and no NativeHistoryLoad before opening. No market HTTP mocked, no cache clearing. Visible requires real nonempty native bars, dataReady and two animation frames. Existing-page switching reported separately.",
+  "initial_prototype": [
+    {
+      "symbol": "USDPLN",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 6478.3,
+      "widget_constructor_ms": 1711.5,
+      "first_get_bars_ms": 4449,
+      "first_prices_callback_ms": 6040.9,
+      "preparation_start_ms": 1752.74,
+      "actual_request_ms": 1532.75,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 14.57,
+          "fill_ms": 3125.19,
+          "pages": 1,
+          "upstream_http_ms": 984.22,
+          "database_commit_ms": 820.11
+        }
+      ]
+    },
+    {
+      "symbol": "NZDSGD",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 5647.3,
+      "widget_constructor_ms": 1548.8,
+      "first_get_bars_ms": 3984.2,
+      "first_prices_callback_ms": 5239.5,
+      "preparation_start_ms": 1327.86,
+      "actual_request_ms": 666.12,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 26.37,
+          "fill_ms": 2130.35,
+          "pages": 1,
+          "upstream_http_ms": 684.01,
+          "database_commit_ms": 673.81
+        }
+      ]
+    },
+    {
+      "symbol": "EURCZK",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 5335.2,
+      "widget_constructor_ms": 1495.6,
+      "first_get_bars_ms": 3600.5,
+      "first_prices_callback_ms": 5008.9,
+      "preparation_start_ms": 1294.58,
+      "actual_request_ms": 1241.56,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 24.16,
+          "fill_ms": 2423.62,
+          "pages": 1,
+          "upstream_http_ms": 696.64,
+          "database_commit_ms": 656.82
+        }
+      ]
+    }
+  ],
+  "final_full_page": [
+    {
+      "symbol": "USDCZK",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 6455.1,
+      "widget_constructor_ms": 1518.1,
+      "first_get_bars_ms": 3909,
+      "first_prices_callback_ms": 5999.4,
+      "preparation_start_ms": 1396.07,
+      "actual_request_ms": 2070.42,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 41.14,
+          "fill_ms": 3825.71,
+          "pages": 1,
+          "upstream_http_ms": 1090.1,
+          "database_commit_ms": 1640.63
+        }
+      ]
+    },
+    {
+      "symbol": "EURTRY",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 5245.9,
+      "widget_constructor_ms": 1293.7,
+      "first_get_bars_ms": 3952.9,
+      "first_prices_callback_ms": 4859.6,
+      "preparation_start_ms": 1148.43,
+      "actual_request_ms": 501.39,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 71.29,
+          "fill_ms": 2466.64,
+          "pages": 1,
+          "upstream_http_ms": 1048.56,
+          "database_commit_ms": 619.1
+        }
+      ]
+    },
+    {
+      "symbol": "USDTRY",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 5677,
+      "widget_constructor_ms": 1533.3,
+      "first_get_bars_ms": 4256.5,
+      "first_prices_callback_ms": 5263,
+      "preparation_start_ms": 1355.14,
+      "actual_request_ms": 966.78,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 60.82,
+          "fill_ms": 2899.94,
+          "pages": 1,
+          "upstream_http_ms": 685.39,
+          "database_commit_ms": 1234.99
+        }
+      ]
+    },
+    {
+      "symbol": "GBPPLN",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 6296.1,
+      "widget_constructor_ms": 1438.8,
+      "first_get_bars_ms": 4135.7,
+      "first_prices_callback_ms": 5894,
+      "preparation_start_ms": 1276.58,
+      "actual_request_ms": 1659.9,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 348.07,
+          "fill_ms": 3194.28,
+          "pages": 1,
+          "upstream_http_ms": 1841.05,
+          "database_commit_ms": 737.85
+        }
+      ]
+    },
+    {
+      "symbol": "EURHUF",
+      "cold_proven": true,
+      "status": "ok",
+      "visible_ms": 5826,
+      "widget_constructor_ms": 1626.3,
+      "first_get_bars_ms": 3738.6,
+      "first_prices_callback_ms": 5373.4,
+      "preparation_start_ms": 1449.35,
+      "actual_request_ms": 341.98,
+      "actual_result_bars": 2000,
+      "worker_preparation": [
+        {
+          "claim_ms": 30.52,
+          "fill_ms": 2283.75,
+          "pages": 1,
+          "upstream_http_ms": 909.07,
+          "database_commit_ms": 750.18
+        }
+      ]
+    }
+  ],
+  "final_switch": [
+    {
+      "query": "EURSGD",
+      "status": "ok",
+      "cold_proven": true,
+      "switch_to_visible_ms": 2609
+    },
+    {
+      "query": "AUDHKD",
+      "status": "ok",
+      "cold_proven": true,
+      "switch_to_visible_ms": 5105.800000190735
+    },
+    {
+      "query": "NZDHKD",
+      "status": "ok",
+      "cold_proven": true,
+      "switch_to_visible_ms": 2817
+    }
+  ],
+  "full_page_checks": {
+    "price_samples_all_ok": true,
+    "preferences_unchanged": true,
+    "original_workspaces_unchanged": false,
+    "temporary_workspaces_removed": true,
+    "harness_overall_passed": false,
+    "limitation": "An original workspace revision changed during shared-dev acceptance; preserved without restoring or overwriting. Timing/price assertions passed but the isolation guard failed, so do not report a completely passed browser harness."
+  },
+  "full_page_median_ms": 5826,
+  "switch_median_ms": 2817,
+  "zero_preparation": {
+    "disabled_preparation_creates_dataset": false,
+    "disabled_preparation_creates_task": false,
+    "real_required_bars": 20,
+    "settings_restored": true
+  },
+  "review_status": "Earlier revision independently reviewed; latest incremental review attempts failed with external 402 daily quota exhausted. Latest incremental independent review pending.",
+  "resource_observation": {
+    "logical_cpus": 4,
+    "load_average": [
+      12.67,
+      11.69,
+      10.89
+    ],
+    "note": "Shared host CPU contention and original workspace revision changed during dev acceptance. Preserve raw times; do not subtract estimated load or claim stable performance."
+  }
+}

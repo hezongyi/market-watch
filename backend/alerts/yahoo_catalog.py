@@ -117,31 +117,41 @@ def _store(details):
     return ident
 
 
-def chart_metadata(ident, *, deadline=None, cached_only=False):
+def local_entry(ident):
+    """Validate the maintained identity without contacting Yahoo."""
     from .chart_series import decode
-    from .provider_yahoo import display_precision
     ident = decode(ident)[0]
     if not settings.yahoo_enabled:
         raise QueryError(422, "Yahoo 行情源未启用")
-    deadline = deadline or time.monotonic() + settings.provider_request_seconds
     with transaction() as db:
         row = db.get(MarketCatalog, ident)
-        if row is None or row.source != "yahoo":
+        if row is None or row.source != "yahoo" or not row.available:
             raise QueryError(404, "未知 Yahoo 品种")
-        symbol, name, details, precision = (
-            row.symbol,
-            row.label,
-            dict(row.metadata_json),
-            row.precision,
-        )
-        expired = (
-            now_ms() - details.get("metadata_observed_at", details.get("updated_at", row.updated_at))
+        return {"id": ident, "symbol": row.symbol, "name": row.label,
+                "details": dict(row.metadata_json), "precision": row.precision,
+                "updated_at": row.updated_at}
+
+
+def chart_metadata(ident, *, deadline=None, cached_only=False):
+    from .provider_yahoo import display_precision
+    entry = local_entry(ident)
+    ident, symbol, name, details, precision = (entry[k] for k in ("id", "symbol", "name", "details", "precision"))
+    deadline = deadline or time.monotonic() + settings.provider_request_seconds
+    expired = (
+            now_ms() - details.get("metadata_observed_at", details.get("updated_at", entry["updated_at"]))
             >= settings.yahoo_metadata_ttl_seconds * 1000
             or not details.get("adjustment")
         )
     if cached_only and not details.get("adjustment"):
         raise QueryError(503, 'Yahoo 本地元信息尚未就绪，请先加载图表')
     if expired and not cached_only:
+        from .provider_cache import READ_MODE, HistoryPending
+        if READ_MODE.get() == "cache":
+            # Cache probes and task admission cannot spend their budget doing
+            # remote metadata work; the leased worker owns that request.
+            raise HistoryPending()
+        if time.monotonic() >= deadline:
+            raise TimeoutError("Yahoo 元信息请求超过时间预算")
         with _LOCK:
             future = _INFLIGHT.get(ident)
             owner = future is None

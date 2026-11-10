@@ -316,23 +316,36 @@ def search_metadata(query, *, deadline=None):
 
 
 def _history(ticker, meta, frame, start, end, deadline):
-    return ticker.history(
-        start=int(start / 1000),
-        end=int((end + 999) / 1000),
-        interval=YAHOO_INTERVALS[frame],
-        auto_adjust=meta["adjustment"] == "auto",
-        back_adjust=False,
-        repair=False,
-        actions=True,
-        prepost=False,
-        rounding=False,
-        timeout=max(0.01, deadline - time.monotonic()),
-    )
+    from .provider_chart import record_timing
+    # The maintained metadata already validates the exchange timezone. Supply
+    # it to the pinned SDK rather than repeating its chart/timezone HTTP probe.
+    if meta.get("timezone") and hasattr(ticker, "_tz"):
+        ZoneInfo(meta["timezone"])
+        ticker._tz = meta["timezone"]
+    started = time.monotonic()
+    try:
+        return ticker.history(
+            start=int(start / 1000),
+            end=int((end + 999) / 1000),
+            interval=YAHOO_INTERVALS[frame],
+            auto_adjust=meta["adjustment"] == "auto",
+            back_adjust=False,
+            repair=False,
+            actions=True,
+            prepost=False,
+            rounding=False,
+            timeout=max(0.01, deadline - time.monotonic()),
+        )
+    finally:
+        record_timing("yahoo_sdk_history", started)
 
 
 def _rows(meta, frame, data, before):
     result = []
     high_period = frame in {"D1", "W1", "MN"}
+    price_columns = ("Open", "High", "Low", "Close")
+    offset = {"D1": pd.DateOffset(days=1), "W1": pd.DateOffset(weeks=1),
+              "MN": pd.DateOffset(months=1)}.get(frame)
     for index, row in data.iterrows():
         stamp = pd.Timestamp(index)
         if stamp.tzinfo is None:
@@ -345,7 +358,6 @@ def _rows(meta, frame, data, before):
             else start
         )
 
-        price_columns = ("Open", "High", "Low", "Close")
         prices = [DecimalString(row[name]) for name in price_columns]
         if any(v is None for v in prices):
             # actions=True can add a pure corporate-action row without a price
@@ -361,11 +373,6 @@ def _rows(meta, frame, data, before):
         o, h, low, c = map(float, prices)
         if h < max(o, c, low) or low > min(o, c, h):
             raise YahooError("invalid_data", "Yahoo OHLC 高低关系无效")
-        offset = {
-            "D1": pd.DateOffset(days=1),
-            "W1": pd.DateOffset(weeks=1),
-            "MN": pd.DateOffset(months=1),
-        }.get(frame)
         end = (
             int((stamp + offset).timestamp() * 1000)
             if offset
@@ -513,8 +520,13 @@ def native_page(meta, frame, before, count, *, deadline=None, optional=0):
         "W1": 604800000,
         "MN": 2678400000,
     }[frame]
+    # Daily sessions occupy about 5/7 calendar days. The old 3x estimate
+    # fetched >4000 observations for a 2000-bar opportunity, doubling parse
+    # and persistence work. Sparse sources can still page for mandatory bars.
+    calendar_factor = 1.5 if frame == "D1" else 3
     estimate = max(
-        3 * 86400000 if retention else 30 * 86400000, (count + optional + 3) * duration * 3
+        3 * 86400000 if retention else 30 * 86400000,
+        int((count + optional + 3) * duration * calendar_factor),
     )
     if span:
         estimate = min(estimate, span * 86400000)
@@ -571,7 +583,10 @@ def native_page(meta, frame, before, count, *, deadline=None, optional=0):
                     raise YahooError(
                         "no_data_unconfirmed", "Yahoo 本次无周期数据，尚未确认历史边界"
                     ) from None
+            from .provider_chart import record_timing
+            parse_started = time.monotonic()
             batch = _rows(meta, frame, data, before)
+            record_timing("yahoo_parse", parse_started)
             rows = sorted({b["start"]: b for b in batch + rows}.values(), key=lambda b: b["start"])
             # Date-labelled high periods are exclusive at the chart's right edge.
             covered_start = (

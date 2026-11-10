@@ -1444,6 +1444,12 @@ const feed = {
   resolveSymbol: async (ticker, cb, err) => {
     const operation=beginResolve(ticker);
     try {
+      // Sidebar resolves have no chart target. Keep the measured OANDA single
+      // chart's first delivery ahead of this optional startup work.
+      const gate = initialHistoryGate;
+      if (gate?.priorityTicker && ticker !== gate.priorityTicker && !operation.targets.length)
+        await gate.promise;
+      if (!operation.current()) throw Object.assign(Error("已取消旧图表的行情解析"), {code:"HISTORY_CANCELLED"});
       const {symbol,series_kind} = decode(ticker);
       // One-time startup metadata rides with workspace configuration. Candle
       // demand and every subsequent symbol resolve still use the backend.
@@ -1505,12 +1511,6 @@ const feed = {
         ...(meta.currency ? {currency_code:meta.currency} : {}),
         has_empty_bars: false,
       });
-      setTimeout(()=>{
-        if(operation.current()) {
-          warmNativeSearch(meta.display_symbol || meta.symbol || MWSeries.display(symbol));
-          warmNativeSearch("");
-        }
-      },0);
       // The library keeps the old interval on a source switch even if the
       // newly resolved symbol excludes it. Use its public chart method.
       if(meta.frames?.length) setTimeout(()=>{
@@ -1521,6 +1521,7 @@ const feed = {
         }
       },0);
     } catch (e) {
+      if (operation.current() && initialHistoryGate?.priorityTicker === ticker) initialHistoryGate.resolve();
       if(operation.current()) {
         for(const target of operation.targets) if(resolveCurrent(target)) Object.assign(target,{state:'error',
           message:typeof e.message==='string'?e.message:'行情身份解析失败，请重试',code:e.code || 'RESOLVE_FAILED',
@@ -1641,6 +1642,14 @@ const feed = {
         }
         send({type:'native-load-applying',id:loadId,epoch:loadEpoch,count:rows.length});
         const accepted = cb(rows,{noData:boundary,mw_historyPages:page.history_pages || 0}) !== false;
+        if (accepted && rows.length && p.firstDataRequest) {
+          requestAnimationFrame(() => requestAnimationFrame(() => {
+            if (epoch === workspaceEpoch && (!s.mw_current || s.mw_current())) {
+              warmNativeSearch(s.name || MWSeries.display(decode(s.ticker).symbol));
+              warmNativeSearch("");
+            }
+          }));
+        }
         if (accepted && rows.length) {
           const key = workKey;
           lastHistory.set(key,Math.max(lastHistory.get(key)||0,rows.at(-1).time));
@@ -1770,8 +1779,12 @@ const feed = {
         providerWork.inflight--;
         if(loadEpoch===workspaceEpoch) setTimeout(()=>flushProviderCorrections(),0);
       }
-      if (p.firstDataRequest && !decode(s.ticker).spec && initialHistoryGate?.epoch === loadEpoch)
-        initialHistoryGate.resolve();
+      if (p.firstDataRequest && !decode(s.ticker).spec && initialHistoryGate?.epoch === loadEpoch) {
+        const gate = initialHistoryGate;
+        if (gate.priorityTicker && typeof requestAnimationFrame === "function")
+          requestAnimationFrame(() => requestAnimationFrame(() => gate.resolve()));
+        else gate.resolve();
+      }
     }
   },
   subscribeBars: (s, res, cb, id, reset) => {
@@ -2252,6 +2265,7 @@ function boot(
   workspace = null,
   symbolMetadata = null,
   initialWatchlistMetadata = {},
+  startupHistory = null,
 ) {
   initialSymbol = symbolMetadata;
   watchlistMetadata.clear();
@@ -2604,8 +2618,11 @@ function boot(
   savedDoc = doc;
   savedDoc.templates ||= {};
   initialHistoryGate?.resolve();
-  initialHistoryGate = {epoch: workspaceEpoch};
-  initialHistoryGate.promise = new Promise(resolve => {initialHistoryGate.resolve = resolve;});
+  const gate = initialHistoryGate = {epoch: workspaceEpoch,
+    priorityTicker: startupHistory ? "MWP:" + startupHistory.instrument : null};
+  gate.promise = new Promise(resolve => {gate.resolve = () => {clearTimeout(gate.timer); resolve();};});
+  // A failed/slow first source must not leave the sidebar waiting indefinitely.
+  if (gate.priorityTicker) gate.timer = setTimeout(gate.resolve, 5000);
   loading = true;
   ready = false;
   indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
@@ -2794,7 +2811,7 @@ function boot(
             ...[["系统消息","signals"],["设置","settings"]].map(([label,action]) => ({label, action, run:() => send({type:"workspace-action",action})})),
             {label: "历史加载详情", run: () => send({type:"history-load-details-open"})},
             {label: "取消历史加载", run: () => MWNativeNavigation.cancelAll()},
-            {label: "历史数据容量", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
+            {label: "历史数据与预取", run: () => send({type:"history-capacity-open",usage:MWNativeNavigation.diagnostics().resident})},
             ...(!readonly ? [{label: "保存样式", title: "保存图表样式模板", run: async () => {
               try {
                 const epoch = workspaceEpoch;
@@ -2924,6 +2941,7 @@ function boot(
       // after the reset would discard the end or mismatch its durable context.
       for(const [id] of subscriptions) feed.unsubscribeBars(id);
       for(const [id] of quoteSubscriptions) feed.unsubscribeQuotes(id);
+      initialHistoryGate?.resolve();
       workspaceEpoch++;
       indicatorCoordinator?.dispose();indicatorCoordinator=undefined;indicatorBindings.clear();
       send({type:'native-load-reset',epoch:workspaceEpoch});
@@ -3227,7 +3245,7 @@ async function update(m) {
     MWNativeNavigation.setCapabilities(m.history_capabilities);
     globalThis.MW_HISTORY_CAPABILITIES=m.history_capabilities;
     globalThis.MWPreferenceDraftKeys = Array.isArray(m.preference_draft_keys) ? m.preference_draft_keys : [];
-    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata);
+    boot(m.document, m.readonly, m.catalog, m.preferences, m.workspace, m.initial_symbol, m.watchlist_metadata, m.startup_history);
   }
   else if (m.type === 'refresh-managed') await refreshManagedHistory(m.instrument);
   else if (m.type === 'preference-draft-resolve' && activePreferences) {
@@ -3284,6 +3302,7 @@ const adapter = {
     if (disposed) return;
     disposed = true;
     cleanupListeners();
+    initialHistoryGate?.resolve();
     workspaceEpoch++;ready=false;loading=true;
     disposeChart();
     for (const [id, entry] of pending) {

@@ -1,0 +1,177 @@
+{
+  "started_at": "2026-11-10T12:47:03.254Z",
+  "finished_at": "2026-11-10T12:50:36.046Z",
+  "period": "D1",
+  "viewport": {
+    "width": 1600,
+    "height": 1000
+  },
+  "method": "Real HTTP, native widget, single chart, no indicators. Fresh browser context per unique instrument, opened exactly once. Before navigation every timeframe has no dataset/bars and no history-load records. No cache clearing. Readiness requires nonempty real bars, native dataReady, nonempty visible range, then two requestAnimationFrame callbacks. Browser page navigation is the start; login/workspace preparation is outside the measurement.",
+  "preferences_unchanged": true,
+  "original_workspaces_unchanged": true,
+  "passed": false,
+  "attempts": [
+    {
+      "source": "yahoo",
+      "query": "VST",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 18153.900000095367,
+      "widget_constructor_ms": 2492.5,
+      "widget_ready_ms": 17288.599999904633,
+      "first_nonempty_bars_ms": 17021.400000095367,
+      "data_ready_ms": 17391.400000095367,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "MRVL",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 13494,
+      "widget_constructor_ms": 2131.9000000953674,
+      "widget_ready_ms": 12946.5,
+      "first_nonempty_bars_ms": 12783.60000038147,
+      "data_ready_ms": 13146.5,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "TSM",
+      "status": "failed",
+      "error": "TimeoutError: page.waitForFunction: Timeout 90000ms exceeded.",
+      "cold_proven": false,
+      "navigation_to_visible_ms": null,
+      "widget_constructor_ms": null,
+      "widget_ready_ms": null,
+      "first_nonempty_bars_ms": null,
+      "data_ready_ms": null,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "CSGP",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 14292.099999904633,
+      "widget_constructor_ms": 1376.4000000953674,
+      "widget_ready_ms": 14091,
+      "first_nonempty_bars_ms": 14023,
+      "data_ready_ms": 14142,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "OLED",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 22474.5,
+      "widget_constructor_ms": 1894.0999999046326,
+      "widget_ready_ms": 21935.099999904633,
+      "first_nonempty_bars_ms": 21847.200000286102,
+      "data_ready_ms": 22054.700000286102,
+      "errors": []
+    }
+  ],
+  "cleanup": {
+    "owned": 5,
+    "removed": 5
+  },
+  "background": [
+    {
+      "source": "yahoo",
+      "query": "VST",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 2538,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 3,
+              "error": "YahooError",
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "MRVL",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4135,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "TSM",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 0,
+          "targets": []
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "CSGP",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4135,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "OLED",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4135,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

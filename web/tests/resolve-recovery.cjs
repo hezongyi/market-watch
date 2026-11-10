@@ -197,8 +197,28 @@ const meta = {
     await reply({ result: meta });
     await ctx.flight;
     assert.equal(ctx.resolved.length, 3, "disposal fences late metadata");
+    ctx.resolveMeta = meta;
+    run(`resolveDisposed=false;globalThis.resolveRequests=[];
+      request=async q=>{resolveRequests.push(q.args.instrument);return resolveMeta;};
+      initialHistoryGate={epoch:workspaceEpoch,priorityTicker:'MWP:OANDA:PRIMARY'};
+      initialHistoryGate.promise=new Promise(resolve=>initialHistoryGate.resolve=resolve);`);
+    const sidebar = run(`feed.resolveSymbol('MWP:OANDA:SIDEBAR',()=>{},e=>errors.push(e))`);
+    await new Promise(resolve=>setImmediate(resolve));
+    assert.equal(run('resolveRequests.length'),0,'sidebar resolve waits while first chart delivery is pending');
+    await run(`feed.resolveSymbol('MWP:OANDA:PRIMARY',()=>{},e=>errors.push(e))`);
+    assert.equal(run('resolveRequests.length'),1,'startup chart cannot wait on its own history');
+    await run(`feed.resolveSymbol(chart.symbol(),()=>{},e=>errors.push(e))`);
+    assert.equal(run('resolveRequests.length'),2,'a real chart target bypasses sidebar deferral after a user switch');
+    run('initialHistoryGate.resolve()');
+    await sidebar;
+    assert.equal(run('resolveRequests.length'),3,'ready first history releases the sidebar');
+    run(`initialHistoryGate.promise=new Promise(resolve=>initialHistoryGate.resolve=resolve);`);
+    const staleSidebar=run(`feed.resolveSymbol('MWP:OANDA:STALE',()=>{},()=>{})`);
+    run('workspaceEpoch++;initialHistoryGate.resolve()');
+    await staleSidebar;
+    assert.equal(run('resolveRequests.length'),3,'released old sidebar cannot start metadata I/O after workspace replacement');
     console.log(
-      "Resolve failures, recovery, per-chart lifetime and cooldown PASS",
+      "Resolve failures, recovery, per-chart lifetime, startup priority and cooldown PASS",
     );
   } finally {
     for (const entry of run("[...pending.values()]")) {

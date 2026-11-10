@@ -13,9 +13,12 @@ function script(src:string) {return new Promise<void>((resolve,reject)=>{
   const node=document.createElement("script");node.src=src;
   node.onload=()=>resolve();node.onerror=()=>{node.remove();reject(Error("图表资源加载失败，请重试"));};document.head.append(node);
 });}
-export async function mountChart(container:HTMLElement, application:ChartApplication) {
+export function prepareChart() {
   if(!assets)assets=fetch('/chart-assets.json').then(response=>{if(!response.ok)throw Error("图表资源清单不可用");return response.json();})
     .then(async manifest=>{await script('/'+manifest.libraryDirectory+'/charting_library.js');await script('/'+manifest.script);})
     .catch(error=>{assets=undefined;throw error;});
-  await assets;return MWChartAdapter.mount(container,application);
+  return assets;
+}
+export async function mountChart(container:HTMLElement, application:ChartApplication) {
+  await prepareChart();return MWChartAdapter.mount(container,application);
 }

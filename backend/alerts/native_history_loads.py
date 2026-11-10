@@ -16,7 +16,8 @@ from sqlalchemy.exc import IntegrityError
 
 from . import provider_cache as cache
 from .config import settings
-from .provider_capabilities import request_seconds
+from .native_history_signals import notify
+from .provider_capabilities import COMPLETION_SECONDS, instrument_source, request_seconds
 from .provider_history_policy import CapacityExceeded, capacity
 from .source_history_store import AcquisitionBusy
 from .storage import NativeHistoryLoad, now_ms, transaction, uid
@@ -43,13 +44,14 @@ def admit(body):
     limit = capacity()
     required = max(body.limit, body.count_back or 0) + prefix
     if required > limit:
-        raise CapacityExceeded(f"历史请求及指标前缀需要 {required:,} 根，上限 {limit:,} 根。请在汉堡菜单 → 历史数据容量中调整，或提高周期、减小跨度")
+        raise CapacityExceeded(f"历史请求及指标前缀需要 {required:,} 根，上限 {limit:,} 根。请在汉堡菜单 → 历史数据与预取中调整，或提高周期、减小跨度")
 
 
 @contextmanager
-def read_context(mode, deadline, progress=None, valid=None):
+def read_context(mode, deadline, progress=None, valid=None, io_deadline=None):
     tokens = [(cache.READ_MODE, cache.READ_MODE.set(mode)),
               (cache.DEADLINE, cache.DEADLINE.set(deadline)),
+              (cache.IO_DEADLINE, cache.IO_DEADLINE.set(io_deadline)),
               (cache.PAGE_PROGRESS, cache.PAGE_PROGRESS.set(progress)),
               (cache.WORK_VALID, cache.WORK_VALID.set(valid))]
     try:
@@ -59,9 +61,9 @@ def read_context(mode, deadline, progress=None, valid=None):
             variable.reset(token)
 
 
-def read_cached(body):
+def read_cached(body, prepare=False, coverage_only=False):
     with read_context("cache", time.monotonic() + settings.provider_request_seconds):
-        result = cache.data(body)
+        result = cache.prepare(body, initial=prepare) if prepare or coverage_only else cache.data(body)
     # The final snapshot is bounded in bars and in serialized bytes, including
     # indicator series. Neither overflow can masquerade as an exhausted market.
     size = len(json.dumps(result, separators=(",", ":"), ensure_ascii=False).encode())
@@ -93,9 +95,16 @@ def refresh(row):
         row.consumer_until = min(row.deadline, now_ms() + 45000)
 
 
-def submit(owner, request_id, body, notice_context=None):
+def submit(owner, request_id, body, notice_context=None, prepare=False):
     admit(body)
+    if prepare and (body.indicators or body.before is not None or body.from_time is not None
+                    or body.count_back != 1 or body.limit != 1
+                    or body.native_history.chart_count != 1 or body.history_observation is not None
+                    or body.provider_snapshot_id is not None):
+        raise HTTPException(422, error("INVALID_HISTORY_REQUEST", "启动准备只支持当前单图的一页机会采集", 422))
     query = body.model_dump(by_alias=True, mode="json")
+    if prepare:
+        query['_prepare'] = True
     if notice_context:
         query['_notice_context'] = notice_context
     with transaction() as db:
@@ -107,10 +116,11 @@ def submit(owner, request_id, body, notice_context=None):
             refresh(old)
             return {"load": public(old)}
     try:
-        result = read_cached(body)
+        result = read_cached(body, prepare)
         from .notification_sources import native_recovery
-        with transaction() as db:
-            native_recovery(db.connection(), request_id, query)
+        if not prepare:
+            with transaction() as db:
+                native_recovery(db.connection(), request_id, query)
         return {"result": result}
     except cache.HistoryPending:
         pass
@@ -138,6 +148,7 @@ def submit(owner, request_id, body, notice_context=None):
                 if existing is None or existing.query_json != query:
                     raise HTTPException(409, error("INVALID_HISTORY_REQUEST", "请求标识冲突", 409))
                 return {"load": public(existing)}
+        notify(db, row.id)
         return {"load": public(row)}
 
 
@@ -149,6 +160,7 @@ def status(owner, ident, cancel=False):
             row.state = "cancelled"
             row.generation += 1
             row.error_json = error("HISTORY_CANCELLED", "已取消历史加载", 409)
+            notify(db, row.id)
         return public(row)
 
 
@@ -163,12 +175,13 @@ def result(owner, ident):
     # Ready is coverage, never a cached JSON/version. Re-read the latest
     # coherent observation; a concurrent cache invalidation returns to filling.
     try:
-        value = read_cached(body)
+        value = read_cached(body, row.query_json.get('_prepare', False))
     except cache.HistoryPending:
         with transaction() as db:
             row = owned(db, owner, ident)
             if row.state == "ready":
                 row.state = "waiting"
+                notify(db, row.id)
             return {"load": public(row)}
     status_now = status(owner, ident)
     if status_now["state"] != "ready":
@@ -195,10 +208,9 @@ def once():
             return False
         row.state = "filling"
         row.generation += 1
-        ticker = row.query_json.get("instrument", "").upper().removeprefix("MWP:")
-        source = "fxcm" if ticker.startswith("FXCM:") else "akshare" if ticker.startswith(("AKSHARE:", "TENCENT:")) else None
+        source = instrument_source(row.query_json.get("instrument", ""))
         budget = request_seconds(source)
-        row.lease_until = now + int(budget*1000) + 5000
+        row.lease_until = now + int((budget + COMPLETION_SECONDS)*1000) + 5000
         ident, generation, query = row.id, row.generation, row.query_json
         created_at = row.created_at
         pages, stalls = row.pages, row.stalls
@@ -218,7 +230,7 @@ def once():
     try:
         if pages >= settings.native_history_task_pages:
             try:
-                read_cached(DataQuery.model_validate(query))
+                read_cached(DataQuery.model_validate(query), prepare=query.get("_prepare", False), coverage_only=True)
                 state = "ready"
             except cache.LatestObservationPending:
                 raise
@@ -227,8 +239,10 @@ def once():
         else:
             state = "filling"
         if state != "ready":
-            with read_context("step", time.monotonic()+budget, progress, valid), lane("chart"):
-                cache.data(DataQuery.model_validate(query))
+            io_deadline = time.monotonic() + budget
+            with read_context("step", io_deadline + COMPLETION_SECONDS, progress, valid,
+                              io_deadline=io_deadline), lane("chart"):
+                cache.prepare(DataQuery.model_validate(query), initial=query.get('_prepare', False))
             state = "ready"
     except cache.LatestObservationPending:
         state, waiting_latest = "waiting", True
@@ -241,7 +255,9 @@ def once():
     except CapacityExceeded as exc:
         state, failure = "failed", error(exc.code, str(exc), 422)
     except TimeoutError:
-        if not progress["pages"] and stalls >= 2:
+        # A full source budget with no committed page is a visible failure.
+        # Retrying it silently can turn one 65s FXCM attempt into minutes.
+        if not progress["pages"] and (source in ("fxcm", "yahoo") or stalls >= 2):
             state, failure = "failed", error("HISTORY_TIMEOUT", "历史分页暂时未推进，请重试")
     except Exception as exc:
         log.warning("History page failed type=%s", type(exc).__name__)
@@ -256,7 +272,9 @@ def once():
                     lease_until=now_ms()+1000 if waiting_latest or waiting_acquisition else 0,
                     pages=pages+progress["pages"],
                     stalls=0 if progress["advanced"] else stalls if waiting_latest or waiting_acquisition else stalls+1))
-        if result.rowcount and state in ('failed', 'ready'):
+        if result.rowcount:
+            notify(db, ident)
+        if result.rowcount and state in ('failed', 'ready') and not query.get('_prepare'):
             from .notification_sources import native_result
             native_result(db, ident)
     log.info("native-history-turn %s", json.dumps({
@@ -266,7 +284,8 @@ def once():
         "persist_ms": round((time.monotonic() - persist_started) * 1000, 2),
         "state": state, "committed": bool(result.rowcount), "waiting_latest": waiting_latest,
         "waiting_acquisition": waiting_acquisition,
-        "pages": progress["pages"], "timings_ms": progress.get("timings_ms", {}),
+        "pages": progress["pages"], "metadata_ms": progress.get("metadata_ms"),
+        "timings_ms": progress.get("timings_ms", {}),
     }, sort_keys=True))
     return True
 
@@ -279,6 +298,16 @@ def main():
 
 
 def run(stop):
+    from .native_history_signals import close, watch
+    wake = threading.Event()
+    try:
+        with watch(lambda _: wake.set()):
+            _run(stop, wake)
+    finally:
+        close()
+
+
+def _run(stop, wake):
     from .composite_price_confirmation import once as confirm_price
     from .worker_health import Pulse
 
@@ -286,6 +315,7 @@ def run(stop):
     logging.basicConfig(level=logging.INFO)
     logging.getLogger("httpx").setLevel(logging.WARNING)
     while not stop.is_set():
+        wake.clear()
         try:
             pulse.start()
             confirmation_at, confirmation_started = now_ms(), time.monotonic()
@@ -307,7 +337,10 @@ def run(stop):
             progress(error=exc)
             log.warning("History worker turn failed type=%s", type(exc).__name__)
             worked = False
-        stop.wait(0.05 if worked else 1)
+        if worked:
+            stop.wait(0.05)
+        else:
+            wake.wait(1)
 
 
 if __name__ == "__main__":

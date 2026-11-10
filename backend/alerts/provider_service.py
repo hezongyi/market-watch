@@ -30,7 +30,6 @@ from .storage import (
     uid,
 )
 
-PERIODS = ("D1", "W1", "H4", "M5", "M1", "MN", "H1", "M30", "M15")
 _STOP = threading.Event()
 _EXECUTOR = None
 _FUTURES = []
@@ -60,84 +59,24 @@ def _activate(db, client, key, before, count, *, latest=False):
     # Serialize activations even when the interest row has not been created
     # yet. Workers lock only the interest during their short CAS writeback.
     focus = db.scalar(select(ProviderDataset).where(ProviderDataset.id == key).with_for_update())
-    if focus.source == "akshare":
-        # A foreground read already fetched the selected period. Do not turn
-        # that view into cross-period/depth prewarming or durable maintenance.
-        return
-    # One latest and one historical focus per dataset/client; requests for
-    # other panes remain separate. Fixed anchor targets do not chase now.
+    from .provider_history_policy import source_prefetch
+    goal = source_prefetch(focus.source, db)["reserve_bars"]
+    # One finite anchor for the period actually visited. Other periods get
+    # their own interests only when requested, including AKShare.
     listener = "read:" + key + (":latest" if latest else ":history")
     ident = interest_id(client, listener)
     old = db.scalar(select(ProviderInterest).where(ProviderInterest.id == ident).with_for_update())
-    if old and (latest or abs(old.cursor - before) < 1000):
+    if not goal:
+        if old:
+            old.targets = []
+        return
+    if old and old.targets and (latest or abs(old.cursor - before) < 1000):
         old.expires = now + settings.provider_activity_seconds * 1000
         old.accessed_at = now
-        targets = [dict(target) for target in old.targets]
-        for target in targets:
-            if target["frame"] != focus.timeframe or "after" in target:
-                continue
-            # Latest uses its original fixed anchor, never moving now.
-            goal = target.get("goal", settings.provider_basic_bars)
-            wanted = max(goal, count) if latest else goal + count
-            if wanted <= target["count"]:
-                continue
-            target["count"] = wanted
-            target["generation"] = target.get("generation", 0) + 1
-            interval = next((r for r in focus.coverage
-                             if r[0] < target["before"] <= r[1]), None)
-            actual = db.scalar(select(func.count()).select_from(ProviderBar).where(
-                ProviderBar.dataset_id == key,
-                ProviderBar.chart_time >= (interval[0] if interval else target["before"]),
-                ProviderBar.chart_time < target["before"],
-            ))
-            target["done"] = bool(interval and
-                                  (actual >= wanted or focus.earliest and interval[0] == 0))
-            target["next_at"] = 0
-        old.targets = targets
-        return
-    frames = (focus.timeframe,) + tuple(f for f in PERIODS if f != focus.timeframe and f in source_frames(focus.source))
-    targets = []
-    for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
-        for frame in frames:
-            targets.append(
-                {
-                    "frame": frame,
-                    "before": before,
-                    "count": max(goal, count if frame == focus.timeframe else 0),
-                    "goal": goal,
-                    "done": False,
-                    "next_at": 0,
-                    "attempts": 0,
-                }
-            )
-    if not latest:
-        # Historical left buffer includes the requested window. Right
-        # buffer is a separate bounded anchor, clamped to the present.
-        for goal in (settings.provider_basic_bars, settings.provider_depth_bars):
-            targets.append(
-                {
-                    "frame": focus.timeframe,
-                    "before": min(now + 1, before + goal * upstream.FRAME_MS[focus.timeframe]),
-                    "after": before,
-                    "until": now + 1,
-                    "count": goal,
-                    "done": False,
-                    "next_at": 0,
-                    "attempts": 0,
-                }
-            )
-        for target in targets:
-            if target["frame"] == focus.timeframe and target["before"] == before:
-                target["count"] = target["goal"] + count
-        # Neighbor buffers precede cross-period work in each round.
-        right = targets[-2:]
-        width = len(frames)
-        targets = [targets[0], right[0], *targets[1:width],
-                   targets[width], right[1], *targets[width+1:2*width]]
-    task_id = uid()
-    for target in targets:
-        target["task_id"] = task_id
-        target["generation"] = 0
+        if len(old.targets) == 1 and old.targets[0].get("goal") == goal:
+            return
+        before = old.cursor
+    targets = [_prefetch_target(focus.timeframe, before, goal)]
     values = dict(
         dataset_id=key,
         expires=now + settings.provider_activity_seconds * 1000,
@@ -174,6 +113,24 @@ def _activate(db, client, key, before, count, *, latest=False):
     )
     for item in stale:
         db.delete(item)
+
+
+def _prefetch_target(frame, before, goal):
+    return {"frame": frame, "before": before, "count": goal, "goal": goal,
+            "done": False, "next_at": 0, "attempts": 0,
+            "task_id": uid(), "generation": 0, "policy": 1}
+
+
+def reconcile_prefetch(db, values):
+    """Replace active finite targets on save; stale CAS writebacks then fail."""
+    rows = db.execute(select(ProviderInterest, ProviderDataset).join(
+        ProviderDataset, ProviderInterest.dataset_id == ProviderDataset.id).where(
+        ProviderInterest.subscribed.is_(False), ProviderInterest.expires > now_ms())
+        .with_for_update(of=ProviderInterest))
+    for interest, dataset in rows:
+        goal = values[dataset.source]["reserve_bars"]
+        interest.targets = ([_prefetch_target(dataset.timeframe, interest.cursor, goal)]
+                            if goal else [])
 
 
 def subscribe(
@@ -419,20 +376,6 @@ def realtime_step(source=None):
                     row.error = type(exc).__name__
 
 
-def right_status(key, target):
-    """A right buffer requires proven coverage and actual future bar count."""
-    with transaction() as db:
-        dataset = db.get(ProviderDataset, key)
-        connected = any(a <= target["after"] and target["before"] <= b for a, b in dataset.coverage)
-        actual = db.scalar(select(func.count()).select_from(ProviderBar).where(
-            ProviderBar.dataset_id == key,
-            ProviderBar.chart_time >= target["after"],
-            ProviderBar.chart_time < target["before"],
-        ))
-    satisfied = connected and (actual >= target["count"] or target["before"] >= target["until"])
-    return satisfied, connected, actual
-
-
 def warm_step(source, after=None):
     if source == "yahoo" and not settings.yahoo_enabled:
         return after, False
@@ -461,6 +404,16 @@ def warm_step(source, after=None):
         for interest, dataset in rows:
             if cache.identity(dataset.metadata_json, dataset.timeframe) != dataset.id:
                 continue
+            from .provider_history_policy import source_prefetch
+            goal = source_prefetch(source, db)["reserve_bars"]
+            if (interest.targets and any(t.get("policy") != 1 or t.get("goal") != goal
+                                         for t in interest.targets)) or (not interest.targets and goal):
+                # Recheck before every page, including interests inserted by an
+                # older foreground snapshot after a settings save committed.
+                db.refresh(interest, with_for_update=True)
+                goal = source_prefetch(source, db)["reserve_bars"]
+                interest.targets = ([_prefetch_target(dataset.timeframe, interest.cursor, goal)]
+                                    if goal else [])
             pending = next(
                 (
                     i
@@ -484,37 +437,25 @@ def warm_step(source, after=None):
     key = cache.ensure(meta, target["frame"])
     state = cache.snapshot(key, target["before"], target["count"])
     try:
-        right = target.get("after")
-        if right is not None:
-            satisfied, connected, actual = right_status(key, target)
-        else:
-            satisfied = state["satisfied"]
-        if right is not None and connected and not satisfied:
-            # Natural duration is only a search estimate. Count real bars and
-            # extend past weekends/closures until the finite goal or fixed now.
-            extra = max(1, target["count"] - actual) * upstream.FRAME_MS[target["frame"]]
-            target["before"] = min(target["until"], target["before"] + extra)
-        elif not satisfied:
+        satisfied = state["satisfied"]
+        if not satisfied:
+            previous_progress = (state["interval"], state["available_count"], state["history_boundary"])
             before = state["interval"][0] if state["interval"] else target["before"]
-            missing = target["count"]
-            if right is None and state["interval"]:
-                missing -= len(state["bars"])
-            cap = page_capacity(source)
+            missing = target["count"] - (len(state["bars"]) if state["interval"] else 0)
             cache.fetch_page(
-                key,
-                meta,
-                target["frame"],
-                before,
-                min(cap, max(1, missing)),
-                time.monotonic() + request_seconds(source),
-                kind="history",
+                key, meta, target["frame"], before,
+                min(page_capacity(source), max(1, missing)),
+                time.monotonic() + request_seconds(source), kind="history",
             )
             state = cache.snapshot(key, target["before"], target["count"])
-            if right is not None:
-                satisfied, _, _ = right_status(key, target)
-            else:
-                satisfied = state["satisfied"]
-        target["done"] = satisfied or state["window_limit"]
+            satisfied = state["satisfied"]
+            progress = (state["interval"], state["available_count"], state["history_boundary"])
+            if not satisfied and not state["window_limit"] and progress == previous_progress:
+                # A successful page without progress ends only this optional
+                # attempt. It is not a listing/window boundary or reserve success.
+                target["stop_reason"] = "no_progress"
+        target["satisfied"] = satisfied
+        target["done"] = satisfied or state["window_limit"] or target.get("stop_reason") == "no_progress"
         target["next_at"] = now_ms() + 1000
     except Exception as exc:
         target["attempts"] += 1
@@ -528,7 +469,6 @@ def warm_step(source, after=None):
                 and interest.targets[index].get("task_id") == target.get("task_id")
                 and interest.targets[index].get("generation", 0) == target.get("generation", 0)):
             targets = list(interest.targets)
-            target["count"] = max(target["count"], targets[index]["count"])
             targets[index] = target
             interest.targets = targets
     return ident, True
@@ -602,7 +542,7 @@ def start():
     seed()
     from .akshare_catalog import seed as akshare_seed
     akshare_seed()
-    _EXECUTOR = ThreadPoolExecutor(max_workers=2*len(enabled_sources())+2, thread_name_prefix="provider")
+    _EXECUTOR = ThreadPoolExecutor(max_workers=len(enabled_sources())+len(enabled_sources(history=True))+2, thread_name_prefix="provider")
 
     def warmer(source):
         after = None
@@ -633,7 +573,7 @@ def start():
                 log.exception("Provider cache cleanup failed")
             _STOP.wait(60)
 
-    _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources()]
+    _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources(history=True)]
     _FUTURES.extend(_EXECUTOR.submit(live, source) for source in enabled_sources())
     _FUTURES.append(_EXECUTOR.submit(janitor))
 

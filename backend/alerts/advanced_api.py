@@ -125,6 +125,20 @@ def migrate_legacy_templates(db):
     db.add(Preference(key=marker, value={"complete": True, "at": now_ms()}))
 
 
+def with_initial_symbol(value):
+    ticker = value["document"].get("symbol", "XAUUSD")
+    try:
+        symbol, kind = decode(ticker)
+        if kind == "provider":
+            from .provider_chart import metadata
+            value["initial_symbol"] = {"ticker": ticker, "metadata":
+                metadata(symbol, cached_only=True) if symbol.startswith("YAHOO:") else metadata(symbol)}
+    except (HTTPException, QueryError, ValueError, TimeoutError, RuntimeError):
+        # The ordinary resolver reports source errors without replacing identity.
+        pass
+    return value
+
+
 def router(authenticated):
     r = APIRouter(prefix="/api/advanced-charts", dependencies=[Depends(authenticated)])
 
@@ -135,8 +149,11 @@ def router(authenticated):
         return {"ok": True}
 
     @r.get("/preferences")
-    def preferences():
+    def preferences(migrate: bool = False):
         with transaction() as db:
+            if migrate:
+                migrate_legacy_templates(db)
+                db.flush()
             return [preference_json(row) for row in db.scalars(select(AdvancedPreference))]
 
     @r.post("/preferences/save")
@@ -294,17 +311,7 @@ def router(authenticated):
                 for x in db.scalars(query)
             ]
         if limit == 1 and rows:
-            ticker = rows[0]['document'].get('symbol', 'XAUUSD')
-            try:
-                symbol, kind = decode(ticker)
-                if kind == 'provider':
-                    from .provider_chart import metadata
-
-                    rows[0]['initial_symbol'] = {'ticker': ticker, 'metadata': metadata(symbol)}
-            except (HTTPException, QueryError, ValueError, TimeoutError, RuntimeError):
-                # The normal native resolve path reports unavailable/invalid
-                # symbols. Never replace the workspace or its series here.
-                pass
+            rows[0] = with_initial_symbol(rows[0])
         return rows
 
     @r.get("/workspaces/{id}")
@@ -313,7 +320,8 @@ def router(authenticated):
             row = db.get(AdvancedWorkspace, id)
             if not row:
                 raise HTTPException(404, "工作区不存在")
-            return serialized(row)
+            value = serialized(row)
+        return with_initial_symbol(value)
 
     @r.post("/workspaces")
     def create(body: WorkspaceCreate):
@@ -327,14 +335,19 @@ def router(authenticated):
                 raise HTTPException(422, "指定入口仅支持平台原生系列")
             from .provider_chart import metadata
 
-            metadata(ident)
+            if ident.startswith("YAHOO:"):
+                from .yahoo_catalog import local_entry
+                local_entry(ident)
+            else:
+                metadata(ident)
             ticker = encode(ident, kind)
         with transaction() as db:
             row = AdvancedWorkspace(name=body.name, document={"engine": "tv31", "schemaVersion": 1,
                                                            "symbol": ticker, "series_kind": "provider"})
             db.add(row)
             db.flush()
-            return serialized(row)
+            value = serialized(row)
+        return with_initial_symbol(value)
 
     @r.post("/workspaces/{id}/save")
     def save(id: str, body: Save):

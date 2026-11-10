@@ -444,19 +444,16 @@ def data_sync(body: DataQuery):
 
 async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_work=False):
     """One cancellable query path shared by browser and MCP adapters."""
-    from .provider_cache import CANCELLED, DEADLINE
-    from .provider_capabilities import request_seconds
+    from .provider_cache import CANCELLED, DEADLINE, IO_DEADLINE
+    from .provider_capabilities import COMPLETION_SECONDS, instrument_source, request_seconds
 
     cancelled = threading.Event()
     token = CANCELLED.set(cancelled)
-    source = None
-    if body.series_kind == "provider":
-        ident = body.instrument.removeprefix("MWP:").upper()
-        if ident.startswith("FXCM:"):
-            source = "fxcm"
-        elif ident.startswith(("AKSHARE:", "TENCENT:")):
-            source = "akshare"
-    deadline = min(deadline or float("inf"), time.monotonic() + request_seconds(source))
+    source = instrument_source(body.instrument) if body.series_kind == "provider" else None
+    io_deadline = time.monotonic() + request_seconds(source)
+    deadline = min(deadline or float("inf"), io_deadline +
+                   (COMPLETION_SECONDS if source is not None else 0))
+    io_token = IO_DEADLINE.set(min(io_deadline, deadline))
     deadline_token = DEADLINE.set(deadline)
     task = asyncio.create_task(asyncio.to_thread(data_sync, body))
     try:
@@ -473,6 +470,7 @@ async def query_chart(body: DataQuery, disconnected=None, deadline=None, retain_
         cancelled.set()
         CANCELLED.reset(token)
         DEADLINE.reset(deadline_token)
+        IO_DEADLINE.reset(io_token)
         if not task.done():
             # MCP retains its compute slot while its transport returns a budget error.
             # Browser waiters keep the established immediate deadline response.

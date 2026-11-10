@@ -1,0 +1,754 @@
+{
+  "started_at": "2026-11-10T12:20:36.300Z",
+  "finished_at": "2026-11-10T12:29:04.259Z",
+  "period": "D1",
+  "viewport": {
+    "width": 1600,
+    "height": 1000
+  },
+  "method": "Real HTTP, native widget, single chart, no indicators. Fresh browser context per unique instrument, opened exactly once. Before navigation every timeframe has no dataset/bars and no history-load records. No cache clearing. Readiness requires nonempty real bars, native dataReady, nonempty visible range, then two requestAnimationFrame callbacks. Browser page navigation is the start; login/workspace preparation is outside the measurement.",
+  "preferences_unchanged": false,
+  "original_workspaces_unchanged": true,
+  "passed": false,
+  "attempts": [
+    {
+      "source": "binance",
+      "query": "BCHUSDT",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 14916.5,
+      "widget_constructor_ms": 3395.5,
+      "widget_ready_ms": 14067.900000095367,
+      "first_nonempty_bars_ms": 13855.199999809265,
+      "data_ready_ms": 14293,
+      "errors": []
+    },
+    {
+      "source": "binance",
+      "query": "NEARUSDT",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 5133.400000095367,
+      "widget_constructor_ms": 1473,
+      "widget_ready_ms": 4758,
+      "first_nonempty_bars_ms": 4706.099999904633,
+      "data_ready_ms": 4816.699999809265,
+      "errors": []
+    },
+    {
+      "source": "binance",
+      "query": "ETHUSDT",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 5461.699999809265,
+      "widget_constructor_ms": 1219.8999996185303,
+      "widget_ready_ms": 5100.699999809265,
+      "first_nonempty_bars_ms": 5031.5,
+      "data_ready_ms": 5154.799999713898,
+      "errors": []
+    },
+    {
+      "source": "dukascopy",
+      "query": "EURGBP",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 8880,
+      "widget_constructor_ms": 1437.4000000953674,
+      "widget_ready_ms": 8560.200000286102,
+      "first_nonempty_bars_ms": 8518.700000286102,
+      "data_ready_ms": 8630.400000095367,
+      "errors": []
+    },
+    {
+      "source": "dukascopy",
+      "query": "AUDCAD",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 5294.400000095367,
+      "widget_constructor_ms": 1402.9000000953674,
+      "widget_ready_ms": 4890.200000286102,
+      "first_nonempty_bars_ms": 4822.800000190735,
+      "data_ready_ms": 4927.400000095367,
+      "errors": []
+    },
+    {
+      "source": "dukascopy",
+      "query": "USDSEK",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 8841.199999809265,
+      "widget_constructor_ms": 1535.5,
+      "widget_ready_ms": 8506.699999809265,
+      "first_nonempty_bars_ms": 8408.5,
+      "data_ready_ms": 8570.900000095367,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "GOOGL",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 26257.599999904633,
+      "widget_constructor_ms": 1309.2000002861023,
+      "widget_ready_ms": 25914.900000095367,
+      "first_nonempty_bars_ms": 25840.900000095367,
+      "data_ready_ms": 25970.900000095367,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "BRK-B",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 30021.400000095367,
+      "widget_constructor_ms": 1442.4000000953674,
+      "widget_ready_ms": 29537.699999809265,
+      "first_nonempty_bars_ms": 29491.300000190735,
+      "data_ready_ms": 29657.599999904633,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "NBIS",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 23227.200000286102,
+      "widget_constructor_ms": 1503,
+      "widget_ready_ms": 22902.200000286102,
+      "first_nonempty_bars_ms": 22843.5,
+      "data_ready_ms": 22976.400000095367,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "GEV",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 25350.400000095367,
+      "widget_constructor_ms": 1557.4000000953674,
+      "widget_ready_ms": 25041.400000095367,
+      "first_nonempty_bars_ms": 24968,
+      "data_ready_ms": 25088.599999904633,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "VRT",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 32156.300000190735,
+      "widget_constructor_ms": 1400.3000001907349,
+      "widget_ready_ms": 31764.800000190735,
+      "first_nonempty_bars_ms": 31687,
+      "data_ready_ms": 31825.300000190735,
+      "errors": []
+    },
+    {
+      "source": "akshare",
+      "query": "601888",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 9532.700000286102,
+      "widget_constructor_ms": 1374.5,
+      "widget_ready_ms": 9226,
+      "first_nonempty_bars_ms": 9183.60000038147,
+      "data_ready_ms": 9297.60000038147,
+      "errors": []
+    },
+    {
+      "source": "akshare",
+      "query": "601166",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 10784.5,
+      "widget_constructor_ms": 1571.1999998092651,
+      "widget_ready_ms": 10564.099999904633,
+      "first_nonempty_bars_ms": 10533.89999961853,
+      "data_ready_ms": 10602.099999904633,
+      "errors": []
+    },
+    {
+      "source": "akshare",
+      "query": "002594",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 10624.599999904633,
+      "widget_constructor_ms": 1580.0999999046326,
+      "widget_ready_ms": 10420,
+      "first_nonempty_bars_ms": 10335.599999904633,
+      "data_ready_ms": 10432.900000095367,
+      "errors": []
+    },
+    {
+      "source": "akshare",
+      "query": "600028",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 8324.400000095367,
+      "widget_constructor_ms": 1306.5999999046326,
+      "widget_ready_ms": 8152.800000190735,
+      "first_nonempty_bars_ms": 8096.099999904633,
+      "data_ready_ms": 8171.800000190735,
+      "errors": []
+    },
+    {
+      "source": "akshare",
+      "query": "601988",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 10278.299999713898,
+      "widget_constructor_ms": 1516.4000000953674,
+      "widget_ready_ms": 10067.599999904633,
+      "first_nonempty_bars_ms": 10014.5,
+      "data_ready_ms": 10089.599999904633,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "GBPAUD",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 18619.699999809265,
+      "widget_constructor_ms": 1346.5999999046326,
+      "widget_ready_ms": 18359.699999809265,
+      "first_nonempty_bars_ms": 18308,
+      "data_ready_ms": 18420,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "GBPNZD",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 36367.5,
+      "widget_constructor_ms": 1337.2999997138977,
+      "widget_ready_ms": 35770.90000009537,
+      "first_nonempty_bars_ms": 35721.199999809265,
+      "data_ready_ms": 35827.09999990463,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "CADCHF",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 14508.800000190735,
+      "widget_constructor_ms": 1470.9000000953674,
+      "widget_ready_ms": 14189.099999904633,
+      "first_nonempty_bars_ms": 14150.900000095367,
+      "data_ready_ms": 14244.5,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "EURSEK",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 6735.900000095367,
+      "widget_constructor_ms": 1626.9000000953674,
+      "widget_ready_ms": 6380.700000286102,
+      "first_nonempty_bars_ms": 6329.10000038147,
+      "data_ready_ms": 6446.200000286102,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "GBPCAD",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 12904,
+      "widget_constructor_ms": 1423.7999997138977,
+      "widget_ready_ms": 12637.400000095367,
+      "first_nonempty_bars_ms": 12585.400000095367,
+      "data_ready_ms": 12679.299999713898,
+      "errors": []
+    }
+  ],
+  "cleanup": {
+    "owned": 21,
+    "removed": 21
+  },
+  "background": [
+    {
+      "source": "binance",
+      "query": "BCHUSDT",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 2540,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "binance",
+      "query": "NEARUSDT",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 2219,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "binance",
+      "query": "ETHUSDT",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 3373,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "dukascopy",
+      "query": "EURGBP",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "dukascopy",
+      "query": "AUDCAD",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "dukascopy",
+      "query": "USDSEK",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "GOOGL",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4135,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "BRK-B",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4135,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "NBIS",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 515,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 2,
+              "error": "TimeoutError",
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "GEV",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 658,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "query": "VRT",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 2079,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 1,
+              "error": "TimeoutError",
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "akshare",
+      "query": "601888",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "akshare",
+      "query": "601166",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 1000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": false,
+              "stop_reason": "no_progress",
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "akshare",
+      "query": "002594",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 1000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": false,
+              "stop_reason": "no_progress",
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "akshare",
+      "query": "600028",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 4000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": true,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "akshare",
+      "query": "601988",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 1000,
+          "targets": [
+            {
+              "done": true,
+              "satisfied": false,
+              "stop_reason": "no_progress",
+              "attempts": 0,
+              "error": null,
+              "goal": 4000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "fxcm",
+      "query": "GBPAUD",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 1142,
+          "targets": [
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            },
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "fxcm",
+      "query": "GBPNZD",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 1170,
+          "targets": [
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            },
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "fxcm",
+      "query": "CADCHF",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 898,
+          "targets": [
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            },
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "fxcm",
+      "query": "EURSEK",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 900,
+          "targets": [
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            },
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "source": "fxcm",
+      "query": "GBPCAD",
+      "datasets": [
+        {
+          "timeframe": "D1",
+          "bars": 600,
+          "targets": [
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            },
+            {
+              "done": false,
+              "satisfied": false,
+              "stop_reason": null,
+              "attempts": 0,
+              "error": null,
+              "goal": 2000
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

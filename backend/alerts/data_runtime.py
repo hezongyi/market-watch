@@ -26,11 +26,12 @@ def build_loops():
 
     providers = tuple(
         loop
-        for source in enabled_sources()
+        for source in enabled_sources(history=True)
         for loop in (
             Loop(f"provider_live_{source}", lambda stop, source=source: provider_service.run_live(stop, source)),
             Loop(f"provider_warm_{source}", lambda stop, source=source: provider_service.run_warm(stop, source)),
         )
+        if not loop.role.startswith("provider_live_") or source in enabled_sources()
     )
     transports = tuple(
         Loop(f"provider_transport_{source}",

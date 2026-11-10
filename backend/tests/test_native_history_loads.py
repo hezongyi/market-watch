@@ -1,5 +1,6 @@
 import json
 import logging
+import time
 
 import pytest
 from alerts import native_history_loads as loads
@@ -42,6 +43,54 @@ def test_cold_task_progress_final_snapshot_hot_reuse_and_idempotency(history):
     with pytest.raises(Exception) as exc:
         loads.status('another-owner', ident)
     assert exc.value.status_code == 404
+
+
+def test_worker_only_prepares_coverage_and_api_publishes_final_snapshot(history, monkeypatch):
+    from alerts import provider_display_snapshots
+
+    published = []
+    original = provider_display_snapshots.publish
+    monkeypatch.setattr(provider_display_snapshots, 'publish', lambda page: published.append(page))
+    ident = loads.submit('owner', 'coverage-only', body(4000))['load']['id']
+    loads.once()
+    assert loads.status('owner', ident)['state'] == 'ready'
+    assert published == [], 'worker must not construct and discard a final display response'
+    monkeypatch.setattr(provider_display_snapshots, 'publish', original)
+    result = loads.result('owner', ident)['result']
+    assert len(result['bars']) == 4000 and result['provider_snapshot_id']
+
+
+def test_received_page_has_bounded_completion_budget_without_second_fetch(history, monkeypatch):
+    calls = []
+    original = upstream.native_page
+    monkeypatch.setattr(loads, 'request_seconds', lambda source: 0.2)
+
+    def received_page(*args, **kwargs):
+        calls.append(1)
+        time.sleep(0.25)  # A valid response finishes parsing at the I/O boundary.
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(upstream, 'native_page', received_page)
+    ident = loads.submit('owner', 'io-boundary', body(4000))['load']['id']
+    loads.once()
+    assert loads.status('owner', ident)['state'] == 'ready'
+    assert len(loads.result('owner', ident)['result']['bars']) == 4000
+    assert calls == [1]
+
+
+def test_completion_budget_never_commits_a_cancelled_consumer(history, monkeypatch):
+    ident = loads.submit('owner', 'cancel-before-commit', body(4000))['load']['id']
+    original = upstream.native_page
+
+    def cancelled_page(*args, **kwargs):
+        result = original(*args, **kwargs)
+        loads.status('owner', ident, True)
+        return result
+
+    monkeypatch.setattr(upstream, 'native_page', cancelled_page)
+    loads.once()
+    assert loads.status('owner', ident)['state'] == 'cancelled'
+    assert cache.snapshot(cache.identity(META, 'M5'), 40000000, 4000)['bars'] == []
 
 
 def test_result_poll_preserves_progress_and_final_page_count(history):
@@ -251,3 +300,129 @@ def test_snapshot_database_timeout_is_structured_and_next_request_recovers(histo
             assert recovered.json()["result"]["bars"][-1]["chart_time"] == 39999000
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def startup_body():
+    return DataQuery(instrument=META['id'], series_kind='provider', timeframe='M5',
+                     limit=1, countBack=1, firstDataRequest=True,
+                     native_history={'chart_count': 1, 'focused': True})
+
+
+def test_startup_preparation_commits_once_and_real_demand_reads_prices(history, monkeypatch):
+    calls = []
+    monkeypatch.setattr(upstream, 'native_page', lambda m,f,b,n,**k:
+        calls.append(1) or page(b-(n+k.get('optional',0))*1000,b))
+    query = startup_body()
+    ident = loads.submit('owner', 'startup', query, prepare=True)['load']['id']
+    assert loads.submit('owner', 'startup', query, prepare=True)['load']['id'] == ident
+    with pytest.raises(Exception) as exc:
+        loads.submit('owner', 'startup', query)
+    assert exc.value.status_code == 409
+    loads.once()
+    result = loads.result('owner', ident)['result']
+    assert result['prepared'] is True and 'bars' not in result and 'provider_snapshot_id' not in result
+    actual = loads.submit('owner', 'actual', query.model_copy(update={'limit':200, 'count_back':200}))['result']
+    assert len(actual['bars']) == 2000 and actual['provider_snapshot_id']
+    assert calls == [1]
+
+
+@pytest.mark.parametrize('disabled', ['setting', 'global', 'queued-setting'])
+def test_disabled_preparation_does_not_fetch_or_expand(history, monkeypatch, disabled):
+    from alerts import provider_history_policy as policy
+    from alerts.storage import ProviderDataset
+    from sqlalchemy import func, select
+    query = startup_body()
+    ident = None
+    if disabled == 'queued-setting':
+        ident = loads.submit('owner', 'startup', query, prepare=True)['load']['id']
+    if disabled in ('setting', 'queued-setting'):
+        values = policy.prefetch_capabilities()['sources']
+        values['oanda'] = {'initial_bars':0, 'reserve_bars':0}
+        policy.save_prefetch(values)
+    elif disabled == 'global':
+        monkeypatch.setattr(settings, 'provider_native_history_buffer', False)
+    else:
+        monkeypatch.setattr(upstream, 'metadata', lambda _: {**META, 'source':'binance'})
+    monkeypatch.setattr(upstream, 'native_page', lambda *a, **k: pytest.fail('disabled optional work fetched prices'))
+    if ident:
+        loads.once()
+        result = loads.result('owner', ident)['result']
+    else:
+        result = loads.submit('owner', 'startup', query, prepare=True)['result']
+        with history.begin() as db:
+            assert db.scalar(select(func.count()).select_from(ProviderDataset)) == 0
+    assert result == {'prepared':False}
+
+
+def test_preparation_rejects_real_demands(history):
+    with pytest.raises(Exception) as exc:
+        loads.submit('owner', 'invalid-startup', body(), prepare=True)
+    assert exc.value.status_code == 422
+
+
+@pytest.mark.parametrize('instrument,source', [('YAHOO:AAPL','yahoo'), ('MWP:YAHOO:AAPL','yahoo'), ('OANDA:EUR_USD','oanda'), ('NATIVE:configured','oanda')])
+def test_worker_uses_central_source_budget(history, monkeypatch, instrument, source):
+    sources = []
+    monkeypatch.setattr(loads, 'request_seconds', lambda value: sources.append(value) or 30)
+    loads.submit('owner', 'central-budget', body(4000).model_copy(update={'instrument':instrument}))
+    loads.once()
+    assert sources == [source]
+
+
+def test_worker_coverage_preserves_real_range_and_indicator_prefix(history, monkeypatch):
+    from alerts.chart_indicators import history_requirement
+    from test_provider_indicator_inputs import stable_indicators
+    spec = {'name':'EMA', 'params':{'period':20}}
+    query = body(200, indicators=[spec]).model_copy(update={'from_time':39500000})
+    calls = []
+    monkeypatch.setattr(upstream, 'native_page', lambda m,f,b,n,**k: calls.append(n) or page(b-n*1000,b))
+    ident = loads.submit('owner','range-prefix',query)['load']['id']
+    for _ in range(3):
+        loads.once()
+        if loads.status('owner',ident)['state']=='ready':
+            break
+    result = loads.result('owner',ident)['result']
+    direct = cache.data(query)
+    assert len(result['bars']) == 500
+    assert sum(calls) >= 500 + history_requirement(spec)
+    assert result['bars'] == direct['bars']
+    assert stable_indicators(result) == stable_indicators(direct)
+
+
+@pytest.mark.parametrize('source,prefix', [('oanda','OANDA'),('binance','BINANCE'),('dukascopy','DUKA'),('yahoo','YAHOO'),('akshare','AKSHARE'),('fxcm','FXCM')])
+def test_all_sources_prepare_once_and_reuse_prices(history, monkeypatch, source, prefix):
+    meta = {**META, 'source':source, 'id':prefix+':sample',
+            'adjustment':'supplier', 'source_family':'sina'}
+    if source == 'fxcm':
+        meta['account_scope'] = 'fixture'
+    monkeypatch.setattr(upstream, 'metadata', lambda *a, **k: meta)
+    calls = []
+    monkeypatch.setattr(upstream, 'native_page', lambda m,f,b,n,**k:
+        calls.append(n+k.get('optional',0)) or page(b-(n+k.get('optional',0))*1000,b))
+    query = startup_body().model_copy(update={'instrument':meta['id']})
+    ident = loads.submit('owner','all-source-startup',query,prepare=True)['load']['id']
+    loads.once()
+    assert loads.result('owner',ident)['result']['prepared'] is True
+    actual = loads.submit('owner','real-demand',query.model_copy(update={'limit':20,'count_back':20}))['result']
+    assert len(actual['bars']) >= 20
+    assert len(calls) == 1
+
+
+def test_disabled_preparation_skips_remote_metadata(history, monkeypatch):
+    from alerts import provider_history_policy as policy
+    values = policy.prefetch_capabilities()['sources']
+    values['yahoo'] = {'initial_bars':0,'reserve_bars':0}
+    policy.save_prefetch(values)
+    monkeypatch.setattr(upstream,'metadata',lambda *a,**k: pytest.fail('disabled preparation resolved remote metadata'))
+    query = startup_body().model_copy(update={'instrument':'YAHOO:AAPL'})
+    assert loads.submit('owner','disabled-yahoo',query,prepare=True) == {'result':{'prepared':False}}
+
+
+def test_upstream_timeout_without_progress_is_terminal(history, monkeypatch):
+    ident = loads.submit('owner','timeout-no-progress',body(4000).model_copy(update={'instrument':'FXCM:sample'}))['load']['id']
+    monkeypatch.setattr(upstream,'native_page',lambda *a,**k: (_ for _ in ()).throw(TimeoutError('budget expired')))
+    loads.once()
+    result = loads.status('owner',ident)
+    assert result['state'] == 'failed'
+    assert result['error']['code'] == 'HISTORY_TIMEOUT'
+    assert result['error']['history_boundary'] is False

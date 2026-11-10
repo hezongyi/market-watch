@@ -1,0 +1,241 @@
+{
+  "host": "Ubuntu quant-server",
+  "dev_url": "https://192.168.7.232:18443/",
+  "period": "D1",
+  "single_chart": true,
+  "indicators": 0,
+  "native_bundle": "chart.bba29dc12793c492.js",
+  "date_utc": "2026-11-10",
+  "cache_cleared": false,
+  "measurements": [
+    {
+      "symbol": "GBPCAD",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 7001,
+      "before_get_bars_ms": 3485.6,
+      "get_bars_to_callback_ms": 3109.0,
+      "callback_to_visible_ms": 406.4,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 2628.51,
+          "source_http_ms": 1160.32,
+          "commit_ms": 431.06,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 45
+        }
+      ]
+    },
+    {
+      "symbol": "GBPCHF",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 15080.5,
+      "before_get_bars_ms": 3848.1,
+      "get_bars_to_callback_ms": 10910.7,
+      "callback_to_visible_ms": 321.7,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 8150.71,
+          "source_http_ms": 6922.74,
+          "commit_ms": null,
+          "pages": 0,
+          "state": "filling",
+          "first_claim_delay_ms": 217
+        },
+        {
+          "generation": 2,
+          "fill_ms": 1914.06,
+          "source_http_ms": 804.43,
+          "commit_ms": 503.69,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": null
+        }
+      ]
+    },
+    {
+      "symbol": "SGDJPY",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 6379.2,
+      "before_get_bars_ms": 3550.1,
+      "get_bars_to_callback_ms": 2373.2,
+      "callback_to_visible_ms": 455.9,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 1958.81,
+          "source_http_ms": 745.89,
+          "commit_ms": 530.69,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 24
+        }
+      ]
+    },
+    {
+      "symbol": "CADJPY",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 6081,
+      "before_get_bars_ms": 3085.3,
+      "get_bars_to_callback_ms": 2655.0,
+      "callback_to_visible_ms": 340.7,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 2219.95,
+          "source_http_ms": 823.29,
+          "commit_ms": 356.87,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 46
+        }
+      ]
+    },
+    {
+      "symbol": "CHFJPY",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 9869.5,
+      "before_get_bars_ms": 3588.1,
+      "get_bars_to_callback_ms": 5748.1,
+      "callback_to_visible_ms": 533.3,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 4805.73,
+          "source_http_ms": 632.74,
+          "commit_ms": 1362.34,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 70
+        }
+      ]
+    },
+    {
+      "symbol": "EURNOK",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 7201,
+      "before_get_bars_ms": 3772.7,
+      "get_bars_to_callback_ms": 2934.6,
+      "callback_to_visible_ms": 493.7,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 2320.83,
+          "source_http_ms": 1291.55,
+          "commit_ms": 445.89,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 206
+        }
+      ]
+    },
+    {
+      "symbol": "EURDKK",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 6024.7,
+      "before_get_bars_ms": 3470.8,
+      "get_bars_to_callback_ms": 2127.6,
+      "callback_to_visible_ms": 426.3,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 1710.54,
+          "source_http_ms": 644.55,
+          "commit_ms": 360.09,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 92
+        }
+      ]
+    },
+    {
+      "symbol": "USDSEK",
+      "kind": "full_page",
+      "cold_proven": true,
+      "visible_ms": 6942.1,
+      "before_get_bars_ms": 3788.9,
+      "get_bars_to_callback_ms": 2804.3,
+      "callback_to_visible_ms": 348.9,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 2043.49,
+          "source_http_ms": 748.74,
+          "commit_ms": 376.44,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 117
+        }
+      ]
+    },
+    {
+      "symbol": "USDMXN",
+      "kind": "in_page_switch",
+      "cold_proven": true,
+      "visible_ms": 6091.4,
+      "before_get_bars_ms": 269.6,
+      "get_bars_to_callback_ms": 5524.5,
+      "callback_to_visible_ms": 297.3,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 4680.95,
+          "source_http_ms": 1041.02,
+          "commit_ms": 1551.31,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 73
+        }
+      ]
+    },
+    {
+      "symbol": "USDZAR",
+      "kind": "in_page_switch",
+      "cold_proven": true,
+      "visible_ms": 4064.1,
+      "before_get_bars_ms": 140.9,
+      "get_bars_to_callback_ms": 3812.0,
+      "callback_to_visible_ms": 111.2,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 3324.26,
+          "source_http_ms": 2136.25,
+          "commit_ms": 547.01,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 54
+        }
+      ]
+    },
+    {
+      "symbol": "EURPLN",
+      "kind": "in_page_switch",
+      "cold_proven": true,
+      "visible_ms": 2967.8,
+      "before_get_bars_ms": 157.7,
+      "get_bars_to_callback_ms": 2517.6,
+      "callback_to_visible_ms": 292.5,
+      "worker_turns": [
+        {
+          "generation": 1,
+          "fill_ms": 1917.89,
+          "source_http_ms": 645.47,
+          "commit_ms": 522.46,
+          "pages": 1,
+          "state": "ready",
+          "first_claim_delay_ms": 79
+        }
+      ]
+    }
+  ]
+}

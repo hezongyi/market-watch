@@ -4,34 +4,39 @@ import {workspaceRuntime} from "../runtime/workspace";
 import {sessionRuntime} from "../runtime/session";
 import {alertRuntime} from "../runtime/alerts";
 import {marketRuntime} from "../runtime/market";
-import {mountChart,type ChartAdapter,type ChartApplication,type ChartUpdate} from "../runtime/chart";
+import {mountChart,prepareChart,type ChartAdapter,type ChartApplication,type ChartUpdate} from "../runtime/chart";
 import {workspaceDraftKey,putWorkspaceDraft,workspaceDraftEntries,dropWorkspaceDraft} from "./localDrafts";
 import {useNotices,useNoticeState} from "../notifications/context";
 import {setChartTime} from "../time/ChartTimeContext";
 import {operationFault} from "../notifications/operations";
 import {
   subscribeHistoryLoadCapacity,
+  loadNativeHistory,
+  startupHistoryQuery,
   type HistoryCapabilities,
 } from "./nativeHistoryLoads";
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
 import { pageName } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
 import { api as requestAPI } from "../api";
 import "./advanced.css";
-import { HistoryPlansDialog, type DatasetViews } from "./HistoryPlansDialog";
-import { MaintenanceDialog } from "./MaintenanceDialog";
-import { ExportDialog, type ExportSelection } from "./ExportDialog";
+import type { DatasetViews } from "./HistoryPlansDialog";
+import type { ExportSelection } from "./ExportDialog";
 import { providerSubscriptions } from "./providerSubscriptions";
 import { validAlertContext } from "./chartAlerts";
-import { HistoryCapacityDialog } from "./HistoryCapacityDialog";
 import {
   HistoryLoadingNotice,
   HISTORY_NOTICE_DELAY_MS,
   type NativeLoad,
   type CapacityNotice,
 } from "./HistoryLoadingNotice";
+
+const HistoryPlansDialog = lazy(() => import("./HistoryPlansDialog").then(module => ({default: module.HistoryPlansDialog})));
+const MaintenanceDialog = lazy(() => import("./MaintenanceDialog").then(module => ({default: module.MaintenanceDialog})));
+const ExportDialog = lazy(() => import("./ExportDialog").then(module => ({default: module.ExportDialog})));
+const HistoryCapacityDialog = lazy(() => import("./HistoryCapacityDialog").then(module => ({default: module.HistoryCapacityDialog})));
 
 type Workspace = {
   id: string;
@@ -103,6 +108,9 @@ export default function ChartApplicationPage() {
   const [, setRows] = useState<Workspace[]>([]),
     [active, setActive] = useState<Workspace | null>(null);
   const [workspaceOpening,setWorkspaceOpening]=useState(true);
+  const startupInputs = useRef<Promise<any[]> | null>(null);
+  const startupCapabilities = useRef<Promise<HistoryCapabilities> | null>(null);
+  const startupPreparation = useRef<{instrument:string;timeframe:string;controller:AbortController;result:Promise<any>} | null>(null);
   const [historyPlansOpen, setHistoryPlansOpen] = useState(false);
   const [historyDetailsOpen, setHistoryDetailsOpen] = useState(false);
   const [maintenanceInstrument, setMaintenanceInstrument] = useState<
@@ -275,6 +283,15 @@ export default function ChartApplicationPage() {
   useEffect(() => {
     if (current.current && current.current.id === workspaceId) return;
     setWorkspaceOpening(true);
+    // The chart route can overlap independent I/O before the workspace arrives.
+    void prepareChart().catch(() => {}); // mount retries and reports resource errors.
+    startupCapabilities.current = api<HistoryCapabilities>("/charts/history-capabilities");
+    startupInputs.current = Promise.all([
+      api("/advanced-charts/catalog"),
+      api("/advanced-charts/preferences" + (mobile ? "" : "?migrate=true")),
+      startupCapabilities.current,
+    ]);
+    void startupInputs.current.catch(() => {});
     let cancelled = false;
     const opening = workspaceId
       ? api<Workspace>("/advanced-charts/workspaces/" + encodeURIComponent(workspaceId)).then(row => [row])
@@ -295,6 +312,28 @@ export default function ChartApplicationPage() {
     }).catch(e => { if (!cancelled) { setActive(null); current.current = null; setError(workspaceId ? "工作区不可用：" + String(e) : String(e)); } }).finally(()=>{if(!cancelled)setWorkspaceOpening(false);});
     return () => { cancelled = true; };
   }, [workspaceId, requestedPlatform, mobile]);
+  useEffect(() => {
+    if (!active) return;
+    const query = startupHistoryQuery(active.document, active.initial_symbol);
+    if (!query) return;
+    const controller = new AbortController();
+    const capabilities = startupCapabilities.current || Promise.resolve(historyCapabilities.current);
+    const result = capabilities.then(cap => {
+      if (!cap?.startup_preparation || controller.signal.aborted) return;
+      return loadNativeHistory(query, controller.signal, cap, () => {},
+        {workspace_id:active.id}, undefined, true);
+    });
+    const preparation = {...query, controller, result};
+    startupPreparation.current = preparation;
+    void result.catch(() => {
+      // The matching datafeed consumer reports failures; avoid an unhandled
+      // rejection while widget initialization is still in progress.
+    });
+    return () => {
+      controller.abort();
+      if (startupPreparation.current === preparation) startupPreparation.current = null;
+    };
+  }, [active?.id, frameKey]);
   useEffect(() => {
     if (active) sessionStorage.setItem("mw.chart-return.v1", appLocation.pathname + appLocation.search + appLocation.hash);
   }, [active?.id, appLocation]);
@@ -594,6 +633,11 @@ export default function ChartApplicationPage() {
         return;
       }
       if(m.type==='chart-resolve-states' && m.epoch===nativeLoadEpoch.current && Array.isArray(m.states)) {
+        const preparation = startupPreparation.current;
+        if (preparation && m.states.some((item:any) => item.index === 0 && item.state === 'loading' &&
+          (item.symbol !== 'MWP:' + preparation.instrument ||
+           ({'1':'M1','5':'M5','15':'M15','30':'M30','60':'H1','240':'H4','1D':'D1','1W':'W1','1M':'MN'} as Record<string,string>)[item.resolution] !== preparation.timeframe)))
+          preparation.controller.abort();
         setResolveStates(m.states.filter((item:any)=>Number.isSafeInteger(item.index) && item.index>=0 && item.index<8 &&
           typeof item.symbol==='string' && typeof item.resolution==='string' && Number.isSafeInteger(item.generation) &&
           ['loading','error'].includes(item.state) && typeof item.message==='string' && Number.isFinite(item.retryAt))
@@ -705,6 +749,11 @@ export default function ChartApplicationPage() {
           );
           return;
         }
+        if (m.type === "native-load-start" && typeof m.instrument === "string" && frames.has(m.timeframe)) {
+          const preparation = startupPreparation.current;
+          if (preparation && (m.instrument !== preparation.instrument || m.timeframe !== preparation.timeframe))
+            preparation.controller.abort();
+        }
         setNativeLoads((previous) => {
           const next = { ...previous };
           if (
@@ -771,62 +820,19 @@ export default function ChartApplicationPage() {
       }
       if (m.type === "loaded") {
         alertUiSession.current = crypto.randomUUID();
-        await provider.clear();
+        // clear invalidates desired subscriptions synchronously; network cleanup
+        // stays ordered in the subscription queues without delaying the new widget.
+        void provider.clear();
         try {
-          if (!mobile) await api("/advanced-charts/preferences/migrate", {});
-          const [catalog, preferences, capabilities] = await Promise.all([
+          // Prepared inputs belong only to the first widget. Reloads must
+          // recover failed requests and observe settings saved since startup.
+          const prepared = startupInputs.current;
+          startupInputs.current = null;
+          const [catalog, preferences, capabilities] = await (prepared ?? Promise.all([
             api("/advanced-charts/catalog"),
-            api("/advanced-charts/preferences"),
+            api("/advanced-charts/preferences" + (mobile ? "" : "?migrate=true")),
             api("/charts/history-capabilities"),
-          ]);
-          const stored = (preferences as any[]).find(
-            (preference) => preference?.kind === "setting" && preference?.name === "mw.watchlists.v1",
-          )?.content?.value;
-          const active = Array.isArray(stored?.lists)
-            ? stored.lists.find((list: any) => list?.id === stored.active) || stored.lists[0]
-            : undefined;
-          const tickers: string[] = [...new Set<string>(
-            (Array.isArray(active?.symbols) ? active.symbols as unknown[] : [])
-              .filter((ticker: unknown): ticker is string => typeof ticker === "string")
-              .filter((ticker) => !ticker.startsWith("###"))
-              .slice(0, 32),
-          )];
-          const decodeWatchlistTicker = (ticker: string) => {
-            if (ticker.startsWith("MWH:")) return { instrument: ticker.slice(4), series_kind: "history" };
-            if (ticker.startsWith("MWC:")) return { instrument: ticker.slice(4), series_kind: "composite" };
-            if (ticker.startsWith("MWP:")) return { instrument: ticker.slice(4), series_kind: "provider" };
-            return { instrument: ticker, series_kind: "managed" };
-          };
-          const entries: [string, Record<string, unknown>][] = [];
-          let cursor = 0;
-          // One budget for the whole optional prewarm, rather than four
-          // seconds for each successive batch of four stale identities.
-          const controller = new AbortController();
-          let timeout: number | undefined;
-          const deadline = new Promise<void>((resolve) => {
-            timeout = window.setTimeout(() => { controller.abort(); resolve(); }, 4000);
-          });
-          const worker = async () => {
-            while (cursor < tickers.length && !controller.signal.aborted) {
-              const ticker = tickers[cursor++];
-              try {
-                const metadata = await api<Record<string, unknown>>(
-                  "/market-data/resolve",
-                  { ...decodeWatchlistTicker(ticker), timeframe: "M1" },
-                  controller.signal,
-                );
-                if (!controller.signal.aborted) entries.push([ticker, metadata]);
-              } catch (_) {
-                // A stale list entry must keep its native fallback behavior.
-              }
-            }
-          };
-          try {
-            await Promise.race([
-              Promise.all(Array.from({ length: Math.min(4, tickers.length) }, worker)),
-              deadline,
-            ]);
-          } finally { window.clearTimeout(timeout); }
+          ]));
           historyCapabilities.current = capabilities;
           reply({
             type: "init",
@@ -835,6 +841,7 @@ export default function ChartApplicationPage() {
             alert_ui_draft: readAlertDraft(current.current?.id),
             history_capabilities: capabilities,
             history_load_available: historyLoadAvailable,
+            startup_history: current.current && startupHistoryQuery(current.current.document, current.current.initial_symbol),
             document: current.current?.document || {},
             workspace: current.current,
             readonly: mobile,
@@ -845,7 +852,7 @@ export default function ChartApplicationPage() {
               ...preferences.filter((p:any)=>!(p.kind === "setting" && p.name === "mw.theme")),
               {...preferences.find((p:any)=>p.kind === "setting" && p.name === "mw.theme"),kind:"setting",name:"mw.theme",tool:"",content:{value:appRef.current.theme}},
             ] : preferences,
-            watchlist_metadata: Object.fromEntries(entries),
+            watchlist_metadata: {},
             initial_symbol: current.current?.initial_symbol,
           });
         } catch (e) {
@@ -981,7 +988,7 @@ export default function ChartApplicationPage() {
         });
       }
     };
-    const market = marketRuntime({api,marketRequests,inflight,historyCapabilities,setNativeLoads,current,nativeLoadEpoch,chart,compositeEstablished,updateChart});
+    const market = marketRuntime({api,marketRequests,inflight,historyCapabilities,setNativeLoads,current,nativeLoadEpoch,chart,compositeEstablished,updateChart,startupPreparation});
     const workspace = workspaceRuntime({api,mobile,queue,blocked,current,setError,notices,select,setFeedError,setStatus,setActive,remember,alertUiSession,readAlertDraft,setRows,refresh,unsaved,updateChart});
     const dataCenter = dataCenterRuntime({api,mobile,session:()=>centerSession.current,requests:marketRequests});
     const session = sessionRuntime({mobile,api,rawAPI:requestAPI});
@@ -1074,6 +1081,7 @@ export default function ChartApplicationPage() {
       {!Object.keys(nativeLoads).length && !Object.keys(capacityNotices).length && !chartFailures.length && <p>当前没有进行中的加载任务。</p>}
         </div>
       )}
+      <Suspense fallback={<p role="status">正在打开…</p>}>
       {capacityDialog && (
         <HistoryCapacityDialog
           request={api}
@@ -1113,6 +1121,7 @@ export default function ChartApplicationPage() {
           onClose={() => setExportSelection(null)}
         />
       )}
+      </Suspense>
       {notificationFailed && !notificationReady && (
         <div className="advanced-shell-recovery" role="status">
           <span>图表界面接入未完成，请重新加载。</span>

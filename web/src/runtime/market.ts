@@ -1,16 +1,17 @@
 /** Existing data/history behavior shared directly with the native adapter. */
 import {validIndicatorRead} from '../advanced/indicatorRequests';
-import {loadNativeHistory,type HistoryCapabilities} from '../advanced/nativeHistoryLoads';
+import {loadNativeHistory,startupMetadata,waitStartupPreparation,type HistoryCapabilities,type StartupPreparation} from '../advanced/nativeHistoryLoads';
 import {apiErrorDetails,errorMessage} from '../api';
 import type {ChartAdapter,ChartUpdate} from './chart';
 import type {Dispatch,SetStateAction} from 'react';
 import type {NativeLoad} from '../advanced/HistoryLoadingNotice';
 type Ref<T>={current:T};
 const frames = new Set(["M1","M5","M15","M30","H1","H4","D1","W1","MN"]);
-export function marketRuntime({api,marketRequests,inflight,historyCapabilities,setNativeLoads,current,nativeLoadEpoch,chart,compositeEstablished,updateChart}: {
+export function marketRuntime({api,marketRequests,inflight,historyCapabilities,setNativeLoads,current,nativeLoadEpoch,chart,compositeEstablished,updateChart,startupPreparation}: {
  api:<T=any>(path:string,body?:unknown,signal?:AbortSignal)=>Promise<T>;marketRequests:Map<ChartAdapter,Map<number,AbortController>>;
  inflight:Ref<number>;historyCapabilities:Ref<HistoryCapabilities|null>;setNativeLoads:Dispatch<SetStateAction<Record<string,NativeLoad>>>;
  current:Ref<{id:string}|null>;nativeLoadEpoch:Ref<number>;chart:Ref<ChartAdapter|null>;compositeEstablished:(instrument:string)=>void;updateChart:(value:ChartUpdate)=>void;
+ startupPreparation?:Ref<StartupPreparation|null>;
 }) {
 async function market(q:any,source:ChartAdapter,context:{id:number;history_client?:string}) {
 
@@ -67,6 +68,18 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
         sourceRequests.set(context.id, controller);
         inflight.current++;
         try {
+          if (q.op === "resolve" && q.args?.series_kind === "provider") {
+            const preparation = startupPreparation?.current;
+            let metadata;
+            try {
+              metadata = await startupMetadata(preparation, q.args.instrument, controller.signal);
+            } catch (error) {
+              if (startupPreparation && startupPreparation.current === preparation) startupPreparation.current = null;
+              throw error;
+            }
+            controller.signal.throwIfAborted();
+            if (metadata) return metadata;
+          }
           let result;
           if (q.op === "serverTime") {
             const response = await fetch("/readyz", {
@@ -208,6 +221,16 @@ async function data(q:any,source:ChartAdapter,context:{id:number;history_client?
         sourceRequests.set(context.id, controller);
         inflight.current++;
         try {
+          const preparation = startupPreparation?.current;
+          if (q.series_kind === "provider" && q.native_history && !q.native_reserve &&
+              preparation && preparation.instrument === q.instrument && preparation.timeframe === q.timeframe) {
+            try {
+              await waitStartupPreparation(preparation, q.instrument, controller.signal);
+            } finally {
+              if (startupPreparation && startupPreparation.current === preparation) startupPreparation.current = null;
+            }
+            controller.signal.throwIfAborted();
+          }
           const result = await (
               q.series_kind === "provider" &&
                 q.native_history &&
