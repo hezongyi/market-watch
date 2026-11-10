@@ -7,6 +7,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
 import pytest
+import test_price_alert_close as close_contracts
 import test_price_alert_inputs as contracts
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
@@ -17,6 +18,35 @@ from test_provider_postgres import provider_pg as _provider_pg
 
 provider_pg = _provider_pg
 pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requires task-owned PostgreSQL")
+
+
+@pytest.mark.parametrize("contract", [
+    close_contracts.test_close_backlog_ignores_current_quote_outage,
+    close_contracts.test_sparse_m5_uses_bounded_query_without_faking_coverage,
+    close_contracts.test_first_unresolved_period_blocks_later_confirmed_cross,
+    close_contracts.test_failed_query_blocks_until_newer_success_covers_the_window,
+    close_contracts.test_observed_unconfirmed_member_blocks_sparse_close,
+    close_contracts.test_global_aggregation_lag_does_not_block_confirmed_older_range,
+    close_contracts.test_correction_in_required_range_waits_for_aggregation,
+    close_contracts.test_batch_limit_resumes_at_exact_next_period,
+    close_contracts.test_pending_latest_baseline_correction_blocks_future_comparison,
+    close_contracts.test_creation_with_old_seam_uses_verified_current_materialization,
+    close_contracts.test_create_without_confirmed_baseline_first_future_close_is_only_baseline,
+    close_contracts.test_monthly_materialization_with_truncated_start_is_explicitly_blocked,
+    close_contracts.test_expired_failure_evidence_cannot_silently_certify_old_bar,
+])
+def test_close_contract(provider_pg, monkeypatch, contract):
+    contract(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize("latest", [False, True])
+def test_close_correction(provider_pg, monkeypatch, latest):
+    close_contracts.test_corrections_preserve_events_and_only_rebase_affected_latest_close(provider_pg[0], monkeypatch, latest)
+
+
+@pytest.mark.parametrize("frame", ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"])
+def test_close_period(provider_pg, monkeypatch, frame):
+    close_contracts.test_all_existing_periods_use_source_confirmed_sparse_close(provider_pg[0], monkeypatch, frame)
 
 
 @pytest.fixture

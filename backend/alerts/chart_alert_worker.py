@@ -227,10 +227,12 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
     if config.series_kind == "composite":
         from .price_alert_inputs import is_price_rule
 
-        if is_price_rule(config) and config.mode == "intrabar":
+        if is_price_rule(config):
+            from .price_alert_close import evaluate_close
             from .price_alert_evaluator import evaluate_intrabar
 
-            return evaluate_intrabar(db, alert, version, config, now, clock=clock)
+            evaluator = evaluate_intrabar if config.mode == "intrabar" else evaluate_close
+            return evaluator(db, alert, version, config, now, clock=clock)
         from .composite_alerts import evaluate as evaluate_composite
 
         return evaluate_composite(db, alert, version, config, now, clock=clock)

@@ -151,7 +151,7 @@ def bind(db, config, *, now=None):
     version = db.get(HistoryVersion, revision.history_version_id)
     from .price_alert_inputs import is_price_rule
 
-    if is_price_rule(config) and config.mode == "intrabar":
+    if is_price_rule(config):
         from .price_alert_evaluator import eligibility
 
         eligibility(db, revision, mode=config.mode, now=now_ms() if now is None else now)

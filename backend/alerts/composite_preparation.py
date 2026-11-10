@@ -126,12 +126,21 @@ def failed(ownership, error, *, batch=None, read_kind=None):
     busy = isinstance(error, AcquisitionBusy)
     permanent = isinstance(error, HistoryConfigurationError) or result.status == "unauthorized"
     with transaction() as db:
+        from .price_alert_confirmation import lock_source
+        from .price_alert_confirmation import record as record_query
+
+        failed_batch = batch is not None and not batch.result.successful
+        if failed_batch:
+            # Keep the same source -> preparation order as successful commits.
+            lock_source(db, batch.identity)
         attempt = db.get(CompositeReadAttempt, read_id(ownership["token"]))
         try:
             prep = _lock(db, ownership)
         except TimeoutError:
             _finish(attempt, "discarded", batch=batch, read_kind=read_kind)
             return
+        if failed_batch:
+            record_query(db, batch)
         count = prep.state.get("attempts", 0) + (0 if busy else 1)
         status = "shared_busy" if busy else "configuration_error" if permanent else result.status
         prep.error, prep.status = status, "configuration_error" if permanent else "retrying"

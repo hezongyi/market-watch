@@ -62,6 +62,10 @@ def initialize(db, alert, identity, config, *, now, takeover=False):
 
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
     sample = eligibility(db, revision, mode=config.mode, now=now)
+    if config.mode == "close":
+        from .price_alert_close import initialize_close
+
+        return initialize_close(db, alert, identity, config, now=now, takeover=takeover)
     stream = register(db, identity["target_dataset_id"], now=now)
     if stream.last_received_at is None or not any(
             other.id != alert.id for other, _ in consumers(db, stream.dataset_id, now=now)):

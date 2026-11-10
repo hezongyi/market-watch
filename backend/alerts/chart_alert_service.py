@@ -204,7 +204,7 @@ def current_version(db, alert):
 def initialize_price(db, alert, identity, config, *, at):
     from .price_alert_inputs import is_price_rule
 
-    if alert.status == "active" and is_price_rule(config) and config.mode == "intrabar":
+    if alert.status == "active" and is_price_rule(config):
         from .price_alert_evaluator import initialize
 
         initialize(db, alert, identity, config, now=at)
@@ -299,7 +299,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
                 raise ValueError("告警绑定的组合修订不存在")
             from .price_alert_inputs import is_price_rule
 
-            if is_price_rule(config) and config.mode == "intrabar":
+            if is_price_rule(config):
                 from .price_alert_evaluator import eligibility
 
                 eligibility(db, revision, mode=config.mode, now=at)

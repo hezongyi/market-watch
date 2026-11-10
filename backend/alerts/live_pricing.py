@@ -759,6 +759,9 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
                 observation.expected, observation.expectation = True, 'observed_source_pending'
         state.revision += 1
         if not batch.result.successful:
+            from .price_alert_confirmation import record as record_query
+
+            record_query(db, batch)
             for observation in observations.values():
                 observation.failures += 1
             state.attempts += 1
@@ -789,7 +792,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         # Legacy empty confirmations carry no checkpoint and no M1 to pin.
         # Preserve their independently reviewed closure path without inventing
         # canonical minutes or a query checkpoint. Data confirmations stay strict.
-        if batch.rows:
+        if batch.rows or batch.checkpoint is not None:
             apply_minutes(db, record(db, batch))
         ingest(db, inst, batch.ingestion_payload())
         # Measure completed ingestion, rather than the entry into the fenced

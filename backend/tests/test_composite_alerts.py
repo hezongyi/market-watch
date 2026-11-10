@@ -39,6 +39,12 @@ from test_history_versions import Adapter
 from test_market_contracts import batch, identity, minute
 
 
+def ray_condition():
+    """The existing geometry path remains outside the fixed-price contract."""
+    return {"relation": "cross_up", "right": {"kind": "line", "line": {
+        "kind": "horizontal_ray", "points": [{"time": 166020000, "index": 0, "price": "1.115"}]}}}
+
+
 def config(composite, **changes):
     return AlertConfig.model_validate({"name": "固定组合预警", "instrument": composite,
         "series_kind": "composite", "source": "composite", "timeframe": "M1", "max_triggers": 3,
@@ -168,7 +174,7 @@ def test_account_fault_blocks_alert_even_if_another_instrument_still_has_ready_s
         assert db.scalar(select(SignalRow)) is None
 
 
-def test_disconnect_recovery_baselines_old_cross_and_later_new_event_triggers(database, monkeypatch):
+def test_close_disconnect_recovery_consumes_confirmed_backlog(database, monkeypatch):
     ident, _, revision, seam, stamp = armed(database, monkeypatch)
     with database.begin() as db:
         evaluate(db, ident, now=stamp)
@@ -181,9 +187,9 @@ def test_disconnect_recovery_baselines_old_cross_and_later_new_event_triggers(da
     append(database, revision, seam + 600000, "1.119", now)
     live(database, revision, now, seam + 660000, epoch=2)
     with database.begin() as db:
-        assert evaluate(db, ident, now=now) == []
-        assert db.get(ChartAlert, ident).runtime["readiness"]["last_outcome"] == "recovery_baseline"
-        assert db.scalar(select(SignalRow)) is None
+        assert len(evaluate(db, ident, now=now)) == 1
+        assert db.get(ChartAlert, ident).runtime["last_outcome"] == "evaluated"
+        assert db.scalar(select(SignalRow)).occurred_at == seam + 660000
     append(database, revision, seam + 660000, "1.11", seam + 720010)
     with database.begin() as db:
         assert evaluate(db, ident, now=seam + 720010) == []
@@ -204,17 +210,18 @@ def test_correction_rebuild_preserves_judgments_and_never_replays_historical_eve
     aggregate(revision, "M1")
     with database.begin() as db:
         assert evaluate(db, ident, now=seam + 660020) == []
-        assert db.get(ChartAlert, ident).runtime["readiness"]["last_outcome"] == "recovery_baseline"
+        assert db.get(ChartAlert, ident).runtime["last_outcome"] == "evaluated"
+        assert db.scalar(select(Audit).where(Audit.kind == "chart_alert_input_revision"))
         assert db.get(ChartAlert, ident).count == 1
         assert db.scalar(select(SignalRow)).evidence == original
-        assert len(list(db.scalars(select(CompositeJudgment)))) == 3
+        assert len(list(db.scalars(select(CompositeJudgment)))) == 2
     with pytest.raises(ValueError, match="不可变"):
         with database.begin() as db:
             db.scalar(select(CompositeJudgment)).evidence = {}
 
 
 def test_missing_confirmation_period_waterline_and_stale_owner_all_fence_rules(database, monkeypatch):
-    ident, _, revision, seam, stamp = armed(database, monkeypatch)
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, condition=ray_condition())
     add_tail(database, revision, [minute(seam + 600000, volume="3")])
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
@@ -293,7 +300,8 @@ def test_seam_jump_itself_never_compares_prices_or_accepted_indicators(database,
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
         assert db.scalar(select(SignalRow)) is None
-        assert db.get(ChartAlert, ident).runtime["readiness"]["last_outcome"] == "seam_baseline"
+        assert db.get(ChartAlert, ident).runtime["execution_contract"] == "price-v2"
+        assert db.scalar(select(Audit).where(Audit.kind == "chart_alert_unobserved"))
 
 
 def test_indicator_dependency_gap_cannot_be_hidden_by_latest_confirmed_minute(database, monkeypatch):
@@ -493,7 +501,7 @@ def test_new_bucket_point_beyond_freshness_still_rebuilds_baseline(database, mon
         assert db.get(ChartAlert, ident).count == 0 and db.scalar(select(SignalRow)) is None
 
 
-def test_missed_and_expired_events_establish_baseline_without_notifications(database, monkeypatch):
+def test_price_close_backlog_preserves_late_events_and_notifications(database, monkeypatch):
     ident, _, revision, seam, stamp = armed(database, monkeypatch, notify_ntfy=True, late_delivery="notify")
     with database.begin() as db:
         evaluate(db, ident, now=stamp)
@@ -502,9 +510,10 @@ def test_missed_and_expired_events_establish_baseline_without_notifications(data
     aggregate(revision, "M1")
     live(database, revision, seam + 780010, seam + 780000)
     with database.begin() as db:
-        assert evaluate(db, ident, now=seam + 780010) == []
+        assert len(evaluate(db, ident, now=seam + 780010)) == 2
         assert db.get(ChartAlert, ident).state["sequence"] == seam + 780000
-        assert db.scalar(select(SignalRow)) is None and db.scalar(select(Outbox)) is None
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 2
+        assert db.scalar(select(func.count()).select_from(Outbox)) == 2
 
 
 def test_duplicate_logical_event_after_state_recovery_keeps_count(database, monkeypatch):
@@ -620,11 +629,12 @@ def gated(database, ident, stamp):
 
 
 def test_unchanged_waterline_skips_the_expensive_majority(database, monkeypatch):
-    ident, _, _, _, stamp = armed(database, monkeypatch)
+    ident, _, _, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     counts = gate_counters(monkeypatch)
     state, armed_at = gated(database, ident, stamp)
     armed_counts = dict(counts)
-    assert armed_counts["chart_page"] == armed_counts["operands"] >= 2
+    # The ray's endpoint mapping reads an additional chart page per full pass.
+    assert armed_counts["chart_page"] == 2 * armed_counts["operands"] >= 4
     for offset in range(armed_at - stamp + 1, armed_at - stamp + 4):
         with database.begin() as db:
             assert evaluate(db, ident, now=stamp + offset) == []
@@ -637,21 +647,21 @@ def test_unchanged_waterline_skips_the_expensive_majority(database, monkeypatch)
 
 
 def test_advanced_waterline_evaluates_and_can_produce_an_event(database, monkeypatch):
-    ident, _, revision, seam, stamp = armed(database, monkeypatch)
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, condition=ray_condition())
     counts = gate_counters(monkeypatch)
     gated(database, ident, stamp)
     before = dict(counts)
     append(database, revision, seam + 600000, "1.119", seam + 660010)
     with database.begin() as db:
         assert len(evaluate(db, ident, now=seam + 660010)) == 1
-    assert counts["chart_page"] == before["chart_page"] + 1, "new input must still take the full path"
+    assert counts["chart_page"] == before["chart_page"] + 2, "new input and ray mapping take the full path"
     assert counts["operands"] == before["operands"] + 1
     with database.begin() as db:
         assert db.get(ChartAlert, ident).count == 1
 
 
 def test_gate_never_skips_unhealthy_or_recovering_runtime(database, monkeypatch):
-    ident, _, _, _, stamp = armed(database, monkeypatch)
+    ident, _, _, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     counts = gate_counters(monkeypatch)
     gated(database, ident, stamp)
     with database.begin() as db:
@@ -682,7 +692,7 @@ def test_gate_force_full_round_runs_after_the_configured_interval(database, monk
     from alerts import composite_alerts
 
     monkeypatch.setenv(composite_alerts.GATE_FULL_SECONDS_ENV, "1")
-    ident, _, _, _, stamp = armed(database, monkeypatch)
+    ident, _, _, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     counts = gate_counters(monkeypatch)
     _, armed_at = gated(database, ident, stamp)
     before = dict(counts)
@@ -700,7 +710,7 @@ def test_gate_can_be_disabled_for_an_a_b_comparison(database, monkeypatch):
     from alerts import composite_alerts
 
     monkeypatch.setenv(composite_alerts.GATE_ENABLED_ENV, "0")
-    ident, _, _, _, stamp = armed(database, monkeypatch)
+    ident, _, _, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     counts = gate_counters(monkeypatch)
     for offset in (0, 1, 2):
         with database.begin() as db:

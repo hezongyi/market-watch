@@ -43,20 +43,25 @@
    - 已覆盖同毫秒、重复输入、回滚、超过 15s 的实际采样缺口、连续积压的迟到投递、无连续性证据的 epoch 切换、明确拒收、REST 显示容量独立性和手动恢复首个新穿越。
    - 已覆盖有依据的休市区间（跨连接恢复仍比较开盘）及 DST 关闭时长；未知日历仍保守留缺口，不能冒充闭市。
    - 锁顺序为既有 dataset/LiveState/display → 日志保留 advisory mutex → Stream。全局裁剪只触碰日志，不反向获取 dataset/LiveState/ChartAlert 行锁。消费与裁剪使用同一 mutex；固定负载下的锁成本必须由性能验收确认。
-2. **收盘**：尚未分流，仍使用旧 latest-only 路径。需固定 revision 分页、确认窗口事实、稀疏 M1、首个未决柱阻挡、历史修订/跨源/DST/W1/MN/闭市末柱语义。
+2. **收盘已分流**：按固定已发布 input_revision 和周期终点分页，每轮最多 128 周期；有界成功查询事实、失败窗口、已观察未确认分钟分别校验。已覆盖稀疏 M1、首个未决窗口阻挡、当前报价失效时消费积压、修订审计及仅修正受影响末柱基准、九周期、旧 seam 可验证当前物化柱、31 天 MN 截断明确阻挡。完整周末/闭市末柱与 DST 端到端矩阵仍需补齐。
 3. **到期**：worker/consume 仍有旧 detected_at 到期前置检查。必须实现 price-v2 固定范围结算、有限批次 expired 选择和不能补判的最终结论。
 4. **执行故障**：已有 runtime、Audit、notice_source 初版；手机 60 秒延迟、永久错误立即通知、独立 notification runtime 巡检、发送配置校验和 health 汇总尚未完成。错误原因还须统一稳定 reason_code，页面文案与 code 分开。
 5. **兼容与 UI**：React/原生入口、API 能力分模式、通知深链接及状态文案尚未修改。旧 active/paused/expired/completed、信号与 pending Outbox 的升级及代码回退用例尚未完成。
-6. **当前明确失败**：`test_close_consumes_intermediate_confirmed_bar`。旧触价用例已改为穿过真实 publish 接口并断言日志序号/永久缺口审计；原复杂指标规则的 fixtures/保护继续保留。关闭上游输入时必须先消费已提交合法日志，不能再靠“当前 owner 失效”丢弃它们。
+6. **原始三项故障回归已通过**：`test_price_alert_reliability.py` 的中间观察覆盖、收盘跳柱、临时故障保留启用意图均通过。旧价格测试改为新要求；原复杂指标 fixtures 保留，通用依赖与门控测试使用真实水平射线继续验证旧路径。
 7. **验收资产与交付**：补齐 `scripts/price_alert_acceptance.py`、browser 脚本、完整 Compose、矩阵逐项结果、固定性能负载、自审、独立 Standards/Spec review、CI 和 Draft PR。
 
-## 收盘接续前的证据检查
+## 收盘接续实现与证据
 
 - `CompositeAggregateTask.applied_input_revision` 是已发布固定输入水位；读取新 price close 分页应固定这一版本，不要求全局 prep 已完全追平。
 - `CompositeAggregateBar` 可分页按 start 读取各桶最近的 `input_revision <= 固定水位`，无需反复 `chart_page(count=2000)`。
 - 现有聚合 reader 因旧 seam 年龄整体返回 None；新价格 reader 需要检查具体物化柱的构建输入边界，尤其 MN 的 31 天跨度，不能单纯去掉 guard。
-- `LiveState.confirmed_end`/`source_confirmed` 只证实已有分钟。`CompositeReadAttempt` 有准备请求的 accepted/checkpoint 事实，`LiveMinute` 有实际失败/已观察未确认的证据；目前没有覆盖所有实际 `confirmed_minutes.record` 入口的紧凑成功查询区间事实。
-- 下一步先在成功 checkpoint 的同事务入口补最小确认窗口事实（含空成功、有界 checkpoint；失败继续保留现有窗口证据），再实现稀疏收盘准入与顺序消费。不改变图表 coverage 真值，不扩大历史窗口。
+- `LiveState.confirmed_end`/`source_confirmed` 只证实已有分钟。`CompositeReadAttempt` 有准备请求的 accepted/checkpoint 事实，`LiveMinute` 有实际失败/已观察未确认的证据；现已在 `confirmed_minutes.record` 同事务写入 `price_confirmation:v1` 紧凑查询区间事实；live confirmation 和 preparation 的失败窗口亦记录，失效 lease 不提交失败事实。
+- 内部物化柱保存读取边界与查询证明，公共图表 reader 去除此内部字段，原 OHLC/coverage 不变。过期未解决失败保留保守区间摘要，不能因 30 天裁剪而变成确认成功。
+- 收盘/原始可靠性/组合规则回归：44 passed（后续补充九周期与截断用例另验）。
+- 最终收盘 + 原始可靠性 + preparation：32 passed，包含九周期、31 天 MN 截断和过期失败证据。
+- 采集/聚合/图表/input 扩展回归：65 passed / 2 failed；两项失败是内部证据泄漏至图表比较，修复后聚合完整文件 9 passed。
+- 真实 PG：初轮 47 passed / 1 failed；失败为旧 ai36 迁移测试在新创建基准之后人为删除 judgment 表的时机假设。改为真实旧路径水平射线后，最终 price reliability + 迁移定向共 42 passed，0 skipped；包含原 17 项日志/并发用例与新收盘/九周期用例。
+- 本机日志：`/tmp/mw-price-alerts-v203rc1-{close-final,close-verified,close-collection,aggregate-read,pg-close,pg-close-final}.log`。后续到期结算修改需重新验证受影响范围。
 
 ## 当前可复现命令
 
@@ -64,7 +69,7 @@
 cd /home/quant/repos/market-watch-price-alerts-v203rc1
 .venv/bin/python -m pytest -q backend/tests/test_price_alert_inputs.py
 .venv/bin/python -m pytest -q backend/tests/test_price_alert_reliability.py
-# 第二条目前会明确报告未完成的 close 回归失败。
+.venv/bin/python -m pytest -q backend/tests/test_price_alert_close.py
 
 export MW_ALERT_PRIVATE=/home/quant/.local/share/market-watch-private/price-alerts-v203rc1
 export MW_ALERT_PROJECT=mw-price-alerts-v203rc1
