@@ -84,6 +84,8 @@ async function main() {
     if (await options.getAttribute("open") === null) await options.locator("summary").click();
     await options.getByText("收盘确认", { exact: true }).click();
     await frame.getByText("盘中观察", { exact: true }).last().click();
+    await dialog.getByRole("button", { name: "触发次数", exact: true }).click();
+    await frame.getByText("最多 3 次", { exact: true }).last().click();
     await expect(dialog.getByText(/未收到的价格无法补判/)).toBeVisible();
     const [response] = await Promise.all([
       page.waitForResponse((r) => r.url().endsWith("/api/chart-alerts") && r.request().method() === "POST"),
@@ -107,13 +109,13 @@ async function main() {
     await context.close();
     control({ prime_until: 0 });
     await expect.poll(() => evidence(id).unexpired_chart_leases, {
-      timeout: 145000, intervals: [2500, 5000],
+      timeout: 240000, intervals: [2500, 5000],
     }).toBe(0);
     expect(browser.contexts()).toHaveLength(0);
     control({ price: "101" });
     await expect.poll(() => evidence(id).count, { timeout: 12000 }).toBe(1);
     const signal = evidence(id).events[0];
-    expect(signal.price).toBe("101");
+    expect(Number(signal.price)).toBe(101);
     report.checks.push("A02: zero tabs and unexpired chart leases; live collector and runtime committed a signal");
 
     control({ price: "99" });

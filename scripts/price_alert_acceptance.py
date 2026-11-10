@@ -86,6 +86,28 @@ class HistoryFixture:
 
 
 def seed(root, count):
+    # The task uses synthetic products beyond the maintained public allowlist.
+    # Supply exact fixture facts only while creating those isolated mappings;
+    # collectors, evaluation, confirmation and delivery remain real modules.
+    from unittest.mock import patch
+
+    from alerts.composite_matching import product_rule
+
+    def synthetic_rule(historical, entry):
+        symbol = historical.provider_symbol.replace("/", "_")
+        if (historical.source == "dukascopy" and historical.environment == "historical"
+                and symbol in SYMBOLS and entry.symbol == symbol and entry.label == "FIXTURE " + symbol):
+            base, quote = symbol.split("_")
+            return ({"underlying": base, "quote_currency": quote, "historical_product": "spot_fx",
+                "live_product": "spot_fx", "relationship": "same_product"},
+                [{"url": "https://fixture.invalid/product-facts", "scope": "Synthetic acceptance data"}], None)
+        return product_rule(historical, entry)
+
+    with patch("alerts.composite_matching.product_rule", side_effect=synthetic_rule):
+        return seed_products(root, count)
+
+
+def seed_products(root, count):
     from alerts.composite_definitions import first_use, save_mapping
     from alerts.composite_series import period
     from alerts.history_artifacts import artifact_tick
@@ -190,10 +212,19 @@ def fixture_pricing(stop):
 
 
 def market():
+    from alerts import chart_alert_worker
     from alerts.market_runtime import build_loops, run
     from alerts.runtime_supervisor import Loop
 
     check_runtime()
+    real_step = chart_alert_worker.step
+
+    def controlled_step(**kwargs):
+        if read_control(Path("/controls")).get("evaluator_paused"):
+            return 0  # Fault injection: loop lives and reports, rule cursors stall.
+        return real_step(**kwargs)
+
+    chart_alert_worker.step = controlled_step
     run(loops=tuple(Loop("pricing", fixture_pricing) if loop.role == "pricing" else loop
                     for loop in build_loops()))
 
@@ -261,12 +292,16 @@ def perf_worker(root, seconds):
     from alerts.alert_monitor import run
     from alerts.chart_alert_service import AlertConfig, create
     from alerts.composite_aggregates import aggregate_tick
+    from alerts.composite_preparation import preparation_tick
     from alerts.market_contracts import DatasetIdentity, QuoteEvent
     from alerts.storage import ChartAlert, MarketDataset, SignalRow, bootstrap, now_ms, transaction
     from sqlalchemy import func, select, text
 
     bootstrap()
     entries = seed(root, 10)["entries"]
+    for entry in entries.values():
+        while preparation_tick(HistoryFixture(), entry["revision_id"]):
+            pass
     with transaction() as db:
         identities = {key: DatasetIdentity.model_validate(db.get(MarketDataset, row["dataset_id"]).identity)
                       for key, row in entries.items()}
@@ -441,9 +476,90 @@ def compare_performance(config, seconds):
             "collector_limit_ms": limit, "passed": passed, **result}
 
 
+def runtime_faults(config_path, root):
+    """Stall and stop the task evaluator; independent notifications must patrol."""
+    from uuid import uuid4
+
+    import httpx
+
+    cfg = json.loads(config_path.read_text())
+    container = TASK + "-market-runtime-1"
+    owned = json.loads(subprocess.check_output(["docker", "inspect", container], text=True))[0]
+    assert owned["Config"]["Labels"]["com.docker.compose.project"] == TASK
+    assert owned["Config"]["Labels"]["com.docker.compose.service"] == "market-runtime"
+
+    def control(**change):
+        write_json(root / "control.json", {**read_control(root), **change})
+
+    def wait_for(check, seconds=100):
+        deadline = time.monotonic() + seconds
+        while time.monotonic() < deadline:
+            value = check()
+            if value:
+                return value
+            time.sleep(1)
+        raise AssertionError("Timed out waiting for independent execution evidence")
+
+    control(online=True, price="99", prime_until=int(time.time() * 1000) + 120000)
+    time.sleep(2)
+    entry = read_control(root)["entries"]["EUR_USD"]
+    ident, stopped = None, False
+    report = {"project": TASK, "synthetic": True, "checks": []}
+    with httpx.Client(base_url=cfg["web_url"], timeout=15) as client:
+        login = client.post("/api/login", json={"password": cfg["admin_password"]})
+        login.raise_for_status()
+        client.headers["X-CSRF-Token"] = login.json()["csrf"]
+        try:
+            created = client.post("/api/chart-alerts", json={"request_id": str(uuid4()), "config": {
+                "name": "FIXTURE independent execution patrol", "instrument": entry["composite_id"],
+                "composite_revision_id": entry["revision_id"], "series_kind": "composite", "source": "composite",
+                "mode": "intrabar", "timeframe": "M1", "max_triggers": 3, "notify_ntfy": True,
+                "condition": {"relation": "cross_up", "right": {"kind": "constant", "value": "100"}}}})
+            created.raise_for_status()
+            ident = created.json()["id"]
+            wait_for(lambda: evidence(ident)["runtime"].get("execution_state") == "monitoring", 20)
+            control(prime_until=0)
+            for kind in ("alive_without_progress", "process_stopped"):
+                control(evaluator_paused=True, price="101")
+                time.sleep(2)  # Commit input while its real evaluator is held.
+                if kind == "process_stopped":
+                    subprocess.run(["docker", "stop", container], check=True, stdout=subprocess.DEVNULL)
+                    stopped = True
+                wait_for(lambda: evidence(ident)["runtime"].get("reason_code") == "worker_progress_stalled")
+                failed = evidence(ident)
+                incident = failed["runtime"]["incident"]["id"]
+                assert failed["status"] == "active"
+                control(evaluator_paused=False)
+                if stopped:
+                    subprocess.run(["docker", "start", container], check=True, stdout=subprocess.DEVNULL)
+                    stopped = False
+                wait_for(lambda: evidence(ident)["runtime"].get("execution_state") == "monitoring", 40)
+                restored = evidence(ident)
+                assert restored["runtime"]["last_incident"]["id"] == incident
+                report["checks"].append({"scenario": kind, "reason_code": "worker_progress_stalled",
+                    "incident": incident, "recovered": True, "count": restored["count"]})
+                cursor = restored["runtime"]["cursor"]
+                control(price="99")
+                wait_for(lambda: evidence(ident)["runtime"].get("cursor", 0) > cursor, 20)
+            report["passed"] = True
+        finally:
+            if stopped:
+                subprocess.run(["docker", "start", container], check=True, stdout=subprocess.DEVNULL)
+            control(online=True, price="99", prime_until=0, evaluator_paused=False)
+            if ident:
+                wait_for(lambda: client.get("/readyz").is_success, 40)
+                row = client.get("/api/chart-alerts/" + ident).json()
+                if row.get("status") == "active":
+                    paused = client.post("/api/chart-alerts/" + ident + "/lifecycle", json={
+                        "request_id": str(uuid4()), "version": row["version"],
+                        "control_revision": row["control_revision"], "action": "pause"})
+                    paused.raise_for_status()
+    return report
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=["seed", "control", "evidence", "market", "notification", "perf", "_perf"],
+    parser.add_argument("operation", choices=["seed", "control", "evidence", "market", "notification", "perf", "_perf", "runtime-faults"],
                         nargs="?", default="seed")
     parser.add_argument("--config", type=Path)
     parser.add_argument("--output", type=Path)
@@ -470,10 +586,12 @@ def main():
     root = setup_host(args.config)
     if args.operation == "seed":
         result = seed(root, args.symbols)
+    elif args.operation == "runtime-faults":
+        result = runtime_faults(args.config, root)
     elif args.operation == "perf":
         result = compare_performance(args.config, args.seconds)
     elif args.operation == "control":
-        if not set(args.set) <= {"price", "close_price", "online", "prime_until", "notification_response"}:
+        if not set(args.set) <= {"price", "close_price", "online", "prime_until", "notification_response", "evaluator_paused"}:
             parser.error("unknown fixture control")
         write_json(root / "control.json", {**read_control(root), **args.set})
         result = {"project": TASK, "controls_updated": sorted(args.set)}

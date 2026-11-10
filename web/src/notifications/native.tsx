@@ -27,6 +27,11 @@ async function attach({
   let center: Awaited<ReturnType<typeof attachNativeSystemMessages>>;
   const close = (_restore = false) => center?.close(_restore);
   async function locateSource(notice: Notice) {
+    if (notice.source_kind === "chart_alert_execution") {
+      close(false);
+      await locate(notice);
+      return;
+    }
     if (
       notice.workspace !== scope.workspace_id ||
       notice.source_kind === "chart_alert"
