@@ -19,7 +19,7 @@ from .storage import (
 )
 
 KINDS = {'provider', 'history', 'composite', 'managed'}
-KIND_LABELS = {'provider':'平台行情', 'history':'固定历史', 'composite':'组合行情', 'managed':'自建行情'}
+KIND_LABELS = {'provider':'平台', 'history':'自建', 'composite':'组合', 'managed':'自建'}
 PREFIXES = {'MWC:': 'composite', 'MWH:': 'history', 'MWP:': 'provider'}
 
 

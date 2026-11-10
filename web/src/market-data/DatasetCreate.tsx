@@ -443,7 +443,7 @@ export function DatasetCreate() {
           <h2>自建行情已创建，历史准备任务已提交</h2>
           <p>
             {result.dataset.display_symbol || result.dataset.logical_symbol} ·{" "}
-            {names[result.dataset.identity.source]} ·{" "}
+            {result.dataset.source_display || names[result.dataset.identity.source]} ·{" "}
             {phase(result.dataset.aggregation_calendar)}
           </p>
           <p>
@@ -484,7 +484,7 @@ export function DatasetCreate() {
           <div className="dc-create-actionbar">
             <span>
               {selected
-                ? `已选择：${selected.display_symbol || selected.logical_symbol} · ${names[selected.source]}`
+                ? `已选择：${selected.display_symbol || selected.logical_symbol} · ${selected.source_display || names[selected.source]}`
                 : "请选择支持自建历史的品种"}
             </span>
             <button onClick={manualMode}>手工登记</button>
@@ -504,7 +504,7 @@ export function DatasetCreate() {
         <>
           <div className="dc-create-selection">
             <h2 ref={configHeading} tabIndex={-1}>
-              {title} · {names[source]}
+              {title} · {selected?.source_display || names[source]}
             </h2>
             <button
               disabled={busy || uncertain || probing}
@@ -588,7 +588,7 @@ export function DatasetCreate() {
                       <dt>资产类别</dt>
                       <dd>{assetNames[asset] || asset}</dd>
                       <dt>报价</dt>
-                      <dd>{native || source === "binance" ? "Last / Trade" : "Bid"}</dd>
+                      <dd>{native ? ({qfq: "前复权", hfq: "后复权", supplier: "来源价格"}[adjustment] || "原始价格") : source === "binance" ? "成交价" : "买价"}</dd>
                     </dl>
                   )}
                   {selected?.precision != null ? (
@@ -720,9 +720,9 @@ export function DatasetCreate() {
                   <dt>品种</dt>
                   <dd>{title}</dd>
                   <dt>来源</dt>
-                  <dd>{names[source]}</dd>
+                  <dd>{selected?.source_display || names[source]}</dd>
                   <dt>报价</dt>
-                  <dd>{native || source === "binance" ? "Last / Trade" : "Bid"}</dd>
+                  <dd>{native ? ({qfq: "前复权", hfq: "后复权", supplier: "来源价格"}[adjustment] || "原始价格") : source === "binance" ? "成交价" : "买价"}</dd>
                   <dt>模式</dt><dd>{modeNames[mode]}</dd>
                   <dt>日线划分</dt>
                   <dd>{calendar ? phase(calendar) : "待选择"}</dd>

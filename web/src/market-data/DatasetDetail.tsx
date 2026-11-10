@@ -182,7 +182,7 @@ export function DatasetDetail() {
       {dataset && <>
         <div className="dc-dataset-hero">
           <div><h1>{dataset.display_symbol || dataset.logical_symbol}</h1>
-            <p>{names[dataset.identity.source]} · {dataset.identity.basis.toUpperCase()} · {phase(dataset.aggregation_calendar)} · {dataset.provider_display_symbol || dataset.identity.provider_symbol}</p>
+            <p>{dataset.source_display || names[dataset.identity.source]} · {dataset.price_basis_display || dataset.identity.basis.toUpperCase()} · {phase(dataset.aggregation_calendar)} · {dataset.provider_display_symbol || dataset.identity.provider_symbol}</p>
             <div className="dc-dataset-statusbar"><span className="dc-status-pill">{lifecycleStatus}</span><span>{maintenanceSummary}</span><span>可用到 {time(dataset.available_end)}</span></div>
           </div>
           <div className="dc-dataset-hero-actions" aria-label="行情快捷操作">

@@ -75,7 +75,7 @@ const VERSION = process.env.MW_ALIGNMENT_VERSION || "1.18.0";
     await native.getByRole("button", { name: "数据中心", exact: true }).click();
     const center = native.locator(".dc-window");
     await expect(center).toBeVisible();
-    const sections = ["自建行情", "平台行情", "组合行情", "任务与记录", "来源状态"];
+    const sections = ["自建", "平台", "组合", "任务与记录", "来源状态"];
     if (VERSION !== "1.18.0") sections.push("交易日历");
     const navigation = center.locator(".dc-window-nav");
     await expect(navigation.getByRole("button")).toHaveCount(sections.length);

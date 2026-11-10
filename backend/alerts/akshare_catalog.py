@@ -15,7 +15,7 @@ VERIFIED = {
     "HKEX:00700": {"none": []},
     "SHFE:RB0": {"none": ["M5", "D1"]},
 }
-SEEDS = {"SZSE:000001": "平安银行", "HKEX:00700": "腾讯控股", "SHFE:RB0": "螺纹钢连续（新浪 RB0）"}
+SEEDS = {"SZSE:000001": "平安银行", "HKEX:00700": "腾讯控股", "SHFE:RB0": "螺纹钢主力连续"}
 
 
 def stable_id(symbol):
@@ -175,7 +175,7 @@ def chart_metadata(ident):
         elif info["source_family"] == "eastmoney-a":
             info.update(symbol_rules(row.symbol, "sina-a"))
         return {**info, "id": ident if tencent else row.id,
-            "name": row.label + (" · 腾讯" if tencent else ""), "symbol": row.symbol,
+            "name": row.label, "name_zh": info.get("name_zh"), "symbol": row.symbol,
             "display_symbol": row.symbol, "source": "akshare", "basis": "last",
             "calendar": "source_date", "series_kind": "provider", "series_kinds": ["provider"],
             "frames": ["D1"] if info["source_family"] in ("sina-a", "sina-hk", "tencent-a") else supported_frames(row.symbol, info["source_family"]),

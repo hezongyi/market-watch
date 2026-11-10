@@ -79,8 +79,9 @@ def _compact_pair(symbol, source=None, asset_type=None):
 
 
 def display_code(symbol, source=None, asset_type=None):
-    """Return a compact UI code while preserving non-pair tickers verbatim."""
+    """Compact UI codes omit known exchange prefixes; acquisition codes stay intact."""
     raw = symbol.strip().upper()
+    raw = re.sub(r"^(?:SSE|SZSE|BSE|HKEX|SHFE|DCE|CZCE|CFFEX|INE|GFEX):(?=[A-Z0-9]+$)", "", raw)
     return _compact_pair(raw, source, asset_type) or raw
 
 

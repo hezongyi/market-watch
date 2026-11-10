@@ -216,6 +216,7 @@ jobs:
           node tests/advanced-watchlist-prewarm.cjs
           node tests/advanced-watchlist-metadata.cjs
           node tests/advanced-startup-metadata.cjs
+          node tests/series-source-presentation.cjs
           node tests/resolve-recovery.cjs
           node tests/multi-chart-resolve-init.cjs
           node --test tests/native-toolbar-model-ready.test.mjs

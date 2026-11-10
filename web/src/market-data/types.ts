@@ -14,8 +14,8 @@ export const names: Record<string, string> = {
   dukascopy: "Dukascopy",
   oanda: "OANDA Practice",
   fxcm: "FXCM Demo",
-  binance: "Binance",
-  yahoo: "Yahoo",
+  binance: "Binance Spot",
+  yahoo: "Yahoo Finance",
   akshare: "AKShare",
   partial: "部分成功",
   failed: "失败",
@@ -77,6 +77,9 @@ export type Plan = {
   frame_plan?: Record<string, FrameRule>;
 };
 export type Dataset = {
+  source_display?: string;
+  price_basis_display?: string;
+  instrument_name?: string;
   id: string;
   instrument_id: string;
   logical_symbol: string;

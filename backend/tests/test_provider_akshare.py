@@ -105,8 +105,8 @@ def test_platform_catalog_lists_tencent_separately_without_managed_capability(da
         rows = catalog(db, source="akshare", page_size=100)["items"]
     sina = next(row for row in rows if row["id"] == "AKSHARE:fixture")
     tencent = next(row for row in rows if row["id"] == "TENCENT:SZSE:000001")
-    assert sina["provider_name"] == "新浪 (AKShare)"
-    assert tencent["provider_name"] == "腾讯 (AKShare)"
+    assert sina["provider_name"] == "新浪（AKShare）"
+    assert tencent["provider_name"] == "腾讯（AKShare）"
     assert tencent["capabilities"]["native_periods"] == ["D1"]
     assert tencent["logical_symbol"] is None
 

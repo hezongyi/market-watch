@@ -11,6 +11,7 @@ import { api } from "./api";
 import { names } from "./types";
 
 export type CatalogItem = {
+  source_display?: string;
   catalog_id: string;
   source: string;
   provider_symbol: string;
@@ -128,7 +129,7 @@ export function CreationCatalog({
             symbol: item.display_symbol || item.provider_symbol,
             description: item.label,
             exchange: item.source.toUpperCase(),
-            sourceName: names[item.source],
+            sourceName: item.source_display || names[item.source],
             type: item.asset_class === "metal" ? "commodity" : item.asset_class,
             category:
               categories.find(
@@ -348,7 +349,7 @@ export function CreationCatalog({
                   {item.display_symbol || item.provider_symbol}
                 </button>
                 <span>
-                  {item.label} · {names[item.source]}
+                  {item.label} · {item.source_display || names[item.source]}
                 </span>
                 <button
                   disabled={busy || disabled}

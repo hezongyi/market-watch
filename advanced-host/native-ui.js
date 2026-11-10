@@ -176,7 +176,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         // The native renderer owns search, round category tabs, the table header,
         // result rows and the scrolling sentinel. It does not own chart apply.
         return R.createElement(PlatformContext.Provider,{value:{latest,alive,lock,state,open}},R.createElement(Search,{
-          initialMode:"symbolSearch",dialogTitle:props.title||"平台行情",defaultValue:props.query||"",placeholder:"品种代码或名称",
+          initialMode:"symbolSearch",dialogTitle:props.title||"平台",defaultValue:props.query||"",placeholder:"品种代码或名称",
           wrapper:PlatformWrapper,dialog:PlatformInline,contentItem:PlatformRow,footer:R.createElement(PlatformStatus),
           autofocus:false,selectSearchOnInit:false,shouldReturnFocus:false,disableRecents:true,showRecents:false,showSpreadActions:false,
           symbolTypes:props.symbolTypes,selectedSymbolSettingsKey:(props.settingsScope||"mw.data-center.platform")+".category",filterValuesSettingsKey:(props.settingsScope||"mw.data-center.platform")+".filters",
@@ -232,8 +232,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const scoped={...ctx,selectedSearchSource:selected,setSelectedSearchSource:item=>setSource(item.value().toLowerCase()),
           symbolSearchContent:{...ctx.symbolSearchContent,currentSelectedSearchSource:selected,canChangeExchange:false}};
         const sources=ctx.searchSources.map(item=>({value:item.value().toLowerCase(),content:item.value()?item.name():"全部来源"}));
-        const kinds=[{value:"all",content:"全部行情"},{value:"provider",content:"平台行情"},
-          {value:"history",content:"自建行情"},{value:"composite",content:"组合行情"}];
+        const kinds=[{value:"all",content:"全部行情"},{value:"provider",content:"平台"},
+          {value:"history",content:"自建"},{value:"composite",content:"组合"}];
         const control=(label,value,items,onChange)=>R.createElement("div",{className:"dc-select-control mw-symbol-search-select","data-native-component":"select"},
           R.createElement(Select,{"aria-label":label,value,items,onChange:next=>{
             if(next===value) return;

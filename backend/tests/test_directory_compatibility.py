@@ -124,6 +124,25 @@ def test_compatibility_search_uses_paged_order_and_bounded_candidates(client, da
     assert legacy[0]["symbol"] == "COMPAT"
 
 
+def test_series_compatibility_routes_share_the_canonical_directory_seam(client, monkeypatch):
+    from alerts import series_directory
+
+    calls = []
+    original = series_directory.page
+
+    def traced(*args, **kwargs):
+        calls.append({key: kwargs.get(key) for key in ("kind", "page_size", "include_total")})
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(series_directory, "page", traced)
+    assert client.get("/api/market-data/series/page", params={"kind": "provider", "page_size": 3}).status_code == 200
+    assert client.get("/api/market-data/series/search", params={"kind": "provider", "limit": 3}).status_code == 200
+    assert calls == [
+        {"kind": "provider", "page_size": 3, "include_total": True},
+        {"kind": "provider", "page_size": 3, "include_total": False},
+    ]
+
+
 def test_legacy_source_picker_adapts_the_creation_search_contract(client):
     modern = client.get("/api/market-data/history-catalog/search", params={
         "source": "dukascopy", "query": "USD", "symbol_type": "forex", "offset": 7, "limit": 7})
