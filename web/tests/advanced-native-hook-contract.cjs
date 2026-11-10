@@ -118,24 +118,20 @@ try {
     fs.writeFileSync(assetBundle, source);
     execFileSync(process.execPath, [path.join(root, "web/scripts/build-alert-ui.mjs"), assets], {cwd:path.join(root,"web")});
     execFileSync(process.execPath, [path.join(assets, "build-assets.mjs")]);
-    const html = fs.readFileSync(path.join(assets, "index.html"), "utf8");
+    const manifest = JSON.parse(fs.readFileSync(path.join(assets, "chart-assets.json"), "utf8"));
     const version = crypto.createHash('sha256').update(source).update(toolset).digest('hex').slice(0, 16);
-    assert.ok(
-      html.includes(`/charting_library_${version}/charting_library.js`),
-    );
-    const hostFile = html.match(/src="\/(host\.[a-f0-9]+\.js)"/)[1];
+    assert.equal(manifest.libraryDirectory, `charting_library_${version}`);
     assert.ok(
       fs
-        .readFileSync(path.join(assets, hostFile), "utf8")
+        .readFileSync(path.join(assets, manifest.script), "utf8")
         .includes(`MW_CHART_LIBRARY_PATH="/charting_library_${version}/"`),
     );
-    assert.equal((html.match(/src="\/host\./g) || []).length, 1);
   }
-  const previousHtml = fs.readFileSync(path.join(assets, 'index.html'), 'utf8');
+  const previousManifest = fs.readFileSync(path.join(assets, 'chart-assets.json'), 'utf8');
   fs.appendFileSync(path.join(assets,
     'charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js'), '\n/* cache test */');
   execFileSync(process.execPath, [path.join(assets, 'build-assets.mjs')]);
-  assert.notEqual(fs.readFileSync(path.join(assets, 'index.html'), 'utf8'), previousHtml,
+  assert.notEqual(fs.readFileSync(path.join(assets, 'chart-assets.json'), 'utf8'), previousManifest,
     'toolset-only change must invalidate the private library URL');
   console.log(
     "Original, legacy, idempotent, partial/tampered, disable and distinct cache URL contracts passed",
