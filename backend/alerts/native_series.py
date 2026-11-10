@@ -74,6 +74,7 @@ def configured_metadata(ticker):
     import re
 
     from .history_catalog import account_scope
+    from .market_presentation import present
     from .provider_chart import metadata
     from .storage import transaction
 
@@ -95,13 +96,13 @@ def configured_metadata(ticker):
     aligned = all(values[k] == DEFAULTS[k] for k in ("dailyAlignment", "alignmentTimezone", "weeklyAlignment"))
     description = (f"{BASES[values['price']]} · {'平滑' if values['smooth'] else '非平滑'} · "
         f"{values['alignmentTimezone']} {values['dailyAlignment']:02d}:00 · {values['weeklyAlignment']}")
-    return {**meta, "id": ticker, "native_series_id": key, "native_parameters": values,
+    return present({**meta, "id": ticker, "native_series_id": key, "native_parameters": values,
         "basis": BASES[values["price"]], "calendar": "ny17" if aligned else "native",
         "timezone": "Etc/UTC" if values["alignmentTimezone"] == "UTC" else values["alignmentTimezone"],
         # Provider observations establish trading availability, not the chosen
         # alignment timezone. A display session must never suppress source bars.
         "session": "24x7", "price_description": description,
-        "native_identity": identity, "name": meta["name"] + " · " + description}
+        "native_identity": identity, "name": meta["name"] + " · " + description})
 
 
 def session_start(start, values):
