@@ -28,7 +28,7 @@ def right_value(config):
     return right.value if right.kind == "constant" else right.line.points[0].price
 
 
-def eligibility(db, revision, *, mode, now, lock=True):
+def eligibility(db, revision, *, mode, now, lock=True, acquired=False):
     from .composite_inputs import frozen
     from .composite_quotes import live_snapshot, sampled_observation
     from .history_catalog import account_scope
@@ -46,7 +46,7 @@ def eligibility(db, revision, *, mode, now, lock=True):
         raise Unavailable("binding_frozen", "组合修订已冻结，请显式编辑绑定")
     if target.identity["account_scope"] != account_scope() or target.identity.get("basis") != "bid":
         raise Unavailable("binding_changed", "实时映射账户或价格口径不匹配")
-    if not revision_enabled(db, revision):
+    if not acquired and not revision_enabled(db, revision):
         raise Unavailable("realtime_disabled", "该自建品种实时流已关闭，不能启动可执行告警")
     if mode == "intrabar":
         view = live_snapshot(db, revision, now=now)
@@ -111,7 +111,7 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
     if not runnable(alert):
         return []
     settling = pending(alert)
-    if not revision_enabled(db, revision):
+    if not settling and not revision_enabled(db, revision):
         transition(db, alert, state="blocked", now=now, reason="realtime_disabled")
         return []
     if alert.runtime.get("execution_contract") != CONTRACT:
@@ -184,7 +184,9 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
         return events
     view = live_snapshot(db, revision, now=now)
     if view.get("market_session") == "closed":
-        transition(db, alert, state="closed", now=now)
+        transition(db, alert, state="closed", now=now, resolve_incident=bool(
+            view["owned"] and sampled_observation(view) and not alert.runtime.get("needs_baseline")
+            and not view.get("authentication_hold") and not view.get("connection_error")))
     elif view.get("authentication_hold"):
         transition(db, alert, state="blocked", now=now, reason="unauthorized")
     elif not view["owned"] or sampled_observation(view) is None:

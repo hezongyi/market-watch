@@ -128,7 +128,7 @@ def full_legacy_upgrade(engine, monkeypatch):
             consume(db, ident, sample(i, price), detected_at=i*300_000)
         assert db.get(ChartAlert, ident).status == "completed"
         assert len(list(db.scalars(select(SignalRow).where(SignalRow.chart_alert_id == ident)))) == 3
-    with pytest.raises(RuntimeError, match="roll back the application"):
+    with pytest.raises(RuntimeError, match="pause price-v2 writers before code rollback"):
         command.downgrade(alembic, "r19_native_history_loads")
     with engine.connect() as connection:
         # The additive notice migration refuses downgrade before any DDL of its own;

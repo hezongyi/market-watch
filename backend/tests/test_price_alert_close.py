@@ -308,3 +308,51 @@ def test_expired_failure_evidence_cannot_silently_certify_old_bar(database, monk
         assert fact["failures"] == [] and fact["unreadable_failure"] == [seam + 600000, seam + 660000]
         assert evaluate(db, ident, now=later + 60000) == []
         assert alert.runtime["reason_code"] == "confirmation_window_unreadable"
+
+
+@pytest.mark.parametrize("week", ["2026-03-06T21:59:00+00:00", "2026-10-30T20:59:00+00:00"])
+@pytest.mark.parametrize("frame", ["M1", "W1"])
+def test_final_session_close_is_consumed_during_weekend_across_dst(database, monkeypatch, week, frame):
+    from datetime import datetime, timedelta
+
+    from alerts.chart_alert_service import create
+    from alerts.composite_series import period
+    from alerts.config import settings
+    from alerts.storage import MarketDataset
+    from test_composite_alerts import config
+    from test_live_session import generator
+
+    original, composite, revision, _, _ = armed(database, monkeypatch)
+    last_minute = int(datetime.fromisoformat(week).timestamp() * 1000)
+    start, end = period(last_minute, frame, "ny17")
+    observed = end + 60001
+    for module in ("live_window", "composite_series"):
+        monkeypatch.setattr("alerts." + module + ".now_ms", lambda: observed)
+    with database.begin() as db:
+        target_id = current_version(db, db.scalar(select(ChartAlert))).market_identity["target_dataset_id"]
+        target = db.get(MarketDataset, target_id)
+        profile = generator()(target.identity["account_scope"],
+            datetime.fromisoformat(week) - timedelta(days=1),
+            datetime.fromisoformat(week) + timedelta(days=4),
+            ["EUR_USD"])["EUR_USD"]
+    monkeypatch.setattr(settings, "oanda_live_session_profiles", {"EUR_USD": profile})
+    # The previous bucket supplies an actual baseline; sparse completed queries
+    # cover intervening open minutes without pretending that each has a candle.
+    add_tail(database, revision, [minute(start - 60000, close="1.110")], observed_at=start)
+    query(database, original, period(start - 60000, frame, "ny17")[0], start, start)
+    aggregate(revision, frame)
+    with database.begin() as db:
+        ident = create(db, "final-session-" + frame, config(composite, timeframe=frame), at=start + 10).id
+        assert db.get(ChartAlert, ident).state["left"] == "1.11"
+    add_tail(database, revision, [minute(last_minute, close="1.119")], observed_at=observed)
+    query(database, ident, start, end, observed)
+    aggregate(revision, frame)
+    live(database, revision, observed, last_minute + 60000, connected=False)
+    with database.begin() as db:
+        events = evaluate(db, ident, now=observed)
+        assert len(events) == 1
+        assert events[0].occurred_at == end
+        alert = db.get(ChartAlert, ident)
+        assert alert.runtime["execution_state"] == "closed"
+        assert alert.runtime["close_cursor"] >= end
+        assert evaluate(db, ident, now=observed + 1) == []

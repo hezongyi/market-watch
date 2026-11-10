@@ -60,6 +60,7 @@ def test_each_alert_uses_its_read_time_and_reports_committed_state(database, mon
         ids=[create(db,'monitor-clock-'+str(i),AlertConfig.model_validate(config()),at=stamp).id
              for i in range(2)]
     seen, reports = [], []
+    monkeypatch.setattr(chart_alert_worker, "_RETENTION_NEXT", float("inf"))
     clock=iter([stamp+1000,stamp+2000])
     monkeypatch.setattr(chart_alert_worker,'now_ms',lambda:next(clock))
 

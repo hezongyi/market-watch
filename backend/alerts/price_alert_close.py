@@ -195,7 +195,7 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
 
     try:
         revision, target = bound_identity(db, version.market_identity)
-        eligibility(db, revision, mode="close", now=now)
+        eligibility(db, revision, mode="close", now=now, acquired=pending(alert))
     except ValueError as exc:
         transition(db, alert, state="blocked", now=now, reason=getattr(exc, "reason_code", "binding_changed"))
         return []

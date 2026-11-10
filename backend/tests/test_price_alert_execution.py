@@ -276,3 +276,74 @@ def test_incident_projection_is_idempotent_and_keeps_recovery(database, monkeypa
         assert sorted(row["incident"]["closed_at"] is not None for row in events) == [False, True]
         assert all(row["incident"]["count"] == 1 for row in events)
         assert alert.runtime["last_gap"]["unrecoverable"] is True
+
+
+@pytest.mark.parametrize("action", ["edit", "restart"])
+def test_new_configuration_or_run_keeps_fault_until_actual_recovery(database, monkeypatch, action):
+    from alerts.chart_alert_service import edit
+    from alerts.notification_center import SUBJECT, list_events, project
+
+    ident, composite, _, _, stamp = armed(database, monkeypatch, mode="intrabar")
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        execution.transition(db, alert, state="recovering", now=stamp, reason="price_input_unavailable")
+        incident = alert.runtime["incident"]["id"]
+        if action == "edit":
+            edit(db, ident, alert.version, config(composite, mode="intrabar"), at=stamp + 1)
+        else:
+            lifecycle(db, ident, alert.version, "restart", expected_revision=alert.control_revision,
+                request_id="restart-fault", at=stamp + 1)
+        assert alert.runtime["incident"]["id"] == incident
+        evaluate(db, ident, now=stamp + 2)
+        assert "incident" not in alert.runtime
+        project(db)
+        events = list_events(db, SUBJECT, {"audience": "system", "source": "chart_alert_execution"})["events"]
+        assert len(events) == 1 and events[0]["incident"]["closed_at"] is not None
+
+
+def test_calendar_close_does_not_claim_disconnected_source_recovered(database, monkeypatch):
+    from alerts import composite_quotes
+
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar", notify_ntfy=True)
+    live(database, revision, stamp + 1, seam + 600000, connected=False)
+    with database.begin() as db:
+        evaluate(db, ident, now=stamp + 1)
+        alert = db.get(ChartAlert, ident)
+        incident = alert.runtime["incident"]["id"]
+    original = composite_quotes.live_snapshot
+    monkeypatch.setattr(composite_quotes, "live_snapshot", lambda *args, **kw:
+        {**original(*args, **kw), "market_session": "closed"})
+    with database.begin() as db:
+        evaluate(db, ident, now=stamp + 2)
+        alert = db.get(ChartAlert, ident)
+        assert alert.runtime["execution_state"] == "closed"
+        assert alert.runtime["incident"]["id"] == incident
+        assert "last_incident" not in alert.runtime
+        assert all(not note.payload["incident_id"].endswith(":recovery") for note in system_notes(db))
+
+    live(database, revision, stamp + 3, seam + 600000, connected=True)
+    with database.begin() as db:
+        evaluate(db, ident, now=stamp + 3)
+        alert = db.get(ChartAlert, ident)
+        assert alert.runtime["execution_state"] == "closed"
+        assert "incident" not in alert.runtime
+        assert alert.runtime["last_incident"]["id"] == incident
+
+
+def test_edit_to_complex_rule_ends_price_fault_observation_without_claiming_recovery(database, monkeypatch):
+    from alerts.chart_alert_service import edit
+    from alerts.notification_center import SUBJECT, list_events, project
+    from test_composite_alerts import ray_condition
+
+    ident, composite, _, _, stamp = armed(database, monkeypatch)
+    with database.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        execution.transition(db, alert, state="recovering", now=stamp, reason="confirmation_source_unavailable")
+        edit(db, ident, 1, config(composite, condition=ray_condition()), at=stamp + 1)
+        assert "incident" not in alert.runtime
+        assert alert.runtime["last_incident"]["ended_at"] == stamp + 1
+        assert "recovered_at" not in alert.runtime["last_incident"]
+        project(db)
+        event = list_events(db, SUBJECT, {"audience": "system", "source": "chart_alert_execution"})["events"][0]
+        assert event["observation_status"] == "ended"
+        assert event["incident"]["closed_at"] is None

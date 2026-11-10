@@ -10,12 +10,12 @@ PERMANENT = {"realtime_disabled", "binding_unavailable", "binding_changed", "bin
     "binding_contract_changed", "confirmation_window_unreadable", "legacy_auto_paused", "unauthorized"}
 
 
-def transition(db, alert, *, state, now, reason=None, interval=None, checked=True):
+def transition(db, alert, *, state, now, reason=None, interval=None, checked=True, resolve_incident=False):
     runtime = dict(alert.runtime)
     changed = runtime.get("execution_state") != state or runtime.get("reason_code") != reason
     if checked:
         runtime["last_checked_at"] = now
-    if not changed:
+    if not changed and not (resolve_incident and runtime.get("incident")):
         if interval:
             runtime["last_gap"] = {"reason_code": reason, **interval}
             if interval.get("unrecoverable") and runtime.get("incident"):
@@ -31,7 +31,7 @@ def transition(db, alert, *, state, now, reason=None, interval=None, checked=Tru
         if opened:
             number = runtime.get("incident_number", 0) + 1
             runtime["incident_number"] = number
-            incident = {"id": f"price:{alert.id}:{alert.version}:{alert.run}:{number}", "opened_at": now}
+            incident = {"id": f"price:{alert.id}:{alert.version}:{alert.run}:{number}", "opened_at": now, "context": context}
         incident = {**incident, "reason_code": reason}
         runtime["incident"] = incident
         if interval and interval.get("unrecoverable"):
@@ -41,7 +41,7 @@ def transition(db, alert, *, state, now, reason=None, interval=None, checked=Tru
                 "dedupe_key": incident["id"], "code": reason, "title": "价格告警执行异常",
                 "message": message(reason), "attempt": str(now), "context": context,
                 "evidence": interval or {}, "notify_web": True})
-    elif incident and state in ("monitoring", "closed", "settled"):
+    elif incident and (state in ("monitoring", "settled") or resolve_incident):
         _append(db.connection(), "recovery", alert.id,
             {"source_kind": "chart_alert_execution", "dedupe_key": incident["id"]})
         runtime.pop("incident", None)
@@ -68,6 +68,16 @@ def transition(db, alert, *, state, now, reason=None, interval=None, checked=Tru
     phone_due(db, alert, now=now)
 
 
+def end_observation(db, alert, *, now):
+    incident = alert.runtime.get("incident")
+    if not incident:
+        return
+    _append(db.connection(), "observation_end", alert.id,
+        {"source_kind": "chart_alert_execution", "dedupe_key": incident["id"]})
+    runtime = {key: value for key, value in alert.runtime.items() if key != "incident"}
+    alert.runtime = {**runtime, "last_incident": {**incident, "ended_at": now}}
+
+
 def gap(db, alert, *, now, reason, start, end, **evidence):
     interval = {"start": start, "end": end, "bounds": "possible", "unrecoverable": True, **evidence}
     # Every distinct discontinuity is permanent evidence, even inside one outage.
@@ -92,7 +102,7 @@ def queue_phone(db, alert, incident, *, now, recovery=False):
         description += f"\n可能受影响区间：{label(gap_info.get('start'))}—{label(gap_info.get('end'))}；未能判定是否触发。"
     return _queue_system_notice(db, title=title, message=f"{alert.name}\n{description}",
         incident_id=incident["id"] + (":recovery" if recovery else ":failure"), at=now,
-        context={"alert_id": alert.id, "version": alert.version, "run": alert.run})
+        context=incident.get("context") or {"alert_id": alert.id, "version": alert.version, "run": alert.run})
 
 
 def pending_phone(note_id):

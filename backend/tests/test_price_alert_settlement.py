@@ -219,3 +219,26 @@ def test_expiry_during_dataset_lock_wait_still_settles_real_detected_time(databa
         assert len(events) == 1
         assert events[0].created_at == expiry + 100
         assert db.get(ChartAlert, ident).status == "expired"
+
+
+@pytest.mark.parametrize("mode", ["intrabar", "close"])
+def test_disabled_acquisition_still_settles_committed_valid_input(database, monkeypatch, mode):
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import CompositeRevision, HistoryVersion, MarketDataset
+
+    expiry = 165600000 + 720000
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode=mode, expires_at=expiry)
+    if mode == "intrabar":
+        publish(database, ident, stamp + 100, "1.119", 1)
+    else:
+        append(database, revision, seam + 600000, "1.119", seam + 660010)
+    with database.begin() as db:
+        source = db.get(HistoryVersion, db.get(CompositeRevision, revision).history_version_id).dataset_id
+        set_enabled(db, db.get(MarketDataset, source).instrument_id, False, now=expiry - 1)
+    with database.begin() as db:
+        events = evaluate(db, ident, now=expiry + 10)
+        assert len(events) == 1
+        alert = db.get(ChartAlert, ident)
+        assert alert.count == 1 and not alert.runtime["settlement_pending"]
+        assert evaluate(db, ident, now=expiry + 20) == []
+    assert not live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)

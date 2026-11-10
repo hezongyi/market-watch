@@ -8,6 +8,7 @@ from pathlib import Path
 
 import pytest
 import test_price_alert_close as close_contracts
+import test_price_alert_execution as execution_contracts
 import test_price_alert_inputs as contracts
 import test_price_alert_settlement as settlement_contracts
 from alembic.migration import MigrationContext
@@ -410,7 +411,7 @@ with MonkeyPatch.context() as patch:
             before = history(db)
             cursor = db.get(ChartAlert, ids["active_close"]).state["sequence"]
             old_touch = db.get(ChartAlert, ids["active_touch"]).state["sequence"]
-            assert before["outbox"] and before["composite_judgments"] and before["signals"]
+            assert before["outbox"] and before["market_composite_judgments"] and before["signals"]
 
         config = Config(str(root / "alembic.ini"))
         config.set_main_option("script_location", str(root / "migrations"))
@@ -468,3 +469,80 @@ with transaction() as db:
         with admin.begin() as conn:
             conn.execute(text(f"DROP SCHEMA {schema} CASCADE"))
         admin.dispose()
+
+
+@pytest.mark.parametrize("mode", ["intrabar", "close"])
+def test_expiry_after_disabled_acquisition(provider_pg, monkeypatch, mode):
+    settlement_contracts.test_disabled_acquisition_still_settles_committed_valid_input(provider_pg[0], monkeypatch, mode)
+
+
+@pytest.mark.parametrize("action", ["edit", "restart"])
+def test_incident_survives_configuration_change(provider_pg, monkeypatch, action):
+    execution_contracts.test_new_configuration_or_run_keeps_fault_until_actual_recovery(provider_pg[0], monkeypatch, action)
+
+
+@pytest.mark.parametrize("contract", [
+    execution_contracts.test_transient_fault_is_persistent_but_phone_waits_sixty_seconds,
+    execution_contracts.test_incident_projection_is_idempotent_and_keeps_recovery,
+    execution_contracts.test_calendar_close_does_not_claim_disconnected_source_recovered,
+    execution_contracts.test_edit_to_complex_rule_ends_price_fault_observation_without_claiming_recovery,
+])
+def test_execution_contract(provider_pg, monkeypatch, contract):
+    contract(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize("action", ["edit", "pause", "restart"])
+def test_control_change_serializes_with_signal_commit(collecting, action):
+    from alerts.chart_alert_service import AlertConfig, current_version, edit, lifecycle
+    from alerts.chart_alert_worker import evaluate
+    from alerts.storage import ChartAlert, SignalRow
+
+    factory, ident, _, _, stamp = collecting
+    contracts.publish(collecting, 1, "1.120")
+    consumed, release, changing = threading.Event(), threading.Event(), threading.Event()
+
+    def evaluate_old_run():
+        with factory.begin() as db:
+            events = evaluate(db, ident, now=stamp + 200)
+            assert len(events) == 1
+            consumed.set()
+            assert release.wait(15)
+
+    def control():
+        changing.set()
+        with factory.begin() as db:
+            if action == "edit":
+                alert = db.get(ChartAlert, ident)
+                cfg = AlertConfig.model_validate(current_version(db, alert).config)
+                edit(db, ident, 1, cfg, at=stamp + 300)
+            else:
+                lifecycle(db, ident, 1, action, expected_revision=1,
+                    request_id="concurrent-" + action, at=stamp + 300)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        evaluation = pool.submit(evaluate_old_run)
+        assert consumed.wait(15)
+        change = pool.submit(control)
+        try:
+            assert changing.wait(15)
+            assert not change.done()
+        finally:
+            release.set()
+        evaluation.result(timeout=15)
+        change.result(timeout=15)
+    with factory.begin() as db:
+        alert = db.get(ChartAlert, ident)
+        signal = db.scalar(select(SignalRow))
+        assert signal.evidence["rule_version"] == 1
+        assert signal.evidence["run"] == 1
+        assert alert.version == (2 if action == "edit" else 1)
+        assert alert.run == (2 if action == "restart" else 1)
+        assert alert.status == ("paused" if action == "pause" else "active")
+        assert evaluate(db, ident, now=stamp + 400) == []
+        assert len(list(db.scalars(select(SignalRow)))) == 1
+
+
+@pytest.mark.parametrize("week", ["2026-03-06T21:59:00+00:00", "2026-10-30T20:59:00+00:00"])
+@pytest.mark.parametrize("frame", ["M1", "W1"])
+def test_final_close_across_dst(provider_pg, monkeypatch, week, frame):
+    close_contracts.test_final_session_close_is_consumed_during_weekend_across_dst(provider_pg[0], monkeypatch, week, frame)

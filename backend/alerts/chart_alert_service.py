@@ -246,6 +246,11 @@ def locked(db, alert_id, expected_version=None):
     return alert
 
 
+def execution_history(alert):
+    return {key: alert.runtime[key] for key in ("incident", "incident_number", "last_incident",
+        "last_gap", "execution_notification") if key in alert.runtime}
+
+
 def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     alert = locked(db, alert_id, expected_version)
     if alert.status == "archived":
@@ -257,10 +262,17 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
 
     validate_notification(config)
     identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
+    from .price_alert_inputs import is_price_rule
+
+    if alert.runtime.get("incident") and not is_price_rule(config):
+        from .chart_alert_execution import end_observation
+
+        end_observation(db, alert, now=at)
     alert.version += 1
     alert.control_revision += 1
     alert.name, alert.max_triggers, alert.expires_at = config.name, config.max_triggers, config.expires_at
-    alert.state, alert.runtime, alert.effective_at, alert.updated_at = {}, {}, at, at
+    preserved = execution_history(alert)
+    alert.state, alert.runtime, alert.effective_at, alert.updated_at = {}, preserved, at, at
     alert.health, alert.health_reason = "warming", "条件已更新，等待建立新基准"
     if alert.count >= alert.max_triggers:
         alert.status = "completed"
@@ -328,11 +340,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             raise ValueError("仅等待核对的告警可重建基准")
         elif alert.status == "active" and action != "rebaseline":
             raise ValueError("告警已在监控，无需恢复")
-        preserved = {key: alert.runtime[key] for key in ("incident", "incident_number", "last_incident",
-            "last_gap", "execution_notification") if key in alert.runtime}
-        if action == "restart":
-            preserved.pop("incident", None)
-            preserved.pop("incident_number", None)
+        preserved = execution_history(alert)
         alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, preserved, at
         alert.health, alert.health_reason = "warming", "等待重新建立基准"
         initialize_price(db, alert, current_version(db, alert).market_identity, config, at=at)

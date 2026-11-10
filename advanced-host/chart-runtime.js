@@ -2424,7 +2424,7 @@ function boot(
           request:query=>request({...scope,...query},'notice-center-rpc',()=>attempt===attachingAlerts && session===alertUISession),
           panelChanged:(open,event)=>send({type:'notice-center-panel',...scope,open,event}),
           alert:signal=>{alertUI?.event(signal);send({type:'alerts-panel-state',workspace_id:workspaceId,open:true});},
-          locate:row=>send({type:'notice-center-locate',...scope,event_id:row.id}),
+          locate:row=>{if(row.source_kind==='chart_alert_execution')noticeUI?.close();send({type:'notice-center-locate',...scope,event_id:row.id});},
           report:error=>send({type:'error',error:String(error)})});
         if(attempt!==attachingAlerts || session!==alertUISession || alertUIStopped){notification.destroy();return;}
         noticeUI=notification;send({type:'notice-center-ready',...scope});
