@@ -48,6 +48,8 @@ def capabilities(body):
     with transaction() as db:
         if body.series_kind == "composite":
             from .composite_alerts import require_live_eligibility
+            from .price_alert_evaluator import eligibility
+            from .price_alert_reasons import Unavailable, message
             from .series_access import composite_definition
             from .series_access import metadata as fixed_metadata
             from .storage import CompositeRevision, now_ms
@@ -62,9 +64,24 @@ def capabilities(body):
                 available = True
             except ValueError:
                 available = False
+            price_modes = {}
+            for mode in ("close", "intrabar"):
+                code = None
+                try:
+                    if body.timeframe not in meta["frames"]:
+                        raise Unavailable("binding_unavailable")
+                    if revision:
+                        eligibility(db, revision, mode=mode, now=now_ms(), lock=False)
+                    elif not meta["realtime_enabled"]:
+                        raise Unavailable("realtime_disabled")
+                    elif mode == "intrabar":
+                        raise Unavailable("price_baseline_unavailable")
+                except ValueError as exc:
+                    code = getattr(exc, "reason_code", "binding_unavailable")
+                price_modes[mode] = {"available": code is None, "reason_code": code, "reason": message(code)}
             return {"instrument": body.instrument, "timeframe": body.timeframe,
                 "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
-                    "calendar": meta["calendar"], "available": available,
+                    "calendar": meta["calendar"], "available": available, "price_modes": price_modes,
                     "reason": None if available else "实时流已关闭或来源不可用",
                     "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
                 "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"],
@@ -167,7 +184,47 @@ def alert_dict(db, alert, *, last_triggered_at=None):
             "last_triggered_at": last_triggered_at,
             "display_label": display_label(db, version.config, version.market_identity),
             "condition_summary": condition_label(version.config["condition"]),
-            "runtime": alert.runtime}
+            "runtime": alert.runtime, "execution": execution_dict(alert, version)}
+
+
+def execution_dict(alert, version, *, at=None):
+    from .config import settings
+    from .price_alert_inputs import is_price_rule
+    from .price_alert_reasons import message
+    from .storage import now_ms
+
+    if not is_price_rule(version.config):
+        return None
+    runtime = alert.runtime
+    stamp = now_ms() if at is None else at
+    expired = alert.expires_at is not None and stamp >= alert.expires_at
+    phase = runtime.get("execution_state", "preparing")
+    labels = {"preparing": "准备中", "monitoring": "监控中", "closed": "休市",
+        "recovering": "等待恢复", "blocked": "需处理", "settling": "已到期，结果结算中",
+        "settled": "已到期", "expired": "已到期", "paused": "已暂停", "archived": "已归档",
+        "completed": "触发次数已用完"}
+    reason = runtime.get("reason_code")
+    if alert.status in ("completed", "archived"):
+        phase = alert.status
+    elif alert.status == "paused":
+        phase = "expired" if expired else "paused"
+        if runtime.get("demand_hold") == "stale_input":
+            reason = "legacy_auto_paused"
+    elif expired or alert.status == "expired":
+        phase = "settling" if runtime.get("settlement_pending") else "expired"
+    elif not runtime.get("taken_over_at") and phase in ("monitoring", "closed"):
+        phase = "preparing"
+    phone_code = ("phone_topic_missing" if not settings.ntfy_topic.strip() else
+        "phone_delivery_disabled" if not settings.delivery_enabled else None) if version.config.get("notify_ntfy") else None
+    return {"contract": runtime.get("execution_contract"), "state": phase, "label": labels.get(phase, "需处理"),
+        "reason_code": reason, "message": message(reason), "enabled_intent": alert.status == "active",
+        "expired": expired, "settlement_pending": bool(runtime.get("settlement_pending")),
+        "taken_over_at": runtime.get("taken_over_at"), "last_checked_at": runtime.get("last_checked_at"),
+        "last_evaluated_at": runtime.get("last_evaluated_at"), "last_input_at": runtime.get("last_input_at"),
+        "position": runtime.get("cursor", runtime.get("close_cursor")), "expected_input_at": runtime.get("expected_input_at"),
+        "last_gap": runtime.get("last_gap"), "incident": runtime.get("incident"),
+        "notification": runtime.get("execution_notification"),
+        "phone_configuration": {"available": phone_code is None, "reason_code": phone_code, "message": message(phone_code)}}
 
 
 def listing(db, instrument: str | None = None, status: str | None = None, search: str = ""):

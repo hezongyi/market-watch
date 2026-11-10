@@ -25,6 +25,7 @@ export function alertCode(
   return value.display_identity?.code || value.display_label || fallback;
 }
 export function alertState(row: AlertRow) {
+  if (row.execution) return row.execution.label;
   if (row.status === "active" && row.health !== "ready")
     return healthNames[row.health] || row.health;
   return row.status === "completed"

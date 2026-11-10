@@ -220,6 +220,9 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
+    from .price_alert_reasons import validate_notification
+
+    validate_notification(config)
     identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
     alert = ChartAlert(request_id=request_id, request_hash=digest, name=config.name,
                        effective_at=at, max_triggers=config.max_triggers,
@@ -250,6 +253,9 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
+    from .price_alert_reasons import validate_notification
+
+    validate_notification(config)
     identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
     alert.version += 1
     alert.control_revision += 1
@@ -295,6 +301,9 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         if alert.expires_at is not None and alert.expires_at <= at:
             raise ValueError("告警已到期，请先修改到期时间")
         config = AlertConfig.model_validate(current_version(db, alert).config)
+        from .price_alert_reasons import validate_notification
+
+        validate_notification(config)
         if config.series_kind == "composite":
             from .composite_alerts import require_live_eligibility
             from .storage import CompositeRevision
@@ -319,7 +328,12 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             raise ValueError("仅等待核对的告警可重建基准")
         elif alert.status == "active" and action != "rebaseline":
             raise ValueError("告警已在监控，无需恢复")
-        alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, {}, at
+        preserved = {key: alert.runtime[key] for key in ("incident", "incident_number", "last_incident",
+            "last_gap", "execution_notification") if key in alert.runtime}
+        if action == "restart":
+            preserved.pop("incident", None)
+            preserved.pop("incident_number", None)
+        alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, preserved, at
         alert.health, alert.health_reason = "warming", "等待重新建立基准"
         initialize_price(db, alert, current_version(db, alert).market_identity, config, at=at)
     elif action == "archive":

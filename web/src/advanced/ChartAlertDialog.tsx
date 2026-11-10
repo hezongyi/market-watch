@@ -25,6 +25,7 @@ import {
   indicatorDefaults,
   indicatorUnit,
   relations,
+  isFixedPrice,
   type AlertConfig,
   type AlertRow,
   type Capabilities,
@@ -278,6 +279,8 @@ export function ChartAlertDialog({
   const offsetSupported = ["cross_up", "cross_down", "above", "below"].includes(draft.condition.relation)
     && priceUnit(draft.condition.left) && priceUnit(draft.condition.right)
     && ["constant", "line", "indicator"].includes(draft.condition.right?.kind || "");
+  const fixedPrice = isFixedPrice(draft);
+  const admission = fixedPrice ? source?.price_modes?.[draft.mode] ?? source : source;
   const atrFrames = source?.atr_frames || [];
   function change(value: Partial<AlertConfig>) {
     setDraft((p) => ({
@@ -307,9 +310,9 @@ export function ChartAlertDialog({
       errorBox.current?.focus();
       return;
     }
-    if (!source?.available) {
+    if (!admission?.available) {
       setError(
-        source?.reason || "行情来源尚未可用，请等待能力查询或显式选择来源",
+        admission?.reason || "行情来源尚未可用，请等待能力查询或显式选择来源",
       );
       errorBox.current?.focus();
       return;
@@ -322,7 +325,7 @@ export function ChartAlertDialog({
     try {
       let config = { ...draft, condition: normalizeCondition(draft.condition) };
       const line = draft.condition.right?.line;
-      if (draft.condition.right?.kind === "line" && line) {
+      if (draft.condition.right?.kind === "line" && line && !fixedPrice) {
         // Bar indices belong to a market/period. Recompute them from timestamps
         // before saving, including after a source or timeframe change.
         const query = {
@@ -368,6 +371,7 @@ export function ChartAlertDialog({
       if (mounted.current) {
         setError(errorMessage(e));
         setFieldErrors(e instanceof ApiError ? e.fieldErrors : []);
+        if (e instanceof ApiError && e.fieldErrors.some((issue) => issue.field === "notify_ntfy")) setPage("notifications");
         setConflict(e instanceof ApiError && e.status === 409);
       }
     } finally {
@@ -635,11 +639,12 @@ export function ChartAlertDialog({
                 onChange={setWeb}
               />
               <p>在打开的网页中显示提醒，并使用已有声音设置。</p>
-              <AlertCheckbox
-                label="已有 ntfy 推送通道"
+              <div data-alert-field="notify_ntfy"><AlertCheckbox
+                label="手机推送（ntfy）"
                 checked={phone}
                 onChange={setPhone}
-              />
+              /></div>
+              {fieldErrors.filter((issue) => issue.field === "notify_ntfy").map((issue) => <p key={issue.field} role="alert">{issue.message}</p>)}
               <p>需要后台已配置通道并启用投递。服务接受与设备接收分别记录。</p>
               <label>
                 迟到事件
@@ -1088,7 +1093,7 @@ export function ChartAlertDialog({
                       <option
                         key={`${source.series_kind}:${source.source}`}
                         value={`${source.series_kind}:${source.source}`}
-                        disabled={!source.available}
+                        disabled={!(source.available || Object.values(source.price_modes || {}).some((mode) => mode.available))}
                       >
                         {source.source} ·{" "}
                         {source.series_kind === "managed"
@@ -1097,7 +1102,7 @@ export function ChartAlertDialog({
                             ? "组合行情"
                             : "平台原生"}{" "}
                         · {source.basis}
-                        {source.reason ? " · " + source.reason : ""}
+                        {!source.price_modes && source.reason ? " · " + source.reason : ""}
                       </option>
                     ))}
                   </AlertSelect>
@@ -1149,10 +1154,9 @@ export function ChartAlertDialog({
                   </AlertSelect>
                 </label>
                 <p>
-                  {source?.observation_basis}。
-                  {draft.mode === "close"
-                    ? "等待来源确认完整 K 线。"
-                    : "后台按收到的观察值判定，不代表完整市场逐笔。"}
+                  {fixedPrice
+                    ? (draft.mode === "close" ? "按顺序判定来源已确认的收盘价。" : "按收到的买价或 REST 收盘抽样判定，未收到的价格无法补判。") + "首次建立基准，之后越界触发。"
+                    : source?.observation_basis}
                 </p>
                 <label data-alert-field="expires_at">
                   到期时间
@@ -1167,6 +1171,7 @@ export function ChartAlertDialog({
                 </label>
                 {draft.series_kind === "composite" && (
                   <>
+                    {!fixedPrice && (
                     <label>
                       指标依赖含原价接缝时
                       <AlertSelect
@@ -1187,9 +1192,12 @@ export function ChartAlertDialog({
                         </option>
                       </AlertSelect>
                     </label>
+                    )}
                     <p>
                       保存时固定组合修订：{draft.composite_revision_id}
-                      。跨接缝先建立基准，不补发过期事件。
+                      {fixedPrice
+                        ? "。到期后仍会结算有效期内已取得且可验证的输入。"
+                        : "。跨接缝先建立基准，不补发过期事件。"}
                     </p>
                   </>
                 )}
@@ -1197,7 +1205,7 @@ export function ChartAlertDialog({
                   发起图表身份已固定，后台监控在关闭网页后继续。创建时条件已成立不会立即触发。
                 </p>
               </details>
-              {source?.reason && <p role="status">{source.reason}</p>}
+              {admission?.reason && <p role="status">{admission.reason}</p>}
             </>
           )}
           {conflict && editing && (
@@ -1277,7 +1285,7 @@ export function ChartAlertDialog({
               <AlertButton
                 primary
                 title={editing ? "保存为新的规则版本" : "创建告警"}
-                disabled={busy || !source?.available || !expiryValid}
+                disabled={busy || !admission?.available || !expiryValid}
                 onClick={() => {
                   if (formRef.current?.reportValidity()) void submit();
                 }}

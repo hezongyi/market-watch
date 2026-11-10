@@ -120,6 +120,7 @@ export const severityLabels: Record<string, string> = {
 };
 export const sourceLabels: Record<string, string> = {
   chart_alert: "交易告警",
+  chart_alert_execution: "告警执行",
   workspace: "工作区",
   indicator: "指标",
   history: "图格历史",

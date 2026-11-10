@@ -142,7 +142,7 @@ def initialize_close(db, alert, identity, config, *, now, takeover=False):
         detail = evidence(identity, revision, row, value, {})
         judgment(db, alert, current_version(db, alert), revision, row, value, detail, "initial_baseline", now)
         break
-    transition(db, alert, state="preparing", now=now, reason="awaiting_worker")
+    transition(db, alert, state="preparing", now=now, reason="awaiting_worker", checked=False)
     db.add(Audit(kind="chart_alert_baseline", at=now, details={"alert_id": alert.id,
         "version": alert.version, "run": alert.run, "effective_at": alert.effective_at,
         "cursor": boundary, "price": alert.state.get("left"), "takeover": takeover}))
@@ -197,7 +197,7 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
         revision, target = bound_identity(db, version.market_identity)
         eligibility(db, revision, mode="close", now=now)
     except ValueError as exc:
-        transition(db, alert, state="blocked", now=now, reason=str(exc))
+        transition(db, alert, state="blocked", now=now, reason=getattr(exc, "reason_code", "binding_changed"))
         return []
     if clock:
         now = clock()

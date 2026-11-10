@@ -510,7 +510,13 @@ def step(*, now=None, on_evaluated=None, on_error=None):
                 assert_current(db)
                 row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident).with_for_update())
                 if row and row.status == "active":
-                    health(row, "error", "判定失败：" + type(exc).__name__)
+                    if row.runtime.get("execution_contract") == "price-v2":
+                        from .chart_alert_execution import transition
+
+                        transition(db, row, state="recovering", now=now_ms() if now is None else now,
+                            reason="evaluation_failed")
+                    else:
+                        health(row, "error", "判定失败：" + type(exc).__name__)
                 elif row:
                     from .price_alert_settlement import finish, pending
 

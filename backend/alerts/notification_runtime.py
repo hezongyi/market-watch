@@ -205,19 +205,25 @@ def inspect_health(*, startup_grace_until=0):
             _queue_system_notice(db, title="后台服务已恢复",
                 message="以下运行角色已恢复正常：\n" + "\n".join(recovered),
                 incident_id=f"runtime-recovery:{now}")
+        if not paused(window, "market"):
+            from .chart_alert_execution import patrol
+
+            patrol(db, now=now)
 
 
-def _queue_system_notice(db, *, title, message, incident_id):
+def _queue_system_notice(db, *, title, message, incident_id, context=None, at=None):
     from .storage import Notification, Outbox, now_ms
 
-    note = Notification(kind="system", signal_id=None, status="pending",
+    stamp = now_ms() if at is None else at
+    note = Notification(kind="system", signal_id=None, status="pending", created_at=stamp,
                         payload={"title": title, "message": message,
-                                 "incident_id": incident_id})
+                                 "incident_id": incident_id, **({"context": context} if context else {})})
     db.add(note)
     db.flush()
     db.add(Outbox(notification_id=note.id, status="pending", attempts=0,
-                  next_at=now_ms(),
+                  next_at=stamp,
                   lease_until=None, error=None, provider_id=None))
+    return note
 
 
 def main():

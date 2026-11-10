@@ -44,7 +44,7 @@ CONTEXT_KEYS = {'workspace_id', 'chart_index', 'instrument', 'timeframe', 'serie
                 'provider', 'epoch', 'generation', 'attempt_id', 'code', 'consumer',
                 'input_fingerprint', 'params_fingerprint', 'algorithm_version',
                 'snapshot_id', 'source_id', 'dataset_id', 'task_id', 'revision',
-                'visible_from', 'visible_to', 'endpoint', 'acceptance_run'}
+                'visible_from', 'visible_to', 'endpoint', 'acceptance_run', 'alert_id', 'version', 'run'}
 BROWSER_SOURCES = {'workspace', 'indicator', 'history', 'capacity', 'data_center',
                    'preferences', 'market', 'connection', 'chart_shell'}
 OBSERVATIONS = {'received', 'rendered', 'viewed', 'handled', 'sound_blocked',
@@ -254,7 +254,8 @@ def _server_source(db, state, audit):
         row = _new_event(db, state, ident=ident, source_kind=facts.get('source_kind', 'data_center'),
             source_id=source['source_id'], occurred_at=audit.at, source_version=audit.id,
             dedupe=facts['dedupe_key'], backfill=audit.at < state.started_at,
-            body={'title': facts['title'], 'message': facts['code'], 'notify_web': facts.get('notify_web', True),
+            body={'title': facts['title'], 'message': facts.get('message', facts['code']), 'code': facts['code'],
+                  'notify_web': facts.get('notify_web', True),
                   'context': facts.get('context', {}), 'evidence': facts.get('evidence', {}),
                   'instrument_display': facts.get('instrument_display')})
         return row.id

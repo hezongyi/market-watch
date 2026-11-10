@@ -212,10 +212,12 @@ def bound_rules(db, composite_id, *, lock=False):
 
 def pause(db, rules, *, reason, run_id=None, now=None):
     """Pause a rule that can no longer read a served revision; never migrate it."""
+    from .price_alert_inputs import is_price_rule
+
     now = now_ms() if now is None else now
     output = []
     for version, alert in rules:
-        if alert.status != "active":
+        if alert.status != "active" or is_price_rule(version.config):
             continue
         alert.status, alert.control_revision = "paused", alert.control_revision + 1
         alert.health, alert.health_reason = "blocked", reason[:250]
@@ -281,7 +283,10 @@ def relocatable(db, previous, target, config, bound, *, input_revision, source=N
 
 def rebind_active(db, composite, *, previous, target, boundary, run_id, now, input_revision,
                   source=None, shadow=None):
-    """Move every active rule onto the activated revision at one event boundary.
+    """Move compatible legacy rules at the activation boundary.
+
+    Fixed-price rules keep their explicit revision and require a rule edit
+    when that revision is frozen.
 
     A rule that the target revision can serve is relocated by a new immutable
     version: same condition, geometry, limits and delivery choice, only the bound
@@ -295,12 +300,22 @@ def rebind_active(db, composite, *, previous, target, boundary, run_id, now, inp
     rebuilt ATR reference is a different rule. Both judgements are a union: either
     one can only pause, never relocate.
     """
+    from .chart_alert_execution import transition
     from .chart_alert_service import AlertConfig
+    from .price_alert_inputs import is_price_rule
 
     aligned, rebound, paused, affected = [], [], [], []
     for version, alert in bound_rules(db, composite.id, lock=True):
         config = AlertConfig.model_validate(version.config)
         current = version.market_identity.get("composite_revision_id")
+        if is_price_rule(config):
+            if current == target.id:
+                aligned.append({"id": alert.id, "revision_id": target.id, "version": alert.version})
+            elif current == previous.id:
+                transition(db, alert, state="blocked", now=now, reason="binding_frozen", checked=False)
+                affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
+                                 "migration": "price_binding_unchanged", "reason": alert.health_reason})
+            continue
         if current == target.id:
             aligned.append({"id": alert.id, "revision_id": target.id, "version": alert.version})
             affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
@@ -500,19 +515,21 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
 
 def bound_identity(db, identity):
     """Shared fixed-binding validation for both execution contracts."""
+    from .price_alert_reasons import Unavailable
+
     if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
-        raise ValueError("组合或指标算法契约已改变，请显式编辑规则生成新版本")
+        raise Unavailable("binding_contract_changed", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
     composite = db.get(MarketComposite, identity["composite_id"])
     if revision and frozen(db.get(CompositePreparation, revision.id)):
-        raise ValueError(FROZEN_REASON)
+        raise Unavailable("binding_frozen", FROZEN_REASON)
     mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
     target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
     if (not composite or composite.permission_scope != "workspace:default" or not revision or
             revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or
             revision.rules != identity["rules"] or revision.seam != identity["seam"] or
             not target or target.identity != identity["target_identity"] or target.identity["account_scope"] != account_scope()):
-        raise ValueError("固定组合基线、映射或账户已改变，请显式编辑规则")
+        raise Unavailable("binding_changed", "固定组合基线、映射或账户已改变，请显式编辑规则")
     return revision, target
 
 

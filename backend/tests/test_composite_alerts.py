@@ -75,6 +75,9 @@ def armed(database, monkeypatch, **changes):
     from alerts.realtime_switch import set_enabled
 
     monkeypatch.setattr(settings, "oanda_resident_symbols", "")
+    if changes.get("notify_ntfy"):
+        monkeypatch.setattr(settings, "ntfy_topic", "fixture-price-alerts")
+        monkeypatch.setattr(settings, "delivery_enabled", True)
     composite, revision, seam = populated(database, monkeypatch)
     stamp = seam + 600010
     live(database, revision, stamp, seam + 600000)
@@ -110,6 +113,9 @@ def ready_config(database, monkeypatch):
     monkeypatch.setattr("alerts.chart_alert_service.now_ms", lambda: stamp)
 
     def make(**changes):
+        if changes.get("notify_ntfy"):
+            monkeypatch.setattr(settings, "ntfy_topic", "fixture-price-alerts")
+            monkeypatch.setattr(settings, "delivery_enabled", True)
         return config(composite, **{"composite_revision_id": revision, **changes})
 
     make.at = stamp
@@ -430,8 +436,10 @@ def test_intrabar_quote_gap_without_worker_stale_check_rebuilds_baseline(databas
         evidence = db.scalar(select(Audit.details).where(Audit.kind == "chart_alert_unobserved"))
         assert evidence["reason_code"] == "price_sample_gap"
         assert evidence["observation_gap_ms"] == gap
-        for model in (SignalRow, Notification, Outbox):
-            assert db.scalar(select(func.count()).select_from(model)) == 0
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 0
+        assert db.scalar(select(func.count()).select_from(Notification).where(Notification.kind == "signal")) == 0
+        assert db.scalar(select(func.count()).select_from(Notification).where(Notification.kind == "system")) == 2
+        assert db.scalar(select(func.count()).select_from(Outbox)) == 2
         assert evaluate(db, ident, now=stamp + gap) == []
     quote(gap + 1000, "1.11", 3)
     with database.begin() as db:
@@ -441,8 +449,9 @@ def test_intrabar_quote_gap_without_worker_stale_check_rebuilds_baseline(databas
         assert len(evaluate(db, ident, now=stamp + gap + 2000)) == 1
         assert evaluate(db, ident, now=stamp + gap + 2000) == []
         assert db.get(ChartAlert, ident).count == 1
-        for model in (SignalRow, Notification, Outbox):
-            assert db.scalar(select(func.count()).select_from(model)) == 1
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
+        assert db.scalar(select(func.count()).select_from(Notification).where(Notification.kind == "signal")) == 1
+        assert db.scalar(select(func.count()).select_from(Outbox)) == 3
 
 
 def switching_rule(database, monkeypatch):
