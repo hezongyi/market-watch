@@ -133,4 +133,4 @@ FXCM 最新慢尾说明：NZDJPY 源额度等待 24.71 秒、重新登录 19.50 
 
 最后开发部署核对：25 个候选业务源码与开发 checkout、私有 manifest 的 SHA256 全部一致；API、data-worker、market-runtime、notification-worker、前端、数据库等经 `mw-dev up` 健康检查通过。原生 bundle `chart.2ebf2f4d9536406e.js` 与候选一致。未做 schema 迁移、未清价格缓存、未重置数据库。
 
-代码交付：完成代码/测试/证据提交并准备 Draft PR；CI 以 PR 最新提交的实际状态为准。需要用户另行明确授权后才合并 main、创建正式 tag 或发布生产。
+代码交付：实现提交 `1dc8fef0`，Draft PR [#127](https://github.com/hezongyi/market-watch/pull/127)。依赖未合并的 [#126](https://github.com/hezongyi/market-watch/pull/126)，以其来源展示分支为 base，合并顺序为 #126 后 #127。首轮 CI 前端失败为旧自选表启动预热测试仍提取已移除代码段；已更新为验证启动不请求整张自选表、当前商品元数据仍交付、重载刷新必要配置。另补齐生命周期测试的主图等待门上下文并断言重置释放。上述 CI 图表/单应用测试在本地全组通过；CI 以 PR 最新提交的实际状态为准。需要用户另行明确授权后才合并 main、创建正式 tag 或发布生产。
