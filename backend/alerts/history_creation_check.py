@@ -4,7 +4,6 @@ from types import SimpleNamespace
 
 from .aggregation_policy import history_dataset_identity, resolve_calendar
 from .config import settings
-from .history_catalog import catalog
 from .storage import DatasetMaintenance, Instrument, MarketDataset, now_ms
 
 
@@ -15,37 +14,23 @@ class CreationCheckError(ValueError):
 
 
 def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=50):
-    if source not in ("", "dukascopy", "oanda", "akshare", "fxcm", "yahoo") or offset < 0 or not 1 <= limit <= 100:
-        raise ValueError("请选择支持自建历史的来源")
     from .fxcm_history import configured as fxcm_configured
-    items, sources = [], []
-    for name in [source] if source else ["dukascopy", "oanda", "akshare", "fxcm", "yahoo"]:
-        page = 1
-        while True:
-            result = catalog(
-                db, source=name, query=query, symbol_type=symbol_type, page=page, page_size=100
-            )
-            items.extend(result["items"])
-            if page == 1:
-                sources.append(
-                    {
-                        "source": name,
-                        "requires_refresh": result["requires_refresh"],
-                        "connection_configured": fxcm_configured() if name == "fxcm" else name != "oanda"
-                        or bool(settings.oanda_account_id and settings.oanda_token),
-                    }
-                )
-            if page * 100 >= result["total"]:
-                break
-            page += 1
-    items.sort(
-        key=lambda item: (
-            item.get("display_symbol") or item["provider_symbol"],
-            item["source"],
-            item["catalog_id"],
-        )
-    )
-    return {"items": items[offset : offset + limit], "total": len(items), "sources": sources}
+    from .history_catalog import creation_entry
+    from .instrument_directory import SOURCES, has_entries, search
+    from .search_types import TYPES
+
+    if source not in ("", *SOURCES) or symbol_type not in TYPES or offset < 0 or not 1 <= limit <= 100:
+        raise ValueError("请选择支持自建历史的来源")
+    asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
+    result = search(db, source=source or None, query=query, asset=asset, managed=True,
+                    offset=offset, limit=limit)
+    sources = []
+    for name in [source] if source else SOURCES:
+        sources.append({"source": name,
+            "requires_refresh": not has_entries(db, name),
+            "connection_configured": fxcm_configured() if name == "fxcm" else name != "oanda"
+                or bool(settings.oanda_account_id and settings.oanda_token)})
+    return {**result, "items": [creation_entry(row) for row in result["items"]], "sources": sources}
 
 
 def check_creation(db, body):
@@ -72,10 +57,11 @@ def check_creation(db, body):
         info, _ = local_details(db, body.source, body.provider_symbol)
         validate_frames(identity, info, body.timeframes)
     if body.catalog_id:
-        entries = catalog(db, source=body.source, query=body.provider_symbol, page_size=100)[
-            "items"
-        ]
-        item = next((item for item in entries if item["catalog_id"] == body.catalog_id), None)
+        from .history_catalog import creation_entry
+        from .instrument_directory import selected
+
+        row = selected(db, body.source, body.catalog_id)
+        item = creation_entry(row) if row else None
         if not item or any(
             item[key] != getattr(body, key)
             for key in ("provider_symbol", "logical_symbol", "asset_class")

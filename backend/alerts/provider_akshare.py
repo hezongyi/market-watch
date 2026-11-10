@@ -28,6 +28,28 @@ RULES = "akshare-1.19.3-source-label-hk-precision-v2"
 MINUTES = {"M1": "1", "M5": "5", "M15": "15", "M30": "30", "H1": "60"}
 PERIODS = {"D1": "daily", "W1": "weekly", "MN": "monthly"}
 EXCHANGES = {"SSE", "SZSE", "BSE", "HKEX", "SHFE", "DCE", "CZCE", "CFFEX", "INE", "GFEX"}
+CATALOG_PATTERN = (
+    r"^(?:SSE:(?:600|601|603|605|688|689)\d{3}|SZSE:(?:000|001|002|003|300|301)\d{3}"
+    r"|HKEX:\d{5}|(?:SHFE|DCE|CZCE|CFFEX|INE|GFEX):[A-Z]{1,3}0)$")
+
+
+
+def catalog_allowed(symbol):
+    """New selections stay within the existing Sina/Tencent stock/continuous paths."""
+    return bool(re.fullmatch(CATALOG_PATTERN, symbol))
+
+def supported_frames(symbol, source_family=None, adjustment="none"):
+    """Implemented endpoint periods, independent of a seed's observed periods."""
+    from .market_contracts import HISTORY_FRAMES
+
+    frames = []
+    for frame in HISTORY_FRAMES:
+        try:
+            endpoint(symbol, frame, adjustment, source_family)
+        except ValueError:
+            continue
+        frames.append(frame)
+    return frames
 
 
 class AKShareRequestError(MarketRequestError):

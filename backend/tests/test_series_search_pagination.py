@@ -10,6 +10,7 @@ from alerts.storage import (
     HistoryArtifact,
     HistoryReclamation,
     HistoryVersion,
+    MarketCatalog,
     MarketComposite,
     MarketDemand,
 )
@@ -195,20 +196,57 @@ def test_provider_pages_reach_full_directory_and_mixed_kind_fairness(database, m
         }
         for i in range(600)
     ]
-    monkeypatch.setattr(market_data, "instrument_catalog",
-                        lambda query, *, limit=None, source=None, managed_status=True: provider)
-    first = market_data.search_series_page(kind="provider", page_size=250)
+    with database.begin() as db:
+        db.add_all(MarketCatalog(id=row["id"], symbol=row["symbol"], source=row["source"],
+            label=row["label"], asset_type="CURRENCY", precision=5, calendar="ny17") for row in provider)
+    monkeypatch.setattr("alerts.provider_dukascopy.catalog", lambda: [])
+    first = market_data.search_series_page("Ticker", kind="provider", source="oanda", page_size=250)
     second = market_data.search_series_page(
-        kind="provider", page_size=250, offset=first["next_offset"]
+        "Ticker", kind="provider", source="oanda", page_size=250, offset=first["next_offset"]
     )
     third = market_data.search_series_page(
-        kind="provider", page_size=250, offset=second["next_offset"]
+        "Ticker", kind="provider", source="oanda", page_size=250, offset=second["next_offset"]
     )
     assert first["total"] == 600 and third["next_offset"] is None
     assert len({r["id"] for p in (first, second, third) for r in p["items"]}) == 600
     mixed = market_data.search_series(kind="all", limit=6)
     assert any(r["series_kind"] == "history" for r in mixed)
     assert any(r["series_kind"] == "provider" for r in mixed)
+
+
+def test_provider_picker_can_page_without_counting_the_directory(database):
+    with database.begin() as db:
+        db.add_all(MarketCatalog(id=f"OANDA:P{i:04}", source="oanda", symbol=f"P{i:04}",
+            label=f"Picker {i}", asset_type="CURRENCY", precision=5) for i in range(101))
+    statements = []
+    engine = database.kw["bind"]
+
+    def capture(connection, cursor, statement, parameters, context, executemany):
+        statements.append(statement.lower())
+
+    event.listen(engine, "before_cursor_execute", capture)
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    try:
+        with TestClient(api.app) as client:
+            items, offset = [], 0
+            while True:
+                response = client.get("/api/market-data/series/page", params={
+                    "kind": "provider", "source": "oanda", "query": "Picker",
+                    "page_size": 50, "offset": offset, "include_total": "false"})
+                assert response.status_code == 200
+                page = response.json()
+                assert "total" not in page
+                assert len(page["items"]) <= 50
+                items.extend(row["id"] for row in page["items"])
+                if not page["has_more"]:
+                    assert page["next_offset"] is None
+                    break
+                offset = page["next_offset"]
+            assert len(items) == len(set(items)) == 101
+        assert not any("count(" in statement for statement in statements)
+    finally:
+        event.remove(engine, "before_cursor_execute", capture)
+        api.app.dependency_overrides.clear()
 
 
 def test_composite_pages_use_known_mapping_without_scanning_other_products(database, monkeypatch):
@@ -277,8 +315,10 @@ def test_all_cursor_covers_each_kind_filters_before_paging_and_rejects_changed_q
     providers = [{"id": f"OANDA:T{i:04}", "symbol": f"T{i:04}", "source": "oanda",
                   "label": f"Ticker{i}", "asset_type": "CURRENCY" if i % 2 else "EQUITY",
                   "available": True, "supported": True} for i in range(600)]
-    monkeypatch.setattr(market_data, "instrument_catalog",
-                        lambda query, *, limit=None, source=None, managed_status=True: providers)
+    with database.begin() as db:
+        db.add_all(MarketCatalog(id=row["id"], symbol=row["symbol"], source=row["source"],
+            label=row["label"], asset_type=row["asset_type"], precision=5, calendar="ny17") for row in providers)
+    monkeypatch.setattr("alerts.provider_dukascopy.catalog", lambda: [])
     rows, cursor = [], None
     for _ in range(80):
         page = market_data.search_series_page(kind="all", page_size=13, cursor=cursor)

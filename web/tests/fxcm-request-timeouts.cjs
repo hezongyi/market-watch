@@ -15,7 +15,7 @@ const context = vm.createContext({
 });
 vm.runInContext(fs.readFileSync("../advanced-host/series.js", "utf8"), context);
 vm.runInContext(fs.readFileSync("../advanced-host/composite-display-batches.js", "utf8"), context);
-vm.runInContext(fs.readFileSync("../advanced-host/chart-runtime.js", "utf8"), context);
+vm.runInContext(require("./fixtures/direct-runtime.cjs").read("../advanced-host/chart-runtime.js", "utf8"), context);
 
 function timeoutFor(query, type = "data") {
   delays.length = 0;
@@ -29,7 +29,9 @@ function timeoutFor(query, type = "data") {
 assert.equal(timeoutFor({ series_kind: "provider", instrument: "MWP:FXCM:EURUSD" }), 70000);
 assert.equal(timeoutFor({ series_kind: "provider", instrument: "FXCM:XAUUSD" }), 70000);
 assert.equal(timeoutFor({ path: "/market-data/history-catalog/refresh", body: { source: "fxcm" } }, "data-center-api"), 70000);
-assert.equal(timeoutFor({ path: "/market-data/history-catalog/refresh", body: { source: "oanda" } }, "data-center-api"), 30000);
+assert.equal(timeoutFor({ path: "/market-data/history-catalog/refresh?market=a", body: { source: "fxcm" } }, "data-center-api"), 70000);
+assert.equal(timeoutFor({ path: "/market-data/history-catalog/refresh?market=a", body: { source: "yahoo" } }, "data-center-api"), 120000);
+assert.equal(timeoutFor({ path: "/market-data/history-catalog/refresh", body: { source: "oanda" } }, "data-center-api"), 40000);
 assert.equal(timeoutFor({ path: "/market-data/history-catalog", body: { source: "fxcm" } }, "data-center-api"), 30000);
 assert.equal(timeoutFor({ series_kind: "provider", instrument: "OANDA:EURUSD" }), 30000);
 assert.equal(timeoutFor({ series_kind: "provider", instrument: "FXCM:EURUSD", native_history: true }), 610000);

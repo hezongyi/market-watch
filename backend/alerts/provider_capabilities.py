@@ -11,6 +11,7 @@ YAHOO_INTERVALS = {
     "M1": "1m",
     "M5": "5m",
     "M15": "15m",
+    "M30": "30m",
     "H1": "1h",
     "D1": "1d",
     "W1": "1wk",
@@ -89,7 +90,7 @@ def history_policy(frame):
     # These are configurable request policy estimates, not permanent exhaustion.
     if frame == "M1":
         return settings.yahoo_m1_retention_days, settings.yahoo_m1_span_days
-    if frame in ("M5", "M15"):
+    if frame in ("M5", "M15", "M30"):
         return settings.yahoo_minute_retention_days, settings.yahoo_minute_retention_days
     if frame == "H1":
         return settings.yahoo_hour_retention_days, settings.yahoo_hour_retention_days

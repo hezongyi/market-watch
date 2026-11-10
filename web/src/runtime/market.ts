@@ -15,7 +15,7 @@ export function marketRuntime({api,marketRequests,inflight,historyCapabilities,s
 async function market(q:any,source:ChartAdapter,context:{id:number;history_client?:string}) {
 
         const endpoints: Record<string, string> = {
-          search: "/market-data/series/search",
+          search: "/market-data/series/page",
           searchPage: "/market-data/series/page",
           resolve: "/market-data/resolve",
           viewport: "/market-data/viewport-session",
@@ -87,13 +87,14 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
               endpoints[q.op] +
                 (q.op === "searchPage"
                   ? "?" + new URLSearchParams({query:String(q.args?.query || ""),
+                    include_total:"false",
                     kind:["provider","history","composite","all"].includes(q.args?.kind) ? q.args.kind : "provider",
                     source:String(q.args?.source || ""),calendar:String(q.args?.calendar || ""),
                     symbol_type:String(q.args?.symbol_type || ""),cursor:String(q.args?.cursor || ""),
                     page_size:String(Number.isSafeInteger(q.args?.page_size) ? Math.max(1,Math.min(100,q.args.page_size)) : 25),
                     offset:String(Number.isSafeInteger(q.args?.offset) ? q.args.offset : 0)})
                   : q.op === "search"
-                    ? "?query=" +
+                    ? "?include_total=false&page_size=100&query=" +
                       encodeURIComponent(String(q.args?.query || "")) +
                       "&kind=" +
                       encodeURIComponent(
@@ -112,7 +113,7 @@ async function market(q:any,source:ChartAdapter,context:{id:number;history_clien
               ["search", "searchPage"].includes(q.op) ? undefined : q.args,
               controller.signal,
             );
-          return result;
+          return q.op === "search" ? result.items : result;
         } catch (e) {
           throw Object.assign(Error(errorMessage(e)),apiErrorDetails(e));
         } finally {

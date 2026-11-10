@@ -5,7 +5,6 @@ from alerts import chart_history_worker as worker
 def test_history_replans_between_pages_without_maintenance_delay(monkeypatch):
     events=[]
     monkeypatch.setattr(worker.time,'monotonic',lambda:100000)
-    monkeypatch.setattr(worker,'refresh_catalog',lambda:events.append('catalog'))
     monkeypatch.setattr(worker,'advance_pending_plans',lambda:events.append('plan'))
     monkeypatch.setattr(worker,'import_once',lambda **kwargs:events.append('page') or True)
     def sleep(seconds):
@@ -15,14 +14,13 @@ def test_history_replans_between_pages_without_maintenance_delay(monkeypatch):
     monkeypatch.setattr(worker.time,'sleep',sleep)
     with pytest.raises(SystemExit):
         worker.run(lambda *args:None)
-    assert events==['catalog','plan','page',0.2,'plan','page',0.2,'plan','page',0.2]
+    assert events==['plan','page',0.2,'plan','page',0.2,'plan','page',0.2]
 
 
 def test_old_manual_queue_drained_before_plan_work_and_realtime_excluded(monkeypatch):
     calls=[]
     monkeypatch.setattr(worker.time,'monotonic',lambda:100000)
-    for name in ('refresh_catalog','advance_pending_plans'):
-        monkeypatch.setattr(worker,name,lambda:None)
+    monkeypatch.setattr(worker,'advance_pending_plans',lambda:None)
     def imported(**kwargs):
         calls.append(kwargs.get('chart_only',False))
         assert kwargs['defer_aggregation'] is True

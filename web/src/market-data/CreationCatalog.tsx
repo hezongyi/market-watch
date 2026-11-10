@@ -1,3 +1,4 @@
+import { DirectoryTools } from "./DirectoryTools";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
   NativeInput,
@@ -19,6 +20,7 @@ export type CatalogItem = {
   asset_class: string;
   precision: number | null;
   supported_modes?: string[];
+  supported_frames?: Record<string, string[]>;
   verified_frames?: Record<string, string[]>;
   default_mode?: string;
   default_start_date?: string;
@@ -210,7 +212,7 @@ export function CreationCatalog({
     observer.observe(sentinel.current);
     return () => observer.disconnect();
   }, [ui, loading, error, fallback]);
-  async function refreshDirectory(source: "oanda" | "fxcm" = "oanda") {
+  async function refreshDirectory(source: "dukascopy" | "oanda" | "binance" | "fxcm" = "oanda") {
     if (busy) return;
     setBusy(true);
     setError("");
@@ -242,6 +244,7 @@ export function CreationCatalog({
   }
   return (
     <div className="dc-create-catalog">
+      {!fixedSource && <DirectoryTools source={filters.source} refreshed={() => { setOffset(0); refresh(v => v + 1); }} />}
       {metadata.some(
         (s) =>
           s.source === "oanda" &&
@@ -271,6 +274,17 @@ export function CreationCatalog({
           ) : "FXCM Demo 历史连接未配置，请由管理员配置后再选择。"}
         </div>
       )}
+      {!fixedSource && metadata.some(s => s.source === "dukascopy" || s.source === "binance") && (
+        <div className="dc-create-notice">
+          公共来源目录支持手动刷新：
+          <button disabled={busy || disabled} onClick={() => void refreshDirectory("dukascopy")}>
+            {busy ? "刷新中…" : "刷新 Dukascopy"}
+          </button>
+          <button disabled={busy || disabled} onClick={() => void refreshDirectory("binance")}>
+            {busy ? "刷新中…" : "刷新 Binance"}
+          </button>
+        </div>
+      )}
       {error && <p role="alert">{error}</p>}
       {ui ? (
         <NativeSlot
@@ -280,7 +294,7 @@ export function CreationCatalog({
             mode: "select",
             title: fixedSource ? "选择实时品种" : "选择自建品种",
             settingsScope: fixedSource ? "mw.data-center.mapping" : "mw.data-center.creation",
-            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda", "fxcm", "yahoo", "akshare"],
+            allowedSources: fixedSource ? [fixedSource] : ["dukascopy", "oanda", "binance", "fxcm", "yahoo", "akshare"],
             fixedSource,
             query: filters.query,
             source: fixedSource || filters.source,
@@ -317,6 +331,7 @@ export function CreationCatalog({
               <option value="">全部来源</option>
               <option value="dukascopy">Dukascopy</option>
               <option value="oanda">OANDA Practice</option>
+              <option value="binance">Binance Spot</option>
               <option value="fxcm">FXCM Demo</option>
               <option value="yahoo">Yahoo</option>
               <option value="akshare">AKShare</option>

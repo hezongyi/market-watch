@@ -120,7 +120,8 @@ def chinese_name(source, symbol):
     code = symbol.upper()
     if source == "yahoo":
         return ALIASES.get(code, (None,))[0]
-    if source == "oanda":
+    if source in ("oanda", "dukascopy", "fxcm"):
+        code = code.replace("/", "_")
         if code in _OANDA:
             return _OANDA[code]
         pair = code.split("_")
@@ -132,3 +133,28 @@ def chinese_name(source, symbol):
             if base != code and base in _CRYPTO:
                 return _CRYPTO[base] + " / " + _CRYPTO.get(quote, _CURRENCIES.get(quote, quote))
     return None
+
+
+
+def alias_search(query, source, symbol):
+    """Add only matching stable legacy aliases; ordinary SQL searches stay small."""
+    from sqlalchemy import and_, false, or_
+
+    term = query.strip().casefold()
+    if not any("\u4e00" <= char <= "\u9fff" for char in term):
+        return false()
+    matches = []
+    for provider in ("oanda", "dukascopy", "fxcm"):
+        codes = dict(_OANDA)
+        codes.update({base + "_" + quote: base_name + " / " + quote_name
+            for base, base_name in _CURRENCIES.items() for quote, quote_name in _CURRENCIES.items()})
+        aliases = [code for code, name in codes.items() if term in name.casefold()]
+        if provider != "oanda":
+            aliases = [code.replace("_", "/") for code in aliases]
+        if aliases:
+            matches.append(and_(source == provider, symbol.in_(aliases)))
+    aliases = [base + quote for base in _CRYPTO for quote in ("USDT", "USDC", "USD", "BTC", "ETH")
+        if term in (chinese_name("binance", base + quote) or "").casefold()]
+    if aliases:
+        matches.append(and_(source == "binance", symbol.in_(aliases)))
+    return or_(*matches) if matches else false()

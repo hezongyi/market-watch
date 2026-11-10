@@ -76,7 +76,7 @@ function MappingEditor({ dataset, mappings, readError }: { dataset: Dataset; map
     if (!row) { setHydrating(false); return; }
     setHydrating(true);
     try {
-      const response = await api<Page<CatalogItem>>(`/market-data/history-catalog?source=oanda&query=${encodeURIComponent(row.target_identity.provider_symbol)}&page_size=100`);
+      const response = await api<Page<CatalogItem>>(`/market-data/history-catalog/search?source=oanda&query=${encodeURIComponent(row.target_identity.provider_symbol)}&limit=100`);
       if (!mounted.current || token !== generation.current) return;
       const entry = response.items.find(item => item.provider_symbol === row.target_identity.provider_symbol);
       if (!entry) throw Error("原品种已不在当前账户目录中，请重新选择。");

@@ -37,7 +37,7 @@ def data_roles():
     providers = tuple(role for source in enabled_sources()
                       for role in (f"provider_live_{source}", f"provider_warm_{source}"))
     transports = tuple(f"provider_transport_{source}" for source in ORIGINS)
-    return providers + transports + ("provider_janitor", "chart_history",
+    return providers + transports + ("provider_janitor", "catalog_runtime", "chart_history",
                         "history_network", "history_compute", "native_history", "chart_aggregation",
                         "market_stream", "switch_shadow", "retention", "data_ownership")
 

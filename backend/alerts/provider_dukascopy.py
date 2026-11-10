@@ -17,7 +17,7 @@ from .dukascopy_history import DukascopyHistory
 from .market_names import display_code, matches_code
 from .market_resources import cooldown, request_slot
 from .query_errors import QueryError
-from .storage import instant, ms, now_ms
+from .storage import MarketCatalog, instant, ms, now_ms, transaction
 from .volume import encoded
 
 INTERVALS = dict(zip(FRAMES, ("1MIN", "5MIN", "15MIN", "30MIN", "1HOUR", "4HOUR", "1DAY", "1WEEK", "1MONTH")))
@@ -72,7 +72,23 @@ class NativeRateLimited(NativeDataError):
 
 
 def metadata(ident):
-    row = next((row for row in catalog() if row["id"] == ident), None)
+    try:
+        with transaction() as db:
+            entry = db.get(MarketCatalog, ident)
+            row = ({"id": entry.id, "symbol": entry.symbol, "label": entry.label,
+                "source": "dukascopy", "asset_type": entry.asset_type, "precision": 8,
+                "display_precision": entry.precision, "frames": list(FRAMES),
+                "available": entry.available, "metadata_origin": entry.metadata_json.get("directory_origin")}
+                if entry and entry.source == "dukascopy" else None)
+    except Exception as error:
+        # Native provider metadata remains available for isolated chart callers
+        # before the optional catalog table exists.
+        from sqlalchemy.exc import OperationalError
+        if not isinstance(error, OperationalError):
+            raise
+        row = None
+    if row is None:
+        row = next((row for row in catalog() if row["id"] == ident), None)
     if row is None:
         raise QueryError(404, "未知Dukascopy来源品种，请重新搜索")
     return {**row, "name": row["label"], "basis": "bid", "series_kind": "provider",

@@ -57,10 +57,16 @@ def history_dataset_identity(*, provider_symbol, asset_class, aggregation_calend
         if not configured():
             raise ValueError("请先配置FXCM历史连接")
         channel, environment, scope = "forexconnect", "demo", account_scope()
+    elif source == "binance":
+        import re
+
+        if not re.fullmatch(r"[A-Z0-9]{2,64}", provider_symbol):
+            raise ValueError("请选择准确的 Binance 现货代码")
+        channel, environment, scope = "rest", "public", "public"
     else:
         raise ValueError("此来源尚未支持自建历史版本")
     return DatasetIdentity(source=source, channel=channel, environment=environment,
-        account_scope=scope, provider_symbol=provider_symbol, basis="bid",
+        account_scope=scope, provider_symbol=provider_symbol, basis="last" if source == "binance" else "bid",
         calendar_version=f"user-{asset_class}-{calendar}-v1")
 
 
@@ -83,6 +89,8 @@ def register_history_dataset(db, *, logical_symbol, provider_symbol, asset_class
     volume_kind, volume_unit = ("price_count", "quotes") if source == "oanda" else ("quantity", "source_quantity")
     if source == "fxcm":
         volume_kind, volume_unit = "tick_count", "price_changes"
+    if source == "binance":
+        volume_kind, volume_unit = "base", "source_base"
     inst = register_dataset(db, identity, logical_symbol=logical_symbol, label=logical_symbol,
         calendar=calendar, precision=precision, volume_kind=volume_kind,
         volume_unit=volume_unit, asset_class=asset_class)

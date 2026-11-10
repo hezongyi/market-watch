@@ -106,13 +106,17 @@ def metadata(ident, *, deadline=None, cached_only=False):
             raise QueryError(422, "显式数据集仅支持自建系列，不转换为平台原生身份")
         entry = db.get(MarketCatalog, ident)
         if entry is None and ident.startswith("OANDA:"):
-            from .history_catalog import account_scope
-            entry = next((row for row in db.scalars(select(MarketCatalog).where(
-                MarketCatalog.source == "oanda", MarketCatalog.symbol == ident[6:],
-                MarketCatalog.id.startswith("HC:")))
-                if row.metadata_json.get("history_account_scope") == account_scope()), None)
+            from .history_catalog import oanda_entry
+
+            entry = oanda_entry(db, ident[6:])
         if entry and entry.id.startswith("HC:") and not ident.startswith("OANDA:"):
             raise QueryError(422, "自建来源目录仅用于登记历史，不作为平台原生身份")
+        if entry and entry.source == "oanda":
+            from .history_catalog import account_scope
+
+            scope = (entry.metadata_json or {}).get("history_account_scope")
+            if scope is not None and scope != account_scope():
+                raise QueryError(422, "此品种不属于当前账户目录")
         inst = db.get(Instrument, ident)
         if entry:
             if not entry.available:

@@ -14,7 +14,7 @@ class HistoryConfigurationError(ValueError):
 def history_identity(raw):
     identity = DatasetIdentity.model_validate(raw)
     collection_identity(identity)
-    if identity.source not in ("dukascopy", "oanda", "fxcm"):
+    if identity.source not in ("dukascopy", "oanda", "fxcm", "binance"):
         raise ValueError("此来源尚未支持自建历史版本")
     if identity.source == "dukascopy" and identity.account_scope != "public":
         raise ValueError("Dukascopy公共历史必须使用public账户范围")
@@ -24,7 +24,7 @@ def history_identity(raw):
 def page_end(identity, start, end):
     """Bound a request before entering the adapter, independent of calendar phase."""
     identity = history_identity(identity)
-    minutes = 300 if identity.source == "fxcm" else 4000 if identity.source == "oanda" else 31 * 1440
+    minutes = {"fxcm": 300, "oanda": 4000, "binance": 1000}.get(identity.source, 31 * 1440)
     return min(end, start + minutes * 60000)
 
 
@@ -46,7 +46,11 @@ class HistorySources:
             if not configured() or identity.account_scope != account_scope():
                 raise HistoryConfigurationError("fxcm_history_configuration")
         if source not in self.adapters:
-            if source == "fxcm":
+            if source == "binance":
+                from .binance_history import BinanceHistory
+
+                self.adapters[source] = BinanceHistory()
+            elif source == "fxcm":
                 from .fxcm_history import FxcmHistory
                 self.adapters[source] = FxcmHistory()
             elif source == "dukascopy":

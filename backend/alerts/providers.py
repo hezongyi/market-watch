@@ -13,8 +13,10 @@ from .volume import encoded
 
 
 def fetch_binance(symbol="BTCUSDT", start=None, end=None, mode="live", client=None):
-    if symbol != "BTCUSDT":
-        raise ValueError("Unsupported Binance market")
+    import re
+
+    if not re.fullmatch(r"[A-Z0-9]{2,64}", symbol):
+        raise ValueError("Invalid Binance Spot market")
     base = "https://data-api.binance.vision/api/v3"
     client = client or pooled_client("binance")
     deadline = time.monotonic() + 15

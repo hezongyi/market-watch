@@ -911,12 +911,14 @@ function drain() {
       continue;
     }
     const id = ++seq;
+    const directoryRefresh = type === "data-center-api" && query.path?.split("?")[0] === "/market-data/history-catalog/refresh";
+    const managementTimeout = directoryRefresh ? (query.body?.source === "fxcm" ? 70000 : query.body?.source === "yahoo" ? 120000 : 40000) : 30000;
     const timer = setTimeout(() => {
       pending.delete(id);
       application.cancel(id,adapter);
       reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
       drain();
-    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : (query.series_kind === "provider" && /^(MWP:)?FXCM:/i.test(query.instrument || "")) || (type === "data-center-api" && query.path === "/market-data/history-catalog/refresh" && query.body?.source === "fxcm") ? 70000 : 30000);
+    }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : (query.series_kind === "provider" && /^(MWP:)?FXCM:/i.test(query.instrument || "")) ? 70000 : managementTimeout);
     const entry = {resolve,reject,timer,cancellationTimer:null,...requestPolicy.describe(selected)};
     pending.set(id, entry);
     if (isCurrent) {

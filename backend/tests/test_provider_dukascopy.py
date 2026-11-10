@@ -10,6 +10,12 @@ from alerts.storage import Bar, MarketDemand
 from sqlalchemy import select
 
 
+@pytest.fixture(autouse=True)
+def isolated_catalog(database):
+    """Native metadata now consults the persistent local directory."""
+    return database
+
+
 @pytest.mark.parametrize("frame", provider.FRAMES)
 def test_native_sdk_exact_period_and_exclusive_backward_pagination(frame):
     meta = provider.metadata(provider.stable_id("EUR/USD"))

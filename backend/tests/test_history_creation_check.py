@@ -66,8 +66,9 @@ def test_combined_catalog_filters_paging_scope_and_no_registration(database, mon
         )
         for table in (MarketDataset, HistoryVersion, HistoryRun, MarketDemand, SourceSeries):
             assert db.scalar(select(func.count()).select_from(table)) == 0
+        assert search_catalog(db, source="binance")["sources"][0]["source"] == "binance"
         with pytest.raises(ValueError):
-            search_catalog(db, source="binance")
+            search_catalog(db, source="unsupported")
     monkeypatch.setattr(history_creation_check.settings, "oanda_account_id", "other-account")
     with database.begin() as db:
         assert search_catalog(db, source="oanda")["total"] == 0

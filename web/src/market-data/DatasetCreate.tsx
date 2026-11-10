@@ -42,7 +42,7 @@ const defaults: Record<string, string> = {
 };
 export function DatasetCreate() {
   const [params] = useSearchParams();
-  const initialSource = ["dukascopy", "oanda", "fxcm", "yahoo", "akshare"].includes(
+  const initialSource = ["dukascopy", "oanda", "binance", "fxcm", "yahoo", "akshare"].includes(
     params.get("source") || "",
   )
     ? params.get("source")!
@@ -65,6 +65,7 @@ export function DatasetCreate() {
     [periods, setPeriods] = useState(["M1", "H4", "D1"]),
     [frequency, setFrequency] = useState("daily");
   const [mode, setMode] = useState("base_m1"), [adjustment, setAdjustment] = useState("none");
+  const [supported, setSupported] = useState<string[]>([]);
   const [verified, setVerified] = useState<Record<string, string[]>>({}), [probing, setProbing] = useState(false);
   const [framePlan, setFramePlan] = useState<Record<string, FrameRule>>({});
   const native = mode !== "base_m1";
@@ -127,6 +128,7 @@ export function DatasetCreate() {
   );
   function choose(item: CatalogItem) {
     setSelected(item);
+    setSupported(item.supported_frames?.none || []);
     setSource(item.source);
     setSymbol(item.provider_symbol);
     setLogical(item.logical_symbol);
@@ -379,7 +381,7 @@ export function DatasetCreate() {
     if (probing) return;
     setProbing(true); setError("");
     try {
-      const candidates = mode === "base_d1" ? ["D1"] : source === "yahoo" ? ["M1", "M5", "M15", "H1", "D1", "W1", "MN"] : ["M1", "M5", "M15", "M30", "H1", "D1", "W1", "MN"];
+      const candidates = mode === "base_d1" ? ["D1"] : supported;
       const result = await api<{frames:string[]}>("/market-data/history-catalog/probe", {source, provider_symbol:symbol, adjustment, timeframes:candidates, start: Date.parse(`${day || "2000-01-01"}T00:00:00Z`)});
       setVerified(old => ({...old, [adjustment]: result.frames}));
       setPeriods(mode === "base_d1" ? (result.frames.includes("D1") ? ["D1", "W1", "MN"] : []) : result.frames);
@@ -533,7 +535,7 @@ export function DatasetCreate() {
                           }}
                         >
                           <option value="dukascopy">Dukascopy</option>
-                          <option value="oanda">OANDA Practice</option><option value="fxcm">FXCM Demo</option>
+                          <option value="oanda">OANDA Practice</option><option value="binance">Binance Spot</option><option value="fxcm">FXCM Demo</option>
                         </NativeSelect>
                       </label>
                       <label>
@@ -586,7 +588,7 @@ export function DatasetCreate() {
                       <dt>资产类别</dt>
                       <dd>{assetNames[asset] || asset}</dd>
                       <dt>报价</dt>
-                      <dd>{native ? "Last / Trade" : "Bid"}</dd>
+                      <dd>{native || source === "binance" ? "Last / Trade" : "Bid"}</dd>
                     </dl>
                   )}
                   {selected?.precision != null ? (
@@ -720,7 +722,7 @@ export function DatasetCreate() {
                   <dt>来源</dt>
                   <dd>{names[source]}</dd>
                   <dt>报价</dt>
-                  <dd>{native ? "Last / Trade" : "Bid"}</dd>
+                  <dd>{native || source === "binance" ? "Last / Trade" : "Bid"}</dd>
                   <dt>模式</dt><dd>{modeNames[mode]}</dd>
                   <dt>日线划分</dt>
                   <dd>{calendar ? phase(calendar) : "待选择"}</dd>

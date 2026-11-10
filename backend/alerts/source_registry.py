@@ -101,7 +101,7 @@ def capabilities(source: str):
         return {"source": source, "native_periods": list(FRAMES), "native_status": "supported",
                 "history_m1": True, "confirmation_m1": True, "stream": False,
                 "channel": "rest", "environment": "public", "bases": ["last"],
-                "history_range": "spot listing dependent; adapter currently supports BTCUSDT",
+                "history_range": "spot listing dependent; selected symbol only",
                 "volume_kind": "base", "volume_unit": "source_base"}
     if source == "yahoo":
         return {"source": source, "native_periods": list(YAHOO_INTERVALS),

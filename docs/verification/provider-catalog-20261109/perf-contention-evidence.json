@@ -1,0 +1,34 @@
+{
+  "rows": 47232,
+  "synthetic_rows": 25000,
+  "api_cpu_limit": 1.0,
+  "postgres_cpu_limit": 2.0,
+  "memory_mb": 512,
+  "host_load": [
+    14.04443359375,
+    12.63525390625,
+    12.07958984375
+  ],
+  "measurements": {
+    "list": {
+      "p95_ms": 1520.28,
+      "median_ms": 681.15,
+      "samples": 20
+    },
+    "code": {
+      "p95_ms": 60.72,
+      "median_ms": 44.79,
+      "samples": 20
+    },
+    "chinese": {
+      "p95_ms": 99.41,
+      "median_ms": 46.09,
+      "samples": 20
+    },
+    "creation": {
+      "p95_ms": 101.39,
+      "median_ms": 71.93,
+      "samples": 20
+    }
+  }
+}

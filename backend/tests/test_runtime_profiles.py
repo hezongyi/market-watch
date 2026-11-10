@@ -46,7 +46,7 @@ def test_data_profile_assembles_provider_and_data_roles_without_duplicate_stream
         "provider_live_oanda", "provider_warm_oanda",
         "provider_live_binance", "provider_warm_binance",
         "provider_transport_oanda", "provider_transport_binance", "provider_transport_dukascopy",
-        "provider_janitor", "chart_history", "history_network", "history_compute",
+        "provider_janitor", "catalog_runtime", "chart_history", "history_network", "history_compute",
         "native_history", "chart_aggregation", "market_stream",
         "switch_shadow", "retention",
     ]

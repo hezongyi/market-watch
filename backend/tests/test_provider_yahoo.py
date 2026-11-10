@@ -83,7 +83,7 @@ def test_native_date_labels_negative_prices_and_sdk_timestamp_metadata(adapter):
 def test_unsupported_period_never_fetches_or_creates_dataset(database, adapter, monkeypatch):
     monkeypatch.setattr(service.upstream, "metadata", lambda ident: META)
     _, calls = adapter
-    for frame in ("M30", "H4"):
+    for frame in ("H4",):
         with pytest.raises(ValueError):
             yahoo.native_page(META, frame, stamp("2020-04-22T00:00:00Z"), 2)
         with pytest.raises(ValueError):
@@ -149,33 +149,39 @@ def test_local_id_and_scope():
         assert not yahoo.allowed({"symbol": symbol, "quoteType": "EQUITY", "exchange": exchange})
 
 
-def test_yahoo_rounds_include_seven_frames_and_neighbor_buffers(database):
+def test_synced_crypto_directory_resolves_metadata_chart_and_archive(database, adapter, monkeypatch):
+    from alerts.catalog_sync import publish
+    from alerts.history_mode_sources import probe_yahoo
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    data, _ = adapter
+    data.loc[:, ["Open", "High", "Low", "Close"]] = [[10, 12, 9, 11], [11, 13, 10, 12]]
+    symbol = "BTC-USD"
+    ident = yahoo.stable_id(symbol)
+    publish("yahoo", [{"id": ident, "symbol": symbol, "label": "Bitcoin USD",
+        "asset_type": "CRYPTOCURRENCY"}], partition="crypto-usd", complete=True)
+    ticker = yahoo.yf.Ticker(symbol)
+    ticker.info = {"symbol": symbol, "quoteType": "CRYPTOCURRENCY", "exchange": "CCC",
+        "exchangeTimezoneName": "UTC", "currency": "USD", "shortName": "Bitcoin USD"}
+    monkeypatch.setattr(yahoo.yf, "Ticker", lambda *a, **k: ticker)
+    meta = yahoo_catalog.chart_metadata(ident)
+    assert meta["session"] == "24x7" and meta["timezone"] == "UTC"
+    assert meta["volume_kind"] == "unavailable"
+    assert yahoo.native_page(meta, "D1", stamp("2020-04-22T00:00:00Z"), 2)["bars"]
+    assert probe_yahoo(symbol, ["D1"])["frames"] == ["D1"]
+    assert not yahoo.allowed({**ticker.info, "symbol": "BTC-EUR"})
+    assert not yahoo.allowed({**ticker.info, "exchange": "OTHER"})
+
+
+def test_yahoo_rounds_include_eight_frames_and_neighbor_buffers(database):
     key = cache.ensure(META, "D1")
     service.activate("yahoo-test", key, stamp("2020-04-22T00:00:00Z"), 20)
     with storage.transaction() as db:
         interest = db.scalar(select(storage.ProviderInterest))
-        assert len(interest.targets) == 16
+        expected = ["D1", "D1", "W1", "M5", "M1", "MN", "H1", "M30", "M15"]
+        assert len(interest.targets) == 18
         assert {t["frame"] for t in interest.targets} == set(YAHOO_INTERVALS)
-        assert [t["frame"] for t in interest.targets[:8]] == [
-            "D1",
-            "D1",
-            "W1",
-            "M5",
-            "M1",
-            "MN",
-            "H1",
-            "M15",
-        ]
-        assert [t["frame"] for t in interest.targets[8:]] == [
-            "D1",
-            "D1",
-            "W1",
-            "M5",
-            "M1",
-            "MN",
-            "H1",
-            "M15",
-        ]
+        assert [t["frame"] for t in interest.targets[:9]] == expected
+        assert [t["frame"] for t in interest.targets[9:]] == expected
 
 
 def test_temporary_window_preserves_cached_prices_and_never_sets_earliest(database):

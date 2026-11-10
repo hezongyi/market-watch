@@ -110,8 +110,9 @@ def _store(details):
         row.precision = 8  # preserve fractional market values; no priceHint rounding
         row.calendar = "yahoo"
         row.available = True
-        row.metadata_json = {**{key: previous[key] for key in (
-            "archive_verified_frames", "archive_probes") if key in previous}, **details}
+        row.metadata_json = {**previous, **details, "metadata_observed_at": details["updated_at"]}
+        if previous.get("name_zh_origin") == "manual":
+            row.metadata_json = {**row.metadata_json, "name_zh": previous["name_zh"], "name_zh_origin": "manual"}
         row.updated_at = details["updated_at"]
     return ident
 
@@ -134,9 +135,11 @@ def chart_metadata(ident, *, deadline=None, cached_only=False):
             row.precision,
         )
         expired = (
-            now_ms() - row.updated_at >= settings.yahoo_metadata_ttl_seconds * 1000 or not details
+            now_ms() - details.get("metadata_observed_at", details.get("updated_at", row.updated_at))
+            >= settings.yahoo_metadata_ttl_seconds * 1000
+            or not details.get("adjustment")
         )
-    if cached_only and not details.get('adjustment'):
+    if cached_only and not details.get("adjustment"):
         raise QueryError(503, 'Yahoo 本地元信息尚未就绪，请先加载图表')
     if expired and not cached_only:
         with _LOCK:
@@ -229,3 +232,69 @@ def search(query):
         while len(_SEARCH) > 128:
             _SEARCH.pop(next(iter(_SEARCH)))
     return status
+
+
+# Public partitions whose pagination/coverage is documented in the research.
+# US equity is attempted but never published if Yahoo's 10k cap truncates it.
+PARTITIONS = {"crypto-usd": ("ALL_CRYPTOCURRENCIES_US", "CRYPTOCURRENCY"),
+              "equity-us": ("equity", "EQUITY")}
+
+
+def fetch_partition(scr_id, kind):
+    import httpx
+
+    from .provider_yahoo import stable_id
+
+    url = "https://query1.finance.yahoo.com/v1/finance/screener/predefined/saved"
+    records, total, start = {}, None, 0
+    from . import runtime_health
+    with httpx.Client(timeout=30, proxy=settings.yahoo_proxy or settings.market_proxy or None,
+                      trust_env=False) as client:
+        while total is None or start < total:
+            response = client.get(url, params={"scrIds": scr_id, "count": 250,
+                "start": start, "useRecordsResponse": "true", "sortField": "ticker", "sortType": "ASC"}, headers={"User-Agent": "Mozilla/5.0"})
+            response.raise_for_status()
+            runtime_health.progress()
+            data = response.json()["finance"]["result"][0]
+            reported = data["total"]
+            if total is None:
+                total = reported
+            if reported != total or data["start"] != start or total > 10000:
+                raise ValueError("供应商分区总数变化或超过10000条分页上限；未发布，保留旧快照")
+            page = data.get("records", data.get("quotes", []))
+            if not page:
+                raise ValueError("供应商分页提前结束；保留旧快照")
+            for item in page:
+                symbol = item.get("ticker") or item.get("symbol")
+                if not symbol or symbol in records:
+                    raise ValueError("供应商分页重复或缺少代码；保留旧快照")
+                records[symbol] = {"id": stable_id(symbol), "symbol": symbol,
+                    "label": item.get("companyName") or item.get("longName") or item.get("shortName") or symbol,
+                    "asset_type": kind, "precision": 8, "calendar": "yahoo",
+                    "metadata_json": {"exchange": item.get("exchange") or ("CCC" if kind == "CRYPTOCURRENCY" else "US"),
+                        "coverage_note": "USD quotes on CCC" if kind == "CRYPTOCURRENCY" else "US equity screener"}}
+            start += len(page)
+    if len(records) != total:
+        raise ValueError("供应商总数与唯一代码数不符；保留旧快照")
+    # The declared public partitions exclude A/H equities, including stale rows.
+    items = [row for row in records.values() if not row["symbol"].upper().endswith((".HK", ".SS", ".SZ", ".BJ"))]
+    return items, total
+
+
+def refresh():
+    from .catalog_sync import failed, publish
+
+    if not settings.yahoo_enabled:
+        raise ValueError("Yahoo 行情源未启用")
+    results = []
+    for partition, (scr_id, kind) in PARTITIONS.items():
+        try:
+            records, total = fetch_partition(scr_id, kind)
+            results.append(publish("yahoo", records, partition=partition, complete=True,
+                advertised_total=total, origin="Yahoo screener: " + scr_id, mark_missing=True))
+        except ValueError as error:
+            results.append(failed("yahoo", partition=partition, reason=str(error)))
+        except Exception:
+            results.append(failed("yahoo", partition=partition))
+    return {"source": "yahoo", "partitions": results,
+        "coverage_note": "已声明公开分区；不代表全球资产全集；排除沪深京及港股"}
