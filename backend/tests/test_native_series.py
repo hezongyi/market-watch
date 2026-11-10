@@ -34,11 +34,12 @@ def test_invalid_supplier_parameters_rejected(values):
         OandaParameters.model_validate(values)
 
 
-def test_authenticated_registration_is_immutable_idempotent_and_demand_free(native_catalog, monkeypatch):
+@pytest.mark.parametrize(("price", "basis", "display"), [("M", "mid", "中间价"), ("A", "ask", "卖价"), ("B", "bid", "买价")])
+def test_authenticated_registration_is_immutable_idempotent_and_demand_free(native_catalog, monkeypatch, price, basis, display):
     database = native_catalog
     monkeypatch.setattr(settings, "oanda_account_id", "native-test-account")
     with TestClient(api.app) as client:
-        body = {"instrument": "OANDA:EUR_USD", "parameters": {**DEFAULTS, "price": "M", "smooth": True}}
+        body = {"instrument": "OANDA:EUR_USD", "parameters": {**DEFAULTS, "price": price, "smooth": True}}
         assert client.post("/api/charts/provider/configure", json=body).status_code == 401
         api.app.dependency_overrides[api.authenticated] = lambda: "test"
         try:
@@ -49,7 +50,9 @@ def test_authenticated_registration_is_immutable_idempotent_and_demand_free(nati
             assert created.status_code == 200, created.text
             data = created.json()
             assert data == client.post("/api/charts/provider/configure", json=body).json()
-            assert data["metadata"]["basis"] == "mid"
+            assert data["metadata"]["basis"] == basis
+            assert data["metadata"]["price_basis_display"] == display
+            assert data["metadata"]["presentation_description"].endswith(" · " + display)
             assert data["metadata"]["native_identity"]["parameters"] == body["parameters"]
             ticker = data["ticker"][4:]
             assert provider_chart.metadata(ticker.upper())["id"] == ticker

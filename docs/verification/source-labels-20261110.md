@@ -67,3 +67,9 @@ node scripts/test-single-frontend.mjs --unit
 Playwriter 真实登录开发服务 `https://192.168.7.232:18443/`，只在本任务浏览器标签将静态资源路由到候选。后端元信息由本分支在独立 SQLite 生成，浏览器请求使用 fixture；工作区写入被浏览器拦截，未保存 fixture 到开发数据库。核对平台（新浪、腾讯、国内连续期货、Binance、Yahoo 期货）、自建、固定版本自建、组合图表及数据中心组合列表的显示。
 
 边界：该 smoke 验证真实原生图表和 React UI 的展示，不等价于独立完整服务的生产规模、供源实时性或数据迁移验收。开发服务代码和生产服务均未更新。
+
+## 原生价格口径一致性修正
+
+CI 的注册/解析一致性回归发现：OANDA 原生配置覆盖 `basis` 后，配置接口仍保留默认买价展示，解析接口重新计算后则显示实际价格口径。`native_series.configured_metadata` 现在在参数覆盖完成后调用统一 `present`，不改变价格参数、来源身份和注册行为。
+
+原有端到端注册测试覆盖买价、卖价、中间价，同时保留注册幂等、解析结果完全相等、账户隔离及无采集需求的断言。修正前原测试可稳定复现；修正后 native-series、presentation、provider-chart、series-access、platform-catalog、history-catalog 共 174 项回归通过，Ruff 与 diff 检查通过。
