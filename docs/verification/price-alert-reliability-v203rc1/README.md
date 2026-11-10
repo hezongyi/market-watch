@@ -44,7 +44,7 @@
    - 已覆盖有依据的休市区间（跨连接恢复仍比较开盘）及 DST 关闭时长；未知日历仍保守留缺口，不能冒充闭市。
    - 锁顺序为既有 dataset/LiveState/display → 日志保留 advisory mutex → Stream。全局裁剪只触碰日志，不反向获取 dataset/LiveState/ChartAlert 行锁。消费与裁剪使用同一 mutex；固定负载下的锁成本必须由性能验收确认。
 2. **收盘已分流**：按固定已发布 input_revision 和周期终点分页，每轮最多 128 周期；有界成功查询事实、失败窗口、已观察未确认分钟分别校验。已覆盖稀疏 M1、首个未决窗口阻挡、当前报价失效时消费积压、修订审计及仅修正受影响末柱基准、九周期、旧 seam 可验证当前物化柱、31 天 MN 截断明确阻挡。完整周末/闭市末柱与 DST 端到端矩阵仍需补齐。
-3. **到期**：worker/consume 仍有旧 detected_at 到期前置检查。必须实现 price-v2 固定范围结算、有限批次 expired 选择和不能补判的最终结论。
+3. **到期已接通**：price-v2 到期时冻结版本/run/有效区间与日志截止序号或聚合输入版本；worker 仅续做有匹配结算标记的 expired 规则。consume 验证限定入口、事件时间、来源及截止位置，检测时间保持真实。缺失确认即时终结并留痕；pause/archive 中止结算；次数用完终止。触价有效期末无观察区间保守留痕。后续 UI 与完整生命周期迁移仍未验收。
 4. **执行故障**：已有 runtime、Audit、notice_source 初版；手机 60 秒延迟、永久错误立即通知、独立 notification runtime 巡检、发送配置校验和 health 汇总尚未完成。错误原因还须统一稳定 reason_code，页面文案与 code 分开。
 5. **兼容与 UI**：React/原生入口、API 能力分模式、通知深链接及状态文案尚未修改。旧 active/paused/expired/completed、信号与 pending Outbox 的升级及代码回退用例尚未完成。
 6. **原始三项故障回归已通过**：`test_price_alert_reliability.py` 的中间观察覆盖、收盘跳柱、临时故障保留启用意图均通过。旧价格测试改为新要求；原复杂指标 fixtures 保留，通用依赖与门控测试使用真实水平射线继续验证旧路径。
@@ -62,6 +62,13 @@
 - 采集/聚合/图表/input 扩展回归：65 passed / 2 failed；两项失败是内部证据泄漏至图表比较，修复后聚合完整文件 9 passed。
 - 真实 PG：初轮 47 passed / 1 failed；失败为旧 ai36 迁移测试在新创建基准之后人为删除 judgment 表的时机假设。改为真实旧路径水平射线后，最终 price reliability + 迁移定向共 42 passed，0 skipped；包含原 17 项日志/并发用例与新收盘/九周期用例。
 - 本机日志：`/tmp/mw-price-alerts-v203rc1-{close-final,close-verified,close-collection,aggregate-read,pg-close,pg-close-final}.log`。后续到期结算修改需重新验证受影响范围。
+
+## 到期结算验证
+
+- 价格路径（输入、收盘、原始可靠性、结算）：62 passed。
+- 固定版本分批、截止等值、暂停/归档、次数上限、事务回滚、锁等待跨到期：真实 PG 12 passed，0 skipped。
+- 原计划 11 模块核心回归：155 passed / 1 failed；唯一失败为 HTTP 测试向已有收盘基准注入旧式 1/2 游标。该用例改为真实确认分钟→聚合→worker 后，API 全文件 8 passed。
+- Ruff 与 diff check 通过。日志：`/tmp/mw-price-alerts-v203rc1-{price-settlement,pg-settlement,core-settlement,api-settlement}.log`。
 
 ## 当前可复现命令
 

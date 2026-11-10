@@ -282,9 +282,14 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         if action != "archive":
             raise ValueError("已删除的告警不能恢复")
     if action in ("pause", "drawing_deleted"):
-        if alert.status == "active":
+        from .price_alert_settlement import pending
+
+        if alert.status == "active" or pending(alert):
             alert.status = "paused"
             alert.health_reason = "关联画线已明确删除" if action == "drawing_deleted" else "用户暂停"
+            if alert.runtime.get("settlement_pending"):
+                alert.runtime = {**alert.runtime, "settlement_pending": False,
+                    "settlement": {**alert.runtime["settlement"], "finished_at": at, "outcome": "user_paused"}}
         alert.runtime = {key: value for key, value in alert.runtime.items() if key != "demand_hold"}
     elif action in ("resume", "restart", "rebaseline"):
         if alert.expires_at is not None and alert.expires_at <= at:
@@ -319,6 +324,9 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         initialize_price(db, alert, current_version(db, alert).market_identity, config, at=at)
     elif action == "archive":
         alert.status = "archived"
+        if alert.runtime.get("settlement_pending"):
+            alert.runtime = {**alert.runtime, "settlement_pending": False,
+                "settlement": {**alert.runtime["settlement"], "finished_at": at, "outcome": "user_archived"}}
     else:
         raise ValueError("未知生命周期操作")
     alert.updated_at = at
@@ -329,18 +337,27 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
 
 
 def consume(db, alert_id, observation: Observation, *, detected_at=None, baseline=False,
-            expected_version=None):
+            expected_version=None, settlement=False):
     """Checkpoint, count, signal, notification and outbox are one transaction."""
     alert = locked(db, alert_id, expected_version)
     detected_at = now_ms() if detected_at is None else detected_at
-    if alert.status != "active":
+    if not settlement and alert.status != "active":
         return None
-    if alert.expires_at is not None and detected_at >= alert.expires_at:
+    if not settlement and alert.expires_at is not None and detected_at >= alert.expires_at:
         alert.status = "expired"
         alert.control_revision += 1
         return None
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
+    from .price_alert_inputs import is_price_rule
+
+    if is_price_rule(config) and alert.expires_at is not None and observation.occurred_at >= alert.expires_at:
+        return None
+    if settlement:
+        from .price_alert_settlement import accepts
+
+        if not is_price_rule(config) or not accepts(alert, observation, config):
+            return None
     state = EvaluationState(**alert.state) if alert.state else EvaluationState(count=alert.count)
     if state.sequence is not None and observation.sequence <= state.sequence:
         return None

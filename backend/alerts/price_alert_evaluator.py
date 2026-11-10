@@ -92,6 +92,7 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
     from .chart_alert_service import consume
     from .composite_alerts import bound_identity
     from .composite_quotes import live_snapshot, sampled_observation
+    from .price_alert_settlement import begin, finish, pending, runnable
     from .realtime_switch import revision_enabled
 
     try:
@@ -105,6 +106,10 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
         .order_by(MarketDataset.id).with_for_update()))
     if clock:
         now = clock()
+    begin(db, alert, version, config, now=now)
+    if not runnable(alert):
+        return []
+    settling = pending(alert)
     if not revision_enabled(db, revision):
         transition(db, alert, state="blocked", now=now, reason="realtime_disabled")
         return []
@@ -131,8 +136,11 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
         alert.runtime = {**alert.runtime, "cursor": cursor}
     events = []
     for row in read_after(db, target.id, cursor):
-        if alert.status != "active":
+        if not runnable(alert) or settling and row.sequence > alert.runtime["settlement"]["cursor_limit"]:
             break
+        if settling and (row.occurred_at >= alert.expires_at or row.received_at >= alert.expires_at):
+            alert.runtime = {**alert.runtime, "cursor": row.sequence}
+            continue
         if row.kind == "interruption":
             gap(db, alert, now=now, reason=row.evidence["reason_code"],
                 start=row.evidence.get("possible_start"), end=row.evidence.get("end"),
@@ -148,7 +156,7 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
                     "dataset_id": target.id, "sequence": row.sequence, "mode": row.mode,
                     "epoch": row.epoch, "received_at": row.received_at, **row.evidence}),
                 detected_at=now, baseline=recovering,
-                expected_version=alert.version)
+                expected_version=alert.version, settlement=settling)
             if record:
                 events.append(record)
             if recovering:
@@ -159,6 +167,20 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
                 "last_input_at": row.occurred_at, "last_evaluated_at": now,
                 "last_outcome": "recovery_baseline" if recovering else "evaluated"}
         alert.runtime = {**alert.runtime, "cursor": row.sequence}
+    if settling:
+        if alert.status == "completed" or alert.runtime["cursor"] >= alert.runtime["settlement"]["cursor_limit"]:
+            from .live_session import unclosed_milliseconds
+            from .storage import Instrument
+
+            last = max(alert.effective_at, alert.runtime.get("last_input_at", alert.effective_at))
+            open_ms = unclosed_milliseconds(target.identity, db.get(Instrument, target.instrument_id).calendar_profile,
+                last, alert.expires_at)
+            if alert.status != "completed" and (open_ms if open_ms is not None else alert.expires_at - last) > 15000:
+                gap(db, alert, now=now, reason="expiry_unobserved_tail", start=last, end=alert.expires_at)
+            finish(db, alert, now=now, reason="settlement_unobserved_input" if alert.runtime.get("needs_baseline") else None)
+        else:
+            transition(db, alert, state="settling", now=now)
+        return events
     view = live_snapshot(db, revision, now=now)
     if view.get("market_session") == "closed":
         transition(db, alert, state="closed", now=now)

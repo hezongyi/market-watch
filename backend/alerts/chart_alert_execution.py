@@ -23,7 +23,7 @@ def transition(db, alert, *, state, now, reason=None, interval=None):
         _append(db.connection(), "task_failure", alert.id, {"source_kind": "chart_alert",
             "dedupe_key": incident["id"], "code": reason, "title": "价格告警执行异常",
             "attempt": str(now), "context": context, "evidence": interval or {}})
-    elif incident and state in ("monitoring", "closed"):
+    elif incident and state in ("monitoring", "closed", "settled"):
         _append(db.connection(), "recovery", alert.id,
             {"source_kind": "chart_alert", "dedupe_key": incident["id"]})
         runtime.pop("incident", None)
@@ -32,7 +32,7 @@ def transition(db, alert, *, state, now, reason=None, interval=None):
     runtime.update(execution_state=state, execution_since=now, reason_code=reason)
     alert.runtime = runtime
     alert.health = {"preparing": "warming", "monitoring": "ready", "closed": "ready",
-                    "recovering": "stale", "blocked": "blocked"}[state]
+                    "recovering": "stale", "blocked": "blocked", "settling": "ready", "settled": "ready"}[state]
     alert.health_reason = reason
     db.add(Audit(kind="chart_alert_execution", at=now, details={**context,
         "state": state, "reason_code": reason, "interval": interval,

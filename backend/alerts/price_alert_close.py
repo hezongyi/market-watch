@@ -6,7 +6,7 @@ import json
 from dataclasses import asdict
 from decimal import Decimal
 
-from sqlalchemy import and_, func, select
+from sqlalchemy import and_, func, or_, select
 
 from .chart_alert_domain import EvaluationState, Observation
 from .chart_alert_execution import transition
@@ -44,26 +44,35 @@ def bars(db, revision, frame, value, *, start, end, newest=False):
     return list(db.scalars(query))
 
 
-def window_reason(db, revision, target, value, fact, start, end, *, row=None):
+def window_reason(db, revision, target, value, fact, start, end, *, row=None, settlement=None):
     """Query completion and observed-but-unconfirmed input are separate facts."""
     unreadable = fact.get("unreadable_failure")
     if unreadable and unreadable[0] < end and start < unreadable[1]:
         return "confirmation_window_unreadable"
     if failure(fact, start, end):
         return "confirmation_query_failed"
-    if db.scalar(select(LiveMinute.id).where(LiveMinute.dataset_id == target.id,
+    observations = select(LiveMinute.id).where(LiveMinute.dataset_id == target.id,
             LiveMinute.start >= start, LiveMinute.start < end,
-            LiveMinute.expected.is_(True), LiveMinute.confirmed_at.is_(None)).limit(1)) is not None:
+            LiveMinute.expected.is_(True))
+    observations = observations.where(or_(LiveMinute.confirmed_at.is_(None),
+        LiveMinute.confirmed_at > settlement["started_at"]), LiveMinute.first_attempt <= settlement["started_at"]
+        ) if settlement else observations.where(LiveMinute.confirmed_at.is_(None))
+    if db.scalar(observations.limit(1)) is not None:
         return "observed_minute_unconfirmed"
-    if db.scalar(select(CompositeMinuteInput.start).where(
+    newer = select(CompositeMinuteInput.start).where(
             CompositeMinuteInput.revision_id == revision.id, CompositeMinuteInput.start >= start,
-            CompositeMinuteInput.start < end, CompositeMinuteInput.input_revision > value).limit(1)) is not None:
+            CompositeMinuteInput.start < end, CompositeMinuteInput.input_revision > value)
+    if settlement:
+        newer = newer.where(CompositeMinuteInput.input_revision <= settlement["known_input_revision"])
+    if db.scalar(newer.limit(1)) is not None:
         return "confirmation_aggregation_pending"
     proof = row.data.get("price_input_read", {}) if row else {}
     if not covered(fact, start, end) and not proof.get("query_covered"):
         # Old accepted preparation reads already carry a bounded source proof.
         cursor = start
-        for lower, upper in db.execute(select(CompositeReadAttempt.start, CompositeReadAttempt.checkpoint)
+        attempts = select(CompositeReadAttempt.start, CompositeReadAttempt.checkpoint)
+        attempts = attempts.where(CompositeReadAttempt.finished_at <= settlement["started_at"]) if settlement else attempts
+        for lower, upper in db.execute(attempts
                 .where(CompositeReadAttempt.revision_id == revision.id,
                     CompositeReadAttempt.accepted.is_(True), CompositeReadAttempt.start < end,
                     CompositeReadAttempt.checkpoint > start).order_by(CompositeReadAttempt.start)):
@@ -139,14 +148,17 @@ def initialize_close(db, alert, identity, config, *, now, takeover=False):
         "cursor": boundary, "price": alert.state.get("left"), "takeover": takeover}))
 
 
-def corrections(db, alert, revision, target, config, value, fact, now):
+def corrections(db, alert, revision, target, config, value, fact, now, *, settlement=None):
     previous = alert.runtime.get("processed_input_revision", value)
     cursor = alert.runtime["close_cursor"]
     last_start = alert.runtime.get("last_start")
-    if last_start is not None and db.scalar(select(CompositeMinuteInput.start).where(
+    newer = select(CompositeMinuteInput.start).where(
             CompositeMinuteInput.revision_id == revision.id, CompositeMinuteInput.start >= last_start,
-            CompositeMinuteInput.start < alert.state["sequence"],
-            CompositeMinuteInput.input_revision > value).limit(1)) is not None:
+            CompositeMinuteInput.start < alert.state["sequence"], CompositeMinuteInput.input_revision > value
+        ) if last_start is not None else None
+    if newer is not None and settlement:
+        newer = newer.where(CompositeMinuteInput.input_revision <= settlement["known_input_revision"])
+    if newer is not None and db.scalar(newer.limit(1)) is not None:
         return "confirmation_aggregation_pending"
     if value <= previous:
         return
@@ -160,7 +172,8 @@ def corrections(db, alert, revision, target, config, value, fact, now):
         if last_start is not None and last >= last_start:
             rows = bars(db, revision, config.timeframe, value, start=last_start, end=last_start + 1)
             if rows:
-                reason = window_reason(db, revision, target, value, fact, last_start, rows[0].data["end"], row=rows[0])
+                reason = window_reason(db, revision, target, value, fact, last_start, rows[0].data["end"],
+                    row=rows[0], settlement=settlement)
                 if reason:
                     return reason
             if rows and rows[0].data["close"] != alert.state.get("left"):
@@ -178,6 +191,7 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
     from .live_session import session_status, unclosed_milliseconds
     from .live_window import lower_bound
     from .price_alert_evaluator import eligibility
+    from .price_alert_settlement import begin, finish, pending, runnable
 
     try:
         revision, target = bound_identity(db, version.market_identity)
@@ -187,6 +201,10 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
         return []
     if clock:
         now = clock()
+    begin(db, alert, version, config, now=now)
+    if not runnable(alert):
+        return []
+    settlement = alert.runtime["settlement"] if pending(alert) else None
     if alert.runtime.get("execution_contract") != CONTRACT:
         # Trust only an immutable old judgment with the same version and cursor.
         trusted = db.scalar(select(CompositeJudgment).where(
@@ -203,17 +221,17 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
     alert.runtime = {**alert.runtime, "taken_over_at": alert.runtime.get("taken_over_at", now),
         "last_checked_at": now}
     task = db.get(CompositeAggregateTask, (revision.id, config.timeframe))
-    value = task.applied_input_revision if task else -1
+    value = settlement["input_revision"] if settlement else task.applied_input_revision if task else -1
     phase = revision.rules["aggregation_calendar"]
     cursor = alert.runtime["close_cursor"]
-    cutoff = period(now, config.timeframe, phase)[0]
+    cutoff = settlement["cursor_limit"] if settlement else period(now, config.timeframe, phase)[0]
     profile = db.get(Instrument, target.instrument_id).calendar_profile
-    fact = facts(db, target.identity)
-    correction_reason = corrections(db, alert, revision, target, config, value, fact, now)
+    fact = settlement["query_fact"] if settlement else facts(db, target.identity)
+    correction_reason = corrections(db, alert, revision, target, config, value, fact, now, settlement=settlement)
     selected = {row.start: row for row in bars(db, revision, config.timeframe, value, start=cursor, end=cutoff)}
     events, empty, reason = [], None, correction_reason
     for _ in range(BATCH_SIZE):
-        if reason or cursor >= cutoff or alert.status != "active":
+        if reason or cursor >= cutoff or not runnable(alert):
             break
         start, end = period(cursor, config.timeframe, phase)
         row = selected.get(start)
@@ -223,7 +241,7 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
             db.add(Audit(kind="chart_alert_source_boundary", at=now, details={"alert_id": alert.id,
                 "version": alert.version, "run": alert.run, "start": start, "end": end}))
         else:
-            reason = window_reason(db, revision, target, value, fact, start, end, row=row)
+            reason = window_reason(db, revision, target, value, fact, start, end, row=row, settlement=settlement)
             if reason and not row and unclosed_milliseconds(target.identity, profile, start, end) == 0:
                 # Verified closure does not override actual observed/failing input.
                 if reason == "confirmation_window_pending":
@@ -240,7 +258,7 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
                 detail = evidence(version.market_identity, revision, row, value, copy.deepcopy(alert.state))
                 signal = consume(db, alert.id, Observation(f"bar:{start}", end, end,
                     Decimal(row.data["close"]), right_value(config), Decimal(row.data["close"]), detail),
-                    detected_at=now, baseline=baseline, expected_version=alert.version)
+                    detected_at=now, baseline=baseline, expected_version=alert.version, settlement=bool(settlement))
                 if signal:
                     events.append(signal)
                 if baseline or signal:
@@ -255,6 +273,12 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
         alert.runtime = {**alert.runtime, "close_cursor": cursor}
     if empty:
         _empty_audit(db, alert, empty, now)
+    if settlement:
+        if reason or cursor >= cutoff or alert.status == "completed":
+            finish(db, alert, now=now, reason=reason, start=cursor, end=cutoff)
+        else:
+            transition(db, alert, state="settling", now=now)
+        return events
     deadline = period(cursor, config.timeframe, phase)[1] + max(120000, 3 * CONFIRMATION_INTERVAL_MS)
     alert.runtime = {**alert.runtime, "expected_input_at": deadline}
     if reason:

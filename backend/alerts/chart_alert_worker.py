@@ -7,7 +7,7 @@ import time
 from decimal import Decimal
 from types import SimpleNamespace
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from .calendar_profile import closures_from
 from .chart_alert_domain import Observation
@@ -216,23 +216,32 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
         clock = clock or now_ms
         now = clock()
     alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update(skip_locked=True))
-    if not alert or alert.status != "active":
-        return []
-    if alert.expires_at is not None and now >= alert.expires_at:
-        alert.status = "expired"
-        alert.control_revision += 1
+    from .price_alert_settlement import begin, finish, pending, runnable
+
+    if not alert or not runnable(alert):
         return []
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
-    if config.series_kind == "composite":
-        from .price_alert_inputs import is_price_rule
+    from .price_alert_inputs import is_price_rule
 
+    if is_price_rule(config):
+        begin(db, alert, version, config, now=now)
+        if not runnable(alert):
+            return []
+    elif alert.expires_at is not None and now >= alert.expires_at:
+        alert.status = "expired"
+        alert.control_revision += 1
+        return []
+    if config.series_kind == "composite":
         if is_price_rule(config):
             from .price_alert_close import evaluate_close
             from .price_alert_evaluator import evaluate_intrabar
 
             evaluator = evaluate_intrabar if config.mode == "intrabar" else evaluate_close
-            return evaluator(db, alert, version, config, now, clock=clock)
+            result = evaluator(db, alert, version, config, now, clock=clock)
+            if pending(alert) and alert.runtime.get("execution_state") in ("blocked", "recovering"):
+                finish(db, alert, now=now, reason=alert.runtime.get("reason_code") or "settlement_input_unavailable")
+            return result
         from .composite_alerts import evaluate as evaluate_composite
 
         return evaluate_composite(db, alert, version, config, now, clock=clock)
@@ -451,7 +460,10 @@ def step(*, now=None, on_evaluated=None, on_error=None):
         maintain(now=now_ms() if now is None else now)
         _RETENTION_NEXT = time.monotonic() + 60
     with transaction() as db:
-        ids = list(db.scalars(select(ChartAlert.id).where(ChartAlert.status == "active")))
+        ids = list(db.scalars(select(ChartAlert.id).where(or_(ChartAlert.status == "active",
+            (ChartAlert.status == "expired") &
+            (ChartAlert.runtime["execution_contract"].as_string() == "price-v2") &
+            ChartAlert.runtime["settlement_pending"].as_boolean()))))
     evaluated_count = 0
     for ident in ids:
         started = time.monotonic()
@@ -461,7 +473,9 @@ def step(*, now=None, on_evaluated=None, on_error=None):
                 business_now = now_ms() if now is None else now
                 row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident)
                     .with_for_update(skip_locked=True))
-                if row is None or row.status != "active":
+                from .price_alert_settlement import runnable
+
+                if row is None or not runnable(row):
                     continue
                 version = current_version(db, row)
                 config = AlertConfig.model_validate(version.config)
@@ -497,6 +511,11 @@ def step(*, now=None, on_evaluated=None, on_error=None):
                 row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident).with_for_update())
                 if row and row.status == "active":
                     health(row, "error", "判定失败：" + type(exc).__name__)
+                elif row:
+                    from .price_alert_settlement import finish, pending
+
+                    if pending(row):
+                        finish(db, row, now=now_ms() if now is None else now, reason="settlement_evaluation_failed")
             continue
         if on_evaluated:
             # Evidence collection failures propagate to the monitor, without

@@ -9,6 +9,7 @@ from pathlib import Path
 import pytest
 import test_price_alert_close as close_contracts
 import test_price_alert_inputs as contracts
+import test_price_alert_settlement as settlement_contracts
 from alembic.migration import MigrationContext
 from alembic.operations import Operations
 from alerts.price_alert_inputs import prune, read_after
@@ -47,6 +48,33 @@ def test_close_correction(provider_pg, monkeypatch, latest):
 @pytest.mark.parametrize("frame", ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"])
 def test_close_period(provider_pg, monkeypatch, frame):
     close_contracts.test_all_existing_periods_use_source_confirmed_sparse_close(provider_pg[0], monkeypatch, frame)
+
+
+@pytest.mark.parametrize("mode", ["intrabar", "close"])
+def test_expiry_valid_input(provider_pg, monkeypatch, mode):
+    settlement_contracts.test_expiry_saves_valid_delayed_signal_without_restarting_demand(provider_pg[0], monkeypatch, mode)
+
+
+@pytest.mark.parametrize("mode", ["intrabar", "close"])
+def test_expiry_boundary(provider_pg, monkeypatch, mode):
+    settlement_contracts.test_event_at_exact_expiry_never_triggers(provider_pg[0], monkeypatch, mode)
+
+
+@pytest.mark.parametrize("contract", [
+    settlement_contracts.test_worker_resumes_expired_fixed_close_version_in_finite_batches,
+    settlement_contracts.test_failure_before_settlement_commit_retries_same_inputs,
+    settlement_contracts.test_intrabar_expiry_can_resume_multiple_batches,
+    settlement_contracts.test_settlement_respects_remaining_trigger_count,
+    settlement_contracts.test_expired_close_finishes_unresolved_window_and_never_waits_for_future_repair,
+    settlement_contracts.test_expiry_during_dataset_lock_wait_still_settles_real_detected_time,
+])
+def test_settlement_contract(provider_pg, monkeypatch, contract):
+    contract(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize("action", ["pause", "archive"])
+def test_settlement_cancel(provider_pg, monkeypatch, action):
+    settlement_contracts.test_user_lifecycle_cancels_pending_settlement(provider_pg[0], monkeypatch, action)
 
 
 @pytest.fixture
