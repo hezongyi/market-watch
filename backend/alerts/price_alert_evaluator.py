@@ -7,7 +7,7 @@ from sqlalchemy import select
 
 from .chart_alert_domain import EvaluationState, Observation
 from .chart_alert_execution import gap, transition
-from .price_alert_inputs import read_after, register
+from .price_alert_inputs import consumers, expire, read_after, register, retention_lock
 from .storage import (
     Audit,
     CompositePreparation,
@@ -63,6 +63,14 @@ def initialize(db, alert, identity, config, *, now, takeover=False):
     revision = db.get(CompositeRevision, identity["composite_revision_id"])
     sample = eligibility(db, revision, mode=config.mode, now=now)
     stream = register(db, identity["target_dataset_id"], now=now)
+    if stream.last_received_at is None or not any(
+            other.id != alert.id for other, _ in consumers(db, stream.dataset_id, now=now)):
+        # A manual resume/new first consumer begins at its current sample. Idle
+        # time before that interval must not suppress the first future crossing.
+        stream.last_received_at = sample["observed_at"]
+        stream.last_mode = "candle_close_sample" if sample["kind"] == "sampled_candle_close" else "stream_quote"
+        stream.last_epoch = (sample.get("quote") or sample.get("candle") or {}).get("connection_epoch")
+        stream.interrupted = False
     right = right_value(config)
     alert.state = asdict(EvaluationState(sequence=stream.sequence, left=str(sample["value"]),
         right=str(right) if right is not None else None, count=alert.count))
@@ -107,10 +115,13 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
         alert.runtime = {**alert.runtime, "needs_baseline": False}
     alert.runtime = {**alert.runtime, "taken_over_at": alert.runtime.get("taken_over_at", now),
         "last_checked_at": now}
-    stream = db.get(PriceAlertStream, target.id)
+    retention_lock(db)
+    stream = db.get(PriceAlertStream, target.id, populate_existing=True)
+    expire(db, stream, now=now)
     cursor = alert.runtime["cursor"]
     if stream.trimmed_through > cursor:
-        gap(db, alert, now=now, reason="input_retention_exceeded", start=stream.trimmed_start,
+        gap(db, alert, now=now, reason="input_retention_exceeded",
+            start=max(stream.trimmed_start or 0, alert.effective_at, alert.runtime.get("last_input_at", 0)),
             end=stream.trimmed_end, trimmed_through=stream.trimmed_through)
         cursor = stream.trimmed_through
         alert.runtime = {**alert.runtime, "cursor": cursor}
@@ -120,22 +131,29 @@ def evaluate_intrabar(db, alert, version, config, now, *, clock=None):
             break
         if row.kind == "interruption":
             gap(db, alert, now=now, reason=row.evidence["reason_code"],
-                start=row.evidence.get("possible_start"), end=row.evidence.get("end"))
+                start=row.evidence.get("possible_start"), end=row.evidence.get("end"),
+                observation_gap_ms=row.evidence.get("observation_gap_ms"))
         else:
             if row.mode != alert.runtime.get("baseline_mode") and not alert.runtime.get("needs_baseline"):
                 gap(db, alert, now=now, reason="observation_mode_changed",
                     start=alert.runtime.get("last_input_at"), end=row.occurred_at)
+            recovering = alert.runtime.get("needs_baseline", False)
             record = consume(db, alert.id, Observation(identity=f"price:{target.id}:{row.sequence}",
                 sequence=row.sequence, occurred_at=row.occurred_at, left=Decimal(row.price),
                 right=right_value(config), market_price=Decimal(row.price), evidence={
                     "dataset_id": target.id, "sequence": row.sequence, "mode": row.mode,
                     "epoch": row.epoch, "received_at": row.received_at, **row.evidence}),
-                detected_at=now, baseline=alert.runtime.get("needs_baseline", False),
+                detected_at=now, baseline=recovering,
                 expected_version=alert.version)
             if record:
                 events.append(record)
+            if recovering:
+                db.add(Audit(kind="chart_alert_baseline", at=now, details={"alert_id": alert.id,
+                    "version": alert.version, "run": alert.run, "cursor": row.sequence,
+                    "price": row.price, "mode": row.mode, "reason": "recovery_baseline"}))
             alert.runtime = {**alert.runtime, "needs_baseline": False, "baseline_mode": row.mode,
-                "last_input_at": row.occurred_at, "last_evaluated_at": now}
+                "last_input_at": row.occurred_at, "last_evaluated_at": now,
+                "last_outcome": "recovery_baseline" if recovering else "evaluated"}
         alert.runtime = {**alert.runtime, "cursor": row.sequence}
     view = live_snapshot(db, revision, now=now)
     if view.get("market_session") == "closed":

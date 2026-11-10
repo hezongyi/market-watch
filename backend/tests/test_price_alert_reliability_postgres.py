@@ -164,3 +164,60 @@ def test_signal_cursor_count_and_notification_rollback_together(collecting):
         assert db.get(ChartAlert, ident).count == 1
         assert db.get(ChartAlert, ident).runtime["cursor"] == 1
         assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
+
+
+@pytest.mark.parametrize("contract", [
+    contracts.test_hard_dataset_limit_without_evaluator_and_recovery_boundary,
+    contracts.test_global_limit_prefers_acknowledged_data_across_datasets,
+    contracts.test_rest_logging_does_not_depend_on_display_capacity,
+    contracts.test_verified_closure_preserves_baseline_across_connection_change,
+    contracts.test_age_limit_is_applied_before_evaluation_even_without_periodic_cleanup,
+])
+def test_retention_and_continuity_contract(collecting, monkeypatch, contract):
+    contract(collecting, monkeypatch)
+
+
+def test_periodic_retention_without_new_collection(collecting):
+    contracts.test_retention_reclaims_acknowledged_inputs_and_age_without_new_quotes(collecting)
+
+
+def test_resume_starts_at_current_baseline_after_no_demand(collecting):
+    contracts.test_resume_after_idle_registration_does_not_lose_first_future_cross(collecting)
+
+
+def test_cleanup_waits_for_consumer_transaction_before_deleting(collecting):
+    from alerts.chart_alert_worker import evaluate
+    from alerts.storage import ChartAlert, SignalRow
+    from sqlalchemy import func
+
+    factory, ident, identity, _, stamp = collecting
+    contracts.publish(collecting, 1, "1.120")
+    consumed, release, pruning = threading.Event(), threading.Event(), threading.Event()
+
+    def consume():
+        with factory.begin() as db:
+            assert len(evaluate(db, ident, now=stamp + 200)) == 1
+            consumed.set()
+            assert release.wait(10)
+
+    def clean():
+        with factory.begin() as db:
+            pruning.set()
+            return prune(db, identity.key, now=stamp + 300, max_rows=0)
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        evaluation = pool.submit(consume)
+        assert consumed.wait(10)
+        cleanup = pool.submit(clean)
+        try:
+            assert pruning.wait(10)
+            assert not cleanup.done()
+        finally:
+            release.set()
+        evaluation.result(timeout=10)
+        assert cleanup.result(timeout=10) == 1
+    with factory.begin() as db:
+        assert db.get(ChartAlert, ident).runtime["cursor"] == 1
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
+        assert db.get(PriceAlertStream, identity.key).trimmed_through == 1
+        assert evaluate(db, ident, now=stamp + 400) == []

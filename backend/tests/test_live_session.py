@@ -46,6 +46,16 @@ def test_weekend_reopening_after_dst_shift_uses_source_timezone():
     assert status['next_session_at'] == at('2026-11-01T22:04:00+00:00')
     assert session_status(identity, profile, status['next_session_at'])['market_session'] == 'unknown'
     assert session_status(identity, profile, status['next_session_at']+60000)['market_session'] == 'scheduled_open'
+    from alerts.live_session import unclosed_milliseconds
+
+    # Friday close to Sunday reopen spans the fall DST change. Only the two
+    # five-second observed edges are outside the explicit closed interval.
+    assert unclosed_milliseconds(identity, profile, at('2026-10-30T20:59:55+00:00'),
+        at('2026-11-01T22:04:05+00:00')) == 10000
+    assert unclosed_milliseconds(identity, profile, at('2026-10-30T20:59:00+00:00'),
+        at('2026-11-01T22:04:05+00:00')) == 65000
+    assert unclosed_milliseconds(identity, profile, at('2026-10-29T20:59:55+00:00'),
+        at('2026-11-01T22:04:05+00:00')) is None
 
 
 def test_daily_and_weekend_boundary_minutes_remain_unknown():

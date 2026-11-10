@@ -34,6 +34,7 @@ from .storage import (
 log = logging.getLogger(__name__)
 _VALUE_CACHE = {}
 _ATR_CACHE = {}
+_RETENTION_NEXT = 0.0
 ATR_PAGE_ROWS = 2048
 
 
@@ -441,6 +442,12 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
 
 
 def step(*, now=None, on_evaluated=None, on_error=None):
+    global _RETENTION_NEXT
+    if time.monotonic() >= _RETENTION_NEXT:
+        from .price_alert_inputs import maintain
+
+        maintain(now=now_ms() if now is None else now)
+        _RETENTION_NEXT = time.monotonic() + 60
     with transaction() as db:
         ids = list(db.scalars(select(ChartAlert.id).where(ChartAlert.status == "active")))
     evaluated_count = 0

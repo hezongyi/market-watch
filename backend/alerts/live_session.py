@@ -39,6 +39,37 @@ def session_evidence(identity, profile, stamp):
         'reviewed_end': session.reviewed_end.isoformat() if session else None}
 
 
+def unclosed_milliseconds(identity, profile, start, end):
+    """Duration not covered by explicit source closures, or None without proof.
+
+    This uses exact reviewed closure edges, including DST. It does not infer
+    closure from missing samples or broaden the deliberately unknown minutes.
+    """
+    profile = effective_profile(identity, profile)
+    session = session_from(profile)
+    if not session or any(getattr(session, key) != identity.get(key) for key in (
+            'source', 'channel', 'environment', 'provider_symbol', 'account_scope')):
+        return None
+    first, last = (datetime.fromtimestamp(value / 1000, UTC) for value in (start, end))
+    if not session.reviewed_start <= first <= last <= session.reviewed_end:
+        return None
+    intervals = [(c.start, c.end) for c in closures_from(profile)]
+    local = first.astimezone(ZoneInfo(session.timezone))
+    monday = local.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=local.weekday())
+    while monday.astimezone(UTC) < last:
+        intervals.extend(((monday + timedelta(minutes=c.start)).astimezone(UTC),
+                          (monday + timedelta(minutes=c.end)).astimezone(UTC))
+                         for c in session.weekly_closures)
+        monday += timedelta(weeks=1)
+    covered, cursor = 0, first
+    for lower, upper in sorted(intervals):
+        lower, upper = max(lower, cursor), min(upper, last)
+        if lower < upper:
+            covered += int((upper - lower).total_seconds() * 1000)
+            cursor = upper
+    return end - start - covered
+
+
 @lru_cache(maxsize=512)
 def _status(encoded_identity, encoded_profile, minute):
     identity, profile = json.loads(encoded_identity), json.loads(encoded_profile)

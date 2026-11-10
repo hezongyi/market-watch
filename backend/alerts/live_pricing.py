@@ -396,6 +396,10 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         handover_legacy(db, state)
         previous = state.quote
         if previous and event.source_time < previous["source_time"]:
+            if previous.get("connection_epoch") == epoch and event.sequence > previous.get("sequence", 0):
+                from .price_alert_inputs import interrupt
+
+                interrupt(db, event.identity.key, now=stamp, epoch=epoch, reason="out_of_order_price")
             return "rejected_old_source"
         if previous and previous["connection_epoch"] == epoch and event.sequence <= previous["sequence"]:
             return "rejected_sequence"
@@ -483,7 +487,14 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
         if owner.error == 'provider_maintenance':
             return 'rejected_provider_maintenance'
         owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
-        from .display_observations import accept_rest
+        from .display_observations import accept_rest, admission_lock
+
+        # A REST response may contain several datasets. Acquire all mutable
+        # state/display locks before any sample takes the price-retention mutex.
+        list(db.scalars(select(LiveState).where(LiveState.dataset_id.in_(
+            sorted(identity.key for identity in identities.values())))
+            .order_by(LiveState.dataset_id).with_for_update()))
+        admission_lock(db)
 
         for identity in identities.values():
             state = db.get(LiveState, identity.key)

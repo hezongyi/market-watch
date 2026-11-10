@@ -13,6 +13,7 @@ from alerts.history_versions import create_version, import_page
 from alerts.live_pricing import account_key, desired_datasets
 from alerts.market_contracts import DatasetIdentity, QuoteEvent
 from alerts.storage import (
+    Audit,
     ChartAlert,
     CompositeJudgment,
     CompositePreparation,
@@ -61,7 +62,7 @@ def live(database, revision, stamp, confirmed_end, *, epoch=1, connected=True):
         state.heartbeat_at = state.received_at = stamp
         state.confirmed_end, state.error = confirmed_end, None
         state.quote = {"source_time": stamp, "bid": "1.11", "ask": "1.111", "tradeable": True,
-                       "connection_epoch": epoch}
+                       "connection_epoch": epoch, "sequence": 0, "received_at": stamp}
 
 
 def armed(database, monkeypatch, **changes):
@@ -347,21 +348,35 @@ def forming(database, revision, at, stamp, price="1.11", epoch=1):
             profile=db.get(Instrument, dataset.instrument_id).calendar_profile)
 
 
+def price_sample(database, revision, stamp, price="1.11", *, tradeable=True):
+    from alerts.live_pricing import publish_event
+
+    with database.begin() as db:
+        target = db.get(RealtimeMapping, db.get(CompositeRevision, revision).mapping_id).target_dataset_id
+        source = DatasetIdentity.model_validate(db.get(MarketDataset, target).identity)
+        state = db.get(LiveState, target)
+        sequence, epoch = state.quote.get("sequence", 0) + 1, state.epoch
+    return publish_event((account_key(settings.oanda_account_id), "test-owner"), epoch,
+        QuoteEvent(identity=source, source_time=stamp, received_at=stamp, bid=price,
+            ask=str(float(price) + .001), tradeable=tradeable, connection_epoch=epoch, sequence=sequence),
+        {"EUR_USD": source}, now=stamp)
+
+
 def test_explicit_sampled_quote_mode_never_mutates_confirmed_state_and_requires_valid_owner(database, monkeypatch):
     ident, _, revision, seam, _ = armed(database, monkeypatch, mode="intrabar")
-    at, stamp = seam + 600000, seam + 600010
-    forming(database, revision, at, stamp)
+    stamp = seam + 600010
+    price_sample(database, revision, stamp)
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
         assert db.get(ChartAlert, ident).health == "ready"
         before = list(db.scalars(select(FixedIndicatorRun)))
-    forming(database, revision, at, stamp + 1000, price="1.119")
+    price_sample(database, revision, stamp + 1000, price="1.119")
     with database.begin() as db:
         assert len(evaluate(db, ident, now=stamp + 1000)) == 1
         signal = db.scalar(select(SignalRow))
         assert signal.evidence["observation"]["observation_basis"] == "sampled_bid_quote"
         assert list(db.scalars(select(FixedIndicatorRun))) == before
-    forming(database, revision, at, stamp + 2000, price="1.11")
+    price_sample(database, revision, stamp + 2000, price="1.11")
     with database.begin() as db:
         db.get(PricingOwner, account_key(settings.oanda_account_id)).expires = 0
         assert evaluate(db, ident, now=stamp + 2000) == []
@@ -402,10 +417,11 @@ def test_intrabar_quote_gap_without_worker_stale_check_rebuilds_baseline(databas
             return
         assert events == []
         row = db.get(ChartAlert, ident)
-        assert row.count == 0 and row.state["sequence"] == stamp + gap
-        judgment = db.scalar(select(CompositeJudgment).where(CompositeJudgment.event_time == stamp + gap))
-        assert judgment.outcome == "recovery_baseline" and judgment.evidence["recovery"]
-        assert judgment.evidence["observation_gap_ms"] == gap
+        assert row.count == 0 and row.state["sequence"] == row.runtime["cursor"]
+        assert row.runtime["last_outcome"] == "recovery_baseline"
+        evidence = db.scalar(select(Audit.details).where(Audit.kind == "chart_alert_unobserved"))
+        assert evidence["reason_code"] == "price_sample_gap"
+        assert evidence["observation_gap_ms"] == gap
         for model in (SignalRow, Notification, Outbox):
             assert db.scalar(select(func.count()).select_from(model)) == 0
         assert evaluate(db, ident, now=stamp + gap) == []
@@ -696,61 +712,39 @@ def test_gate_can_be_disabled_for_an_a_b_comparison(database, monkeypatch):
         assert "input_gate" not in db.get(ChartAlert, ident).runtime
 
 
-def test_gate_keeps_pending_native_price_request_and_intrabar_is_gated(database, monkeypatch):
-    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar")
+def test_price_cursor_skips_unchanged_inputs_without_chart_dependencies(database, monkeypatch):
+    ident, _, revision, _, stamp = armed(database, monkeypatch, mode="intrabar")
     counts = gate_counters(monkeypatch)
-    at = seam + 600000
-    forming(database, revision, at, stamp)
-    for offset in (0, 1, 2):
+    for offset in range(5):
         with database.begin() as db:
             assert evaluate(db, ident, now=stamp + offset) == []
-    armed_counts = dict(counts)
-    with database.begin() as db:
-        assert "skipped_at" not in db.get(ChartAlert, ident).runtime["input_gate"]
-    for offset in (3, 4):
-        with database.begin() as db:
-            assert evaluate(db, ident, now=stamp + offset) == []
-            alert = db.get(ChartAlert, ident)
-            assert alert.runtime["input_gate"]["skipped_at"] == stamp + offset
-            # The judgement checkpoint is the sampled quote time, not the bucket start.
-            assert alert.state["sequence"] == stamp
-    assert dict(counts) == armed_counts, "an unchanged live sample must not be re-read"
-    # The full path must still run once the sampled waterline moves.
-    forming(database, revision, at, stamp + 3000, price="1.119")
+            assert db.get(ChartAlert, ident).runtime["cursor"] == 0
+    assert not any(counts.values())
+    price_sample(database, revision, stamp + 3000, price="1.119")
     with database.begin() as db:
         assert len(evaluate(db, ident, now=stamp + 3000)) == 1
-    assert counts["operands"] == armed_counts["operands"] + 1
-    # A pending native-price request must survive a gated skip: that background
-    # worker claims requests by scanning this active runtime field.
-    with database.begin() as db:
-        db.get(ChartAlert, ident).runtime = {**db.get(ChartAlert, ident).runtime,
-                                            "price_confirmation_request": "ohlc:probe"}
+        cursor = db.get(ChartAlert, ident).runtime["cursor"]
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp + 3001) == []
-        alert = db.get(ChartAlert, ident)
-        assert alert.runtime["input_gate"]["skipped_at"] == stamp + 3001
-        assert alert.runtime.get("price_confirmation_request") == "ohlc:probe"
+        assert db.get(ChartAlert, ident).runtime["cursor"] == cursor
+    assert not any(counts.values()), "fixed prices must not load chart/indicator dependencies"
 
 
 @pytest.mark.parametrize("gate", ["0", "1"])
 def test_untradeable_intrabar_quote_keeps_recovery_guard(database, monkeypatch, gate):
     monkeypatch.setenv("ALERTS_CHART_ALERT_INPUT_GATE", gate)
     ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar")
-    forming(database, revision, seam + 600000, stamp)
+    price_sample(database, revision, stamp)
     settle(database, ident, stamp)
-    with database.begin() as db:
-        rev = db.get(CompositeRevision, revision)
-        target = db.get(RealtimeMapping, rev.mapping_id).target_dataset_id
-        state = db.get(LiveState, target)
-        state.quote = {**state.quote, "tradeable": False}
+    price_sample(database, revision, stamp + 100, tradeable=False)
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp + 100) == []
         alert = db.get(ChartAlert, ident)
-        assert alert.health == "stale" and alert.runtime.get("recovering")
+        assert alert.health == "stale" and alert.runtime["execution_state"] == "recovering"
     # The first valid crossing after unavailable input establishes a baseline.
-    forming(database, revision, seam + 600000, stamp + 200, price="1.119")
+    price_sample(database, revision, stamp + 200, price="1.119")
     assert settle(database, ident, stamp + 200) == []
     with database.begin() as db:
         alert = db.get(ChartAlert, ident)
         assert alert.count == 0
-        assert alert.runtime["readiness"]["last_outcome"] == "recovery_baseline"
+        assert alert.runtime["last_outcome"] == "recovery_baseline"
