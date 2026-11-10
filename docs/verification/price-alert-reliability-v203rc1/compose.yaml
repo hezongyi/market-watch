@@ -1,0 +1,25 @@
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_DB: price_alerts
+      POSTGRES_USER: price_alerts
+      POSTGRES_PASSWORD: ${MW_ALERT_PG_PASSWORD:?private compose.env required}
+    ports:
+      - "127.0.0.1:${MW_ALERT_PG_PORT:-25463}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    networks: [acceptance, host_access]
+    mem_limit: 512m
+    cpus: 1
+    healthcheck:
+      test: [CMD-SHELL, "test \"$$(psql -U price_alerts -d price_alerts -Atc 'SHOW server_version_num')\" = 140024"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+volumes:
+  postgres:
+networks:
+  acceptance:
+    internal: true
+  host_access:

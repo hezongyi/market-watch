@@ -436,6 +436,9 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         from .display_observations import accept
 
         accept(db, state, event, stamp=stamp, profile=inst.calendar_profile)
+        from .price_alert_inputs import record_quote
+
+        record_quote(db, event, now=stamp, profile=inst.calendar_profile)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
         return "accepted"
@@ -494,6 +497,10 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
 
             sampling_evidence(db, state, result=series.result)
             if not series.result.successful:
+                from .price_alert_inputs import interrupt
+
+                interrupt(db, identity.key, now=stamp, epoch=epoch,
+                    reason=series.result.status, mode="candle_close_sample")
                 state.error = series.result.status
                 state.connection = 'recovering'
                 state.ready = False
@@ -513,6 +520,9 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
                                       profile=inst.calendar_profile)
             if observation is None:
                 continue
+            from .price_alert_inputs import record_rest
+
+            record_rest(db, identity.key, sample)
             state.connection = 'connected' if state.ready else 'recovering'
             state.error = None
             state.received_at = sample.received_at
@@ -586,6 +596,7 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized' or (
                 owner.error == 'provider_maintenance' and result.status != 'unauthorized'):
             result = RequestResult(status=owner.error)
@@ -600,6 +611,10 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
         for identity in identities.values():
             state = db.get(LiveState, identity.key)
             if state and state.epoch == epoch:
+                from .price_alert_inputs import interrupt
+
+                interrupt(db, identity.key, now=stamp, epoch=epoch,
+                    reason="collection_stopped" if intentional else result.status)
                 state.connection = "inactive" if intentional else "disconnected"
                 state.ready = False
                 state.error = None if intentional else result.status

@@ -149,8 +149,15 @@ def bind(db, config, *, now=None):
     if not revision or revision.composite_id != composite.id:
         raise ValueError("组合修订不属于所选系列")
     version = db.get(HistoryVersion, revision.history_version_id)
-    require_live_eligibility(db, revision, now=now_ms() if now is None else now,
-                             timeframe=config.timeframe)
+    from .price_alert_inputs import is_price_rule
+
+    if is_price_rule(config) and config.mode == "intrabar":
+        from .price_alert_evaluator import eligibility
+
+        eligibility(db, revision, mode=config.mode, now=now_ms() if now is None else now)
+    else:
+        require_live_eligibility(db, revision, now=now_ms() if now is None else now,
+                                 timeframe=config.timeframe)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     target = db.get(MarketDataset, mapping.target_dataset_id)
     if target.identity["account_scope"] != account_scope():
@@ -491,6 +498,24 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
     return resolved
 
 
+def bound_identity(db, identity):
+    """Shared fixed-binding validation for both execution contracts."""
+    if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
+        raise ValueError("组合或指标算法契约已改变，请显式编辑规则生成新版本")
+    revision = db.get(CompositeRevision, identity["composite_revision_id"])
+    composite = db.get(MarketComposite, identity["composite_id"])
+    if revision and frozen(db.get(CompositePreparation, revision.id)):
+        raise ValueError(FROZEN_REASON)
+    mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
+    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+    if (not composite or composite.permission_scope != "workspace:default" or not revision or
+            revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or
+            revision.rules != identity["rules"] or revision.seam != identity["seam"] or
+            not target or target.identity != identity["target_identity"] or target.identity["account_scope"] != account_scope()):
+        raise ValueError("固定组合基线、映射或账户已改变，请显式编辑规则")
+    return revision, target
+
+
 def evaluate(db, alert, version, config, now, *, clock=None):
     from .chart_alert_service import consume
     from .composite_chart import chart_page
@@ -500,20 +525,11 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     # A D1 close rule keeps its native-price request registered between passes;
     # the gated path below must not unregister it.
     price_request = runtime.pop("price_confirmation_request", None)
-    if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
-        return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
-    revision = db.get(CompositeRevision, identity["composite_revision_id"])
+    try:
+        revision, target = bound_identity(db, identity)
+    except ValueError as exc:
+        return wait(alert, runtime, "blocked", str(exc))
     composite = db.get(MarketComposite, identity["composite_id"])
-    if revision and frozen(db.get(CompositePreparation, revision.id)):
-        # Fencing: a judgment round for a switched-away revision writes nothing.
-        return wait(alert, runtime, "blocked", FROZEN_REASON)
-    mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
-    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
-    if (not composite or composite.permission_scope != "workspace:default" or not revision or
-            revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or
-            revision.rules != identity["rules"] or revision.seam != identity["seam"] or
-            not target or target.identity != identity["target_identity"] or target.identity["account_scope"] != account_scope()):
-        return wait(alert, runtime, "blocked", "固定组合基线、映射或账户已改变，请显式编辑规则")
     # Evidence writers/reference protection take exclusive dataset locks. Take
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(

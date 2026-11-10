@@ -201,6 +201,15 @@ def current_version(db, alert):
         ChartAlertVersion.alert_id == alert.id, ChartAlertVersion.version == alert.version))
 
 
+def initialize_price(db, alert, identity, config, *, at):
+    from .price_alert_inputs import is_price_rule
+
+    if alert.status == "active" and is_price_rule(config) and config.mode == "intrabar":
+        from .price_alert_evaluator import initialize
+
+        initialize(db, alert, identity, config, now=at)
+
+
 def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None):
     digest = config_hash(config)
     existing = db.scalar(select(ChartAlert).where(ChartAlert.request_id == request_id))
@@ -221,6 +230,7 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
                              market_identity=identity, dataset_id=dataset_id, effective_at=at))
     db.add(Audit(kind="chart_alert_created", details={"alert_id": alert.id, "version": 1}))
     db.flush()
+    initialize_price(db, alert, identity, config, at=at)
     return alert
 
 
@@ -253,6 +263,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
                              dataset_id=dataset_id, effective_at=at))
     db.add(Audit(kind="chart_alert_edited", details={"alert_id": alert.id, "version": alert.version}))
     db.flush()
+    initialize_price(db, alert, identity, config, at=at)
     return alert
 
 
@@ -286,7 +297,14 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             revision = db.get(CompositeRevision, current_version(db, alert).market_identity["composite_revision_id"])
             if not revision:
                 raise ValueError("告警绑定的组合修订不存在")
-            require_live_eligibility(db, revision, now=at, timeframe=config.timeframe)
+            from .price_alert_inputs import is_price_rule
+
+            if is_price_rule(config) and config.mode == "intrabar":
+                from .price_alert_evaluator import eligibility
+
+                eligibility(db, revision, mode=config.mode, now=at)
+            else:
+                require_live_eligibility(db, revision, now=at, timeframe=config.timeframe)
         if action == "restart":
             alert.run += 1
             alert.count = 0
@@ -298,6 +316,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             raise ValueError("告警已在监控，无需恢复")
         alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, {}, at
         alert.health, alert.health_reason = "warming", "等待重新建立基准"
+        initialize_price(db, alert, current_version(db, alert).market_identity, config, at=at)
     elif action == "archive":
         alert.status = "archived"
     else:

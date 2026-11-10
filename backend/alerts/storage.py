@@ -539,6 +539,38 @@ class LiveState(Base):
     received_at: Mapped[int] = mapped_column(BigInteger, default=0)
 
 
+class PriceAlertStream(Base):
+    """Transactional dataset sequence and durable retention boundary."""
+    __tablename__ = "price_alert_streams"
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("market_datasets.id"), primary_key=True)
+    sequence: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    trimmed_through: Mapped[int] = mapped_column(BigInteger, default=0, server_default="0")
+    trimmed_start: Mapped[int | None] = mapped_column(BigInteger)
+    trimmed_end: Mapped[int | None] = mapped_column(BigInteger)
+    registered_at: Mapped[int] = mapped_column(BigInteger)
+    last_event_key: Mapped[str | None] = mapped_column(String(128))
+    last_mode: Mapped[str | None] = mapped_column(String(24))
+    last_epoch: Mapped[int | None] = mapped_column(BigInteger)
+    last_received_at: Mapped[int | None] = mapped_column(BigInteger)
+    interrupted: Mapped[bool] = mapped_column(default=False, server_default="false")
+
+
+class PriceAlertInput(Base):
+    """Bounded exact observations; sequence is distinct from event time."""
+    __tablename__ = "price_alert_inputs"
+    __table_args__ = (Index("ix_price_alert_inputs_received", "received_at", "dataset_id"),)
+    dataset_id: Mapped[str] = mapped_column(ForeignKey("price_alert_streams.dataset_id"), primary_key=True)
+    sequence: Mapped[int] = mapped_column(BigInteger, primary_key=True)
+    kind: Mapped[str] = mapped_column(String(16))
+    price: Mapped[str | None] = mapped_column(String(100))
+    occurred_at: Mapped[int] = mapped_column(BigInteger)
+    received_at: Mapped[int] = mapped_column(BigInteger)
+    mode: Mapped[str] = mapped_column(String(24))
+    epoch: Mapped[int] = mapped_column(BigInteger)
+    event_key: Mapped[str] = mapped_column(String(128))
+    evidence: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
 class ObservedMinute(Base):
     """Accepted display observations; epoch fragments never claim confirmation."""
     __tablename__ = "market_observed_minutes"
