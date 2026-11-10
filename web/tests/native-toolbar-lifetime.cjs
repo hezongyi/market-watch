@@ -22,6 +22,20 @@ try {
     const installed = fs.readFileSync(file, "utf8");
     execFileSync(process.execPath, [patch, file]);
     assert.equal(fs.readFileSync(file, "utf8"), installed);
+    // Upgrade the actual previous patch, then retain byte verification.
+    execFileSync(process.execPath, [patch, file, "--disable"]);
+    const legacy = path.join(temp, "legacy.mjs");
+    fs.writeFileSync(legacy, execFileSync("git", [
+      "show", "v2.0.1:advanced-host/patch-native-toolset.mjs",
+    ], {cwd: root}));
+    execFileSync(process.execPath, [legacy, file]);
+    execFileSync(process.execPath, [patch, file]);
+    assert.equal(fs.readFileSync(file, "utf8"), installed);
+    const partial = installed.replace('this._mwDisposeSymbolResolved=void 0', '');
+    fs.writeFileSync(file, partial);
+    assert.notEqual(spawnSync(process.execPath, [patch, file]).status, 0);
+    assert.equal(fs.readFileSync(file, "utf8"), partial);
+    fs.writeFileSync(file, installed);
     execFileSync(process.execPath, [patch, file, "--disable"]);
     const original = fs.readFileSync(file, "utf8");
     fs.writeFileSync(file, installed + "\n/* unsupported */");
@@ -53,8 +67,18 @@ try {
           assert.ok(listeners.delete(callback)),
       };
       delegates.push(listeners);
+      let ready = false;
+      const pending = new Set();
       return {
+        hasModel: () => ready,
+        modelCreated: () => ({
+          subscribe: (_context, cb) => pending.add(cb),
+          unsubscribe: (_context, cb) => pending.delete(cb),
+        }),
+        attach: () => { ready = true; for (const cb of [...pending]) cb(); },
+        pending,
         model: () => {
+          if (!ready) throw Error("Value is null");
           lookups++;
           return { mainSeries: () => ({ symbolResolved: () => delegate }) };
         },
@@ -75,10 +99,20 @@ try {
     });
     for (let i = 0; i < 20; i++) {
       current = create();
+      const activeListeners = new Set();
       const toolbar = new Toolbar();
+      toolbar.context = { chartWidgetCollection: { activeChartWidget: {
+        value: () => current,
+        subscribe: cb => activeListeners.add(cb),
+        unsubscribe: cb => activeListeners.delete(cb),
+      } } };
       toolbar._onSymbolChanged = () => {};
       toolbar._onSymbolInfoResolved = () => {};
       toolbar.componentDidMount();
+      assert.equal(lookups, i * (enabled ? 1 : 0), "mount must wait for a model");
+      const initial = current;
+      initial.attach();
+      assert.equal(delegates.at(-1).size, enabled ? 1 : 0, "subscribe after model creation");
       const reads = lookups;
       // Saved-layout restore replaces or destroys the currently linked model.
       current =
@@ -92,6 +126,8 @@ try {
       toolbar.componentWillUnmount();
       assert.equal(lookups, reads, "unmount must not resolve another model");
       assert.equal(symbolListeners.size, 0);
+      assert.equal(initial.pending.size, 0, "model readiness listener is released");
+      assert.equal(activeListeners.size, 0, "active chart listener is released");
       assert.ok(
         delegates.every((listeners) => listeners.size === 0),
         "no leaked delegate",
@@ -99,7 +135,7 @@ try {
     }
   }
   console.log(
-    "Toolbar: destroyed/replaced model, feature disabled, repeated lifetimes passed",
+    "Toolbar: pending/attached model, destroyed/replaced model, feature disabled, repeated lifetimes and legacy upgrade passed",
   );
 } finally {
   fs.rmSync(temp, { recursive: true, force: true });

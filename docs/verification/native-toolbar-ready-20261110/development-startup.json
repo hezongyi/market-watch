@@ -1,0 +1,50 @@
+{
+  "cases": [
+    {
+      "name": "generic entry auto-restore 1",
+      "chartCount": 5
+    },
+    {
+      "name": "generic entry auto-restore 2",
+      "chartCount": 5
+    },
+    {
+      "name": "saved workspace direct link",
+      "chartCount": 5
+    },
+    {
+      "name": "saved workspace reload",
+      "chartCount": 5
+    },
+    {
+      "name": "leave chart and re-enter",
+      "chartCount": 5
+    }
+  ],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "protectedWrites": [
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save",
+      "method": "POST"
+    }
+  ],
+  "workspaceUnchanged": true,
+  "passed": true
+}

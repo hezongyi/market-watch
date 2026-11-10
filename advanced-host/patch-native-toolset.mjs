@@ -2,22 +2,35 @@
 import {createHash} from 'node:crypto';
 import {readFileSync, writeFileSync} from 'node:fs';
 import {fileURLToPath} from 'node:url';
+import {subscribeToolbarSymbol} from './native-toolbar-lifetime.mjs';
 const file = process.argv.slice(2).find(x => !x.startsWith('--')) || fileURLToPath(new URL(
   'charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js', import.meta.url));
 const expected = '3898bb2184d6a736de093f9faa93c0c2a4528a1ee7c7dd68232b255fa9dea76b';
-const replacements = [
+const legacyReplacements = [
   ['r.linking.getChartWidget()?.model().mainSeries().symbolResolved().subscribe(null,this._onSymbolInfoResolved,!1)',
    '(this._mwResolvedEvent=r.linking.getChartWidget()?.model().mainSeries().symbolResolved(),this._mwResolvedEvent?.subscribe(null,this._onSymbolInfoResolved,!1))'],
   ['(0,n.isFeaturesetEnabled)("use_symbol_name_for_header_toolbar")&&r.linking.getChartWidget()?.model().mainSeries().symbolResolved().unsubscribe(null,this._onSymbolInfoResolved)',
    '(this._mwResolvedEvent?.unsubscribe(null,this._onSymbolInfoResolved),this._mwResolvedEvent=void 0)'],
 ];
+const replacements = [
+  [legacyReplacements[0][0],
+   `(this._mwDisposeSymbolResolved=(${subscribeToolbarSymbol.toString()})(this.context.chartWidgetCollection.activeChartWidget,this._onSymbolInfoResolved))`],
+  [legacyReplacements[1][0],
+   '(this._mwDisposeSymbolResolved?.(),this._mwDisposeSymbolResolved=void 0)'],
+];
 const digest = text => createHash('sha256').update(text).digest('hex');
 let source = readFileSync(file, 'utf8');
 if (digest(source) !== expected) {
-  if (!replacements.every(([, after]) => source.split(after).length === 2))
-    throw Error('Unsupported or incomplete native toolbar hooks');
-  for (const [before, after] of replacements) source = source.replace(after, before);
-  if (digest(source) !== expected) throw Error('Unsupported licensed toolset: restore verified v31.1.0');
+  // Upgrade only complete, verified installations of this or the prior patch.
+  const restored = [replacements, legacyReplacements].map(hooks => {
+    if (!hooks.every(([, after]) => source.split(after).length === 2)) return;
+    let original = source;
+    for (const [before, after] of hooks) original = original.replace(after, before);
+    return digest(original) === expected ? original : undefined;
+  }).find(original => original !== undefined);
+  if (restored === undefined)
+    throw Error('Unsupported or incomplete native toolbar hooks: restore verified v31.1.0');
+  source = restored;
 }
 if (!process.argv.includes('--disable')) {
   for (const [before, after] of replacements) {
