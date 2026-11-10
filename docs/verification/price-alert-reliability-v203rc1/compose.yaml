@@ -1,3 +1,14 @@
+name: mw-price-alerts-v203rc1
+x-api: &api
+  image: market-watch-api:price-alerts-v203rc1
+  env_file: ${MW_ALERT_APP_ENV:?private app.env required}
+  networks: [acceptance]
+  mem_limit: 384m
+  cpus: 0.75
+  logging: {driver: json-file, options: {max-size: 10m, max-file: "2"}}
+x-fixture: &fixture
+  - ../../../scripts/price_alert_acceptance.py:/acceptance/price_alert_acceptance.py:ro
+  - ${MW_ALERT_CONTROL_DIR:?private fixture controls required}:/controls:ro
 services:
   postgres:
     image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
@@ -17,6 +28,64 @@ services:
       interval: 5s
       timeout: 5s
       retries: 12
+  migrate:
+    <<: *api
+    command: [alembic, upgrade, head]
+    depends_on:
+      postgres: {condition: service_healthy}
+  api:
+    <<: *api
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
+      interval: 5s
+      timeout: 5s
+      retries: 12
+  market-runtime:
+    <<: *api
+    user: ${MW_ALERT_UID:?private fixture reader UID required}
+    command: [python, /acceptance/price_alert_acceptance.py, market]
+    volumes: *fixture
+    environment:
+      ALERTS_DATABASE_POOL_SIZE: "8"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-price-alerts-v203rc1-market
+      ALERTS_DELIVERY_ENABLED: "false"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  data-worker:
+    <<: *api
+    command: [python, -m, alerts.runtime, --profile, data]
+    environment:
+      ALERTS_DATABASE_POOL_SIZE: "16"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-price-alerts-v203rc1-data
+      ALERTS_DELIVERY_ENABLED: "false"
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+  notification-worker:
+    <<: *api
+    command: [python, -m, alerts.runtime, --profile, notifications]
+    environment:
+      ALERTS_DATABASE_POOL_SIZE: "6"
+      ALERTS_DATABASE_APPLICATION_NAME: mw-price-alerts-v203rc1-notifications
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      notification-fixture: {condition: service_started}
+  notification-fixture:
+    <<: *api
+    user: ${MW_ALERT_UID:?private fixture reader UID required}
+    command: [python, /acceptance/price_alert_acceptance.py, notification]
+    volumes: *fixture
+    mem_limit: 64m
+    cpus: 0.1
+  web:
+    image: market-watch-web:price-alerts-v203rc1
+    networks: [acceptance, host_access]
+    ports: ["127.0.0.1:${MW_ALERT_WEB_PORT:-28463}:80"]
+    mem_limit: 128m
+    cpus: 0.25
+    depends_on:
+      api: {condition: service_healthy}
 volumes:
   postgres:
 networks:

@@ -279,3 +279,192 @@ def test_cleanup_waits_for_consumer_transaction_before_deleting(collecting):
         assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
         assert db.get(PriceAlertStream, identity.key).trimmed_through == 1
         assert evaluate(db, ident, now=stamp + 400) == []
+
+
+def test_populated_alembic_upgrade_and_rc1_evaluator_rollback_fence(monkeypatch, tmp_path):
+    """Run the original evaluator on both sides of a real additive upgrade."""
+    import json
+    import subprocess
+    import sys
+    import tarfile
+    from io import BytesIO
+    from uuid import uuid4
+
+    from alembic import command
+    from alembic.config import Config
+    from alerts import storage
+    from alerts.chart_alert_worker import evaluate
+    from alerts.config import settings
+    from alerts.storage import (
+        Audit,
+        ChartAlert,
+        ChartAlertVersion,
+        CompositeJudgment,
+        Outbox,
+        SignalRow,
+    )
+    from sqlalchemy import create_engine, text
+    from sqlalchemy.engine import make_url
+    from sqlalchemy.orm import sessionmaker
+
+    root = Path(__file__).resolve().parents[2]
+    baseline = "ef57bed61f66715a4c5ec2797f9abd67cb23d2fb"
+    old = tmp_path / "rc1"
+    old.mkdir()
+    archive = subprocess.check_output(["git", "archive", baseline, "backend", "migrations",
+        "alembic.ini"], cwd=root)
+    with tarfile.open(fileobj=BytesIO(archive)) as checkout:
+        checkout.extractall(old, filter="data")
+    admin = create_engine(os.environ["TEST_POSTGRES_URL"])
+    schema = "price_upgrade_" + uuid4().hex
+    url = make_url(os.environ["TEST_POSTGRES_URL"]).update_query_dict({"options": "-csearch_path=" + schema})
+    url_str = url.render_as_string(hide_password=False)
+    with admin.begin() as conn:
+        conn.execute(text(f"CREATE SCHEMA {schema}"))
+    engine = create_engine(url)
+
+    def old_python(code, **params):
+        run = subprocess.run([sys.executable, "-"], cwd=old, text=True, input=code,
+            env={**os.environ, "PYTHONPATH": os.pathsep.join((str(old / "backend"), str(old / "backend/tests"))),
+                "ALERTS_DATABASE_URL": url_str, **params}, capture_output=True, timeout=90)
+        assert run.returncode == 0, run.stderr
+        return json.loads(run.stdout.splitlines()[-1])
+
+    def revision():
+        with engine.connect() as conn:
+            return conn.scalar(text("SELECT version_num FROM alembic_version"))
+
+    def history(db):
+        models = (ChartAlertVersion, CompositeJudgment, SignalRow, Outbox)
+        return {model.__tablename__: {row.id: tuple(getattr(row, field.name)
+                for field in model.__table__.columns) for row in db.scalars(select(model))}
+                for model in models}
+
+    try:
+        seeded = old_python("""
+import json
+from alembic import command
+from alembic.config import Config
+from alerts.chart_alert_service import create, current_version, lifecycle
+from alerts.chart_alert_worker import evaluate
+from alerts.config import settings
+from alerts.live_pricing import account_key, publish_event
+from alerts.market_contracts import DatasetIdentity, QuoteEvent
+from alerts.storage import ChartAlert, LiveState, bootstrap, transaction, Session
+from pytest import MonkeyPatch
+from test_composite_alerts import append, armed, config
+
+command.upgrade(Config('alembic.ini'), 'head')
+bootstrap()
+with MonkeyPatch.context() as patch:
+    close, composite, revision, seam, stamp = armed(Session, patch, notify_ntfy=True)
+    with transaction() as db:
+        evaluate(db, close, now=stamp)
+        ids = {'active_close': close}
+        for label in ('active_touch', 'paused', 'legacy_hold', 'expired', 'archived', 'completed'):
+            cfg = config(composite, mode='intrabar' if label == 'active_touch' else 'close',
+                expires_at=stamp + 1000 if label == 'expired' else None)
+            if label == 'completed':
+                cfg = cfg.model_copy(update={'max_triggers': 1})
+            alert = create(db, 'legacy:' + label, cfg, at=stamp)
+            ids[label] = alert.id
+            if label == 'legacy_hold':
+                alert.status, alert.runtime = 'paused', {'demand_hold': 'stale_input'}
+            elif label in ('paused', 'archived'):
+                lifecycle(db, alert.id, alert.version, 'pause' if label == 'paused' else 'archive',
+                    expected_revision=alert.control_revision, request_id=label, at=stamp + 1)
+            elif label == 'completed':
+                evaluate(db, alert.id, now=stamp)
+        identity = DatasetIdentity.model_validate(current_version(db,
+            db.get(ChartAlert, ids['active_touch'])).market_identity['target_identity'])
+        state = db.get(LiveState, identity.key)
+        state.quote = {**state.quote, "sequence": 0, "received_at": stamp}
+        evaluate(db, ids['expired'], now=stamp + 1000)
+    assert publish_event((account_key(settings.oanda_account_id), 'test-owner'), 1,
+        QuoteEvent(identity=identity, source_time=stamp, received_at=stamp, bid='1.1101',
+            ask='1.111', connection_epoch=1, sequence=1, tradeable=True),
+        {'EUR_USD': identity}, now=stamp) == 'accepted'
+    with transaction() as db:
+        evaluate(db, ids['active_touch'], now=stamp)
+        row = db.get(ChartAlert, ids['active_touch'])
+        assert row.state.get('sequence'), (row.health, row.health_reason)
+    end = seam + 660000
+    append(Session, revision, seam + 600000, '1.119', end + 10)
+    with transaction() as db:
+        assert len(evaluate(db, close, now=end + 10)) == 1
+        assert len(evaluate(db, ids['completed'], now=end + 10)) == 1
+        assert db.get(ChartAlert, ids['completed']).status == 'completed'
+    print(json.dumps({'ids': ids, 'at': end + 10}))
+""")
+        assert revision() == "bb55_provider_catalog_indexes"
+        ids, stamp = seeded["ids"], seeded["at"]
+        factory = sessionmaker(engine, expire_on_commit=False)
+        monkeypatch.setattr(storage, "Session", factory)
+        monkeypatch.setattr(settings, "database_url", url_str)
+        monkeypatch.setattr(settings, "oanda_account_id", "composite-test-account")
+        monkeypatch.setattr(settings, "oanda_token", "test-token")
+        monkeypatch.setattr(settings, "ntfy_topic", "local-upgrade")
+        monkeypatch.setattr(settings, "delivery_enabled", True)
+        monkeypatch.setattr("alerts.live_window.now_ms", lambda: stamp)
+        with factory() as db:
+            before = history(db)
+            cursor = db.get(ChartAlert, ids["active_close"]).state["sequence"]
+            old_touch = db.get(ChartAlert, ids["active_touch"]).state["sequence"]
+            assert before["outbox"] and before["composite_judgments"] and before["signals"]
+
+        config = Config(str(root / "alembic.ini"))
+        config.set_main_option("script_location", str(root / "migrations"))
+        command.upgrade(config, "head")
+        assert revision() == "bc56_price_alert_inputs"
+        with factory.begin() as db:
+            assert history(db) == before
+            for name in ("active_close", "active_touch"):
+                assert evaluate(db, ids[name], now=stamp) == []
+            close = db.get(ChartAlert, ids["active_close"])
+            touch = db.get(ChartAlert, ids["active_touch"])
+            assert close.runtime["execution_contract"] == "price-v2" and close.runtime["close_cursor"] == cursor
+            assert touch.runtime["cursor"] == 0 and old_touch != 0
+            assert touch.runtime["last_gap"]["reason_code"] == "upgrade_boundary"
+            for name, expected in (("paused", "paused"), ("legacy_hold", "paused"), ("expired", "expired"),
+                                   ("archived", "archived"), ("completed", "completed")):
+                assert db.get(ChartAlert, ids[name]).status == expected
+        # Restarting the upgrade and evaluator must not append a second takeover gap.
+        command.upgrade(config, "head")
+        with factory.begin() as db:
+            assert evaluate(db, ids["active_touch"], now=stamp + 1) == []
+            gaps = db.scalars(select(Audit).where(Audit.kind == "chart_alert_unobserved",
+                Audit.details["alert_id"].as_string() == ids["active_touch"])).all()
+            assert [row.details["reason_code"] for row in gaps] == ["upgrade_boundary"]
+            assert history(db) == before
+            # New writers are quiescent; pause price-v2 without changing its checkpoint.
+            db.execute(text("""
+                UPDATE chart_alerts SET status = 'paused', control_revision = control_revision + 1
+                WHERE status = 'active' AND runtime->>'execution_contract' = 'price-v2'
+            """))
+        checked = old_python("""
+import json
+import os
+from alerts.chart_alert_worker import evaluate, step
+from alerts.storage import ChartAlert, Outbox, SignalRow, transaction
+from sqlalchemy import select
+
+ids = json.loads(os.environ['LEGACY_IDS'])
+stamp = int(os.environ['LEGACY_AT'])
+assert step(now=stamp + 100) == 0
+with transaction() as db:
+    for name in ('active_close', 'active_touch'):
+        row = db.get(ChartAlert, ids[name])
+        assert row.status == 'paused' and evaluate(db, row.id, now=stamp + 100) == []
+        assert row.runtime['execution_contract'] == 'price-v2'
+    print(json.dumps({'signals': len(db.scalars(select(SignalRow)).all()),
+                      'pending': len(db.scalars(select(Outbox).where(Outbox.status == 'pending')).all())}))
+""", LEGACY_IDS=json.dumps(ids), LEGACY_AT=str(stamp))
+        assert checked["signals"] == len(before["signals"]) and checked["pending"] == len(before["outbox"])
+        assert revision() == "bc56_price_alert_inputs"
+        with factory() as db:
+            assert history(db) == before
+    finally:
+        engine.dispose()
+        with admin.begin() as conn:
+            conn.execute(text(f"DROP SCHEMA {schema} CASCADE"))
+        admin.dispose()
