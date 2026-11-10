@@ -108,7 +108,7 @@ function chartAlertBridge({
       display_identity: {code: meta.display_symbol || meta.logical_symbol || meta.symbol || meta.name || identity.symbol,
         series_kind: identity.series_kind, source: meta.source, basis: meta.basis, timeframe: frames[chart.resolution()]},
       display_label: [meta.display_symbol || meta.symbol || meta.logical_symbol || meta.name || identity.symbol,
-        ({provider:'平台行情',managed:'自建行情',composite:'组合行情',history:'固定历史'})[identity.series_kind],
+        ({provider:'平台',managed:'自建',composite:'组合',history:'自建'})[identity.series_kind],
         meta.price_description || meta.basis, frames[chart.resolution()]].filter(Boolean).join(' · '),
       calculation_origin:
         calculationOrigin(chart.symbol(), chart.resolution()) ?? null,
@@ -708,7 +708,7 @@ function chartAlertBridge({
           : currentOrigin != null &&
               savedOrigin != null &&
               currentOrigin !== savedOrigin
-            ? "图表与告警固定历史起点不同；请核对计算历史后编辑告警"
+            ? "图表与告警自建历史起点不同；请核对计算历史后编辑告警"
             : "",
       );
     }

@@ -54,8 +54,8 @@ const row=value=>({id:'one',kind:'setting',name:'widgetbar.layout-settings',tool
  await transport.dispose();
  const displayExports={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/notifications/types.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:displayExports});
  const notice={instrument:'a'.repeat(64),source_kind:'market',context:{series_kind:'composite'}};
- assert.equal(displayExports.noticeInstrument(notice),'组合行情（名称不可用）· aaaaaaaa');
- assert.equal(displayExports.noticeInstrument({...notice,instrument_display:{series_kind:'composite',symbol:'EURUSD',provenance:'event_snapshot'}}),'EURUSD · 组合行情 · aaaaaaaa');
+ assert.equal(displayExports.noticeInstrument(notice),'组合（名称不可用）· aaaaaaaa');
+ assert.equal(displayExports.noticeInstrument({...notice,instrument_display:{series_kind:'composite',symbol:'EURUSD',provenance:'event_snapshot'}}),'EURUSD · 组合 · aaaaaaaa');
  console.log('PASS preference durable conflicts/reload/CAS/quota/queued versions; first-use/cancellation; name fallback');
 })().catch(e=>{console.error(e);process.exitCode=1});
 // Additional regression: establish hint arrives while stale metadata is in flight.

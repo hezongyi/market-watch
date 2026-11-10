@@ -75,6 +75,11 @@ def warm_clients():
 
 
 def metadata(ident, *, deadline=None, cached_only=False):
+    from .market_presentation import present
+    return present(_metadata(ident, deadline=deadline, cached_only=cached_only))
+
+
+def _metadata(ident, *, deadline=None, cached_only=False):
     if ident.startswith("NATIVE:"):
         from .native_series import configured_metadata
         try:
@@ -140,6 +145,7 @@ def metadata(ident, *, deadline=None, cached_only=False):
         "symbol": symbol,
         "name": label,
         "source": source,
+        "environment": "practice" if source == "oanda" else "public",
         "basis": "bid" if source == "oanda" else "last",
         "calendar": calendar,
         "precision": precision,

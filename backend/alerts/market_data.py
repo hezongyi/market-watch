@@ -634,9 +634,12 @@ def router(authenticated):
                     raise HTTPException(422, str(error)) from None
         with transaction() as db:
             inst = resolve(db, body.instrument)
-            return {
+            from .market_presentation import present
+            dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == inst.id))
+            return present({
                 "id": inst.id,
                 "name": inst.label,
+                "series_kind": "managed",
                 "symbol": inst.symbol,
                 "display_symbol": display_code(inst.symbol, inst.source),
                 "source": inst.source,
@@ -645,7 +648,7 @@ def router(authenticated):
                 "calendar": inst.calendar,
                 "frames": FRAMES,
                 **volume_metadata(inst.source, inst.symbol),
-            }
+            }, identity=dataset.identity if dataset else {"source": inst.source})
 
     @r.post("/viewport-session")
     def viewport(body: ViewportQuery):
@@ -715,38 +718,14 @@ def router(authenticated):
 
     @r.post("/maintenance")
     def maintenance(body: MaintenanceQuery):
-        import httpx
+        from .chart_maintenance_entry import MaintenanceUnavailable, configure
 
-        from .chart_history_plan import plan_status, record_boundary
-        from .managed_dataset import date_start, join
-        from .provider_chart import earliest_m1
-
-        with transaction() as db:
-            inst = resolve(db, body.instrument)
-            try:
-                start = date_start(inst, body.start_date)
-            except ValueError as error:
-                raise HTTPException(422, str(error)) from error
-            meta = dict(id=inst.id, source=inst.source, symbol=inst.symbol, basis=inst.basis)
-        # Release the pool connection before querying the provider's real first
-        # M1. Reject unreachable requests without shifting the approved start.
         try:
-            earliest = earliest_m1(meta)
-        except (httpx.HTTPError, TimeoutError, ValueError) as error:
+            return configure(body.instrument, body.start_date)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from error
+        except MaintenanceUnavailable as error:
             raise HTTPException(503, "尚未确认最早可用历史，未建立维护任务，请稍后重试") from error
-        if start < earliest:
-            raise HTTPException(422, f"历史起点不可达：该品种最早可用M1为 {instant(earliest).isoformat()}；请明确选择可达起点，原维护范围保持不变")
-        with transaction() as db:
-            inst = resolve(db, body.instrument)
-            existing = db.get(ChartHistoryPlan, inst.id)
-            if existing and existing.target_start < earliest:
-                record_boundary(db, inst, existing.target_start, earliest, now_ms())
-            try:
-                plan = join(db, inst, start, now_ms())
-            except ValueError as error:
-                raise HTTPException(422, str(error)) from error
-            record_boundary(db, inst, plan.target_start, earliest, now_ms())
-            return {**plan_status(db, plan, now_ms()), "calendar": inst.calendar}
 
     @r.post("/dataset")
     def dataset(body: DatasetQuery):
@@ -843,87 +822,18 @@ def router(authenticated):
 
 def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None,
                        symbol_type="", cursor=None, include_total=True):
-    from .search_types import TYPES
-    if (kind not in ("all", "provider", "history", "composite") or symbol_type not in TYPES
-            or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
-            or source not in (None, "dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")
-            or calendar not in (None, "ny17", "utc0", "source_date")):
-        raise HTTPException(422, "无效行情搜索分页或筛选")
-    if kind == "all":
-        if offset:
-            raise HTTPException(422, "全类别搜索请使用游标翻页")
-        return _all_series_page(query, page_size=page_size, source=source, calendar=calendar,
-                                symbol_type=symbol_type, cursor=cursor)
-    if cursor:
-        raise HTTPException(422, "此搜索范围不接受游标")
-    if kind == "provider":
-        if calendar:
-            raise HTTPException(422, "平台搜索不接受自建聚合日界")
-        return _provider_series_page(query, source=source, symbol_type=symbol_type,
-                                     offset=offset, page_size=page_size, include_total=include_total)
-    from .series_access import search_page
-    try:
-        with transaction() as db:
-            return search_page(db, query, kind=kind, page_size=page_size, offset=offset,
-                               source=source, calendar=calendar, symbol_type=symbol_type)
-    except ValueError as error:
-        raise HTTPException(422, str(error)) from None
+    """Compatibility adapter over the canonical series-directory seam."""
+    from .series_directory import page
+    return page(query, kind=kind, page_size=page_size, offset=offset, source=source,
+                calendar=calendar, symbol_type=symbol_type, cursor=cursor,
+                include_total=include_total, provider_page=_provider_series_page)
 
 
 def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor):
-    """Fair merge of three pure searches. Cursor advances through candidates,
-    including invalid mappings, without losing the unconsumed part of a page.
-    Each managed branch retains its bounded qualification scan.
-    """
-    import base64
-    import binascii
-    import hashlib
-    import json
-
-    from .series_access import search_page
-
-    signature = hashlib.sha256(json.dumps([query, source, calendar, symbol_type]).encode()).hexdigest()[:16]
-    positions, turn = [0, 0, 0], 0
-    if cursor:
-        try:
-            if len(cursor) > 300:
-                raise ValueError()
-            state = json.loads(base64.urlsafe_b64decode(cursor + "=" * (-len(cursor) % 4)))
-            positions, turn = state["p"], state["t"]
-            if (state["s"] != signature or len(positions) != 3 or type(turn) is not int or not 0 <= turn < 3
-                    or any(p is not None and (type(p) is not int or not 0 <= p <= 1000000) for p in positions)):
-                raise ValueError()
-        except (ValueError, KeyError, TypeError, UnicodeError, binascii.Error):
-            raise HTTPException(422, "无效搜索游标") from None
-    p = positions[0] or 0
-    provider_page = (_provider_series_page(query, source=source, symbol_type=symbol_type,
-        offset=p, page_size=page_size, include_total=False) if positions[0] is not None and not calendar
-        else {"items": [], "next_offset": None})
-    pages = [{**provider_page, "item_offsets": list(range(p + 1, p + len(provider_page["items"]) + 1))}]
-    with transaction() as db:
-        for i, kind in enumerate(("history", "composite"), 1):
-            pages.append(search_page(db, query, kind=kind, page_size=page_size, offset=positions[i],
-                         source=source, calendar=calendar, symbol_type=symbol_type)
-                         if positions[i] is not None else {"items": [], "next_offset": None})
-    for i, page in enumerate(pages):
-        if not page["items"]:
-            positions[i] = page["next_offset"]
-    indices, items = [0, 0, 0], []
-    for _ in range(page_size * 3):
-        i = turn
-        turn = (turn + 1) % 3
-        page = pages[i]
-        if indices[i] < len(page["items"]):
-            items.append(page["items"][indices[i]])
-            positions[i] = page["item_offsets"][indices[i]]
-            indices[i] += 1
-        if indices[i] == len(page["items"]):
-            positions[i] = page["next_offset"]
-        if len(items) == page_size or all(indices[j] == len(pages[j]["items"]) for j in range(3)):
-            break
-    has_more = any(p is not None for p in positions)
-    next_cursor = base64.urlsafe_b64encode(json.dumps({"p": positions, "t": turn, "s": signature}, separators=(",", ":")).encode()).decode().rstrip("=") if has_more else None
-    return {"items": items, "has_more": has_more, "next_cursor": next_cursor}
+    """Legacy private seam retained for integrations; delegates to the core."""
+    from .series_directory import page
+    return page(query, kind="all", page_size=page_size, source=source, calendar=calendar,
+                symbol_type=symbol_type, cursor=cursor, provider_page=_provider_series_page)
 
 
 def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25, include_total=True):
@@ -942,7 +852,7 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
         item.update({"series_kind": "provider", "ticker": encode(item["id"], "provider"),
             "supported": bool(item["capabilities"]["native_periods"]),
             "type": search_type(item["asset_class"]),
-            "description": "平台 · " + item.get("provider_name", item["source"]) + " · 原生周期"})
+            "description": " · ".join((item["series_kind_display"], item["source_display"], item["price_basis_display"], "原生周期"))})
         items.append(item)
     has_more = offset + len(items) < page["total"] if include_total else page["has_more"]
     return {"items": items, **({"total": page["total"]} if include_total else {}), "offset": offset, "page_size": page_size,
@@ -950,13 +860,10 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
 
 
 def search_series(query="", *, kind="all", limit=100, source=None, calendar=None):
-    """Compatibility list response; ranking and merging belong to paged search."""
-    if kind not in ("all", "provider", "history", "composite") or not 1 <= limit <= 250:
-        raise HTTPException(422, "无效行情搜索范围")
-    if kind == "all" and (source or calendar):
-        raise HTTPException(422, "筛选请明确平台、自建或组合范围")
-    return search_series_page(query, kind=kind, page_size=limit, source=source,
-                              calendar=calendar, include_total=False)["items"]
+    """Compatibility list response over the canonical series-directory seam."""
+    from .series_directory import search
+    return search(query, kind=kind, limit=limit, source=source, calendar=calendar,
+                  provider_page=_provider_series_page)
 
 
 def instrument_catalog(query: str = "", *, limit=250, source=None, managed_status=True):
@@ -1030,8 +937,7 @@ def quote_snapshot(body: QuoteQuery):
                 try:
                     meta = metadata(db, ident, kind)
                     shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
-                    values = {"short_name": shown, "description": meta["name"] + (
-                        " · 固定历史" if kind == "history" else " · 组合行情"), "exchange": meta["source"].upper()}
+                    values = {"short_name": shown, "description": meta.get("presentation_description", meta["name"] + (" · 自建" if kind == "history" else " · 组合")), "exchange": meta["source"].upper()}
                     facts = None
                     if kind == "history":
                         values.update(fixed_snapshot(db, ident, meta))
@@ -1111,7 +1017,7 @@ def quote_snapshot(body: QuoteQuery):
                 delay = snapshot["delay_seconds"]
                 read_at = now_ms()
                 session = session_status(meta["source"], meta["symbol"], now_ms(), metadata=meta)
-                description = meta["name"] + " · Yahoo 市场报价"
+                description = meta.get("presentation_description", meta["name"] + " · Yahoo 市场报价")
 
                 description += " · 延迟 " + str(delay//60) + " 分钟" if delay is not None and delay>0 else " · 延迟未知" if delay is None else " · 实时"
                 conflict = _session_observation(meta["source"], meta["symbol"], session, stamp, meta)
@@ -1143,7 +1049,7 @@ def quote_snapshot(body: QuoteQuery):
             quote_time_type = "source_d1" if quote_frame == "D1" else "source_m1"
             fetch_status = page.get("fetch_status", "ok")
             read_at = page.get("read_at", page.get("as_of"))
-            values = {"short_name": shown, "description": shown + " · 平台行情" + (" · " + meta["price_description"] if meta.get("price_description") else ""),
+            values = {"short_name": shown, "description": meta.get("presentation_description", shown + " · 平台" + (" · " + meta["price_description"] if meta.get("price_description") else "")),
                       "exchange": meta["source"].upper(), **session, **conflict,
                       "fetched_at": page.get("as_of"), "read_at": read_at, "fetch_status": fetch_status,
                       **{key:page[key] for key in ("wait_reason", "last_success_at", "cache_age_ms") if key in page},
@@ -1213,12 +1119,16 @@ def quote_snapshot(body: QuoteQuery):
             dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == ident)) if inst else None
             session_meta = {"calendar_profile": inst.calendar_profile, "calendar_verified": bool(inst.calendar_profile),
                             "source_identity": dataset.identity if dataset else None} if inst else {}
+            from .market_presentation import present
+            presentation = present({"symbol": inst.symbol, "name": inst.label, "source": inst.source,
+                                    "basis": inst.basis, "series_kind": "managed"},
+                                   identity=dataset.identity if dataset else None) if inst else None
             if not bar:
                 if inst:
                     session = session_status(inst.source, inst.symbol, now_ms(), metadata=session_meta)
                     result.append({"s": "ok", "n": ident, "quality": "pending", **session, "v": {
-                        "short_name": display_code(inst.symbol, inst.source),
-                        "description": display_code(inst.symbol, inst.source) + " · 报价准备中",
+                        "short_name": presentation["display_symbol"],
+                        "description": presentation["presentation_description"] + " · 报价准备中",
                         "exchange": inst.source.upper(),
                         **session, "time_type": None, "quote_time": None, "data_start": None,
                     }})
@@ -1228,8 +1138,8 @@ def quote_snapshot(body: QuoteQuery):
                 continue
             values = {
                 "lp": float(bar.close),
-                "short_name": display_code(inst.symbol, inst.source),
-                "description": display_code(inst.symbol, inst.source) + " · " + inst.basis + " · M1",
+                "short_name": presentation["display_symbol"],
+                "description": presentation["presentation_description"],
                 "exchange": inst.source.upper(),
             }
             if inst.basis == "bid":

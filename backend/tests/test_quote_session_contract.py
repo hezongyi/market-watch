@@ -91,7 +91,7 @@ def test_history_and_composite_snapshots_preserve_observation_type_and_demand(da
     history, composite = quote_snapshot(QuoteQuery(symbols=[encode(parent, "history"), encode(composite_id, "composite")]))
     assert history["v"]["time_type"] == "fixed_history"
     assert history["v"]["data_start"] is not None and "历史数据时间" in history["v"]["description"]
-    assert "固定历史" in history["v"]["description"] and "交易时段内" not in history["v"]["description"]
+    assert "自建" in history["v"]["description"] and "交易时段内" not in history["v"]["description"]
     value = composite["v"]
     assert value["time_type"] == "composite_snapshot" and value["observation_type"] == "source_m1"
     assert value["quote_time"] is None and value["data_start"] == seam + 540000
