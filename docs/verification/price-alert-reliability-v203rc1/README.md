@@ -62,6 +62,7 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | PG既有链路整合5模块 | **46 passed，0 skipped** | composite alerts /live pricing /market usage /notification outbox /switch activation；`/tmp/mw-price-alerts-v203rc1-pg-integration-final.log` |
 | 取锁期间新报价/到期边界 | **9 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-clock-green.log`；create/edit/resume/restart 锁后取时、到期拒绝、下一穿越及首次注册互斥 |
 | 取锁时间修复影响回归7模块 | **132 passed** | `/tmp/mw-price-alerts-v203rc1-clock-regression.log` |
+| 完整 CI 失败涉及的11模块 | **209 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-ci-repair-final.log`；真实 PG 配置，含历史迁移、原生 OHLC、重查、运行时并发与实时开关；53个改动后端Python文件 Ruff通过 |
 | 既有来源闭市→开市 PG 模块 | **11 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-provider-clock-green.log`；补齐固定行情的窗口时钟，避免日期推进后 fixture 超出30天；产品窗口规则未改 |
 | 后续 PG 故障/控制并发/DST 边界 | **15 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-pg-final-boundaries.log`；涵盖全文件运行后补充场景 |
 | 春秋 DST 周末最后 M1 / W1 收盘柱 | **4 passed** | 真实确认→聚合→创建/判断，闭市期间补判，不重复；已纳入上述 PG 复验 |
@@ -73,8 +74,14 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | 前端生产构建 | 通过 | 最新 web Docker build 含 tsc、Vite 与单前端产物构建 |
 | 浏览器 | **最终镜像完整通过** | [browser-result.json](browser-result.json)：真实创建/幂等、零浏览器且图表需求租约自然归零后继续判断、断线恢复不伪造穿越、缺口/恢复通知、深链接和历史信号；无 pageerror。等待允许两层120s租约及共享主机调度余量；没有手工删租约 |
 | 独立巡检运行时故障注入 | **2场景通过** | [runtime-faults.json](runtime-faults.json)：真实monitor存活不推进、market-runtime进程停止；notifications独立检测/恢复 |
-| 全 backend suite | **未通过完整运行** | 旧轮运行在 557 passed /15 failed /2 skipped 时中断；已定位的失败已修复并定向重跑。不能把相关模块通过表述为全套 CI 通过 |
+| 全 backend suite | **旧 head CI 失败，最终修复待 CI** | [run 42930065236](https://github.com/hezongyi/market-watch/actions/runs/42930065236)：41 failed /3725 passed /3 skipped。失败集中在旧价格路径预期、历史迁移夹具与报价并发夹具；定向修复及最终运行见下节，不把局部通过表述为全套 CI 通过 |
 | 远端 CI / Draft PR | Draft [#128](https://github.com/hezongyi/market-watch/pull/128)；以最终提交 checks 为准 | [PR 检查](https://github.com/hezongyi/market-watch/pull/128/checks)及 PR 描述记录最终运行 URL/结果。旧 run 42925957555 因推送修复而取消，不计作通过 |
+
+### 完整 CI 回归修复
+
+旧价格用例原先直接调用公开 worker，却仍期待旧版 OHLC 放行、断线自动暂停及修复后重建基准。现在原生 OHLC 的账户、租约、校验、修订、无事务 HTTP 等保护在明确的保留组件入口验证；指标及射线仍走公开旧规则路径，价格规则另走公开 price-v2 路径。新增 D1 在已有原生证明时仍拒绝替代缺失的 M1 查询证明，后续稀疏日线以有界查询建立基准并顺序触发，图表 OHLC / coverage 不变。
+
+缺口重查同时验证旧射线恢复基准、价格收盘补判；显式关闭实时流同时验证旧规则暂停、价格 active 意图保留且不偷开采集。时钟竞态分别通过旧形成中报价和真实 price collector 入口，核对信号发生时间、发现时间和最终监控状态。历史迁移用例固定原 rc.1 `bb55` 目标，保留表增量、幂等及数据断言；到当前 `bc56` 的真实有数据升级仍由专项覆盖，未放宽生产迁移。
 
 ### 存量迁移与代码回退
 

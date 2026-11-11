@@ -65,6 +65,11 @@ def test_stale_sample(switch_pg, monkeypatch, mode):
     contracts.test_stale_input_pauses_without_event_or_automatic_recovery(switch_pg, monkeypatch, mode)
 
 
+@pytest.mark.parametrize('mode', ['close', 'intrabar'])
+def test_blocked_price_rule_keeps_enabled_intent(switch_pg, monkeypatch, mode):
+    contracts.test_price_rule_keeps_enabled_intent_when_realtime_is_off(switch_pg, monkeypatch, mode)
+
+
 @pytest.mark.parametrize('action', ['resume', 'restart', 'rebaseline'])
 def test_admission(switch_pg, monkeypatch, action):
     contracts.test_disabled_rules_reject_create_and_resume_without_mutating_counters(switch_pg, monkeypatch, action)

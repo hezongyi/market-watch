@@ -35,7 +35,7 @@ from alerts.storage import (
 )
 from fastapi.testclient import TestClient
 from sqlalchemy import func, select
-from test_composite_alerts import armed, config, live
+from test_composite_alerts import armed, config, live, ray_condition
 from test_composite_chart import populated
 from test_managed_dataset import START
 
@@ -262,7 +262,7 @@ def test_disabled_rules_reject_create_and_resume_without_mutating_counters(datab
 
 
 def test_running_rule_pauses_once_off_and_reenable_needs_explicit_resume(database, monkeypatch):
-    ident, _, revision, _, stamp = armed(database, monkeypatch)
+    ident, _, revision, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
         row = db.get(ChartAlert, ident)
@@ -287,8 +287,30 @@ def test_running_rule_pauses_once_off_and_reenable_needs_explicit_resume(databas
 
 
 @pytest.mark.parametrize('mode', ['close', 'intrabar'])
-def test_stale_input_pauses_without_event_or_automatic_recovery(database, monkeypatch, mode):
+def test_price_rule_keeps_enabled_intent_when_realtime_is_off(database, monkeypatch, mode):
     ident, _, revision, _, stamp = armed(database, monkeypatch, mode=mode)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp) == []
+        row = db.get(ChartAlert, ident)
+        control = row.control_revision
+        sid = source_id(db, revision)
+        set_enabled(db, sid, False, now=stamp + 1)
+        assert evaluate(db, ident, now=stamp + 1) == []
+        assert row.status == 'active' and row.control_revision == control
+        assert row.runtime['execution_state'] == 'blocked'
+        assert row.runtime['reason_code'] == 'realtime_disabled'
+        assert not enabled(db, sid)
+        assert composite_targets(db, wanted_instruments(db)) == set()
+        set_enabled(db, sid, True, now=stamp + 2)
+        assert evaluate(db, ident, now=stamp + 2) == []
+        assert row.status == 'active' and row.control_revision == control
+        assert row.runtime['execution_state'] == 'monitoring'
+        assert db.scalar(select(SignalRow)) is None
+
+
+@pytest.mark.parametrize('mode', ['close', 'intrabar'])
+def test_stale_input_pauses_without_event_or_automatic_recovery(database, monkeypatch, mode):
+    ident, _, revision, _, stamp = armed(database, monkeypatch, mode=mode, condition=ray_condition())
     with database.begin() as db:
         evaluate(db, ident, now=stamp)
         assert evaluate(db, ident, now=stamp + 15001) == []
@@ -305,7 +327,9 @@ def test_stale_creation_is_rejected(database, monkeypatch):
     _, composite, _, _, stamp = armed(database, monkeypatch)
     with database.begin() as db:
         with pytest.raises(ValueError, match='尚未就绪'):
-            create(db, 'late-create', config(composite), at=stamp + 15001)
+            create(db, 'late-legacy-create', config(composite, condition=ray_condition()), at=stamp + 15001)
+        with pytest.raises(ValueError, match='没有有效价格基准'):
+            create(db, 'late-price-create', config(composite, mode='intrabar'), at=stamp + 15001)
 
 
 @pytest.mark.parametrize('gap', ['preparation', 'period'])
@@ -318,11 +342,13 @@ def test_alert_admission_requires_prepared_seam_and_period(database, monkeypatch
             from alerts.storage import CompositeAggregateTask
             db.delete(db.get(CompositeAggregateTask, (revision, 'M1')))
         with pytest.raises(ValueError, match='接缝或告警周期'):
-            create(db, 'not-ready-' + gap, config(composite), at=stamp)
+            create(db, 'not-ready-' + gap, config(composite, condition=ray_condition()), at=stamp)
+        price = create(db, 'price-' + gap, config(composite, mode='intrabar'), at=stamp)
+        assert price.state['left'] == '1.11'
 
 
 def test_expired_input_pauses_even_while_preparation_is_pending(database, monkeypatch):
-    ident, _, revision, _, stamp = armed(database, monkeypatch)
+    ident, _, revision, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     with database.begin() as db:
         db.get(CompositePreparation, revision).status = 'pending'
         assert evaluate(db, ident, now=stamp + 15001) == []
@@ -330,7 +356,7 @@ def test_expired_input_pauses_even_while_preparation_is_pending(database, monkey
 
 
 def test_known_closed_session_does_not_pause_on_old_input(database, monkeypatch):
-    ident, _, _, _, stamp = armed(database, monkeypatch)
+    ident, _, _, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     # Session evidence itself is covered by test_live_session. Exercise the
     # evaluator's closed-session boundary, independently of the synthetic date.
     monkeypatch.setattr('alerts.live_session.session_status', lambda *args: {
@@ -342,13 +368,13 @@ def test_known_closed_session_does_not_pause_on_old_input(database, monkeypatch)
 
 
 def test_rest_candle_freshness_does_not_require_a_quote(database, monkeypatch):
-    ident, composite, revision, _, stamp = armed(database, monkeypatch)
+    ident, composite, revision, _, stamp = armed(database, monkeypatch, condition=ray_condition())
     with database.begin() as db:
         target = db.get(RealtimeMapping, db.get(CompositeRevision, revision).mapping_id).target_dataset_id
         state = db.get(LiveState, target)
         state.quote = {}
         state.forming = {'acquisition_mode': 'rest_batch', 'close': '1.11', 'connection_epoch': state.epoch}
-        assert create(db, 'fresh-rest', config(composite), at=stamp)
+        assert create(db, 'fresh-rest', config(composite, condition=ray_condition()), at=stamp)
         assert evaluate(db, ident, now=stamp) == []
         assert db.get(ChartAlert, ident).status == 'active'
         assert evaluate(db, ident, now=stamp + 15001) == []

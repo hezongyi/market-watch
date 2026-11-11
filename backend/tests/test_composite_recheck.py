@@ -1,9 +1,15 @@
 import pytest
-from alerts import composite_recheck as module
 from alerts import composite_preparation as preparation
-from alerts.storage import CompositeInputEvent, CompositePreparation, CompositeRevision, CompositeReadAttempt, SourceMinuteRevision
+from alerts import composite_recheck as module
+from alerts.storage import (
+    CompositeInputEvent,
+    CompositePreparation,
+    CompositeReadAttempt,
+    CompositeRevision,
+    SourceMinuteRevision,
+)
 from sqlalchemy import select
-from test_composite_preparation import ready, answer
+from test_composite_preparation import answer, ready
 from test_market_contracts import minute
 
 
@@ -51,10 +57,11 @@ def test_recheck_applies_real_observations_to_same_revision_without_activation(d
 
 @pytest.mark.parametrize('covered', ['observed', 'target_closure', 'history_closure'])
 def test_recheck_targets_unknown_minutes_before_spending_quota(database, monkeypatch, covered):
+    from datetime import datetime, timezone
+
     from alerts.config import settings
     from alerts.market_datasets import register_dataset
     from test_market_contracts import identity
-    from datetime import datetime, timezone
 
     # Register reviewed calendar identities before binding/publication. Existing
     # dataset metadata and published manifests remain immutable in this test too.
@@ -173,9 +180,9 @@ def test_failed_or_obsolete_rechecks_never_register_source_or_composite_prices(d
 
 
 def test_recheck_http_requires_authentication_and_closes_source_adapter(database, monkeypatch):
+    from alerts.composite_api import router
     from fastapi import FastAPI, HTTPException
     from fastapi.testclient import TestClient
-    from alerts.composite_api import router
 
     authorized = [False]
     def authenticate():
@@ -219,31 +226,39 @@ def test_abandoned_attempt_expires_without_reissuing_or_accepting_prices(databas
     assert module.recheck(composite_id, revision_id, body, object()) == result
 
 
-def test_recheck_restores_same_fixed_alert_baseline_before_later_cross(database, monkeypatch):
+@pytest.mark.parametrize("path", ["legacy_ray", "price"])
+def test_recheck_restores_same_fixed_alert_before_later_cross(database, monkeypatch, path):
     from alerts.chart_alert_service import current_version
     from alerts.chart_alert_worker import evaluate
+    from alerts.composite_chart import chart_page
     from alerts.market_contracts import DatasetIdentity
     from alerts.storage import ChartAlert, MarketDataset, RealtimeMapping, SignalRow
     from sqlalchemy import func
-    from test_composite_alerts import armed, live, aggregate
+    from test_composite_alerts import aggregate, armed, live, ray_condition
     from test_fixed_indicators import add_tail
-    from alerts.composite_chart import chart_page
     from test_market_contracts import batch
 
-    ident, composite_id, revision_id, seam, stamp = armed(database, monkeypatch, timeframe="M5")
+    price = path == "price"
+    # The legacy ray endpoint must match an actual M5 label.
+    condition = {} if price else {"condition": ray_condition(at=165900000)}
+    ident, composite_id, revision_id, seam, stamp = armed(database, monkeypatch, timeframe="M5", **condition)
     aggregate(revision_id, 'M5')
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
         version_before = current_version(db, db.get(ChartAlert, ident)).id
         assert db.get(ChartAlert, ident).health == 'ready'
 
-    # An interrupted stream leaves an unobserved minute. The next observed
-    # crossing must become a recovery baseline after the explicit source read.
+    # An interrupted stream leaves an unqueried minute. Legacy geometry must
+    # rebase after repair; price close must wait and consume the repaired bar.
     outage = seam + 640000
     live(database, revision_id, outage, seam + 600000, connected=False)
     with database.begin() as db:
         assert evaluate(db, ident, now=outage) == []
-        assert db.get(ChartAlert, ident).health == 'stale'
+        row = db.get(ChartAlert, ident)
+        if price:
+            assert row.runtime['close_cursor'] == seam + 600000
+        else:
+            assert row.health == 'stale'
     recovered_at = seam + 900010
     add_tail(database, revision_id, [minute(at, close='1.119', volume='3')
         for at in range(seam + 660000, seam + 900000, 60000)])
@@ -252,7 +267,11 @@ def test_recheck_restores_same_fixed_alert_baseline_before_later_cross(database,
     with database.begin() as db:
         assert evaluate(db, ident, now=recovered_at) == []
         assert db.scalar(select(SignalRow)) is None
-        assert db.get(ChartAlert, ident).health == 'stale'
+        row = db.get(ChartAlert, ident)
+        if price:
+            assert row.runtime['reason_code'] == 'confirmation_window_pending'
+        else:
+            assert row.health == 'stale'
         gap = chart_page(db, composite_id, 'M5', revision_id=revision_id, count=1, now=recovered_at)['bars'][-1]
         assert not gap['coverage_complete'] and gap['unknown_minutes'] == 1
         assert gap['time_closed'] and gap['source_confirmed']
@@ -278,12 +297,18 @@ def test_recheck_restores_same_fixed_alert_baseline_before_later_cross(database,
         previous = chart_page(db, composite_id, 'M5', revision_id=revision_id,
                               input_revision=input_before, count=1, now=recovered_at)['bars'][-1]
         assert not previous['coverage_complete'] and previous['unknown_minutes'] == 1
-        assert evaluate(db, ident, now=recovered_at) == []
+        events = evaluate(db, ident, now=recovered_at)
         row = db.get(ChartAlert, ident)
-        assert row.runtime['readiness']['last_outcome'] == 'recovery_baseline'
+        if price:
+            assert len(events) == 1
+            assert events[0].occurred_at == seam + 900000
+            assert row.runtime['close_cursor'] == seam + 900000
+        else:
+            assert events == []
+            assert row.runtime['readiness']['last_outcome'] == 'recovery_baseline'
+            assert db.scalar(select(SignalRow)) is None
         assert current_version(db, row).id == version_before
         assert current_version(db, row).market_identity['composite_revision_id'] == revision_id
-        assert db.scalar(select(SignalRow)) is None
 
     def next_period(start, close):
         add_tail(database, revision_id, [minute(at, close=close, volume='3')
@@ -297,5 +322,6 @@ def test_recheck_restores_same_fixed_alert_baseline_before_later_cross(database,
     with database.begin() as db:
         assert len(evaluate(db, ident, now=seam + 1500010)) == 1
         assert evaluate(db, ident, now=seam + 1500010) == []
-        assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
-        assert db.get(ChartAlert, ident).count == 1
+        expected = 2 if price else 1
+        assert db.scalar(select(func.count()).select_from(SignalRow)) == expected
+        assert db.get(ChartAlert, ident).count == expected

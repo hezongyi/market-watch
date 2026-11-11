@@ -4,16 +4,24 @@ from concurrent.futures import ThreadPoolExecutor
 from threading import Event
 
 import pytest
-from sqlalchemy import select, func
-from alerts import composite_recheck as module
 from alerts import composite_preparation as preparation
-from alerts.storage import CompositeRevision, CompositeReadAttempt
-from test_composite_preparation import ready, answer
+from alerts import composite_recheck as module
+from alerts.storage import CompositeReadAttempt, CompositeRevision
+from sqlalchemy import func, select
+from test_composite_preparation import answer, ready
+from test_composite_recheck import (
+    test_failed_or_obsolete_rechecks_never_register_source_or_composite_prices as failed_contract,
+)
+from test_composite_recheck import (
+    test_recheck_restores_same_fixed_alert_before_later_cross as recovery_contract,
+)
+from test_composite_recheck import (
+    test_recheck_targets_unknown_minutes_before_spending_quota as gap_contract,
+)
+from test_composite_recheck import (
+    test_successful_recheck_can_be_retried_after_its_gap_is_filled as idempotent_contract,
+)
 from test_provider_postgres import provider_pg as _provider_pg
-from test_composite_recheck import test_failed_or_obsolete_rechecks_never_register_source_or_composite_prices as failed_contract
-from test_composite_recheck import test_recheck_restores_same_fixed_alert_baseline_before_later_cross as recovery_contract
-from test_composite_recheck import test_recheck_targets_unknown_minutes_before_spending_quota as gap_contract
-from test_composite_recheck import test_successful_recheck_can_be_retried_after_its_gap_is_filled as idempotent_contract
 
 provider_pg = _provider_pg
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
@@ -57,8 +65,9 @@ def test_concurrent_rechecks_share_audit_and_serialize_rate_limit(provider_pg, m
         assert db.scalar(select(func.count()).select_from(CompositeReadAttempt).where(CompositeReadAttempt.read_kind == 'gap_recheck')) == 1
 
 
-def test_source_recheck_fixed_alert_recovery_postgres(provider_pg, monkeypatch):
-    recovery_contract(provider_pg[0], monkeypatch)
+@pytest.mark.parametrize("path", ["legacy_ray", "price"])
+def test_source_recheck_fixed_alert_recovery_postgres(provider_pg, monkeypatch, path):
+    recovery_contract(provider_pg[0], monkeypatch, path)
 
 
 @pytest.mark.parametrize('covered', ['observed', 'target_closure', 'history_closure'])

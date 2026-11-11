@@ -39,10 +39,10 @@ from test_history_versions import Adapter
 from test_market_contracts import batch, identity, minute
 
 
-def ray_condition():
+def ray_condition(at=166020000):
     """The existing geometry path remains outside the fixed-price contract."""
     return {"relation": "cross_up", "right": {"kind": "line", "line": {
-        "kind": "horizontal_ray", "points": [{"time": 166020000, "index": 0, "price": "1.115"}]}}}
+        "kind": "horizontal_ray", "points": [{"time": at, "index": 0, "price": "1.115"}]}}}
 
 
 def config(composite, **changes):

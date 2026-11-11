@@ -26,7 +26,10 @@ def test_mapping_notes_upgrade_preserves_existing_mapping_and_composite(postgres
     # The fixture publisher uses the current history worker, which requires
     # the later period tables. Isolate the mapping-note upgrade on that shape;
     # the real pre-period schema upgrade has its own history-modes PG contract.
-    command.upgrade(config, "head")
+    command.upgrade(config, "bb55_provider_catalog_indexes")
+    # This is the rc.1 mapping-note compatibility contract. New price-input
+    # migrations have their own populated upgrade test and must not replay
+    # over a newer physical schema artificially stamped at aw50.
     # Some fresh-install migrations use current metadata. Model the actual
     # deployed pre-ax51 table set rather than accidentally testing create_all.
     with postgres_alerts.begin() as connection:
@@ -45,8 +48,8 @@ def test_mapping_notes_upgrade_preserves_existing_mapping_and_composite(postgres
         composite_id, revision_id = composite.id, revision.id
         history, seam = revision.history_version_id, revision.seam
     before = set(inspect(postgres_alerts).get_table_names())
-    command.upgrade(config, "head")
-    command.upgrade(config, "head")
+    command.upgrade(config, "bb55_provider_catalog_indexes")
+    command.upgrade(config, "bb55_provider_catalog_indexes")
     assert set(inspect(postgres_alerts).get_table_names()) - before == {"market_realtime_mapping_notes"}
     with factory.begin() as db:
         checked = check_match(db, identity().key, catalog_id)
