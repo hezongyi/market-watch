@@ -1,6 +1,6 @@
 # 守望 Android 外壳（A 阶段）
 
-对应应用基线 v2.0.5 / A06；本目录是新建工程，不恢复归档 Android 工程。
+当前应用基线 v2.0.6 / A06（最初从 v2.0.5 实施，2026-11-11 按用户要求变基）；本目录是新建工程，不恢复归档 Android 工程。
 
 - applicationId：`com.kookvv.marketwatch`，versionCode：`2`，versionName：`0.1.1`。
 - 工具链：JDK 17、Gradle 8.11.1（wrapper 固定 distribution SHA-256）、AGP 8.9.2、Kotlin 2.1.20、compile/target SDK 35、min SDK 26。

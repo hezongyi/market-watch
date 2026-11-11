@@ -2,7 +2,7 @@
 
 ## 目标与边界
 
-从固定 `1bb935bdf1195c4da532cb2e6f62faca2198e6c4` 在 `feat/android-personal-v205` 实施任务书 A→D；冻结五项导航、真实图表、共享自选/手机状态隔离、缓存只读、基线组合价格告警及既有 ntfy。唯一任务书与 UI 规范仍为 `docs/android-personal-app-plan-20261110.md` 和 `docs/android-ui-freeze-a02-20261111.md`。
+当前按用户要求以固定 v2.0.6 `d2a3e0925175376746170e2597c6fa675d2fa43d` 为基线（原始 v2.0.5 `1bb935bdf1195c4da532cb2e6f62faca2198e6c4` 的实现提交全部重放），在 `feat/android-personal-v205` 实施任务书 A→D；冻结五项导航、真实图表、共享自选/手机状态隔离、缓存只读、基线组合价格告警及既有 ntfy。唯一任务书与 UI 规范仍为 `docs/android-personal-app-plan-20261110.md` 和 `docs/android-ui-freeze-a02-20261111.md`。
 
 不合并、不打正式 tag、不发布生产、不使用其他任务可写库、不清理其他任务。
 

@@ -298,6 +298,8 @@ jobs:
           java-version: "17"
       - name: Set up Android tools
         uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
       - name: Install Android SDK 35
         run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
       - name: Build and lint debug shell
