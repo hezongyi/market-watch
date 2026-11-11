@@ -74,7 +74,7 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | 前端生产构建 | 通过 | 最新 web Docker build 含 tsc、Vite 与单前端产物构建 |
 | 浏览器 | **最终镜像完整通过** | [browser-result.json](browser-result.json)：真实创建/幂等、零浏览器且图表需求租约自然归零后继续判断、断线恢复不伪造穿越、缺口/恢复通知、深链接和历史信号；无 pageerror。等待允许两层120s租约及共享主机调度余量；没有手工删租约 |
 | 独立巡检运行时故障注入 | **2场景通过** | [runtime-faults.json](runtime-faults.json)：真实monitor存活不推进、market-runtime进程停止；notifications独立检测/恢复 |
-| 全 backend suite | **旧 head CI 失败，最终修复待 CI** | [run 42930065236](https://github.com/hezongyi/market-watch/actions/runs/42930065236)：41 failed /3725 passed /3 skipped。失败集中在旧价格路径预期、历史迁移夹具与报价并发夹具；定向修复及最终运行见下节，不把局部通过表述为全套 CI 通过 |
+| 全 backend suite | **39e22f31 完整 CI 通过，集成后补丁待 CI** | [run 42941074960](https://github.com/hezongyi/market-watch/actions/runs/42941074960)：3776 passed /3 skipped；附加 PG 检查1项及8项通过。同步 main 的同文件树重跑出现既有供源测试超时，补丁结果见下节 |
 | 远端 CI / Draft PR | Draft [#128](https://github.com/hezongyi/market-watch/pull/128)；以最终提交 checks 为准 | [PR 检查](https://github.com/hezongyi/market-watch/pull/128/checks)及 PR 描述记录最终运行 URL/结果。旧 run 42925957555 因推送修复而取消，不计作通过 |
 
 ### 完整 CI 回归修复
@@ -82,6 +82,8 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 旧价格用例原先直接调用公开 worker，却仍期待旧版 OHLC 放行、断线自动暂停及修复后重建基准。现在原生 OHLC 的账户、租约、校验、修订、无事务 HTTP 等保护在明确的保留组件入口验证；指标及射线仍走公开旧规则路径，价格规则另走公开 price-v2 路径。新增 D1 在已有原生证明时仍拒绝替代缺失的 M1 查询证明，后续稀疏日线以有界查询建立基准并顺序触发，图表 OHLC / coverage 不变。
 
 缺口重查同时验证旧射线恢复基准、价格收盘补判；显式关闭实时流同时验证旧规则暂停、价格 active 意图保留且不偷开采集。时钟竞态分别通过旧形成中报价和真实 price collector 入口，核对信号发生时间、发现时间和最终监控状态。历史迁移用例固定原 rc.1 `bb55` 目标，保留表增量、幂等及数据断言；到当前 `bc56` 的真实有数据升级仍由专项覆盖，未放宽生产迁移。
+
+同步 main 的 `423dfb41` 文件树与已通过 CI 的合并内容完全一致，但 [run 42945464361](https://github.com/hezongyi/market-watch/actions/runs/42945464361) 为3775 passed /1 failed /3 skipped：既有 `test_ready_history_activation_reuses_snapshot_connection[True]` 在进入 activate 前耗尽0.3s预算。短预算改到连接池争用边界，前置读取单独给足预算；连接池填满后直接禁止第二次 `engine.connect()`，不再只靠墙钟推断连接复用。整个真实 PG 模块 **21 passed，0 skipped**；注入丢弃既有连接的回归时，测试按预期以 `activation opened another connection` 失败。独立 Spec 只读复核无阻断；生产代码未改。
 
 ### 存量迁移与代码回退
 
