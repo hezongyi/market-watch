@@ -1,6 +1,6 @@
 # 价格告警可靠性：实施与验收记录（进行中）
 
-风险分类 **F1 / 定向 R2**：新增有界持久输入、规则执行契约、到期结算、故障通知及兼容迁移。本记录不是完成声明。**10 分钟固定负载尚未验收；远端 CI 和 Draft PR 待最终验收后更新。GitHub API 登录已恢复。**
+风险分类 **F1 / 定向 R2**：新增有界持久输入、规则执行契约、到期结算、故障通知及兼容迁移。本记录不是完成声明。**10 分钟固定负载尚未验收。Draft PR [#128](https://github.com/hezongyi/market-watch/pull/128) 已创建；远端 CI 仍在运行，不能宣称完整交付。**
 
 ## 基线、隔离与运行
 
@@ -10,7 +10,7 @@
 - 网页：**http://127.0.0.1:28463**；PG：`127.0.0.1:25463`。均仅绑定本机回环地址，不是 Unraid 或 SSH 转发实例。
 - 已运行 PG、migrate、API、market-runtime、data-worker、notification-worker、本地 HTTP 通知 fixture、web。API `/readyz` 已通过。行情、账户和通知 topic 均为本任务 fixture；不发送真实手机消息。
 - PG 固定 `postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`，实际 `server_version_num=140024`。健康检查同时临时启用 JIT 并检测 `pg_jit_available()`。
-- 当前运行镜像：API `sha256:261c73a7be4a48f1e866fbd7bb13a865979519cd4ea3251252105242a732cdb6`；web 镜像最终浮层修复重建后另行记录。应用运行源码包含 `e2dde20a` 的修复；镜像在提交前从同一工作树构建，标签中的 Git revision 仍是旧 HEAD，以上 image ID 才是本次实际运行证据。
+- 当前运行镜像：API `sha256:34dba393651b69c2b6dc9d2e34c6f46bf79987c23f77881487ccb47d21524af0`；web `sha256:4f2c35bc27907d489da48598d55515143a31df0111942aab37a9df16adaf40ca`。API 运行源码对应 `5841e64d`（含锁等待时间竞态修复），web 对应 `c19764e6` 的通知浮层适配修复；镜像在提交前从同一工作树构建，标签中的 Git revision 仍是旧 HEAD，以上 image ID 才是本次实际运行证据。
 - 私有配置：`/home/quant/.local/share/market-watch-private/price-alerts-v203rc1`（目录 0700，配置 0600）；密码、env、许可库、完整浏览器输出不入 Git。
 - 网络、数据库、schema、volume、端口均属本任务。测试 schema 在任务 PG 中独立创建；未修改或停止其他项目、`mw-dev` 或生产。
 - market-runtime 使用真实 supervisor，只将 pricing loop 替换为受控 producer；故障验收可在真实 alert monitor 的 step 边界暂停规则推进。其余确认、聚合、消费、Outbox、通知投递与投影走真实模块。
@@ -40,6 +40,7 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 
 ## 实现范围
 
+- 价格准入在取得采集共用 dataset 锁后刷新真实时钟；新建/编辑/恢复/重新启用在锁内确定生效时间并复查到期，避免等待期间的新报价被旧请求时间判为未来。显式 `at` 保持固定时间语义。
 - 触价按 dataset 共享已提交日志、每规则独立游标；采集快照与日志同事务。支持同毫秒不同报价、重发去重、REST close 采样口径、保留裁剪和断线边界。每轮最多 256 条观察。
 - close 固定 revision / input_revision，按周期终点补判，每轮最多 128 周期。区分稀疏有效分钟、查询确认失败和真实未知区间；不以当前报价有效性挡住历史已确认柱。
 - 输入保留为 24h、每 dataset 100,000、全局 1,000,000 条；裁剪与边界同事务。无输入时仍由既有 worker 定期维护。
@@ -59,6 +60,9 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | 迁移三模块 | **21 passed** | `test_alerts_mcp_migration.py`、`test_chart_alert_migration.py`、`test_chart_alert_postgres.py`；55 条 Alembic 既有弃用警告 |
 | 真实 PG 可靠性专项全文件 | **64 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-pg-review.log`；包括真实旧 evaluator 回退 |
 | PG既有链路整合5模块 | **46 passed，0 skipped** | composite alerts /live pricing /market usage /notification outbox /switch activation；`/tmp/mw-price-alerts-v203rc1-pg-integration-final.log` |
+| 取锁期间新报价/到期边界 | **9 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-clock-green.log`；create/edit/resume/restart 锁后取时、到期拒绝、下一穿越及首次注册互斥 |
+| 取锁时间修复影响回归7模块 | **132 passed** | `/tmp/mw-price-alerts-v203rc1-clock-regression.log` |
+| 既有来源闭市→开市 PG 模块 | **11 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-provider-clock-green.log`；补齐固定行情的窗口时钟，避免日期推进后 fixture 超出30天；产品窗口规则未改 |
 | 后续 PG 故障/控制并发/DST 边界 | **15 passed，0 skipped** | `/tmp/mw-price-alerts-v203rc1-pg-final-boundaries.log`；涵盖全文件运行后补充场景 |
 | 春秋 DST 周末最后 M1 / W1 收盘柱 | **4 passed** | 真实确认→聚合→创建/判断，闭市期间补判，不重复；已纳入上述 PG 复验 |
 | HTTP 通知故障 | 已通过，纳入 execution 复验 | 本地真实 HTTP 500、401、403、超时、静默、200；server_accepted 不等于设备到达 |
@@ -67,10 +71,10 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | Python Ruff（相对 rc.1 全部改动） | 通过 | 后续新增 Python 另行复验 |
 | 前端69条CI Node命令 | **全部通过** | `/tmp/mw-price-alerts-v203rc1-web-ci.log`，包括适用browser脚本 |
 | 前端生产构建 | 通过 | 最新 web Docker build 含 tsc、Vite 与单前端产物构建 |
-| 浏览器 | 部分已通过，浮层修复后待最终重跑 | 已真实创建/幂等、零浏览器继续判断、断线恢复、缺口与通知链接；末步发现浮层挡住详情按钮，已修复，不能据此先标 A23 完成 |
+| 浏览器 | **最终镜像完整通过** | [browser-result.json](browser-result.json)：真实创建/幂等、零浏览器且图表需求租约自然归零后继续判断、断线恢复不伪造穿越、缺口/恢复通知、深链接和历史信号；无 pageerror。等待允许两层120s租约及共享主机调度余量；没有手工删租约 |
 | 独立巡检运行时故障注入 | **2场景通过** | [runtime-faults.json](runtime-faults.json)：真实monitor存活不推进、market-runtime进程停止；notifications独立检测/恢复 |
 | 全 backend suite | **未通过完整运行** | 旧轮运行在 557 passed /15 failed /2 skipped 时中断；已定位的失败已修复并定向重跑。不能把相关模块通过表述为全套 CI 通过 |
-| 远端 CI / Draft PR | 待创建 | 先前 gh 登录失效，本轮复查已恢复，继续交付 |
+| 远端 CI / Draft PR | Draft [#128](https://github.com/hezongyi/market-watch/pull/128)；以最终提交 checks 为准 | [PR 检查](https://github.com/hezongyi/market-watch/pull/128/checks)及 PR 描述记录最终运行 URL/结果。旧 run 42925957555 因推送修复而取消，不计作通过 |
 
 ### 存量迁移与代码回退
 
@@ -105,7 +109,7 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | A06 | PG 信号/游标/次数/Outbox 一起回滚并重试、不重复，通过 |
 | A07 | stream / REST receive-time、模式切换、显示容量独立性用例通过 |
 | A08 | 连续积压及 late_delivery 用例通过 |
-| A09–A10 | 真断线恢复浏览器部分已通过；PG 保留裁剪/缺口/恢复基准通过 |
+| A09–A10 | 真断线恢复浏览器完整通过；PG 保留裁剪/缺口/恢复基准通过 |
 | A11–A13 | 顺序 close、多批、次数上限、旧报价失效、稀疏M1/未确认/失败窗口，PG 通过 |
 | A14 | 九周期、月桶截断、春秋 DST、闭市最后M1/W1，PG 通过；不以 NY17 代替来源会话证据 |
 | A15 | 老 seam、窗口不可读、冻结/账户变化、固定绑定和能力分模式回归通过 |
@@ -116,7 +120,7 @@ mw-docker build --repo . --context . --file web/Dockerfile --component web \
 | A20 | PG独立巡检及真实运行时存活停滞/进程停止均通过，规则active、每实例故障与恢复对应 |
 | A21 | 配置错误、真实本地 HTTP 故障/重试/blocked/quiet/200，execution 回归通过 |
 | A22 | 真实填充旧库 Alembic 升级、幂等接管及原 evaluator 代码回退围栏通过 |
-| A23 | 浏览器最终重跑待补，当前不标完成 |
+| A23 | 最终镜像真实浏览器完整通过：新会话查看恢复通知→规则链接→关闭详情→历史信号 |
 | A24 | PG 裁剪/消费互斥、登记/采集、事务回滚、控制并发和跨dataset容量用例通过 |
 
 ## 复现命令
@@ -150,4 +154,4 @@ PY
 
 ## 独立审查与停止边界
 
-两路独立 Standards / Spec review 已运行，详见 [reviews.md](reviews.md)。不合并、不打正式 tag、不发布 Unraid/生产。进行中资源保留，不做全局清理或删除 volume。最终仍须补齐有效性能、浏览器/运行时最终结果及 CI/Draft PR，之后才可宣称任务完成。
+两路独立 Standards / Spec review 已运行，详见 [reviews.md](reviews.md)。不合并、不打正式 tag、不发布 Unraid/生产。进行中资源保留，不做全局清理或删除 volume。Draft PR 已创建，真实运行时与浏览器闭环已有通过证据。最终仍须补齐有效性能及最终提交 CI，之后才可宣称任务完成。

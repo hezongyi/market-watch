@@ -114,9 +114,12 @@ async function main() {
     const getRule = () => request(page, "/api/chart-alerts/" + id);
     await expect.poll(async () => (await getRule()).execution.state, { timeout: 15000 }).toBe("monitoring");
     await context.close();
+    report.browser_closed_at = Date.now();
     control({ prime_until: 0 });
+    // Stream subscriptions and their demand leases each last 120 seconds.
+    // Allow cancellation/publication scheduling on the shared Ubuntu host.
     await expect.poll(() => evidence(id).unexpired_chart_leases, {
-      timeout: 240000, intervals: [2500, 5000],
+      timeout: 360000, intervals: [2500, 5000],
     }).toBe(0);
     expect(browser.contexts()).toHaveLength(0);
     control({ price: "101" });

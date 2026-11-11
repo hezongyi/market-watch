@@ -51,6 +51,7 @@ def test_closed_boundary_open_recovery_requires_current_m1_on_postgres(provider_
     factory, _ = provider_pg
     stamp = int(datetime.fromisoformat("2026-10-11T20:00:00+00:00").timestamp() * 1000)
     monkeypatch.setattr(live, "now_ms", lambda: stamp)
+    monkeypatch.setattr("alerts.live_window.now_ms", lambda: stamp)
     monkeypatch.setattr(settings, "oanda_resident_symbols", "EUR_USD")
     live.ensure_catalog([{"name": "EUR_USD", "displayPrecision": 5}], "test-account")
     from alerts.realtime_switch import set_enabled
