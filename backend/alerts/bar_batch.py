@@ -98,12 +98,17 @@ def write_bars(db, instrument_id, timeframe, candles, *, observed_at=None,
     # Native snapshots can advance freshness atomically with the source write.
     # Derived calendar frames still use their ordinary bounded reconciliation.
     dirty = changes.price | changes.volume | pending_observation
-    if timeframe in ('M15', 'D1'):
-        dirty |= observed_only
     enqueue_publication(db, instrument_id, timeframe, dirty)
+    # The native snapshot already committed this exact observation atomically.
+    # Only calendar-derived frames still need ordinary bounded reconciliation.
+    clean_observation = observed_only - pending_observation
+    enqueue_publication(db, instrument_id, timeframe, clean_observation, include_source=False)
     from .publication_schedule import request, source_frames
-    if dirty:
-        request(db, instrument_id, frames=source_frames(timeframe))
+    frames = set(source_frames(timeframe)) if dirty else set()
+    if clean_observation:
+        frames.update(source_frames(timeframe)[1:])
+    if frames:
+        request(db, instrument_id, frames=frames)
     if timeframe == 'M1':
         # Metadata-only observations must reach matching stored aggregates too.
         # Price/volume updates already trigger their full aggregation in callers.

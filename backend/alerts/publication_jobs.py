@@ -9,10 +9,14 @@ from .domain import bucket_bounds, calendar_for
 from .storage import ChartPublication, ChartPublicationJob, Instrument, instant, ms
 
 
-def enqueue_publication(db, instrument_id, source, starts):
+def enqueue_publication(db, instrument_id, source, starts, *, include_source=True):
     if not starts:
         return
     frames = (source, "M30") if source == "M15" else (source, "W1", "MN") if source == "D1" else (source,)
+    if not include_source:
+        frames = frames[1:]
+    if not frames:
+        return
     publications = list(db.scalars(select(ChartPublication).where(
         ChartPublication.instrument_id == instrument_id,
         ChartPublication.timeframe.in_(frames),

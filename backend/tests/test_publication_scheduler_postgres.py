@@ -16,6 +16,23 @@ from test_publication_scheduler import MINUTE, START
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
 
 
+@pytest.mark.parametrize('frame,seconds,derived', [('M15', 900, {'M30'}), ('D1', 86400, {'W1', 'MN'})])
+def test_pg_atomic_observation_queues_derived_only_and_keeps_content_repair(publication_pg, frame, seconds, derived):
+    from test_idle_worker_costs import (
+        test_atomic_native_observation_only_schedules_derived_and_keeps_content_repair,
+    )
+    test_atomic_native_observation_only_schedules_derived_and_keeps_content_repair(
+        publication_pg[0], frame, seconds, derived)
+
+
+def test_pg_incomplete_observation_fallback_retains_full_calculation(publication_pg, monkeypatch):
+    from test_idle_worker_costs import (
+        test_incomplete_day_fallback_reuses_boundaries_without_skipping_full_calculation,
+    )
+    test_incomplete_day_fallback_reuses_boundaries_without_skipping_full_calculation(
+        publication_pg[0], monkeypatch)
+
+
 def test_pg_observation_does_not_revise_unchanged_snapshots(publication_pg, monkeypatch):
     from test_publication_observation import (
         test_rolling_observation_keeps_freshness_without_content_revisions,

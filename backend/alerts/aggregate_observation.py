@@ -64,9 +64,9 @@ def refresh(db, instrument, touched, frame, rows):
         from .publication_observation import refresh
         from .publication_schedule import request, source_frames
         pending = refresh(db, instrument.id, frame, changed)
-        if frame in ('M15', 'D1'):
-            pending |= changed
         if pending:
             enqueue_publication(db, instrument.id, frame, pending)
-            request(db, instrument.id, frames=source_frames(frame))
+        enqueue_publication(db, instrument.id, frame, changed - pending, include_source=False)
+        frames = source_frames(frame) if pending else source_frames(frame)[1:]
+        request(db, instrument.id, frames=frames)
     return remaining

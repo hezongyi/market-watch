@@ -14,3 +14,10 @@ Standards 与 Spec 均通过，无阻断项；未查询 CI。
 
 后续 CLI 投影入口也接入同一通知监听；实际来源入口、notice/alert/stream 提交和回滚
 通过新增 PostgreSQL 回归。迁移/旧 writer/运行验收以独立证据为准。
+
+## 第二轮增量审查（相对 cc8ad83a）
+
+两个独立审查均通过，无阻断项。默认调用兼容；仅完整匹配并已原子刷新的快照
+跳过 native 排队，M30/W1/MN 继续排队，既有任务及代际不删除或提前确认。
+fallback bisect 只替换桶定位，保留完整源行、coverage、完成、成交量和修复屏障；
+UTC 有序桶与 23/25 小时 DST 边界语义不变。真实 PG 跟进回归 186 passed。
