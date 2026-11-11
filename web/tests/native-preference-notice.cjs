@@ -26,6 +26,7 @@ const adapter = bridge.slice(
       writes = [];
     let fail = true;
     const sandbox = vm.createContext({
+      mobileMode: false,
       Map,
       Promise,
       JSON,
@@ -122,6 +123,7 @@ const adapter = bridge.slice(
     let finish, started;
     const began = new Promise((resolve) => (started = resolve));
     const sandbox = vm.createContext({
+      mobileMode: false,
       Map,
       Promise,
       JSON,
