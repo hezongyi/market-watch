@@ -374,6 +374,7 @@ def test_populated_alembic_upgrade_and_rc1_evaluator_rollback_fence(monkeypatch,
 
     from alembic import command
     from alembic.config import Config
+    from alembic.script import ScriptDirectory
     from alerts import storage
     from alerts.chart_alert_worker import evaluate
     from alerts.config import settings
@@ -496,8 +497,9 @@ with MonkeyPatch.context() as patch:
 
         config = Config(str(root / "alembic.ini"))
         config.set_main_option("script_location", str(root / "migrations"))
+        expected_head = ScriptDirectory.from_config(config).get_current_head()
         command.upgrade(config, "head")
-        assert revision() == "bc56_price_alert_inputs"
+        assert revision() == expected_head
         with factory.begin() as db:
             assert history(db) == before
             for name in ("active_close", "active_touch"):
@@ -542,7 +544,7 @@ with transaction() as db:
                       'pending': len(db.scalars(select(Outbox).where(Outbox.status == 'pending')).all())}))
 """, LEGACY_IDS=json.dumps(ids), LEGACY_AT=str(stamp))
         assert checked["signals"] == len(before["signals"]) and checked["pending"] == len(before["outbox"])
-        assert revision() == "bc56_price_alert_inputs"
+        assert revision() == expected_head
         with factory() as db:
             assert history(db) == before
     finally:
