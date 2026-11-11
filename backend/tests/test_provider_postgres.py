@@ -316,6 +316,7 @@ def test_optional_activation_does_not_block_cached_native_delivery(provider_pg, 
     from alerts import provider_service as service
     from alerts.chart_query import DataQuery
     from alerts.storage import ProviderInterest
+    from sqlalchemy.exc import DBAPIError
     from test_provider_cache import seed
     factory, _ = provider_pg
     key = seed(META, 'M5', 100000, page(90000, 100000))
@@ -326,8 +327,25 @@ def test_optional_activation_does_not_block_cached_native_delivery(provider_pg, 
                      native_history={'chart_count': 1, 'focused': True})
     service.activate(body.client, key, 100000, 3)
     ident = service.interest_id(body.client, 'read:' + key + ':history')
-    def read():
+    entered = threading.Event()
+    lock_errors = []
+    original = service.activate
+    def activate(*args, **kwargs):
+        # Budget the optional write itself, not native planning or scheduling
+        # on a busy CI runner. The error code proves lock_timeout wins over
+        # the request's statement timeout; elapsed wall time alone cannot.
         token = cache.DEADLINE.set(time.monotonic() + 0.3)
+        entered.set()
+        try:
+            return original(*args, **kwargs)
+        except DBAPIError as error:
+            lock_errors.append(getattr(error.orig, 'sqlstate', None))
+            raise
+        finally:
+            cache.DEADLINE.reset(token)
+    monkeypatch.setattr(service, 'activate', activate)
+    def read():
+        token = cache.DEADLINE.set(time.monotonic() + 10)
         try:
             return cache.data(body)
         finally:
@@ -340,9 +358,11 @@ def test_optional_activation_does_not_block_cached_native_delivery(provider_pg, 
                 writer.scalar(select(ProviderInterest).where(ProviderInterest.id == ident).with_for_update())
             pending = pool.submit(read)
             try:
-                result = pending.result(timeout=0.8)
+                assert entered.wait(10), 'cached read never reached optional activation'
+                result = pending.result(timeout=2)
             finally:
                 writer.rollback()
+    assert lock_errors == ['55P03'], 'optional activation must fail on the held lock'
     assert result['cache_hit'] and result['mandatory_count'] == 3
     assert len(result['bars']) >= 3
 

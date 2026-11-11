@@ -15,3 +15,5 @@
 PR 保持 Draft，base ref 为 main（GitHub PR base 需为分支；当次 main 精确位于 v2.0.6）。远端任务分支更新使用明确旧头的 force-with-lease，只重写本任务分支。没有改正式 tag、合并、生产发布或其他工作树。
 
 隔离实例更新与 PR CI 结果随后记录；在更新前，历史候选部署记录不代表新后端已经部署。
+
+后端 CI 的唯一超时已按 [锁竞争诊断](ci-provider-contention.md) 修正测试边界并强化 SQLSTATE 断言；本地真实 PostgreSQL/缓存回归 52 passed，等待最新 CI。
