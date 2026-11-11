@@ -21,6 +21,7 @@
 - [后续补充](tests-extra.log)：W1/MN 自动 `publish_once` 调度 2 passed；worker 持锁与新写入交错、分片余量和公开新鲜度 1 passed。测试使用事件同步，断言写入等待 Instrument 锁并最终保留范围。
 - [迁移兼容补验](tests-migrations.log)：15 passed、无跳过。更新旧测试写死的 schema head（先复现 7 failed），验证六条 SQLite 历史升级路径、PostgreSQL 发布迁移、原有告警记录及 rc1 evaluator 在新 head 上的回退保护；事实保留断言不变。
 - Ruff 与 `git diff --check` 通过。
+- CI 另外复现了 main 既有的 `saved-layout-startup.browser.cjs` 时序失败：保存失败通知已接收、尚未投影，详情确认 GET 未被 mock。夹具按空投影状态返回 404，保留所有布局/草稿/冲突断言；本任务源码 `npm run build:ui` 成功，该浏览器测试连续 5 次通过。无产品 Web 代码变更。
 - Standards 独立复审：无阻塞项/需报告异味；上轮 M1 双读预算问题已关闭。
 - Spec 独立复审：上轮 fallback 丢请求、预算双读、冗余唤醒三项关闭，无新代码阻塞。提出的自动调度和 writer/worker 交错证据边界已补测，并在 `97a0c526` 复审确认关闭。
 - 最终提交的 CI 结果在 PR 展示；旧提交的绿灯不能替代最终候选检查。
