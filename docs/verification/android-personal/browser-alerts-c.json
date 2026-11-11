@@ -1,0 +1,18 @@
+{
+  "evidence": "built mobile UI with HTTP doubles",
+  "checks": [
+    "per-mode capabilities and actual frames",
+    "no workspace on create; revision bound",
+    "rapid submit fenced",
+    "unknown result reuses request ID/config",
+    "editing preserves old association",
+    "409 preserves input",
+    "back affects only top sheet",
+    "versioned lifecycle",
+    "execution preparing is not monitoring",
+    "notice close does not handle; explicit confirmation does",
+    "notice ID dedup across reload",
+    "single mobile IDB and 150% layout"
+  ],
+  "errors": []
+}

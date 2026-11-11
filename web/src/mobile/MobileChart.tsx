@@ -14,7 +14,7 @@ import {
   type ChartApplication,
   type ChartUpdate,
 } from "../runtime/chart";
-import { providerSubscriptions } from "../advanced/providerSubscriptions";
+import type { MobileMarket } from "./market";
 import {
   subscribeHistoryLoadCapacity,
   type HistoryCapabilities,
@@ -48,12 +48,17 @@ export default forwardRef<
   MobileChartHandle,
   {
     profile: Profile;
+    connection: MobileMarket;
     symbol: string;
     visible: boolean;
     report(message: string): void;
     dirty(value: boolean): void;
+    createAlert(): void;
   }
->(function MobileChart({ profile, symbol, visible, report, dirty }, ref) {
+>(function MobileChart(
+  { profile, connection, symbol, visible, report, dirty, createAlert },
+  ref,
+) {
   const root = useRef<HTMLDivElement>(null),
     chart = useRef<ChartAdapter | null>(null);
   const callbacks = useRef({ report, dirty });
@@ -109,27 +114,7 @@ export default forwardRef<
     const updateChart = (value: ChartUpdate) => {
       if (!stopped) void chart.current?.update(value);
     };
-    const provider = providerSubscriptions(
-      api,
-      (client) =>
-        new EventSource(
-          "/api/charts/stream/events?client=" + encodeURIComponent(client),
-        ),
-      (event) => updateChart({ type: "market-event", event }),
-      (error) => callbacks.current.report(String(error)),
-      undefined,
-      undefined,
-      async (args) => {
-        const query = args.query as { series_kind: string; instrument: string };
-        if (query?.series_kind !== "composite") return true;
-        const metadata = await api("/market-data/resolve", {
-          instrument: query.instrument,
-          series_kind: "composite",
-          timeframe: "M1",
-        });
-        return metadata.created === true;
-      },
-    );
+    const owned = new Map<string, any>();
     const market = marketRuntime({
       api,
       marketRequests,
@@ -140,7 +125,7 @@ export default forwardRef<
       chart,
       setNativeLoads,
       compositeEstablished: (id) => {
-        void provider.established(id);
+        void connection.established(id);
       },
       updateChart,
     });
@@ -216,6 +201,7 @@ export default forwardRef<
             await source.update({
               type: "init",
               mode: "mobile",
+              mobile_client: connection.client,
               readonly: false,
               workspace: null,
               document: document || {
@@ -228,12 +214,16 @@ export default forwardRef<
               history_capabilities: capabilities,
               preferences: await localSettings("preferences", { op: "read" }),
             });
-          } else if (message.type === "market-subscribe")
-            await provider.subscribe(message.args);
-          else if (message.type === "market-unsubscribe")
-            await provider.unsubscribe(message.args);
-          else if (message.type === "market-accept")
-            await provider.accept(message.args);
+          } else if (message.type === "market-subscribe") {
+            owned.set(message.args.listener, message.args);
+            await connection.subscribe(message.args, (event) =>
+              updateChart({ type: "market-event", event }),
+            );
+          } else if (message.type === "market-unsubscribe") {
+            owned.delete(message.args.listener);
+            await connection.unsubscribe(message.args);
+          } else if (message.type === "market-accept")
+            await connection.accept(message.args);
           else if (message.type === "native-load-reset") {
             nativeLoadEpoch.current = message.epoch;
           } else if (message.type === "ready") {
@@ -330,7 +320,8 @@ export default forwardRef<
       unsubscribeCapacity();
       instance?.dispose();
       if (chart.current === instance) chart.current = null;
-      void provider.dispose();
+      for (const args of owned.values())
+        void connection.unsubscribe(args).catch(() => {});
       for (const requests of marketRequests.values())
         for (const request of requests.values()) request.abort();
       for (const pending of flushes.current.values()) {
@@ -340,7 +331,7 @@ export default forwardRef<
       flushes.current.clear();
     };
     // Keep a single widget; subsequent symbol changes use the native API below.
-  }, [profile.origin, profile.subject, retry]);
+  }, [profile.origin, profile.subject, connection, retry]);
   const initial = useRef("");
   useEffect(() => {
     if (initial.current === symbol || !ready) return;
@@ -409,8 +400,19 @@ export default forwardRef<
           </button>
           <button
             aria-label="价格告警"
-            disabled
-            title="价格告警将在告警阶段接入"
+            disabled={!ready || !symbol.startsWith("MWC:")}
+            title={
+              symbol.startsWith("MWC:")
+                ? "创建当前组合的价格告警"
+                : "仅组合行情支持新建价格告警"
+            }
+            onClick={() =>
+              void command("can-leave")
+                .then((value) => {
+                  if (!value) createAlert();
+                })
+                .catch((error) => report(String(error)))
+            }
           >
             <BellPlus aria-hidden="true" />
           </button>

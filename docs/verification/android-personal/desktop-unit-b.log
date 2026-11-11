@@ -1,0 +1,217 @@
+
+> market-watch-web@1.27.0 test:single-frontend
+> node scripts/test-single-frontend.mjs --unit
+
+single-app continuation allowlist passed
+Catalog RPC endpoints stay session-scoped and provider refresh budgets cover query strings
+FXCM provider and embedded refresh deadlines cover cold login; other deadlines remain source-specific
+{"saved_offset":10,"current_offset":20,"dirty":true,"messages":[{"type":"workspace-dirty"}],"bug_reproduced":false}
+Native save preserves edits and workspace switches during async capture; unchanged snapshot acknowledges.
+PASS notification intake isolation, permanent rejection, accepted projection gap and business outcome
+PASS atomic alert/cursor recovery, dedupe, retention, subject isolation and v1 compatibility
+TAP version 13
+# Subtest: notification surface waits for the actual header before acquiring its shell or creating a button
+ok 1 - notification surface waits for the actual header before acquiring its shell or creating a button
+  ---
+  duration_ms: 5.439558
+  type: 'test'
+  ...
+# Subtest: header failure propagates without leaving a partially attached shell
+ok 2 - header failure propagates without leaving a partially attached shell
+  ---
+  duration_ms: 1.158188
+  type: 'test'
+  ...
+# Subtest: a button failure after header readiness releases the acquired native shell
+ok 3 - a button failure after header readiness releases the acquired native shell
+  ---
+  duration_ms: 0.957351
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 15.90264
+Unified native callbacks: generation/order fences, authoritative extremes, quote delivery and no polling passed
+PASS: unified historical proof, reset/reload, gap and generation fences
+Unchanged history preserves mapping; confirmed revision invalidates metadata and pending tickets during busy navigation
+PASS: polling fallback retains unified supplier SSE and cancellation
+Market scheduling: foreground room, live focus, fairness and fixed/provider reserve parity passed
+Four obsolete in-flight histories release slots within 180ms; current request starts
+History admission: immediate prices, live-focus selection through cleanup and bounded lifetimes passed
+Provider native requests survive period switches and cancel on workspace replacement
+native workspace adapter: conflict, serialized saves and readonly passed
+native adapters: queued writes, namespaces, reload, conflict and readonly passed
+PASS multi-window preference merge, idempotence, conflict retention, bounded retries, deletion and opaque templates
+TAP version 13
+# Subtest: UI bridge rejects URLs, methods, forged sessions and workspace association before API work
+ok 1 - UI bridge rejects URLs, methods, forged sessions and workspace association before API work
+  ---
+  duration_ms: 1.961021
+  type: 'test'
+  ...
+# Subtest: read, capability, geometry, create, edit, lifecycle and ack have bounded allowed routes
+ok 2 - read, capability, geometry, create, edit, lifecycle and ack have bounded allowed routes
+  ---
+  duration_ms: 0.594578
+  type: 'test'
+  ...
+# Subtest: workspace change suppresses delayed response and refuses subsequent calls
+ok 3 - workspace change suppresses delayed response and refuses subsequent calls
+  ---
+  duration_ms: 0.567412
+  type: 'test'
+  ...
+1..3
+# tests 3
+# suites 0
+# pass 3
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 12.821743
+TAP version 13
+# Subtest: drag previews do not write; mouse up serializes successive versions
+ok 1 - drag previews do not write; mouse up serializes successive versions
+  ---
+  duration_ms: 40.182045
+  type: 'test'
+  ...
+# Subtest: timeout queries committed version; failures preserve position until explicit restore
+ok 2 - timeout queries committed version; failures preserve position until explicit restore
+  ---
+  duration_ms: 33.09117
+  type: 'test'
+  ...
+# Subtest: explicit removal pauses; symbol, interval and layout changes never pause
+ok 3 - explicit removal pauses; symbol, interval and layout changes never pause
+  ---
+  duration_ms: 47.171175
+  type: 'test'
+  ...
+# Subtest: source changes fence drawing edits and menu contexts are captured at open
+ok 4 - source changes fence drawing edits and menu contexts are captured at open
+  ---
+  duration_ms: 18.169843
+  type: 'test'
+  ...
+# Subtest: style changes preserve the rule when serialized geometry order or price formatting differs
+ok 5 - style changes preserve the rule when serialized geometry order or price formatting differs
+  ---
+  duration_ms: 23.583057
+  type: 'test'
+  ...
+# Subtest: native history events submit restored geometry without resuming a paused alert
+ok 6 - native history events submit restored geometry without resuming a paused alert
+  ---
+  duration_ms: 44.100199
+  type: 'test'
+  ...
+# Subtest: price-axis presentation changes cannot silently replace the saved coordinate system
+ok 7 - price-axis presentation changes cannot silently replace the saved coordinate system
+  ---
+  duration_ms: 28.112561
+  type: 'test'
+  ...
+# Subtest: visible create paths explain loading and unresolved metadata
+ok 8 - visible create paths explain loading and unresolved metadata
+  ---
+  duration_ms: 2.706384
+  type: 'test'
+  ...
+# Subtest: squeeze alert captures calculation parameters and boolean, excluding display colors
+ok 9 - squeeze alert captures calculation parameters and boolean, excluding display colors
+  ---
+  duration_ms: 2.674507
+  type: 'test'
+  ...
+# Subtest: price-axis plus opens selection; only its alert action creates at captured display price
+ok 10 - price-axis plus opens selection; only its alert action creates at captured display price
+  ---
+  duration_ms: 7.072246
+  type: 'test'
+  ...
+# Subtest: price-axis plus rejects invalid price, loading, missing metadata and readonly charts
+ok 11 - price-axis plus rejects invalid price, loading, missing metadata and readonly charts
+  ---
+  duration_ms: 7.548993
+  type: 'test'
+  ...
+# Subtest: dismissed plus menus never create or affect an ordinary menu
+ok 12 - dismissed plus menus never create or affect an ordinary menu
+  ---
+  duration_ms: 1.471616
+  type: 'test'
+  ...
+# Subtest: plus selection rejects changed chart and missing/invalid captured price
+ok 13 - plus selection rejects changed chart and missing/invalid captured price
+  ---
+  duration_ms: 6.703926
+  type: 'test'
+  ...
+1..13
+# tests 13
+# suites 0
+# pass 13
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 269.738157
+TAP version 13
+# Subtest: gesture keeps exact decimals, controls, message and delivery while updating generated name
+ok 1 - gesture keeps exact decimals, controls, message and delivery while updating generated name
+  ---
+  duration_ms: 1.481877
+  type: 'test'
+  ...
+# Subtest: custom name survives; stale version and lifecycle revisions reject before any write
+ok 2 - custom name survives; stale version and lifecycle revisions reject before any write
+  ---
+  duration_ms: 0.937525
+  type: 'test'
+  ...
+# Subtest: unsupported ATR, drawing, units and non-active statuses never write
+ok 3 - unsupported ATR, drawing, units and non-active statuses never write
+  ---
+  duration_ms: 1.077626
+  type: 'test'
+  ...
+# Subtest: lost response is read back; genuine conflicts expose authoritative row and never auto-retry writes
+ok 4 - lost response is read back; genuine conflicts expose authoritative row and never auto-retry writes
+  ---
+  duration_ms: 0.899115
+  type: 'test'
+  ...
+# Subtest: generated names follow grouped or fractional native display prices
+ok 5 - generated names follow grouped or fractional native display prices
+  ---
+  duration_ms: 0.486488
+  type: 'test'
+  ...
+1..5
+# tests 5
+# suites 0
+# pass 5
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 16.689685
+PASS all range/single switches and restored drafts submit mutually exclusive payloads
+PASS saved authoritative row survives a stale GET and immediate second edit
+PASS slow events do not delay rule edits
+PASS field validation focuses the invalid input without raw body or duplicate prefixes
+PASS real competing version retains draft until explicit reload and save
+PASS historical event searches its visible name
+PASS lifecycle commits complete rows and archived rules cannot reappear
+PASS runtime observations advance; late mutations, read failures and workspace changes are fenced
+PASS range, MACD and expiry validation messages locate their fields
+PASS price-line contract: native geometry, failure retention, latest revision, stale async fence, unit/ATR filter and disposal
+PASS alert price drag: real pointer preview/drop/Escape, failed/busy/versioned saves, native onMove, inverted scale, readonly/ATR and disposal

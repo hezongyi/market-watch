@@ -19,4 +19,4 @@
 
 ## 当前实现范围
 
-A 阶段纵向链路代码及 Kotlin 外壳已构建并通过 lint；Ubuntu 独立 HTTPS 候选已运行。用户可自行进行 Find X8 验收，尚未获得结果。B 小图接口及必要回归已通过；自选、数据和共享 transport 页面在实施/验证，C 尚未开始，当前不是完整应用。验证事实和环境缺口见 [progress.md](progress.md)。
+A 阶段纵向链路代码及 Kotlin 外壳已构建并通过 lint；Ubuntu 独立 HTTPS 候选已运行。用户可自行进行 Find X8 验收，尚未获得结果。B 小图及前端、C 告警和通知代码已实现并通过定向浏览器/缓存检查；独立 review、最新候选重建、真实后端多类样本及真机/ntfy 门槛仍待核验，当前不是完整验收交付。验证事实和环境缺口见 [progress.md](progress.md)。

@@ -7,16 +7,35 @@ export type Profile = {
 };
 export type Snapshot<T> = { value: T; readAt: number };
 const database = "mw-mobile";
-function open(): Promise<IDBDatabase> {
+export const noticeStores = [
+  "pending",
+  "cache",
+  "meta",
+  "claims",
+  "observations",
+];
+export function openMobileDatabase(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const request = indexedDB.open(database, 1);
+    const request = indexedDB.open(database, 2);
     request.onupgradeneeded = () => {
-      request.result.createObjectStore("records");
-      request.result.createObjectStore("profiles");
+      for (const name of ["records", "profiles"])
+        if (!request.result.objectStoreNames.contains(name))
+          request.result.createObjectStore(name);
+      for (const name of noticeStores)
+        if (!request.result.objectStoreNames.contains(name)) {
+          const store = request.result.createObjectStore(name, {
+            keyPath: "key",
+          });
+          store.createIndex("subject", "subject");
+          store.createIndex("at", "at");
+        }
     };
     request.onerror = () => reject(request.error);
     request.onblocked = () => reject(Error("请关闭旧的手机页面后重试本机存储"));
-    request.onsuccess = () => resolve(request.result);
+    request.onsuccess = () => {
+      request.result.onversionchange = () => request.result.close();
+      resolve(request.result);
+    };
   });
 }
 async function transaction<T>(
@@ -24,7 +43,7 @@ async function transaction<T>(
   mode: IDBTransactionMode,
   action: (tx: IDBTransaction, result: (value: T) => void) => void,
 ): Promise<T> {
-  const db = await open();
+  const db = await openMobileDatabase();
   return new Promise<T>((resolve, reject) => {
     const tx = db.transaction(stores, mode);
     let value: T;
@@ -99,17 +118,24 @@ export function dropSnapshot(profile: Profile, name: string): Promise<void> {
   });
 }
 export function clearOrigin(origin: string): Promise<void> {
-  return transaction(["records", "profiles"], "readwrite", (tx) => {
-    tx.objectStore("profiles").delete(origin);
-    tx.objectStore("profiles").put(true, [origin, "signed-out"]);
-    const cursor = tx.objectStore("records").openCursor();
-    cursor.onsuccess = () => {
-      const row = cursor.result;
-      if (!row) return;
-      if (Array.isArray(row.key) && row.key[0] === origin) row.delete();
-      row.continue();
-    };
-  });
+  return transaction(
+    ["records", "profiles", ...noticeStores],
+    "readwrite",
+    (tx) => {
+      // IndexedDB is origin scoped. Notification runtime shares this database.
+      if (origin === window.location.origin)
+        for (const name of noticeStores) tx.objectStore(name).clear();
+      tx.objectStore("profiles").delete(origin);
+      tx.objectStore("profiles").put(true, [origin, "signed-out"]);
+      const cursor = tx.objectStore("records").openCursor();
+      cursor.onsuccess = () => {
+        const row = cursor.result;
+        if (!row) return;
+        if (Array.isArray(row.key) && row.key[0] === origin) row.delete();
+        row.continue();
+      };
+    },
+  );
 }
 /** An offline logout must not silently reuse an unretracted HttpOnly browser cookie. */
 export function locallySignedOut(origin: string): Promise<boolean> {

@@ -55,7 +55,7 @@ async function observedFetch(path: string, init: RequestInit, attempt: number, r
   }
 }
 const readFlights = new Map<string, Promise<Response>>();
-const safePostReads = new Set(["/charts/data", "/market-data/history/cache", "/market-data/quotes", "/market-data/resolve"]);
+const safePostReads = new Set(["/charts/data", "/market-data/history/cache", "/market-data/quotes", "/market-data/resolve", "/market-data/sparklines"]);
 function abortableDelay(ms: number, signal?: AbortSignal) {
   return new Promise<void>((resolve,reject) => {
     const cancel = () => {clearTimeout(timer);signal?.removeEventListener("abort",cancel);reject(signal?.reason || new DOMException("已取消读取","AbortError"));};

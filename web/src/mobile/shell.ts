@@ -18,6 +18,10 @@ export function useMobileShell(
   flush: () => Promise<void>,
   hasInput: () => boolean,
 ) {
+  const [info, setInfo] = useState<{
+    appVersion?: string;
+    webViewVersion?: string;
+  }>();
   const [update, setUpdate] = useState(false),
     registration = useRef<ServiceWorkerRegistration | undefined>(undefined);
   const activated = useRef(false);
@@ -29,6 +33,7 @@ export function useMobileShell(
         const result = JSON.parse(event.data);
         if (result.version !== protocol || result.error)
           alert(result.error || "请更新 APK：页面协议不兼容");
+        else setInfo(result);
       };
       host("hello");
     }
@@ -75,6 +80,7 @@ export function useMobileShell(
   }, []);
   return {
     update,
+    info,
     apply: async () => {
       if (latest.current.hasInput())
         throw Error("请先完成或放弃当前输入，再更新页面");

@@ -7,6 +7,7 @@ type Item = {
   value: any;
 };
 export class NoticeStore {
+  constructor(private connection?: () => Promise<IDBDatabase>) {}
   private db: IDBDatabase | null = null;
   private opening: Promise<void> | null = null;
   open(): Promise<void> {
@@ -16,6 +17,10 @@ export class NoticeStore {
     }));
   }
   private async connect() {
+    if (this.connection) {
+      this.db = await this.connection();
+      return;
+    }
     this.db = await new Promise<IDBDatabase>((resolve, reject) => {
       const request = indexedDB.open("mw-professional-notices-v1", 1);
       request.onupgradeneeded = () => {

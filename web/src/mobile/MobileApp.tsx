@@ -23,6 +23,13 @@ import {
   type Profile,
 } from "./cache";
 import { useMobileShell } from "./shell";
+import { mobileMarket, type MobileMarket } from "./market";
+import WatchPage from "./WatchPage";
+import DataPage from "./DataPage";
+import MobileToast from "./MobileToast";
+import AlertsPage from "./AlertsPage";
+import MorePage from "./MorePage";
+import { useMobileNotices } from "./notices";
 
 type Series = {
   ticker: string;
@@ -51,29 +58,44 @@ export default function MobileApp() {
     [password, setPassword] = useState(""),
     [reveal, setReveal] = useState(false),
     [busy, setBusy] = useState(false);
-  const [series, setSeries] = useState<Series[]>([]),
-    [seriesReadAt, setSeriesReadAt] = useState<number>(),
-    [symbol, setSymbol] = useState("");
+  const [symbol, setSymbol] = useState("");
   const [theme, setTheme] = useState<"dark" | "light">("dark"),
     [chartDirty, setChartDirty] = useState(false);
   const [chartOpened, setChartOpened] = useState(false);
+  const [createAlert, setCreateAlert] = useState(0);
+  const [records, setRecords] = useState(false);
+  const notices = useMobileNotices(profile, state === "online");
+  const [connection, setConnection] = useState<MobileMarket>();
   const chart = useRef<MobileChartHandle>(null),
     generation = useRef(0),
     session = useRef<AbortController | undefined>(undefined),
     sessionAllowed = useRef(false);
   const report = useCallback((value: string) => setMessage(value), []);
+  useEffect(() => {
+    if (!profile || state !== "online") {
+      setConnection(undefined);
+      return;
+    }
+    const value = mobileMarket(report);
+    setConnection(value);
+    return () => {
+      void value.dispose().catch(() => {});
+    };
+  }, [profile?.origin, profile?.subject, state, report]);
   const flush = useCallback(async () => {
     await chart.current?.flush();
   }, []);
-  const shell = useMobileShell(flush, () => password.length > 0);
+  const shell = useMobileShell(
+    flush,
+    () =>
+      password.length > 0 ||
+      Boolean(document.querySelector('[data-mobile-dirty="true"]')),
+  );
   const restore = async (value: Profile) => {
-    const [data, selected, appearance] = await Promise.all([
-      readSnapshot<Series[]>(value, "recent-composites"),
+    const [selected, appearance] = await Promise.all([
       readSnapshot<string>(value, "chart-selection"),
       readSnapshot<"dark" | "light">(value, "theme"),
     ]);
-    setSeries(data?.value || []);
-    setSeriesReadAt(data?.readAt);
     setSymbol(selected?.value || "");
     setTheme(appearance?.value || "dark");
   };
@@ -105,23 +127,6 @@ export default function MobileApp() {
         await restore(value);
       } catch {
         report("本机存储不可用，当前更改可能无法记住");
-      }
-      if (token !== generation.current) return;
-      try {
-        const data = await api<{ items: Series[] }>(
-          "/market-data/series/page?kind=composite&include_total=false&page_size=20",
-          undefined,
-          controller.signal,
-        );
-        if (token !== generation.current) return;
-        setSeries(data.items);
-        setSeriesReadAt(undefined);
-        await writeSnapshot(value, "recent-composites", data.items).catch(() =>
-          report("上次数据未能写入本机"),
-        );
-      } catch (error) {
-        if (token === generation.current && !controller.signal.aborted)
-          report(String(error));
       }
     } catch (error) {
       if (token !== generation.current || controller.signal.aborted) return;
@@ -184,6 +189,13 @@ export default function MobileApp() {
   }, [location.pathname, navigate]);
   useEffect(() => {
     const back = (event: Event) => {
+      // On Window, target listeners may run in registration order even when
+      // the sheet listener uses capture. Let the open top layer own this event.
+      if (
+        event.defaultPrevented ||
+        document.querySelector("dialog.mobile-sheet[open]")
+      )
+        return;
       event.preventDefault();
       if (password) {
         if (window.confirm("放弃尚未提交的密码输入？")) setPassword("");
@@ -203,10 +215,11 @@ export default function MobileApp() {
   async function logout() {
     ++generation.current;
     session.current?.abort();
+    notices.runtime.pause();
+    setRecords(false);
     setProfile(undefined);
     setPassword("");
     setSymbol("");
-    setSeries([]);
     setChartDirty(false);
     setChartOpened(false);
     setState("login");
@@ -239,14 +252,7 @@ export default function MobileApp() {
       <a className="sr-only" href="#mobile-main">
         跳至主要内容
       </a>
-      {message && (
-        <aside className="mobile-toast" role="alert">
-          <span>{message}</span>
-          <button aria-label="关闭通知" onClick={() => setMessage("")}>
-            关闭
-          </button>
-        </aside>
-      )}
+      <MobileToast message={message} close={() => setMessage("")} />
       {shell.update && (
         <aside className="mobile-update" role="status">
           页面有更新
@@ -258,6 +264,9 @@ export default function MobileApp() {
             更新页面
           </button>
         </aside>
+      )}
+      {notices.popup && !message && (
+        <MobileToast message={notices.popup} close={notices.closePopup} />
       )}
       <main id="mobile-main">
         {state === "login" || (!profile && state !== "loading") ? (
@@ -316,7 +325,7 @@ export default function MobileApp() {
           </section>
         ) : (
           <>
-            {location.pathname !== "/chart" && (
+            {location.pathname !== "/chart" && location.pathname !== "/" && (
               <header className="mobile-title">
                 <h1>
                   {pages.find((page) => page.path === location.pathname)
@@ -329,15 +338,21 @@ export default function MobileApp() {
             )}
             {profile &&
               state === "online" &&
+              connection &&
               symbol &&
               (chartOpened || location.pathname === "/chart") && (
                 <MobileChart
                   ref={chart}
                   profile={profile}
+                  connection={connection}
                   symbol={symbol}
                   visible={location.pathname === "/chart"}
                   report={report}
                   dirty={setChartDirty}
+                  createAlert={() => {
+                    navigate("/alerts");
+                    setCreateAlert((value) => value + 1);
+                  }}
                 />
               )}
             {location.pathname === "/chart" && state !== "online" && (
@@ -351,88 +366,67 @@ export default function MobileApp() {
                 本次图表更改尚未记住
               </span>
             )}
-            {location.pathname === "/" && (
-              <section className="mobile-content">
-                <p>自选列表将在日常看盘阶段接入。</p>
-                <button onClick={() => navigate("/data")}>打开组合图表</button>
-              </section>
+            {profile && (
+              <WatchPage
+                profile={profile}
+                online={state === "online"}
+                connection={connection}
+                visible={location.pathname === "/"}
+                report={report}
+                search={() => navigate("/data")}
+                open={(ticker) =>
+                  void select({ ticker }).catch((error) =>
+                    report(String(error)),
+                  )
+                }
+              />
             )}
-            {location.pathname === "/data" && (
-              <section className="mobile-content">
-                <h2>组合行情</h2>
-                {seriesReadAt && (
-                  <p>上次读取 {new Date(seriesReadAt).toLocaleString()}</p>
-                )}
-                {!series.length && (
-                  <p>
-                    {state === "online"
-                      ? "暂无可用组合"
-                      : state === "loading"
-                        ? "正在读取…"
-                        : "当前没有可读取的组合缓存"}
-                  </p>
-                )}
-                {series.map((row) => (
-                  <button
-                    className="mobile-series"
-                    key={row.ticker}
-                    onClick={() =>
-                      void select(row).catch((error) => report(String(error)))
-                    }
-                  >
-                    <strong>
-                      {row.display_symbol ||
-                        row.symbol ||
-                        row.name ||
-                        row.ticker}
-                    </strong>
-                    <span>{row.description || row.ticker}</span>
-                  </button>
-                ))}
-              </section>
+            {profile && (
+              <DataPage
+                profile={profile}
+                online={state === "online"}
+                visible={location.pathname === "/data"}
+                report={report}
+                open={(ticker) =>
+                  void select({ ticker }).catch((error) =>
+                    report(String(error)),
+                  )
+                }
+              />
             )}
-            {location.pathname === "/alerts" && (
-              <section className="mobile-content">
-                <p>手机告警与记录将在告警阶段接入。已有服务器规则继续执行。</p>
-              </section>
+            {profile && (
+              <AlertsPage
+                key={profile.origin + profile.subject}
+                profile={profile}
+                online={state === "online"}
+                visible={location.pathname === "/alerts"}
+                symbol={symbol}
+                createToken={createAlert}
+                runtime={notices.runtime}
+                records={records}
+                showRecords={() => setRecords(true)}
+                closeRecords={() => setRecords(false)}
+                report={report}
+              />
             )}
             {location.pathname === "/more" && (
-              <section className="mobile-content">
-                <h2>连接</h2>
-                <p>{window.location.origin}</p>
-                <p>
-                  {state === "online" ? "会话已核验" : "上次内容，连接尚未核验"}
-                </p>
-                <button onClick={() => void refresh()}>重新连接</button>
-                <h2>外观</h2>
-                <button
-                  onClick={() => {
-                    const value = theme === "dark" ? "light" : "dark";
-                    setTheme(value);
-                    if (profile)
-                      void writeSnapshot(profile, "theme", value).catch(() =>
-                        report("主题未记住"),
-                      );
-                  }}
-                >
-                  切换{theme === "dark" ? "浅色" : "深色"}
-                </button>
-                <h2>后台通知</h2>
-                <p>
-                  沿用 ntfy。退出 App 不停止服务器监控；手机实收状态尚未验收。
-                </p>
-                <h2>关于</h2>
-                <p>Android 个人版 · A 阶段开发中</p>
-                <button onClick={() => void logout()}>退出登录</button>
-                <button
-                  onClick={() => {
-                    if (confirm("换服务器将清除本机内容，服务器告警继续运行。"))
-                      void logout().then(() => shell.configure());
-                  }}
-                >
-                  换服务器
-                </button>
-              </section>
+              <MorePage
+                online={state === "online"}
+                theme={theme}
+                connection={connection}
+                shell={shell}
+                records={() => setRecords(true)}
+                logout={logout}
+                report={report}
+                setTheme={() => {
+                  const value = theme === "dark" ? "light" : "dark";
+                  setTheme(value);
+                  if (profile)
+                    void writeSnapshot(profile, "theme", value).catch(() =>
+                      report("主题未记住"),
+                    );
+                }}
+              />
             )}
           </>
         )}
@@ -456,7 +450,15 @@ export default function MobileApp() {
               }}
             >
               <Icon aria-hidden="true" />
-              <span>{label}</span>
+              <span>
+                {label}
+                {path === "/alerts" && Boolean(notices.state.alertUnread) && (
+                  <small aria-label="未处理告警">
+                    {" "}
+                    · {notices.state.alertUnread}
+                  </small>
+                )}
+              </span>
             </NavLink>
           ))}
         </nav>

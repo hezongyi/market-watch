@@ -831,7 +831,7 @@ function offerHistoryRetry() {
     break;
   }
 }
-const clientId = crypto.randomUUID();
+let clientId = crypto.randomUUID();
 const requests = [];
 let initialHistoryGate;
 const managementRequest = type => type === 'data-center-api' || type === 'preferences';
@@ -3333,6 +3333,8 @@ async function update(m) {
     if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
   } else if (m.type === "init" && !widget) {
     mobileMode = m.mode === "mobile";
+    if (mobileMode && typeof m.mobile_client === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(m.mobile_client))
+      clientId = m.mobile_client;
     requestPolicy.capacity(m.history_load_available);
     alertUISession = m.alert_ui_session;
     noticeState = m.notice_state;

@@ -14,6 +14,8 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/session')return logged?json({csrf:'test-csrf',subject:'admin'}):json({detail:'未登录'},401);
    if(url.pathname==='/api/login'){logged=true;return json({csrf:'test-csrf',subject:'admin'});}
    if(url.pathname==='/api/logout'){logged=false;return json({ok:true});}
+   if(url.pathname==='/api/advanced-charts/preferences')return json([]);
+   if(url.pathname==='/api/market-data/composites/'+id)return json({id,source:'composite',frames:['M1','M5','H1','D1'],status:'ready'});
    if(url.pathname==='/api/market-data/series/page')return json({items:[{ticker,symbol:'TEST-COMPOSITE',description:'受控浏览器测试组合',series_kind:'composite'}]});
    if(url.pathname==='/api/advanced-charts/catalog')return json({});
    if(url.pathname==='/api/charts/history-capabilities')return json({protocol:1,version:'test',mode:'continuous',max_bars:20000,workspace_bars:100000,default_bars:1000,task_seconds:30});
@@ -59,6 +61,7 @@ const server=http.createServer(async(req,res)=>{
    assert.equal(await page.getByRole('navigation',{name:'主导航'}).getByRole('link').count(),5);checks.push('login and five mobile navigation entries');
    await page.getByRole('link',{name:'数据',exact:true}).click();
    await page.getByRole('button',{name:/TEST-COMPOSITE/}).click();
+   await page.getByRole('button',{name:'打开图表',exact:true}).click();
    await expect(page.getByRole('button',{name:'指标',exact:true})).toBeEnabled({timeout:30000});
    await expect.poll(()=>page.evaluate(()=>Boolean(window.MW_TEST_WIDGET?.activeChart().dataReady())),{timeout:30000}).toBe(true);
    assert.equal(await page.evaluate(()=>window.MW_TEST_WIDGET.chartsCount()),1);checks.push('actual pinned widget loads controlled composite through shared market runtime');
@@ -96,7 +99,7 @@ const server=http.createServer(async(req,res)=>{
    await page.getByLabel('图表周期').selectOption('5');
    await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('5');
    await expect.poll(()=>page.evaluate(async()=>{
-     const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile',1);r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
+     const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
      return new Promise(resolve=>{const r=db.transaction('records').objectStore('records').get([location.origin,'admin',1,'chart']);r.onsuccess=()=>{db.close();resolve(r.result?.value?.state?.charts?.length || 0);};});
    }),{timeout:10000}).toBe(1);
    for(let i=0;i<20;i++){await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();}
