@@ -1,0 +1,63 @@
+name: mw-health-pg-20261111
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_USER: health_acceptance
+      POSTGRES_DB: health_acceptance
+      POSTGRES_PASSWORD: ${HEALTH_POSTGRES_PASSWORD:?private env required}
+    command: [postgres, -c, shared_buffers=32MB, -c, max_connections=40, -c, max_wal_size=64MB, -c, min_wal_size=32MB, -c, jit=off]
+    volumes: ['postgres-data:/var/lib/postgresql/data']
+    mem_limit: 512m
+    cpus: 0.5
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U health_acceptance -d health_acceptance']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    networks: [acceptance]
+  verify:
+    # Reuse dependencies by exact ID; mount only this task's source.
+    image: sha256:6dcd7c1b9e05c16552606cd33dcced0788f8786ac678f4ce03bd298d307183a4
+    profiles: [tools]
+    working_dir: /app
+    environment:
+      PYTHONPATH: /app/backend:/app/backend/tests
+      PYTHONDONTWRITEBYTECODE: '1'
+      ALERTS_DATABASE_URL: postgresql+psycopg://health_acceptance:${HEALTH_POSTGRES_PASSWORD:?private env required}@postgres/health_acceptance
+      CHART_ALERT_TEST_DATABASE_URL: postgresql+psycopg://health_acceptance:${HEALTH_POSTGRES_PASSWORD:?private env required}@postgres/health_acceptance
+      ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+      ALERTS_FX_SOURCE: dukascopy
+      ALERTS_DELIVERY_ENABLED: 'false'
+      ALERTS_YAHOO_ENABLED: 'false'
+      ALERTS_AKSHARE_ENABLED: 'false'
+      ALERTS_FXCM_ENABLED: 'false'
+      ALERTS_OANDA_STREAM_ENABLED: 'false'
+      ALERTS_MCP_ENABLED: 'false'
+      ALERTS_COOKIE_SECURE: 'false'
+    volumes:
+      - ../../../backend:/app/backend:ro
+      - ../../../migrations:/app/migrations:ro
+      - ../../../alembic.ini:/app/alembic.ini:ro
+      - ../../../pyproject.toml:/app/pyproject.toml:ro
+    command: [python, -m, pytest, -q, -p, no:cacheprovider, backend/tests/test_chart_alert_health_postgres.py]
+    mem_limit: 768m
+    cpus: 0.75
+    networks: [acceptance]
+  api:
+    extends: verify
+    profiles: [smoke]
+    command: [python, -m, uvicorn, alerts.api:app, --host, 0.0.0.0, --port, '8000']
+    ports: ['127.0.0.1:28472:8000']
+    networks: [acceptance, entry]
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz')"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+volumes:
+  postgres-data: {}
+networks:
+  acceptance:
+    internal: true
+  entry: {}
