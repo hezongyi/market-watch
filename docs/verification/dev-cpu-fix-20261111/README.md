@@ -18,7 +18,8 @@
 先运行三个新增用例，均复现基线失败；实现后首轮 45 passed。
 最终 [核心回归](tests-core.log) 212 passed，另有一个真实 v1.14.0 writer 用例因未指定
 源码而跳过；[补充回归](tests-extra.log) 配置真实旧源码后 162 passed，包括该补跑。
-合计 374 项通过，包含独立 PostgreSQL 14.24、并发锁/代际、发布故障回滚、历史交错、
+再补验 [发布数据集契约](tests-managed.log) 31 passed，合计 405 项通过。包含独立
+PostgreSQL 14.24、并发锁/代际、发布故障回滚、历史交错、
 死锁、成交量、告警、指标缓存和实时流。未宣称运行完整仓库测试套件。
 
 隔离验收 project/network：mw-cpu-fix-20261111 / mw-cpu-fix-20261111_acceptance；
@@ -85,4 +86,6 @@ PG 127.0.0.1:25473，独立库及 volume，无开发库写入。PG 上限 1 CPU 
 
 ## 交付边界
 
-开发实例已更新。未合并 main、未创建正式 Git/Docker tag、未部署生产。
+开发实例已更新；[Draft PR #132](https://github.com/hezongyi/market-watch/pull/132)
+承载代码与证据，GitHub CI 已触发，最终结果以 PR 检查为准。
+未合并 main、未创建正式 Git/Docker tag、未部署生产。
