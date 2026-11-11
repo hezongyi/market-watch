@@ -7,6 +7,17 @@ from .chart_data import FRAMES
 from .config import settings
 
 SOURCES = ("oanda", "binance", "yahoo", "dukascopy", "akshare", "fxcm")
+# Finite time to commit a received page and confirm coverage; never more I/O.
+COMPLETION_SECONDS = 3
+
+
+def instrument_source(instrument):
+    prefix = instrument.upper().removeprefix("MWP:").partition(":")[0]
+    return {"OANDA": "oanda", "NATIVE": "oanda", "BINANCE": "binance", "YAHOO": "yahoo",
+            "DUKA": "dukascopy", "AKSHARE": "akshare", "TENCENT": "akshare",
+            "FXCM": "fxcm"}.get(prefix)
+
+
 YAHOO_INTERVALS = {
     "M1": "1m",
     "M5": "5m",
@@ -19,13 +30,13 @@ YAHOO_INTERVALS = {
 }
 
 
-def enabled_sources():
+def enabled_sources(*, history=False):
     # OANDA's account-scoped live path is owned by ``oanda_worker`` in REST
     # batch mode.  Do not start the legacy provider-service poller alongside
     # it; otherwise native/provider interests can issue pricing or single
     # instrument candle requests outside the shared lease.
     return tuple(s for s in SOURCES
-                 if (s != "oanda" or settings.oanda_acquisition_mode == "stream")
+                 if (s != "oanda" or history or settings.oanda_acquisition_mode == "stream")
                  and (s != "yahoo" or settings.yahoo_enabled)
                  and (s != "akshare" or settings.akshare_enabled)
                  and (s != "fxcm" or settings.fxcm_enabled))
@@ -49,7 +60,9 @@ def request_seconds(source):
         return 65
     # AKShare starts a disposable SDK process and Sina serves a full daily
     # snapshot. Keep the chart wait bounded by that adapter's 30-second budget.
-    return max(30, settings.provider_request_seconds) if source == "akshare" else settings.provider_request_seconds
+    # Yahoo's cold cookie/timezone negotiation must share one bounded attempt
+    # with its history response; repeatedly discarding it at 8s is wasteful.
+    return max(30, settings.provider_request_seconds) if source in ("akshare", "yahoo") else settings.provider_request_seconds
 
 
 def fresh_seconds(source):

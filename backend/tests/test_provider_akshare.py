@@ -269,3 +269,65 @@ def test_daily_platform_quote_uses_daily_source_without_minute_requests(monkeypa
     assert provider_chart.quote_page(meta)["bars"][0]["close"] == "11"
     assert provider_chart.quote_previous_close(meta, {"start": stamp("2024-01-03")}) == 11
     assert calls == [("D1", 1), ("D1", 1)]
+
+
+def test_platform_pages_share_full_snapshot_and_report_finite_window(database, monkeypatch):
+    calls = []
+    observed = stamp("2024-01-10") + 20000
+    monkeypatch.setattr(source, "now_ms", lambda: observed)
+    def invoke(name, parameters, deadline=None):
+        calls.append((name, parameters))
+        return [{"date": f"2024-01-{n:02}", "open": "10", "high": "12", "low": "9", "close": "11", "volume": "5"}
+                for n in range(2, 8)]
+    monkeypatch.setattr(source, "invoke", invoke)
+    meta = {"symbol": "SZSE:000001", "source_family": "sina-a", "frames": ["D1"],
+            "volume_unit": "shares", "precision": 4}
+    newest = source.platform_page(meta, "D1", observed, 2, optional=1)
+    older = source.platform_page(meta, "D1", newest["bars"][0]["start"], 3)
+    assert len(newest["bars"]) == len(older["bars"]) == 3
+    assert len(calls) == 1, "changing cursor must slice shared full snapshot without restarting SDK"
+    assert older["boundary_evidence"]["left"] == older["bars"][0]["start"]
+    assert older["boundary_evidence"]["kind"] == "rolling_window"
+    assert not older["history_boundary"], "finite snapshot is not permanent lifecycle exhaustion"
+
+
+def test_tencent_optional_reserve_stops_without_inventing_a_history_boundary(database, monkeypatch):
+    from alerts import provider_cache as cache
+    from alerts import provider_chart
+    from alerts import provider_service as service
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
+    from alerts.storage import ProviderInterest
+
+    observed = stamp("2024-01-10") + 20000
+    monkeypatch.setattr(source, "now_ms", lambda: observed)
+    calls = []
+    def invoke(name, parameters, deadline=None):
+        calls.append(parameters)
+        return [{"date": f"2024-01-{n:02}", "open": "10", "high": "12", "low": "9", "close": "11", "volume": "5"}
+                for n in range(2, 8)]
+    monkeypatch.setattr(source, "invoke", invoke)
+    monkeypatch.setattr(provider_chart, "native_page", source.platform_page)
+    values = prefetch_capabilities()["sources"]
+    values["akshare"] = {"initial_bars": 0, "reserve_bars": 10}
+    save_prefetch(values)
+    meta = {"id": "TENCENT:reserve-test", "source": "akshare", "symbol": "SZSE:000001",
+            "source_family": "tencent-a", "frames": ["D1"], "adjustment": "qfq",
+            "volume_unit": "lots", "volume_kind": "quantity", "basis": "last",
+            "calendar": "source_date", "precision": 4}
+    key = cache.ensure(meta, "D1")
+    service.activate("tencent-reserve", key, observed, 3)
+    clock = [service.now_ms()]
+    monkeypatch.setattr(service, "now_ms", lambda: clock[0])
+    for _ in range(4):
+        service.warm_step("akshare")
+        clock[0] += 2000
+    with database() as db:
+        target = db.get(ProviderInterest, service.interest_id("tencent-reserve", "read:" + key + ":history")).targets[0]
+        assert target["done"] and target["stop_reason"] == "no_progress"
+        assert target["satisfied"] is False
+    count = len(calls)
+    assert service.warm_step("akshare")[1] is False
+    assert len(calls) == count
+    state = cache.snapshot(key, observed, 10)
+    assert len(state["bars"]) == 6
+    assert not state["history_boundary"] and not state["window_limit"] and not state["satisfied"]

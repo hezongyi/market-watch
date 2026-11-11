@@ -41,6 +41,7 @@ _ACTIVE_LOCK = threading.Lock()
 _ACTIVE_READS = {source: 0 for source in SOURCES}
 CANCELLED = ContextVar("provider_request_cancelled", default=None)
 DEADLINE = ContextVar("provider_request_deadline", default=None)
+IO_DEADLINE = ContextVar("provider_io_deadline", default=None)
 READ_MODE = ContextVar("provider_history_read_mode", default="normal")
 PAGE_PROGRESS = ContextVar("provider_history_page_progress", default=None)
 WORK_VALID = ContextVar("provider_history_work_valid", default=None)
@@ -202,7 +203,7 @@ def ensure(meta, frame):
 @contextmanager
 def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=None,
                          native_from=None, prefix=0, reserve=0, planning=False, history_limit=None,
-                         source_before=None):
+                         source_before=None, coverage_only=False):
     """One short repeatable-read observation; metadata is decoded exactly once.
 
     Planning counts indexed timestamps and reads just the tail while coverage is
@@ -252,6 +253,8 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
             range_done = native_from is None or bool(readable and readable[0] <= native_from)
             enough = available >= demand + prefix or bool(metadata.earliest and readable and readable[0] == 0)
             limit = min(history_limit + 1, demand + prefix + reserve + 1) if (range_done and enough) or window_limit else 1
+        if coverage_only:
+            limit = 1  # Counts/coverage prove readiness; the worker needs only the tail.
         records = db.execute(select(ProviderBar.chart_time, ProviderBar.payload).where(*predicate)
                              .order_by(ProviderBar.chart_time.desc()).limit(limit)).all()
         rows = [r.payload for r in reversed(records)]
@@ -464,8 +467,10 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
             )
         if values:
             insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
-            stmt = insert(ProviderBar).values(values)
-            db.execute(
+            # Bind a batch of rows rather than compiling one SQL expression
+            # per bar. Psycopg pipelines executemany in the same transaction.
+            stmt = insert(ProviderBar)
+            db.connection().execute(
                 stmt.on_conflict_do_update(
                     index_elements=["dataset_id", "start"],
                     set_={
@@ -480,7 +485,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                             "revision",
                         )
                     },
-                )
+                ),
+                values,
             )
         if start < before or page.get("coverage"):
             proven = page.get("coverage", [[start, before]])
@@ -515,6 +521,7 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
 
 def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", latest=False,
                optional=0, revalidate=False):
+    deadline = min(deadline, IO_DEADLINE.get() or deadline)
     if latest and meta["source"] == "oanda" and rest_batch_owner_active(key):
         raise LatestObservationPending()
     progress = PAGE_PROGRESS.get()
@@ -722,7 +729,7 @@ def read(meta, frame, before, count, *, latest=False, deadline=None, on_ready=No
                                         deadline=deadline, on_ready=on_ready))
 
 
-def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
+def _native_read(meta, body, before, count, prefix, latest, on_ready=None, coverage_only=False):
     """Discover demand using real bars and coverage; optional history is PG-only
     except for spare capacity in a mandatory upstream request.
     """
@@ -754,7 +761,7 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
         with snapshot_transaction(key, before, count,
                                   observation=body.history_observation, native_from=from_time,
                                   prefix=prefix, reserve=3000, planning=True,
-                                  history_limit=history_limit) as (db, state):
+                                  history_limit=history_limit, coverage_only=coverage_only) as (db, state):
             bars = state["bars"]
             in_range = state["range_count"]
             demand = max(count, in_range)
@@ -773,15 +780,14 @@ def _native_read(meta, body, before, count, prefix, latest, on_ready=None):
             if hot is None:
                 hot = mandatory_done and fresh
             optional = optional_bars(
-                body.native_history, demand, prefix, hot=hot,
+                body.native_history, demand, prefix, source=meta["source"], hot=hot,
                 first=body.first_data_request, enabled=settings.provider_native_history_buffer,
                 python=bool(body.indicators) or body.history_observation is not None,
-                cold_extra=settings.provider_native_cold_extra_bars,
-                first_extra=settings.provider_native_first_extra_bars,
-                history_extra=settings.provider_native_history_extra_bars,
-                history_limit=history_limit,
+                history_limit=history_limit, db=db,
             )
             if mandatory_done and fresh:
+                if coverage_only:
+                    return {"prepared": True, "dataset_id": key}
                 # Prefix is immediately before D. E never changes Python inputs.
                 required = bars[-(demand + prefix):]
                 visible = required[-demand:]
@@ -865,7 +871,7 @@ def _reserve_read(meta, body, before):
                 'reserve_status': status, 'reserve_requested_count': target}
 
 
-def data(body):
+def _request_parameters(body):
     metadata_started = time.monotonic()
     # A reserve may use expired persisted identity metadata, but cannot refresh
     # Yahoo metadata over HTTP. Mandatory reads retain their refresh policy.
@@ -873,6 +879,9 @@ def data(body):
             if body.native_reserve is not None and body.instrument.startswith('YAHOO:')
             else upstream.metadata(body.instrument))
     metadata_ms = (time.monotonic()-metadata_started)*1000
+    progress = PAGE_PROGRESS.get()
+    if progress is not None:
+        progress["metadata_ms"] = round(metadata_ms, 2)
     now = (now_ms() // 1000 + 1) * 1000
     # Native to can include the chart's future right margin. It is exclusive;
     # never ask for/cache proof of future provider data.
@@ -883,6 +892,38 @@ def data(body):
         from .native_series import chart_ceiling, parameters
         ceiling = chart_ceiling(now_ms(), body.timeframe, parameters(meta))
         before = min(body.before or ceiling, ceiling)
+    count = body.count_back or body.limit
+    latest = body.before is None or body.first_data_request and body.before >= now - 120000
+    if body.native_history is not None:
+        latest = body.before is None or before >= now - 120000
+    extra = max((history_requirement(spec) for spec in body.indicators), default=0)
+    return meta, before, count, latest, extra, metadata_ms
+
+
+def prepare(body, *, initial=False):
+    """Same demand/coverage core, without constructing a display or indicators."""
+    if initial:
+        from .provider_capabilities import instrument_source
+        from .provider_history_policy import source_prefetch
+        source = instrument_source(body.instrument)
+        if (not settings.provider_native_history_buffer
+                or source is not None and not source_prefetch(source)["initial_bars"]):
+            return {"prepared": False}
+    meta, before, count, latest, extra, _ = _request_parameters(body)
+    if initial:
+        from .provider_history_policy import source_prefetch
+        # Only an explicit active single chart starts preparation; directories
+        # and metadata reads never create a price demand.
+        if (meta["source"] not in SOURCES or not settings.provider_native_history_buffer
+                or not source_prefetch(meta["source"])["initial_bars"]):
+            return {"prepared": False}
+    result = _observed_read(meta, body.timeframe, count + extra,
+        lambda: _native_read(meta, body, before, count, extra, latest, coverage_only=True))
+    return {**result, "metadata": meta} if initial else result
+
+
+def data(body):
+    meta, before, count, latest, extra, metadata_ms = _request_parameters(body)
     if body.native_reserve is not None:
         if body.timeframe not in upstream.FRAMES:
             raise ValueError("无效平台周期")
@@ -891,12 +932,7 @@ def data(body):
             from .native_series import parameters
             page["native_parameters"] = parameters(meta)
         return {k: v for k, v in page.items() if k not in ('interval', 'preceding', 'satisfied')}
-    count = body.count_back or body.limit
-    latest = body.before is None or body.first_data_request and body.before >= now - 120000
-    extra = max((history_requirement(spec) for spec in body.indicators), default=0)
     native = body.native_history is not None
-    if native:
-        latest = body.before is None or before >= now - 120000
     calculation_limit = capacity() if body.indicators else 0
     input_stats = {}
 

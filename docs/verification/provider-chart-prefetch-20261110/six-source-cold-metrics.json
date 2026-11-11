@@ -1,0 +1,195 @@
+{
+  "started_at": "2026-11-10T11:43:59.003Z",
+  "finished_at": "2026-11-10T11:56:32.555Z",
+  "candidate_native_script": "chart.2ebf2f4d9536406e.js",
+  "scope": "D1 platform single chart, no studies, fresh browser and uncached instrument; login/workspace setup excluded",
+  "performance_accepted": false,
+  "preferences_unchanged": false,
+  "original_workspaces_unchanged": false,
+  "owned_workspace_cleanup": {
+    "total": 18,
+    "removed": 18
+  },
+  "sources": [
+    {
+      "source": "binance",
+      "attempts": 3,
+      "visible_successes": 3,
+      "median_success_ms": 8421.8,
+      "samples": [
+        {
+          "instrument": "TRXUSDT",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 8421.8,
+          "error": null
+        },
+        {
+          "instrument": "XLMUSDT",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 8469,
+          "error": null
+        },
+        {
+          "instrument": "ATOMUSDT",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 7484,
+          "error": null
+        }
+      ]
+    },
+    {
+      "source": "dukascopy",
+      "attempts": 3,
+      "visible_successes": 3,
+      "median_success_ms": 14203.4,
+      "samples": [
+        {
+          "instrument": "GBPCHF",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 11744.8,
+          "error": null
+        },
+        {
+          "instrument": "CADJPY",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 14203.4,
+          "error": null
+        },
+        {
+          "instrument": "CHFJPY",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 17559.3,
+          "error": null
+        }
+      ]
+    },
+    {
+      "source": "yahoo",
+      "attempts": 4,
+      "visible_successes": 1,
+      "median_success_ms": 24747.4,
+      "samples": [
+        {
+          "instrument": "COST",
+          "status": "failed",
+          "cold_proven": false,
+          "navigation_to_visible_ms": null,
+          "error": "Error: /api/advanced-charts/workspaces HTTP 500"
+        },
+        {
+          "instrument": "DIS",
+          "status": "failed",
+          "cold_proven": false,
+          "navigation_to_visible_ms": null,
+          "error": "TimeoutError: page.waitForFunction: Timeout 90000ms exceeded."
+        },
+        {
+          "instrument": "INTC",
+          "status": "failed",
+          "cold_proven": false,
+          "navigation_to_visible_ms": null,
+          "error": "Error: /api/advanced-charts/workspaces HTTP 500"
+        },
+        {
+          "instrument": "IBM",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 24747.4,
+          "error": null
+        }
+      ]
+    },
+    {
+      "source": "akshare",
+      "attempts": 5,
+      "visible_successes": 5,
+      "median_success_ms": 10938.8,
+      "samples": [
+        {
+          "instrument": "600030",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 10587.3,
+          "error": null
+        },
+        {
+          "instrument": "600887",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 10938.8,
+          "error": null
+        },
+        {
+          "instrument": "000651",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 12966.2,
+          "error": null
+        },
+        {
+          "instrument": "002415",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 10999.8,
+          "error": null
+        },
+        {
+          "instrument": "600104",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 10108.7,
+          "error": null
+        }
+      ]
+    },
+    {
+      "source": "fxcm",
+      "attempts": 5,
+      "visible_successes": 2,
+      "median_success_ms": 35387.0,
+      "samples": [
+        {
+          "instrument": "EURNZD",
+          "status": "failed",
+          "cold_proven": false,
+          "navigation_to_visible_ms": null,
+          "error": "TimeoutError: page.waitForFunction: Timeout 90000ms exceeded."
+        },
+        {
+          "instrument": "EURCAD",
+          "status": "failed",
+          "cold_proven": false,
+          "navigation_to_visible_ms": null,
+          "error": "TimeoutError: page.waitForFunction: Timeout 90000ms exceeded."
+        },
+        {
+          "instrument": "AUDCHF",
+          "status": "failed",
+          "cold_proven": false,
+          "navigation_to_visible_ms": null,
+          "error": "TimeoutError: page.waitForFunction: Timeout 90000ms exceeded."
+        },
+        {
+          "instrument": "NZDCAD",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 55877.2,
+          "error": null
+        },
+        {
+          "instrument": "NZDCHF",
+          "status": "ok",
+          "cold_proven": true,
+          "navigation_to_visible_ms": 14896.7,
+          "error": null
+        }
+      ]
+    }
+  ]
+}

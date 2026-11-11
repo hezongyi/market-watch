@@ -230,11 +230,13 @@ def test_snapshot_statement_timeout_preserves_error_type_and_recovers(provider_p
 @pytest.mark.parametrize('replace', [False, True])
 def test_old_warmer_cannot_overwrite_expanded_or_recreated_task(provider_pg, monkeypatch, replace):
     from alerts import provider_service as service
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
     from alerts.storage import ProviderInterest
     from test_provider_cache import seed
     factory, _ = provider_pg
-    monkeypatch.setattr(service.settings, 'provider_basic_bars', 3)
-    monkeypatch.setattr(service.settings, 'provider_depth_bars', 8)
+    values = prefetch_capabilities()['sources']
+    values['oanda'] = {'initial_bars': 0, 'reserve_bars': 3}
+    save_prefetch(values)
     key = seed(META, 'M5', 100000, page(99000, 100000))
     service.activate('race', key, 100000, 3, latest=True)
     ident = service.interest_id('race', 'read:' + key + ':latest')
@@ -251,24 +253,28 @@ def test_old_warmer_cannot_overwrite_expanded_or_recreated_task(provider_pg, mon
         assert started.wait(3)
         if replace:
             service.unsubscribe('race', 'read:' + key + ':latest')
+        values['oanda']['reserve_bars'] = 10
+        save_prefetch(values)
         service.activate('race', key, 100000, 10, latest=True)
         finish.set()
         worker.result(timeout=3)
     with factory.begin() as db:
         target = db.get(ProviderInterest, ident).targets[0]
         assert target['count'] == 10 and not target['done']
-        assert (target['task_id'] != original_task) == replace
-        assert target['generation'] == (0 if replace else 1)
+        assert target['task_id'] != original_task
+        assert target['generation'] == 0
         assert db.scalar(select(func.count()).select_from(ProviderBar)) == 3, 'successful old worker page remains useful'
 
 
-def test_concurrent_activation_merges_max_and_reopens_completed_goals(provider_pg, monkeypatch):
+def test_concurrent_activation_preserves_finite_goal_until_settings_increase(provider_pg, monkeypatch):
     from alerts import provider_service as service
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
     from alerts.storage import ProviderInterest
     from test_provider_cache import seed
     factory, _ = provider_pg
-    monkeypatch.setattr(service.settings, 'provider_basic_bars', 3)
-    monkeypatch.setattr(service.settings, 'provider_depth_bars', 8)
+    values = prefetch_capabilities()['sources']
+    values['oanda'] = {'initial_bars': 0, 'reserve_bars': 3}
+    save_prefetch(values)
     key = seed(META, 'M5', 100000, page(95000, 100000))
     service.activate('race', key, 100000, 3, latest=True)
     service.warm_step('oanda')
@@ -280,9 +286,13 @@ def test_concurrent_activation_merges_max_and_reopens_completed_goals(provider_p
     with factory.begin() as db:
         targets = db.get(ProviderInterest, ident).targets
         assert targets[0]['before'] == 100000, 'latest anchor stays fixed'
-        assert targets[0]['count'] == targets[9]['count'] == 12
-        assert not targets[0]['done']
-        assert all(t['generation'] == 0 for t in targets if t['frame'] != 'M5')
+        assert len(targets) == 1 and targets[0]['count'] == 3
+        assert targets[0]['done'], 'mandatory demand cannot restart completed optional reserve'
+    values['oanda']['reserve_bars'] = 12
+    save_prefetch(values)
+    with factory.begin() as db:
+        target = db.get(ProviderInterest, ident).targets[0]
+        assert target['count'] == 12 and not target['done']
 
 
 def test_snapshot_housekeeping_skips_a_locked_dataset(provider_pg):

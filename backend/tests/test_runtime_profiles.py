@@ -37,7 +37,7 @@ def test_data_profile_assembles_provider_and_data_roles_without_duplicate_stream
     from alerts import data_runtime, provider_capabilities
 
     expected_sources = ("oanda", "binance")
-    monkeypatch.setattr(provider_capabilities, "enabled_sources", lambda: expected_sources)
+    monkeypatch.setattr(provider_capabilities, "enabled_sources", lambda **_: expected_sources)
     loops = data_runtime.build_loops()
 
     roles = [loop.role for loop in loops]

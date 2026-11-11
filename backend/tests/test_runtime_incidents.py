@@ -232,6 +232,7 @@ def test_expected_data_roles_follow_enabled_sources(monkeypatch):
     monkeypatch.setattr(settings, "oanda_acquisition_mode", "rest_batch")
     assert "data:provider_live_yahoo" not in expected_roles()
     assert "data:provider_live_oanda" not in expected_roles()
+    assert "data:provider_warm_oanda" in expected_roles()
     monkeypatch.setattr(settings, "yahoo_enabled", True)
     monkeypatch.setattr(settings, "oanda_acquisition_mode", "stream")
     assert "data:provider_live_yahoo" in expected_roles()

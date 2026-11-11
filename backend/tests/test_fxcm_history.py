@@ -215,3 +215,22 @@ def test_fxcm_cancellation_keeps_shared_slot_until_child_closed(database, fxcm_c
     assert cleaned == [True]
     with database() as db:
         assert db.get(Preference, "upstream_slots:fxcm").value["active"] == []
+
+
+def test_waiting_background_yields_without_closing_reusable_session(database, fxcm_config, monkeypatch):
+    from alerts import market_resources, provider_cache
+
+    adapter = fxcm.FxcmHistory()
+    waiting = []
+    monkeypatch.setattr(provider_cache, "interactive_busy", lambda source: bool(waiting))
+
+    def acquire(*args):
+        waiting.append(True)
+        return None
+
+    monkeypatch.setattr(market_resources, "acquire", acquire)
+    monkeypatch.setattr(adapter, "close", lambda: pytest.fail("queued work must keep reusable session"))
+    monkeypatch.setattr(adapter, "_start", lambda *a: pytest.fail("background bypassed foreground"))
+    with market_resources.lane("history"), pytest.raises(TimeoutError, match="让位"):
+        adapter._request("catalog\n", expected="instrument", limit=1, deadline=time.monotonic() + .3)
+    assert len(waiting) == 1, "queued background must stop requesting slots once foreground arrives"

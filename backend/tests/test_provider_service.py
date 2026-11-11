@@ -150,27 +150,16 @@ def test_python_subscription_cannot_calculate_across_disconnected_prefix(databas
     )
 
 
-def test_session_targets_finite_two_rounds_and_no_recursive_activation(database, monkeypatch):
+def test_session_targets_only_visited_period_and_no_recursive_activation(database, monkeypatch):
     key = seed(META, "M5", 100000, page(90000, 100000))
     service.activate("a", key, 100000, 10, latest=True)
     service.activate("b", key, 50000, 10, latest=False)
     with database.begin() as db:
         a = db.get(ProviderInterest, service.interest_id("a", "read:" + key + ":latest"))
         b = db.get(ProviderInterest, service.interest_id("b", "read:" + key + ":history"))
-        assert len(a.targets) == 18 and len(b.targets) == 20
-        assert [t["frame"] for t in a.targets[:9]] == [
-            "M5",
-            "D1",
-            "W1",
-            "H4",
-            "M1",
-            "MN",
-            "H1",
-            "M30",
-            "M15",
-        ]
-        assert [t["count"] for t in a.targets[:9]] == [1000] * 9
-        assert [t["count"] for t in a.targets[9:]] == [4000] * 9
+        assert len(a.targets) == len(b.targets) == 1
+        assert a.targets[0]["frame"] == b.targets[0]["frame"] == "M5"
+        assert a.targets[0]["count"] == b.targets[0]["count"] == 4000
         assert a.cursor == 100000 and b.cursor == 50000
     calls = []
 
@@ -241,17 +230,21 @@ def test_background_yields_to_foreground_and_continues_after_failed_period(datab
     monkeypatch.setattr(upstream, "native_page", fetch)
     service.warm_step("oanda")
     service.warm_step("oanda")
-    assert calls == ["M5", "D1"], "a backed-off frame does not block other basic targets"
+    assert calls == ["M5"], "a backed-off period must not start unvisited periods"
 
 
 def test_shared_cached_goals_do_not_delay_other_sessions_by_seconds(database, monkeypatch):
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
+    values = prefetch_capabilities()["sources"]
+    values["oanda"] = {"initial_bars": 0, "reserve_bars": 3}
+    save_prefetch(values)
     key = seed(META, "M5", 100000, page(90000, 100000))
     for index in range(9):
         client = "cached-" + str(index)
         service.activate(client, key, 100000, 3, latest=True)
         with database.begin() as db:
             db.get(ProviderInterest, service.interest_id(client, "read:" + key + ":latest")).targets = [{
-                "frame": "M5", "before": 100000, "count": 3, "done": False,
+                "frame": "M5", "before": 100000, "count": 3, "goal": 3, "done": False, "policy": 1,
                 "next_at": 0, "attempts": 0,
             }]
     monkeypatch.setattr(upstream, "native_page", lambda *a, **k: pytest.fail("shared cache cannot be fetched again"))
@@ -268,7 +261,7 @@ def test_shared_cached_goals_do_not_delay_other_sessions_by_seconds(database, mo
     monkeypatch.setattr(service, "_FUTURES", [])
     monkeypatch.setattr(service, "ThreadPoolExecutor", Executor)
     START_PROVIDER()
-    assert len(submitted) == 2 * len(service.enabled_sources()) + 1
+    assert len(submitted) == len(service.enabled_sources()) + len(service.enabled_sources(history=True)) + 1
     assert {worker.__name__ for worker, _args in submitted} == {"warmer", "live", "janitor"}
     worker,args = submitted[0]
     worker(*args)
@@ -334,8 +327,8 @@ def test_cleanup_removes_expired_coverage_with_data_not_active_interest(database
             == 0
         )
         assert db.get(ProviderDataset, active).coverage
-        assert db.get(ProviderDataset, sibling).coverage, (
-            "active cross-period targets protect their cached data"
+        assert db.get(ProviderDataset, sibling) is None, (
+            "unvisited stale periods are no longer protected by cross-period prefetch"
         )
 
 
@@ -374,62 +367,71 @@ def test_unchanged_reobservation_does_not_invalidate_already_loaded_revision(dat
     )
 
 
-def test_historical_right_buffer_counts_real_bars_across_market_closure(database, monkeypatch):
-    clock = [20000]
-    monkeypatch.setattr(service, "now_ms", lambda: clock[0])
-    monkeypatch.setitem(upstream.FRAME_MS, "M5", 1000)
-    monkeypatch.setattr(service.settings, "provider_basic_bars", 3)
-    key = seed(META, "M5", 10000, page(5000, 10000))
-    service.activate("a", key, 10000, 3, latest=False)
+def test_history_prefetch_is_total_not_added_to_repeated_demand(database):
+    key = seed(META, "M5", 100000, page(90000, 100000))
+    service.activate("a", key, 100000, 3, latest=False)
     ident = service.interest_id("a", "read:" + key + ":history")
-    with database.begin() as db:
-        interest = db.get(ProviderInterest, ident)
-        interest.targets = [next(t for t in interest.targets if t.get("after") == 10000)]
+    service.activate("a", key, 100000, 10, latest=False)
+    with database() as db:
+        assert len(db.get(ProviderInterest, ident).targets) == 1
+        assert db.get(ProviderInterest, ident).targets[0]["count"] == 4000
+
+
+def test_lowering_and_disabling_inflight_prefetch_cannot_resurrect_goal(database, monkeypatch):
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
+    key = seed(META, "M5", 10000000, page(9990000, 10000000))
+    service.activate("a", key, 10000000, 10, latest=True)
     calls = []
     def fetch(meta, frame, before, count, **kwargs):
-        calls.append((before, count))
-        # The source is closed from 10000 through 14000. A count/to query
-        # still returns older bars, which cannot satisfy a right-hand buffer.
-        times = [at for at in range(1000, before, 1000) if not 10000 <= at < 14000][-count:]
-        return {"bars": [page(at, at + 1000)["bars"][0] for at in times], "history_boundary": False}
+        calls.append(count)
+        values = prefetch_capabilities()["sources"]
+        values["oanda"] = {"initial_bars": 0, "reserve_bars": 0}
+        save_prefetch(values)
+        return page(before - count * 1000, before)
     monkeypatch.setattr(upstream, "native_page", fetch)
     service.warm_step("oanda")
-    with database.begin() as db:
-        assert not db.get(ProviderInterest, ident).targets[0]["done"], "older bars cannot count as right-hand warming"
-    for _ in range(10):
-        clock[0] += 1001
-        service.warm_step("oanda")
-    with database.begin() as db:
-        target = db.get(ProviderInterest, ident).targets[0]
-        assert target["done"]
-        assert db.scalar(select(func.count()).select_from(ProviderBar).where(
-            ProviderBar.dataset_id == key, ProviderBar.chart_time >= 10000,
-            ProviderBar.chart_time < target["before"],
-        )) == 3
-        assert target["before"] <= target["until"] == 20001
-    assert len(calls) == 3, "finite completed buffers do not fetch again or recursively extend"
+    service.warm_step("oanda")
+    with database() as db:
+        row = db.get(ProviderInterest, service.interest_id("a", "read:" + key + ":latest"))
+        assert row.targets == [], "old worker must fail its target CAS after disabling"
+        assert db.get(ProviderDataset, key).coverage, "inflight valid data remain cached"
+    assert len(calls) == 1
 
 
-def test_same_anchor_historical_demand_growth_only_expands_focus_left_targets(database, monkeypatch):
-    monkeypatch.setattr(service.settings, 'provider_basic_bars', 3)
-    monkeypatch.setattr(service.settings, 'provider_depth_bars', 8)
-    key = seed(META, 'M5', 100000, page(90000, 100000))
-    service.activate('grow', key, 100000, 2, latest=False)
-    ident = service.interest_id('grow', 'read:' + key + ':history')
+def test_completed_current_period_reserve_does_not_repeat_fetch(database, monkeypatch):
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
+    values = prefetch_capabilities()["sources"]
+    values["oanda"] = {"initial_bars": 0, "reserve_bars": 12}
+    save_prefetch(values)
+    key = seed(META, "M5", 100000, page(90000, 100000))
+    service.activate("a", key, 100000, 3, latest=True)
+    calls = []
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append((frame, count))
+        return page(before - count * 1000, before)
+    monkeypatch.setattr(upstream, "native_page", fetch)
+    service.warm_step("oanda")
+    service.warm_step("oanda")
+    service.activate("a", key, 100100, 3, latest=True)
+    service.warm_step("oanda")
+    assert calls == [("M5", 2)]
+
+
+def test_late_old_activation_after_disable_is_not_fetched(database, monkeypatch):
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
+    key = seed(META, "M5", 100000, page(90000, 100000))
+    values = prefetch_capabilities()["sources"]
+    values["oanda"] = {"initial_bars": 0, "reserve_bars": 0}
+    save_prefetch(values)
+    # A foreground repeatable snapshot may insert after the save enumerated
+    # existing interests. Worker must recheck policy before its first page.
+    ident = service.interest_id("late", "read:" + key + ":latest")
     with database.begin() as db:
-        row = db.get(ProviderInterest, ident)
-        originals = [dict(t) for t in row.targets]
-        row.targets = [{**t, 'done': True} for t in row.targets]
-    service.activate('grow', key, 100000, 10, latest=False)
-    with database.begin() as db:
-        targets = db.get(ProviderInterest, ident).targets
-        assert len(targets) == 20
-        for original, target in zip(originals, targets):
-            if target['frame'] == 'M5' and 'after' not in target:
-                assert target['count'] == target['goal'] + 10
-                assert target['generation'] == 1
-                assert not target['done']
-            else:
-                assert target['count'] == original['count'] and target['done']
-                assert target['generation'] == 0
-            assert target['task_id'] == original['task_id']
+        db.add(ProviderInterest(id=ident, client="late", listener="read:" + key + ":latest",
+            dataset_id=key, subscribed=False, expires=cache.now_ms()+60000,
+            accessed_at=cache.now_ms(), cursor=100000, revision=0, next_poll=0,
+            targets=[service._prefetch_target("M5", 100000, 4000)]))
+    monkeypatch.setattr(upstream, "native_page", lambda *a, **k: pytest.fail("disabled policy cannot fetch"))
+    assert service.warm_step("oanda")[1] is False
+    with database() as db:
+        assert db.get(ProviderInterest, ident).targets == []

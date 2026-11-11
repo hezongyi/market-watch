@@ -66,7 +66,9 @@ async def lifespan(app):
         else:
             yield
     finally:
+        from .native_history_signals import close as close_history_signals
         from .provider_chart import close_clients
+        close_history_signals()
         close_clients()
 
 

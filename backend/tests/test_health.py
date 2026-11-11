@@ -1,3 +1,5 @@
+from threading import Event
+
 from alerts import api as api_module
 from fastapi.testclient import TestClient
 
@@ -136,7 +138,7 @@ def test_worker_pulse_is_bounded_and_recovers_after_failed_report(database, monk
 
 
 def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch):
-    from alerts import chart_history_worker, native_history_loads, provider_chart, worker_health
+    from alerts import chart_history_worker, native_history_loads, worker_health
 
     class StopAfterCycle(BaseException):
         pass
@@ -150,18 +152,15 @@ def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch)
     import pytest
     with pytest.raises(StopAfterCycle):
         chart_history_worker.run(lambda *args: None)
-    monkeypatch.setattr(provider_chart, "warm_clients", lambda: None)
-    monkeypatch.setattr(native_history_loads, "once", lambda: False)
-    class StopAfterWait:
-        def is_set(self):
-            return False
 
-        def wait(self, _seconds):
-            raise StopAfterCycle()
+    native_stop = Event()
 
-    monkeypatch.setattr(native_history_loads.threading, "Event", StopAfterWait)
-    with pytest.raises(StopAfterCycle):
-        native_history_loads.main()
+    def finish_native_turn():
+        native_stop.set()
+        return True
+
+    monkeypatch.setattr(native_history_loads, "once", finish_native_turn)
+    native_history_loads.run(native_stop)
     with database() as db:
         rows = {row["id"]: row for row in worker_health.services(db)}
     assert rows["chart_history"]["status"] == "running"

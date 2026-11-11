@@ -93,9 +93,10 @@ def _metadata(ident, *, deadline=None, cached_only=False):
         from .provider_dukascopy import metadata as dukascopy_metadata
         return dukascopy_metadata(ident)
     if ident.startswith("YAHOO:"):
-        from .provider_cache import DEADLINE
+        from .provider_cache import DEADLINE, IO_DEADLINE
         from .yahoo_catalog import chart_metadata
-        return chart_metadata(ident, deadline=deadline or DEADLINE.get(), cached_only=cached_only)
+        budgets = [value for value in (deadline, DEADLINE.get(), IO_DEADLINE.get()) if value is not None]
+        return chart_metadata(ident, deadline=min(budgets) if budgets else None, cached_only=cached_only)
     if ident.startswith("AKSHARE:"):
         from .akshare_catalog import chart_metadata
 
@@ -297,7 +298,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     if meta["source"] == "akshare":
         from .provider_akshare import platform_page
 
-        return platform_page(meta, frame, before, count, deadline=deadline)
+        return platform_page(meta, frame, before, count, deadline=deadline, optional=optional)
     if frame not in source_frames(meta["source"]) or not 1 <= count <= (4000 if meta["source"] == "oanda" else 1000):
         raise ValueError("无效平台周期或根数")
     source = meta["source"]

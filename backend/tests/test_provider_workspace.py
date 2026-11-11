@@ -58,3 +58,25 @@ def test_initial_workspace_metadata_is_ephemeral_and_never_fetches_candles(datab
                                                                'state': {'opaque': 'preserved'}}
     finally:
         api_module.app.dependency_overrides.clear()
+
+
+def test_yahoo_workspace_opens_from_local_catalog_without_upstream_metadata(database, monkeypatch):
+    from alerts import provider_yahoo, yahoo_catalog
+    from alerts.config import settings
+    monkeypatch.setattr(settings, 'yahoo_enabled', True)
+    yahoo_catalog.seed()
+    monkeypatch.setattr(provider_yahoo, 'metadata', lambda *a, **k: (_ for _ in ()).throw(
+        TimeoutError('remote metadata unavailable')))
+    ticker = 'MWP:' + provider_yahoo.stable_id('AAPL')
+    api_module.app.dependency_overrides[api_module.authenticated] = lambda: 'test'
+    try:
+        with TestClient(api_module.app, raise_server_exceptions=False) as client:
+            response = client.post('/api/advanced-charts/workspaces', json={'name':'local Yahoo','symbol':ticker})
+            assert response.status_code == 200, response.text
+            value = response.json()
+            assert value['document']['symbol'] == ticker
+            assert 'initial_symbol' not in value, 'missing metadata must not be fabricated'
+            assert client.get('/api/advanced-charts/workspaces/'+value['id']).status_code == 200
+            assert client.post('/api/advanced-charts/workspaces', json={'name':'invalid','symbol':'MWP:YAHOO:unknown'}).status_code == 404
+    finally:
+        api_module.app.dependency_overrides.clear()

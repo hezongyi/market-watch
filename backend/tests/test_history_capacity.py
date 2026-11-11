@@ -33,7 +33,7 @@ def test_validation_and_lowering_apply_to_native_task(policy, monkeypatch):
         limit=90000, countBack=90000, native_history={"chart_count": 4})
     loads.admit(query)
     save_capacity(80000)
-    with pytest.raises(loads.CapacityExceeded, match="90,000.*80,000.*历史数据容量"):
+    with pytest.raises(loads.CapacityExceeded, match="90,000.*80,000.*历史数据与预取"):
         loads.admit(query)
     save_capacity(200000)
     loads.admit(query)

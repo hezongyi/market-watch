@@ -332,13 +332,14 @@ class AKShareHistory:
         pass
 
 
-def platform_page(meta, frame, before, count, *, deadline=None):
+def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
     """Selected native frame only, sharing fixed-source content and source slots."""
     from .history_mode_sources import dataset_identity
     from .source_history_store import shared_native_page
 
     if frame not in meta.get("frames", []) or not 1 <= count <= 4000:
         raise ValueError("此品种尚未验证所选原生周期")
+    count = min(4000, count + optional)
     parent = dataset_identity("akshare", meta["symbol"], "native_periods", "none")
     source = collection_identity(parent, frame)
     if meta["source_family"] == "tencent-a":
@@ -357,6 +358,12 @@ def platform_page(meta, frame, before, count, *, deadline=None):
     else:
         left = max(0, right - max(count * int(MINUTES[frame]) * 60000 * 5, 90 * 86400000))
     left, right = left // 60000 * 60000, right // 60000 * 60000
+    snapshot = meta["source_family"] in ("sina-a", "sina-hk", "sina-futures")
+    if snapshot:
+        # These endpoints ignore date bounds. Keep their one bounded full
+        # snapshot in the existing source store, shared across platform cursors.
+        # A minute anchor makes sequential pages reuse the same observation.
+        left, right = 0, observed // 60000 * 60000
 
     class Request:
         def native_page(self, identity, start, end):
@@ -366,8 +373,16 @@ def platform_page(meta, frame, before, count, *, deadline=None):
         fresh_after=observed - 60000, volume_kind="quantity", volume_unit=meta["volume_unit"])
     bars = [{**row.model_dump(), "chart_time": row.start, "volume_complete": row.complete and row.volume is not None}
             for row in batch.rows if row.start < before]
+    evidence = None
+    if snapshot and batch.rows:
+        # Successful full snapshot proves its current available left edge,
+        # not permanent listing exhaustion. Empty success alone proves nothing.
+        evidence = {"kind": "rolling_window", "left": batch.rows[0].start,
+                    "confirmed_at": batch.observed_at, "retry_at": batch.observed_at + 60000,
+                    "reason": "source_snapshot_window"}
     visible = bars[-count:]
     return {"bars": visible, "has_more": bool(bars), "history_boundary": False,
+        "boundary_evidence": evidence,
         "coverage": [[visible[0]["chart_time"], min(before, observed)]] if visible else [],
         "availability": "observed_window", "series_kind": "provider", "basis": "last",
         "calendar": "source_date", "precision": meta["precision"], "indicators": [],

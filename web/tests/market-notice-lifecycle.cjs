@@ -23,7 +23,9 @@ assert.equal(quote.noticeOutages.size, 0);
 const resetStart=source.indexOf('    widget.subscribe("chart_load_requested", () => {');
 const resetPrefix=source.slice(source.indexOf('\n',resetStart)+1,source.indexOf('      quoteSnapshotRows.clear();',resetStart));
 const resetMessages=[];
+let releasedStartup=0;
 Object.assign(sandbox,{workspaceEpoch:7,alertUIWorkspace:'test',alertUISession:'session',
+  initialHistoryGate:{resolve:()=>releasedStartup++},
   send:message=>resetMessages.push(message),invalidateAlertUI(){},barRangeMapping:{suspend(){}},
   edgeGuard:null,rangeGuard:null,indicatorCoordinator:null,indicatorBindings:new Map(),
   subscriptions:new Map(),pendingSync:{},syncCoordinator:{resetWorkspace(){},acquirePause(){}},
@@ -31,6 +33,7 @@ Object.assign(sandbox,{workspaceEpoch:7,alertUIWorkspace:'test',alertUISession:'
 sandbox.emitNotice=(fault,recovered)=>resetMessages.push({type:'notice-source',epoch:sandbox.workspaceEpoch,fault,recovered});
 fail();resetMessages.length=0;
 vm.runInContext(resetPrefix,sandbox);
+assert.equal(releasedStartup,1,'workspace reset releases optional sidebar startup waiting');
 const ended=resetMessages.findIndex(message=>message.fault?.observation_ended);
 const reset=resetMessages.findIndex(message=>message.type==='native-load-reset');
 assert.ok(ended>=0 && ended<reset,'ending must arrive before parent switches its epoch fence');

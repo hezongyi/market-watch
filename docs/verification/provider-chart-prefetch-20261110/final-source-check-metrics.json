@@ -1,0 +1,123 @@
+{
+  "started_at": "2026-11-10T12:56:48.441Z",
+  "finished_at": "2026-11-10T13:01:22.142Z",
+  "period": "D1",
+  "viewport": {
+    "width": 1600,
+    "height": 1000
+  },
+  "method": "Real HTTP, native widget, single chart, no indicators. Fresh browser context per unique instrument, opened exactly once. Before navigation every timeframe has no dataset/bars and no history-load records. No cache clearing. Readiness requires nonempty real bars, native dataReady, nonempty visible range, then two requestAnimationFrame callbacks. Browser page navigation is the start; login/workspace preparation is outside the measurement.",
+  "preferences_unchanged": true,
+  "original_workspaces_unchanged": true,
+  "passed": false,
+  "attempts": [
+    {
+      "source": "fxcm",
+      "query": "AUDJPY",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 14753.599999904633,
+      "widget_constructor_ms": 1359.5,
+      "widget_ready_ms": 14502.300000190735,
+      "first_nonempty_bars_ms": 14468.800000190735,
+      "data_ready_ms": 14554.400000095367,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "NZDJPY",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 48062.699999809265,
+      "widget_constructor_ms": 1297.1999998092651,
+      "widget_ready_ms": 47722.199999809265,
+      "first_nonempty_bars_ms": 47685.2999997139,
+      "data_ready_ms": 47764.59999990463,
+      "errors": []
+    },
+    {
+      "source": "fxcm",
+      "query": "USDMXN",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 24437.799999713898,
+      "widget_constructor_ms": 1480.0999999046326,
+      "widget_ready_ms": 24148.199999809265,
+      "first_nonempty_bars_ms": 24122.900000095367,
+      "data_ready_ms": 24207.299999713898,
+      "errors": []
+    },
+    {
+      "source": "akshare",
+      "query": "601818",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 9192.39999961853,
+      "widget_constructor_ms": 1351.6999998092651,
+      "widget_ready_ms": 9048.799999713898,
+      "first_nonempty_bars_ms": 8991.89999961853,
+      "data_ready_ms": 9061.39999961853,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "JEPQ",
+      "status": "failed",
+      "error": "TimeoutError: page.waitForFunction: Timeout 90000ms exceeded.",
+      "cold_proven": false,
+      "navigation_to_visible_ms": null,
+      "widget_constructor_ms": null,
+      "widget_ready_ms": null,
+      "first_nonempty_bars_ms": null,
+      "data_ready_ms": null,
+      "errors": []
+    },
+    {
+      "source": "yahoo",
+      "query": "VOO",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 9159.400000095367,
+      "widget_constructor_ms": 1381.9000000953674,
+      "widget_ready_ms": 8875.199999809265,
+      "first_nonempty_bars_ms": 8798.400000095367,
+      "data_ready_ms": 8975.800000190735,
+      "errors": []
+    },
+    {
+      "source": "binance",
+      "query": "FILUSDT",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 5197.699999809265,
+      "widget_constructor_ms": 1360,
+      "widget_ready_ms": 4879.900000095367,
+      "first_nonempty_bars_ms": 4834.099999904633,
+      "data_ready_ms": 4923.900000095367,
+      "errors": []
+    },
+    {
+      "source": "dukascopy",
+      "query": "USDDKK",
+      "status": "ok",
+      "error": null,
+      "cold_proven": true,
+      "navigation_to_visible_ms": 9424.599999904633,
+      "widget_constructor_ms": 1269.8999996185303,
+      "widget_ready_ms": 9074.799999713898,
+      "first_nonempty_bars_ms": 9006.699999809265,
+      "data_ready_ms": 9151.299999713898,
+      "errors": []
+    }
+  ],
+  "cleanup": {
+    "owned": 8,
+    "removed": 8
+  }
+}

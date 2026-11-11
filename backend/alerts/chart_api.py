@@ -2,7 +2,7 @@
 
 import asyncio
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Query, Request
 from fastapi.responses import JSONResponse, Response
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 from sqlalchemy import delete, select
@@ -48,6 +48,7 @@ class Template(Create):
 class HistoryLoadQuery(BaseModel):
     request_id: str = Field(min_length=1, max_length=100, pattern=r"^[a-zA-Z0-9._:-]+$")
     query: DataQuery
+    prepare: bool = Field(default=False, strict=True)
     notice_context: dict[str, str] = Field(default_factory=dict, max_length=2)
 
     @field_validator('notice_context')
@@ -61,6 +62,12 @@ class HistoryLoadQuery(BaseModel):
 class HistoryCapacityWrite(BaseModel):
     model_config = ConfigDict(extra="forbid", strict=True)
     max_bars: int
+
+
+class ProviderPrefetchWrite(BaseModel):
+    model_config = ConfigDict(extra="forbid", strict=True)
+    version: int = Field(ge=1, le=1)
+    sources: dict[str, dict[str, int]]
 
 
 class ExportQuery(BaseModel):
@@ -332,6 +339,19 @@ def router(authenticated):
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from None
 
+    @r.get("/provider-prefetch")
+    def provider_prefetch():
+        from .provider_history_policy import prefetch_capabilities
+        return prefetch_capabilities()
+
+    @r.post("/provider-prefetch")
+    def provider_prefetch_save(body: ProviderPrefetchWrite):
+        from .provider_history_policy import save_prefetch
+        try:
+            return save_prefetch(body.sources)
+        except ValueError as exc:
+            raise HTTPException(422, str(exc)) from None
+
     async def history_operation(operation, *args):
         import httpx
 
@@ -347,10 +367,51 @@ def router(authenticated):
         except ValueError as exc:
             raise HTTPException(422, {"code": "INVALID_HISTORY_REQUEST", "message": str(exc), "history_boundary": False}) from None
 
+    async def wait_history_result(owner, ident, request, wait_ms, cancel_on_disconnect=False):
+        from .native_history_loads import result, status
+        from .native_history_signals import watch
+        loop = asyncio.get_running_loop()
+        ready = asyncio.Event()
+        def wake(changed):
+            if changed == ident and not loop.is_closed():
+                loop.call_soon_threadsafe(ready.set)
+        # Subscribe before reading, so completion between read and wait is retained.
+        deadline = loop.time() + wait_ms / 1000
+        async def cancel_consumer():
+            # During submit-wait the browser has not received its handle yet.
+            # End only this owned demand; datasets and other consumers survive.
+            await asyncio.shield(asyncio.to_thread(status, owner, ident, True))
+        try:
+            with watch(wake):
+                while True:
+                    ready.clear()
+                    value = await history_operation(result, owner, ident)
+                    if await request.is_disconnected():
+                        if cancel_on_disconnect:
+                            await cancel_consumer()
+                        return value
+                    if (value.get("result") is not None or
+                            value.get("load", {}).get("state") in ("failed", "cancelled", "expired") or
+                            loop.time() >= deadline):
+                        return value
+                    try:
+                        # Periodic authoritative reread also covers lost NOTIFY/reconnect.
+                        await asyncio.wait_for(ready.wait(), timeout=min(0.5, max(0.001, deadline - loop.time())))
+                    except TimeoutError:
+                        pass
+        except asyncio.CancelledError:
+            if cancel_on_disconnect:
+                await cancel_consumer()
+            raise
+
     @r.post("/history-loads")
-    async def history_submit(body: HistoryLoadQuery, request: Request):
+    async def history_submit(body: HistoryLoadQuery, request: Request, wait_ms: int = Query(default=0, ge=0, le=3000)):
         from .native_history_loads import owner_of, submit
-        return await history_operation(submit, owner_of(request), body.request_id, body.query, body.notice_context)
+        owner = owner_of(request)
+        value = await history_operation(submit, owner, body.request_id, body.query, body.notice_context, body.prepare)
+        if wait_ms and value.get("load"):
+            return await wait_history_result(owner, value["load"]["id"], request, wait_ms, cancel_on_disconnect=True)
+        return value
 
     @r.get("/history-loads/{id}")
     async def history_status(id: str, request: Request):
@@ -358,9 +419,9 @@ def router(authenticated):
         return await history_operation(status, owner_of(request), id)
 
     @r.get("/history-loads/{id}/result")
-    async def history_result(id: str, request: Request):
-        from .native_history_loads import owner_of, result
-        return await history_operation(result, owner_of(request), id)
+    async def history_result(id: str, request: Request, wait_ms: int = Query(default=0, ge=0, le=1500)):
+        from .native_history_loads import owner_of
+        return await wait_history_result(owner_of(request), id, request, wait_ms)
 
     @r.post("/history-loads/{id}/cancel")
     async def history_cancel(id: str, request: Request):

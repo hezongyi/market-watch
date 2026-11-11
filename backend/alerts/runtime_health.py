@@ -34,8 +34,9 @@ def data_roles():
     from .provider_capabilities import enabled_sources
     from .provider_transport import ORIGINS
 
-    providers = tuple(role for source in enabled_sources()
-                      for role in (f"provider_live_{source}", f"provider_warm_{source}"))
+    providers = tuple(role for source in enabled_sources(history=True)
+                      for role in (f"provider_live_{source}", f"provider_warm_{source}")
+                      if not role.startswith("provider_live_") or source in enabled_sources())
     transports = tuple(f"provider_transport_{source}" for source in ORIGINS)
     return providers + transports + ("provider_janitor", "catalog_runtime", "chart_history",
                         "history_network", "history_compute", "native_history", "chart_aggregation",

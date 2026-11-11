@@ -12,6 +12,8 @@ export type HistoryCapabilities = {
   hard_max_bars: number;
   default_bars: number;
   result_polling?: boolean;
+  result_waiting?: boolean;
+  startup_preparation?: boolean;
 };
 
 export type HistoryProgress = {
@@ -21,6 +23,39 @@ export type HistoryProgress = {
   estimatedPages?: number;
   received?: number;
 };
+
+export type StartupPreparation = {
+  instrument: string;
+  timeframe: string;
+  controller: AbortController;
+  result: Promise<any>;
+};
+
+export async function waitStartupPreparation(preparation: StartupPreparation | null | undefined,
+  instrument: string, signal: AbortSignal) {
+  if (!preparation || preparation.instrument !== instrument || preparation.controller.signal.aborted) return;
+  const waiting = AbortSignal.any([signal, preparation.controller.signal]);
+  waiting.throwIfAborted();
+  let abort: () => void = () => {};
+  try {
+    return await Promise.race([preparation.result, new Promise<never>((_, reject) => {
+      abort = () => reject(new DOMException("已取消启动等待", "AbortError"));
+      waiting.addEventListener("abort", abort, {once:true});
+    })]);
+  } finally {
+    waiting.removeEventListener("abort", abort);
+  }
+}
+
+/** Reuse Yahoo's worker metadata instead of starting a second SDK request. */
+export async function startupMetadata(preparation: StartupPreparation | null | undefined,
+  instrument: string, signal: AbortSignal) {
+  if (!preparation || preparation.instrument !== instrument ||
+      !instrument.startsWith("YAHOO:") || preparation.controller.signal.aborted) return;
+  const value = await waitStartupPreparation(preparation, instrument, signal);
+  if (value?.prepared && value.metadata?.source === "yahoo" &&
+      value.metadata.id?.toUpperCase() === instrument.toUpperCase()) return value.metadata;
+}
 
 // Returning prices releases the bridge request, not the server handle. Keep
 // the original four-load budget until cleanup finishes so rapid switches do
@@ -136,6 +171,7 @@ export async function loadNativeHistory(
   progress: (state: HistoryProgress) => void,
   noticeContext: Record<string, string> = {},
   onAdmitted?: (available: number) => void,
+  prepare = false,
 ) {
   let handle: string | undefined;
   let delivered = false;
@@ -148,17 +184,18 @@ export async function loadNativeHistory(
     onAdmitted?.(historyLifetimes - admitted);
     progress({ phase: "checking", estimatedPages: estimate });
     let reply = await api(
-      "/charts/history-loads",
-      { request_id: crypto.randomUUID(), query, notice_context: noticeContext },
+      "/charts/history-loads" + (capabilities.result_waiting ? "?wait_ms=3000" : ""),
+      { request_id: crypto.randomUUID(), query, notice_context: noticeContext, ...(prepare ? {prepare: true} : {}) },
       signal,
     );
+    handle = reply.load?.id;
     if (reply.result) {
       progress({
         phase: "delivering",
         received: reply.result.bars?.length || 0,
       });
       delivered = true;
-      return {...reply.result,history_pages:0};
+      return {...reply.result,history_pages:reply.load?.pages ?? 0};
     }
     handle = reply.load?.id;
     if (!handle) throw Error("历史加载协议不匹配，请刷新工作区");
@@ -197,7 +234,9 @@ export async function loadNativeHistory(
           undefined,
           signal,
         );
-      else {
+      else if (capabilities.result_waiting) {
+        reply = await api(`/charts/history-loads/${handle}/result?wait_ms=1500`, undefined, signal);
+      } else {
         await new Promise<void>((resolve, reject) => {
           const abort = () => {
             clearTimeout(timer);
@@ -249,4 +288,34 @@ export async function loadNativeHistory(
       if (!delivered) await cleanup;
     } else release();
   }
+}
+
+/** Only the authoritative single-chart state may start an optional page early. */
+export function startupHistoryQuery(document: Record<string, any>, initialSymbol?: {ticker: string; metadata: Record<string, unknown>}) {
+  let state = document.state;
+  if (state && !state.charts && typeof state.content === "string") {
+    try { state = JSON.parse(state.content); } catch { return null; }
+  }
+  let ticker = document.symbol, resolution = document.interval || "240";
+  if (state?.charts?.length) {
+    if (state.charts.length !== 1) return null;
+    const sources = (state.charts[0].panes || []).flatMap((pane: any) => pane.sources || []);
+    if (sources.some((source: any) => /study/i.test(source.type || ""))) return null;
+    const mains = sources.filter((source: any) => source.type === "MainSeries");
+    if (mains.length !== 1) return null;
+    ticker = mains[0].state?.symbol;
+    resolution = mains[0].state?.interval || resolution;
+  }
+  if (typeof ticker !== "string" || !ticker.startsWith("MWP:")) return null;
+  const metadata = initialSymbol?.ticker === ticker ? initialSymbol.metadata : undefined;
+  const source = ({OANDA:"oanda", NATIVE:"oanda", BINANCE:"binance", DUKA:"dukascopy",
+    YAHOO:"yahoo", AKSHARE:"akshare", TENCENT:"akshare", FXCM:"fxcm"} as Record<string,string>)[ticker.split(":")[1]]
+    || metadata?.source;
+  if (!(["oanda","binance","dukascopy","yahoo","akshare","fxcm"] as unknown[]).includes(source)) return null;
+  const timeframe = ({"1":"M1","5":"M5","15":"M15","30":"M30","60":"H1","240":"H4","1D":"D1","1W":"W1","1M":"MN"} as Record<string,string>)[resolution];
+  if (!timeframe || source === "yahoo" && timeframe === "H4" ||
+      Array.isArray(metadata?.frames) && !metadata.frames.includes(timeframe)) return null;
+  return {instrument:ticker.slice(4), series_kind:"provider", timeframe,
+    limit:1, countBack:1, firstDataRequest:true, indicators:[], history_page_bars:4000,
+    native_history:{chart_count:1,focused:true,screen_bars:1,batch_screens:1}};
 }

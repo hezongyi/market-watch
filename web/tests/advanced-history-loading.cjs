@@ -29,9 +29,89 @@ function loader(api, clock = Date) {
     setTimeout,
     clearTimeout,
   });
-  return Object.assign(exports.loadNativeHistory, {diagnostics:exports.historyLoadDiagnostics});
+  return Object.assign(exports.loadNativeHistory, {diagnostics:exports.historyLoadDiagnostics,startupQuery:exports.startupHistoryQuery,startupMetadata:exports.startupMetadata});
+}
+function runtime(api, preparation) {
+  const exports = {}, historyExports = {};
+  const context = {Date,DOMException,AbortSignal,AbortController,setTimeout,clearTimeout,
+    crypto:require("node:crypto").webcrypto};
+  const errors = {errorMessage:e=>e.message,apiErrorDetails:e=>({code:e.code,status:e.status})};
+  vm.runInNewContext(source,{...context,exports:historyExports,require:()=>({api,...errors})});
+  vm.runInNewContext(ts.transpileModule(fs.readFileSync("src/runtime/market.ts","utf8"),{
+    compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022},
+  }).outputText,{...context,exports,require:name=>name.includes("nativeHistoryLoads") ? historyExports
+    : name.includes("indicatorRequests") ? {validIndicatorRead:value=>Array.isArray(value)} : errors});
+  const sourceChart = {}, marketRequests = new Map(), inflight = {current:0};
+  const startupPreparation = {current:preparation};
+  const value = exports.marketRuntime({api,marketRequests,inflight,startupPreparation,
+    historyCapabilities:{current:{task_seconds:60,max_bars:20000}},setNativeLoads:()=>{},
+    current:{current:{id:"workspace"}},nativeLoadEpoch:{current:0},chart:{current:sourceChart},
+    compositeEstablished:()=>{},updateChart:()=>{}});
+  return {...value,sourceChart,marketRequests,inflight,startupPreparation};
 }
 (async () => {
+  const preparationLoader = loader(async () => ({}));
+  const startupQuery = preparationLoader.startupQuery;
+  const preparationController = new AbortController();
+  const metadata = {id:"YAHOO:sample",source:"yahoo",adjustment:"auto"};
+  const pending = {instrument:metadata.id,timeframe:"D1",controller:preparationController,result:Promise.resolve({prepared:true,metadata})};
+  assert.equal(await preparationLoader.startupMetadata(pending,metadata.id,new AbortController().signal),metadata);
+  assert.equal(await preparationLoader.startupMetadata(pending,"YAHOO:other",new AbortController().signal),undefined);
+  assert.equal(await preparationLoader.startupMetadata({...pending,result:Promise.resolve({prepared:true,metadata:{...metadata,id:"YAHOO:other"}})},metadata.id,new AbortController().signal),undefined);
+  const cancelled = new AbortController();
+  const waitingMetadata = preparationLoader.startupMetadata({...pending,result:new Promise(()=>{})},metadata.id,cancelled.signal);
+  cancelled.abort();
+  await assert.rejects(waitingMetadata,{name:"AbortError"},"workspace cancellation must release metadata waiting");
+  await assert.rejects(preparationLoader.startupMetadata({...pending,result:Promise.reject(Error("source timeout"))},metadata.id,new AbortController().signal),/source timeout/,
+    "failed preparation must reach the caller instead of starting another full source attempt");
+  preparationController.abort();
+  assert.equal(await preparationLoader.startupMetadata(pending,metadata.id,new AbortController().signal),undefined);
+  // Exercise the shipped market consumer, not only the waiting helper: a
+  // failed early load must not silently start a second full acquisition.
+  for (const source of ["YAHOO", "FXCM"]) {
+    let fail, calls = 0;
+    const preparation = {instrument:`${source}:sample`,timeframe:"D1",controller:new AbortController(),
+      result:new Promise((_,reject)=>{fail=reject;})};
+    const actual = runtime(async ()=>{calls++;return {result:{bars:[{close:1}]}};},preparation);
+    const query = {instrument:preparation.instrument,series_kind:"provider",timeframe:"D1",limit:1,
+      indicators:[],native_history:{chart_count:1,focused:true,historical_navigation:false}};
+    const waiting = actual.data(query,actual.sourceChart,{id:1});
+    assert.equal(calls,0,"real demand joins the pending acquisition");
+    fail(Error("source acquisition timed out"));
+    await assert.rejects(waiting,/source acquisition timed out/);
+    assert.equal(calls,0,"a failed preparation cannot cause a second source attempt");
+    assert.equal(actual.startupPreparation.current,null);
+    assert.equal(actual.inflight.current,0);
+    assert.equal(actual.marketRequests.size,0);
+    assert.equal((await actual.data(query,actual.sourceChart,{id:2})).bars.length,1,
+      "explicit retry can start fresh after the failed preparation is consumed");
+    assert.equal(calls,1);
+  }
+  const document = {symbol:"MWP:OANDA:EUR_USD", interval:"240"};
+  assert.equal(startupQuery(document).timeframe,"H4");
+  const saved = {charts:[{panes:[{sources:[{type:"MainSeries",state:{symbol:"MWP:OANDA:GBP_USD",interval:"1D"}}]}]}]};
+  const savedQuery = startupQuery({...document,state:saved});
+  assert.equal(savedQuery.instrument,"OANDA:GBP_USD","saved main series overrides stale document identity");
+  assert.equal(savedQuery.timeframe,"D1");
+  assert.equal(startupQuery({...document,state:{content:JSON.stringify(saved)}}).instrument,"OANDA:GBP_USD");
+  assert.equal(startupQuery({...document,state:{charts:[...saved.charts,...saved.charts]}}),null);
+  assert.equal(startupQuery({...document,state:{charts:[{panes:[{sources:[...saved.charts[0].panes[0].sources,{type:"Study"}]}]}]}}),null);
+  for(const symbol of ["MWM:managed","MWC:composite","MWP:UNKNOWN:sample"])
+    assert.equal(startupQuery({...document,symbol}),null);
+  for (const prefix of ["OANDA", "BINANCE", "DUKA", "YAHOO", "AKSHARE", "TENCENT", "FXCM"]) {
+    assert.equal(startupQuery({...document,symbol:`MWP:${prefix}:sample`,interval:"1D"}).instrument,`${prefix}:sample`);
+  }
+  assert.equal(startupQuery({...document,symbol:"MWP:BTCUSDT"}, {ticker:"MWP:BTCUSDT",metadata:{source:"binance"}}).instrument,"BTCUSDT");
+  assert.equal(startupQuery({...document,symbol:"MWP:YAHOO:AAPL",interval:"240"}),null,"Yahoo does not supply H4");
+  assert.equal(startupQuery({...document,symbol:"MWP:FXCM:sample",interval:"240"}, {ticker:"MWP:FXCM:sample",metadata:{source:"fxcm",frames:["M1","H1","D1"]}}),null);
+  assert.equal(startupQuery({...document,interval:"unsupported"}),null);
+  let preparationBody;
+  const prepare = loader(async (path,body) => {preparationBody=body;return {result:{prepared:true}};});
+  const prepared = await prepare(savedQuery,new AbortController().signal,{task_seconds:60},()=>{},{},undefined,true);
+  assert.equal(preparationBody.prepare,true);
+  assert.equal(preparationBody.query.limit,1,"configured acquisition target must remain optional");
+  assert.equal(prepared.prepared,true);
+  assert.equal(prepared.bars,undefined,"preparation must never fabricate prices");
   const progress = [],
     cap = { task_seconds: 600 },
     body = { instrument: "EURUSD", timeframe: "M5" };
@@ -278,6 +358,19 @@ function loader(api, clock = Date) {
     failed(body, new AbortController().signal, cap, () => {}),
     (e) => e.code === "HISTORY_PROVIDER_FAILED",
   );
+  const waitingPaths = [];
+  const waited = loader(async path => {
+    waitingPaths.push(path);
+    if (path.endsWith("/cancel")) return {};
+    assert.equal(path, "/charts/history-loads?wait_ms=3000");
+    return {load: {id: "waited", state: "ready", pages: 1}, result: {bars: [1, 2]}};
+  });
+  const waitedResult = await waited(body, new AbortController().signal,
+    {...cap, result_waiting: true}, () => {});
+  assert.equal(waitedResult.history_pages, 1, "submit wait retains real committed pages");
+  assert.deepEqual(waitingPaths, ["/charts/history-loads?wait_ms=3000", "/charts/history-loads/waited/cancel"],
+    "same-request delivery still releases its persistent handle");
+
   console.log(
     "History loading: hot/cold truthful phases, real pages, cancellation and failure passed",
   );

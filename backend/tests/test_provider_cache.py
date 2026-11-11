@@ -290,7 +290,7 @@ def test_native_range_demand_is_preserved_with_buffer_switch_off_and_on(database
     monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
     on = cache.data(body)
     assert off['mandatory_count'] == on['mandatory_count'] == 500
-    assert len(off['bars']) == 500 and len(on['bars']) == 2500
+    assert len(off['bars']) == 500 and len(on['bars']) == 2000
     assert off['bars'] == on['bars'][-500:]
     assert off['cache_revision'] == on['cache_revision']
     assert on['cache_hit']
@@ -400,12 +400,16 @@ def test_empty_native_snapshot_preserves_dataset_metadata(database):
 def test_reduced_optional_budgets_keep_demand_and_native_loaded_extra_in_backend(database, monkeypatch):
     monkeypatch.setattr(upstream, 'metadata', lambda instrument: META)
     monkeypatch.setattr(settings, 'provider_native_history_buffer', True)
-    monkeypatch.setattr(settings, 'provider_native_first_extra_bars', 1000)
+    from alerts.provider_history_policy import prefetch_capabilities, save_prefetch
+    values = prefetch_capabilities()["sources"]
+    values["oanda"] = {"initial_bars": 1200, "reserve_bars": 4000}
+    save_prefetch(values)
     seed(META, 'M5', 5000000, page(0, 5000000, boundary=True))
     result = cache.data(native_body(before=5000000, countBack=200, firstDataRequest=True))
     assert len(result['bars']) == 1200 and result['mandatory_count'] == 200
     assert result['optional_count'] == 1000
-    monkeypatch.setattr(settings, 'provider_native_cold_extra_bars', 200)
+    values["oanda"]["initial_bars"] = 400
+    save_prefetch(values)
     calls = []
     def fetch(meta, frame, before, count, **kwargs):
         optional = kwargs.get('optional', 0)
@@ -417,7 +421,7 @@ def test_reduced_optional_budgets_keep_demand_and_native_loaded_extra_in_backend
     assert len(result['bars']) == 400 and result['mandatory_count'] == 200
 
 
-@pytest.mark.parametrize('charts,focused,expected', [(1,True,2500),(2,True,1500),
+@pytest.mark.parametrize('charts,focused,expected', [(1,True,2000),(2,True,1500),
                                                   (4,True,1500),(4,False,500),(8,None,1500)])
 def test_native_multichart_response_budget_and_focus(database, monkeypatch, charts, focused, expected):
     from alerts.chart_query import DataQuery

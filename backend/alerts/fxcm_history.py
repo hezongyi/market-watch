@@ -176,28 +176,45 @@ class FxcmHistory:
             data = data[written:]
 
     def _request(self, command, *, expected, limit, deadline=None, scope=None):
+        from .market_resources import LANE
+        from .provider_cache import interactive_busy
+        from .provider_chart import record_timing
         deadline = deadline or time.monotonic() + 65
+        started = time.monotonic()
         with self._locked(deadline):
+            record_timing("fxcm_session_lock", started)
             self.cancel()
             # Covers login, the snapshot and error cleanup across all workers.
             def cancelled():
                 self.cancel()
-                return False
+                # Yield only before native I/O begins: abandoning queued
+                # warming must not close a healthy, reusable broker session.
+                return LANE.get() == "history" and interactive_busy("fxcm")
+            slot_started = time.monotonic()
             with request_slot("fxcm", deadline=deadline, cancelled=cancelled):
+                record_timing("fxcm_source_slot", slot_started)
                 try:
                     current_scope = account_scope()
                     if scope is not None and scope != current_scope:
                         raise ValueError("FXCM账户配置已变化，请重新选择")
-                    self._start(current_scope, deadline)
-                    self._write(command.encode())
-                    rows = []
-                    while True:
-                        row = self._line(deadline)
-                        if row == {"kind": "done"}:
-                            return rows
-                        if row.get("kind") != expected or len(rows) >= limit:
-                            raise ValueError("FXCM响应类型或条数无效")
-                        rows.append(row)
+                    login_started = time.monotonic()
+                    try:
+                        self._start(current_scope, deadline)
+                    finally:
+                        record_timing("fxcm_login", login_started)
+                    snapshot_started = time.monotonic()
+                    try:
+                        self._write(command.encode())
+                        rows = []
+                        while True:
+                            row = self._line(deadline)
+                            if row == {"kind": "done"}:
+                                return rows
+                            if row.get("kind") != expected or len(rows) >= limit:
+                                raise ValueError("FXCM响应类型或条数无效")
+                            rows.append(row)
+                    finally:
+                        record_timing("fxcm_snapshot", snapshot_started)
                 except BaseException:
                     self.close()
                     raise

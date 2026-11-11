@@ -874,3 +874,27 @@ def test_oanda_count_latest_at_exclusive_boundary_tries_one_historical_cursor(mo
             with pytest.raises(ValueError, match='分页未推进'):
                 provider.native_page(META, 'M1', before, 1, client=client)
     assert len(calls) == 2
+
+
+@pytest.mark.parametrize('instrument,source', [('YAHOO:AAPL','yahoo'),('AKSHARE:test','akshare'),('OANDA:EUR_USD','oanda'),('NATIVE:configured','oanda')])
+def test_direct_query_uses_source_io_budget_and_preserves_explicit_deadline(database, monkeypatch, instrument, source):
+    import asyncio
+    import time
+
+    from alerts import chart_query, provider_cache, provider_capabilities
+    sources, observed = [], []
+    monkeypatch.setattr(provider_capabilities, 'request_seconds', lambda value: sources.append(value) or 30)
+    def query(body):
+        observed.append((provider_cache.IO_DEADLINE.get(),provider_cache.DEADLINE.get()))
+        return {'bars':[]}
+    monkeypatch.setattr(chart_query, 'data_sync', query)
+    body = chart_query.DataQuery(instrument=instrument,series_kind='provider',timeframe='M5',limit=1)
+    start = time.monotonic()
+    asyncio.run(chart_query.query_chart(body))
+    assert sources == [source]
+    assert start+29 <= observed[0][0] <= start+31
+    assert observed[0][1] == observed[0][0]+provider_capabilities.COMPLETION_SECONDS
+    explicit = time.monotonic()+1
+    asyncio.run(chart_query.query_chart(body,deadline=explicit))
+    assert observed[1] == (explicit,explicit)
+    assert provider_cache.IO_DEADLINE.get() is None and provider_cache.DEADLINE.get() is None

@@ -32,6 +32,55 @@ def stamp(value):
     return int(pd.Timestamp(value).timestamp() * 1000)
 
 
+def test_history_reuses_validated_timezone_without_sdk_probe(monkeypatch):
+    from yfinance.scrapers.history import PriceHistory
+
+    ticker = yahoo.yf.Ticker("AAPL")
+    monkeypatch.setattr(ticker, "_fetch_ticker_tz", lambda *a, **k: pytest.fail("redundant timezone HTTP"))
+    observed = []
+
+    def history(instance, **kwargs):
+        observed.append((instance.tz, kwargs))
+        return "real SDK history seam"
+
+    monkeypatch.setattr(PriceHistory, "history", history)
+    meta = {**META, "timezone": "America/New_York", "adjustment": "auto"}
+    assert yahoo._history(ticker, meta, "D1", 1000, 2000, time.monotonic() + 2) == "real SDK history seam"
+    assert observed[0][0] == meta["timezone"]
+    assert observed[0][1]["auto_adjust"] is True
+    assert observed[0][1]["interval"] == "1d"
+
+
+def test_expired_metadata_respects_io_deadline_before_remote_fetch(database, monkeypatch):
+    from alerts import provider_chart
+
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    yahoo_catalog.seed()
+    monkeypatch.setattr(yahoo, "metadata", lambda *a, **k: pytest.fail("I/O after deadline"))
+    completion = cache.DEADLINE.set(time.monotonic() + 3)
+    io = cache.IO_DEADLINE.set(time.monotonic() - 1)
+    try:
+        with pytest.raises(TimeoutError, match="元信息"):
+            provider_chart.metadata(yahoo.stable_id("AAPL"))
+    finally:
+        cache.IO_DEADLINE.reset(io)
+        cache.DEADLINE.reset(completion)
+
+
+def test_yahoo_cache_probe_admits_task_without_remote_metadata(database, monkeypatch):
+    from alerts import native_history_loads as loads
+    from alerts.chart_query import DataQuery
+    monkeypatch.setattr(settings, 'yahoo_enabled', True)
+    yahoo_catalog.seed()
+    calls = []
+    monkeypatch.setattr(yahoo,'metadata',lambda *a,**k: calls.append(a) or pytest.fail('cache probe contacted Yahoo'))
+    query = DataQuery(instrument=yahoo.stable_id('AAPL'),series_kind='provider',timeframe='D1',
+                     limit=1,countBack=1,firstDataRequest=True,native_history={'chart_count':1,'focused':True})
+    result = loads.submit('owner','yahoo-cold-metadata',query,prepare=True)
+    assert result['load']['state'] == 'waiting'
+    assert calls == []
+
+
 @pytest.fixture
 def adapter(monkeypatch):
     @contextmanager
@@ -172,16 +221,22 @@ def test_synced_crypto_directory_resolves_metadata_chart_and_archive(database, a
     assert not yahoo.allowed({**ticker.info, "exchange": "OTHER"})
 
 
-def test_yahoo_rounds_include_eight_frames_and_neighbor_buffers(database):
+def test_yahoo_reserve_targets_only_the_visited_native_period(database):
     key = cache.ensure(META, "D1")
     service.activate("yahoo-test", key, stamp("2020-04-22T00:00:00Z"), 20)
     with storage.transaction() as db:
         interest = db.scalar(select(storage.ProviderInterest))
-        expected = ["D1", "D1", "W1", "M5", "M1", "MN", "H1", "M30", "M15"]
-        assert len(interest.targets) == 18
-        assert {t["frame"] for t in interest.targets} == set(YAHOO_INTERVALS)
-        assert [t["frame"] for t in interest.targets[:9]] == expected
-        assert [t["frame"] for t in interest.targets[9:]] == expected
+        assert len(interest.targets) == 1
+        assert interest.targets[0]["frame"] == "D1"
+        assert interest.targets[0]["count"] == 4000
+
+
+def test_daily_opportunity_uses_bounded_calendar_window_without_extra_http(adapter):
+    _, calls = adapter
+    before = stamp("2020-04-22T00:00:00Z")
+    result = yahoo.native_page(META, "D1", before, 2, optional=1998)
+    assert len(result["bars"]) == 2 and len(calls) == 1
+    assert calls[0]["end"] - calls[0]["start"] <= 3005 * 86400
 
 
 def test_temporary_window_preserves_cached_prices_and_never_sets_earliest(database):
@@ -207,7 +262,7 @@ def test_temporary_window_preserves_cached_prices_and_never_sets_earliest(databa
         assert not db.get(storage.ProviderDataset, key).earliest
 
 
-@pytest.mark.parametrize("buffer,total,count,delivered", [(False, 10, 2, 2), (True, 3000, 100, 2100)])
+@pytest.mark.parametrize("buffer,total,count,delivered", [(False, 10, 2, 2), (True, 3000, 100, 2000)])
 def test_cached_minutes_remain_pageable_at_rolling_window(
     database, monkeypatch, buffer, total, count, delivered
 ):
