@@ -4,7 +4,20 @@ export type Profile = {
   origin: string;
   subject: string;
   schema: typeof MOBILE_SCHEMA;
+  generation?: number;
 };
+const generations = new Map<string, number>();
+export function invalidateProfile(origin: string) {
+  generations.set(origin, (generations.get(origin) || 0) + 1);
+}
+export const profileActive = (profile: Profile) =>
+  (profile.generation || 0) === (generations.get(profile.origin) || 0);
+export const profileFor = (origin: string, subject: string): Profile => ({
+  origin,
+  subject,
+  schema: MOBILE_SCHEMA,
+  generation: generations.get(origin) || 0,
+});
 export type Snapshot<T> = { value: T; readAt: number };
 const database = "mw-mobile";
 export const noticeStores = [
@@ -72,10 +85,11 @@ function key(profile: Profile, name: string): IDBValidKey[] {
 export function rememberProfile(
   origin: string,
   subject: string,
+  profile = profileFor(origin, subject),
 ): Promise<Profile> {
   if (!subject) return Promise.reject(Error("会话未提供身份"));
-  const profile: Profile = { origin, subject, schema: MOBILE_SCHEMA };
   return transaction(["profiles"], "readwrite", (tx, done) => {
+    if (!profileActive(profile)) throw Error("会话已结束");
     tx.objectStore("profiles").put(profile, origin);
     done(profile);
   });
@@ -86,7 +100,9 @@ export function lastProfile(origin: string): Promise<Profile | undefined> {
     const request = tx.objectStore("profiles").get(origin);
     request.onsuccess = () =>
       done(
-        request.result?.schema === MOBILE_SCHEMA ? request.result : undefined,
+        request.result?.schema === MOBILE_SCHEMA
+          ? profileFor(origin, request.result.subject)
+          : undefined,
       );
   });
 }
@@ -105,7 +121,10 @@ export function writeSnapshot<T>(
   name: string,
   value: T,
 ): Promise<void> {
+  if (!profileActive(profile))
+    return Promise.reject(Error("会话已结束，忽略迟到的本机写入"));
   return transaction(["records"], "readwrite", (tx) => {
+    if (!profileActive(profile)) throw Error("会话已结束");
     tx.objectStore("records").put(
       { value, readAt: Date.now() },
       key(profile, name),
@@ -118,6 +137,7 @@ export function dropSnapshot(profile: Profile, name: string): Promise<void> {
   });
 }
 export function clearOrigin(origin: string): Promise<void> {
+  invalidateProfile(origin);
   return transaction(
     ["records", "profiles", ...noticeStores],
     "readwrite",
@@ -144,8 +164,9 @@ export function locallySignedOut(origin: string): Promise<boolean> {
     request.onsuccess = () => done(request.result === true);
   });
 }
-export function allowSession(origin: string): Promise<void> {
+export function allowSession(origin: string, profile?: Profile): Promise<void> {
   return transaction(["profiles"], "readwrite", (tx) => {
+    if (profile && !profileActive(profile)) throw Error("会话已结束");
     tx.objectStore("profiles").delete([origin, "signed-out"]);
   });
 }

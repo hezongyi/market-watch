@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.SslErrorHandler
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceError
+import android.webkit.WebResourceResponse
 import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
@@ -31,6 +33,7 @@ import org.json.JSONObject
 class MainActivity : ComponentActivity() {
     private var web: WebView? = null
     private var origin: String? = null
+    private var connectionDialog: AlertDialog? = null
     private val preferences by lazy { getSharedPreferences("shell", MODE_PRIVATE) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,6 +65,7 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun configure() {
+        connectionDialog?.dismiss(); connectionDialog = null
         web?.destroy(); web = null
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(32, 48, 32, 24) }
         val title = TextView(this).apply { text = "连接守望\n输入可信 HTTPS 服务器地址"; textSize = 20f }
@@ -87,6 +91,15 @@ class MainActivity : ComponentActivity() {
         }
         layout.addView(title); layout.addView(address); layout.addView(error); layout.addView(connect)
         setContentView(layout)
+    }
+
+    private fun connectionFailure(view: WebView, message: String) {
+        if (web !== view || isFinishing || connectionDialog?.isShowing == true) return
+        connectionDialog = AlertDialog.Builder(this).setMessage(message)
+            .setPositiveButton("重试") { _, _ -> view.reload() }
+            .setNeutralButton("连接设置") { _, _ -> configure() }
+            .setNegativeButton("返回", null).create()
+        connectionDialog?.show()
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -125,8 +138,19 @@ class MainActivity : ComponentActivity() {
             }
             override fun onReceivedSslError(view: WebView, handler: SslErrorHandler, error: SslError) {
                 handler.cancel()
-                AlertDialog.Builder(this@MainActivity).setMessage("服务器证书无法验证，请检查地址与证书配置")
-                    .setPositiveButton("连接设置") { _, _ -> configure() }.setNegativeButton("返回", null).show()
+                // A subresource failure must not replace an otherwise usable app.
+                if (error.url == view.url)
+                    connectionFailure(view, "服务器证书无法验证，请检查地址与证书配置")
+            }
+            override fun onReceivedError(view: WebView, request: WebResourceRequest, error: WebResourceError) {
+                if (request.isForMainFrame)
+                    connectionFailure(view, if (error.errorCode == ERROR_FAILED_SSL_HANDSHAKE)
+                        "TLS 握手失败，请检查 HTTPS 地址与服务器配置"
+                        else "无法连接服务器，请检查地址、网络和服务器状态")
+            }
+            override fun onReceivedHttpError(view: WebView, request: WebResourceRequest, response: WebResourceResponse) {
+                if (request.isForMainFrame)
+                    connectionFailure(view, "服务器返回 HTTP ${response.statusCode}，请重试或检查连接设置")
             }
             override fun onPageStarted(view: WebView, url: String, favicon: Bitmap?) {
                 if (!url.startsWith("$value/")) view.stopLoading()
@@ -166,5 +190,5 @@ class MainActivity : ComponentActivity() {
         super.onPause()
     }
     override fun onResume() { super.onResume(); web?.onResume() }
-    override fun onDestroy() { web?.destroy(); web = null; super.onDestroy() }
+    override fun onDestroy() { connectionDialog?.dismiss(); web?.destroy(); web = null; super.onDestroy() }
 }

@@ -19,7 +19,9 @@ import {
   rememberProfile,
   readSnapshot,
   writeSnapshot,
-  MOBILE_SCHEMA,
+  profileFor,
+  invalidateProfile,
+  profileActive,
   type Profile,
 } from "./cache";
 import { useMobileShell } from "./shell";
@@ -69,7 +71,8 @@ export default function MobileApp() {
   const chart = useRef<MobileChartHandle>(null),
     generation = useRef(0),
     session = useRef<AbortController | undefined>(undefined),
-    sessionAllowed = useRef(false);
+    sessionAllowed = useRef(false),
+    signingOut = useRef(false);
   const report = useCallback((value: string) => setMessage(value), []);
   useEffect(() => {
     if (!profile || state !== "online") {
@@ -91,15 +94,21 @@ export default function MobileApp() {
       password.length > 0 ||
       Boolean(document.querySelector('[data-mobile-dirty="true"]')),
   );
-  const restore = async (value: Profile) => {
+  const restore = async (
+    value: Profile,
+    active = () => profileActive(value),
+  ) => {
     const [selected, appearance] = await Promise.all([
       readSnapshot<string>(value, "chart-selection"),
       readSnapshot<"dark" | "light">(value, "theme"),
     ]);
+    if (!active()) return;
     setSymbol(selected?.value || "");
     setTheme(appearance?.value || "dark");
   };
   const refresh = useCallback(async () => {
+    if (signingOut.current) return;
+    setBusy(false);
     const token = ++generation.current;
     session.current?.abort();
     const controller = new AbortController();
@@ -112,25 +121,27 @@ export default function MobileApp() {
         if (token === generation.current) setState("login");
         return;
       }
+      if (token !== generation.current || controller.signal.aborted) return;
       const result = await api("/session", undefined, controller.signal);
       if (token !== generation.current) return;
       setCsrf(result.csrf);
-      const value: Profile = {
-        origin: window.location.origin,
-        subject: result.subject,
-        schema: MOBILE_SCHEMA,
-      };
+      const value = profileFor(window.location.origin, result.subject);
       setProfile(value);
       setState("online");
       try {
-        await rememberProfile(value.origin, value.subject);
-        await restore(value);
+        await rememberProfile(value.origin, value.subject, value);
+        await restore(
+          value,
+          () => token === generation.current && profileActive(value),
+        );
       } catch {
-        report("本机存储不可用，当前更改可能无法记住");
+        if (token === generation.current)
+          report("本机存储不可用，当前更改可能无法记住");
       }
     } catch (error) {
       if (token !== generation.current || controller.signal.aborted) return;
       if (error instanceof ApiError && error.status === 401) {
+        invalidateProfile(window.location.origin);
         setCsrf("");
         setProfile(undefined);
         setState("login");
@@ -148,7 +159,7 @@ export default function MobileApp() {
         const previous = await lastProfile(window.location.origin);
         if (active && previous) {
           setProfile(previous);
-          await restore(previous);
+          await restore(previous, () => active && profileActive(previous));
         }
       } catch {
         if (active) report("本机缓存暂不可用");
@@ -156,6 +167,8 @@ export default function MobileApp() {
       if (active) void refresh();
     })();
     const expire = () => {
+      if (signingOut.current) return;
+      invalidateProfile(window.location.origin);
       ++generation.current;
       session.current?.abort();
       setCsrf("");
@@ -164,6 +177,7 @@ export default function MobileApp() {
       setPassword("");
       setChartDirty(false);
       setChartOpened(false);
+      setBusy(false);
     };
     const foreground = () => {
       if (!document.hidden) void refresh();
@@ -213,7 +227,9 @@ export default function MobileApp() {
     return () => removeEventListener("mw-mobile-back", back);
   }, [location.pathname, password, flush, shell, report, navigate]);
   async function logout() {
-    ++generation.current;
+    if (signingOut.current) return;
+    signingOut.current = true;
+    const token = ++generation.current;
     session.current?.abort();
     notices.runtime.pause();
     setRecords(false);
@@ -223,17 +239,21 @@ export default function MobileApp() {
     setChartDirty(false);
     setChartOpened(false);
     setState("login");
+    setBusy(true);
     sessionAllowed.current = false;
     await clearOrigin(window.location.origin).catch(() =>
       report("本机缓存清理失败，请在系统设置清除此站点数据"),
     );
     // Keep CSRF until the request is constructed, even when local contents are removed first.
     try {
-      await api("/logout", {});
+      await api("/logout", {}, AbortSignal.timeout(10000));
       report("已退出；服务器告警继续运行");
     } catch {
       report("本机内容已清除，服务端会话撤销未确认；服务器告警继续运行");
     }
+    signingOut.current = false;
+    if (token !== generation.current) return;
+    setBusy(false);
     setCsrf("");
     shell.clearCookies();
     navigate("/", { replace: true });
@@ -279,19 +299,37 @@ export default function MobileApp() {
                 if (busy) return;
                 setBusy(true);
                 setMessage("");
+                const token = ++generation.current,
+                  controller = new AbortController();
+                session.current?.abort();
+                session.current = controller;
                 try {
-                  const result = await api("/login", { password });
+                  const result = await api(
+                    "/login",
+                    { password },
+                    controller.signal,
+                  );
+                  if (token !== generation.current || controller.signal.aborted)
+                    return;
                   setCsrf(result.csrf);
                   setPassword("");
                   sessionAllowed.current = true;
-                  await allowSession(window.location.origin).catch(() =>
-                    report("本机登录状态未记住"),
-                  );
+                  await allowSession(
+                    window.location.origin,
+                    profileFor(window.location.origin, result.subject),
+                  ).catch(() => report("本机登录状态未记住"));
+                  if (token !== generation.current || controller.signal.aborted)
+                    return;
+                  setBusy(false);
                   await refresh();
                 } catch (error) {
-                  report(String(error));
+                  if (
+                    token === generation.current &&
+                    !controller.signal.aborted
+                  )
+                    report(String(error));
                 } finally {
-                  setBusy(false);
+                  if (!controller.signal.aborted) setBusy(false);
                 }
               }}
             >

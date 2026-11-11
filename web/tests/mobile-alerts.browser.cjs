@@ -98,6 +98,11 @@ const server=http.createServer(async(req,res)=>{
   await expect(edit).toBeVisible();
   page.once('dialog',d=>d.accept());await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
   await expect(edit).toHaveCount(0);await expect(page.getByRole('dialog',{name:'手机价格规则',exact:true})).toBeVisible();
+  rows[0].execution={...rows[0].execution,state:'monitoring',label:'后台最新监控状态',message:'后台刷新已接管'};
+  rows[0].count=1;
+  await page.evaluate(()=>document.dispatchEvent(new Event('visibilitychange')));
+  await expect(page.getByRole('dialog',{name:'手机价格规则',exact:true})).toContainText('后台最新监控状态');
+  await expect(page.getByRole('dialog',{name:'手机价格规则',exact:true})).toContainText('1/1 次');
   conflict=false;await page.getByRole('button',{name:'暂停',exact:true}).click();
   await expect(page.getByRole('button',{name:'恢复',exact:true})).toBeVisible();assert.equal(actions[0].version,1);assert.equal(actions[0].control_revision,1);
   await page.getByRole('button',{name:'关闭',exact:true}).click();
@@ -109,6 +114,6 @@ const server=http.createServer(async(req,res)=>{
   await page.evaluate(()=>document.documentElement.style.fontSize='150%');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:'/tmp/mw-android-personal-v205-alerts.png'});
   assert.deepEqual(errors,[]);
-  console.log(JSON.stringify({evidence:'built mobile UI with HTTP doubles',checks:['per-mode capabilities and actual frames','no workspace on create; revision bound','rapid submit fenced','unknown result reuses request ID/config','editing preserves old association','409 preserves input','back affects only top sheet','versioned lifecycle','execution preparing is not monitoring','notice close does not handle; explicit confirmation does','notice ID dedup across reload','single mobile IDB and 150% layout'],errors},null,2));
+  console.log(JSON.stringify({evidence:'built mobile UI with HTTP doubles',checks:['per-mode capabilities and actual frames','no workspace on create; revision bound','rapid submit fenced','unknown result reuses request ID/config','editing preserves old association','409 preserves input','back affects only top sheet','versioned lifecycle','execution preparing is not monitoring','open rule detail follows background refresh','notice close does not handle; explicit confirmation does','notice ID dedup across reload','single mobile IDB and 150% layout'],errors},null,2));
  }finally{await context.close();await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

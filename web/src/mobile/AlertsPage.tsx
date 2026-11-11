@@ -44,7 +44,7 @@ export default function AlertsPage({
     [healthAt, setHealthAt] = useState(0),
     [filter, setFilter] = useState("all"),
     [query, setQuery] = useState("");
-  const [selected, setSelected] = useState<AlertRow>(),
+  const [selection, setSelected] = useState<AlertRow>(),
     [judgments, setJudgments] = useState<any[]>([]);
   const [editor, setEditor] = useState<{
     config: AlertConfig;
@@ -149,6 +149,12 @@ export default function AlertsPage({
       document.removeEventListener("visibilitychange", visibility);
     };
   }, [visible, records, online, refresh]);
+  const rows = loaded ? data.rows : cached;
+  const selected =
+    selection && (rows.find((row) => row.id === selection.id) || selection);
+  const selectionMissing = Boolean(
+    selection && loaded && !rows.some((row) => row.id === selection.id),
+  );
   useEffect(() => {
     if (!selected || !online) return;
     const controller = new AbortController();
@@ -166,7 +172,6 @@ export default function AlertsPage({
       });
     return () => controller.abort();
   }, [selected?.id, online, report]);
-  const rows = loaded ? data.rows : cached;
   const loop = health?.chart_alerts?.loop;
   const verified = online && Boolean(healthAt) && Date.now() - healthAt < 45000;
   const workerKnown =
@@ -373,7 +378,7 @@ export default function AlertsPage({
           </p>
           <p>
             {selected.execution ? selected.execution.label : "执行状态待确认"}
-            {!workerKnown && " · 服务待确认"}
+            {(!workerKnown || readAt || selectionMissing) && " · 状态待确认"}
           </p>
           <p>{selected.execution?.message || selected.health_reason}</p>
           <dl className="mobile-facts">

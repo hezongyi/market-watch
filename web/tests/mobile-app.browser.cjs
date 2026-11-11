@@ -4,7 +4,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {chromium,expect}=require('@playwright/test');
 const dist=path.resolve('dist'),id='a'.repeat(64),ticker='MWC:'+id;
 const requests=[],errors=[],checks=[],consoleErrors=[];
-let logged=false,shellRevision=0,brokenInstall=false;
+let logged=false,shellRevision=0,brokenInstall=false,delayLogin=false,pendingLogin;
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
  if(url.pathname.startsWith('/api/')) {
@@ -12,7 +12,7 @@ const server=http.createServer(async(req,res)=>{
    const query=text?JSON.parse(text):{};requests.push({path:url.pathname,method:req.method});
    const json=(value,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(value));};
    if(url.pathname==='/api/session')return logged?json({csrf:'test-csrf',subject:'admin'}):json({detail:'未登录'},401);
-   if(url.pathname==='/api/login'){logged=true;return json({csrf:'test-csrf',subject:'admin'});}
+   if(url.pathname==='/api/login'){logged=true;if(delayLogin){pendingLogin=()=>json({csrf:'test-csrf',subject:'admin'});return;}return json({csrf:'test-csrf',subject:'admin'});}
    if(url.pathname==='/api/logout'){logged=false;return json({ok:true});}
    if(url.pathname==='/api/advanced-charts/preferences')return json([]);
    if(url.pathname==='/api/market-data/composites/'+id)return json({id,source:'composite',frames:['M1','M5','H1','D1'],status:'ready'});
@@ -110,6 +110,8 @@ const server=http.createServer(async(req,res)=>{
    checks.push('real native layout and RSI parameter restore from IDB');
    await page.evaluate(()=>navigator.serviceWorker.ready);
    await page.getByRole('link',{name:'数据',exact:true}).click();
+   await expect(page).toHaveURL(/\/m\/data$/);
+   await expect(page.getByRole('button',{name:/TEST-COMPOSITE/})).toBeVisible();
    await context.setOffline(true);await page.reload();
    await expect(page.getByRole('button',{name:/TEST-COMPOSITE/})).toBeVisible({timeout:15000});checks.push('SW offline cold navigation displays last IDB series snapshot');
    await context.setOffline(false);await page.reload();
@@ -138,6 +140,25 @@ const server=http.createServer(async(req,res)=>{
    await page.getByRole('button',{name:'退出登录',exact:true}).click();await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
    await context.setOffline(false);await page.reload();await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
    checks.push('offline logout clears cached profile and prevents automatic reuse of an unrevoked server cookie');
+   delayLogin=true;
+   await page.getByLabel('密码',{exact:true}).fill('cancelled-login');
+   await page.getByRole('button',{name:'登录',exact:true}).click();
+   await expect.poll(()=>Boolean(pendingLogin)).toBe(true);
+   const cancelledLogin=pendingLogin;pendingLogin=undefined;
+   await page.evaluate(()=>dispatchEvent(new Event('online')));
+   await expect(page.getByRole('button',{name:'登录',exact:true})).toBeEnabled();
+   cancelledLogin();await page.waitForTimeout(150);
+   await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
+   checks.push('foreground/online refresh cancels login without leaving submit disabled');
+   await page.getByLabel('密码',{exact:true}).fill('late-login');
+   await page.getByRole('button',{name:'登录',exact:true}).click();
+   await expect.poll(()=>Boolean(pendingLogin)).toBe(true);
+   await page.getByRole('button',{name:'换服务器',exact:true}).click();
+   await expect(page.getByRole('button',{name:'登录',exact:true})).toBeEnabled();
+   pendingLogin();await page.waitForTimeout(250);
+   await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
+   await page.reload();await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
+   checks.push('changing server aborts pending login; late success cannot restore session or clear logout marker');
    const forbidden=requests.filter(row=>row.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)/.test(row.path));
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    console.log(JSON.stringify({evidence:'browser with API test doubles; actual licensed widget; no device/backend acceptance',checks,errors,forbiddenWrites:forbidden},null,2));

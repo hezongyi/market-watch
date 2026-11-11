@@ -1,6 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
-import { readSnapshot, writeSnapshot, type Profile } from "./cache";
+import {
+  profileActive,
+  readSnapshot,
+  writeSnapshot,
+  type Profile,
+} from "./cache";
 import { seriesIdentity } from "./market";
 import {
   addSymbol,
@@ -245,6 +250,7 @@ export default function DataPage({
         baseline,
         addSymbol(content, row.ticker, targetGroup),
       );
+      if (!profileActive(profile)) return;
       setFavorites(allSymbols(watchContent(saved)));
       setGroups(watchContent(saved).lists);
       setAdded(true);

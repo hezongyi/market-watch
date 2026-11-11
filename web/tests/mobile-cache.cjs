@@ -40,9 +40,16 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/cache.ts','utf
   assert.equal(await notices.get('meta','admin:receipt'),undefined,'logout also clears notification receipts');notices.close();
   assert.equal(await cache.lastProfile(a.origin),undefined);
   assert.equal(await cache.locallySignedOut(a.origin),true,'offline logout blocks silent session reuse');
-  await cache.allowSession(a.origin);assert.equal(await cache.locallySignedOut(a.origin),false);
+  await assert.rejects(cache.writeSnapshot(a,'watchlists',{late:true}),'late response cannot recreate cleared cache');
+  await assert.rejects(cache.rememberProfile(a.origin,a.subject,a),'late session persistence cannot restore profile');
+  await assert.rejects(cache.allowSession(a.origin,a),'late login cannot clear logout tombstone');
+  const fresh=cache.profileFor(a.origin,a.subject);
+  await cache.writeSnapshot(fresh,'watchlists',{fresh:true});
+  await assert.rejects(cache.writeSnapshot(a,'watchlists',{late:true}),'old response stays fenced even after relogin');
+  assert.equal((await cache.readSnapshot(fresh,'watchlists')).value.fresh,true);
+  await cache.allowSession(a.origin,fresh);assert.equal(await cache.locallySignedOut(a.origin),false);
   assert.equal(await cache.readSnapshot(a,'recent-composites'),undefined);
   assert.equal(await cache.readSnapshot(other,'chart'),undefined);
   assert.equal((await cache.readSnapshot(b,'chart')).value.value,'other server','logout is scoped to selected server');
-  console.log('PASS mobile cache: identity/schema isolation, atomic failure, selective chart reset and origin logout');
+  console.log('PASS mobile cache: identity/schema isolation, atomic failure, selective chart reset origin logout and late-response generation fences');
 })().catch(error=>{console.error(error);process.exitCode=1;});

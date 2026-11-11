@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import {
   ChevronDown,
   Plus,
@@ -9,7 +16,12 @@ import {
 } from "lucide-react";
 import { api } from "../api";
 import type { MarketTransportState } from "../advanced/providerSubscriptions";
-import { readSnapshot, writeSnapshot, type Profile } from "./cache";
+import {
+  profileActive,
+  readSnapshot,
+  writeSnapshot,
+  type Profile,
+} from "./cache";
 import { type MobileMarket, seriesIdentity } from "./market";
 import { sparklineLoader, sparklinePaths, type Sparkline } from "./sparklines";
 import {
@@ -123,6 +135,8 @@ export default function WatchPage({
   const [transport, setTransport] = useState<MarketTransportState>();
   const [foreground, setForeground] = useState(!document.hidden),
     [visibleRows, setVisibleRows] = useState<string[]>([]);
+  const scrollPositions = useRef<Record<string, number>>({});
+  const scrollTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const list = useRef<HTMLDivElement>(null),
     epoch = useRef(0),
     quotesEpoch = useRef(0);
@@ -152,6 +166,7 @@ export default function WatchPage({
         ),
       );
       if (generation !== epoch.current || signal?.aborted) return;
+      if (!profileActive(profile)) return false;
       setPreference(row);
       setLoaded(true);
       setReadAt(undefined);
@@ -168,14 +183,16 @@ export default function WatchPage({
       readSnapshot<string>(profile, "watch-group"),
       readSnapshot<Record<string, Quote>>(profile, "watch-quotes"),
       readSnapshot<Record<string, Sparkline>>(profile, "watch-sparklines"),
+      readSnapshot<Record<string, number>>(profile, "watch-scroll"),
     ])
-      .then(([saved, selection, quote, spark]) => {
+      .then(([saved, selection, quote, spark, scroll]) => {
         if (!active) return;
         if (saved) {
           setPreference(saved.value || undefined);
           setLoaded(true);
           setReadAt(saved.readAt);
         }
+        scrollPositions.current = scroll?.value || {};
         setGroup(selection?.value || "");
         setQuotes(quote?.value || {});
         setSparks(
@@ -195,6 +212,22 @@ export default function WatchPage({
       ++epoch.current;
     };
   }, [profile.origin, profile.subject, report]);
+  useLayoutEffect(() => {
+    if (hydrated && loaded && visible && list.current)
+      list.current.scrollTop = scrollPositions.current[group] || 0;
+  }, [hydrated, loaded, visible, group, symbolsKey]);
+  useEffect(
+    () => () => {
+      clearTimeout(scrollTimer.current);
+      if (profileActive(profile))
+        void writeSnapshot(
+          profile,
+          "watch-scroll",
+          scrollPositions.current,
+        ).catch(() => {});
+    },
+    [profile],
+  );
   useEffect(() => {
     if (!hydrated || !online || !visible || !foreground || sheet) return;
     const controller = new AbortController();
@@ -290,6 +323,10 @@ export default function WatchPage({
         query: { ...seriesIdentity(ticker), timeframe: "M1", limit: 2 },
       }));
     const received = new Set<string>();
+    let ready = false,
+      openedAt: number | null = null,
+      snapshotEpoch = 0;
+    let snapshot: AbortController | undefined;
     const update = (rows: Quote[], streamed = false) => {
       if (generation !== quotesEpoch.current || controller.signal.aborted)
         return;
@@ -302,24 +339,49 @@ export default function WatchPage({
       }
       currentQuotes.current = next;
       setQuotes(next);
-      setAligned(
-        (previous) => new Set([...previous, ...rows.map((row) => row.n)]),
-      );
+      if (ready)
+        setAligned(
+          (previous) => new Set([...previous, ...rows.map((row) => row.n)]),
+        );
       void writeSnapshot(profile, "watch-quotes", next).catch(() => {});
     };
-    void api<Quote[]>(
-      "/market-data/quotes",
-      { symbols: visibleRows, client: connection.client },
-      controller.signal,
-    )
-      .then((rows) => update(rows))
-      .catch((error) => {
-        if (!controller.signal.aborted) report(String(error));
-      });
+    const loadSnapshot = () => {
+      snapshot?.abort();
+      const request = (snapshot = new AbortController()),
+        token = ++snapshotEpoch;
+      void api<Quote[]>(
+        "/market-data/quotes",
+        { symbols: visibleRows, client: connection.client },
+        request.signal,
+      )
+        .then((rows) => {
+          if (!request.signal.aborted && token === snapshotEpoch) update(rows);
+        })
+        .catch((error) => {
+          if (!request.signal.aborted && !controller.signal.aborted)
+            report(String(error));
+        });
+    };
+    loadSnapshot();
+    const stopObserving = connection.observe((state) => {
+      if (state.state !== "open") {
+        ready = false;
+        openedAt = null;
+        snapshot?.abort();
+        ++snapshotEpoch;
+        setAligned(new Set());
+      } else if (!ready || openedAt !== state.openedAt) {
+        ready = true;
+        openedAt = state.openedAt;
+        received.clear();
+        setAligned(new Set());
+        loadSnapshot();
+      }
+    });
     for (const args of subscriptions)
       void connection
         .subscribe(args, (event) => {
-          if (event.type !== "quotes") return;
+          if (event.type !== "quotes" || !ready) return;
           const ticker = visibleRows.find(
             (value) =>
               seriesIdentity(value).instrument === args.query.instrument &&
@@ -334,6 +396,8 @@ export default function WatchPage({
     return () => {
       ++quotesEpoch.current;
       controller.abort();
+      snapshot?.abort();
+      stopObserving();
       for (const args of subscriptions)
         void connection.unsubscribe(args).catch(() => {});
     };
@@ -427,6 +491,7 @@ export default function WatchPage({
     setUnsaved(true);
     try {
       const row = await saveWatchlists(api, preference, lists);
+      if (!profileActive(profile)) return false;
       setPreference(row);
       setDraft(undefined);
       setUnsaved(false);
@@ -491,7 +556,22 @@ export default function WatchPage({
           </button>
         </div>
       </header>
-      <div ref={list} className="mobile-watch-list">
+      <div
+        ref={list}
+        className="mobile-watch-list"
+        onScroll={(event) => {
+          if (!hydrated || !visible) return;
+          scrollPositions.current[group] = event.currentTarget.scrollTop;
+          clearTimeout(scrollTimer.current);
+          scrollTimer.current = setTimeout(() => {
+            void writeSnapshot(
+              profile,
+              "watch-scroll",
+              scrollPositions.current,
+            ).catch(() => {});
+          }, 150);
+        }}
+      >
         {!loaded ? (
           <p role="status">
             {loadError
@@ -522,6 +602,7 @@ export default function WatchPage({
             change = value?.chp;
           const stale =
             !online ||
+            transport?.state !== "open" ||
             !aligned.has(ticker) ||
             quote?.s !== "ok" ||
             (value?.fetch_status && value.fetch_status !== "ok");

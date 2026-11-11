@@ -29,3 +29,6 @@ advanced-host/charting_library_*/
 
 /web/dist
 .artifacts/
+
+# Task-local APK delivery; never commit binary candidates.
+/web/public/downloads/

@@ -5,7 +5,7 @@ const first='MWP:TEST',second='MWP:SECOND',third='MWP:THIRD';
 let remote={kind:'setting',name:'mw.watchlists.v1',tool:'',revision:3,content:{envelope:'keep',value:{active:'a',unknown:'keep',lists:[
   {id:'a',title:'第一组',symbols:[first],unknown:'keep-list'}, {id:'b',title:'第二组',symbols:[second]}
 ]}}},logged=false,conflict=false;
-const writes=[],clients=new Set(),streams=new Set(),errors=[];let maxStreams=0;
+const writes=[],clients=new Set(),streams=new Set(),errors=[];let maxStreams=0,holdQuotes=false;const pendingQuotes=[];
 const dist=path.resolve('dist');
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');let raw='';for await(const chunk of req)raw+=chunk;
@@ -25,7 +25,10 @@ const server=http.createServer(async(req,res)=>{
   return json({items:[{ticker:third,symbol:query==='new'?'NEW-RESULT':'THIRD',description:'真实身份测试 · 平台 · 测试来源'}],next_offset:null});
  }
  if(url.pathname==='/api/market-data/resolve')return json({id:body.instrument,source:'binance',basis:'last',frames:['M1','M5','H1'],precision:2});
- if(url.pathname==='/api/market-data/quotes')return json(body.symbols.map(n=>({n,s:'ok',v:{short_name:n.slice(4),description:'测试名称 · 平台 · 测试来源',lp:123.45,chp:1.2,fetch_status:'ok'}})));
+ if(url.pathname==='/api/market-data/quotes'){
+  const reply=()=>json(body.symbols.map(n=>({n,s:'ok',v:{short_name:n.slice(4),description:'测试名称 · 平台 · 测试来源',lp:123.45,chp:1.2,fetch_status:'ok'}})));
+  if(holdQuotes){pendingQuotes.push(reply);return;}return reply();
+ }
  if(url.pathname==='/api/market-data/sparklines'){
   const left=Math.floor(Date.now()/86400000)*86400000;
   return json({as_of:Date.now(),items:body.items.map(item=>({ticker:item.ticker,revision:null,window_start:left,window_end:left+86400000,timeframe:'M1',
@@ -58,6 +61,14 @@ const server=http.createServer(async(req,res)=>{
   await expect(page.locator('.mobile-sse')).toContainText('SSE 已连接');
   await expect(page.locator('.mobile-sse')).toContainText('最近通信');
   await expect.poll(()=>page.locator('.mobile-spark path[stroke]').count()).toBe(4);
+  await expect(page.locator('.mobile-watch-row.stale')).toHaveCount(0);
+  holdQuotes=true;for(const response of streams)response.end();
+  await expect(page.locator('.mobile-watch-row.stale')).toHaveCount(2);
+  await expect(page.locator('.mobile-sse')).toContainText('SSE 已连接',{timeout:10000});
+  await expect.poll(()=>pendingQuotes.length).toBeGreaterThan(0);
+  await expect(page.locator('.mobile-watch-row.stale')).toHaveCount(2);
+  holdQuotes=false;for(const reply of pendingQuotes.splice(0))reply();
+  await expect(page.locator('.mobile-watch-row.stale')).toHaveCount(0);
   for(const width of [375,412]){
    await page.setViewportSize({width,height:915});await page.evaluate(()=>document.documentElement.style.fontSize='150%');
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'large watch text overflow');
@@ -98,8 +109,19 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('link',{name:'自选',exact:true}).click();
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('button',{name:'全部自选',exact:true}).click();
   await expect(page.locator('.mobile-watch-row')).toHaveCount(3);
-  assert.equal(clients.size,1,'one application market client');assert.equal(maxStreams,1,'only one SSE channel');
+  const clientCountBeforeReload=clients.size;
+  remote.content.value.lists[0].symbols.push(...Array.from({length:30},(_,i)=>'MWP:SCROLL'+i));remote.revision++;
+  await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-watchlists-changed')));
+  await expect(page.locator('.mobile-watch-row')).toHaveCount(33);
+  await page.locator('.mobile-watch-list').evaluate(el=>{el.scrollTop=700;});
+  await expect.poll(()=>page.evaluate(async()=>{
+    const db=await new Promise(resolve=>{const r=indexedDB.open('mw-mobile');r.onsuccess=()=>resolve(r.result);});
+    return new Promise(resolve=>{const r=db.transaction('records').objectStore('records').get([location.origin,'admin',1,'watch-scroll']);r.onsuccess=()=>{db.close();resolve(r.result?.value?.['']||0);};});
+  })).toBe(700);
+  await page.reload();await expect(page.locator('.mobile-watch-row')).toHaveCount(33);
+  await expect.poll(()=>page.locator('.mobile-watch-list').evaluate(el=>el.scrollTop)).toBe(700);
+  assert.equal(clientCountBeforeReload,1,'one application market client');assert.equal(maxStreams,1,'only one SSE channel');
   assert.deepEqual(errors,[]);
-  console.log(JSON.stringify({evidence:'built mobile UI with API doubles',checks:['real transport heartbeat status','visible quote/spark rows and gaps','375/412 at 150% font','phone group selection isolated','latest desktop active and unknown fields retained','409 keeps input','late search discarded','actual supported periods shown','favorite add and shared refresh','one market client/SSE'],errors},null,2));
+  console.log(JSON.stringify({evidence:'built mobile UI with API doubles',checks:['real transport heartbeat status','SSE drop grays rows until new connection snapshot aligns','scroll restored after reload','visible quote/spark rows and gaps','375/412 at 150% font','phone group selection isolated','latest desktop active and unknown fields retained','409 keeps input','late search discarded','actual supported periods shown','favorite add and shared refresh','one market client/SSE'],errors},null,2));
  }finally{for(const response of streams)response.end();await context.close();await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});
