@@ -86,6 +86,22 @@ PG 127.0.0.1:25473，独立库及 volume，无开发库写入。PG 上限 1 CPU 
 
 ## 交付边界
 
+### CI 跟进修复
+
+首次完整 CI（run 43040422283）后端为 3816 passed、3 skipped、1 failed：
+回退测试仍假定纯观测时间刷新要等待发布 worker，与本次原子刷新行为不符。
+改用真实成交量修订触发待发布内容，继续验证分页回退准备不改变可见快照、
+旧 worker 协议能恢复快照以及修订后的成交量和观测时间。
+
+Web 与 Compose 则在安装系统依赖时遇到 azure.archive.ubuntu.com DNS 失败，
+没有执行到对应浏览器/BusyBox 测试。工作流复用 Ubuntu hosted runner 自带的
+Chromium 运行库和 BusyBox，保留浏览器下载、全部 DOM 回归与两种 shell 的备份测试；
+缺少 BusyBox 时仍安装。此次跟进仅调整测试和 CI，按 P0 验证，不改变运行代码或 schema。
+
+本地验证：关联后端/CI 分类测试 32 passed、18 subtests passed；备份测试原生 shell
+及 BusyBox 各 112 passed、0 failed；watchlist DOM 回归通过；Ruff 和 diff check 通过。
+远端最终结果以 PR 最新提交的完整检查为准。
+
 开发实例已更新；[Draft PR #132](https://github.com/hezongyi/market-watch/pull/132)
 承载代码与证据，GitHub CI 已触发，最终结果以 PR 检查为准。
 未合并 main、未创建正式 Git/Docker tag、未部署生产。

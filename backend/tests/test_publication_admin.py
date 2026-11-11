@@ -1,5 +1,7 @@
 """Rollback preparations expose dirty observations to the previous worker protocol."""
 
+from decimal import Decimal
+
 from alerts import managed_dataset as managed
 from alerts import market, storage
 from test_publication_scheduler import MINUTE, START
@@ -23,7 +25,10 @@ def test_rollback_prepares_restartable_old_bucket_jobs_without_changing_snapshot
     now += 1000
     with database.begin() as db:
         market.ingest(db, db.get(storage.Instrument, 'BTCUSDT'), {'rows': [
-            dict(timestamp=START + MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
+            dict(timestamp=START + MINUTE, open=10, high=11, low=9, close=10,
+                 volume=5)]}, received_at=now)
+        # A real content correction remains queued. Pure observation freshness
+        # now commits atomically with ingestion and needs no rollback repair.
         # Simulate loss of newer request metadata, which the previous binary
         # doesn't understand. Preparation must recover from actual snapshots.
         db.query(storage.ChartPublicationJob).delete()
@@ -43,7 +48,9 @@ def test_rollback_prepares_restartable_old_bucket_jobs_without_changing_snapshot
         pub = db.get(storage.ChartPublication, (inst.id, 'M1'))
         result = managed.publish_corrections(db, inst, pub, 'M1', pub.start, pub.end, [], now)
         assert result.snapshot_changed
-        assert managed.read_rows(db, inst, 'M1', now, 100)[1]['observed_at'] == now
+        repaired = managed.read_rows(db, inst, 'M1', now, 100)[1]
+        assert repaired['observed_at'] == now
+        assert Decimal(repaired['volume']) == Decimal(5)
 
 
 def test_rollback_invalidates_every_coverage_identity_including_unpublished(database, monkeypatch):

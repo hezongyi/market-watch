@@ -248,7 +248,9 @@ jobs:
       - name: Watchlist native DOM regressions
         working-directory: web
         run: |
-          npx playwright install --with-deps chromium
+          # Hosted Ubuntu already includes Chromium runtime libraries. Avoid
+          # reinstalling fonts/system packages through the runner's apt mirror.
+          npx playwright install chromium
           node tests/saved-layout-startup.browser.cjs
           node tests/chart-stream-shared.browser.cjs
           node tests/advanced-watchlist-layout.browser.cjs
@@ -318,7 +320,11 @@ jobs:
       - name: Backup rotation regressions
         run: |
           sh deploy/tests/test_unraid_backup_rotation.sh
-          sudo apt-get update && sudo apt-get install -y busybox
+          # ubuntu-24.04 includes busybox-static; retain installation only for
+          # runners that lack it, without replacing an existing working binary.
+          if ! command -v busybox >/dev/null 2>&1; then
+            sudo apt-get update && sudo apt-get install -y busybox
+          fi
           TEST_SHELL="busybox sh" sh deploy/tests/test_unraid_backup_rotation.sh
 
   required:
