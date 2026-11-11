@@ -1,0 +1,434 @@
+{
+  "checks": [
+    "initial summary floats",
+    "dismiss floats",
+    "dismiss retains outstanding count",
+    "navigation does not redisplay notice",
+    "NY17 boundaries stay 17 local",
+    "NY17 DST 23/25 hour windows",
+    "London and NY DST independently",
+    "future blank and no labels morning",
+    "marker scope morning",
+    "future blank and no labels europe",
+    "marker scope europe",
+    "future blank and no labels america",
+    "marker scope america",
+    "no data does not show previous day",
+    "time moves right without resizing window",
+    "gap remains disconnected",
+    "healthy SSE independent of stale quotes",
+    "layout 375 14 dark {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":135.421875,\"controls\":true,\"chartRow\":true}",
+    "layout 375 14 light {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":135.421875,\"controls\":true,\"chartRow\":true}",
+    "layout 375 21 dark {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":83.40625,\"controls\":true,\"chartRow\":true}",
+    "layout 375 21 light {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":83.40625,\"controls\":true,\"chartRow\":true}",
+    "layout 412 14 dark {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":172.421875,\"controls\":true,\"chartRow\":true}",
+    "layout 412 14 light {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":172.421875,\"controls\":true,\"chartRow\":true}",
+    "layout 412 21 dark {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":120.40625,\"controls\":true,\"chartRow\":true}",
+    "layout 412 21 light {\"overflow\":false,\"center\":0.0078125,\"aligned\":true,\"width\":120.40625,\"controls\":true,\"chartRow\":true}",
+    "notice routes to needs attention",
+    "view does not repeat notice",
+    "removed footer and summary"
+  ],
+  "windows": [
+    {
+      "start": 1768428000000,
+      "end": 1768514400000,
+      "date": "2026-01-15T12:00:00Z",
+      "hours": 24,
+      "localStart": {
+        "year": 2026,
+        "month": 1,
+        "day": 14,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      },
+      "localEnd": {
+        "year": 2026,
+        "month": 1,
+        "day": 15,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      }
+    },
+    {
+      "start": 1784062800000,
+      "end": 1784149200000,
+      "date": "2026-07-15T12:00:00Z",
+      "hours": 24,
+      "localStart": {
+        "year": 2026,
+        "month": 7,
+        "day": 14,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      },
+      "localEnd": {
+        "year": 2026,
+        "month": 7,
+        "day": 15,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      }
+    },
+    {
+      "start": 1772920800000,
+      "end": 1773003600000,
+      "date": "2026-03-08T12:00:00Z",
+      "hours": 23,
+      "localStart": {
+        "year": 2026,
+        "month": 3,
+        "day": 7,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      },
+      "localEnd": {
+        "year": 2026,
+        "month": 3,
+        "day": 8,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      }
+    },
+    {
+      "start": 1793480400000,
+      "end": 1793570400000,
+      "date": "2026-11-01T12:00:00Z",
+      "hours": 25,
+      "localStart": {
+        "year": 2026,
+        "month": 10,
+        "day": 31,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      },
+      "localEnd": {
+        "year": 2026,
+        "month": 11,
+        "day": 1,
+        "hour": 17,
+        "minute": 0,
+        "second": 0
+      }
+    }
+  ],
+  "markers": [
+    [
+      [
+        "Europe/London",
+        8
+      ],
+      [
+        "America/New_York",
+        13
+      ]
+    ],
+    [
+      [
+        "Europe/London",
+        8
+      ],
+      [
+        "America/New_York",
+        12
+      ]
+    ],
+    [
+      [
+        "Europe/London",
+        7
+      ],
+      [
+        "America/New_York",
+        12
+      ]
+    ]
+  ],
+  "progress": [
+    {
+      "time": "morning",
+      "rows": [
+        {
+          "id": "gold",
+          "rule": "NY17",
+          "f": 0.15356481481481482,
+          "last": 1794361268000,
+          "now": 1794361268000,
+          "labels": 0,
+          "markers": 2,
+          "lines": 1
+        },
+        {
+          "id": "eur",
+          "rule": "NY17",
+          "f": 0.15356481481481482,
+          "last": 1794361268000,
+          "now": 1794361268000,
+          "labels": 0,
+          "markers": 2,
+          "lines": 1
+        },
+        {
+          "id": "btc",
+          "rule": "UTC0",
+          "f": 0.07023148148148148,
+          "last": 1794361268000,
+          "now": 1794361268000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "silver",
+          "rule": "UTC0",
+          "f": 0.07023148148148148,
+          "last": 1794361268000,
+          "now": 1794361268000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "nasdaq",
+          "rule": "UTC0",
+          "f": 0.07023148148148148,
+          "last": 0,
+          "now": 1794361268000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 0
+        },
+        {
+          "id": "cn",
+          "rule": "UTC0",
+          "f": 0.07023148148148148,
+          "last": 1794361268000,
+          "now": 1794361268000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        }
+      ]
+    },
+    {
+      "time": "europe",
+      "rows": [
+        {
+          "id": "gold",
+          "rule": "NY17",
+          "f": 0.48689814814814814,
+          "last": 1794390068000,
+          "now": 1794390068000,
+          "labels": 0,
+          "markers": 2,
+          "lines": 1
+        },
+        {
+          "id": "eur",
+          "rule": "NY17",
+          "f": 0.48689814814814814,
+          "last": 1794390068000,
+          "now": 1794390068000,
+          "labels": 0,
+          "markers": 2,
+          "lines": 1
+        },
+        {
+          "id": "btc",
+          "rule": "UTC0",
+          "f": 0.4035648148148148,
+          "last": 1794390068000,
+          "now": 1794390068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "silver",
+          "rule": "UTC0",
+          "f": 0.4035648148148148,
+          "last": 1794390068000,
+          "now": 1794390068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "nasdaq",
+          "rule": "UTC0",
+          "f": 0.4035648148148148,
+          "last": 0,
+          "now": 1794390068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 0
+        },
+        {
+          "id": "cn",
+          "rule": "UTC0",
+          "f": 0.4035648148148148,
+          "last": 1794380400000,
+          "now": 1794390068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 2
+        }
+      ]
+    },
+    {
+      "time": "america",
+      "rows": [
+        {
+          "id": "gold",
+          "rule": "NY17",
+          "f": 0.6952314814814815,
+          "last": 1794408068000,
+          "now": 1794408068000,
+          "labels": 0,
+          "markers": 2,
+          "lines": 1
+        },
+        {
+          "id": "eur",
+          "rule": "NY17",
+          "f": 0.6952314814814815,
+          "last": 1794408068000,
+          "now": 1794408068000,
+          "labels": 0,
+          "markers": 2,
+          "lines": 1
+        },
+        {
+          "id": "btc",
+          "rule": "UTC0",
+          "f": 0.6118981481481481,
+          "last": 1794408068000,
+          "now": 1794408068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "silver",
+          "rule": "UTC0",
+          "f": 0.6118981481481481,
+          "last": 1794408068000,
+          "now": 1794408068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "nasdaq",
+          "rule": "UTC0",
+          "f": 0.6118981481481481,
+          "last": 1794408068000,
+          "now": 1794408068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 1
+        },
+        {
+          "id": "cn",
+          "rule": "UTC0",
+          "f": 0.6118981481481481,
+          "last": 1794380400000,
+          "now": 1794408068000,
+          "labels": 0,
+          "markers": 0,
+          "lines": 2
+        }
+      ]
+    }
+  ],
+  "layouts": [
+    {
+      "width": 135.421875,
+      "font": 14,
+      "theme": "dark",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 135.421875,
+      "font": 14,
+      "theme": "light",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 83.40625,
+      "font": 21,
+      "theme": "dark",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 83.40625,
+      "font": 21,
+      "theme": "light",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 172.421875,
+      "font": 14,
+      "theme": "dark",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 172.421875,
+      "font": 14,
+      "theme": "light",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 120.40625,
+      "font": 21,
+      "theme": "dark",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    },
+    {
+      "width": 120.40625,
+      "font": 21,
+      "theme": "light",
+      "overflow": false,
+      "center": 0.0078125,
+      "aligned": true,
+      "controls": true,
+      "chartRow": true
+    }
+  ],
+  "errors": []
+}
