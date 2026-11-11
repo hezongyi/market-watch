@@ -22,3 +22,9 @@
 这不是单独放宽超时：禁用业务锁限制会让新测试失败。临时延迟/SQL 突变只在外部诊断脚本中使用，未加入产品或仓库测试。
 
 最终回归：`test_provider_postgres.py` + `test_provider_cache.py`，**52 passed / 0 skipped**（72.31s）；Ruff 与 `git diff --check` 通过。临时诊断 instrumentation 未进入源码。PR CI 推送后重跑，结果以 GitHub 对该提交的检查为准。
+
+## 完整 CI 作业预算
+
+提交 `cde694de` 的 [43000737600](https://github.com/hezongyi/market-watch/actions/runs/43000737600) 中 Android/Web/Compose 全部通过。后端测试从 10:07:34 持续执行至 10:36:08 的 96%，此前没有 `F`/失败标记；10:36:35 被作业取消。GitHub annotation 明确为 `The job has exceeded the maximum execution time of 30m0s`。原锁竞争场景位于已完成区段；此轮不能计作全量通过。
+
+上轮完整 Python suite 已耗时 1540.77s（25m40s），本轮 runner 下接近 29 分钟仍在正常前进，另有约一分钟依赖/工具准备。30 分钟总作业预算缺少余量。仅将 backend job 总时限改为 45 分钟，保留所有测试、单请求 deadline、锁竞争短预算及 SQLSTATE 断言，不重试或跳过失败测试。最新完整 CI 随提交重跑，结果以对应 GitHub 检查为准。

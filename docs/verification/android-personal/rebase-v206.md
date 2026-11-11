@@ -17,3 +17,5 @@ PR 保持 Draft，base ref 为 main（GitHub PR base 需为分支；当次 main 
 隔离实例更新与 PR CI 结果随后记录；在更新前，历史候选部署记录不代表新后端已经部署。
 
 后端 CI 的唯一超时已按 [锁竞争诊断](ci-provider-contention.md) 修正测试边界并强化 SQLSTATE 断言；本地真实 PostgreSQL/缓存回归 52 passed，等待最新 CI。
+
+隔离实例现已运行 v2.0.6 API digest `sha256:4ddcbbd552f700d7785692afdcce1b2a696a3f10600e023c432ee420dac97a35`。本机 CA 校验 HTTPS readyz、手机入口、APK 下载通过；实际登录/CSRF、许可 widget 的 61 根固定 D1 合成柱、原生指标窗口、返回和退出 smoke 通过，page errors 0。18445 仍是本任务地址，未启用供应商/ntfy，真机门槛仍待验。
