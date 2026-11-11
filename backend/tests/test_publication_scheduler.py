@@ -195,6 +195,19 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
             dict(timestamp=START + 59 * MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
     observed = now
     now += 10000  # Delay the worker; calculation time cannot invent freshness.
+    coverage_reads = []
+    engine = database.kw['bind']
+    def record(conn, cursor, statement, parameters, context, many):
+        if 'FROM market_data_coverage' in statement or 'FROM audit' in statement:
+            coverage_reads.append(statement)
+    event.listen(engine, 'before_cursor_execute', record)
+    try:
+        with database.begin() as db:
+            market.aggregate_touched(db, db.get(Instrument, 'BTCUSDT'),
+                {storage.instant(START + 59*MINUTE)}, received_at=now,
+                timeframes=('H1',), kind='observed')
+    finally:
+        event.remove(engine, 'before_cursor_execute', record)
     for _ in range(40):
         aggregate_once()
         managed.publish_once()
@@ -206,6 +219,7 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
             k: v for k, v in before.items() if k != 'observed_at'}
         assert db.scalar(select(storage.Bar.revision).where(
             storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1')) == revision
+    assert not coverage_reads, 'An unchanged completed hour must not reload coverage history'
 
 
 def test_restart_catches_up_more_than_one_source_page_without_further_input(database, monkeypatch):

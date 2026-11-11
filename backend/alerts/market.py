@@ -337,10 +337,17 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
         return
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     received_at = received_at or now_ms()
+    remaining = {frame: touched for frame in timeframes}
+    if kind == 'observed':
+        from .aggregate_observation import refresh
+        remaining = {frame: refresh(db, instrument, touched, frame) for frame in timeframes}
+        timeframes = tuple(frame for frame in timeframes if remaining[frame])
+        if not timeframes:
+            return True
     closures = closures_from(instrument.calendar_profile)
     calendar = calendar_for(instrument)
-    earliest = min(ms(bucket_bounds(min(touched), frame, calendar)[0]) for frame in timeframes)
-    latest_boundary = max(ms(bucket_bounds(max(touched), frame, calendar)[1]) for frame in timeframes)
+    earliest = min(ms(bucket_bounds(min(remaining[frame]), frame, calendar)[0]) for frame in timeframes)
+    latest_boundary = max(ms(bucket_bounds(max(remaining[frame]), frame, calendar)[1]) for frame in timeframes)
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
     # Read each touched day once rather than issuing one query per aggregate bar.
     minute_rows = db.scalars(
@@ -357,8 +364,9 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     if current():
         current().consume(len(minute_rows))
     calendar = calendar_for(instrument)
+    blocked = False
     for timeframe in timeframes:
-        bounds = {bucket_bounds(t, timeframe, calendar) for t in touched}
+        bounds = {bucket_bounds(t, timeframe, calendar) for t in remaining[timeframe]}
         grouped = {}
         for row in minute_rows:
             pair = bucket_bounds(instant(row.start), timeframe, calendar)
@@ -403,9 +411,10 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
             if db.scalar(select(ChartAggregationJob.id).where(
                     ChartAggregationJob.instrument_id == instrument.id,
                     ChartAggregationJob.timeframe == timeframe,
-                    ChartAggregationJob.kind == "price",
+                    ChartAggregationJob.kind.in_(("price", "volume") if kind == 'observed' else ("price",)),
                     ChartAggregationJob.start < latest_boundary,
                     ChartAggregationJob.end > earliest).limit(1)):
+                blocked = True
                 continue
         if kind == 'observed':
             for candle in outputs:
@@ -416,6 +425,7 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
         else:
             write_bars(db, instrument.id, timeframe, outputs, observed_at=received_at,
                        volume_only=kind == "volume", authoritative_volume=True)
+    return not blocked
 
 
 

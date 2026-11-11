@@ -1,0 +1,30 @@
+name: mw-cpu-20261111
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_USER: cpu_acceptance
+      POSTGRES_DB: cpu_acceptance
+      POSTGRES_PASSWORD: ${CPU_POSTGRES_PASSWORD:?private env required}
+    command: [postgres, -c, shared_buffers=64MB, -c, max_connections=64, -c, max_wal_size=128MB]
+    ports: ['127.0.0.1:25471:5432']
+    volumes: ['postgres-data:/var/lib/postgresql/data']
+    mem_limit: 1g
+    cpus: 1
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U cpu_acceptance -d cpu_acceptance']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    networks: [acceptance]
+volumes:
+  postgres-data:
+    # Task-owned ephemeral test volume: conserve scarce host disk. Data is
+    # retained while mounted, not across a complete stop/unmount of all users.
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m
+networks:
+  acceptance: {}

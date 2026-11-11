@@ -16,6 +16,29 @@ from test_publication_scheduler import MINUTE, START
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
 
 
+def test_pg_observed_rolling_windows_keep_all_minutes(publication_pg):
+    from test_chart_aggregation import (
+        test_unchanged_rolling_minutes_coalesce_without_losing_new_edge,
+    )
+    test_unchanged_rolling_minutes_coalesce_without_losing_new_edge(publication_pg[0])
+
+
+def test_pg_observed_input_waits_for_content_repair(publication_pg, monkeypatch):
+    from test_observation_aggregation import (
+        test_observation_waits_for_same_bucket_content_repair_without_losing_request,
+    )
+    test_observation_waits_for_same_bucket_content_repair_without_losing_request(
+        publication_pg[0], monkeypatch)
+
+
+def test_pg_observation_refresh_preserves_published_content(publication_pg, monkeypatch):
+    from test_publication_scheduler import (
+        test_same_price_minute_observation_refreshes_matching_hour_without_price_revision,
+    )
+    test_same_price_minute_observation_refreshes_matching_hour_without_price_revision(
+        publication_pg[0], monkeypatch)
+
+
 def test_pg_service_order_survives_different_history_and_clock_rollback(publication_pg, monkeypatch):
     from test_publication_scheduler import (
         test_service_order_survives_different_history_and_clock_rollback,

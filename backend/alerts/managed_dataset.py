@@ -552,6 +552,7 @@ def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
     # history permits fewer candles, but does not invent indicator history.
     indicator_ready = count >= ceil(width / spacing) + lookback if lookback else True
     ready = bool(pub and count and (count >= threshold or pub.initialized) and indicator_ready)
+    from .coverage_projection import maintenance_status
     return dict(
         instrument=inst.id,
         timeframe=frame,
@@ -570,6 +571,7 @@ def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
         threshold=threshold,
         ready=ready,
         initialized=bool(pub and pub.initialized),
+        coverage_projection=maintenance_status(db, inst),
         indicator_ready=indicator_ready,
         reason=(
             "ready"

@@ -115,6 +115,17 @@ def read(db, inst, left, right):
         MarketCoverageProjection.end > left).order_by(MarketCoverageProjection.start))]
 
 
+def maintenance_status(db, inst):
+    """Read-only diagnostic; never promote a checkpoint or run verification."""
+    from .config import settings
+    state = db.get(MarketCoverageCheckpoint, (inst.id, inst.source, inst.basis))
+    complete = bool(state and state.complete)
+    phase = state.phase if state else 'unstarted'
+    return dict(enabled=settings.coverage_projection_enabled, complete=complete, phase=phase,
+                maintenance_required=bool(settings.coverage_projection_enabled
+                                          and phase == 'verify' and not complete))
+
+
 def _structured(db, inst):
     return select(MarketCoverage).where(*_where(MarketCoverage, inst))
 
