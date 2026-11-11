@@ -83,15 +83,19 @@ def test_same_price_new_observation_wakes_only_its_persisted_snapshot(database, 
     now += 1000
     with database.begin() as db:
         market.ingest(db, db.get(Instrument, 'BTCUSDT'), {'rows': rows[-1:]}, received_at=now)
-    progressed = False
+    # Freshness is now copied atomically by ingestion; the worker must not
+    # manufacture a content revision just to announce that observation.
+    with database.begin() as db:
+        revision = db.get(storage.ChartPublication, ('BTCUSDT', 'M1')).revision
     for _ in managed.FRAMES:
-        result = managed.publish_once()
-        progressed |= result.snapshot_changed
+        managed.publish_once()
         with database.begin() as db:
             visible = read_rows(db, db.get(Instrument, 'BTCUSDT'), 'M1', now, 1)[0]
         if visible['observed_at'] == now:
             break
-    assert progressed and visible['observed_at'] == now
+    assert visible['observed_at'] == now
+    with database.begin() as db:
+        assert db.get(storage.ChartPublication, ('BTCUSDT', 'M1')).revision == revision
     assert float(visible['close']) == 10
 
 

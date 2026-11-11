@@ -65,6 +65,18 @@ def query(name="EMA", period=None):
     )
 
 
+def test_cached_indicator_does_not_freeze_visible_observation_time(database):
+    seed(database, count=30)
+    first = data(query('EMA', 3))
+    with database.begin() as db:
+        row = db.get(ChartPublishedBar, ('BTCUSDT', 'M1', first['bars'][-1]['start']))
+        row.payload = {**row.payload, 'observed_at': 1234567}
+    second = data(query('EMA', 3))
+    assert second['bars'][-1]['observed_at'] == 1234567
+    execution = second['indicators'][0]['calculation']['execution']
+    assert execution['input_cache'] == 'hit' and execution['calculation_steps'] == 0
+
+
 @pytest.mark.parametrize(
     "name",
     [

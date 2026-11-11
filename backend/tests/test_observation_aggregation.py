@@ -280,6 +280,10 @@ def test_day_observation_refreshes_derived_calendar_snapshot(database, monkeypat
     with database.begin() as db:
         inst = db.get(Instrument, 'BTCUSDT')
         before = managed.read_rows(db, inst, frame, target+day, 1)[0]
+        revisions = {(row.timeframe, row.start): row.revision for row in
+                     db.scalars(select(storage.ChartPublishedBar).where(
+                         storage.ChartPublishedBar.timeframe.in_(('D1', 'W1', 'MN'))))}
+        assert {key[0] for key in revisions} == {'D1', 'W1', 'MN'}
     now += 1000
     with database.begin() as db:
         write_bars(db, 'BTCUSDT', 'M1', minutes, observed_at=now)
@@ -292,3 +296,6 @@ def test_day_observation_refreshes_derived_calendar_snapshot(database, monkeypat
         assert after['observed_at'] == now
         assert {k: v for k, v in after.items() if k != 'observed_at'} == {
             k: v for k, v in before.items() if k != 'observed_at'}
+        assert {(row.timeframe, row.start): row.revision for row in
+                db.scalars(select(storage.ChartPublishedBar).where(
+                    storage.ChartPublishedBar.timeframe.in_(('D1', 'W1', 'MN'))))} == revisions

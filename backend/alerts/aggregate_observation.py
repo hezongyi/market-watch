@@ -52,7 +52,12 @@ def refresh(db, instrument, touched, frame, rows):
         remaining.difference_update(buckets[(target.start, target.end)])
     if changed:
         from .publication_jobs import enqueue_publication
+        from .publication_observation import refresh
         from .publication_schedule import request, source_frames
-        enqueue_publication(db, instrument.id, frame, changed)
-        request(db, instrument.id, frames=source_frames(frame))
+        pending = refresh(db, instrument.id, frame, changed)
+        if frame in ('M15', 'D1'):
+            pending |= changed
+        if pending:
+            enqueue_publication(db, instrument.id, frame, pending)
+            request(db, instrument.id, frames=source_frames(frame))
     return remaining

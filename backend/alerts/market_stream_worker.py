@@ -108,6 +108,15 @@ class Calculator:
             publication = db.get(ChartPublication, (ident, query.timeframe))
             facts = [publication.start, publication.end, publication.revision,
                      publication.initialized, publication.complete_count] if publication else None
+            if publication:
+                from .storage import ChartPublishedBar
+                tail = db.scalar(select(ChartPublishedBar.payload).where(
+                    ChartPublishedBar.instrument_id == ident,
+                    ChartPublishedBar.timeframe == query.timeframe,
+                    ChartPublishedBar.start >= publication.start,
+                    ChartPublishedBar.start < publication.end,
+                ).order_by(ChartPublishedBar.start.desc()).limit(1))
+                facts.append(tail.get('observed_at') if tail else None)
         else:
             facts = list(db.execute(select(func.count(Bar.id), func.max(Bar.received_at),
                 func.sum(Bar.revision + Bar.volume_revision)).where(Bar.instrument_id == ident)).one())

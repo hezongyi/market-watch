@@ -7,7 +7,7 @@ active revision, alert bindings and published charts are only read.
 
 Report schema (`baseline-shadow-v1`):
 
-* `status` / `ready` / `reasons` -- ready, not_ready or failed; each reason carries a
+* `status` / `ready` / `reasons` -- ready, unchanged, not_ready or failed; each reason carries a
   stable `code` and a short `detail`.
 * `run` -- the persisted switch run this report is written to.
 * `history_version` -- candidate and active fixed history versions.
@@ -175,6 +175,9 @@ def candidate_plan(db, composite_id):
                                    "最新历史未覆盖30天实时窗口，需更新历史基线")}
     chosen = {**chosen, "mapping_id": reviewed[0]["id"]}
     return {
+        "already_active": (active.history_version_id == chosen["version_id"]
+                           and active.mapping_id == chosen["mapping_id"]
+                           and active.seam == chosen["recommended_seam"]),
         "active_revision_id": active.id,
         "active_history_version_id": active.history_version_id,
         "active_seam": active.seam,
@@ -526,6 +529,12 @@ def shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budge
             return _finish(report, before, composite_id, record, plan)
         with transaction() as db:
             report["revision"] = _revision_snapshot(db, composite_id, plan)
+        if plan.get("already_active"):
+            report["status"] = "unchanged"
+            report["revision"]["candidate_revision_id"] = plan["active_revision_id"]
+            # A completed no-op window is not an activation verdict or a
+            # successful activation run, and cannot unlock retention.
+            return _finish(report, before, composite_id, record, None)
         candidate_id = create_candidate(composite_id, plan)
         switch_runs.record_target(record["id"], candidate_id,
                                   previous_revision_id=plan["active_revision_id"])
@@ -566,7 +575,7 @@ def _finish(report, before, composite_id, record, candidate_id):
     report["finished_at"] = now_ms()
     if record is not None and record.get("state") not in LIVE_STATES:
         record = switch_runs.record_shadow(record["id"], report)
-        if report["status"] != "ready":
+        if report["status"] not in ("ready", "unchanged"):
             record = switch_runs.set_state(record["id"], "failed", phase="shadow_" + report["status"],
                                   error_summary={"status": report["status"],
                                                  "candidate_revision_id": candidate_id,

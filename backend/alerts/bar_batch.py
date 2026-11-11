@@ -92,14 +92,22 @@ def write_bars(db, instrument_id, timeframe, candles, *, observed_at=None,
         for row in old.values():
             db.expire(row)
     from .publication_jobs import enqueue_publication
-    enqueue_publication(db, instrument_id, timeframe, changes.price | changes.volume | changes.observation)
+    from .publication_observation import refresh
+    observed_only = changes.observation - changes.price - changes.volume
+    pending_observation = refresh(db, instrument_id, timeframe, observed_only)
+    # Native snapshots can advance freshness atomically with the source write.
+    # Derived calendar frames still use their ordinary bounded reconciliation.
+    dirty = changes.price | changes.volume | pending_observation
+    if timeframe in ('M15', 'D1'):
+        dirty |= observed_only
+    enqueue_publication(db, instrument_id, timeframe, dirty)
     from .publication_schedule import request, source_frames
-    if changes.price or changes.volume or changes.observation:
+    if dirty:
         request(db, instrument_id, frames=source_frames(timeframe))
     if timeframe == 'M1':
         # Metadata-only observations must reach matching stored aggregates too.
         # Price/volume updates already trigger their full aggregation in callers.
-        observed_only = sorted(changes.observation - changes.price - changes.volume)
+        observed_only = sorted(observed_only)
         from .chart_aggregation import enqueue_aggregation
         ranges = []
         for start in observed_only:
