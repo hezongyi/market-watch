@@ -1,7 +1,7 @@
 """Independent replayable projection worker; health does not depend on its projection."""
 import argparse
 import logging
-import time
+from threading import Event
 
 from .config import settings
 from .notification_center import backfill, project, rebuild, reconcile_channels, retain
@@ -9,7 +9,7 @@ from .storage import Preference, now_ms, transaction
 
 log = logging.getLogger(__name__)
 BUSY_POLL_SECONDS = .02
-IDLE_POLL_SECONDS = .5
+IDLE_POLL_SECONDS = 2
 
 
 def once():
@@ -30,8 +30,16 @@ def retain_once():
 
 
 def run_projection(stop):
+    from .publication_wakeup import NOTICE_CHANNEL, PublicationWakeup
+
+    with PublicationWakeup(channel=NOTICE_CHANNEL) as wake:
+        _run_projection(stop, wake)
+
+
+def _run_projection(stop, wake):
     last_report = 0
     while not stop.is_set():
+        wake.prepare()
         count, error = 0, None
         try:
             count = once()
@@ -48,7 +56,11 @@ def run_projection(stop):
         from .runtime_health import progress
 
         progress(error=error)
-        stop.wait(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
+        delay = BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS
+        if error:
+            stop.wait(IDLE_POLL_SECONDS)
+        else:
+            wake.wait(delay, stop)
 
 
 def run_retention(stop):
@@ -88,8 +100,18 @@ def main():
             pass
         report('ok')
         return
+    from .publication_wakeup import NOTICE_CHANNEL, PublicationWakeup
+
+    with PublicationWakeup(channel=NOTICE_CHANNEL) as wake:
+        _run_cli(args, wake)
+
+
+def _run_cli(args, wake):
+    stop = Event()
     last_report, last_retention = 0, 0
     while True:
+        wake.prepare()
+        error = None
         try:
             count = once()
             if now_ms() - last_report > 30_000:
@@ -99,7 +121,8 @@ def main():
                 with transaction() as db:
                     retain(db)
                 last_retention = now_ms()
-        except Exception as error:
+        except Exception as exc:
+            error = exc
             count = 0
             log.exception('Notice projection unavailable')
             try:
@@ -110,7 +133,10 @@ def main():
                 raise
         if args.once:
             return
-        time.sleep(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS)
+        if error:
+            stop.wait(IDLE_POLL_SECONDS)
+        else:
+            wake.wait(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS, stop)
 
 
 if __name__ == '__main__':

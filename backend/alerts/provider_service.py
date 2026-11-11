@@ -474,7 +474,7 @@ def warm_step(source, after=None):
     return ident, True
 
 
-def cleanup():
+def cleanup(*, check_capacity=True):
     now = now_ms()
     from .storage import NativeHistoryLoad
     # Resolve provider identity outside the cleanup transaction/pool checkout.
@@ -510,7 +510,6 @@ def cleanup():
             focus = db.get(ProviderDataset, interest.dataset_id)
             for target in interest.targets:
                 protected.add(cache.identity(focus.metadata_json, target["frame"]))
-        total = db.scalar(select(func.count()).select_from(ProviderBar))
         candidates = list(
             db.scalars(
                 select(ProviderDataset)
@@ -524,12 +523,21 @@ def cleanup():
                 .with_for_update(skip_locked=True)
             )
         )
+        total = None
         for row in candidates:
             expired = row.accessed_at < now - settings.provider_cache_days * 86400000
-            if not expired and total <= settings.provider_cache_max_bars:
-                break
+            if not expired:
+                if not check_capacity:
+                    break
+                # Expired datasets must go regardless of capacity. Count only
+                # when a nonexpired eviction candidate actually needs the quota.
+                if total is None:
+                    total = db.scalar(select(func.count()).select_from(ProviderBar))
+                if total <= settings.provider_cache_max_bars:
+                    break
             count = db.execute(delete(ProviderBar).where(ProviderBar.dataset_id == row.id)).rowcount
-            total -= count
+            if total is not None:
+                total -= count
             db.delete(row)
 
 
@@ -566,12 +574,7 @@ def start():
             _STOP.wait(1)
 
     def janitor():
-        while not _STOP.is_set():
-            try:
-                cleanup()
-            except Exception:
-                log.exception("Provider cache cleanup failed")
-            _STOP.wait(60)
+        run_janitor(_STOP)
 
     _FUTURES = [_EXECUTOR.submit(warmer, source) for source in enabled_sources(history=True)]
     _FUTURES.extend(_EXECUTOR.submit(live, source) for source in enabled_sources())
@@ -609,10 +612,16 @@ def run_warm(stop, source):
 
 
 def run_janitor(stop):
+    capacity_at = 0
     while not stop.is_set():
         error = None
         try:
-            cleanup()
+            check_capacity = time.monotonic() >= capacity_at
+            cleanup(check_capacity=check_capacity)
+            if check_capacity:
+                # Expiry stays at 60s. Capacity is a soft cache quota; avoid a
+                # million-row scan each minute when there are no consumers.
+                capacity_at = time.monotonic() + 300
         except Exception as exc:
             error = exc
             log.exception("Provider cache cleanup failed")

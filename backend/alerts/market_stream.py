@@ -132,6 +132,8 @@ def register(session_hash, client, listener, generation, identity, query, state)
         old.state, old.expires = state, stamp + LEASE_MS
         owner.expires = stamp + LEASE_MS
         task.expires = max(task.expires, old.expires)
+        from .publication_wakeup import STREAM_CHANNEL, notify
+        notify(db, STREAM_CHANNEL)
         if previous_task and previous_task != key:
             db.flush()
             if not db.scalar(select(MarketStreamSubscription.id).where(
@@ -294,7 +296,7 @@ def renew(session_hash, client):
                     expires=deadline))
 
 
-def claim(exclude=(), owner=None):
+def claim(exclude=(), owner=None, *, activity=None):
     with transaction() as db:
         stamp = now_ms()
         active = select(MarketStreamSubscription.task_id).join(MarketStreamClient,
@@ -309,6 +311,9 @@ def claim(exclude=(), owner=None):
             .order_by(MarketStreamTask.next_at, MarketStreamTask.id)
             .with_for_update(skip_locked=True).limit(1))
         if not task:
+            if activity is not None:
+                activity['active'] = db.scalar(select(MarketStreamTask.id).where(
+                    MarketStreamTask.expires > stamp).limit(1)) is not None
             return None
         task.lease_token, task.lease_until = uid(), stamp + 30000
         if owner:

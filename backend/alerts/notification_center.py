@@ -384,6 +384,8 @@ def accept_browser(db, subject, value):
         db.add(Preference(key=order_key, value={'last': order}))
     db.add(NoticeIntake(id=value.event_id, subject=subject, profile=value.profile, at=at,
                        intent_hash=signature, body=raw))
+    from .publication_wakeup import NOTICE_CHANNEL, notify
+    notify(db, NOTICE_CHANNEL)
     return {'id': value.event_id, 'status': 'accepted', 'recorded_at': at}
 
 

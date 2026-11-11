@@ -1,9 +1,11 @@
 """Refresh proven, unchanged aggregate observations without rebuilding coverage."""
 
+from bisect import bisect_right
+
 from sqlalchemy import select
 
 from .domain import bucket_bounds, calendar_for
-from .storage import Bar, ChartAggregationJob, instant, ms
+from .storage import Bar, ChartAggregationJob, ms
 from .volume import total
 
 
@@ -16,9 +18,13 @@ def refresh(db, instrument, touched, frame, rows):
     """
     calendar = calendar_for(instrument)
     buckets = {}
-    for at in touched:
-        left, right = bucket_bounds(at, frame, calendar)
-        buckets.setdefault((ms(left), ms(right)), set()).add(at)
+    pair = None
+    for at in sorted(touched):
+        stamp = ms(at)
+        if pair is None or not pair[0] <= stamp < pair[1]:
+            left, right = bucket_bounds(at, frame, calendar)
+            pair = ms(left), ms(right)
+        buckets.setdefault(pair, set()).add(at)
     left, right = min(a for a, _ in buckets), max(b for _, b in buckets)
     pending = list(db.execute(select(ChartAggregationJob.start, ChartAggregationJob.end).where(
         ChartAggregationJob.instrument_id == instrument.id,
@@ -32,9 +38,12 @@ def refresh(db, instrument, touched, frame, rows):
         return touched
     # Reuse the caller's single bounded source page, including on fallback.
     grouped = {}
+    bounds = sorted(buckets)
+    starts = [a for a, _ in bounds]
     for row in rows:
-        pair = bucket_bounds(instant(row.start), frame, calendar)
-        grouped.setdefault((ms(pair[0]), ms(pair[1])), []).append(row)
+        index = bisect_right(starts, row.start) - 1
+        if index >= 0 and row.start < bounds[index][1]:
+            grouped.setdefault(bounds[index], []).append(row)
     remaining, changed = set(touched), set()
     for target in targets:
         members = grouped.get((target.start, target.end), [])

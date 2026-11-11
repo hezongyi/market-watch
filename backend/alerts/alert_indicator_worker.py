@@ -19,7 +19,7 @@ class IndicatorDependencyError(RuntimeError):
         super().__init__(error_type)
 
 
-def tick(*, failures=None):
+def tick(*, failures=None, activity=None):
     """Advance at most one persisted indicator run referenced by an active rule."""
     failures = {} if failures is None else failures
     with transaction() as db:
@@ -28,6 +28,8 @@ def tick(*, failures=None):
             ChartAlert.status == "active").order_by(ChartAlert.id))
         run_ids = set()
         for runtime in alerts:
+            if activity is not None:
+                activity['active'] = True
             dependencies = [*runtime.get("indicators", []),
                             *runtime.get("offset_indicators", [])]
             run_ids.update(item["run_id"] for item in dependencies
@@ -62,14 +64,29 @@ def tick(*, failures=None):
 
 
 def run(stop):
+    from .publication_wakeup import ALERT_CHANNEL, PublicationWakeup
+
+    with PublicationWakeup(channel=ALERT_CHANNEL) as wake:
+        _run(stop, wake)
+
+
+def _run(stop, wake):
     failures = {}
     while not stop.is_set():
+        wake.prepare()
+        activity = {}
         worked = False
+        failed = False
         try:
-            worked = tick(failures=failures)
+            worked = tick(failures=failures, activity=activity)
             progress(state="running" if worked else "idle")
         except Exception as error:
+            failed = True
             log.warning("alert_indicator_tick_failed type=%s", type(error).__name__)
             progress(state="degraded", error=(error.error_type
                 if isinstance(error, IndicatorDependencyError) else error))
-        stop.wait(.01 if worked else .1)
+        delay = .01 if worked else .1 if activity.get('active') or failed else 1
+        if failed:
+            stop.wait(delay)
+        else:
+            wake.wait(delay, stop)
