@@ -93,3 +93,6 @@
 - 本次完整前端构建、既有单前端 unit、共享通知 unit、Android assembleDebug/lintDebug 通过。新 APK 0.1.1/versionCode2 与 0.1.0 同签名；本次实际升级和故障入口待 Find X8 检查。
 - 实例使用固定 D1 合成缓存，已通过真实登录/CSRF API 新建独立“D1 合成数据 · 非实时”自选，便于安装后进入实际图表；未启用供应商或投递。不会把旧日期缓存、任务健康或 UI 创建成功当作实时链路验收。
 - 用户可自行验收，无需先接 ADB。全部真机事实仍等待用户反馈，目标仍 active；没有合并、正式 tag 或生产发布。
+
+
+0.1.1 候选已更新至 Ubuntu 18445，四服务 ready。真实 API/PostgreSQL/实际许可库 smoke 通过；CA 校验的 APK 下载 hash 与本机一致。见 [候选及自验说明](candidate-0.1.1.md)、[部署记录](deployment-0.1.1.json) 和 [下载检查](delivery-check-0.1.1.md)。Find X8、真实供应商/完整告警与 ntfy、覆盖升级仍待验证。
