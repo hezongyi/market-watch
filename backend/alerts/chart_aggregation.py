@@ -88,6 +88,23 @@ def aggregation_priority(job, demands):
     return min(priorities), -job.end, job.created_at, job.id
 
 
+def _wake_unblocked_publications(db, inst, frame, left, right):
+    """A prior changed snapshot may have waited on this now-removed barrier."""
+    from sqlalchemy import or_
+
+    from .publication_schedule import request, source_frames
+    from .storage import ChartPublicationJob, ChartPublicationState
+
+    state, dirty = ChartPublicationState, ChartPublicationJob
+    frames = list(db.scalars(select(state.timeframe).where(state.instrument_id == inst.id,
+        state.timeframe.in_(source_frames(frame)), state.attempts == 0,
+        or_(state.requested == state.processed, state.blocked_reason.in_(('source', 'aggregation'))),
+        select(dirty.start).where(dirty.instrument_id == state.instrument_id,
+            dirty.timeframe == state.timeframe, dirty.start < right, dirty.end > left).exists())))
+    if frames:
+        request(db, inst.id, frames=frames)
+
+
 def aggregate_once():
     from .market import aggregate_touched
     from .publication_budget import current
@@ -164,7 +181,10 @@ def aggregate_once():
                     job.next_at = now + 1000
                     return True
                 from .publication_schedule import AGGREGATED, request, source_frames
-                request(db, inst.id, frames=source_frames(job.timeframe), reason=AGGREGATED, stamp=now)
+                if job.kind != 'observed':
+                    # Observation writers request publication only on a real
+                    # change; an obsolete duplicate job has nothing to publish.
+                    request(db, inst.id, frames=source_frames(job.timeframe), reason=AGGREGATED, stamp=now)
                 if slice_end < job.end:
                     remaining = db.scalar(select(ChartAggregationJob).where(
                         ChartAggregationJob.instrument_id == inst.id,
@@ -177,6 +197,8 @@ def aggregate_once():
                         remaining.kind = job.kind
                 db.delete(job)
                 db.flush()
+                if job.kind == 'observed':
+                    _wake_unblocked_publications(db, inst, job.timeframe, source_left, source_right)
         except Exception as error:
             job.attempts += 1
             job.next_at = now + min(300_000, 1000 * 2 ** min(job.attempts, 9))

@@ -187,6 +187,7 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
     with database.begin() as db:
         inst = db.get(Instrument, 'BTCUSDT')
         before = read_rows(db, inst, 'H1', now, 1)[0]
+        before_m30 = read_rows(db, inst, 'M30', now, 1)[0]
         revision = db.scalar(select(storage.Bar.revision).where(
             storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1'))
     now += 1000
@@ -219,6 +220,10 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
             k: v for k, v in before.items() if k != 'observed_at'}
         assert db.scalar(select(storage.Bar.revision).where(
             storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1')) == revision
+        after_m30 = read_rows(db, inst, 'M30', now, 1)[0]
+        assert after_m30['observed_at'] == observed
+        assert {k: v for k, v in after_m30.items() if k != 'observed_at'} == {
+            k: v for k, v in before_m30.items() if k != 'observed_at'}
     assert not coverage_reads, 'An unchanged completed hour must not reload coverage history'
 
 

@@ -7,7 +7,7 @@ from .storage import Bar, ChartAggregationJob, instant, ms
 from .volume import total
 
 
-def refresh(db, instrument, touched, frame):
+def refresh(db, instrument, touched, frame, rows):
     """Caller owns Instrument. Return minutes still needing the full calculation.
 
     A completed aggregate is its retained completeness proof. Compare bounded
@@ -30,16 +30,7 @@ def refresh(db, instrument, touched, frame):
         a < row.end and b > row.start for a, b in pending)]
     if not targets:
         return touched
-    # No ORM objects, coverage audits, calendar-minute enumeration or Candle
-    # construction for unchanged completed buckets. DST bounds come from domain.
-    rows = list(db.execute(select(Bar.start, Bar.end, Bar.open, Bar.high, Bar.low,
-        Bar.close, Bar.complete, Bar.volume, Bar.volume_complete, Bar.observed_at).where(
-        Bar.instrument_id == instrument.id, Bar.timeframe == 'M1',
-        Bar.start >= min(row.start for row in targets),
-        Bar.start < max(row.end for row in targets)).order_by(Bar.start)))
-    from .publication_budget import current
-    if current():
-        current().consume(len(rows))
+    # Reuse the caller's single bounded source page, including on fallback.
     grouped = {}
     for row in rows:
         pair = bucket_bounds(instant(row.start), frame, calendar)

@@ -17,6 +17,35 @@ services:
       timeout: 2s
       retries: 30
     networks: [acceptance]
+  maintenance:
+    # Reuse the installed dependency image, with this task's source mounted.
+    # This is not a newly built candidate image and is not a production artifact.
+    image: sha256:6dcd7c1b9e05c16552606cd33dcced0788f8786ac678f4ce03bd298d307183a4
+    profiles: [tools]
+    working_dir: /app
+    environment:
+      PYTHONPATH: /app/backend
+      ALERTS_DATABASE_URL: postgresql+psycopg://cpu_acceptance:${CPU_POSTGRES_PASSWORD:?private env required}@postgres/cpu_rehearsal
+      ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+      ALERTS_FX_SOURCE: dukascopy
+    volumes:
+      - ../../../backend:/app/backend:ro
+      - ../../../migrations:/app/migrations:ro
+      - ../../../alembic.ini:/app/alembic.ini:ro
+    command: [python, -m, alerts.publication_admin, --help]
+    mem_limit: 512m
+    cpus: 1
+    networks: [acceptance]
+  api:
+    extends: maintenance
+    profiles: [smoke]
+    command: [python, -m, uvicorn, alerts.api:app, --host, 0.0.0.0, --port, '8000']
+    ports: ['127.0.0.1:28471:8000']
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz')"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
 volumes:
   postgres-data:
     # Task-owned ephemeral test volume: conserve scarce host disk. Data is
