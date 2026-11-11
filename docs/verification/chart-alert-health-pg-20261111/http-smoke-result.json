@@ -1,0 +1,16 @@
+{
+  "host": "Ubuntu quant-server",
+  "url": "http://127.0.0.1:28472",
+  "checks": {
+    "/healthz": 200,
+    "/readyz": 200,
+    "/api/health": 401,
+    "login": 200,
+    "authenticated_health": 200
+  },
+  "execution": {
+    "monitoring": 2,
+    "settling": 1,
+    "recovering": 1
+  }
+}

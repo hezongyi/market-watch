@@ -65,12 +65,14 @@ def summary(db, *, at=None):
             (Notification.kind == "system") & Notification.payload["context"]["alert_id"].as_string().is_not(None)),
         Outbox.status.in_(("pending", "sending", "blocked"))).subquery()
     delivery = dict(db.execute(select(backlog.c.status, func.count()).group_by(backlog.c.status)).all())
-    execution = dict(db.execute(select(ChartAlert.runtime["execution_state"].as_string(), func.count())
-        .where(ChartAlert.status != "archived", ChartAlert.runtime["execution_state"].as_string().is_not(None),
+    # Reuse the JSON expression so SELECT/GROUP BY share the same bound key on PostgreSQL.
+    execution_state = ChartAlert.runtime["execution_state"].as_string()
+    execution = dict(db.execute(select(execution_state, func.count())
+        .where(ChartAlert.status != "archived", execution_state.is_not(None),
             or_((ChartAlert.status == "active") & or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp),
                 ChartAlert.runtime["settlement_pending"].as_boolean(),
                 ChartAlert.runtime["incident"]["id"].as_string().is_not(None)))
-        .group_by(ChartAlert.runtime["execution_state"].as_string())).all())
+        .group_by(execution_state)).all())
     legacy_paused = db.scalar(select(func.count()).select_from(ChartAlert).where(ChartAlert.status == "paused",
         ChartAlert.runtime["demand_hold"].as_string() == "stale_input"))
     settling = db.scalar(select(func.count()).select_from(ChartAlert).where(ChartAlert.status == "expired",

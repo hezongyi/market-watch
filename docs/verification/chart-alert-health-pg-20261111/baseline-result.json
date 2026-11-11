@@ -1,0 +1,25 @@
+{
+  "base_commit": "1bb935bdf1195c4da532cb2e6f62faca2198e6c4",
+  "attempts": [
+    {
+      "attempt": 1,
+      "exit_code": 1,
+      "error": [
+        "E           psycopg.errors.GroupingError: column \"chart_alerts.runtime\" must appear in the GROUP BY clause or be used in an aggregate function"
+      ],
+      "summary": [
+        "1 failed in 2.14s"
+      ]
+    },
+    {
+      "attempt": 2,
+      "exit_code": 1,
+      "error": [
+        "E           psycopg.errors.GroupingError: column \"chart_alerts.runtime\" must appear in the GROUP BY clause or be used in an aggregate function"
+      ],
+      "summary": [
+        "1 failed in 2.13s"
+      ]
+    }
+  ]
+}
