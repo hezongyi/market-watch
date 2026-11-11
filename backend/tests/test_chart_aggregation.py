@@ -3,6 +3,33 @@ from alerts.storage import ChartAggregationJob, ChartViewportDemand, Instrument
 from sqlalchemy import func, select
 
 
+def test_unchanged_rolling_minutes_coalesce_without_losing_new_edge(database):
+    from datetime import UTC, datetime, timedelta
+    from decimal import Decimal
+
+    from alerts.bar_batch import write_bars
+    from alerts.domain import Candle
+    from alerts.storage import ms
+
+    origin = datetime(2026, 11, 10, tzinfo=UTC)
+    price = Decimal('100')
+    candles = [Candle(origin + timedelta(minutes=i), origin + timedelta(minutes=i+1),
+                      price, price, price, price) for i in range(121)]
+    with database.begin() as db:
+        write_bars(db, 'BTCUSDT', 'M1', candles, observed_at=1000)
+    for stamp, rows in ((2000, candles[:120]), (3000, candles[1:])):
+        with database.begin() as db:
+            changes = write_bars(db, 'BTCUSDT', 'M1', rows, observed_at=stamp)
+            assert not changes.price and not changes.volume
+            assert len(changes.observation) == 120
+    with database.begin() as db:
+        jobs = list(db.scalars(select(ChartAggregationJob)))
+        assert len(jobs) == 5
+        assert {job.timeframe for job in jobs} == {'M5', 'M15', 'H1', 'H4', 'D1'}
+        assert all((job.start, job.end, job.kind, job.created_at) ==
+                   (ms(origin), ms(origin)+121*60000, 'observed', 2000) for job in jobs)
+
+
 def test_queue_is_durable_deduplicated_and_selected_period_first(database, monkeypatch):
     from alerts import market, storage
 

@@ -101,6 +101,9 @@ MWChartAdapter = {mount(container, application) {
         preference = {...preference,...body,revision:preference.revision+1};
         result = clone(preference);
       } else if(p === '/notification-center/events')result = {events:[],after:'0',epoch:'test',unread:0};
+      // Intake can be accepted before projection; reloads may check its ID.
+      else if(req.method() === 'GET' && /^\/notification-center\/events\/[^/]+$/.test(p))
+        return route.fulfill({status:404,json:{detail:'通知尚未投影'}});
       else if(p === '/notification-center/changes')result = {changes:[],after:'0',epoch:'test',more:false,server_time:Date.now()};
       else if(p === '/notification-center/health')result = {at:Date.now(),state:'ready',sound_enabled:false,display_enabled:true};
       else throw Error('Unexpected API request: '+p);

@@ -963,7 +963,12 @@ class Outbox(Base):
 
 class Audit(Base):
     __tablename__ = "audit_events"
-    __table_args__ = (Index("ix_audit_events_kind_at", "kind", "at"),)
+    __table_args__ = (
+        Index("ix_audit_events_kind_at", "kind", "at"),
+        Index("ix_audit_events_notice_source_id", "id",
+              postgresql_where=text("kind = 'notice_source'"),
+              sqlite_where=text("kind = 'notice_source'")),
+    )
     id: Mapped[int] = mapped_column(primary_key=True)
     kind: Mapped[str]
     at: Mapped[int] = mapped_column(BigInteger, default=now_ms)

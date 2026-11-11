@@ -16,6 +16,122 @@ from test_publication_scheduler import MINUTE, START
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
 
 
+def test_pg_observed_rolling_windows_keep_all_minutes(publication_pg):
+    from test_chart_aggregation import (
+        test_unchanged_rolling_minutes_coalesce_without_losing_new_edge,
+    )
+    test_unchanged_rolling_minutes_coalesce_without_losing_new_edge(publication_pg[0])
+
+
+def test_pg_concurrent_observations_coalesce_with_reverse_source_clocks(publication_pg):
+    from datetime import timedelta
+    from decimal import Decimal
+
+    from alerts.bar_batch import write_bars
+    from alerts.domain import Candle
+    from sqlalchemy import select
+
+    factory, _ = publication_pg
+    origin, price = storage.instant(START), Decimal(10)
+    rows = [Candle(origin+timedelta(minutes=i), origin+timedelta(minutes=i+1),
+                   price, price, price, price) for i in range(124)]
+    with factory.begin() as db:
+        write_bars(db, 'BTCUSDT', 'M1', rows, observed_at=1000)
+    def observe(index):
+        with factory.begin() as db:
+            write_bars(db, 'BTCUSDT', 'M1', rows[index:index+120], observed_at=2000+index)
+    with ThreadPoolExecutor(max_workers=4) as pool:
+        list(pool.map(observe, (3, 2, 1, 0)))
+    with factory.begin() as db:
+        jobs = list(db.scalars(select(storage.ChartAggregationJob)))
+        assert len(jobs) == 5
+        assert all(job.start == START and job.end == START+123*MINUTE for job in jobs)
+        assert all(job.attempts == 0 for job in jobs)
+
+
+def test_pg_observed_input_waits_for_content_repair(publication_pg, monkeypatch):
+    from test_observation_aggregation import (
+        test_observation_waits_for_same_bucket_content_repair_without_losing_request,
+    )
+    test_observation_waits_for_same_bucket_content_repair_without_losing_request(
+        publication_pg[0], monkeypatch)
+
+
+def test_pg_writer_waiting_on_observed_slice_preserves_remainder_and_freshness(
+        publication_pg, monkeypatch):
+    from alerts.chart_aggregation import aggregate_once
+    from sqlalchemy import delete, select
+
+    factory, clock = publication_pg
+    clock[0] = START + 185 * MINUTE + 5000
+    rows = [dict(timestamp=START+i*MINUTE, open=10, high=11, low=9, close=10)
+            for i in range(185)]
+    with factory.begin() as db:
+        inst = db.get(storage.Instrument, 'BTCUSDT')
+        managed.join(db, inst, START, clock[0])
+        market.ingest(db, inst, dict(rows=rows), received_at=clock[0])
+    drain()
+    with factory.begin() as db:
+        before = managed.read_rows(db, db.get(storage.Instrument, 'BTCUSDT'),
+                                   'H1', START+180*MINUTE, 1)[0]
+    clock[0] += 1000
+    with factory.begin() as db:
+        market.ingest(db, db.get(storage.Instrument, 'BTCUSDT'),
+                      dict(rows=rows[:181]), received_at=clock[0])
+        # Select the partial H1 slice deterministically; the concurrent writer
+        # will enqueue all ordinary target periods again.
+        db.execute(delete(storage.ChartAggregationJob).where(
+            storage.ChartAggregationJob.timeframe != 'H1'))
+    entered, release, writing, committed = Event(), Event(), Event(), Event()
+    original = market.aggregate_touched
+    def pause(*args, **kwargs):
+        entered.set()
+        assert release.wait(10)
+        return original(*args, **kwargs)
+    def writer():
+        writing.set()
+        with factory.begin() as db:
+            market.ingest(db, db.get(storage.Instrument, 'BTCUSDT'),
+                          dict(rows=rows[119:]), received_at=clock[0])
+        committed.set()
+    monkeypatch.setattr(market, 'aggregate_touched', pause)
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        worker = pool.submit(aggregate_once)
+        try:
+            assert entered.wait(10)
+            clock[0] += 1000
+            pending = pool.submit(writer)
+            assert writing.wait(10)
+            assert not committed.wait(.1), 'Writer must wait for the active aggregation slice'
+        finally:
+            release.set()
+        assert worker.result(timeout=10)
+        pending.result(timeout=10)
+    monkeypatch.setattr(market, 'aggregate_touched', original)
+    with factory.begin() as db:
+        job = db.scalar(select(storage.ChartAggregationJob).where(
+            storage.ChartAggregationJob.timeframe == 'H1'))
+        assert (job.start, job.end) == (START+119*MINUTE, START+185*MINUTE)
+    for _ in range(100):
+        aggregate_once()
+        managed.publish_once()
+    with factory.begin() as db:
+        assert not list(db.scalars(select(storage.ChartAggregationJob)))
+        after = managed.read_rows(db, db.get(storage.Instrument, 'BTCUSDT'),
+                                  'H1', START+180*MINUTE, 1)[0]
+        assert after['observed_at'] == clock[0]
+        assert {k: v for k, v in after.items() if k != 'observed_at'} == {
+            k: v for k, v in before.items() if k != 'observed_at'}
+
+
+def test_pg_observation_refresh_preserves_published_content(publication_pg, monkeypatch):
+    from test_publication_scheduler import (
+        test_same_price_minute_observation_refreshes_matching_hour_without_price_revision,
+    )
+    test_same_price_minute_observation_refreshes_matching_hour_without_price_revision(
+        publication_pg[0], monkeypatch)
+
+
 def test_pg_service_order_survives_different_history_and_clock_rollback(publication_pg, monkeypatch):
     from test_publication_scheduler import (
         test_service_order_survives_different_history_and_clock_rollback,

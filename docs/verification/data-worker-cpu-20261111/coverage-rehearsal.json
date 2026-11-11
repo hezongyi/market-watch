@@ -1,0 +1,346 @@
+{
+  "scope": "Scoped snapshot restored into task-owned cpu_rehearsal; no source-instance maintenance yet",
+  "archive_sha256": "dd061f5b6e9e494c0be65085d7ac0cf57c0a342a0417458370d81b4a1b51f057",
+  "before": {
+    "checkpoints": [
+      {
+        "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+        "complete": false,
+        "phase": "verify"
+      },
+      {
+        "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+        "complete": false,
+        "phase": "verify"
+      },
+      {
+        "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+        "complete": false,
+        "phase": "verify"
+      },
+      {
+        "instrument": "XAUUSD",
+        "complete": false,
+        "phase": "verify"
+      },
+      {
+        "instrument": "EURUSD",
+        "complete": false,
+        "phase": "verify"
+      },
+      {
+        "instrument": "BTCUSDT",
+        "complete": false,
+        "phase": "verify"
+      }
+    ],
+    "m1_sha256": "8afda82dc87e482ca7b475e905c201685b37955efae5510acea9ef535fd13e5c",
+    "raw_coverage_sha256": "b2215c94b9fd5a478f10d1e5119fc963cb59ca364176122f42c50771cd00ac55",
+    "provider_audit_sha256": "c2436202839227a69c42c7a4a5a7718c331ba0c6f8757859e17c5c16d224da74",
+    "complete_source": 4702,
+    "complete_published": 3664
+  },
+  "verification": [
+    {
+      "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "complete": true,
+      "examined": 2426,
+      "phase": "complete",
+      "version": 1943
+    },
+    {
+      "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "complete": true,
+      "examined": 2268,
+      "phase": "complete",
+      "version": 1828
+    },
+    {
+      "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+      "complete": true,
+      "examined": 2395,
+      "phase": "complete",
+      "version": 1928
+    },
+    {
+      "instrument": "XAUUSD",
+      "complete": true,
+      "examined": 17356,
+      "phase": "complete",
+      "version": 2203
+    },
+    {
+      "instrument": "EURUSD",
+      "complete": true,
+      "examined": 17380,
+      "phase": "complete",
+      "version": 2205
+    },
+    {
+      "instrument": "BTCUSDT",
+      "complete": true,
+      "examined": 3199,
+      "phase": "complete",
+      "version": 2437
+    }
+  ],
+  "after": {
+    "checkpoints": [
+      {
+        "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+        "complete": true,
+        "phase": "complete"
+      },
+      {
+        "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+        "complete": true,
+        "phase": "complete"
+      },
+      {
+        "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+        "complete": true,
+        "phase": "complete"
+      },
+      {
+        "instrument": "XAUUSD",
+        "complete": true,
+        "phase": "complete"
+      },
+      {
+        "instrument": "EURUSD",
+        "complete": true,
+        "phase": "complete"
+      },
+      {
+        "instrument": "BTCUSDT",
+        "complete": true,
+        "phase": "complete"
+      }
+    ],
+    "m1_sha256": "8afda82dc87e482ca7b475e905c201685b37955efae5510acea9ef535fd13e5c",
+    "raw_coverage_sha256": "b2215c94b9fd5a478f10d1e5119fc963cb59ca364176122f42c50771cd00ac55",
+    "provider_audit_sha256": "c2436202839227a69c42c7a4a5a7718c331ba0c6f8757859e17c5c16d224da74",
+    "complete_source": 4702,
+    "complete_published": 3664
+  },
+  "benchmark_before": [
+    {
+      "instrument": "XAUUSD",
+      "raw_rows": 8678,
+      "audit_rows": 8678,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 460.529,
+          "cpu_median_ms": 294.883,
+          "returned_spans": 17356
+        },
+        "projection": {
+          "wall_median_ms": 1.131,
+          "cpu_median_ms": 0.894,
+          "returned_spans": 1
+        }
+      }
+    },
+    {
+      "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "raw_rows": 2268,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 69.314,
+          "cpu_median_ms": 17.134,
+          "returned_spans": 2268
+        },
+        "projection": {
+          "wall_median_ms": 1.319,
+          "cpu_median_ms": 0.724,
+          "returned_spans": 3
+        }
+      }
+    },
+    {
+      "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+      "raw_rows": 2395,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 76.239,
+          "cpu_median_ms": 17.476,
+          "returned_spans": 2395
+        },
+        "projection": {
+          "wall_median_ms": 1.107,
+          "cpu_median_ms": 0.757,
+          "returned_spans": 9
+        }
+      }
+    },
+    {
+      "instrument": "EURUSD",
+      "raw_rows": 8690,
+      "audit_rows": 8690,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 371.522,
+          "cpu_median_ms": 278.213,
+          "returned_spans": 17380
+        },
+        "projection": {
+          "wall_median_ms": 0.822,
+          "cpu_median_ms": 0.598,
+          "returned_spans": 1
+        }
+      }
+    },
+    {
+      "instrument": "BTCUSDT",
+      "raw_rows": 3199,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 36.212,
+          "cpu_median_ms": 22.033,
+          "returned_spans": 3199
+        },
+        "projection": {
+          "wall_median_ms": 1.011,
+          "cpu_median_ms": 0.728,
+          "returned_spans": 1
+        }
+      }
+    },
+    {
+      "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "raw_rows": 2426,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 81.634,
+          "cpu_median_ms": 18.529,
+          "returned_spans": 2426
+        },
+        "projection": {
+          "wall_median_ms": 0.937,
+          "cpu_median_ms": 0.721,
+          "returned_spans": 14
+        }
+      }
+    }
+  ],
+  "benchmark_after": [
+    {
+      "instrument": "XAUUSD",
+      "raw_rows": 8678,
+      "audit_rows": 8678,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 1.777,
+          "cpu_median_ms": 1.178,
+          "returned_spans": 1
+        },
+        "projection": {
+          "wall_median_ms": 1.551,
+          "cpu_median_ms": 0.688,
+          "returned_spans": 1
+        }
+      }
+    },
+    {
+      "instrument": "MD:08cb37ede9a86cb9a71c4b8ac:XAUUSD",
+      "raw_rows": 2268,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 2.898,
+          "cpu_median_ms": 1.345,
+          "returned_spans": 3
+        },
+        "projection": {
+          "wall_median_ms": 0.998,
+          "cpu_median_ms": 0.572,
+          "returned_spans": 3
+        }
+      }
+    },
+    {
+      "instrument": "MD:48f368cd34ffe7fe6632bd871:GBPUSD",
+      "raw_rows": 2395,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 4.971,
+          "cpu_median_ms": 1.572,
+          "returned_spans": 9
+        },
+        "projection": {
+          "wall_median_ms": 1.271,
+          "cpu_median_ms": 0.742,
+          "returned_spans": 9
+        }
+      }
+    },
+    {
+      "instrument": "EURUSD",
+      "raw_rows": 8690,
+      "audit_rows": 8690,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 1.87,
+          "cpu_median_ms": 1.17,
+          "returned_spans": 1
+        },
+        "projection": {
+          "wall_median_ms": 0.74,
+          "cpu_median_ms": 0.509,
+          "returned_spans": 1
+        }
+      }
+    },
+    {
+      "instrument": "BTCUSDT",
+      "raw_rows": 3199,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 1.324,
+          "cpu_median_ms": 0.906,
+          "returned_spans": 1
+        },
+        "projection": {
+          "wall_median_ms": 0.63,
+          "cpu_median_ms": 0.418,
+          "returned_spans": 1
+        }
+      }
+    },
+    {
+      "instrument": "MD:7fd3d31e7c7c0e43be3df53eb:EURUSD",
+      "raw_rows": 2426,
+      "audit_rows": 0,
+      "window_union_equal": true,
+      "timings": {
+        "legacy": {
+          "wall_median_ms": 1.267,
+          "cpu_median_ms": 0.869,
+          "returned_spans": 14
+        },
+        "projection": {
+          "wall_median_ms": 0.7,
+          "cpu_median_ms": 0.525,
+          "returned_spans": 14
+        }
+      }
+    }
+  ]
+}

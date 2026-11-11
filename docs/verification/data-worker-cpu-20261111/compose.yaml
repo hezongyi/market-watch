@@ -1,0 +1,59 @@
+name: mw-cpu-20261111
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_USER: cpu_acceptance
+      POSTGRES_DB: cpu_acceptance
+      POSTGRES_PASSWORD: ${CPU_POSTGRES_PASSWORD:?private env required}
+    command: [postgres, -c, shared_buffers=64MB, -c, max_connections=64, -c, max_wal_size=128MB]
+    ports: ['127.0.0.1:25471:5432']
+    volumes: ['postgres-data:/var/lib/postgresql/data']
+    mem_limit: 1g
+    cpus: 1
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U cpu_acceptance -d cpu_acceptance']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    networks: [acceptance]
+  maintenance:
+    # Reuse the installed dependency image, with this task's source mounted.
+    # This is not a newly built candidate image and is not a production artifact.
+    image: sha256:6dcd7c1b9e05c16552606cd33dcced0788f8786ac678f4ce03bd298d307183a4
+    profiles: [tools]
+    working_dir: /app
+    environment:
+      PYTHONPATH: /app/backend
+      ALERTS_DATABASE_URL: postgresql+psycopg://cpu_acceptance:${CPU_POSTGRES_PASSWORD:?private env required}@postgres/cpu_rehearsal
+      ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+      ALERTS_FX_SOURCE: dukascopy
+    volumes:
+      - ../../../backend:/app/backend:ro
+      - ../../../migrations:/app/migrations:ro
+      - ../../../alembic.ini:/app/alembic.ini:ro
+    command: [python, -m, alerts.publication_admin, --help]
+    mem_limit: 512m
+    cpus: 1
+    networks: [acceptance]
+  api:
+    extends: maintenance
+    profiles: [smoke]
+    command: [python, -m, uvicorn, alerts.api:app, --host, 0.0.0.0, --port, '8000']
+    ports: ['127.0.0.1:28471:8000']
+    healthcheck:
+      test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz')"]
+      interval: 2s
+      timeout: 2s
+      retries: 30
+volumes:
+  postgres-data:
+    # Task-owned ephemeral test volume: conserve scarce host disk. Data is
+    # retained while mounted, not across a complete stop/unmount of all users.
+    driver: local
+    driver_opts:
+      type: tmpfs
+      device: tmpfs
+      o: size=512m
+networks:
+  acceptance: {}

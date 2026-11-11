@@ -187,6 +187,7 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
     with database.begin() as db:
         inst = db.get(Instrument, 'BTCUSDT')
         before = read_rows(db, inst, 'H1', now, 1)[0]
+        before_m30 = read_rows(db, inst, 'M30', now, 1)[0]
         revision = db.scalar(select(storage.Bar.revision).where(
             storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1'))
     now += 1000
@@ -195,6 +196,19 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
             dict(timestamp=START + 59 * MINUTE, open=10, high=11, low=9, close=10)]}, received_at=now)
     observed = now
     now += 10000  # Delay the worker; calculation time cannot invent freshness.
+    coverage_reads = []
+    engine = database.kw['bind']
+    def record(conn, cursor, statement, parameters, context, many):
+        if 'FROM market_data_coverage' in statement or 'FROM audit' in statement:
+            coverage_reads.append(statement)
+    event.listen(engine, 'before_cursor_execute', record)
+    try:
+        with database.begin() as db:
+            market.aggregate_touched(db, db.get(Instrument, 'BTCUSDT'),
+                {storage.instant(START + 59*MINUTE)}, received_at=now,
+                timeframes=('H1',), kind='observed')
+    finally:
+        event.remove(engine, 'before_cursor_execute', record)
     for _ in range(40):
         aggregate_once()
         managed.publish_once()
@@ -206,6 +220,11 @@ def test_same_price_minute_observation_refreshes_matching_hour_without_price_rev
             k: v for k, v in before.items() if k != 'observed_at'}
         assert db.scalar(select(storage.Bar.revision).where(
             storage.Bar.instrument_id == inst.id, storage.Bar.timeframe == 'H1')) == revision
+        after_m30 = read_rows(db, inst, 'M30', now, 1)[0]
+        assert after_m30['observed_at'] == observed
+        assert {k: v for k, v in after_m30.items() if k != 'observed_at'} == {
+            k: v for k, v in before_m30.items() if k != 'observed_at'}
+    assert not coverage_reads, 'An unchanged completed hour must not reload coverage history'
 
 
 def test_restart_catches_up_more_than_one_source_page_without_further_input(database, monkeypatch):

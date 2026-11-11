@@ -10,13 +10,52 @@ from .storage import (
 )
 
 PERIODS = ('M5', 'M15', 'H1', 'H4', 'D1')
+MAX_RANGE = 1440 * 60000
+
+
+def _coalesce_observed(db, instrument, frame, left, right):
+    """The caller owns Instrument; retain bounded ranges and durable retry age."""
+    model = ChartAggregationJob
+    rows = list(db.scalars(select(model).where(
+        model.instrument_id == instrument, model.timeframe == frame, model.kind == 'observed',
+        model.start <= right, model.end >= left).order_by(model.created_at, model.id).limit(128)))
+    merged = []
+    for row in rows:
+        a, b = min(left, row.start), max(right, row.end)
+        if b - a <= MAX_RANGE:
+            left, right = a, b
+            merged.append(row)
+    if not merged:
+        return None
+    target = db.scalar(select(model).where(model.instrument_id == instrument,
+        model.timeframe == frame, model.start == left, model.end == right))
+    target = target or merged[0]
+    created_at = min(row.created_at for row in merged)
+    retry = max(merged, key=lambda row: (row.attempts, row.next_at))
+    attempts, error = retry.attempts, retry.error
+    next_at = max(row.next_at for row in merged)
+    for row in merged:
+        if row is not target:
+            db.delete(row)
+    # Release conflicting old unique keys before moving the retained range.
+    db.flush()
+    target.start, target.end = left, right
+    target.created_at = min(target.created_at, created_at)
+    target.attempts = max(target.attempts, attempts)
+    target.next_at = max(target.next_at, next_at)
+    if error:
+        target.error = error
+    db.flush()
+    return target
 
 
 def enqueue_aggregation(db, instrument, start, end, now, *, kind="price"):
     """Caller owns the instrument lock and commits this alongside M1 coverage."""
-    for left in range(start, end, 1440 * 60000):
-        right = min(end, left + 1440 * 60000)
+    for left in range(start, end, MAX_RANGE):
+        right = min(end, left + MAX_RANGE)
         for frame in PERIODS:
+            if kind == 'observed' and _coalesce_observed(db, instrument, frame, left, right):
+                continue
             exists = db.scalar(select(ChartAggregationJob).where(
                 ChartAggregationJob.instrument_id == instrument,
                 ChartAggregationJob.timeframe == frame,
@@ -47,6 +86,23 @@ def aggregation_priority(job, demands):
         elif job.start < demand.end and job.end > demand.warm_start:
             priorities.append(130 if demand.focused else 150)
     return min(priorities), -job.end, job.created_at, job.id
+
+
+def _wake_unblocked_publications(db, inst, frame, left, right):
+    """A prior changed snapshot may have waited on this now-removed barrier."""
+    from sqlalchemy import or_
+
+    from .publication_schedule import request, source_frames
+    from .storage import ChartPublicationJob, ChartPublicationState
+
+    state, dirty = ChartPublicationState, ChartPublicationJob
+    frames = list(db.scalars(select(state.timeframe).where(state.instrument_id == inst.id,
+        state.timeframe.in_(source_frames(frame)), state.attempts == 0,
+        or_(state.requested == state.processed, state.blocked_reason.in_(('source', 'aggregation'))),
+        select(dirty.start).where(dirty.instrument_id == state.instrument_id,
+            dirty.timeframe == state.timeframe, dirty.start < right, dirty.end > left).exists())))
+    if frames:
+        request(db, inst.id, frames=frames)
 
 
 def aggregate_once():
@@ -86,6 +142,10 @@ def aggregate_once():
             ChartAggregationJob.id == job.id).with_for_update().execution_options(populate_existing=True))
         if job is None or job.next_at > now:
             return True
+        if job.kind == 'observed':
+            job = _coalesce_observed(db, inst.id, job.timeframe, job.start, job.end) or job
+            if job.next_at > now:
+                return True
         from .domain import bucket_bounds, calendar_for
         from .storage import ms
         budget = current()
@@ -113,9 +173,18 @@ def aggregate_once():
             # A failed calculation/write must not publish any partial aggregate.
             # Keep the outer transaction usable to persist retry state.
             with db.begin_nested():
-                aggregate_touched(db, inst, touched, received_at=now, timeframes=(job.timeframe,), kind=job.kind)
+                refreshed = aggregate_touched(db, inst, touched, received_at=now,
+                                             timeframes=(job.timeframe,), kind=job.kind)
+                if job.kind == 'observed' and refreshed is False:
+                    # A content repair owns these inputs. Preserve this freshness
+                    # request until that repair commits, without counting failure.
+                    job.next_at = now + 1000
+                    return True
                 from .publication_schedule import AGGREGATED, request, source_frames
-                request(db, inst.id, frames=source_frames(job.timeframe), reason=AGGREGATED, stamp=now)
+                if job.kind != 'observed':
+                    # Observation writers request publication only on a real
+                    # change; an obsolete duplicate job has nothing to publish.
+                    request(db, inst.id, frames=source_frames(job.timeframe), reason=AGGREGATED, stamp=now)
                 if slice_end < job.end:
                     remaining = db.scalar(select(ChartAggregationJob).where(
                         ChartAggregationJob.instrument_id == inst.id,
@@ -128,6 +197,8 @@ def aggregate_once():
                         remaining.kind = job.kind
                 db.delete(job)
                 db.flush()
+                if job.kind == 'observed':
+                    _wake_unblocked_publications(db, inst, job.timeframe, source_left, source_right)
         except Exception as error:
             job.attempts += 1
             job.next_at = now + min(300_000, 1000 * 2 ** min(job.attempts, 9))

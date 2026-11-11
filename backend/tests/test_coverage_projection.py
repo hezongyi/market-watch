@@ -6,6 +6,29 @@ from alerts.storage import Audit, Instrument, MarketCoverage
 from sqlalchemy import event
 
 
+def test_publication_status_reports_required_verification_without_running_it(database):
+    from alerts.coverage_projection import backfill_page
+    from alerts.managed_dataset import status
+
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        db.add(MarketCoverage(instrument_id=inst.id, source=inst.source,
+                              basis=inst.basis, start=0, end=120000))
+        result = backfill_page(db, inst)
+        assert result['phase'] == 'verify' and not result['complete']
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        state = status(db, inst, 'M1')['coverage_projection']
+        assert state == dict(enabled=True, phase='verify', complete=False,
+                             maintenance_required=True)
+        assert market.stored_coverage(db, inst, 0, 120000) == [dict(start=0, end=120000)]
+        assert backfill_page(db, inst, administrative=True)['complete']
+    with database.begin() as db:
+        state = status(db, db.get(Instrument, 'BTCUSDT'), 'M1')['coverage_projection']
+        assert state == dict(enabled=True, phase='complete', complete=True,
+                             maintenance_required=False)
+
+
 def test_projection_keeps_legacy_margin_and_unknown_gap_without_audit_reads(database):
     from alerts.coverage_projection import backfill_page
 

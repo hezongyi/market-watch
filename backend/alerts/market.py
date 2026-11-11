@@ -337,28 +337,34 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
         return
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     received_at = received_at or now_ms()
-    closures = closures_from(instrument.calendar_profile)
     calendar = calendar_for(instrument)
     earliest = min(ms(bucket_bounds(min(touched), frame, calendar)[0]) for frame in timeframes)
     latest_boundary = max(ms(bucket_bounds(max(touched), frame, calendar)[1]) for frame in timeframes)
-    coverage = stored_coverage(db, instrument, earliest, latest_boundary)
-    # Read each touched day once rather than issuing one query per aggregate bar.
-    minute_rows = db.scalars(
-        select(Bar)
-        .where(
-            Bar.instrument_id == instrument.id,
-            Bar.timeframe == "M1",
-            Bar.start >= earliest,
-            Bar.start < latest_boundary,
-        )
-        .order_by(Bar.start)
-    ).all()
+    source = select(Bar).where(Bar.instrument_id == instrument.id, Bar.timeframe == 'M1',
+                              Bar.start >= earliest, Bar.start < latest_boundary).order_by(Bar.start)
+    if kind == 'observed':
+        # Scalar input serves both metadata comparison and a rejected fast path.
+        # Reading it twice would exceed the worker's complete-bucket row budget.
+        minute_rows = list(db.execute(source.with_only_columns(
+            Bar.start, Bar.end, Bar.open, Bar.high, Bar.low, Bar.close, Bar.complete,
+            Bar.volume, Bar.volume_complete, Bar.observed_at)))
+    else:
+        minute_rows = list(db.scalars(source))
     from .publication_budget import current
     if current():
         current().consume(len(minute_rows))
-    calendar = calendar_for(instrument)
+    remaining = {frame: touched for frame in timeframes}
+    if kind == 'observed':
+        from .aggregate_observation import refresh
+        remaining = {frame: refresh(db, instrument, touched, frame, minute_rows) for frame in timeframes}
+        timeframes = tuple(frame for frame in timeframes if remaining[frame])
+        if not timeframes:
+            return True
+    closures = closures_from(instrument.calendar_profile)
+    coverage = stored_coverage(db, instrument, earliest, latest_boundary)
+    blocked = False
     for timeframe in timeframes:
-        bounds = {bucket_bounds(t, timeframe, calendar) for t in touched}
+        bounds = {bucket_bounds(t, timeframe, calendar) for t in remaining[timeframe]}
         grouped = {}
         for row in minute_rows:
             pair = bucket_bounds(instant(row.start), timeframe, calendar)
@@ -384,7 +390,9 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                     ):
                         expected.add(t)
                     t += timedelta(minutes=1)
-            c = aggregate([r.candle() for r in rows], left, right, expected_starts=expected)
+            c = aggregate([Candle(instant(r.start), instant(r.end), r.open, r.high, r.low, r.close,
+                r.complete, volume=r.volume, volume_complete=r.volume_complete, volume_supplied=True)
+                for r in rows], left, right, expected_starts=expected)
             if c:
                 complete = c.complete and bool(expected) and ms(right) <= received_at - 5000
                 from dataclasses import replace
@@ -403,19 +411,21 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
             if db.scalar(select(ChartAggregationJob.id).where(
                     ChartAggregationJob.instrument_id == instrument.id,
                     ChartAggregationJob.timeframe == timeframe,
-                    ChartAggregationJob.kind == "price",
+                    ChartAggregationJob.kind.in_(("price", "volume") if kind == 'observed' else ("price",)),
                     ChartAggregationJob.start < latest_boundary,
                     ChartAggregationJob.end > earliest).limit(1)):
+                blocked = True
                 continue
         if kind == 'observed':
             for candle in outputs:
                 members = grouped[(candle.start, candle.end)]
                 write_bars(db, instrument.id, timeframe, [candle],
                     observed_at=max(row.observed_at for row in members),
-                    authoritative_volume=True, observation_only=True)
+                    authoritative_volume=True)
         else:
             write_bars(db, instrument.id, timeframe, outputs, observed_at=received_at,
                        volume_only=kind == "volume", authoritative_volume=True)
+    return not blocked
 
 
 
