@@ -157,14 +157,14 @@ def bind_offset(db, config, identity, dataset_id):
         "origin": origin, "algorithm": ALGORITHM}}
 
 
-def market_identity(db, config: AlertConfig, dataset_id=None, *, at=None):
+def market_identity(db, config: AlertConfig, dataset_id=None, *, at=None, clock=None):
     """Require the stored source identity; never silently fall back to another series."""
     if config.series_kind == "composite":
         from .composite_alerts import bind
 
         if dataset_id:
             raise ValueError("组合告警不能绑定平台缓存数据集")
-        return bind(db, config, now=at)
+        return bind(db, config, now=at, clock=clock)
     if config.series_kind == "managed":
         instrument = db.get(Instrument, config.instrument)
         if not instrument or not instrument.enabled or instrument.source != config.source:
@@ -217,13 +217,17 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
         if existing.request_hash != digest:
             raise Conflict("此请求身份已用于其他告警内容")
         return existing
+    clock = now_ms if at is None else None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
     from .price_alert_reasons import validate_notification
 
     validate_notification(config)
-    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at, clock=clock), dataset_id)
+    at = clock() if clock is not None else at
+    if config.expires_at is not None and config.expires_at <= at:
+        raise ValueError("到期时间必须晚于生效时间")
     alert = ChartAlert(request_id=request_id, request_hash=digest, name=config.name,
                        effective_at=at, max_triggers=config.max_triggers,
                        expires_at=config.expires_at)
@@ -255,13 +259,17 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     alert = locked(db, alert_id, expected_version)
     if alert.status == "archived":
         raise ValueError("已删除的告警不能编辑")
+    clock = now_ms if at is None else None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
     from .price_alert_reasons import validate_notification
 
     validate_notification(config)
-    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at, clock=clock), dataset_id)
+    at = clock() if clock is not None else at
+    if config.expires_at is not None and config.expires_at <= at:
+        raise ValueError("到期时间必须晚于生效时间")
     from .price_alert_inputs import is_price_rule
 
     if alert.runtime.get("incident") and not is_price_rule(config):
@@ -295,6 +303,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         return alert
     if alert.version != expected_version or alert.control_revision != expected_revision:
         raise Conflict("告警运行状态已改变，请读取当前状态后重试")
+    clock = now_ms if at is None else None
     at = now_ms() if at is None else at
     if alert.status == "archived":
         if action != "archive":
@@ -328,7 +337,10 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             if is_price_rule(config):
                 from .price_alert_evaluator import eligibility
 
-                eligibility(db, revision, mode=config.mode, now=at)
+                eligibility(db, revision, mode=config.mode, now=at, clock=clock)
+                at = clock() if clock is not None else at
+                if alert.expires_at is not None and alert.expires_at <= at:
+                    raise ValueError("告警已到期，请先修改到期时间")
             else:
                 require_live_eligibility(db, revision, now=at, timeframe=config.timeframe)
         if action == "restart":

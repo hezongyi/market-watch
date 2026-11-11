@@ -201,6 +201,87 @@ def test_first_rule_registration_serializes_with_collection(provider_pg, monkeyp
         assert len(evaluate(db, ident, now=make.at + 200)) == 1
 
 
+@pytest.mark.parametrize("action", ["create", "edit", "resume", "restart"])
+@pytest.mark.parametrize("expires_during_wait", [False, True])
+def test_enable_uses_clock_after_waiting_for_collector(provider_pg, monkeypatch, action, expires_during_wait):
+    from contextlib import nullcontext
+
+    from alerts import chart_alert_service as service
+    from alerts import live_pricing
+    from alerts.chart_alert_worker import evaluate
+    from alerts.market_contracts import DatasetIdentity
+    from alerts.storage import ChartAlert, CompositeRevision, RealtimeMapping
+    from sqlalchemy import event
+    from test_composite_alerts import ready_config
+    from test_live_pricing import quote
+
+    factory, engine = provider_pg
+    make = ready_config(factory, monkeypatch)
+    config = make(mode="intrabar", expires_at=make.at + 150 if expires_during_wait else None)
+    with factory.begin() as db:
+        revision = db.get(CompositeRevision, config.composite_revision_id)
+        target = db.get(RealtimeMapping, revision.mapping_id).target_dataset_id
+        identity = DatasetIdentity.model_validate(db.get(MarketDataset, target).identity)
+        ident = service.create(db, "existing-price-rule", config, at=make.at).id
+        if action in ("resume", "restart"):
+            service.lifecycle(db, ident, 1, "pause", expected_revision=1,
+                              request_id="pause-before-clock-test", at=make.at)
+    waiting, published = threading.Event(), threading.Event()
+    monkeypatch.setattr(service, "now_ms", lambda: make.at + (200 if published.is_set() else 0))
+
+    def before_lock(conn, cursor, statement, parameters, context, executemany):
+        if threading.current_thread().name.startswith("enable-rule") and "market_datasets" in statement and "FOR UPDATE" in statement:
+            waiting.set()
+
+    def enable():
+        with factory.begin() as db:
+            if action == "create":
+                return service.create(db, "clock-safe-price-rule", config).id
+            if action == "edit":
+                return service.edit(db, ident, 1, config).id
+            row = db.get(ChartAlert, ident)
+            return service.lifecycle(db, ident, 1, action, expected_revision=row.control_revision,
+                                     request_id="clock-safe-enable").id
+
+    event.listen(engine, "before_cursor_execute", before_lock)
+    try:
+        with ThreadPoolExecutor(max_workers=1, thread_name_prefix="enable-rule") as pool:
+            with factory.begin() as db:
+                db.scalar(select(MarketDataset).where(MarketDataset.id == target).with_for_update())
+                pending = pool.submit(enable)
+                assert waiting.wait(10)
+                owner = (live_pricing.account_key(live_pricing.settings.oanda_account_id), "test-owner")
+                # The collector commits while the enabling request waits for its lock.
+                with monkeypatch.context() as patch:
+                    patch.setattr(live_pricing, "transaction", lambda: nullcontext(db))
+                    assert live_pricing.publish_event(owner, 1, quote(identity, 1, seq=1,
+                        source=make.at + 100, received_at=make.at + 100, bid="1.110"),
+                        {"EUR_USD": identity}, now=make.at + 100) == "accepted"
+                published.set()
+            if expires_during_wait:
+                with pytest.raises(ValueError, match="到期"):
+                    pending.result(timeout=15)
+                with factory.begin() as db:
+                    row = db.get(ChartAlert, ident)
+                    assert row.effective_at == make.at
+                    assert row.version == 1
+                    assert row.status == ("paused" if action in ("resume", "restart") else "active")
+                    assert db.scalar(select(ChartAlert).where(ChartAlert.request_id == "clock-safe-price-rule")) is None
+                return
+            result = pending.result(timeout=15)
+        with factory.begin() as db:
+            row = db.get(ChartAlert, result)
+            assert row.effective_at == make.at + 200
+            assert row.runtime["last_input_at"] == make.at + 100
+        assert live_pricing.publish_event(owner, 1, quote(identity, 1, seq=2,
+            source=make.at + 300, received_at=make.at + 300, bid="1.120"),
+            {"EUR_USD": identity}, now=make.at + 300) == "accepted"
+        with factory.begin() as db:
+            assert len(evaluate(db, result, now=make.at + 400)) == 1
+    finally:
+        event.remove(engine, "before_cursor_execute", before_lock)
+
+
 def test_signal_cursor_count_and_notification_rollback_together(collecting):
     from alerts.chart_alert_worker import evaluate
     from alerts.storage import ChartAlert, Notification, SignalRow

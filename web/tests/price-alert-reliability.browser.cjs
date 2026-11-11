@@ -15,6 +15,7 @@ const root = path.resolve(__dirname, "../..");
 const output = path.join(path.dirname(configPath), "browser-result.json");
 const scratch = path.join(path.dirname(configPath), "browser-command.json");
 const report = { project: cfg.project, url: base, synthetic: true, checks: [] };
+function checked(message) { report.checks.push(message); console.log(message); }
 
 function fixture(operation, extra = []) {
   execFileSync(path.join(root, ".venv/bin/python"), [
@@ -65,6 +66,12 @@ async function main() {
     expect(selected).toBeTruthy();
     const initialSession = await request(page, "/api/session");
     const headers = { "X-CSRF-Token": initialSession.csrf };
+    await expect.poll(async () => {
+      const view = await request(page, "/api/chart-alerts/capabilities", {
+        method: "POST", headers, data: { instrument: composite, series_kind: "composite", timeframe: "M1" },
+      });
+      return view.sources[0]?.price_modes?.intrabar?.available;
+    }, { timeout: 90000, intervals: [1000, 2500] }).toBe(true);
     const workspace = await request(page, "/api/advanced-charts/workspaces", {
       method: "POST", headers, data: { name: "FIXTURE price alerts " + Date.now() },
     });
@@ -102,7 +109,7 @@ async function main() {
       method: "POST", data: payload, headers: { "X-CSRF-Token": session.csrf },
     });
     expect(replay.id).toBe(id);
-    report.checks.push("A01: native chart form, immutable binding, preparing on create, HTTP replay returns one rule");
+    checked("A01: native chart form, immutable binding, preparing on create, HTTP replay returns one rule");
 
     const getRule = () => request(page, "/api/chart-alerts/" + id);
     await expect.poll(async () => (await getRule()).execution.state, { timeout: 15000 }).toBe("monitoring");
@@ -116,7 +123,7 @@ async function main() {
     await expect.poll(() => evidence(id).count, { timeout: 12000 }).toBe(1);
     const signal = evidence(id).events[0];
     expect(Number(signal.price)).toBe(101);
-    report.checks.push("A02: zero tabs and unexpired chart leases; live collector and runtime committed a signal");
+    checked("A02: zero tabs and unexpired chart leases; live collector and runtime committed a signal");
 
     control({ price: "99" });
     await expect.poll(() => evidence(id).runtime.last_input_at, { timeout: 10000 }).toBeGreaterThan(signal.occurred_at);
@@ -130,7 +137,7 @@ async function main() {
     expect(restored.count).toBe(1);
     expect(restored.runtime.last_incident.id).toBe(fault);
     expect(restored.runtime.last_gap.unrecoverable).toBe(true);
-    report.checks.push("A09/A19: real disconnected lease, recovery baseline suppresses phantom crossing, gap retained");
+    checked("A09/A19: real disconnected lease, recovery baseline suppresses phantom crossing, gap retained");
 
     ({ context, page } = await authenticate(browser));
     page.on("pageerror", (error) => errors.push(error.message));
@@ -152,7 +159,7 @@ async function main() {
     await expect(native.locator('[data-signal-id="' + signal.id + '"]')).toBeVisible();
     expect((await getRule()).id).toBe(id);
     expect(errors).toEqual([]);
-    report.checks.push("A23: new browser session views projected recovery, follows rule link and reads historical signal");
+    checked("A23: new browser session views projected recovery, follows rule link and reads historical signal");
     report.signal = signal;
     report.rule = id;
     report.passed = true;

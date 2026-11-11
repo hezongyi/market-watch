@@ -136,7 +136,7 @@ def gate_matched(alert, runtime, now, key, window):
     return isinstance(full_at, int) and 0 <= now - full_at <= window
 
 
-def bind(db, config, *, now=None):
+def bind(db, config, *, now=None, clock=None):
     from .composite_definitions import first_use
     from .series_access import composite_definition
 
@@ -154,7 +154,7 @@ def bind(db, config, *, now=None):
     if is_price_rule(config):
         from .price_alert_evaluator import eligibility
 
-        eligibility(db, revision, mode=config.mode, now=now_ms() if now is None else now)
+        eligibility(db, revision, mode=config.mode, now=now_ms() if now is None else now, clock=clock)
     else:
         require_live_eligibility(db, revision, now=now_ms() if now is None else now,
                                  timeframe=config.timeframe)

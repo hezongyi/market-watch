@@ -28,7 +28,7 @@ def right_value(config):
     return right.value if right.kind == "constant" else right.line.points[0].price
 
 
-def eligibility(db, revision, *, mode, now, lock=True, acquired=False):
+def eligibility(db, revision, *, mode, now, lock=True, acquired=False, clock=None):
     from .composite_inputs import frozen
     from .composite_quotes import live_snapshot, sampled_observation
     from .history_catalog import account_scope
@@ -42,6 +42,10 @@ def eligibility(db, revision, *, mode, now, lock=True, acquired=False):
     if lock:
         list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
             sorted({history.dataset_id, target.id}))).order_by(MarketDataset.id).with_for_update()))
+    # A collector may commit a newer quote while we wait for its dataset lock.
+    # Validate against the clock after acquiring that fence, not request arrival.
+    if clock is not None:
+        now = clock()
     if frozen(db.get(CompositePreparation, revision.id)):
         raise Unavailable("binding_frozen", "组合修订已冻结，请显式编辑绑定")
     if target.identity["account_scope"] != account_scope() or target.identity.get("basis") != "bid":
