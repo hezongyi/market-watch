@@ -1,0 +1,56 @@
+{
+  "runtime_roles": 38,
+  "runtime_healthy": true,
+  "sources": [
+    {
+      "source": "oanda",
+      "status": "ok",
+      "bars": 40,
+      "frame": "H1"
+    },
+    {
+      "source": "binance",
+      "status": "ok",
+      "bars": 40,
+      "frame": "H1"
+    },
+    {
+      "source": "dukascopy",
+      "status": "ok",
+      "bars": 40,
+      "frame": "H1"
+    },
+    {
+      "source": "yahoo",
+      "status": "ok",
+      "bars": 40,
+      "frame": "D1"
+    },
+    {
+      "source": "akshare",
+      "status": "ok",
+      "bars": 40,
+      "frame": "D1"
+    },
+    {
+      "source": "fxcm",
+      "status": "ok",
+      "bars": 40,
+      "frame": "H1",
+      "elapsed_seconds": 16.11
+    }
+  ],
+  "mcp_tools": 42,
+  "ntfy": true,
+  "market_sse": true,
+  "notification_sse": true,
+  "browser": {
+    "chart": true,
+    "bars": 40,
+    "data_center": true,
+    "health": 200,
+    "errors": [],
+    "failedResources": []
+  },
+  "fxcm_note": "An interim native login was rejected and cooled down; a later source-only read after cooldown returned 40 real bars in 16.11 seconds. Credentials were unchanged."
+}
