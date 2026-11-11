@@ -8,17 +8,17 @@ export interface ChartApplication {
   cancel(id:number,source:ChartAdapter):void;
 }
 declare global {var MWChartAdapter:{mount(container:HTMLElement,application:ChartApplication):ChartAdapter};}
-let assets:Promise<void>|undefined;
+const assets = new Map<string, Promise<void>>();
 function script(src:string) {return new Promise<void>((resolve,reject)=>{
   const node=document.createElement("script");node.src=src;
   node.onload=()=>resolve();node.onerror=()=>{node.remove();reject(Error("图表资源加载失败，请重试"));};document.head.append(node);
 });}
-export function prepareChart() {
-  if(!assets)assets=fetch('/chart-assets.json').then(response=>{if(!response.ok)throw Error("图表资源清单不可用");return response.json();})
+export function prepareChart(manifestPath = '/chart-assets.json') {
+  if(!assets.has(manifestPath))assets.set(manifestPath,fetch(manifestPath).then(response=>{if(!response.ok)throw Error("图表资源清单不可用");return response.json();})
     .then(async manifest=>{await script('/'+manifest.libraryDirectory+'/charting_library.js');await script('/'+manifest.script);})
-    .catch(error=>{assets=undefined;throw error;});
-  return assets;
+    .catch(error=>{assets.delete(manifestPath);throw error;}));
+  return assets.get(manifestPath)!;
 }
-export async function mountChart(container:HTMLElement, application:ChartApplication) {
-  await prepareChart();return MWChartAdapter.mount(container,application);
+export async function mountChart(container:HTMLElement, application:ChartApplication, manifestPath?:string) {
+  await prepareChart(manifestPath);return MWChartAdapter.mount(container,application);
 }

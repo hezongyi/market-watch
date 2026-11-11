@@ -52,16 +52,16 @@ function indicatorMatches(entries, query) {
     .map((row) => row.entry);
 }
 
-function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi) {
-  const probe = chartWidget.createButton({
+function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi, externalDocument) {
+  const probe = !externalDocument && chartWidget.createButton({
     align: "left",
     useTradingViewStyle: false,
   });
-  const doc = probe.ownerDocument;
-  chartWidget.removeButton(probe);
+  const doc = externalDocument || probe.ownerDocument;
+  if (probe) chartWidget.removeButton(probe);
   const icon =
     '<svg viewBox="0 0 28 28" fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6.5 11.5 5-5 4 4 7-5"/><path d="M6.5 22.5v-4h4v-3h4v2h4v-5h4v10h-16Zm4 0v-4m4 4v-5m4 5v-5"/></svg>';
-  const buttonId = chartWidget.createButton({
+  const buttonId = !externalDocument && chartWidget.createButton({
     align: "left",
     useTradingViewStyle: true,
     text: "指标",
@@ -745,7 +745,7 @@ function chartIndicatorPicker(chartWidget, catalog, report, getNativeUi) {
       dialog.remove();
       doc.removeEventListener("keydown", keyboard, true);
       doc.removeEventListener("pointerdown", rememberPointer, true);
-      chartWidget.removeButton(buttonId);
+      if (buttonId) chartWidget.removeButton(buttonId);
       for (const [event, callback] of bindings)
         chartWidget.unsubscribe(event, callback);
     },

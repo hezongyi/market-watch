@@ -1,0 +1,51 @@
+# Android v2.0.5 / A06 实施进度
+
+日期：2026-11-11。**A 阶段进行中，未通过完整真机门槛；B/C/D 未完成。** 本文件记录工程进度，不替代唯一任务书或冻结规范。
+
+## 基线与隔离
+
+- 实现工作树：`/home/quant/repos/market-watch-android-personal-v205`。
+- 分支：`feat/android-personal-v205`；应用基线：`1bb935bdf1195c4da532cb2e6f62faca2198e6c4`（v2.0.5）。
+- 文档源：`89d10fe3fcbc71380b12af3dc21aefdcd756758b`；只导入约定 docs 路径并单独提交。
+- 风险 F1（新增本机持久格式、SW 更新和原生外壳），见 [Issue 草案](issue-draft.md)。没有后端/schema 改动。
+- 未合并、未推送或创建 PR、未打正式 tag、未生产发布。未访问 Unraid，未修改其他任务工作树、数据库或实例。
+
+## 本次真实代码
+
+1. Vite 多入口中的独立 `/m/` 页面；Nginx `/m` 规范跳转、手机深链接及 SW 路由。保留桌面入口。
+2. 真实会话/CSRF、当前服务器已存在组合目录和单图选择；五项导航容器。自选、完整数据/更多和告警仍明确为后续阶段，不冒充已交付功能。
+3. 共享 widget/datafeed/marketRuntime 的明确 mobile 模式；真实 getStudiesList、原生指标选择器/参数、副图、原生触屏 tracking 十字线。无预览数据、模拟图层或固定 12 项目录。
+4. 单份实际 captureChartLayout 序列化结果在 IDB 原子替换；300ms 防抖、实际变化、失活 flush；参数窗口未完成时不写布局。手机设置适配不经过服务器偏好、工作区、最近桌面状态或通用草稿。
+5. IDB 以 origin/subject/schema 隔离，缓存真实读取页及读取时间。明确 401 卸载图表；离线只读上次内容。退出清理内容；浏览器离线无法确认服务端会话撤销时，本机 signed-out 标记阻止自动复用遗留 HttpOnly cookie，原生壳另清 Cookie。
+6. Vite manifest 生成最小 SW 壳，作用域仅 `/m/`；不缓存 API、SSE、许可库或 K 线。壳固定对应的 chart-assets 清单；输入/本机写入未完成时不刷新，安装不完整保留旧壳。
+7. 共享 providerSubscriptions 的可选 open/message/显式 heartbeat/error 观察钩子，无新增连接。手机头部/自选统一 transport 的接入仍属于 B。
+8. 新 Kotlin 工程：可信 HTTPS 来源、主框架 WebMessageListener v1、外链交浏览器、返回/键盘、旋转保留 WebView、release 关闭调试。仅源代码和固定 Gradle wrapper；尚未编译或真机验证。
+
+## 已运行证据与边界
+
+- [完整前端构建](build-a.log)：TypeScript、Vite、固定许可库 patch/build、mobile shell 生成成功。
+- [IDB 定向检查](cache-a.log)：身份/schema 隔离、失败事务保留上一份、图表局部重置、按服务器退出清理、离线退出标记。
+- [Transport 定向检查](transport-a.log)：真实 open/message/heartbeat/error 分开记录、重开不沿用旧心跳、共享连接和迟到事件关闭。
+- [既有单前端 unit 回归](desktop-unit-a.log)：`npm run test:single-frontend -- --unit` 通过。另运行 advanced-watchlists、advanced-native-workspaces、advanced-preferences-conflict、advanced-provider-subscriptions，均通过。
+- 桌面实际库：`advanced-native-indicator-categories.browser.cjs` 通过，包含项目 SMA 注册、搜索/分类/收藏、添加、原生设置返回及尺寸/主题检查；使用受控行情。
+- [手机实际库浏览器记录](browser-a.json)：真实构建页面与许可 widget，**API 为受控测试替身**；107 项是该测试空项目 catalog 下的实际内置目录，不能当作真实服务器项目指标目录已验收。包括真实参数取消/副图/十字线、本地恢复、20 次切换单实例、375/412/横屏与 150% 字号、SW 离线重载/更新/安装失败、401 清理及禁止服务器布局/偏好写入。
+- `sh -n mobile/client/gradlew`、`git diff --check` 通过。JDK 为 17。
+
+真实发现并修复：手机不启用 header 时不能继续调用桌面 headerReady 相关 UI；隐藏 watchlist 后原生搜索页脚模块未预载，导致指标选择器回退。现在只在缺少模块时加载固定版本 compare-dialog chunk，并在浏览器中断言没有进入回退窗口。测试专用临时诊断已移除。
+
+## 环境与未验门槛
+
+- 本机根分区最初约 797 MiB 可用，创建约定 worktree 后约 149–223 MiB；不满足 SDK/APK/Docker 构建预算，已报告用户协调。未清理其他任务。
+- npm 依赖、构建 staging/dist 暂置任务独立 `/dev/shm/mw-android-personal-v205-*`，不作为持久交付。重启后正常重新安装/构建。可执行 esbuild 临时复制在 gitignored `.tools/`；未借用其他任务依赖或可写 DB。
+- 许可库本机只读使用既有安装：`/home/quant/repos/market-watch-dev/advanced-host/charting_library`。与基线 manifest 的差异只有两份已有受支持 patch 的 bundle；本次构建验证既有 native hooks/toolbar lifetime，未修改安装目录、未提交或发布库文件。
+- 没有 Android SDK、adb 或已连接设备；没有运行 Gradle assemble/lint，**没有 APK**。工具链版本见 [外壳说明](../../../mobile/client/README.md)。
+- 没有启动本任务 Ubuntu Compose project，故没有本任务真实验收地址。浏览器测试使用临时 loopback HTTP fixture（结束即停止），不是 Ubuntu 后端隔离部署或设备 HTTPS 验收。
+- Find X8 系统/ColorOS/WebView、真实后端及完整项目指标、HTTPS Cookie/CSRF、返回/旋转/进程回收、设备 SW/IDB、冷启动/首图/重连耗时、覆盖升级、ntfy 实收均未验。
+- 缺少上述证据，不能关闭 A 门槛或标目标完成。可继续不依赖这些资源的 B/C 代码，但不能用受控浏览器结果替代真实链路验收。
+
+## 下一步
+
+1. 资源满足后按任务书和 AGENTS 创建本任务独立 Ubuntu R1（建议 project/task `mw-android-personal-v205`），提供可信 HTTPS；不复用其他任务可写数据。
+2. 安装 SDK 35/ADB，执行 `mobile/client/gradlew :app:assembleDebug :app:lintDebug`；Find X8 核对 A 阶段清单，记录设备版本与真实图表/离线/返回证据。
+3. 按 B 实施完整共享自选及 revision/active 隔离、真实数据页面、只读有界 sparklines API、应用级行情 transport；再按 C 复用告警/通知。保持 A06 与 v2.0.5 来源能力边界。
+4. 完成 D 桌面/真机/生命周期回归、独立 review、签名 APK 与交付记录后再更新完成审计。不合并、不生产发布。

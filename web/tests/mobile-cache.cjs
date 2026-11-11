@@ -1,0 +1,34 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const {indexedDB}=require('fake-indexeddb');
+const exportsObject={};
+vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/cache.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
+  {exports:exportsObject,indexedDB,Promise,Error,Date,Array,Object});
+(async()=>{
+  const cache=exportsObject;
+  const a=await cache.rememberProfile('https://one.example','admin');
+  const b=await cache.rememberProfile('https://two.example','admin');
+  const other=await cache.rememberProfile('https://one.example','other');
+  await cache.writeSnapshot(a,'chart',{value:'last complete'});
+  await cache.writeSnapshot(b,'chart',{value:'other server'});
+  await cache.writeSnapshot(other,'chart',{value:'other subject'});
+  assert.equal((await cache.readSnapshot(a,'chart')).value.value,'last complete');
+  assert.equal((await cache.readSnapshot(b,'chart')).value.value,'other server');
+  assert.equal((await cache.readSnapshot(other,'chart')).value.value,'other subject');
+  await assert.rejects(cache.writeSnapshot(a,'chart',{invalid:()=>{}}));
+  assert.equal((await cache.readSnapshot(a,'chart')).value.value,'last complete','failed transaction retains previous complete snapshot');
+  assert.equal(await cache.readSnapshot({...a,schema:2},'chart'),undefined,'new schema cannot read old data');
+  await cache.writeSnapshot(a,'recent-composites',[{ticker:'MWC:'+ 'a'.repeat(64)}]);
+  await cache.dropSnapshot(a,'chart');
+  assert.equal((await cache.readSnapshot(a,'recent-composites')).value.length,1,'chart reset preserves business cache');
+  assert.equal(cache.validChartDocument({engine:'tv31',schemaVersion:1,state:{charts:[{}]}}),true);
+  assert.equal(cache.validChartDocument({engine:'tv31',schemaVersion:1,state:{charts:[{},{}]}}),false);
+  assert.equal(cache.validChartDocument({engine:'old',schemaVersion:1}),false);
+  await cache.clearOrigin(a.origin);
+  assert.equal(await cache.lastProfile(a.origin),undefined);
+  assert.equal(await cache.locallySignedOut(a.origin),true,'offline logout blocks silent session reuse');
+  await cache.allowSession(a.origin);assert.equal(await cache.locallySignedOut(a.origin),false);
+  assert.equal(await cache.readSnapshot(a,'recent-composites'),undefined);
+  assert.equal(await cache.readSnapshot(other,'chart'),undefined);
+  assert.equal((await cache.readSnapshot(b,'chart')).value.value,'other server','logout is scoped to selected server');
+  console.log('PASS mobile cache: identity/schema isolation, atomic failure, selective chart reset and origin logout');
+})().catch(error=>{console.error(error);process.exitCode=1;});

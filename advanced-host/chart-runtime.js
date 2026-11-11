@@ -67,6 +67,7 @@ const watchlistMetadata = new Map();
 let rangeGuard, edgeGuard, demandReporter, progressivePages, progressivePoll, beforeInitialHistory, initialSymbol;
 let prewarming = false;
 let autoSave, editRevision = 0, manualSavePending = false;
+let mobileMode = false, mobileSaveTimer, mobileSaving, mobileCrosshair = false;
 // The SHA-verified native chartSaved handler reads this after the async save
 // adapter completes, so saving A cannot acknowledge a later edit B.
 globalThis.MWNativeSave = { hasUnsavedChanges: () => dirty };
@@ -75,6 +76,7 @@ function markWorkspaceDirty() {
   dirty = true;
   editRevision++;
   send({type: "workspace-dirty"});
+  if (mobileMode) {clearTimeout(mobileSaveTimer); mobileSaveTimer = setTimeout(() => {void snapshot(false)?.catch(error => {});}, 300);}
 }
 const resolutions = ["1", "5", "15", "30", "60", "240", "1D", "1W", "1M"];
 const frames = {
@@ -2221,6 +2223,30 @@ async function tick() {
 }
 function snapshot(manual = true) {
   if (!ready || loading) return;
+  if (mobileMode) {
+    clearTimeout(mobileSaveTimer);
+    if (mobileChartParameterEditing(container)) {
+      if (manual) return Promise.reject(Error('请先完成或取消图表参数输入'));
+      mobileSaveTimer=setTimeout(()=>{void snapshot(false)?.catch(()=>{});},300);
+      return Promise.resolve();
+    }
+    if (mobileSaving) return mobileSaving.then(() => dirty ? snapshot(false) : undefined);
+    if (!dirty) return Promise.resolve();
+    const revision = editRevision, epoch = workspaceEpoch;
+    mobileSaving = (async () => {
+      const state = await captureWorkspaceState();
+      if (disposed || epoch !== workspaceEpoch) return;
+      if (revision !== editRevision) return;
+      const primary = state._mwViewports[0];
+      await request({op:'save',args:{engine:'tv31',schemaVersion:1,state,
+        symbol:primary.symbol,interval:primary.resolution,theme:chartThemeName(widget.getTheme())}}, 'workspace');
+      if (revision === editRevision) {dirty = false; send({type:'mobile-saved'});}
+    })().catch(error => {send({type:'error',error:'本次图表设置未记住：'+String(error)});throw error;})
+      .finally(() => {mobileSaving = undefined;});
+    // Background callers report via observe; explicit flush callers can await rejection.
+    mobileSaving.catch(() => {});
+    return mobileSaving;
+  }
   if (globalThis.MWNativeNavigation?.busy() || rangeGuard?.busy() || edgeGuard?.busy()) {
     dirty = true;
     if (manual) manualSavePending = true;
@@ -2410,7 +2436,7 @@ function boot(
   // Serialize private widgetbar mutations. A cancelled attach must finish and
   // restore its shell before a newer session can install another one.
   alertUIAttach = () => {
-    if (alertUIStopped || loading || !ready || String(currentNativeWorkspace?.id) !== alertUIWorkspace) return Promise.resolve();
+    if (mobileMode || alertUIStopped || loading || !ready || String(currentNativeWorkspace?.id) !== alertUIWorkspace) return Promise.resolve();
     const attempt = ++attachingAlerts, session = alertUISession, workspaceId = alertUIWorkspace;
     alertAttachQueue = alertAttachQueue.then(async () => {
     if (attempt !== attachingAlerts || alertUIStopped) return;
@@ -2473,7 +2499,7 @@ function boot(
     },
     fail:error=>send({type:"error",error:String(error)})});
   alertBridge.reset(chartState || {});
-  const layouts = nativeWorkspaces(
+  const layouts = mobileMode ? {} : nativeWorkspaces(
     workspace,
     (op, args) => request({ op, args }, "workspace"),
     readonly,
@@ -2612,7 +2638,8 @@ function boot(
     }
   };
   activePreferences?.dispose();
-  const prefs = activePreferences = nativePreferences(
+  const prefs = activePreferences = mobileMode ? mobileChartPreferences(preferences,
+    (op,args)=>request({op,args}, "preferences"), error=>send({type:"error",error:String(error)})) : nativePreferences(
     preferences,
     (op, args) => request({ op, args }, "preferences"),
     readonly,
@@ -2630,7 +2657,7 @@ function boot(
   autoSave?.dispose();
   autoSave = chartAutoSave(preferences,
     value => prefs.savePreference("setting", "mw.autoSave", value),
-    () => { if (dirty) snapshot(false); }, readonly);
+    () => { if (dirty) snapshot(false); }, readonly || mobileMode);
   savedDoc = doc;
   savedDoc.templates ||= {};
   initialHistoryGate?.resolve();
@@ -2673,9 +2700,9 @@ function boot(
     custom_css_url: "/chart-menu.css",
     datafeed: feed,
     widgetbar: {
-      watchlist: true,
-      details: true,
-      datawindow: true,
+      watchlist: !mobileMode,
+      details: !mobileMode,
+      datawindow: !mobileMode,
       watchlist_settings: {
         // Restore the active list before native resolves constructor defaults.
         // Waiting until onChartReady briefly requests unrelated default symbols.
@@ -2719,9 +2746,8 @@ function boot(
       : undefined,
     auto_save_delay: 2,
     enabled_features: [
-      "support_multicharts",
+      ...(!mobileMode ? ["support_multicharts", "header_layouttoggle"] : []),
       "determine_first_data_request_size_using_visible_range",
-      "header_layouttoggle",
       "header_in_fullscreen_mode",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
@@ -2731,6 +2757,7 @@ function boot(
       "chart_template_storage",
     ],
     disabled_features: [
+      ...(mobileMode ? ["header_widget", "left_toolbar", "right_toolbar", "timeframes_toolbar", "control_bar", "header_saveload", "study_templates", "chart_template_storage"] : []),
       "widget_logo",
       "use_localstorage_for_settings",
       "open_account_manager",
@@ -2747,7 +2774,7 @@ function boot(
         : []),
     ],
   });
-  widget
+  if (!mobileMode) widget
     .headerReady()
     .then(async () => {
       watchlistLayout?.dispose();
@@ -2756,10 +2783,10 @@ function boot(
           const meta=presentationFor(ticker);
           return meta?.display_symbol || meta?.symbol;
         }, ticker => symbolFlags?.colorFor?.(ticker));
-      if (!readonly) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
+      if (!readonly && !mobileMode) indicatorPicker = chartIndicatorPicker(widget, catalog, (e) =>
         send({type: "error", error: String(e)}), () => dataCenter?.nativeUi);
       // Public left-aligned buttons retain their creation order in the header.
-      if (!readonly) dataCenter = chartDataCenter({occurrence:emitNotice,widget,
+      if (!readonly && !mobileMode) dataCenter = chartDataCenter({occurrence:emitNotice,widget,
         workspace: () => currentNativeWorkspace, epoch: () => workspaceEpoch, send, searchSymbols: searchNativeSymbols,
         timezone: () => {const chart=widget.activeChart(),zone=chart.getTimezoneApi().getTimezone().id;
           return zone === "exchange" ? presentationFor(chart.symbol())?.timezone || "UTC" : zone;},
@@ -2792,7 +2819,7 @@ function boot(
       syncCoordinator.configure({time:true,date:true,barWidth:false},true);
       widget.intervalSync().setValue(false);
       widget.symbolSync().setValue(false);
-      if (workspace && !readonly) {
+      if (workspace && !readonly && !mobileMode) {
         try {
           await Promise.race([new Promise(resolve=>{if(widget.activeChart().dataReady(resolve))resolve();}),
             new Promise((_,reject)=>setTimeout(()=>reject(Error('首次图格历史未能就绪；请在通知中心查看并重试')),15000))]);
@@ -2810,7 +2837,7 @@ function boot(
         }
       }
     }
-    widget.headerReady().then(async()=>{
+    if (!mobileMode) widget.headerReady().then(async()=>{
         studyTemplates=chartStudyTemplates(widget,prefs.templates,readonly,
           error=>send({type:'error',error:String(error)}));
         swingDisplay = chartSwingDisplay(widget,swingStore(),{root:container,
@@ -2890,6 +2917,7 @@ function boot(
           send({ type: "error", error: "主题保存失败：" + String(e) }),
         );
     });
+    if (!mobileMode) {
     symbolFlags?.dispose();
     try {
       symbolFlags = MWSymbolFlags.attach(widget, preferences.find(p=>p.kind==="setting" && p.name===MWSymbolFlags.name), readonly,
@@ -2907,6 +2935,27 @@ function boot(
     ).catch((e) =>
       send({ type: "error", error: "自选列表初始化失败：" + String(e) }),
     );
+    }
+    if (mobileMode) {
+      const doc = container.querySelector("iframe").contentDocument;
+      indicatorPicker = chartIndicatorPicker(widget, catalog, error=>send({type:"error",error:String(error)}), undefined, doc);
+      const changed = () => {
+        markWorkspaceDirty();
+        const chart = widget.activeChart();
+        const metadata = presentationFor(chart.symbol());
+        send({type:"mobile-series",symbol:chart.symbol(),resolution:chart.resolution(),
+          resolutions:chart.symbolExt?.()?.supported_resolutions || (metadata?.frames ? resolutions.filter(r=>metadata.frames.includes(frames[r])) : resolutions)});
+      };
+      widget.activeChart().onSymbolChanged().subscribe(null, changed);
+      widget.activeChart().onIntervalChanged().subscribe(null, changed);
+      widget.subscribe("onAutoSaveNeeded", changed);
+      widget.subscribe("study_event", markWorkspaceDirty);
+      widget.subscribe("study_properties_changed", markWorkspaceDirty);
+      addEventListener("pagehide", () => {void snapshot(false);});
+      addEventListener("visibilitychange", () => {if (document.hidden) void snapshot(false);});
+      addEventListener("mw-mobile-background", () => {void snapshot(false);});
+      changed();
+    }
     const bindEdgeSync = () => {
       edgeGuard?.dispose();
       const sessionRequests = new Map();
@@ -3199,6 +3248,32 @@ async function update(m) {
     }
     return;
   }
+  if (m.type === "mobile-command" && mobileMode && ready) {
+    try {
+      if (m.action === "indicators") await indicatorPicker.open();
+      else if (m.action === "resolution") await widget.activeChart().setResolution(m.resolution);
+      else if (m.action === "symbol") await widget.activeChart().setSymbol(m.symbol);
+      else if (m.action === "crosshair") {
+        mobileCrosshair = mobileChartCrosshair(widget, m.enabled);
+        send({type:"mobile-crosshair",enabled:mobileCrosshair});
+      } else if (m.action === "back" || m.action === "can-leave") {
+        const doc=container.querySelector("iframe").contentDocument;
+        const dialog=[...doc.querySelectorAll('[role="dialog"],.mw-indicator-picker')].some(node=>!node.hidden && node.getBoundingClientRect().height>0);
+        const allowed=!mobileChartParameterEditing(container) || await request({},'confirm-leave');
+        if(dialog && allowed) {indicatorPicker?.close();widget.closePopupsAndDialogs();}
+        send({type:"mobile-flushed",request:m.request,consumed:m.action==='back' ? dialog : !allowed});
+      } else if (m.action === "leave") {
+        mobileCrosshair = mobileChartCrosshair(widget, false);
+        indicatorPicker?.close(); widget.closePopupsAndDialogs();
+        send({type:"mobile-crosshair",enabled:false});
+        await snapshot(false);
+      } else if (m.action === "flush") {
+        await snapshot(true);
+        send({type:"mobile-flushed",request:m.request});
+      }
+    } catch (error) {send({type:"error",error:String(error)}); if(m.request)send({type:"mobile-flushed",request:m.request,error:String(error)});}
+    return;
+  }
   if (m.type === "history-capabilities") {
     MWNativeNavigation.setCapabilities(m.capabilities);
     edgeGuard?.retry();
@@ -3257,6 +3332,7 @@ async function update(m) {
     const chart=widget.chart(m.index);
     if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
   } else if (m.type === "init" && !widget) {
+    mobileMode = m.mode === "mobile";
     requestPolicy.capacity(m.history_load_available);
     alertUISession = m.alert_ui_session;
     noticeState = m.notice_state;
