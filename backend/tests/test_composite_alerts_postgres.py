@@ -20,7 +20,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 
 @pytest.mark.parametrize("contract", [
     contracts.test_fixed_binding_persistent_demand_and_one_transactional_event,
-    contracts.test_disconnect_recovery_baselines_old_cross_and_later_new_event_triggers,
+    contracts.test_close_disconnect_recovery_consumes_confirmed_backlog,
     contracts.test_correction_rebuild_preserves_judgments_and_never_replays_historical_event,
     contracts.test_missing_confirmation_period_waterline_and_stale_owner_all_fence_rules,
     contracts.test_complete_recursive_initialization_requires_explicit_raw_seam_policy,
@@ -28,7 +28,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
     contracts.test_indicator_dependency_gap_cannot_be_hidden_by_latest_confirmed_minute,
     contracts.test_normal_async_indicator_append_keeps_comparison_state_and_triggers_new_cross,
     contracts.test_explicit_sampled_quote_mode_never_mutates_confirmed_state_and_requires_valid_owner,
-    contracts.test_missed_and_expired_events_establish_baseline_without_notifications,
+    contracts.test_price_close_backlog_preserves_late_events_and_notifications,
     contracts.test_duplicate_logical_event_after_state_recovery_keeps_count,
     contracts.test_active_chart_revision_switch_never_retargets_running_rule,
     contracts.test_pure_capabilities_and_authenticated_fixed_creation_geometry_judgments,
@@ -69,7 +69,8 @@ def test_competing_evaluators_and_rollback_preserve_single_event(provider_pg, mo
 
 def test_additive_judgment_migration_preserves_rules_and_rejects_downgrade(provider_pg, monkeypatch):
     factory, engine = provider_pg
-    ident, _, _, _, stamp = contracts.armed(factory, monkeypatch)
+    # ai36 predates price-v2's create-time baseline; exercise an old-path rule.
+    ident, _, _, _, stamp = contracts.armed(factory, monkeypatch, condition=contracts.ray_condition())
     path = Path(__file__).resolve().parents[2] / "migrations/versions/ai36_composite_alerts.py"
     spec = importlib.util.spec_from_file_location("composite_alert_migration", path)
     migration = importlib.util.module_from_spec(spec)

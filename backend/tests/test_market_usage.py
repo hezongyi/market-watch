@@ -89,9 +89,9 @@ def test_stale_paused_composite_alert_keeps_recovery_demand_only(database, monke
     from alerts.market_usage import composite_targets, wanted_instruments
     from alerts.realtime_switch import preference_key
     from alerts.storage import CompositeRevision, MarketDataset
-    from test_composite_alerts import armed
+    from test_composite_alerts import armed, ray_condition
 
-    alert_id, _, revision_id, _, _ = armed(database, monkeypatch)
+    alert_id, _, revision_id, _, _ = armed(database, monkeypatch, condition=ray_condition())
     with database.begin() as db:
         alert = db.get(ChartAlert, alert_id)
         alert.runtime = {"demand_hold": "stale_input"}

@@ -396,6 +396,10 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         handover_legacy(db, state)
         previous = state.quote
         if previous and event.source_time < previous["source_time"]:
+            if previous.get("connection_epoch") == epoch and event.sequence > previous.get("sequence", 0):
+                from .price_alert_inputs import interrupt
+
+                interrupt(db, event.identity.key, now=stamp, epoch=epoch, reason="out_of_order_price")
             return "rejected_old_source"
         if previous and previous["connection_epoch"] == epoch and event.sequence <= previous["sequence"]:
             return "rejected_sequence"
@@ -436,6 +440,9 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         from .display_observations import accept
 
         accept(db, state, event, stamp=stamp, profile=inst.calendar_profile)
+        from .price_alert_inputs import record_quote
+
+        record_quote(db, event, now=stamp, profile=inst.calendar_profile)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
         return "accepted"
@@ -480,7 +487,14 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
         if owner.error == 'provider_maintenance':
             return 'rejected_provider_maintenance'
         owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
-        from .display_observations import accept_rest
+        from .display_observations import accept_rest, admission_lock
+
+        # A REST response may contain several datasets. Acquire all mutable
+        # state/display locks before any sample takes the price-retention mutex.
+        list(db.scalars(select(LiveState).where(LiveState.dataset_id.in_(
+            sorted(identity.key for identity in identities.values())))
+            .order_by(LiveState.dataset_id).with_for_update()))
+        admission_lock(db)
 
         for identity in identities.values():
             state = db.get(LiveState, identity.key)
@@ -494,6 +508,10 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
 
             sampling_evidence(db, state, result=series.result)
             if not series.result.successful:
+                from .price_alert_inputs import interrupt
+
+                interrupt(db, identity.key, now=stamp, epoch=epoch,
+                    reason=series.result.status, mode="candle_close_sample")
                 state.error = series.result.status
                 state.connection = 'recovering'
                 state.ready = False
@@ -513,6 +531,9 @@ def publish_rest_batch(ownership, epoch, batch, identities, *, now=None, demand_
                                       profile=inst.calendar_profile)
             if observation is None:
                 continue
+            from .price_alert_inputs import record_rest
+
+            record_rest(db, identity.key, sample)
             state.connection = 'connected' if state.ready else 'recovering'
             state.error = None
             state.received_at = sample.received_at
@@ -586,6 +607,7 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
+        _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized' or (
                 owner.error == 'provider_maintenance' and result.status != 'unauthorized'):
             result = RequestResult(status=owner.error)
@@ -600,6 +622,10 @@ def disconnected(ownership, epoch, identities, result, *, now=None, intentional=
         for identity in identities.values():
             state = db.get(LiveState, identity.key)
             if state and state.epoch == epoch:
+                from .price_alert_inputs import interrupt
+
+                interrupt(db, identity.key, now=stamp, epoch=epoch,
+                    reason="collection_stopped" if intentional else result.status)
                 state.connection = "inactive" if intentional else "disconnected"
                 state.ready = False
                 state.error = None if intentional else result.status
@@ -733,6 +759,9 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
                 observation.expected, observation.expectation = True, 'observed_source_pending'
         state.revision += 1
         if not batch.result.successful:
+            from .price_alert_confirmation import record as record_query
+
+            record_query(db, batch)
             for observation in observations.values():
                 observation.failures += 1
             state.attempts += 1
@@ -763,7 +792,7 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         # Legacy empty confirmations carry no checkpoint and no M1 to pin.
         # Preserve their independently reviewed closure path without inventing
         # canonical minutes or a query checkpoint. Data confirmations stay strict.
-        if batch.rows:
+        if batch.rows or batch.checkpoint is not None:
             apply_minutes(db, record(db, batch))
         ingest(db, inst, batch.ingestion_payload())
         # Measure completed ingestion, rather than the entry into the fenced

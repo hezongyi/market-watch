@@ -3,7 +3,7 @@
 import os
 import uuid
 
-from sqlalchemy import func, select
+from sqlalchemy import func, or_, select
 
 from .storage import ChartAlert, Notification, Outbox, Preference, SignalRow, now_ms, transaction
 
@@ -59,14 +59,26 @@ def summary(db, *, at=None):
                 "recent_error": role.get("error_type")}
     groups = dict(db.execute(select(ChartAlert.health, func.count()).where(
         ChartAlert.status == "active").group_by(ChartAlert.health)).all())
-    backlog = select(Outbox).join(Notification, Notification.id == Outbox.notification_id).join(
+    backlog = select(Outbox).join(Notification, Notification.id == Outbox.notification_id).outerjoin(
         SignalRow, SignalRow.id == Notification.signal_id).where(
-        SignalRow.chart_alert_id.is_not(None), SignalRow.watch_id.is_(None),
+        or_(SignalRow.chart_alert_id.is_not(None) & SignalRow.watch_id.is_(None),
+            (Notification.kind == "system") & Notification.payload["context"]["alert_id"].as_string().is_not(None)),
         Outbox.status.in_(("pending", "sending", "blocked"))).subquery()
     delivery = dict(db.execute(select(backlog.c.status, func.count()).group_by(backlog.c.status)).all())
+    execution = dict(db.execute(select(ChartAlert.runtime["execution_state"].as_string(), func.count())
+        .where(ChartAlert.status != "archived", ChartAlert.runtime["execution_state"].as_string().is_not(None),
+            or_((ChartAlert.status == "active") & or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp),
+                ChartAlert.runtime["settlement_pending"].as_boolean(),
+                ChartAlert.runtime["incident"]["id"].as_string().is_not(None)))
+        .group_by(ChartAlert.runtime["execution_state"].as_string())).all())
+    legacy_paused = db.scalar(select(func.count()).select_from(ChartAlert).where(ChartAlert.status == "paused",
+        ChartAlert.runtime["demand_hold"].as_string() == "stale_input"))
+    settling = db.scalar(select(func.count()).select_from(ChartAlert).where(ChartAlert.status == "expired",
+        ChartAlert.runtime["settlement_pending"].as_boolean()))
     return {"loop": loop, "rules": {"active": sum(groups.values()),
         "blocked": groups.get("blocked", 0), "stale": groups.get("stale", 0),
-        "error": groups.get("error", 0), "waiting": groups.get("warming", 0),
+        "error": groups.get("error", 0), "waiting": groups.get("warming", 0) + groups.get("coverage_pending", 0),
         "ready": groups.get("ready", 0)}, "delivery": delivery,
+        "execution": execution, "legacy_auto_paused": legacy_paused, "settlement_pending": settling,
         "runtime_roles": runtime_summary(db, at=stamp),
         "lifecycle": "market-runtime owns the monitor; API downtime does not pause evaluation."}

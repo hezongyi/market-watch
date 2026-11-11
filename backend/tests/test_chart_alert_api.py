@@ -1,12 +1,12 @@
 from alerts import api as api_module
-from alerts.chart_alert_domain import Observation
-from alerts.chart_alert_service import consume
+from alerts.chart_alert_service import current_version
+from alerts.chart_alert_worker import evaluate
 from alerts.storage import ChartAlert, ChartAlertVersion
 from argon2 import PasswordHasher
 from fastapi.testclient import TestClient
 from sqlalchemy import select
-from test_chart_alert_service import config, sample
-from test_composite_alerts import ready_config
+from test_chart_alert_service import config
+from test_composite_alerts import append, ready_config
 
 
 def login(client, monkeypatch):
@@ -77,9 +77,11 @@ def test_create_edit_conflict_and_event_confirmation_via_authenticated_http(data
         }).status_code == 409
         with database.begin() as db:
             alert = db.get(ChartAlert, row["id"])
-            at = alert.effective_at
-            consume(db, alert.id, Observation("baseline", 1, at, sample(0, 9).left, sample(0, 9).right), detected_at=at)
-            consume(db, alert.id, Observation("live", 2, at + 1000, sample(0, 11).left, sample(0, 11).right), detected_at=at + 1001)
+            identity = current_version(db, alert).market_identity
+            next_start = alert.state["sequence"]
+        append(database, identity["composite_revision_id"], next_start, "1.119", next_start + 60010)
+        with database.begin() as db:
+            assert len(evaluate(db, row["id"], now=next_start + 60010)) == 1
         events = client.get("/api/chart-alerts/events").json()
         assert len(events) == 1 and events[0]["evidence"]["rule_version"] == 2
         assert events[0]["display_label"] == row["display_label"]

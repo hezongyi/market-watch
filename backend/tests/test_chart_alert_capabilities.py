@@ -6,7 +6,7 @@ import pytest
 from alerts import storage
 from alerts.mcp.auth import issue
 from sqlalchemy import func, select
-from test_chart_alert_service import config, sample
+from test_chart_alert_service import config
 from test_composite_alerts import ready_config
 from test_native_mcp import call
 
@@ -245,7 +245,9 @@ def test_mcp_create_retries_concurrency_and_lifecycle_share_one_rule(mcp, monkey
 
 
 def test_duplicate_observations_have_one_event_and_outbox_across_adapters(mcp, monkeypatch):
-    from alerts.chart_alert_service import consume
+    from alerts.chart_alert_service import current_version
+    from alerts.chart_alert_worker import evaluate
+    from test_composite_alerts import append
 
     client, token, database = mcp
     config = ready_config(database, monkeypatch)
@@ -254,15 +256,13 @@ def test_duplicate_observations_have_one_event_and_outbox_across_adapters(mcp, m
         "config": config(notify_ntfy=True).model_dump(mode="json"),
     })
     with database.begin() as db:
-        at = row["effective_at"]
-        baseline = sample(0, 9)
-        crossing = sample(1, 11)
-        from dataclasses import replace
-        baseline = replace(baseline, occurred_at=at)
-        crossing = replace(crossing, occurred_at=at + 300000)
-        consume(db, row["id"], baseline, detected_at=at)
-        consume(db, row["id"], crossing, detected_at=at + 300001)
-        consume(db, row["id"], crossing, detected_at=at + 300002)
+        alert = db.get(storage.ChartAlert, row["id"])
+        revision = current_version(db, alert).market_identity["composite_revision_id"]
+        next_start = alert.state["sequence"]
+    append(database, revision, next_start, "1.119", next_start + 60010)
+    with database.begin() as db:
+        assert len(evaluate(db, row["id"], now=next_start + 60010)) == 1
+        assert evaluate(db, row["id"], now=next_start + 60020) == []
     events = result(client, token, "chart_alerts_events", {"alert_id": row["id"]})["items"]
     assert events == client.get("/api/chart-alerts/events?alert_id=" + row["id"]).json()
     assert len(events) == 1

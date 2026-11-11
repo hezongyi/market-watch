@@ -1,0 +1,25 @@
+{
+  "project": "mw-price-alerts-v203rc1",
+  "url": "http://127.0.0.1:28463",
+  "synthetic": true,
+  "checks": [
+    "A01: native chart form, immutable binding, preparing on create, HTTP replay returns one rule",
+    "A02: zero tabs and unexpired chart leases; live collector and runtime committed a signal",
+    "A09/A19: real disconnected lease, recovery baseline suppresses phantom crossing, gap retained",
+    "A23: new browser session views projected recovery, follows rule link and reads historical signal"
+  ],
+  "browser_closed_at": 1794355859707,
+  "signal": {
+    "id": "6e6ffc1a-9d86-49a2-9888-f4f71d934074",
+    "price": "101.0000000000",
+    "occurred_at": 1794356103940,
+    "detected_at": 1794356104119
+  },
+  "rule": "ba1ca7ee-2bef-4b25-991f-4798eda5a2dc",
+  "passed": true,
+  "application_source_commit": "5841e64d6c8e5916bc632498bc005c022712dd1f",
+  "runtime_images": {
+    "api": "sha256:34dba393651b69c2b6dc9d2e34c6f46bf79987c23f77881487ccb47d21524af0",
+    "web": "sha256:4f2c35bc27907d489da48598d55515143a31df0111942aab37a9df16adaf40ca"
+  }
+}

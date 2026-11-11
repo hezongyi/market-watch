@@ -367,7 +367,7 @@ export function NoticePanel({
               <dd>{detail.incident?.count || 1} 次</dd>
             </dl>
             <div className="nc-actions">
-              {onLocate && detail.workspace && (
+              {onLocate && (detail.workspace || detail.source_kind === "chart_alert_execution") && (
                 <AlertButton
                   primary
                   onClick={() =>
@@ -376,7 +376,7 @@ export function NoticePanel({
                     })
                   }
                 >
-                  {["workspace", "preferences", "chart_shell"].includes(
+                  {detail.source_kind === "chart_alert_execution" ? "查看告警规则" : ["workspace", "preferences", "chart_shell"].includes(
                     detail.source_kind,
                   )
                     ? "返回专业图表"

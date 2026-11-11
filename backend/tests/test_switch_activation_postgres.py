@@ -44,7 +44,7 @@ def notice_contract(database, monkeypatch):
     contracts.test_shadow_verdict_pauses_rules_the_candidate_cannot_move,
     notice_contract,
     contracts.test_held_pause_on_a_running_revision_keeps_its_target,
-    contracts.test_frozen_held_pause_drops_its_own_target_after_a_source_switch,
+    contracts.test_paused_price_rules_drop_demand_on_both_revisions,
 ])
 def test_activation_contract(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)

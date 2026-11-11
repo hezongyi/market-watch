@@ -124,6 +124,7 @@ async function attach({
   type State = {
     target: HTMLElement | null;
     context: AlertContext | null;
+    focusRule?: { id: string; revision: number };
     focusEvent?: { id: string; revision: number };
     theme: string;
     alertUnread?: number;
@@ -153,6 +154,7 @@ async function attach({
           context={state.context}
           updatedRow={state.updatedRow}
           focusEvent={state.focusEvent}
+          focusRule={state.focusRule}
           noticeRequest={noticeRequest}
           alertUnread={state.alertUnread}
           open
@@ -211,6 +213,10 @@ async function attach({
       }
     },
     noticeState: (state: NoticeState) => {update({alertUnread: state.alertUnread}); shell.setBadge?.(state.alertUnread);},
+    rule: (id: string) => {
+      update({ focusRule: { id, revision: Date.now() }, focusEvent: undefined });
+      shell.open();
+    },
     event: (id: string) => {
       update({ focusEvent: { id, revision: Date.now() } });
       shell.open();

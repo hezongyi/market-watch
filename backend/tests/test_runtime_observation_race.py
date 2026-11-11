@@ -1,14 +1,18 @@
 """A source may commit between a monitor's clock capture and its locked read."""
 
+import pytest
 from alerts import chart_alert_worker
 from alerts.storage import ChartAlert, SignalRow
-from sqlalchemy import func, select
-from test_composite_alerts import armed, evaluate, forming
+from sqlalchemy import select
+from test_composite_alerts import armed, evaluate, forming, price_sample, ray_condition
 
 
-def test_new_cross_committed_after_clock_capture_is_not_lost(database, monkeypatch):
-    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar")
-    forming(database, revision, seam + 600000, stamp, price="1.11")
+@pytest.mark.parametrize("path", ["legacy_ray", "price"])
+def test_new_cross_committed_after_clock_capture_is_not_lost(database, monkeypatch, path):
+    condition = {"condition": ray_condition()} if path == "legacy_ray" else {}
+    ident, _, revision, seam, stamp = armed(database, monkeypatch, mode="intrabar", **condition)
+    if path == "legacy_ray":
+        forming(database, revision, seam + 600000, stamp, price="1.11")
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
         assert db.get(ChartAlert, ident).health == "ready"
@@ -19,13 +23,22 @@ def test_new_cross_committed_after_clock_capture_is_not_lost(database, monkeypat
             # Capture first, then let the independent source commit before the
             # evaluator's transaction reads LiveState (READ COMMITTED).
             captured.append(stamp + 1000)
-            forming(database, revision, seam + 600000, stamp + 1001, price="1.119")
+            if path == "legacy_ray":
+                forming(database, revision, seam + 600000, stamp + 1001, price="1.119")
+            else:
+                price_sample(database, revision, stamp + 1001, "1.119")
             return captured[0]
         return stamp + 1002
 
     monkeypatch.setattr(chart_alert_worker, "now_ms", clock)
+    # The capture belongs to the evaluation, not its periodic retention pass.
+    monkeypatch.setattr(chart_alert_worker, "_RETENTION_NEXT", float("inf"))
     chart_alert_worker.step()
     with database() as db:
         row = db.get(ChartAlert, ident)
         assert row.count == 1, (row.health, row.health_reason, row.state)
-        assert db.scalar(select(func.count()).select_from(SignalRow)) == 1
+        signal = db.scalars(select(SignalRow)).one()
+        assert signal.occurred_at == stamp + 1001
+        assert signal.created_at == stamp + 1002
+        if path == "price":
+            assert row.runtime["execution_state"] == "monitoring"

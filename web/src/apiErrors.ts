@@ -109,6 +109,9 @@ export function responseError(
     detail && typeof detail === "object" && !Array.isArray(detail)
       ? (detail as Record<string, unknown>)
       : {};
+  if (d.field === "notify_ntfy" && ["phone_topic_missing", "phone_delivery_disabled"].includes(String(d.code))) {
+    fieldErrors.push({ field: "notify_ntfy", message: publicMessage(d.message, "请检查手机通知设置") });
+  }
   const fallback =
     status === 409
       ? "内容已在其他窗口修改，请保留草稿并重新读取"

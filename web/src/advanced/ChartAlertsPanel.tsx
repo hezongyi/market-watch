@@ -58,6 +58,20 @@ export type AlertDraft = {
   displayCode?: string;
   automaticName?: boolean;
 };
+function executionPhoneLabel(note: NonNullable<NonNullable<AlertRow["execution"]>["notification"]>) {
+  if (note.device_received) return "设备已接收";
+  if (note.status === "server_accepted") return "服务端已接受，设备接收未确认";
+  if (note.outbox_status === "blocked") return "发送受阻，请检查推送权限";
+  return note.message || ({
+    waiting_delay: "等待故障持续时间确认",
+    short_fault_web_only: "短暂异常，仅站内记录",
+    pending: "等待发送",
+    quiet: "静默时段，延后发送",
+    delivery_error: "发送失败，等待重试",
+    acknowledged: "已确认",
+  } as Record<string, string>)[note.status] || "等待状态更新";
+}
+
 export function ChartAlertsPanel(
   props: Parameters<typeof ScopedChartAlertsPanel>[0],
 ) {
@@ -87,6 +101,7 @@ function ScopedChartAlertsPanel({
   initialDraft,
   persistDraft,
   focusEvent,
+  focusRule,
   noticeRequest,
   creationUnavailable,
   alertUnread,
@@ -96,6 +111,7 @@ function ScopedChartAlertsPanel({
   alertUnread?: number;
   creationUnavailable?: string;
   focusEvent?: { id: string; revision: number };
+  focusRule?: { id: string; revision: number };
   noticeRequest?: NoticeTransport;
   workspaceId: string;
   context: AlertContext | null;
@@ -452,6 +468,21 @@ function ScopedChartAlertsPanel({
       ?.querySelector<HTMLElement>('[data-signal-id="' + focusEvent.id + '"]')
       ?.scrollIntoView({ block: "nearest" });
   }, [focusEvent, selected, events, mountTarget]);
+  useEffect(() => {
+    if (!focusRule) return;
+    setTab("alerts");
+    setSearch("");
+    setStatus("");
+    setCurrentOnly(false);
+    setSelected(focusRule.id);
+    setDetail(focusRule.id);
+    void refresh();
+  }, [focusRule, refresh]);
+  useEffect(() => {
+    if (!focusRule || selected !== focusRule.id) return;
+    contentRef.current?.querySelector('[data-alert-id="' + CSS.escape(focusRule.id) + '"]')
+      ?.scrollIntoView({ block: "nearest" });
+  }, [focusRule, selected, rows, mountTarget]);
   const filteredEvents = events.filter(
     (event) =>
       (showHandled || (!event.notice?.handled_at && !cleared.has(event.id))) &&
@@ -489,12 +520,25 @@ function ScopedChartAlertsPanel({
         {row.config.mode === "close" ? "收盘确认" : "盘中观察"}
       </p>
       <p>
-        {statuses[row.status]} · 已触发 {row.count} / {row.max_triggers} 次
+        {alertState(row)} · 已触发 {row.count} / {row.max_triggers} 次
       </p>
       <p className={`alert-health alert-health-${row.health}`}>
-        {healthNames[row.health]}
-        {row.health_reason ? "：" + row.health_reason : ""}
+        {row.execution ? row.execution.message : [healthNames[row.health], row.health_reason].filter(Boolean).join("：")}
       </p>
+      {row.execution && (
+        <>
+          <p>最近判定：{row.execution.last_evaluated_at == null ? "尚无" : date(row.execution.last_evaluated_at)}</p>
+          {row.execution.last_gap && (
+            <p>
+              {row.execution.last_gap.unrecoverable ? "未能判定是否触发" : row.execution.last_gap.resolved_at ? "已补齐的中断" : "待确认区间"}：
+              {row.execution.last_gap.bounds === "possible" && "可能影响 "}
+              {row.execution.last_gap.start == null ? "起点未知" : date(row.execution.last_gap.start)} 至 {row.execution.last_gap.end == null ? "终点未知" : date(row.execution.last_gap.end)}
+            </p>
+          )}
+          {row.execution.phone_configuration?.message && <p>{row.execution.phone_configuration.message}</p>}
+          {row.execution.notification && <p>执行提醒：{executionPhoneLabel(row.execution.notification)}</p>}
+        </>
+      )}
       {row.config.series_kind === "composite" &&
         typeof row.runtime.quote_health === "string" && (
           <p>
@@ -828,6 +872,7 @@ function ScopedChartAlertsPanel({
             {visible.map((row) => (
               <article
                 key={row.id}
+                data-alert-id={row.id}
                 className={`chart-alert-card ${selected === row.id ? "alert-selected" : ""}`}
               >
                 <AlertSummary row={row} zone={zone} theme={theme}>

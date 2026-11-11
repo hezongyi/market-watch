@@ -5,7 +5,7 @@ const pending = new Map();
 // Only draft recovery requires a native confirmation.
 const acknowledgedNotices = new Set();
 let ordinaryNotices;
-let noticeUI, noticeState, noticeOpenEvent, alertOpenSignal;
+let noticeUI, noticeState, noticeOpenEvent, alertOpenSignal, alertOpenRule;
 let activeNotices = [], noticeDialogOpen = false, chartMenu, indicatorPicker, alertBridge, alertUI, alertUISession, alertUIDraft, alertUIWorkspace, alertUIAttach, dataCenter;
 let invalidateAlertUI = () => {};
 let checkpointWorkspace = () => Promise.reject(Error("工作区尚未就绪"));
@@ -2416,6 +2416,7 @@ function boot(
       if (attempt !== attachingAlerts || session !== alertUISession || alertUIStopped) {instance.destroy();return;}
       alertUI = instance; instance.theme(widget.getTheme()); if(noticeState)instance.noticeState(noticeState);
       if (restoreAlertsPanel) instance.open();
+      if (alertOpenRule) {instance.rule(alertOpenRule);alertOpenRule=undefined;}
       if (alertOpenSignal) {instance.event(alertOpenSignal);alertOpenSignal=undefined;}
       try {
         const scope={workspace_id:workspaceId,session,epoch:workspaceEpoch};
@@ -3064,7 +3065,11 @@ async function update(m) {
   }
   if(m.type==='notice-center-state' && m.session===alertUISession && m.workspace_id===alertUIWorkspace){noticeState=m.state;noticeUI?.update(m.state);alertUI?.noticeState(m.state);return;}
   if(m.type==='notice-center-open'){noticeOpenEvent=typeof m.event_id==='string'?m.event_id:'';if(noticeUI){noticeUI.open(noticeOpenEvent || undefined);noticeOpenEvent=undefined;}return;}
-  if(m.type==='chart-alert-event-open' && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
+  if(m.type==='chart-alert-rule-open' && typeof m.alert_id==='string' && /^[a-f0-9-]{36}$/.test(m.alert_id)) {
+    if(alertUI)alertUI.rule(m.alert_id);else {alertOpenRule=m.alert_id;restoreAlertsPanel=true;}
+    return;
+  }
+  if(m.type==='chart-alert-event-open'  && typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
     if(alertUI)alertUI.event(m.signal_id);else {alertOpenSignal=m.signal_id;restoreAlertsPanel=true;}
     return;
   }

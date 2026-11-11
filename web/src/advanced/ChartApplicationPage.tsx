@@ -354,7 +354,7 @@ export default function ChartApplicationPage() {
   useEffect(()=>{if(nativeReady)updateChart({type:'app-state',pending:noticeState.unread});
     if(notificationReady)updateChart({type:'notice-center-state',session:alertUiSession.current,workspace_id:current.current?.id,state:noticeState});
   },[nativeReady,notificationReady,noticeState]);
-  useEffect(()=>{if(nativeReady && new URLSearchParams(appLocation.search).get('panel')==='alerts') { const signal=new URLSearchParams(appLocation.search).get('signal'); if(signal)updateChart({type:'chart-alert-event-open',signal_id:signal}); }},[nativeReady,appLocation.search]);
+  useEffect(()=>{if(nativeReady && new URLSearchParams(appLocation.search).get('panel')==='alerts') { const params=new URLSearchParams(appLocation.search); const alert=params.get('alert'),signal=params.get('signal'); if(alert)updateChart({type:'chart-alert-rule-open',alert_id:alert}); else if(signal)updateChart({type:'chart-alert-event-open',signal_id:signal}); }},[nativeReady,appLocation.search]);
   useEffect(()=>{
     const signal=new URLSearchParams(appLocation.search).get('signal');
     if(!signal || new URLSearchParams(appLocation.search).get('panel')!=='notifications')return;
@@ -454,6 +454,10 @@ export default function ChartApplicationPage() {
       }
       if(m.type==='notice-center-locate' && m.session===alertUiSession.current && typeof m.event_id==='string'){
         const row=await notices.action({action:'detail',event_id:m.event_id});
+        if(row.source_kind==='chart_alert_execution' && typeof row.context?.alert_id==='string'){
+          navigate('/advanced-charts/'+encodeURIComponent(current.current?.id || '')+'?panel=alerts&alert='+encodeURIComponent(row.context.alert_id));
+          return;
+        }
         const workspace=row.workspace;if(typeof workspace!=='string'||!workspace) return;
         if(workspace!==current.current?.id){
           const session=alertUiSession.current,from=current.current?.id;
@@ -501,7 +505,7 @@ export default function ChartApplicationPage() {
           if(typeof m.signal_id==='string' && /^[a-f0-9-]{36}$/.test(m.signal_id)) {
             url.searchParams.set('signal',m.signal_id);url.searchParams.delete('event');
           }
-        } else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");}
+        } else if(url.searchParams.get("panel")==="alerts") {url.searchParams.delete("panel");url.searchParams.delete("signal");url.searchParams.delete("alert");}
         navigate(url.pathname + url.search + url.hash, {replace:true}); return;
       }
       if (m.type === "data-center-state" && typeof m.session === "string" && /^[a-f0-9-]{36}$/.test(m.session)) {

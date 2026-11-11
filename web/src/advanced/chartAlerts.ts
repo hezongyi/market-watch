@@ -102,7 +102,23 @@ export type AlertRow = {
   config: AlertConfig;
   condition_summary: string;
   runtime: Record<string, unknown>;
+  execution?: {
+    state: string;
+    label: string;
+    message?: string | null;
+    last_evaluated_at?: number | null;
+    last_input_at?: number | null;
+    last_gap?: { start?: number | null; end?: number | null; bounds: string; unrecoverable?: boolean; resolved_at?: number };
+    notification?: { status: string; outbox_status?: string; message?: string; device_received?: boolean };
+    phone_configuration?: { message?: string | null };
+  } | null;
 };
+export function isFixedPrice(config: AlertConfig) {
+  const c = config.condition;
+  return config.series_kind === "composite" && c.left.kind === "price" && !c.offset &&
+    (["enter", "exit", "break_upper", "break_lower"].includes(c.relation) ||
+      c.right?.kind === "constant" || c.right?.line?.kind === "horizontal_line");
+}
 export function offsetSnapshot(value: unknown): string | null {
   if (!value || typeof value !== "object") return null;
   const v = value as Record<string, unknown>;
@@ -144,6 +160,7 @@ export type Capabilities = {
     reason: string | null;
     observation_basis: string;
     atr_frames?: string[];
+    price_modes?: Record<AlertConfig["mode"], { available: boolean; reason: string | null }>;
   }[];
   modes: string[];
   indicators: string[];

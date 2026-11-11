@@ -12,7 +12,8 @@ from .storage import transaction
 
 def error(exc):
     status = 409 if isinstance(exc, Conflict) else 404 if isinstance(exc, LookupError) else 422
-    return HTTPException(status, str(exc))
+    detail = {"field": exc.field, "code": exc.code, "message": str(exc)} if hasattr(exc, "field") else str(exc)
+    return HTTPException(status, detail)
 
 
 def read_operation(fn, *args, **kwargs):

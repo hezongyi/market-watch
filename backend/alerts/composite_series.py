@@ -194,6 +194,7 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
             segments=segments, revision_id=revision.id,
             input_revision=value, now=stamp, history_start=version.start)
     return {"composite_id": composite.id, "revision_id": revision.id, "input_revision": value,
+        "target_input_start": tail_left,
         "history_version_id": version.id, "seam": revision.seam, "timeframe": frame,
         "bars": [row for row in bars if start <= row["start"] < end],
         "rule_version": revision.rules["aggregation"], "preparation_status": prep.status,

@@ -136,7 +136,7 @@ def gate_matched(alert, runtime, now, key, window):
     return isinstance(full_at, int) and 0 <= now - full_at <= window
 
 
-def bind(db, config, *, now=None):
+def bind(db, config, *, now=None, clock=None):
     from .composite_definitions import first_use
     from .series_access import composite_definition
 
@@ -149,8 +149,15 @@ def bind(db, config, *, now=None):
     if not revision or revision.composite_id != composite.id:
         raise ValueError("组合修订不属于所选系列")
     version = db.get(HistoryVersion, revision.history_version_id)
-    require_live_eligibility(db, revision, now=now_ms() if now is None else now,
-                             timeframe=config.timeframe)
+    from .price_alert_inputs import is_price_rule
+
+    if is_price_rule(config):
+        from .price_alert_evaluator import eligibility
+
+        eligibility(db, revision, mode=config.mode, now=now_ms() if now is None else now, clock=clock)
+    else:
+        require_live_eligibility(db, revision, now=now_ms() if now is None else now,
+                                 timeframe=config.timeframe)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     target = db.get(MarketDataset, mapping.target_dataset_id)
     if target.identity["account_scope"] != account_scope():
@@ -205,10 +212,12 @@ def bound_rules(db, composite_id, *, lock=False):
 
 def pause(db, rules, *, reason, run_id=None, now=None):
     """Pause a rule that can no longer read a served revision; never migrate it."""
+    from .price_alert_inputs import is_price_rule
+
     now = now_ms() if now is None else now
     output = []
     for version, alert in rules:
-        if alert.status != "active":
+        if alert.status != "active" or is_price_rule(version.config):
             continue
         alert.status, alert.control_revision = "paused", alert.control_revision + 1
         alert.health, alert.health_reason = "blocked", reason[:250]
@@ -274,7 +283,10 @@ def relocatable(db, previous, target, config, bound, *, input_revision, source=N
 
 def rebind_active(db, composite, *, previous, target, boundary, run_id, now, input_revision,
                   source=None, shadow=None):
-    """Move every active rule onto the activated revision at one event boundary.
+    """Move compatible legacy rules at the activation boundary.
+
+    Fixed-price rules keep their explicit revision and require a rule edit
+    when that revision is frozen.
 
     A rule that the target revision can serve is relocated by a new immutable
     version: same condition, geometry, limits and delivery choice, only the bound
@@ -288,12 +300,22 @@ def rebind_active(db, composite, *, previous, target, boundary, run_id, now, inp
     rebuilt ATR reference is a different rule. Both judgements are a union: either
     one can only pause, never relocate.
     """
+    from .chart_alert_execution import transition
     from .chart_alert_service import AlertConfig
+    from .price_alert_inputs import is_price_rule
 
     aligned, rebound, paused, affected = [], [], [], []
     for version, alert in bound_rules(db, composite.id, lock=True):
         config = AlertConfig.model_validate(version.config)
         current = version.market_identity.get("composite_revision_id")
+        if is_price_rule(config):
+            if current == target.id:
+                aligned.append({"id": alert.id, "revision_id": target.id, "version": alert.version})
+            elif current == previous.id:
+                transition(db, alert, state="blocked", now=now, reason="binding_frozen", checked=False)
+                affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
+                                 "migration": "price_binding_unchanged", "reason": alert.health_reason})
+            continue
         if current == target.id:
             aligned.append({"id": alert.id, "revision_id": target.id, "version": alert.version})
             affected.append({"id": alert.id, "name": alert.name, "revision_id": current,
@@ -491,6 +513,26 @@ def atr_offset(db, identity, config, bar, value, now, profiles, runtime):
     return resolved
 
 
+def bound_identity(db, identity):
+    """Shared fixed-binding validation for both execution contracts."""
+    from .price_alert_reasons import Unavailable
+
+    if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
+        raise Unavailable("binding_contract_changed", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
+    revision = db.get(CompositeRevision, identity["composite_revision_id"])
+    composite = db.get(MarketComposite, identity["composite_id"])
+    if revision and frozen(db.get(CompositePreparation, revision.id)):
+        raise Unavailable("binding_frozen", FROZEN_REASON)
+    mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
+    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
+    if (not composite or composite.permission_scope != "workspace:default" or not revision or
+            revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or
+            revision.rules != identity["rules"] or revision.seam != identity["seam"] or
+            not target or target.identity != identity["target_identity"] or target.identity["account_scope"] != account_scope()):
+        raise Unavailable("binding_changed", "固定组合基线、映射或账户已改变，请显式编辑规则")
+    return revision, target
+
+
 def evaluate(db, alert, version, config, now, *, clock=None):
     from .chart_alert_service import consume
     from .composite_chart import chart_page
@@ -500,20 +542,11 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     # A D1 close rule keeps its native-price request registered between passes;
     # the gated path below must not unregister it.
     price_request = runtime.pop("price_confirmation_request", None)
-    if identity.get("contract") != CONTRACT or identity.get("calculation_algorithm") != ALGORITHM:
-        return wait(alert, runtime, "blocked", "组合或指标算法契约已改变，请显式编辑规则生成新版本")
-    revision = db.get(CompositeRevision, identity["composite_revision_id"])
+    try:
+        revision, target = bound_identity(db, identity)
+    except ValueError as exc:
+        return wait(alert, runtime, "blocked", str(exc))
     composite = db.get(MarketComposite, identity["composite_id"])
-    if revision and frozen(db.get(CompositePreparation, revision.id)):
-        # Fencing: a judgment round for a switched-away revision writes nothing.
-        return wait(alert, runtime, "blocked", FROZEN_REASON)
-    mapping = db.get(RealtimeMapping, revision.mapping_id) if revision else None
-    target = db.get(MarketDataset, mapping.target_dataset_id) if mapping else None
-    if (not composite or composite.permission_scope != "workspace:default" or not revision or
-            revision.composite_id != composite.id or revision.history_version_id != identity["history_version_id"] or
-            revision.rules != identity["rules"] or revision.seam != identity["seam"] or
-            not target or target.identity != identity["target_identity"] or target.identity["account_scope"] != account_scope()):
-        return wait(alert, runtime, "blocked", "固定组合基线、映射或账户已改变，请显式编辑规则")
     # Evidence writers/reference protection take exclusive dataset locks. Take
     # them in order before shared artifact reads, avoiding reader lock upgrades.
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(

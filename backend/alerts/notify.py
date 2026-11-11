@@ -140,7 +140,9 @@ def claim():
         else:
             title = note.payload.get("title", "守望运行通知")
             message = note.payload.get("message", "")
-            click = settings.public_url + "/settings"
+            alert_id = note.payload.get("context", {}).get("alert_id")
+            click = (f"{settings.public_url}/advanced-charts?panel=alerts&alert={alert_id}"
+                if alert_id else settings.public_url + "/settings")
         body = {
             "topic": settings.ntfy_topic,
             "title": title,

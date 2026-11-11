@@ -56,6 +56,10 @@ def composite_targets(db, wanted):
     ).where(ChartAlert.status == "paused", ChartAlert.runtime["demand_hold"].as_string() == "stale_input",
         or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp)))
     for alert, version in held_rules:
+        from .price_alert_inputs import is_price_rule
+
+        if is_price_rule(version.config):
+            continue  # Old auto-paused prices require explicit user resumption.
         if version.config.get("series_kind") != "composite":
             continue
         revision_id = version.market_identity.get("composite_revision_id")

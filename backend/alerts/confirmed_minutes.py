@@ -66,6 +66,9 @@ def record(db, batch):
             db.add(SourceMinute(source_id=source.key, start=start, revision_id=revision_id,
                                 last_observed_at=batch.observed_at))
     db.flush()
+    from .price_alert_confirmation import record as record_query
+
+    record_query(db, batch)
     return {"source_id": source.key, "minutes": output}
 
 

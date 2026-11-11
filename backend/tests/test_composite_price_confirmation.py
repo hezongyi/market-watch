@@ -1,4 +1,4 @@
-"""Sparse source minutes can certify daily OHLC without inventing minute coverage."""
+"""Retained native OHLC components and the separate public price-v2 contract."""
 
 import copy
 import hashlib
@@ -6,7 +6,7 @@ from datetime import datetime
 
 import httpx
 import pytest
-from alerts.chart_alert_service import create
+from alerts.chart_alert_service import AlertConfig, create, current_version
 from alerts.chart_alert_worker import evaluate
 from alerts.composite_chart import chart_page
 from alerts.config import settings
@@ -18,9 +18,10 @@ from test_composite_aggregates import drain as aggregate
 from test_composite_alerts import config, continuous, live
 from test_fixed_indicators import add_tail
 from test_market_contracts import identity, minute
+from test_price_alert_close import query
 
 
-def sparse_daily(database, monkeypatch, **changes):
+def sparse_daily(database, monkeypatch, *, legacy=True, **changes):
     composite, revision, seam, _ = continuous(database, monkeypatch)
     end = seam + 86400000
     add_tail(database, revision, [minute(end - 60000, volume="3")])
@@ -33,8 +34,23 @@ def sparse_daily(database, monkeypatch, **changes):
     while artifact_tick(parent):
         pass
     with database.begin() as db:
-        ident = create(db, "sparse-daily", config(composite, timeframe="D1", **changes), at=stamp).id
+        row = create(db, "sparse-daily", config(composite, timeframe="D1", **changes), at=stamp)
+        if legacy:
+            # Model the saved pre-price-v2 state for the retained native proof
+            # component chain. Production public price rules now use price-v2.
+            row.state, row.runtime = {}, {}
+        ident = row.id
     return ident, composite, revision, seam, end, stamp
+
+
+
+def evaluate_legacy_native(db, ident, *, now):
+    """Exercise retained evaluator/proof components, not public price routing."""
+    from alerts.composite_alerts import evaluate as evaluate_composite
+
+    row = db.get(ChartAlert, ident)
+    version = current_version(db, row)
+    return evaluate_composite(db, row, version, AlertConfig.model_validate(version.config), now)
 
 
 def source_adapter(seam, end, **changes):
@@ -64,7 +80,7 @@ def source_adapter(seam, end, **changes):
 def test_sparse_day_waits_for_price_evidence_without_marking_fresh_quotes_stale(database, monkeypatch):
     ident, _, _, _, _, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        assert evaluate(db, ident, now=stamp) == []
+        assert evaluate_legacy_native(db, ident, now=stamp) == []
         row = db.get(ChartAlert, ident)
         assert row.health == "coverage_pending"
         assert row.runtime["quote_health"] == "ready"
@@ -77,7 +93,7 @@ def test_matching_account_native_day_baselines_then_allows_new_cross_without_fil
 
     ident, composite, revision, seam, end, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
     adapter, client, calls = source_adapter(seam, end)
     try:
         assert prices.once(adapter)
@@ -85,7 +101,7 @@ def test_matching_account_native_day_baselines_then_allows_new_cross_without_fil
     finally:
         client.close()
     with database.begin() as db:
-        assert evaluate(db, ident, now=stamp) == []
+        assert evaluate_legacy_native(db, ident, now=stamp) == []
         row = db.get(ChartAlert, ident)
         assert row.health == "ready" and row.state["sequence"] == end
         assert db.scalar(select(SignalRow)) is None
@@ -103,7 +119,7 @@ def test_matching_account_native_day_baselines_then_allows_new_cross_without_fil
     aggregate(revision, "D1")
     live(database, revision, next_end + 10, next_end)
     with database.begin() as db:
-        assert evaluate(db, ident, now=next_end + 10) == []
+        assert evaluate_legacy_native(db, ident, now=next_end + 10) == []
         assert db.get(ChartAlert, ident).health == "coverage_pending"
     adapter, client, _ = source_adapter(end, next_end, bid={"o": "1.10", "h": "1.12", "l": "1.09", "c": "1.119"})
     try:
@@ -111,10 +127,70 @@ def test_matching_account_native_day_baselines_then_allows_new_cross_without_fil
     finally:
         client.close()
     with database.begin() as db:
-        assert len(evaluate(db, ident, now=next_end + 10)) == 1
-        assert evaluate(db, ident, now=next_end + 10) == []
+        assert len(evaluate_legacy_native(db, ident, now=next_end + 10)) == 1
+        assert evaluate_legacy_native(db, ident, now=next_end + 10) == []
         assert db.get(ChartAlert, ident).count == 1
         assert db.scalar(select(CompositeJudgment).order_by(CompositeJudgment.event_time)).evidence == first_evidence
+
+
+def test_public_daily_close_uses_bounded_minute_queries_instead_of_native_proof(database, monkeypatch):
+    from alerts import composite_price_confirmation as prices
+
+    ident, composite, revision, seam, end, stamp = sparse_daily(database, monkeypatch, legacy=False)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=stamp) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.state == {} and alert.runtime["close_cursor"] == end
+        assert db.scalar(select(SourceFetch).where(SourceFetch.id.startswith(prices.PREFIX))) is None
+        # Publish a genuine matching proof for the same D1 via the retained
+        # evaluator, then create a public rule with the proof already cached.
+        legacy = create(db, "retained-native-daily", config(composite, timeframe="D1"), at=stamp)
+        legacy.state, legacy.runtime = {}, {}
+        legacy_id = legacy.id
+        assert evaluate_legacy_native(db, legacy_id, now=stamp) == []
+    adapter, client, _ = source_adapter(seam, end)
+    try:
+        assert prices.once(adapter)
+    finally:
+        client.close()
+    with database.begin() as db:
+        assert evaluate_legacy_native(db, legacy_id, now=stamp) == []
+        assert db.get(ChartAlert, legacy_id).state["sequence"] == end
+        public = create(db, "price-after-native-proof", config(composite, timeframe="D1"), at=stamp)
+        assert public.state == {} and public.runtime["needs_baseline"]
+        ident = public.id
+
+    for index, close in enumerate(("1.11", "1.119")):
+        start = end + index * 86400000
+        stop = start + 86400000
+        now = stop + 10
+        add_tail(database, revision, [minute(stop - 60000, volume="3", close=close)], observed_at=stop)
+        aggregate(revision, "D1")
+        live(database, revision, now, stop)
+        with database.begin() as db:
+            assert evaluate(db, ident, now=now) == []
+            alert = db.get(ChartAlert, ident)
+            assert alert.runtime["close_cursor"] == start
+            assert alert.runtime["reason_code"] == "confirmation_window_pending"
+            before = chart_page(db, composite, "D1", count=2, now=now)["bars"][-1]
+            assert before["start"] == start and not before["coverage_complete"]
+        query(database, ident, start, stop, stop + 1)
+        with database.begin() as db:
+            events = evaluate(db, ident, now=now)
+            assert len(events) == index
+            alert = db.get(ChartAlert, ident)
+            assert alert.state["sequence"] == stop and alert.state["left"] == close
+            assert alert.runtime["close_cursor"] == stop
+            assert chart_page(db, composite, "D1", count=2, now=now)["bars"][-1] == before
+            if events:
+                assert events[0].occurred_at == stop
+                bar = events[0].evidence["observation"]["bar"]
+                assert bar["source_confirmed"] and not bar["coverage_complete"]
+                assert bar["close"] == before["close"]
+            assert evaluate(db, ident, now=now) == []
+    with database.begin() as db:
+        native_windows = db.scalars(select(SourceFetch).where(SourceFetch.id.startswith(prices.PREFIX))).all()
+        assert [(row.start, row.end) for row in native_windows] == [(seam, end)]
 
 
 @pytest.mark.parametrize("changes", [
@@ -126,14 +202,14 @@ def test_unconfirmed_wrong_identity_or_mismatching_prices_never_release_rule(dat
 
     ident, _, _, seam, end, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
     adapter, client, _ = source_adapter(seam, end, **changes)
     try:
         assert prices.once(adapter)
     finally:
         client.close()
     with database.begin() as db:
-        assert evaluate(db, ident, now=stamp) == []
+        assert evaluate_legacy_native(db, ident, now=stamp) == []
         row = db.get(ChartAlert, ident)
         assert row.health == "coverage_pending" and row.state == {}
         assert db.scalar(select(SignalRow)) is None
@@ -158,7 +234,7 @@ def test_account_switch_cannot_fetch_or_reuse_price_evidence(database, monkeypat
 
     ident, _, _, seam, end, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
     adapter, client, calls = source_adapter(seam, end)
     adapter.account_id = "another-account"
     try:
@@ -167,7 +243,7 @@ def test_account_switch_cannot_fetch_or_reuse_price_evidence(database, monkeypat
         client.close()
     assert calls == [], "account mismatch is rejected before supplier I/O"
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
         assert db.get(ChartAlert, ident).health == "coverage_pending"
         assert db.scalar(select(SignalRow)) is None
 
@@ -178,7 +254,7 @@ def test_background_source_demand_stops_with_its_last_active_rule(database, monk
 
     ident, _, _, seam, end, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
         row = db.get(ChartAlert, ident)
         if status == "expired":
             row.expires_at = stamp - 1
@@ -197,20 +273,20 @@ def test_corrected_minutes_require_new_match_and_never_replay_old_cross(database
 
     ident, _, revision, seam, end, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
     adapter, client, _ = source_adapter(seam, end)
     try:
         assert prices.once(adapter)
     finally:
         client.close()
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
         original = copy.deepcopy(db.scalar(select(CompositeJudgment)).evidence)
     add_tail(database, revision, [minute(end - 60000, volume="3", close="1.119")])
     aggregate(revision, "D1")
     live(database, revision, stamp + 1, end)
     with database.begin() as db:
-        assert evaluate(db, ident, now=stamp + 1) == []
+        assert evaluate_legacy_native(db, ident, now=stamp + 1) == []
         assert db.get(ChartAlert, ident).health == "coverage_pending"
         task = db.scalar(select(SourceFetch).where(SourceFetch.id.startswith("ohlc:")))
         task.fetched_at = 0  # The actual retry is bounded to one per minute.
@@ -220,7 +296,7 @@ def test_corrected_minutes_require_new_match_and_never_replay_old_cross(database
     finally:
         client.close()
     with database.begin() as db:
-        assert evaluate(db, ident, now=stamp + 1) == []
+        assert evaluate_legacy_native(db, ident, now=stamp + 1) == []
         assert db.get(ChartAlert, ident).health == "ready"
         assert db.get(ChartAlert, ident).runtime["readiness"]["last_outcome"] == "recovery_baseline"
         assert db.scalar(select(SignalRow)) is None
@@ -232,7 +308,7 @@ def test_duplicate_workers_and_obsolete_lease_cannot_publish(database, monkeypat
 
     ident, _, _, _, _, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
     ownership = prices.claim()
     assert ownership and prices.claim() is None
     with database.begin() as db:
@@ -273,7 +349,7 @@ def test_successfully_confirmed_sparse_day_still_requires_fresh_next_bar(databas
 
     ident, _, revision, seam, end, stamp = sparse_daily(database, monkeypatch)
     with database.begin() as db:
-        evaluate(db, ident, now=stamp)
+        evaluate_legacy_native(db, ident, now=stamp)
     adapter, client, _ = source_adapter(seam, end)
     try:
         assert prices.once(adapter)
@@ -282,7 +358,7 @@ def test_successfully_confirmed_sparse_day_still_requires_fresh_next_bar(databas
     future = stamp + 86400000 + 60000  # Beyond the existing close-boundary grace.
     live(database, revision, future, end)
     with database.begin() as db:
-        assert evaluate(db, ident, now=future) == []
+        assert evaluate_legacy_native(db, ident, now=future) == []
         assert db.get(ChartAlert, ident).health == "stale"
         assert db.get(ChartAlert, ident).runtime["quote_health"] == "ready"
         assert db.scalar(select(SignalRow)) is None

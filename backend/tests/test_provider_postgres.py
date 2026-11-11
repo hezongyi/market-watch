@@ -365,20 +365,30 @@ def test_ready_history_activation_reuses_snapshot_connection(provider_pg, monkey
     def activate(*args, **kwargs):
         while engine.pool.checkedout() < engine.pool.size():
             held.append(engine.connect())
+        # Start the short contention budget at the boundary under test. Native
+        # capacity/snapshot setup must not consume it on a busy CI runner.
+        token = cache.DEADLINE.set(time.monotonic() + 0.3)
         entered.set()
-        return original(*args, **kwargs)
+        try:
+            # A second checkout fails directly, rather than relying solely on
+            # a short wall-clock timeout to expose a connection-pool regression.
+            with monkeypatch.context() as guard:
+                guard.setattr(engine, 'connect', lambda *a, **k: pytest.fail('activation opened another connection'))
+                return original(*args, **kwargs)
+        finally:
+            cache.DEADLINE.reset(token)
     monkeypatch.setattr(service, 'activate', activate)
     def read():
-        token = cache.DEADLINE.set(time.monotonic() + 0.3)
+        token = cache.DEADLINE.set(time.monotonic() + 10)
         try:
             return cache.data(body)
         finally:
             cache.DEADLINE.reset(token)
     with ThreadPoolExecutor(max_workers=1) as pool:
         pending = pool.submit(read)
-        assert entered.wait(2)
+        assert entered.wait(10)
         try:
-            result = pending.result(timeout=0.8)
+            result = pending.result(timeout=2)
         finally:
             for connection in held:
                 connection.close()

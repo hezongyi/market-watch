@@ -16,9 +16,13 @@ MAX_MINUTES = 4096
 MAX_GLOBAL_MINUTES = 32768
 
 
-def _has_capacity(db, dataset_id, stamp):
+def admission_lock(db):
     if db.bind.dialect.name == 'postgresql':
         db.execute(text('SELECT pg_advisory_xact_lock(8675311)'))
+
+
+def _has_capacity(db, dataset_id, stamp):
+    admission_lock(db)
     size = db.scalar(select(func.count()).select_from(ObservedMinute).where(
         ObservedMinute.dataset_id == dataset_id))
     total = db.scalar(select(func.count()).select_from(ObservedMinute))
@@ -100,11 +104,13 @@ def accept_rest(db, state, sample, *, stamp, profile):
             and state.forming.get('sequence', 0) >= sample.sequence):
         return
     if not observation:
-        if not _has_capacity(db, state.dataset_id, stamp):
-            return
         observation = ObservedMinute(dataset_id=state.dataset_id, start=sample.candle.start,
             epoch=state.epoch)
-        db.add(observation)
+        # Current source state and price-alert admission do not depend on the
+        # chart overlay's bounded minute store. A full display store freezes
+        # that overlay, while the valid current sample remains usable.
+        if _has_capacity(db, state.dataset_id, stamp):
+            db.add(observation)
     observation.content = {**sample.candle.model_dump(), 'volume_kind': 'price_count',
         'volume_unit': 'quotes', 'volume_complete': False, 'observation_complete': False,
         'connection_epoch': sample.generation, 'sequence': sample.sequence, 'source': 'oanda',

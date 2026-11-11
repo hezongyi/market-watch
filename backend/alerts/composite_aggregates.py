@@ -121,10 +121,20 @@ def build(ownership):
     with transaction() as db:
         # Inputs are immutable; reading while new confirmations arrive cannot
         # move this task's selected version or its fixed historical parent.
-        return read_window(db, ownership["composite_id"], ownership["timeframe"],
+        result = read_window(db, ownership["composite_id"], ownership["timeframe"],
             ownership["buckets"][0][0], ownership["buckets"][-1][1],
             revision_id=ownership["revision_id"], input_revision=ownership["input_revision"],
-            provisional=False, permission_scope=ownership["permission_scope"])["bars"]
+            provisional=False, permission_scope=ownership["permission_scope"])
+        from .price_alert_confirmation import covered, facts
+        from .storage import RealtimeMapping
+
+        revision = db.get(CompositeRevision, ownership["revision_id"])
+        target = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
+        fact = facts(db, target.identity)
+        return [{**bar, "price_input_read": {
+            "target_start": max(bar["start"], result["target_input_start"]),
+            "query_covered": covered(fact, max(bar["start"], revision.seam), bar["end"]),
+        }} for bar in result["bars"]]
 
 
 def _lock(db, ownership):
@@ -211,6 +221,7 @@ def read(db, revision_id, frame, input_revision, *, before, count, now, after=No
     selected = list(db.scalars(query.order_by(ordering).limit(count)))
     for row in reversed(selected) if newest_first else selected:
         bar = copy.deepcopy(row.data)
+        bar.pop("price_input_read", None)  # Internal read proof is not chart OHLC/coverage.
         bar["input_revision"] = input_revision
         bar["time_closed"] = bar["end"] <= now
         bar["complete"] = bar["time_closed"] and bar["source_confirmed"] and bar["coverage_complete"]

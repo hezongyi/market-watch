@@ -1,0 +1,21 @@
+{
+  "project": "mw-price-alerts-v203rc1",
+  "synthetic": true,
+  "checks": [
+    {
+      "scenario": "alive_without_progress",
+      "reason_code": "worker_progress_stalled",
+      "incident": "price:ea324f06-d2cd-449c-9566-65d6d77513ac:1:1:1",
+      "recovered": true,
+      "count": 1
+    },
+    {
+      "scenario": "process_stopped",
+      "reason_code": "worker_progress_stalled",
+      "incident": "price:ea324f06-d2cd-449c-9566-65d6d77513ac:1:1:2",
+      "recovered": true,
+      "count": 2
+    }
+  ],
+  "passed": true
+}

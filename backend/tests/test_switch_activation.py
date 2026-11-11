@@ -29,7 +29,7 @@ from alerts.storage import (
     RealtimeMapping,
 )
 from sqlalchemy import delete, func, select
-from test_composite_alerts import config
+from test_composite_alerts import config, ray_condition
 from test_market_contracts import batch, minute
 
 STAMP = 200010000
@@ -45,16 +45,17 @@ def candidate(database, monkeypatch):
     return composite, old, ident, body
 
 
-def rules(database, monkeypatch, composite, old, ident):
+def rules(database, monkeypatch, composite, old, ident, *, fixed=False):
     """One rule left on the running revision and one bound to the candidate."""
     # Eligibility is covered by the alert contract suite; these rules only need
     # their fixed binding identity.
     monkeypatch.setattr("alerts.composite_alerts.require_live_eligibility",
                         lambda *args, **kwargs: None)
+    kind = {} if fixed else {"condition": ray_condition()}
     with database.begin() as db:
-        return (create_alert(db, "switch-old-rule", config(composite), at=STAMP).id,
+        return (create_alert(db, "switch-old-rule", config(composite, **kind), at=STAMP).id,
                 create_alert(db, "switch-aligned-rule",
-                             config(composite, composite_revision_id=ident), at=STAMP).id)
+                             config(composite, composite_revision_id=ident, **kind), at=STAMP).id)
 
 
 def late_batch(database, revision_id, start):
@@ -236,6 +237,7 @@ def test_retries_keep_one_message_and_merge_distinct_errors(database, monkeypatc
 def test_incompatible_source_is_rejected_without_touching_rules(database, monkeypatch):
     composite, old, ident, _ = candidate(database, monkeypatch)
     old_rule, aligned = rules(database, monkeypatch, composite, old, ident)
+    before_judgments = counts(database, CompositeJudgment)
     # A real ask-side/coarse/old candidate cannot even be prepared, so the gate
     # is exercised with the fixture sources and the real comparison code.
     incompatibilities = switch_source.compare(
@@ -258,7 +260,7 @@ def test_incompatible_source_is_rejected_without_touching_rules(database, monkey
         # No rule was migrated, paused or judged: no false crossing was emitted.
         assert db.get(ChartAlert, old_rule).status == "active"
         assert db.get(ChartAlert, aligned).status == "active"
-        assert db.scalar(select(func.count()).select_from(CompositeJudgment)) == 0
+        assert db.scalar(select(func.count()).select_from(CompositeJudgment)) == before_judgments
         run = db.scalar(select(MarketSwitchRun))
         assert (run.state, run.phase) == ("failed", "capability")
         assert run.error_summary["stage"] == "capability"
@@ -320,7 +322,9 @@ def test_relocation_never_replays_a_pre_switch_crossing(database, monkeypatch):
     from alerts.storage import SignalRow
     from test_composite_alerts import aggregate, armed
 
-    ident, composite, revision, seam, stamp = armed(database, monkeypatch)
+    condition = ray_condition()
+    condition["right"]["line"]["points"][0]["time"] = 0  # Present in both fixed revisions.
+    ident, composite, revision, seam, stamp = armed(database, monkeypatch, condition=condition)
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []  # initial baseline
     with database.begin() as db:
@@ -356,7 +360,8 @@ def test_relocation_never_replays_a_pre_switch_crossing(database, monkeypatch):
     # from: reading the same data as a new revision must establish a baseline.
     with database.begin() as db:
         assert evaluate(db, ident, now=seam + 1270000) == []
-        assert db.get(ChartAlert, ident).state["sequence"] == seam + 1260000
+        row = db.get(ChartAlert, ident)
+        assert row.state.get("sequence") == seam + 1260000, row.health_reason
     assert counts(database, SignalRow) == 1
     # A crossing after the boundary fires exactly once, on the new revision.
     feed(database, candidate_id, [(seam + 1260000, "1.110")], now=seam + 1330000)
@@ -395,7 +400,7 @@ def test_rule_the_target_cannot_serve_is_paused_and_reported(database, monkeypat
 
     composite, old, ident, _ = candidate(database, monkeypatch)
     with database.begin() as db:
-        rule = create_alert(db, "switch-blocked-rule", config(composite), at=STAMP).id
+        rule = create_alert(db, "switch-blocked-rule", config(composite, condition=ray_condition()), at=STAMP).id
     monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: STAMP)
     # Readiness already guarantees every frame, so the guard's negative branch is
     # injected here; its own predicate is asserted by the test above.
@@ -447,7 +452,7 @@ def test_forward_history_version_rebinds_without_pausing(database, monkeypatch):
     monkeypatch.setattr("alerts.composite_alerts.require_live_eligibility",
                         lambda *args, **kwargs: None)
     with database.begin() as db:
-        rule = create_alert(db, "advance-rule", config(composite), at=STAMP).id
+        rule = create_alert(db, "advance-rule", config(composite, condition=ray_condition()), at=STAMP).id
         bound_before = dict(db.scalar(select(ChartAlertVersion.market_identity).where(
             ChartAlertVersion.alert_id == rule, ChartAlertVersion.version == 1)))
     monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: STAMP)
@@ -483,7 +488,7 @@ def test_calendar_change_pauses_the_running_rule(database, monkeypatch):
         parent = db.get(HistoryVersion, body["history_version_id"])
         destination, _, derived = change_aggregation(db, parent.dataset_id, "utc0",
             version_id=parent.id)
-        rule = create_alert(db, "calendar-rule", config(composite), at=STAMP).id
+        rule = create_alert(db, "calendar-rule", config(composite, condition=ray_condition()), at=STAMP).id
     while import_page(Adapter([]), version_id=derived.id):
         with database() as db:
             if db.get(HistoryVersion, derived.id).status == "published":
@@ -549,8 +554,8 @@ def test_shadow_verdict_pauses_rules_the_candidate_cannot_move(database, monkeyp
     monkeypatch.setattr("alerts.composite_alerts.require_live_eligibility",
                         lambda *args, **kwargs: None)
     with database.begin() as db:
-        blocked = create_alert(db, "shadow-blocked", config(composite), at=STAMP).id
-        movable = create_alert(db, "shadow-movable", config(composite), at=STAMP).id
+        blocked = create_alert(db, "shadow-blocked", config(composite, condition=ray_condition()), at=STAMP).id
+        movable = create_alert(db, "shadow-movable", config(composite, condition=ray_condition()), at=STAMP).id
     with database.begin() as db:
         run = runs.start(baseline_shadow.KIND, composite_id=composite,
                          previous_revision_id=old, scheduled_for=STAMP)
@@ -623,7 +628,7 @@ def test_held_pause_on_a_running_revision_keeps_its_target(database, monkeypatch
 
     composite, old, ident, _ = candidate(database, monkeypatch)
     with database.begin() as db:
-        rule = create_alert(db, "held-live-rule", config(composite), at=STAMP).id
+        rule = create_alert(db, "held-live-rule", config(composite, condition=ray_condition()), at=STAMP).id
         alert = db.get(ChartAlert, rule)
         alert.status, alert.runtime = "paused", {"demand_hold": "stale_input"}
         target = db.get(RealtimeMapping, db.get(CompositeRevision, old).mapping_id).target_dataset_id
@@ -631,7 +636,7 @@ def test_held_pause_on_a_running_revision_keeps_its_target(database, monkeypatch
         assert composite_targets(db, {internal}) == {target}
 
 
-def test_frozen_held_pause_drops_its_own_target_after_a_source_switch(database, monkeypatch):
+def test_paused_price_rules_drop_demand_on_both_revisions(database, monkeypatch):
     from alerts.market_usage import composite_targets
 
     composite, old, body = contracts.request(database, monkeypatch)
@@ -640,11 +645,15 @@ def test_frozen_held_pause_drops_its_own_target_after_a_source_switch(database, 
         ident = create(db, composite, {**body, "request_id": "held-switch",
                                        "mapping_id": mapping}).id
     contracts.prepared(database, ident)
-    frozen_rule, live_rule = rules(database, monkeypatch, composite, old, ident)
+    frozen_rule, live_rule = rules(database, monkeypatch, composite, old, ident, fixed=True)
     monkeypatch.setattr("alerts.composite_revisions.now_ms", lambda: STAMP)
     with database.begin() as db:
         activate(db, composite, ident, {"request_id": "held", "expected_revision_id": old})
     with database.begin() as db:
+        blocked = db.get(ChartAlert, frozen_rule)
+        assert (blocked.status, blocked.health, blocked.version) == ("active", "blocked", 1)
+        assert blocked.runtime["reason_code"] == "binding_frozen"
+        assert db.get(ChartAlert, live_rule).runtime["execution_contract"] == "price-v2"
         for rule in (frozen_rule, live_rule):
             alert = db.get(ChartAlert, rule)
             alert.status, alert.control_revision = "paused", alert.control_revision + 1
@@ -653,6 +662,4 @@ def test_frozen_held_pause_drops_its_own_target_after_a_source_switch(database, 
         old_target = db.get(RealtimeMapping, db.get(CompositeRevision, old).mapping_id).target_dataset_id
         live_target = db.get(RealtimeMapping, mapping).target_dataset_id
         assert old_target != live_target
-        # The frozen revision ends its own demand; the paused rule on the running
-        # revision still contributes exactly its own target.
-        assert composite_targets(db, {internal}) == {live_target}
+        assert composite_targets(db, {internal}) == set()

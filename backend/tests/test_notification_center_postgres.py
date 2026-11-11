@@ -105,12 +105,12 @@ def test_av49_to_aw50_is_additive_repeatable_and_retains_demands(postgres_alerts
     monkeypatch.setattr(settings, 'database_url', postgres_alerts.url.render_as_string(hide_password=False))
     command.upgrade(config, 'av49_indicator_demands')
     before = set(inspect(postgres_alerts).get_table_names())
-    command.upgrade(config, 'head')
-    command.upgrade(config, 'head')
+    command.upgrade(config, 'bb55_provider_catalog_indexes')
+    command.upgrade(config, 'bb55_provider_catalog_indexes')
     after = set(inspect(postgres_alerts).get_table_names())
     assert before <= after
-    # head (now ba54_market_switch_runs) also adds the two history-mode tables after
-    # aw50/ax51 and the durable switch-run table after az53.
+    # The rc.1 target includes the history-mode and durable switch-run tables.
+    # Later price-alert tables are verified by their own migration contract.
     assert len(after-before) == 12
     assert {'notice_streams', 'notice_events', 'notice_source_receipts', 'notice_intakes', 'market_realtime_mapping_notes', 'market_switch_runs'} <= after
     assert {'market_dataset_frame_sources', 'market_history_frame_runs'} <= after

@@ -157,14 +157,14 @@ def bind_offset(db, config, identity, dataset_id):
         "origin": origin, "algorithm": ALGORITHM}}
 
 
-def market_identity(db, config: AlertConfig, dataset_id=None, *, at=None):
+def market_identity(db, config: AlertConfig, dataset_id=None, *, at=None, clock=None):
     """Require the stored source identity; never silently fall back to another series."""
     if config.series_kind == "composite":
         from .composite_alerts import bind
 
         if dataset_id:
             raise ValueError("组合告警不能绑定平台缓存数据集")
-        return bind(db, config, now=at)
+        return bind(db, config, now=at, clock=clock)
     if config.series_kind == "managed":
         instrument = db.get(Instrument, config.instrument)
         if not instrument or not instrument.enabled or instrument.source != config.source:
@@ -201,6 +201,15 @@ def current_version(db, alert):
         ChartAlertVersion.alert_id == alert.id, ChartAlertVersion.version == alert.version))
 
 
+def initialize_price(db, alert, identity, config, *, at):
+    from .price_alert_inputs import is_price_rule
+
+    if alert.status == "active" and is_price_rule(config):
+        from .price_alert_evaluator import initialize
+
+        initialize(db, alert, identity, config, now=at)
+
+
 def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None):
     digest = config_hash(config)
     existing = db.scalar(select(ChartAlert).where(ChartAlert.request_id == request_id))
@@ -208,10 +217,17 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
         if existing.request_hash != digest:
             raise Conflict("此请求身份已用于其他告警内容")
         return existing
+    clock = now_ms if at is None else None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
-    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
+    from .price_alert_reasons import validate_notification
+
+    validate_notification(config)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at, clock=clock), dataset_id)
+    at = clock() if clock is not None else at
+    if config.expires_at is not None and config.expires_at <= at:
+        raise ValueError("到期时间必须晚于生效时间")
     alert = ChartAlert(request_id=request_id, request_hash=digest, name=config.name,
                        effective_at=at, max_triggers=config.max_triggers,
                        expires_at=config.expires_at)
@@ -221,6 +237,7 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
                              market_identity=identity, dataset_id=dataset_id, effective_at=at))
     db.add(Audit(kind="chart_alert_created", details={"alert_id": alert.id, "version": 1}))
     db.flush()
+    initialize_price(db, alert, identity, config, at=at)
     return alert
 
 
@@ -233,18 +250,37 @@ def locked(db, alert_id, expected_version=None):
     return alert
 
 
+def execution_history(alert):
+    return {key: alert.runtime[key] for key in ("incident", "incident_number", "last_incident",
+        "last_gap", "execution_notification") if key in alert.runtime}
+
+
 def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     alert = locked(db, alert_id, expected_version)
     if alert.status == "archived":
         raise ValueError("已删除的告警不能编辑")
+    clock = now_ms if at is None else None
     at = now_ms() if at is None else at
     if config.expires_at is not None and config.expires_at <= at:
         raise ValueError("到期时间必须晚于生效时间")
-    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at), dataset_id)
+    from .price_alert_reasons import validate_notification
+
+    validate_notification(config)
+    identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at, clock=clock), dataset_id)
+    at = clock() if clock is not None else at
+    if config.expires_at is not None and config.expires_at <= at:
+        raise ValueError("到期时间必须晚于生效时间")
+    from .price_alert_inputs import is_price_rule
+
+    if alert.runtime.get("incident") and not is_price_rule(config):
+        from .chart_alert_execution import end_observation
+
+        end_observation(db, alert, now=at)
     alert.version += 1
     alert.control_revision += 1
     alert.name, alert.max_triggers, alert.expires_at = config.name, config.max_triggers, config.expires_at
-    alert.state, alert.runtime, alert.effective_at, alert.updated_at = {}, {}, at, at
+    preserved = execution_history(alert)
+    alert.state, alert.runtime, alert.effective_at, alert.updated_at = {}, preserved, at, at
     alert.health, alert.health_reason = "warming", "条件已更新，等待建立新基准"
     if alert.count >= alert.max_triggers:
         alert.status = "completed"
@@ -253,6 +289,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
                              dataset_id=dataset_id, effective_at=at))
     db.add(Audit(kind="chart_alert_edited", details={"alert_id": alert.id, "version": alert.version}))
     db.flush()
+    initialize_price(db, alert, identity, config, at=at)
     return alert
 
 
@@ -266,19 +303,28 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         return alert
     if alert.version != expected_version or alert.control_revision != expected_revision:
         raise Conflict("告警运行状态已改变，请读取当前状态后重试")
+    clock = now_ms if at is None else None
     at = now_ms() if at is None else at
     if alert.status == "archived":
         if action != "archive":
             raise ValueError("已删除的告警不能恢复")
     if action in ("pause", "drawing_deleted"):
-        if alert.status == "active":
+        from .price_alert_settlement import pending
+
+        if alert.status == "active" or pending(alert):
             alert.status = "paused"
             alert.health_reason = "关联画线已明确删除" if action == "drawing_deleted" else "用户暂停"
+            if alert.runtime.get("settlement_pending"):
+                alert.runtime = {**alert.runtime, "settlement_pending": False,
+                    "settlement": {**alert.runtime["settlement"], "finished_at": at, "outcome": "user_paused"}}
         alert.runtime = {key: value for key, value in alert.runtime.items() if key != "demand_hold"}
     elif action in ("resume", "restart", "rebaseline"):
         if alert.expires_at is not None and alert.expires_at <= at:
             raise ValueError("告警已到期，请先修改到期时间")
         config = AlertConfig.model_validate(current_version(db, alert).config)
+        from .price_alert_reasons import validate_notification
+
+        validate_notification(config)
         if config.series_kind == "composite":
             from .composite_alerts import require_live_eligibility
             from .storage import CompositeRevision
@@ -286,7 +332,17 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             revision = db.get(CompositeRevision, current_version(db, alert).market_identity["composite_revision_id"])
             if not revision:
                 raise ValueError("告警绑定的组合修订不存在")
-            require_live_eligibility(db, revision, now=at, timeframe=config.timeframe)
+            from .price_alert_inputs import is_price_rule
+
+            if is_price_rule(config):
+                from .price_alert_evaluator import eligibility
+
+                eligibility(db, revision, mode=config.mode, now=at, clock=clock)
+                at = clock() if clock is not None else at
+                if alert.expires_at is not None and alert.expires_at <= at:
+                    raise ValueError("告警已到期，请先修改到期时间")
+            else:
+                require_live_eligibility(db, revision, now=at, timeframe=config.timeframe)
         if action == "restart":
             alert.run += 1
             alert.count = 0
@@ -296,10 +352,15 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
             raise ValueError("仅等待核对的告警可重建基准")
         elif alert.status == "active" and action != "rebaseline":
             raise ValueError("告警已在监控，无需恢复")
-        alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, {}, at
+        preserved = execution_history(alert)
+        alert.status, alert.state, alert.runtime, alert.effective_at = "active", {}, preserved, at
         alert.health, alert.health_reason = "warming", "等待重新建立基准"
+        initialize_price(db, alert, current_version(db, alert).market_identity, config, at=at)
     elif action == "archive":
         alert.status = "archived"
+        if alert.runtime.get("settlement_pending"):
+            alert.runtime = {**alert.runtime, "settlement_pending": False,
+                "settlement": {**alert.runtime["settlement"], "finished_at": at, "outcome": "user_archived"}}
     else:
         raise ValueError("未知生命周期操作")
     alert.updated_at = at
@@ -310,18 +371,27 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
 
 
 def consume(db, alert_id, observation: Observation, *, detected_at=None, baseline=False,
-            expected_version=None):
+            expected_version=None, settlement=False):
     """Checkpoint, count, signal, notification and outbox are one transaction."""
     alert = locked(db, alert_id, expected_version)
     detected_at = now_ms() if detected_at is None else detected_at
-    if alert.status != "active":
+    if not settlement and alert.status != "active":
         return None
-    if alert.expires_at is not None and detected_at >= alert.expires_at:
+    if not settlement and alert.expires_at is not None and detected_at >= alert.expires_at:
         alert.status = "expired"
         alert.control_revision += 1
         return None
     version = current_version(db, alert)
     config = AlertConfig.model_validate(version.config)
+    from .price_alert_inputs import is_price_rule
+
+    if is_price_rule(config) and alert.expires_at is not None and observation.occurred_at >= alert.expires_at:
+        return None
+    if settlement:
+        from .price_alert_settlement import accepts
+
+        if not is_price_rule(config) or not accepts(alert, observation, config):
+            return None
     state = EvaluationState(**alert.state) if alert.state else EvaluationState(count=alert.count)
     if state.sequence is not None and observation.sequence <= state.sequence:
         return None

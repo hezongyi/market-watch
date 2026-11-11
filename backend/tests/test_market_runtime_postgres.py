@@ -454,8 +454,9 @@ def test_alert_suffix_cannot_turn_recovery_or_missing_inputs_into_crossings(prov
             assert row.count == 0 and db.scalar(select(SignalRow)) is None
 
 
-def test_source_commit_between_clock_capture_and_locked_read(provider_pg, monkeypatch):
-    race_contract(provider_pg[0], monkeypatch)
+@pytest.mark.parametrize("path", ["legacy_ray", "price"])
+def test_source_commit_between_clock_capture_and_locked_read(provider_pg, monkeypatch, path):
+    race_contract(provider_pg[0], monkeypatch, path)
 
 
 def test_initialized_atr_reference_does_not_wait_for_unneeded_indicator_tail(provider_pg, monkeypatch):
