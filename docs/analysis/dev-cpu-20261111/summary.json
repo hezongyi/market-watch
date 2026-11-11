@@ -1,0 +1,32 @@
+{
+  "elapsed_seconds": 183,
+  "cpu_means": {
+    "mw-dev-tls-1": 0.07,
+    "mw-dev-web-1": 0.05,
+    "mw-dev-data-worker-1": 67.51,
+    "mw-dev-notification-worker-1": 2.24,
+    "mw-dev-market-runtime-1": 17.49,
+    "mw-dev-api-1": 15.95,
+    "mw-dev-frontend-1": 2.63,
+    "mw-dev-ntfy-1": 1.55,
+    "mw-dev-postgres-1": 30.73
+  },
+  "new_bars": 9,
+  "published_revision_increases": 5802,
+  "empty_queue_samples": 14,
+  "samples": 19,
+  "database_delta": {
+    "read": 162660,
+    "hit": 5195236,
+    "returned": 11970608,
+    "fetched": 2820615,
+    "inserted": 10370,
+    "updated": 32724,
+    "deleted": 9748,
+    "commits": 72008
+  },
+  "16s_changed_rows": 483,
+  "16s_price_or_volume_change_row_upper_bound": 17,
+  "history_cursor_changed": false,
+  "note": "Live requests remained active; this is not an idle baseline. Database counters include observation queries."
+}

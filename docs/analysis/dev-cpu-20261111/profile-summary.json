@@ -1,0 +1,81 @@
+{
+  "format": "GIL samples; indicative hotspots, not exact CPU attribution",
+  "samples": 113,
+  "threads": [
+    {
+      "thread": "Thread 35 \"switch_shadow\"",
+      "samples": 28,
+      "share": 24.8
+    },
+    {
+      "thread": "Thread 33 \"chart_aggregation\"",
+      "samples": 24,
+      "share": 21.2
+    },
+    {
+      "thread": "Thread 40 \"market-stream_1\"",
+      "samples": 11,
+      "share": 9.7
+    },
+    {
+      "thread": "Thread 41 \"market-stream_2\"",
+      "samples": 11,
+      "share": 9.7
+    },
+    {
+      "thread": "Thread 39 \"market-stream_0\"",
+      "samples": 8,
+      "share": 7.1
+    },
+    {
+      "thread": "Thread 42 \"market-stream_3\"",
+      "samples": 8,
+      "share": 7.1
+    },
+    {
+      "thread": "Thread 34 \"market_stream\"",
+      "samples": 7,
+      "share": 6.2
+    },
+    {
+      "thread": "Thread 30 \"history_network\"",
+      "samples": 4,
+      "share": 3.5
+    },
+    {
+      "thread": "Thread 31 \"history_compute\"",
+      "samples": 4,
+      "share": 3.5
+    },
+    {
+      "thread": "Thread 12 \"provider_live_oanda\"",
+      "samples": 2,
+      "share": 1.8
+    },
+    {
+      "thread": "Thread 29 \"chart_history\"",
+      "samples": 2,
+      "share": 1.8
+    },
+    {
+      "thread": "Thread 17 \"provider_warm_yahoo\"",
+      "samples": 1,
+      "share": 0.9
+    },
+    {
+      "thread": "Thread 24 \"provider_transport_oanda\"",
+      "samples": 1,
+      "share": 0.9
+    },
+    {
+      "thread": "Thread 32 \"native_history\"",
+      "samples": 1,
+      "share": 0.9
+    },
+    {
+      "thread": "Thread 37 \"data_ownership\"",
+      "samples": 1,
+      "share": 0.9
+    }
+  ]
+}
