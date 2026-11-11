@@ -7,7 +7,7 @@
 - 实现工作树：`/home/quant/repos/market-watch-android-personal-v205`。
 - 分支：`feat/android-personal-v205`；应用基线：`1bb935bdf1195c4da532cb2e6f62faca2198e6c4`（v2.0.5）。
 - 文档源：`89d10fe3fcbc71380b12af3dc21aefdcd756758b`；只导入约定 docs 路径并单独提交。
-- 风险 F1（新增本机持久格式、SW 更新和原生外壳），见 [Issue 草案](issue-draft.md)。没有后端/schema 改动。
+- 风险 F1（新增本机持久格式、SW 更新和原生外壳），见 [Issue 草案](issue-draft.md)。B 新增兼容只读 API；没有 schema 改动。
 - 未合并、未推送或创建 PR、未打正式 tag、未生产发布。未访问 Unraid，未修改其他任务工作树、数据库或实例。
 
 ## 本次真实代码
@@ -49,3 +49,25 @@
 2. 安装 SDK 35/ADB，执行 `mobile/client/gradlew :app:assembleDebug :app:lintDebug`；Find X8 核对 A 阶段清单，记录设备版本与真实图表/离线/返回证据。
 3. 按 B 实施完整共享自选及 revision/active 隔离、真实数据页面、只读有界 sparklines API、应用级行情 transport；再按 C 复用告警/通知。保持 A06 与 v2.0.5 来源能力边界。
 4. 完成 D 桌面/真机/生命周期回归、独立 review、签名 APK 与交付记录后再更新完成审计。不合并、不生产发布。
+
+## B 推进及环境更新（2026-11-11 07:25 UTC）
+
+上述 A 阶段原始环境记录保留作为历史事实，当前状态如下：
+
+- 磁盘已恢复充足余量（未由本任务清理其他资源）。本任务独立 SDK35/platform-tools/build-tools 已安装；Gradle 8.11.1 官方 distribution 经固定 SHA-256 校验后执行。`assembleDebug` 和 `lintDebug` 成功，见 [Android 构建日志](android-build-a.log)。lint 0 errors / 12 warnings，没有基线抑制。
+- Debug APK 真实存在：`.artifacts/android-personal-v205/market-watch-0.1.0-debug.apk`，SHA-256 `8572c9e3f468507e9e97f33239e1fb5c2d0459b86f466974907868928454d548`；APK v2 签名校验通过。Debug 签名证书 SHA-256 `ca8ee3bd68d2aa412119ea53b15f5393b3a2a9e57aea30f68f2e25b450e9fd33`。这是早期阶段候选，不是完整交付。
+- 用户明确选择可以自行 Find X8 验收，无需先接 ADB。当前 `adb devices` 无设备，真机结果仍未获得。未据此关闭真机门槛。
+- `192.168.7.232` 确认为本机 IP。18443 是既有 `mw-dev`，本任务未改动它。新建 task/project **mw-android-personal-v205**，独立 PostgreSQL14.24、API、Web、TLS、network、volume、凭据，地址 **https://192.168.7.232:18445**。操作入口：
+
+  ```sh
+  python3 deploy/ubuntu/mw_docker.py preview status --task mw-android-personal-v205 --project mw-android-personal-v205
+  python3 deploy/ubuntu/mw_docker.py preview up --task mw-android-personal-v205 --project mw-android-personal-v205
+  python3 deploy/ubuntu/mw_docker.py preview stop --task mw-android-personal-v205 --project mw-android-personal-v205
+  ```
+
+- 镜像通过 `mw-docker build` 构建；web 须显式 `--context . --file web/Dockerfile`，避免本机旧安装工具默认 web context。许可库已复制为本任务自己的 gitignored 安装，既有源安装保持不变。
+- LAN/TLS 适配只改任务私有 preview 配置，见 [脚本](configure-lan.py)；独立开发 CA 公共证书仅加入 Debug 对此 IP 的信任，私钥不提交，release 不包含。4 个服务 healthy，CA 验证的 HTTPS `/readyz`、真实 Cookie/CSRF 登录、`/m/` 及 sparkline API 已通过。**后端使用固定合成 D1 seed，禁出网；不是供应商真实行情或告警通知证据。**
+- B 后端：`POST /api/market-data/sparklines` 已实现。只读现有 provider/managed/history/composite，NY17/DST/UTC0、单一日内周期、1600点、缺口、空窗口、身份/account/revision、现有 managed 有效性、历史校验和组合展示观测。避开 ensure/datafeed/访问时间写入/display快照租约；不增加 demand/任务。
+- [后端回归](backend-b.log) 106 项通过；小图专项 14 项，覆盖 SQL 只读观察、全表计数无增长、cold/warm 查询预算、网络禁止、DST、缺口与四类身份。最近补充参考线响应字段后需再跑专项/回归。
+- B 前端仍在实施：共享自选控制器（保留最新 desktop active/未知字段、409停止）、应用级单行情 client、可见行报价、小图最多两请求/20项/迟到取消/60s/后台停止、真实数据目录与详情。新控制器专项已通过；完整页面浏览器测试仍在补充，不能宣称 B 完成。
+- 部署镜像是已构建阶段快照，最新 B 前端和补充后端改动尚未全部重建进实例。交付前必须重新构建、更新和验收，不能以现地址 ready 代表最新源码已部署。

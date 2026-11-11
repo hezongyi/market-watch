@@ -853,6 +853,10 @@ from .market_data import router as market_data_router  # noqa: E402
 
 app.include_router(market_data_router(authenticated))
 
+from .sparkline_api import router as sparkline_router  # noqa: E402
+
+app.include_router(sparkline_router(authenticated))
+
 from .history_api import router as history_router  # noqa: E402
 
 app.include_router(history_router(authenticated))

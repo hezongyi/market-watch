@@ -303,6 +303,23 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
         raise ValueError("需求租约身份冲突，请重新打开所选行情")
 
 
+def usable_cached_rows(db, inst, rows, now, *, before=None):
+    """Validity shared by cache pages and sparklines; retain all cached islands."""
+    cutoff = (now - 5000) // 60000 * 60000
+    left = rows[0]["start"] if rows else now
+    right = max(before if before is not None else now + 1, cutoff)
+    coverage = stored_coverage(db, inst, left, right) if rows else []
+    observed_end = db.scalar(select(func.max(Bar.end)).where(
+        Bar.instrument_id == inst.id, Bar.timeframe == "M1",
+        Bar.complete.is_(True), Bar.end <= cutoff)) if any(
+            not row["complete"] for row in rows) else None
+    usable = [row for row in rows if not row.get("pending_aggregation") and (row["complete"] or (
+        observed_end is not None and row["start"] < observed_end <= cutoff < row["end"]
+        and covers_interval(coverage, row["start"], observed_end)
+    ))]
+    return usable, coverage
+
+
 def read_cached_history(body: HistoryQuery):
     """Read observations without planning jobs or taking the instrument writer lock.
 
@@ -316,7 +333,6 @@ def read_cached_history(body: HistoryQuery):
         raise HTTPException(422, "不支持的周期")
     now = now_ms()
     before = min(body.before or now + 1, now + 1)
-    cutoff = (now - 5000) // 60000 * 60000
     with transaction() as db:
         # Resolution/registration is a separate operation. Reads never create
         # instruments, so a truly cold symbol can return immediately.
@@ -327,19 +343,10 @@ def read_cached_history(body: HistoryQuery):
         if inst.source not in ("oanda", "binance"):
             raise HTTPException(422, "此品种尚未接入按需行情服务")
         rows = chart_rows(db, inst, body.timeframe, before, body.limit, now)
-        left = rows[0]["start"] if rows else before
-        coverage = stored_coverage(db, inst, left, max(before, cutoff)) if rows else []
         # A forming candle represents the latest persisted observation, not
         # a promise that the provider has delivered through this wall-clock minute.
         # Advancing time alone must not remove/reinsert its native series point.
-        observed_end = db.scalar(select(func.max(Bar.end)).where(
-            Bar.instrument_id == inst.id, Bar.timeframe == "M1",
-            Bar.complete.is_(True), Bar.end <= cutoff)) if any(
-                not row["complete"] for row in rows) else None
-        usable = [row for row in rows if not row.get("pending_aggregation") and (row["complete"] or (
-            observed_end is not None and row["start"] < observed_end <= cutoff < row["end"]
-            and covers_interval(coverage, row["start"], observed_end)
-        ))]
+        usable, coverage = usable_cached_rows(db, inst, rows, now, before=before)
         # Return a contiguous observed suffix. Do not join cached islands across
         # a trading interval whose provider coverage has not been established.
         contiguous = []
