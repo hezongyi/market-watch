@@ -1,6 +1,6 @@
 # Idle optimization acceptance evidence (2026-11-12)
 
-Candidate commit: `fe2970e9` (API image `market-watch-api:dev-idle-v2-20261112`, web image `market-watch-web:dev-idle-v2-20261112`). Development project: `mw-dev` on Ubuntu Docker, four host CPUs. No CI status was queried.
+Deployed application commit: `f301eb69` (API image `market-watch-api:dev-idle-v2-20261112`, web image `market-watch-web:dev-idle-v2-20261112`). `fe2970e9` subsequently changed tests only. Development project: `mw-dev` on Ubuntu Docker, four host CPUs. CI was not tracked during this original deployment acceptance.
 
 Functional checks passed:
 
@@ -17,4 +17,6 @@ Two five-minute idle samples ran with no browser, active alerts, or stream subsc
 | 1 | 3.682% | 3.136% | 6.399% | 3.111% | 0.372% | 0.862% | 0.842% |
 | 2 | 4.227% | 6.149% | 5.149% | 3.511% | 0.375% | 0.871% | 0.851% |
 
-The service process values are normalized to one CPU by Docker; the four-core total is the sum divided by four. The variance is expected around quote/confirmation and minute-boundary work. PostgreSQL counters show no active stream tasks, alerts, imports or volume jobs during the samples; three live composite datasets remained connected. The residual 3–4% host total is therefore the cost of preserving per-quote state, provisional OHLC, ownership/confirmation, and the composite aggregate path, not the retired standalone symbol collectors. No display-state throttling was introduced.
+The service process values are normalized to one CPU by Docker; the four-core total is the sum divided by four. PostgreSQL counters show no active stream tasks, alerts, imports or volume jobs during the samples; three live composite datasets remained connected. These samples establish the remaining cost, but do not establish that it is necessary or irreducible. The isolated test PostgreSQL container was also running during these earlier observations; its CPU is excluded from the `mw-dev` container totals, but host competition was not eliminated. No display-state throttling was introduced.
+
+Follow-up profiling found further avoidable work and eight retained publication correction jobs blocked by historical gaps, despite zero pending publication generations at the inspection instant. Thus “no active work” must not be interpreted as “no retained correction jobs.” See [residual CPU diagnosis and next-step plan](idle-cpu-residual-analysis-20261112.md) for a fresh sample with the task-owned test PostgreSQL stopped, thread attribution, probe measurements, and the limits of a single-core 3% target.
