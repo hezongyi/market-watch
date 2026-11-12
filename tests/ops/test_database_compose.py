@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 PINNED_PG = 'postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872'
 BENCHMARK_COMPOSE = Path('scripts/pg_jit_reassessment/compose.yaml')
+DEVELOPMENT_COMPOSE = Path('deploy/ubuntu/compose.development.yaml')
 
 
 @unittest.skipUnless(shutil.which('docker'), 'Requires Docker Compose CLI')
@@ -91,8 +92,14 @@ class DatabaseComposeTests(unittest.TestCase):
                     if image.startswith('postgres:'):
                         self.assertEqual(image,PINNED_PG)
                         health = ' '.join(service['healthcheck']['test'])
-                        self.assertIn('140024',health)
-                        self.assertIn('pg_jit_available()',health)
+                        if paths == [DEVELOPMENT_COMPOSE]:
+                            # Steady-state liveness stays cheap. Version/JIT are
+                            # gated by migrate and every application connection.
+                            self.assertEqual(service['healthcheck']['test'],
+                                             ['CMD', 'pg_isready', '-U', 'dev', '-d', 'dev'])
+                        else:
+                            self.assertIn('140024',health)
+                            self.assertIn('pg_jit_available()',health)
                     if image.startswith('market-watch-api:') and 'sink' not in name:
                         if paths == [BENCHMARK_COMPOSE] and name == 'assessment':
                             # measure.py gates the actual version/provider itself;
@@ -101,6 +108,19 @@ class DatabaseComposeTests(unittest.TestCase):
                             self.assertIn('/workspace/scripts/pg_jit_reassessment/measure.py',service['command'])
                             continue
                         self.assertEqual(service['environment'].get('ALERTS_DATABASE_EXPECTED_VERSION'),'140024',name)
+
+    def test_development_light_probe_keeps_startup_database_gates(self):
+        services = self.render([DEVELOPMENT_COMPOSE])['services']
+        self.assertEqual(services['migrate']['command'], ['alembic', 'upgrade', 'head'])
+        self.assertEqual(services['migrate']['depends_on']['postgres']['condition'],
+                         'service_healthy')
+        for name in ('migrate', 'api', 'market-runtime', 'data-worker', 'notification-worker'):
+            with self.subTest(service=name):
+                self.assertEqual(services[name]['environment']['ALERTS_DATABASE_EXPECTED_VERSION'],
+                                 '140024')
+                if name != 'migrate':
+                    self.assertEqual(services[name]['depends_on']['migrate']['condition'],
+                                     'service_completed_successfully')
 
     def test_production_defaults_off_even_with_generic_inherit_setting(self):
         rendered = self.render([Path('compose.production.yaml')],ALERTS_DATABASE_JIT='inherit')
