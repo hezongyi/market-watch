@@ -5,6 +5,7 @@
   --spark-area-up: #65b6a4;
   --spark-area-down: #e39b94;
   --spark-previous-session: #7599c8;
+  --spark-previous-stroke: #7599c8;
   --spark-price-reference: #91a8c4;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
@@ -17,6 +18,7 @@
   --spark-area-up: #238779;
   --spark-area-down: #cf6c65;
   --spark-previous-session: #587dab;
+  --spark-previous-stroke: #4c73a5;
   --spark-price-reference: #7891ad;
 }
 .mobile-watch-row.positive:not(.stale) .mobile-spark:not([data-cached]):not([data-previous-session]) stop {
@@ -217,6 +219,10 @@
 .mobile-spark[data-previous-session] > svg {
   height: 100%;
   color: var(--spark-previous-session);
+}
+.mobile-spark[data-previous-session] path[stroke] {
+  stroke: var(--spark-previous-stroke);
+  stroke-opacity: 0.92;
 }
 .mobile-spark[data-previous-session] .mobile-spark-caption {
   position: absolute;

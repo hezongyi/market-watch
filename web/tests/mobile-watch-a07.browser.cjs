@@ -513,9 +513,13 @@ const server = http.createServer(async (req, res) => {
           const colors=await stockRow.locator('.mobile-spark svg').evaluate(svg=>({
             line:getComputedStyle(svg).color,
             fill:getComputedStyle(svg.querySelector('stop')).stopColor,
+            stroke:getComputedStyle(svg.querySelector('path[stroke]')).stroke,
+            strokeOpacity:getComputedStyle(svg.querySelector('path[stroke]')).strokeOpacity,
           }));
           assert.equal(colors.line,theme==='light' ? 'rgb(88, 125, 171)' : 'rgb(117, 153, 200)');
-          assert.equal(colors.fill,colors.line,'previous-session area follows blue line rather than quote direction');
+          assert.equal(colors.fill,colors.line,'previous-session area retains its existing blue');
+          assert.equal(colors.stroke,theme==='light' ? 'rgb(76, 115, 165)' : 'rgb(117, 153, 200)');
+          assert.equal(colors.strokeOpacity,'0.92');
           const reference=await stockRow.locator('.mobile-spark-session-open').evaluate(el=>({color:getComputedStyle(el).stroke,opacity:getComputedStyle(el).opacity}));
           assert.equal(reference.color,theme==='light'?'rgb(120, 145, 173)':'rgb(145, 168, 196)');
           assert.equal(reference.opacity,'0.5');
