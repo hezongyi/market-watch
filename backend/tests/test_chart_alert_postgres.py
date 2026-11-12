@@ -6,7 +6,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import pytest
 from alerts.chart_alert_service import consume, create, lifecycle
-from alerts.storage import ChartAlert, Notification, Outbox, SignalRow, bootstrap
+from alerts.storage import ChartAlert, Instrument, Notification, Outbox, SignalRow, bootstrap
 from sqlalchemy import create_engine, func, select, text
 from sqlalchemy.engine import make_url
 from sqlalchemy.orm import sessionmaker
@@ -44,6 +44,7 @@ def test_postgres_workers_commit_one_logical_event_with_one_outbox(postgres_aler
     bootstrap(postgres_alerts)
     factory = sessionmaker(postgres_alerts, expire_on_commit=False)
     with factory.begin() as db:
+        db.get(Instrument, "EURUSD").enabled = True
         ident = create(db, "pg-concurrency", config(notify_ntfy=True), at=0).id
         consume(db, ident, sample(0, 9), detected_at=0)
 
@@ -69,6 +70,7 @@ def test_postgres_concurrent_lifecycle_retry_opens_one_run(postgres_alerts, monk
     bootstrap(postgres_alerts)
     factory = sessionmaker(postgres_alerts, expire_on_commit=False)
     with factory.begin() as db:
+        db.get(Instrument, "EURUSD").enabled = True
         ident = create(db, "pg-lifecycle", config(), at=0).id
 
     def attempt(_):
@@ -92,6 +94,7 @@ def test_postgres_concurrent_monitors_retire_legacy_once_and_preserve_delivery(p
     factory = sessionmaker(postgres_alerts, expire_on_commit=False)
     monkeypatch.setattr(storage, "Session", factory)
     with factory.begin() as db:
+        db.get(Instrument, "EURUSD").enabled = True
         row = create(db, "retire-concurrent", config(notify_ntfy=True), at=0)
         ident = row.id
         consume(db, ident, sample(0, 9), detected_at=0)
@@ -125,6 +128,7 @@ def test_postgres_locked_rule_is_skipped_without_evaluation_observation(postgres
     factory = sessionmaker(postgres_alerts, expire_on_commit=False)
     monkeypatch.setattr(storage, "Session", factory)
     with factory.begin() as db:
+        db.get(Instrument, "EURUSD").enabled = True
         ident = create(db, "locked-monitor", config(), at=0).id
 
     observations = []

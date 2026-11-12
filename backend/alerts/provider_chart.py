@@ -15,7 +15,7 @@ import httpx
 from .chart_data import FRAMES, bounds
 from .config import settings
 from .domain import Calendar, session_bounds
-from .provider_capabilities import SOURCES, fresh_seconds, versions
+from .provider_capabilities import SOURCES, fresh_seconds, request_seconds, versions
 from .provider_capabilities import frames as source_frames
 from .provider_deadline import request_deadline
 from .provider_transport import (
@@ -557,28 +557,36 @@ def quote_page(meta):
     return {**page, "fetch_status": "ok", "read_at": page.get("as_of")}
 
 
-def quote_previous_close(meta, latest):
-    """Previous completed native session close, with the same price basis."""
+def previous_close_query(meta, latest):
+    """Native query cutoff, count and completed-session boundary."""
     if meta["source"] == "oanda":
         from .native_series import chart_label, parameters, session_start
         native = parameters(meta)
-        current_label = chart_label(session_start(latest["start"], native), "D1", native)
-        session_boundary = session_start(latest["start"], native)
-        page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
-        complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= session_boundary]
-        return Decimal(complete[-1]["close"]) if complete else None
+        boundary = session_start(latest["start"], native)
+        return chart_label(boundary, "D1", native), 2, boundary
     if meta["source"] == "fxcm":
-        page = cached_page(meta, "D1", latest["start"] + 1, 3, quote=True, cache_seconds=300)
-        complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= latest["start"]]
-        return Decimal(complete[-1]["close"]) if complete else None
+        return latest["start"] + 1, 3, latest["start"]
     if meta["source"] == "akshare":
-        page = cached_page(meta, "D1", latest["start"], 1, quote=True, cache_seconds=300)
-        return Decimal(page["bars"][-1]["close"]) if page["bars"] else None
+        return latest["start"], 1, None
     current_label = label(latest["start"], "D1", meta["calendar"])
-    session_start = (latest["start"] // 86400000 * 86400000 if meta["source"] == "dukascopy" else
+    boundary = (latest["start"] // 86400000 * 86400000 if meta["source"] == "dukascopy" else
         ms(session_bounds(instant(latest["start"]), Calendar(meta["calendar"]))[0]))
-    page = cached_page(meta, "D1", current_label, 2, quote=True, cache_seconds=300)
-    complete = [bar for bar in page["bars"] if bar["complete"] and bar["end"] <= session_start]
+    return current_label, 2, boundary
+
+
+def quote_previous_close(meta, latest):
+    """Previous completed native session close, with the same price basis."""
+    from . import provider_cache as cache
+    from .provider_quote_reads import local_previous_close
+    previous = local_previous_close(meta, latest)
+    if previous is not None:
+        return previous
+    before, count, boundary = previous_close_query(meta, latest)
+    key = cache.ensure(meta, 'D1')
+    page = cache.fetch_page(key, meta, 'D1', before, count,
+        time.monotonic() + max(23, request_seconds(meta['source'])), kind='history', revalidate=True)
+    complete = [bar for bar in page["bars"] if boundary is None or
+                bar["complete"] and bar["end"] <= boundary]
     return Decimal(complete[-1]["close"]) if complete else None
 
 

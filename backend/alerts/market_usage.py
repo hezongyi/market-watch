@@ -8,8 +8,11 @@ from .storage import (
     ChartAlertVersion,
     CompositePreparation,
     CompositeRevision,
+    HistoryVersion,
     MarketComposite,
+    MarketDataset,
     MarketDemand,
+    Preference,
     RealtimeMapping,
     now_ms,
 )
@@ -33,7 +36,17 @@ def composite_targets(db, wanted):
     stamp = now_ms()
     from .realtime_switch import revision_enabled
 
-    targets, head_consumers = set(), set()
+    # A saved on-switch is durable acquisition demand for the active head.
+    # Compatibility defaults still belong to leases/rules below; preparation
+    # alone never starts a new subscription and old pinned revisions stay pinned.
+    targets = set(db.scalars(select(RealtimeMapping.target_dataset_id).join(
+        CompositeRevision, CompositeRevision.mapping_id == RealtimeMapping.id).join(
+        MarketComposite, MarketComposite.active_revision_id == CompositeRevision.id).join(
+        HistoryVersion, HistoryVersion.id == CompositeRevision.history_version_id).join(
+        MarketDataset, MarketDataset.id == HistoryVersion.dataset_id).join(
+        Preference, Preference.key == "managed_realtime:" + MarketDataset.instrument_id
+    ).where(Preference.value["enabled"].as_boolean().is_(True))))
+    head_consumers = set()
     for version in db.scalars(select(ChartAlertVersion).join(ChartAlert, (
         ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
     ).where(ChartAlert.status == "active", or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > stamp))):

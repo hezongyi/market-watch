@@ -7,8 +7,8 @@ from threading import Event
 
 import pytest
 import test_coverage_projection as projection_contracts
+from alerts import generic_derivation, market, storage
 from alerts import managed_dataset as managed
-from alerts import market, storage
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import sessionmaker
 from test_publication_scheduler import MINUTE, START
@@ -197,6 +197,10 @@ def publication_pg(monkeypatch):
     clock = [START + 30 * MINUTE + 5000]
     monkeypatch.setattr(managed, 'now_ms', lambda: clock[0])
     monkeypatch.setattr(storage, 'now_ms', lambda: clock[0])
+    # Import before replacing storage.now_ms and explicitly restore this alias.
+    # A late import under the PG clock otherwise leaks that frozen clock into
+    # later SQLite demand leases, which then appear expired to their workers.
+    monkeypatch.setattr(generic_derivation, 'now_ms', lambda: clock[0])
     try:
         yield factory, clock
     finally:

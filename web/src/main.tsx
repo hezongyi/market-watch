@@ -44,7 +44,7 @@ function App() {
   const appLocation = useLocation(), navigate = useNavigate();
   const [subject,setSubject]=useState("");
   const [ready, setReady] = useState(false), [logged, setLogged] = useState(false), [connectionError, setConnectionError] = useState("");
-  const [theme, setThemeState] = useState<"dark" | "light">(localStorage.getItem("mw.app-theme") === "light" ? "light" : "dark");
+  const [theme, setThemeState] = useState<"dark" | "light">(() => localStorage.getItem("mw.app-theme") === "dark" ? "dark" : "light");
   const [pending, setPending] = useState(0);
   const guard = useRef<LeaveGuard | null>(null);
   const [leave, setLeave] = useState<{resolve: (allowed: boolean) => void; guard: LeaveGuard} | null>(null);
@@ -101,7 +101,7 @@ function App() {
     void refresh(); const timer = setInterval(refresh, 10000);
     return () => { active = false; clearInterval(timer); };
   }, [logged]);
-  useEffect(() => { document.title = pageName(appLocation.pathname); }, [appLocation.pathname]);
+  useEffect(() => { document.title = appLocation.pathname.startsWith("/advanced-charts") ? "守望终端" : pageName(appLocation.pathname); }, [appLocation.pathname]);
   async function logout() {
     if (!await confirmLeave()) return;
     await api("/logout", {}); setCsrf(""); bypass.current = true; setLogged(false);

@@ -36,7 +36,9 @@ log = logging.getLogger(__name__)
 
 
 class Calculator:
-    def __init__(self):
+    def __init__(self, previous_closes=None):
+        from .provider_quote_reads import PreviousCloses
+        self.previous_closes = previous_closes or PreviousCloses()
         self.buckets = CurrentBuckets()
         self.bucket_lock = threading.Lock()
         self.signals = {}
@@ -141,6 +143,7 @@ class Calculator:
         if identity["kind"] == "quotes":
             from .market_data import QuoteQuery, quote_snapshot
             from .provider_capabilities import poll_seconds
+            from .provider_quote_reads import page as shared_quote_page
             source = identity["metadata"]["source"]
             delay = poll_seconds(source) * 1000 if query.series_kind == "provider" else 500
             if query.series_kind == "provider" and settings.oanda_acquisition_mode == "rest_batch":
@@ -163,7 +166,7 @@ class Calculator:
                 if work.get("input_signal") == signal_value:
                     return None, delay
             rows = quote_snapshot(QuoteQuery(symbols=[encode(query.instrument, query.series_kind)],
-                composite_revision_id=query.composite_revision_id, input_revision=query.input_revision))
+                composite_revision_id=query.composite_revision_id, input_revision=query.input_revision), previous_close=self.previous_closes.read, provider_page=shared_quote_page)
             if settings.notification_center_sources_enabled and source == 'oanda' and query.series_kind == 'provider' and any(
                     row.get('v', {}).get('fetch_status') in ('pending', 'stale') for row in rows):
                 # Only reread the collector's cache; never accelerate supplier
@@ -316,13 +319,16 @@ def run(stopped):
 
 
 def _run(stopped, wake):
-    calculators, pending = {}, {}
+    calculators, pending, supplier_tasks = {}, {}, set()
     shared_buckets = {}
     owner = uid()
     cleanup_at = 0
     # Fixed in-flight budget. A supplier quote or expensive first bucket does
     # not serialize every other task behind it; SSE never waits on these slots.
-    with ThreadPoolExecutor(max_workers=4, thread_name_prefix="market-stream") as executor:
+    with ThreadPoolExecutor(max_workers=2, thread_name_prefix="quote-close") as close_executor, \
+            ThreadPoolExecutor(max_workers=4, thread_name_prefix="market-stream") as executor:
+        from .provider_quote_reads import PreviousCloses
+        previous_closes = PreviousCloses(close_executor)
         while not stopped.is_set():
             wake.prepare()
             activity = {}
@@ -332,16 +338,22 @@ def _run(stopped, wake):
                 for key, future in list(pending.items()):
                     if future.done():
                         pending.pop(key)
+                        supplier_tasks.discard(key)
                         try:
                             future.result()
                         except Exception as error:
                             log.warning("market task failed: %s", type(error).__name__)
                 if len(pending) < 4:
-                    work = stream.claim(exclude=pending, owner=owner, activity=activity)
+                    # Keep two calculation slots available to local chart/quote
+                    # reads while external platform snapshots wait on suppliers.
+                    work = stream.claim(exclude=pending, owner=owner, activity=activity,
+                                        allow_provider_quotes=len(supplier_tasks) < 2)
                     if work:
                         key = work["id"]
-                        calculator = calculators.pop(key, None) or Calculator()
+                        calculator = calculators.pop(key, None) or Calculator(previous_closes)
                         identity = work["identity"]
+                        if identity["series_kind"] == "provider" and identity["kind"] == "quotes":
+                            supplier_tasks.add(key)
                         if identity["series_kind"] == "composite" and identity["kind"] == "bars":
                             base_key = (identity["instrument"], identity.get("revision_id"), identity["timeframe"])
                             shared = shared_buckets.pop(base_key, None) or (CurrentBuckets(), threading.Lock())
@@ -367,7 +379,7 @@ def _run(stopped, wake):
             if not pending:
                 from .runtime_health import progress
                 progress(error=cycle_error)
-            delay = .01 if worked else .1 if pending or activity.get('active') else 1
+            delay = .01 if worked else .1 if pending or activity.get('active') else 1 if cycle_error else 5
             if cycle_error:
                 stopped.wait(delay)
             else:

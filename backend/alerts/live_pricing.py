@@ -24,6 +24,7 @@ from .storage import (
     LiveMinute,
     LiveState,
     MarketDataset,
+    ObservedMinute,
     Preference,
     PricingOwner,
     now_ms,
@@ -79,7 +80,12 @@ def _desired_dataset_identities(account):
             if enabled(db, instrument_id)
         }
         result = []
-        for row in db.scalars(select(MarketDataset)):
+        for row in db.scalars(select(MarketDataset).where(
+                MarketDataset.identity["source"].as_string() == "oanda",
+                MarketDataset.identity["channel"].as_string() == "v20",
+                MarketDataset.identity["environment"].as_string() == "practice",
+                MarketDataset.identity["account_scope"].as_string() == scope,
+                MarketDataset.identity["calendar_version"].as_string() == settings.oanda_calendar_version)):
             identity = DatasetIdentity.model_validate(row.identity)
             if (identity.source, identity.channel, identity.environment, identity.account_scope) != (
                     "oanda", "v20", "practice", scope):
@@ -147,12 +153,14 @@ def claim(account, *, now=None, startup=False):
         return (key, owner.token)
 
 
-def claim_auth_probe(account, *, now=None):
+def claim_auth_probe(account, *, now=None, activity=None):
     """Reserve the next probe before I/O, including after a worker crash."""
     stamp = now_ms() if now is None else now
     key = account_key(account)
     with transaction() as db:
         owner = db.scalar(select(PricingOwner).where(PricingOwner.id == key).with_for_update())
+        if activity is not None:
+            activity['auth_hold'] = bool(owner and owner.error == 'unauthorized')
         if not owner or owner.error != 'unauthorized' or owner.expires > stamp or owner.next_at > stamp:
             return None
         owner.token = uid()
@@ -305,12 +313,12 @@ def _lock_live_datasets(db, identities, *, confirmation=False):
     # Composite judgments lock datasets before their shared LiveState read.
     # Pin FK parents before changing LiveState or inserting minute evidence;
     # acquiring them during autoflush would invert that order and deadlock.
-    query = select(MarketDataset.id).where(MarketDataset.id.in_(
+    query = select(MarketDataset.id, MarketDataset.instrument_id).where(MarketDataset.id.in_(
         sorted(identity.key for identity in identities))).order_by(MarketDataset.id)
     # Confirmation later calls ingest(), which needs FOR UPDATE. Acquire that
     # final mode now; upgrading after LiveState flush can deadlock chart reads.
-    list(db.scalars(query.with_for_update() if confirmation else
-                    query.with_for_update(read=True, key_share=True)))
+    return dict(db.execute(query.with_for_update() if confirmation else
+                           query.with_for_update(read=True, key_share=True)).all())
 
 
 def begin_connection(ownership, identities, *, now=None):
@@ -365,17 +373,19 @@ def begin_connection(ownership, identities, *, now=None):
         return owner.epoch
 
 
-def publish_event(ownership, epoch, event, identities, *, now=None):
+def publish_event(ownership, epoch, event, identities, *, now=None, completed_handovers=None):
     """Return a bounded outcome only after the fenced transaction commits."""
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
-        _lock_live_datasets(db, identities.values())
+        instruments = _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance':
             return 'rejected_provider_maintenance'
-        owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
+        lease_ms = settings.oanda_stream_lease_seconds * 1000
+        if owner.expires - stamp <= lease_ms // 2:
+            owner.expires = stamp + lease_ms
         if not isinstance(event, QuoteEvent):
             if event.get("type") != "heartbeat" or event.get("connection_epoch") != epoch:
                 raise ValueError("Invalid heartbeat generation")
@@ -388,18 +398,44 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
             return "heartbeat"
         if event.connection_epoch != epoch or event.identity not in identities.values():
             raise ValueError("Quote belongs to another connection or dataset")
-        state = db.get(LiveState, event.identity.key)
+        dataset_id = event.identity.key
+        minute = event.source_time // 60000 * 60000
+        metrics = observations = None
+        if completed_handovers is not None and dataset_id in completed_handovers:
+            # Keep these objects alive for this transaction only. Owner and
+            # dataset locks above retain their original modes and ordering.
+            state, inst, metric, observation = db.execute(
+                select(LiveState, Instrument, LiveMinute, ObservedMinute)
+                .select_from(LiveState)
+                .join(Instrument, Instrument.id == instruments[dataset_id])
+                .outerjoin(LiveMinute, (LiveMinute.dataset_id == LiveState.dataset_id)
+                           & (LiveMinute.start == minute))
+                .outerjoin(ObservedMinute, (ObservedMinute.dataset_id == LiveState.dataset_id)
+                           & (ObservedMinute.start == minute) & (ObservedMinute.epoch == epoch))
+                .where(LiveState.dataset_id == dataset_id)).one()
+            metrics = {minute: metric}
+            observations = {(dataset_id, minute, epoch): observation}
+        else:
+            # Handover may refresh LiveState and adopt a display minute. Do not
+            # preload an absent row before that adoption.
+            state = db.get(LiveState, dataset_id)
+            inst = db.get(Instrument, instruments[dataset_id])
         if state.epoch != epoch:
             raise TimeoutError("Quote generation is obsolete")
         from .display_observations import handover_legacy
 
-        handover_legacy(db, state)
+        if completed_handovers is None or state.dataset_id not in completed_handovers:
+            if handover_legacy(db, state) and completed_handovers is not None:
+                from sqlalchemy import event as sql_event
+                dataset_key = state.dataset_id
+                sql_event.listen(db, 'after_commit',
+                    lambda _: completed_handovers.add(dataset_key), once=True)
         previous = state.quote
         if previous and event.source_time < previous["source_time"]:
             if previous.get("connection_epoch") == epoch and event.sequence > previous.get("sequence", 0):
                 from .price_alert_inputs import interrupt
 
-                interrupt(db, event.identity.key, now=stamp, epoch=epoch, reason="out_of_order_price")
+                interrupt(db, dataset_id, now=stamp, epoch=epoch, reason="out_of_order_price")
             return "rejected_old_source"
         if previous and previous["connection_epoch"] == epoch and event.sequence <= previous["sequence"]:
             return "rejected_sequence"
@@ -410,8 +446,11 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         state.received_at = event.received_at
         state.connection = "connected" if state.ready else "recovering"
         state.revision += 1
-        minute = event.source_time // 60000 * 60000
-        observation = _minute_observation(db, event.identity, state, minute, stamp)
+        # Do not flush a half-updated LiveState just to read its minute metric.
+        # The final quote/forming snapshot still commits with every observation.
+        with db.no_autoflush:
+            observation = _minute_observation(db, event.identity, state, minute, stamp, metrics,
+                                             profile=inst.calendar_profile)
         if observation.expected is not True and event.tradeable and event.bid is not None:
             observation.expected = True
             observation.expectation = "observed_source_tradeable"
@@ -432,19 +471,22 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
                     "volume": None, "volume_kind": "unavailable", "observation_complete": False,
                     "connection_epoch": epoch, "source": "oanda"}
             else:
-                forming = {**forming, "high": str(max(Decimal(forming["high"]), Decimal(event.bid))),
-                           "low": str(min(Decimal(forming["low"]), Decimal(event.bid))), "close": event.bid}
+                bid = Decimal(event.bid)
+                forming = {**forming, "high": str(max(Decimal(forming["high"]), bid)),
+                           "low": str(min(Decimal(forming["low"]), bid)), "close": event.bid}
             state.forming = forming
-        dataset = db.get(MarketDataset, event.identity.key)
-        inst = db.get(Instrument, dataset.instrument_id)
         from .display_observations import accept
 
-        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile)
+        market_session = session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session']
+        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile,
+               market_session=market_session, observations=observations)
         from .price_alert_inputs import record_quote
 
-        record_quote(db, event, now=stamp, profile=inst.calendar_profile)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
+        # The consumer read may autoflush: all four quote snapshots are now
+        # complete. Active inputs retain their own sequence/retention flushes.
+        record_quote(db, event, now=stamp, profile=inst.calendar_profile, market_session=market_session)
         return "accepted"
 
 
@@ -649,6 +691,18 @@ def confirmation_cutoff(stamp):
     return max(0, (stamp - settings.oanda_confirmation_margin_seconds * 1000) // 60000 * 60000)
 
 
+def confirmation_candidates(identities, *, now=None):
+    """One unlocked due-discovery query; window/commit still fence the owner."""
+    stamp = now_ms() if now is None else now
+    if not identities:
+        return []
+    with transaction() as db:
+        due = set(db.scalars(select(LiveState.dataset_id).where(
+            LiveState.dataset_id.in_([identity.key for identity in identities.values()]),
+            LiveState.next_confirm_at <= stamp)))
+    return [identity for identity in identities.values() if identity.key in due]
+
+
 def confirmation_window(ownership, epoch, identity, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
@@ -695,7 +749,7 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
         return start, end
 
 
-def _minute_observation(db, identity, state, start, stamp, cache=None):
+def _minute_observation(db, identity, state, start, stamp, cache=None, *, profile=None):
     metric = (cache.get(start) if cache is not None else db.scalar(select(LiveMinute).where(
         LiveMinute.dataset_id == identity.key, LiveMinute.start == start)))
     if metric and (metric.expected is True or metric.confirmed_at is not None):
@@ -709,9 +763,10 @@ def _minute_observation(db, identity, state, start, stamp, cache=None):
     expected = True if fresh and quote["tradeable"] and quote.get("bid") is not None else None
     expectation = "fresh_source_tradeable" if expected else "unknown_session"
     if expected is None:
-        dataset = db.get(MarketDataset, identity.key)
-        inst = db.get(Instrument, dataset.instrument_id)
-        if session_status(identity.model_dump(), inst.calendar_profile, start)['market_session'] == 'closed':
+        if profile is None:
+            dataset = db.get(MarketDataset, identity.key)
+            profile = db.get(Instrument, dataset.instrument_id).calendar_profile
+        if session_status(identity.model_dump(), profile, start)['market_session'] == 'closed':
             expected = False
             expectation = "reviewed_source_closure"
     if metric:
@@ -794,7 +849,8 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         # canonical minutes or a query checkpoint. Data confirmations stay strict.
         if batch.rows or batch.checkpoint is not None:
             apply_minutes(db, record(db, batch))
-        ingest(db, inst, batch.ingestion_payload())
+        from .generic_derivation import is_paused
+        ingest(db, inst, batch.ingestion_payload(), defer_aggregation=is_paused(db, inst.id))
         # Measure completed ingestion, rather than the entry into the fenced
         # transaction. An explicit test clock remains deterministic.
         db.flush()

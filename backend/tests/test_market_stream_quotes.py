@@ -130,6 +130,10 @@ def test_follow_active_switch_releases_only_previous_task_revision_demand(databa
 
 
 def test_managed_quote_cancellation_releases_only_task_demand(database):
+    from alerts.storage import Instrument
+
+    with database.begin() as db:
+        db.get(Instrument, "BTCUSDT").enabled = True
     owner = session(database)
     query = DataQuery(instrument="BTCUSDT", timeframe="M1")
     identity, serialized = resolve(Subscription(client="page", listener="watchlist", generation=1,
@@ -185,7 +189,8 @@ def test_quote_only_provider_task_keeps_supplier_cadence_without_history_interes
     meta = {**META, "name": "Test EURUSD"}
     calls = []
     monkeypatch.setattr(provider_chart, "metadata", lambda instrument, **kwargs: meta)
-    monkeypatch.setattr(provider_chart, "quote_page", lambda meta: calls.append(meta["id"]) or
+    from alerts import provider_quote_reads
+    monkeypatch.setattr(provider_quote_reads, "page", lambda meta: calls.append(meta["id"]) or
         {"bars": [{"start":60000, "end":120000, "close":"1.1"}]})
     monkeypatch.setattr(provider_chart, "quote_previous_close", lambda *_: None)
     owner = session(database)

@@ -11,6 +11,17 @@ CHANNEL = 'market_watch_publication_ready'
 STREAM_CHANNEL = 'market_watch_stream_demand'
 ALERT_CHANNEL = 'market_watch_alert_demand'
 NOTICE_CHANNEL = 'market_watch_notice_ready'
+HISTORY_CHANNEL = 'market_watch_history_work'
+COMPOSITE_CHANNEL = 'market_watch_composite_input'
+PROVIDER_CHANNEL = 'market_watch_provider_demand'
+DERIVATION_CHANNEL = 'market_watch_derivation_work'
+
+
+def notify_derivation(db):
+    # Keep the public hint for alert/read consumers, but only generic work
+    # producers wake the generic worker. Composite period commits use CHANNEL.
+    notify(db)
+    notify(db, DERIVATION_CHANNEL)
 
 
 def notify_connection(connection, channel):
@@ -41,13 +52,15 @@ class PublicationWakeup:
     never consumes a slot in the application transaction connection pool.
     """
 
-    def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL):
-        if channel not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL):
+    def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL, channels=None):
+        selected = tuple(dict.fromkeys(channels if channels is not None else (channel,)))
+        if not selected or any(value not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL, PROVIDER_CHANNEL, DERIVATION_CHANNEL) for value in selected):
             raise ValueError('Unknown worker wakeup channel')
         if engine is None:
             from .storage import engine
         self.engine = engine
         self.channel = channel
+        self.channels = selected
         self.monotonic = monotonic
         self.connection = None
         self.retry_at = 0
@@ -90,7 +103,8 @@ class PublicationWakeup:
                 kwargs.update(connect_timeout=2, application_name='market-watch-publication-listener')
                 self.connection = self.engine.dialect.loaded_dbapi.connect(*args, **kwargs)
                 self.connection.autocommit = True
-                self.connection.execute('LISTEN ' + self.channel)
+                for channel in self.channels:
+                    self.connection.execute('LISTEN ' + channel)
                 if self.error:
                     log.info('publication_listener_reconnected')
                 self.error = None
@@ -103,11 +117,11 @@ class PublicationWakeup:
     def wait(self, seconds, stop=None):
         """Interrupt idle/due waits on hints; preserve short busy yields.
 
-        No SQL is executed while waiting. stop is checked at most every100ms.
+        No SQL is executed while waiting. stop is checked at most every 500ms.
         """
         stop = stop if stop is not None else Event()
         if seconds < .05 or self.connection is None:
-            stopped = stop.wait(seconds)
+            stopped = stop.wait(min(seconds, 2) if self.connection is None else seconds)
             return 'stopped' if stopped else 'fallback' if self.connection is None else 'timer'
         deadline = self.monotonic() + seconds
         while not stop.is_set():
@@ -115,10 +129,10 @@ class PublicationWakeup:
             if remaining <= 0:
                 return 'timer'
             try:
-                if list(self.connection.notifies(timeout=min(.1, remaining), stop_after=1)):
+                if list(self.connection.notifies(timeout=min(.5, remaining), stop_after=1)):
                     return 'notification'
             except Exception as error:
                 self._failed(error)
-                stopped = stop.wait(max(0, deadline - self.monotonic()))
+                stopped = stop.wait(min(2, max(0, deadline - self.monotonic())))
                 return 'stopped' if stopped else 'fallback'
         return 'stopped'

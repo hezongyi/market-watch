@@ -33,9 +33,9 @@ def ready(database, monkeypatch):
         return composite.id, composite.instrument_id
 
 
-def test_first_use_and_management_create_no_demand_but_actual_chart_renews_shared_target(database, monkeypatch):
+def test_enabled_management_and_chart_leases_share_one_target(database, monkeypatch):
     ident, ticker = ready(database, monkeypatch)
-    assert live.desired_datasets(settings.oanda_account_id) == {}
+    assert set(live.desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
     with database.begin() as db:
         renew_demand(db, "chart-one", db.get(Instrument, ticker))
         renew_demand(db, "chart-one", db.get(Instrument, ticker))
@@ -48,12 +48,15 @@ def test_first_use_and_management_create_no_demand_but_actual_chart_renews_share
     with database.begin() as db:
         for row in db.scalars(select(MarketDemand)):
             row.expires = 0
-    assert not live.desired_datasets(settings.oanda_account_id)
+    assert set(live.desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
 
 
 def test_retired_watch_never_creates_persistent_demand(database, monkeypatch):
     _, ticker = ready(database, monkeypatch)
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
     with database.begin() as db:
+        set_enabled(db, db.get(MarketDataset, identity().key).instrument_id, False, now=1)
         watch = Watch(instrument_id=ticker, name="persistent", status="active", rule={"timeframe": "M1"},
             state={}, armed_at=0)
         db.add(watch)
@@ -80,6 +83,12 @@ def test_current_chart_alert_version_and_expiry_own_persistent_demand(database, 
     assert set(live.desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
     with database.begin() as db:
         db.get(ChartAlert, ident).expires_at = 1
+    # Expiry drops the rule demand, while the explicit on-switch remains.
+    assert set(live.desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
+    from alerts.realtime_switch import set_enabled
+    from alerts.storage import MarketDataset
+    with database.begin() as db:
+        set_enabled(db, db.get(MarketDataset, identity().key).instrument_id, False, now=2)
     assert not live.desired_datasets(settings.oanda_account_id)
 
 
@@ -224,7 +233,7 @@ def test_pinned_chart_revision_leases_coexist_renew_and_expire_independently(dat
             return composite_targets(db, wanted_instruments(db, now=clock[0]))
 
     read(old)
-    assert targets() == {old_target}
+    assert targets() == {old_target, new_target}
     read(old)
     read(None)  # Bind the actual selected head for the second pane.
     assert targets() == {old_target, new_target}
@@ -235,12 +244,12 @@ def test_pinned_chart_revision_leases_coexist_renew_and_expire_independently(dat
     clock[0] += 119999
     read(old)
     clock[0] += 1  # Head lease expires at its boundary; old pane renewed independently.
-    assert targets() == {old_target}
+    assert targets() == {old_target, new_target}
     with database.begin() as db:
         renew_demand(db, "legacy-chart", db.get(Instrument, instrument))
     assert targets() == {old_target, new_target}  # Unbound leases still follow head.
     clock[0] += 120000
-    assert targets() == set()
+    assert targets() == {new_target}
 
 
 def test_chart_demand_rejects_revision_from_another_composite(database, monkeypatch):

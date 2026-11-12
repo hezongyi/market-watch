@@ -20,7 +20,7 @@ python deploy/ubuntu/runtime_preflight.py \\
 
 ## PostgreSQL 验收基线
 
-维护中的开发和验收 Compose 使用 PostgreSQL 14.24，固定引用 `postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`。数据库 healthcheck 实际查询 `server_version_num=140024` 和 JIT provider；不只依赖 `pg_isready` 或镜像标签。应用侧设置 `ALERTS_DATABASE_EXPECTED_VERSION=140024` 后，每个新连接也检查实际服务器版本与 JIT 能力；SQLite 或其他版本会拒绝连接。基线更新必须同步 Compose、检查值及工具镜像白名单，不能自动跟随可变标签。
+维护中的开发和验收 Compose 使用 PostgreSQL 14.24，固定引用 `postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872`。持久开发实例的运行期 healthcheck 每15秒执行轻量 `pg_isready`；版本与 JIT provider 深度检查由本次迁移/应用启动的新连接门禁实际执行。其他验收配置仍可在 healthcheck 查询版本与 JIT。不能仅凭轻量健康状态或镜像标签宣称基线通过。应用侧设置 `ALERTS_DATABASE_EXPECTED_VERSION=140024` 后，每个新连接也检查实际服务器版本与 JIT 能力；SQLite 或其他版本会拒绝连接。基线更新必须同步 Compose、检查值及工具镜像白名单，不能自动跟随可变标签。
 
 `pg_jit_available()` 在当前连接 `jit=off` 时也返回 false。验收检查会临时允许 JIT 探测 provider，再恢复连接的继承或显式策略；这一探测会加载 LLVM，仅用于验收。生产和旧版本回滚不配置 `ALERTS_DATABASE_EXPECTED_VERSION`。
 

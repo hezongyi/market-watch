@@ -289,7 +289,7 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
                 "dataset": batch.identity.key, "calendar_revision": batch.identity.calendar_version,
                 "observed_minute_starts": conflicts, "observed_at": received_at,
                 "action": "preserve source M1; conflicting closure cannot certify aggregate completeness"}))
-    touched = set(changed) if changes.price else set()
+    touched = {instant(at) for at in changes.price}
     volume_touched = {instant(at) for at in changes.volume}
     if instrument.source == "oanda":
         for span in payload.get("coverage", []):

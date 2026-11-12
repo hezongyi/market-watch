@@ -134,7 +134,9 @@ jobs:
 
       - name: Python tests
         if: needs.changes.outputs.backend_changed == 'true'
-        run: python -m pytest -q
+        # Surface the first traceback before a later stalled test can consume
+        # the job timeout and hide the original failures.
+        run: python -m pytest -q -x --tb=short -o faulthandler_timeout=60
 
       - name: Mapping PostgreSQL migration compatibility
         if: needs.changes.outputs.backend_changed == 'true'

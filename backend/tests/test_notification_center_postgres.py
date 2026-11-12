@@ -132,6 +132,10 @@ def test_channel_reconciliation_orders_snapshot_before_concurrent_ack(postgres_a
 
     monkeypatch.setattr(settings, 'fx_source', 'dukascopy')
     factory = sessions(postgres_alerts)
+    # This contract exercises an explicitly enabled legacy managed rule.
+    with factory.begin() as db:
+        from alerts.storage import Instrument
+        db.get(Instrument, 'EURUSD').enabled = True
     signal_id = trigger(factory)
     drain(factory)
     with factory.begin() as db:

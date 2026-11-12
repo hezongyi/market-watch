@@ -16,6 +16,7 @@ _lock = threading.Lock()
 _callbacks = set()
 _stop = threading.Event()
 _thread = None
+_connected = threading.Event()
 
 
 def _dispatch(ident):
@@ -42,6 +43,7 @@ def _listen(url):
             with psycopg.connect(url, autocommit=True, connect_timeout=3,
                                  application_name="mw-native-history-listener") as connection:
                 connection.execute("LISTEN " + CHANNEL)
+                _connected.set()
                 while not _stop.is_set():
                     for notification in connection.notifies(timeout=0.5, stop_after=64):
                         _dispatch(notification.payload)
@@ -49,6 +51,12 @@ def _listen(url):
             # Exceptions can contain connection strings: log the type only.
             log.warning("History listener reconnect type=%s", type(exc).__name__)
             _stop.wait(1)
+        finally:
+            _connected.clear()
+
+
+def healthy():
+    return _connected.is_set()
 
 
 def start():

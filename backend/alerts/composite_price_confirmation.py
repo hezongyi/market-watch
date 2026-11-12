@@ -61,9 +61,12 @@ def confirmation(db, identity, phase, bar, runtime):
     series = db.get(SourceSeries, source.key)
     if series.identity != source.model_dump():
         raise ValueError("Native price source identity collision")
-    db.execute(_insert(db)(SourceFetch).values(id=key, source_id=source.key,
+    inserted = db.scalar(_insert(db)(SourceFetch).values(id=key, source_id=source.key,
         start=bar["start"], end=bar["end"], fetched_at=0, lease_until=0)
-        .on_conflict_do_nothing(index_elements=["id"]))
+        .on_conflict_do_nothing(index_elements=["id"]).returning(SourceFetch.id))
+    if inserted:
+        from .native_history_signals import notify
+        notify(db, key)
     fetch = db.scalar(select(SourceFetch).where(SourceFetch.id == key).with_for_update())
     if (fetch.source_id, fetch.start, fetch.end) != (source.key, bar["start"], bar["end"]):
         raise ValueError("Native price window collision")
@@ -80,6 +83,8 @@ def confirmation(db, identity, phase, bar, runtime):
         # overwrite the composite. The worker retries at most once per minute.
         if fetch.result == "data":
             fetch.result = "pending"
+            from .native_history_signals import notify
+            notify(db, key)
     return None
 
 

@@ -547,10 +547,12 @@ def fetch_page(key, meta, frame, before, count, deadline, *, kind="chart", lates
         # window while we waited for its lease; share that successful result.
         if revalidate:
             with budget_transaction() as db:
+                dataset = db.get(ProviderDataset, key)
+                covered = any(left < before <= right for left, right in dataset.coverage)
                 observations = list(db.scalars(select(ProviderBar.observed_at).where(
                     ProviderBar.dataset_id == key, ProviderBar.chart_time < before)
                     .order_by(ProviderBar.chart_time.desc()).limit(count)))
-            if observations and now_ms()-min(observations) < settings.yahoo_metadata_ttl_seconds*1000:
+            if covered and observations and now_ms()-min(observations) < settings.yahoo_metadata_ttl_seconds*1000:
                 return snapshot(key, before, count)
         # Another owner may have supplied the exact missing interval meanwhile.
         cached = snapshot(key, before, count)

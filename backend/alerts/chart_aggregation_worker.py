@@ -2,6 +2,7 @@
 import logging
 import threading
 import time
+from dataclasses import replace
 
 from .chart_aggregation import aggregate_once
 from .managed_dataset import publish_once
@@ -19,6 +20,23 @@ def cycle(*, observer=None):
         aggregation_started = time.monotonic() if observer is not None else None
         worked = aggregate_once()
         aggregation_finished = time.monotonic() if observer is not None else None
+    if not worked:
+        # A deferred aggregation retry is a deadline too. Paused jobs cannot
+        # make the worker spin, but runnable/failed work retains its cadence.
+        from sqlalchemy import func, select
+
+        from .generic_derivation import paused_query
+        from .storage import ChartAggregationJob, now_ms, transaction
+        with transaction() as db:
+            stamp = now_ms()
+            due = db.scalar(select(func.min(ChartAggregationJob.next_at)).where(
+                ChartAggregationJob.instrument_id.not_in(paused_query(stamp))))
+        if due is not None:
+            # A due row can still be locked or exceed this turn's budget.
+            # Preserve bounded polling rather than claiming it is runnable.
+            due = max(due, stamp + 2000) if due <= stamp else due
+            published = replace(published,
+                next_due_at=min(due, published.next_due_at) if published.next_due_at is not None else due)
     if observer is not None:
         # Call boundaries include selection and transaction work; they are not
         # target-selection or commit timestamps. Observe after both calls so
@@ -34,7 +52,7 @@ def cycle(*, observer=None):
 
 def wait_seconds(worked, published):
     # Drain a confirmed ready publication queue promptly. Progress alone does
-    # not prove another target is ready. Idle checks average one SQL/second.
+    # not prove another target is ready. A healthy listener wakes new work immediately.
     if getattr(published, 'runnable_remaining', False):
         return 0.005
     if worked or published:
@@ -42,8 +60,8 @@ def wait_seconds(worked, published):
     due = getattr(published, 'next_due_at', None)
     if due is not None:
         from .storage import now_ms
-        return min(2, max(.02, (due - now_ms()) / 1000))
-    return 2
+        return min(30, max(.02, (due - now_ms()) / 1000))
+    return 30
 
 
 def main():
@@ -52,8 +70,8 @@ def main():
 
 
 def run(stop):
-    from .publication_wakeup import PublicationWakeup
-    with PublicationWakeup() as wakeup:
+    from .publication_wakeup import DERIVATION_CHANNEL, PublicationWakeup
+    with PublicationWakeup(channel=DERIVATION_CHANNEL) as wakeup:
         while not stop.is_set():
             wakeup.prepare()
             started = time.monotonic()

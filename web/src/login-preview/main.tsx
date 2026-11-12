@@ -2,14 +2,14 @@ import { StrictMode, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { AppContext } from "../app/context";
 import { defaultChart } from "../app/navigation";
-import ParticlesLogin from "../app/ParticlesLogin";
+import SimpleLogin from "../app/SimpleLogin";
 import "./preview.css";
 
 function Preview() {
   const [theme, setTheme] = useState<"dark" | "light">(
-    new URLSearchParams(location.search).get("theme") === "light"
-      ? "light"
-      : "dark",
+    new URLSearchParams(location.search).get("theme") === "dark"
+      ? "dark"
+      : "light",
   );
   return (
     <AppContext.Provider
@@ -22,7 +22,7 @@ function Preview() {
         logout: async () => {},
       }}
     >
-      <ParticlesLogin
+      <SimpleLogin
         next={defaultChart}
         retry={() => {}}
         login={async () => {

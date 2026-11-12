@@ -16,6 +16,7 @@ from .live_pricing import (
     claim,
     claim_auth_probe,
     commit_confirmation,
+    confirmation_candidates,
     confirmation_window,
     desired_dataset_identities,
     desired_datasets,
@@ -376,7 +377,9 @@ def confirm_pages(adapter, ownership, epoch, identities, cancelled):
         with lane("realtime"):
             return adapter.page(identity, *window)
 
-    values = list(identities.values())
+    values = confirmation_candidates(identities)
+    if not values:
+        return None
     with ThreadPoolExecutor(max_workers=2, thread_name_prefix="oanda-confirm-rest") as pool:
         for offset in range(0, len(values), 2):
             if cancelled():
@@ -443,13 +446,8 @@ def collect(adapter, ownership, identities, stopped):
         refreshed = 0
         idle_since = None
         while not stopped.is_set() and not connection_stop.is_set():
-            stage = "renew"
+            stage = "subscription"
             try:
-                if not renew(ownership):
-                    log.warning("pricing_ownership_lost reason=lease_not_renewed stage=maintenance epoch=%s", epoch)
-                    lost.set()
-                    report_confirmation("ownership_lost")
-                    return
                 if time.monotonic() - refreshed >= 10:
                     stage = "subscription"
                     desired = desired_datasets(adapter.account_id)
@@ -499,13 +497,14 @@ def collect(adapter, ownership, identities, stopped):
     thread.start()
     result = RequestResult(status="unavailable")
     stage = "stream"
+    completed_handovers = set()
     try:
         for event in adapter.stream(identities, epoch=epoch,
                 stopped=lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set()):
             if stopped.is_set() or connection_stop.is_set() or lost.is_set():
                 break
             stage = "publish"
-            publish_event(ownership, epoch, event, identities)
+            publish_event(ownership, epoch, event, identities, completed_handovers=completed_handovers)
             with health_lock:
                 error_type = "ownership_lost" if lost.is_set() else confirmation_fault[0]
                 progress(state="degraded" if error_type else "running", error=error_type)
@@ -543,6 +542,24 @@ def collect(adapter, ownership, identities, stopped):
 def run(adapter, stopped):
     catalog = None
     while not stopped.is_set():
+        if catalog is not None:
+            identities = desired_for_mode(adapter.account_id)
+            native = native_specs(adapter.account_id) if settings.oanda_acquisition_mode == "rest_batch" else ()
+            if not identities and not native:
+                # Authentication recovery remains live even after the last
+                # consumer leaves; only ordinary collection leases are skipped.
+                activity = {}
+                probe = claim_auth_probe(adapter.account_id, activity=activity)
+                held = activity.get('auth_hold', False)
+                if probe is not None:
+                    try:
+                        catalog = probe_authentication(adapter, probe)
+                        held = catalog is None
+                    except TimeoutError:
+                        held = True
+                progress(state="waiting_input" if held else "idle")
+                stopped.wait(5)
+                continue
         ownership = claim(adapter.account_id, startup=True)
         if ownership is None:
             probe = claim_auth_probe(adapter.account_id)

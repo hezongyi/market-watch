@@ -636,8 +636,9 @@ def test_held_pause_on_a_running_revision_keeps_its_target(database, monkeypatch
         assert composite_targets(db, {internal}) == {target}
 
 
-def test_paused_price_rules_drop_demand_on_both_revisions(database, monkeypatch):
+def test_paused_price_rules_keep_only_explicit_active_head_demand(database, monkeypatch):
     from alerts.market_usage import composite_targets
+    from alerts.storage import Preference
 
     composite, old, body = contracts.request(database, monkeypatch)
     mapping = standby_mapping(database, old)
@@ -662,4 +663,11 @@ def test_paused_price_rules_drop_demand_on_both_revisions(database, monkeypatch)
         old_target = db.get(RealtimeMapping, db.get(CompositeRevision, old).mapping_id).target_dataset_id
         live_target = db.get(RealtimeMapping, mapping).target_dataset_id
         assert old_target != live_target
+        # A saved on-switch owns the active head independently of paused rules.
+        assert composite_targets(db, {internal}) == {live_target}
+        revision = db.get(CompositeRevision, ident)
+        history = db.get(HistoryVersion, revision.history_version_id)
+        source = db.get(MarketDataset, history.dataset_id).instrument_id
+        db.delete(db.get(Preference, "managed_realtime:" + source))
+        # Without that independent owner, neither paused rule retains demand.
         assert composite_targets(db, {internal}) == set()

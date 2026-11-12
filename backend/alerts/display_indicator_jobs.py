@@ -78,9 +78,9 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None)
             state=initial_state, dependent=False,
             output=pack([]), status='pending', lease_until=0, next_at=0)
             .on_conflict_do_nothing(index_elements=['id']))
-        from .publication_wakeup import notify
+        from .publication_wakeup import HISTORY_CHANNEL, notify
 
-        notify(db)
+        notify(db, HISTORY_CHANNEL)
         task = db.get(DisplayIndicatorTask, ident)
     restarted = None
     if retry and ident in retry:
@@ -94,9 +94,9 @@ def request(db, run, snapshot, affected, cursor, end, checkpoint, *, retry=None)
             restarted = {ident: retry[ident]}
             task.status, task.error, task.next_at = 'pending', None, 0
             task.lease_token, task.lease_until = None, 0
-            from .publication_wakeup import notify
+            from .publication_wakeup import HISTORY_CHANNEL, notify
 
-            notify(db)
+            notify(db, HISTORY_CHANNEL)
     if task.status != 'complete':
         if task.status == 'error':
             error = (DisplayOutputLimit() if task.error == 'DisplayOutputLimit' else
@@ -117,12 +117,14 @@ def tick():
     stamp = now_ms()
     with transaction() as db:
         from .indicator_demands import priority, warmup_capacity
-        order=priority(db,DisplayIndicatorTask.run_id,stamp,kind='display',snapshot_id=DisplayIndicatorTask.snapshot_id)
-        task = db.scalar(select(DisplayIndicatorTask).join(DisplaySnapshot).where(
+        query = (select(DisplayIndicatorTask).join(DisplaySnapshot).where(
             DisplayIndicatorTask.status == 'pending', DisplayIndicatorTask.next_at <= stamp,
             DisplayIndicatorTask.lease_until <= stamp, DisplaySnapshot.expires_at > stamp)
-            .where(warmup_capacity(DisplayIndicatorTask,DisplayIndicatorTask.run_id,stamp))
-            .order_by(order,DisplaySnapshot.expires_at.desc(), DisplayIndicatorTask.id)
+            .where(warmup_capacity(DisplayIndicatorTask,DisplayIndicatorTask.run_id,stamp)))
+        if db.scalar(query.with_only_columns(DisplayIndicatorTask.id).limit(1)) is None:
+            return False
+        order=priority(db,DisplayIndicatorTask.run_id,stamp,kind='display',snapshot_id=DisplayIndicatorTask.snapshot_id)
+        task = db.scalar(query.order_by(order,DisplaySnapshot.expires_at.desc(), DisplayIndicatorTask.id)
             .with_for_update(of=DisplayIndicatorTask, skip_locked=True).limit(1))
         if not task:
             return False

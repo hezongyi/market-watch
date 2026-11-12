@@ -109,3 +109,32 @@ def test_notify_deduplicates_per_transaction_and_savepoint_rollback_can_retry():
     nested[0] = SimpleNamespace()
     notify(db)
     assert len(statements) == 3
+
+
+def test_idle_listener_blocks_between_stop_checks_instead_of_ten_polls_per_second():
+    wake, connections, clock = listener()
+    wake.prepare()
+    waits = []
+    def notifies(**kwargs):
+        waits.append(kwargs['timeout'])
+        clock[0] += kwargs['timeout']
+        return iter(())
+    connections[0].notifies = notifies
+    assert wake.wait(2) == 'timer'
+    assert len(waits) <= 4
+    assert max(waits) <= .5  # shutdown remains bounded; real hints return immediately
+    wake.close()
+
+
+def test_multiple_channels_share_one_connection_and_reconnect():
+    from alerts.publication_wakeup import ALERT_CHANNEL, CHANNEL
+    wake, connections, clock = listener()
+    wake.channels = (CHANNEL, ALERT_CHANNEL)
+    wake.prepare()
+    assert len(connections) == 1
+    assert connections[0].commands == ['LISTEN '+CHANNEL, 'LISTEN '+ALERT_CHANNEL]
+    wake.close()
+    wake.prepare()
+    assert len(connections) == 2
+    assert connections[1].commands == connections[0].commands
+    wake.close()

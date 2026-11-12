@@ -39,18 +39,19 @@ def _has_capacity(db, dataset_id, stamp):
     return True
 
 
-def accept(db, state, event, *, stamp, profile):
+def accept(db, state, event, *, stamp, profile, market_session=None, observations=None):
     from .live_session import session_status
 
+    market_session = market_session or session_status(event.identity.model_dump(), profile, stamp)['market_session']
     if (not event.tradeable or event.bid is None or event.ask is None
             or Decimal(event.ask) < Decimal(event.bid)
             or not 0 <= stamp - event.source_time <= 15000
             or not 0 <= stamp - event.received_at <= 15000
-            or session_status(event.identity.model_dump(), profile, stamp)['market_session'] == 'closed'):
+            or market_session == 'closed'):
         return
     start = event.source_time // 60000 * 60000
     key = (state.dataset_id, start, state.epoch)
-    observation = db.get(ObservedMinute, key)
+    observation = observations[key] if observations is not None else db.get(ObservedMinute, key)
     if not observation:
         if not _has_capacity(db, state.dataset_id, stamp):
             return
@@ -133,8 +134,10 @@ def handover_legacy(db, state):
     from .storage import Instrument, MarketDataset
 
     key = 'display_handover:' + state.dataset_id
-    if db.get(Preference, key) or not state.quote:
-        return
+    if db.get(Preference, key):
+        return True
+    if not state.quote:
+        return False
     # Same source lock as quote/confirmation writers; after waiting, refresh so
     # an older session identity-map value cannot reconstruct a superseded quote.
     from .storage import LiveState
@@ -146,7 +149,7 @@ def handover_legacy(db, state):
     state = db.scalar(select(LiveState).where(LiveState.dataset_id == state.dataset_id)
         .with_for_update().execution_options(populate_existing=True))
     if db.get(Preference, key):
-        return
+        return True
     accepted = False
     try:
         event = QuoteEvent.model_validate(state.quote)
@@ -164,6 +167,7 @@ def handover_legacy(db, state):
         db.add(Audit(kind='display_legacy_quote_adopted', details={
             'dataset': state.dataset_id, 'minute': start,
             'reason': 'only_last_quote_verifiable;legacy_forming_ohlc_excluded'}))
+    return True
 
 
 def pending_query(dataset_id, revision_id, input_revision):

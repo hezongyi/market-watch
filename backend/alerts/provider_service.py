@@ -99,6 +99,8 @@ def _activate(db, client, key, before, count, *, latest=False):
                 **values,
             )
         )
+    from .publication_wakeup import PROVIDER_CHANNEL, notify
+    notify(db, PROVIDER_CHANNEL)
     # Bound per-session targets, including abandoned rapid symbol changes.
     stale = list(
         db.scalars(
@@ -131,6 +133,8 @@ def reconcile_prefetch(db, values):
         goal = values[dataset.source]["reserve_bars"]
         interest.targets = ([_prefetch_target(dataset.timeframe, interest.cursor, goal)]
                             if goal else [])
+    from .publication_wakeup import PROVIDER_CHANNEL, notify
+    notify(db, PROVIDER_CHANNEL)
 
 
 def subscribe(
@@ -163,6 +167,8 @@ def subscribe(
                 setattr(row, field, value)
         else:
             db.add(ProviderInterest(id=ident, client=client, listener=listener, **values))
+        from .publication_wakeup import PROVIDER_CHANNEL, notify
+        notify(db, PROVIDER_CHANNEL)
         # Existing finite read targets remain while this dataset is subscribed.
     return {"id": ident, "dataset_id": key}
 
@@ -328,19 +334,19 @@ def events(client, cursors):
 def realtime_step(source=None):
     now = now_ms()
     with transaction() as db:
+        query = select(ProviderInterest).join(ProviderDataset).where(
+            ProviderInterest.subscribed.is_(True), ProviderInterest.expires > now)
+        if source:
+            query = query.where(ProviderDataset.source == source)
         active = list(
             db.scalars(
-                select(ProviderInterest)
-                .where(
-                    ProviderInterest.subscribed.is_(True),
-                    ProviderInterest.expires > now,
-                    ProviderInterest.next_poll <= now,
-                )
-                .order_by(ProviderInterest.next_poll)
+                query.order_by(ProviderInterest.next_poll)
             )
         )
         groups = {}
         for row in active:
+            if row.next_poll > now:
+                continue
             dataset = db.get(ProviderDataset, row.dataset_id)
             if source and dataset.source != source:
                 continue
@@ -375,11 +381,15 @@ def realtime_step(source=None):
                 ):
                     row.error = type(exc).__name__
 
+    return bool(active)
 
-def warm_step(source, after=None):
+
+def warm_step(source, after=None, *, activity=None):
     if source == "yahoo" and not settings.yahoo_enabled:
         return after, False
     if cache.interactive_busy(source):
+        if activity is not None:
+            activity['active'] = True  # Busy foreground is not evidence of no work.
         return after, False
     now = now_ms()
     with transaction() as db:
@@ -414,6 +424,8 @@ def warm_step(source, after=None):
                 goal = source_prefetch(source, db)["reserve_bars"]
                 interest.targets = ([_prefetch_target(dataset.timeframe, interest.cursor, goal)]
                                     if goal else [])
+            if activity is not None and any(not target["done"] for target in interest.targets):
+                activity['active'] = True
             pending = next(
                 (
                     i
@@ -474,8 +486,9 @@ def warm_step(source, after=None):
     return ident, True
 
 
-def cleanup(*, check_capacity=True):
+def cleanup(*, check_capacity=True, capacity_cache=None):
     now = now_ms()
+    checked = None
     from .storage import NativeHistoryLoad
     # Resolve provider identity outside the cleanup transaction/pool checkout.
     with transaction() as db:
@@ -532,13 +545,32 @@ def cleanup(*, check_capacity=True):
                 # Expired datasets must go regardless of capacity. Count only
                 # when a nonexpired eviction candidate actually needs the quota.
                 if total is None:
+                    # All cache writers advance the dataset revision in the
+                    # same transaction as their bars (including revalidation
+                    # and Yahoo invalidation). Read this small table BEFORE
+                    # counting: a concurrent writer then causes a later retry.
+                    signature = (settings.provider_cache_max_bars, tuple(db.execute(
+                        select(ProviderDataset.id, ProviderDataset.revision, ProviderDataset.updated_at)
+                        .order_by(ProviderDataset.id))))
+                    if (capacity_cache is not None
+                            and capacity_cache.get('signature') == signature
+                            and time.monotonic() < capacity_cache['checked_at'] + 3600):
+                        break
                     total = db.scalar(select(func.count()).select_from(ProviderBar))
+                    checked = dict(signature=signature, checked_at=time.monotonic())
                 if total <= settings.provider_cache_max_bars:
                     break
             count = db.execute(delete(ProviderBar).where(ProviderBar.dataset_id == row.id)).rowcount
             if total is not None:
                 total -= count
             db.delete(row)
+    # Never acknowledge a failed transaction or an unfinished over-quota
+    # eviction. An hourly recount also bounds external/legacy writer drift.
+    if capacity_cache is not None and checked is not None:
+        if total <= settings.provider_cache_max_bars:
+            capacity_cache.update(checked)
+        else:
+            capacity_cache.clear()
 
 
 def start():
@@ -553,25 +585,10 @@ def start():
     _EXECUTOR = ThreadPoolExecutor(max_workers=len(enabled_sources())+len(enabled_sources(history=True))+2, thread_name_prefix="provider")
 
     def warmer(source):
-        after = None
-        while not _STOP.is_set():
-            progressed = False
-            try:
-                after, progressed = warm_step(source, after)
-            except Exception:
-                log.exception("Provider prewarm iteration failed for %s", source)
-            # Shared cached goals and boundary checks do not consume an
-            # upstream request turn. HTTP rate/concurrency remain enforced by
-            # request_slot; idle/interactive iterations still back off.
-            _STOP.wait(0.05 if progressed else 1)
+        run_warm(_STOP, source)
 
     def live(source):
-        while not _STOP.is_set():
-            try:
-                realtime_step(source)
-            except Exception:
-                log.exception("Provider realtime iteration failed for %s", source)
-            _STOP.wait(1)
+        run_live(_STOP, source)
 
     def janitor():
         run_janitor(_STOP)
@@ -582,42 +599,56 @@ def start():
 
 
 def run_live(stop, source):
-    """Serve demand-bound latest subscriptions for one provider source."""
-    while not stop.is_set():
-        error = None
-        try:
-            realtime_step(source)
-        except Exception as exc:
-            error = exc
-            log.exception("Provider realtime iteration failed for %s", source)
-        from .runtime_health import progress
-        progress(error=error)
-        stop.wait(1)
+    """Active subscriptions keep cadence; absent demand uses a committed hint."""
+    from .publication_wakeup import PROVIDER_CHANNEL, PublicationWakeup
+
+    with PublicationWakeup(channel=PROVIDER_CHANNEL) as wake:
+        while not stop.is_set():
+            wake.prepare()
+            error, active = None, False
+            try:
+                active = realtime_step(source)
+            except Exception as exc:
+                error = exc
+                log.exception("Provider realtime iteration failed for %s", source)
+            from .runtime_health import progress
+            progress(error=error)
+            if error or active:
+                stop.wait(1)
+            else:
+                wake.wait(30, stop)
 
 
 def run_warm(stop, source):
-    """Advance one bounded historical page at a time for one source."""
+    """Advance bounded pages, without per-second scans of an empty source."""
+    from .publication_wakeup import PROVIDER_CHANNEL, PublicationWakeup
+
     after = None
-    while not stop.is_set():
-        progressed = False
-        error = None
-        try:
-            after, progressed = warm_step(source, after)
-        except Exception as exc:
-            error = exc
-            log.exception("Provider prewarm iteration failed for %s", source)
-        from .runtime_health import progress
-        progress(error=error)
-        stop.wait(0.05 if progressed else 1)
+    with PublicationWakeup(channel=PROVIDER_CHANNEL) as wake:
+        while not stop.is_set():
+            wake.prepare()
+            progressed, error, activity = False, None, {}
+            try:
+                after, progressed = warm_step(source, after, activity=activity)
+            except Exception as exc:
+                error = exc
+                log.exception("Provider prewarm iteration failed for %s", source)
+            from .runtime_health import progress
+            progress(error=error)
+            if error or progressed or activity.get('active'):
+                stop.wait(.05 if progressed and not error else 1)
+            else:
+                wake.wait(30, stop)
 
 
 def run_janitor(stop):
     capacity_at = 0
+    capacity_cache = {}
     while not stop.is_set():
         error = None
         try:
             check_capacity = time.monotonic() >= capacity_at
-            cleanup(check_capacity=check_capacity)
+            cleanup(check_capacity=check_capacity, capacity_cache=capacity_cache)
             if check_capacity:
                 # Expiry stays at 60s. Capacity is a soft cache quota; avoid a
                 # million-row scan each minute when there are no consumers.

@@ -117,14 +117,14 @@ def claim(revision_id=None, timeframe=None, *, runtime_only=False):
             "token": task.lease_token, "buckets": selected, "total": len(buckets)}
 
 
-def build(ownership):
+def build(ownership, *, realtime=None):
     with transaction() as db:
         # Inputs are immutable; reading while new confirmations arrive cannot
         # move this task's selected version or its fixed historical parent.
         result = read_window(db, ownership["composite_id"], ownership["timeframe"],
             ownership["buckets"][0][0], ownership["buckets"][-1][1],
             revision_id=ownership["revision_id"], input_revision=ownership["input_revision"],
-            provisional=False, permission_scope=ownership["permission_scope"])
+            provisional=False, permission_scope=ownership["permission_scope"], realtime=realtime)
         from .price_alert_confirmation import covered, facts
         from .storage import RealtimeMapping
 
@@ -172,12 +172,12 @@ def commit(ownership, bars):
         task.updated_at = now_ms()
 
 
-def aggregate_tick(revision_id=None, timeframe=None, *, on_error=None, runtime_only=False):
+def aggregate_tick(revision_id=None, timeframe=None, *, on_error=None, runtime_only=False, realtime=None):
     ownership = claim(revision_id, timeframe, runtime_only=runtime_only)
     if not ownership:
         return False
     try:
-        commit(ownership, build(ownership))
+        commit(ownership, build(ownership) if realtime is None else build(ownership, realtime=realtime))
     except Exception as error:
         if on_error:
             on_error(type(error).__name__)

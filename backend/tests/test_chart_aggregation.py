@@ -128,10 +128,15 @@ def test_deferred_ingestion_hides_old_bars_until_rebuilt(database, monkeypatch):
         assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 5
         assert not db.scalar(select(Bar.complete).where(Bar.timeframe == 'M5').limit(1))
         assert chart_rows(db, inst, 'M5', now, 20, now)[0]['pending_aggregation']
-    # Coverage exists, but neither a stale closed bar nor a forming H1 is usable.
-    for frame in ('M5', 'H1'):
-        assert market_data.read_cached_history(market_data.HistoryQuery(
-            instrument='EURUSD', timeframe=frame))['bars'] == []
+    # Only the corrected first M5 and its H1 are fenced. The unaffected
+    # second M5 remains available while the actual correction is rebuilt.
+    unaffected = market_data.read_cached_history(market_data.HistoryQuery(
+        instrument='EURUSD', timeframe='M5'))['bars']
+    assert len(unaffected) == 1
+    assert unaffected[0]['start'] == start + 5 * 60000
+    assert float(unaffected[0]['high']) == 11
+    assert market_data.read_cached_history(market_data.HistoryQuery(
+        instrument='EURUSD', timeframe='H1'))['bars'] == []
     for _ in range(5):
         assert aggregate_once()
     assert not aggregate_once()

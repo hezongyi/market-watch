@@ -172,6 +172,10 @@ def stored_rows(db, version, config, now, *, fixed_origin=None, read_from=None, 
             or instrument.calendar != version.market_identity["calendar"]
             or instrument.calendar_profile != version.market_identity["calendar_profile"]):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
+    from .generic_derivation import is_candidate, pending
+    if is_candidate(db, config.instrument) and pending(
+            db, config.instrument, config.timeframe, published=config.published):
+        raise ValueError("独立行情正在补齐，请稍后重试")
     if config.published:
         from .managed_dataset import read_rows
         origin = config.calculation_origin
@@ -452,7 +456,7 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
     return results
 
 
-def step(*, now=None, on_evaluated=None, on_error=None):
+def step(*, now=None, on_evaluated=None, on_error=None, activity=None):
     global _RETENTION_NEXT
     if time.monotonic() >= _RETENTION_NEXT:
         from .price_alert_inputs import maintain
@@ -464,6 +468,8 @@ def step(*, now=None, on_evaluated=None, on_error=None):
             (ChartAlert.status == "expired") &
             (ChartAlert.runtime["execution_contract"].as_string() == "price-v2") &
             ChartAlert.runtime["settlement_pending"].as_boolean()))))
+    if activity is not None:
+        activity["active"] = bool(ids)  # Includes expired rules awaiting settlement.
     evaluated_count = 0
     for ident in ids:
         started = time.monotonic()

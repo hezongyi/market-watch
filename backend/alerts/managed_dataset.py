@@ -555,6 +555,8 @@ def adopt_legacy_once(*, limit=None):
 def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
     if frame not in FRAMES or not 0 < width <= 16384 or not 0 < spacing <= 1000:
         raise ValueError("无效图表尺寸或周期")
+    from .generic_derivation import pending, touch
+    deferred = touch(db, inst.id) and pending(db, inst.id, frame, published=True)
     plan = db.get(ChartHistoryPlan, inst.id)
     pub = db.get(ChartPublication, (inst.id, frame))
     threshold = 3 * ceil(width / spacing)
@@ -562,7 +564,7 @@ def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
     # lookback is additional to the first visible screen. Completed approved
     # history permits fewer candles, but does not invent indicator history.
     indicator_ready = count >= ceil(width / spacing) + lookback if lookback else True
-    ready = bool(pub and count and (count >= threshold or pub.initialized) and indicator_ready)
+    ready = bool(not deferred and pub and count and (count >= threshold or pub.initialized) and indicator_ready)
     from .coverage_projection import maintenance_status
     return dict(
         instrument=inst.id,
@@ -585,7 +587,9 @@ def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
         coverage_projection=maintenance_status(db, inst),
         indicator_ready=indicator_ready,
         reason=(
-            "ready"
+            "preparing"
+            if deferred
+            else "ready"
             if ready
             else "unmaintained"
             if plan is None
@@ -666,9 +670,11 @@ def published_history_check(db, inst, pub, visible, body):
 
 def data(body):
     from .chart_data import future_grid
+    from .generic_derivation import prepare_read
     from .managed_indicator_inputs import freeze
     from .provider_indicator_inputs import compute
 
+    prepare_read(body.instrument, body.timeframe, published=True)
     with transaction() as db:
         # Published inputs and their prefix credential must describe one snapshot.
         # Otherwise a concurrent correction could acknowledge newer evidence
@@ -680,6 +686,8 @@ def data(body):
             from .query_errors import QueryError
 
             raise QueryError(404, "品种不存在")
+        from .generic_derivation import check_read
+        check_read(db, inst.id, body.timeframe, published=True)
         pub = db.get(ChartPublication, (inst.id, body.timeframe))
         before = body.before or now_ms() + 1
         # Recursive algorithms use only the selected published dataset prefix;

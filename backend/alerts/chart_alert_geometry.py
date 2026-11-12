@@ -58,6 +58,10 @@ def geometry(db, query, *, dataset_id=None, now=None):
         instrument = db.get(Instrument, query.instrument)
         if not instrument or instrument.source != query.source:
             raise ValueError("画线行情身份不匹配")
+        from .generic_derivation import is_candidate, pending
+        if is_candidate(db, query.instrument) and pending(
+                db, query.instrument, query.timeframe, published=query.published):
+            raise ValueError("独立行情正在补齐，请刷新图表后重试")
         meta = {"calendar": instrument.calendar, "calendar_profile": instrument.calendar_profile}
         if query.published:
             from .managed_dataset import read_rows

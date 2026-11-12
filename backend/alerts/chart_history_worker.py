@@ -2,7 +2,6 @@
 
 import logging
 import threading
-import time
 from contextlib import ExitStack
 
 import httpx
@@ -35,11 +34,33 @@ def main():
 
 
 def run(fetch_page, stop=None):
+    from .publication_wakeup import HISTORY_CHANNEL, PublicationWakeup
+
+    with PublicationWakeup(channel=HISTORY_CHANNEL) as wake:
+        _run(fetch_page, stop, wake)
+
+
+def pending_work():
+    """Future retries keep the existing one-second discovery cadence."""
+    from sqlalchemy import select
+
+    from .storage import ChartHistoryPlan, ImportJob, VolumeBackfillJob, transaction
+
+    with transaction() as db:
+        return any(db.scalar(select(model).where(model.status.in_(states)).limit(1))
+                   for model, states in ((ImportJob, ("pending", "running")),
+                       (ChartHistoryPlan, ("pending",)),
+                       (VolumeBackfillJob, ("pending", "running"))))
+
+
+def _run(fetch_page, stop, wake):
     from .worker_health import Pulse
 
     pulse = Pulse("chart_history")
+    stop = stop if stop is not None else threading.Event()
     # Directory scheduling belongs to catalog_runtime, not history imports.
-    while stop is None or not stop.is_set():
+    while not stop.is_set():
+        wake.prepare()
         try:
             pulse.start()
             # Reevaluate after every completed page; do not idle for the
@@ -57,19 +78,16 @@ def run(fetch_page, stop=None):
             pulse.finish(worked=worked)
             from .runtime_health import progress
             progress()
-            if stop is None:
-                time.sleep(0.2 if worked else 1)
+            if worked:
+                stop.wait(0.2)
             else:
-                stop.wait(0.2 if worked else 1)
+                wake.wait(1 if pending_work() else 30, stop)
         except Exception as exc:
             pulse.finish(errors=[type(exc).__name__])
             from .runtime_health import progress
             progress(error=exc)
             logging.warning("chart history cycle failed: %s", type(exc).__name__)
-            if stop is None:
-                time.sleep(5)
-            else:
-                stop.wait(5)
+            stop.wait(5)
 
 
 if __name__ == "__main__":

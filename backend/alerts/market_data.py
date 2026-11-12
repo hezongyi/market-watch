@@ -226,6 +226,7 @@ class Activity(BaseModel):
 
 
 class QuoteQuery(BaseModel):
+    snapshot_only: bool = False
     symbols: list[str] = Field(min_length=1, max_length=100)
     client: str | None = Field(default=None, min_length=1, max_length=40)
     composite_revision_id: str | None = Field(default=None, max_length=36)
@@ -918,7 +919,7 @@ def _session_observation(source, symbol, session, event_at, metadata, *, event_e
     return {}
 
 
-def quote_snapshot(body: QuoteQuery):
+def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None):
     result = []
     # Fetch platform quotes before opening the managed read transaction.
     # Platform watchlists never renew managed M1 demand.
@@ -1008,8 +1009,19 @@ def quote_snapshot(body: QuoteQuery):
         try:
             from .config import settings
             deadline = time.monotonic() + settings.provider_request_seconds
-            meta = metadata(ident, deadline=deadline) if ident.startswith("YAHOO:") else metadata(ident)
+            meta = (metadata(ident, cached_only=True) if body.snapshot_only else
+                    metadata(ident, deadline=deadline) if ident.startswith("YAHOO:") else metadata(ident))
             shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
+            if body.snapshot_only:
+                from .provider_quote_reads import snapshot as local_snapshot
+                row = local_snapshot(meta)
+                values = row['v']
+                values.update(short_name=shown, exchange=meta.get('exchange', meta['source'].upper()),
+                    description=meta.get('presentation_description', meta['name'] + ' · 平台'),
+                    **session_status(meta['source'], meta['symbol'], now_ms(), metadata=meta))
+                values.pop('description_base', None)
+                result.append({**row, 'n':ticker})
+                continue
             if meta["source"] == "yahoo":
                 from .provider_service import yahoo_quote
                 snapshot = yahoo_quote(meta, deadline=deadline)
@@ -1036,7 +1048,7 @@ def quote_snapshot(body: QuoteQuery):
                                **session, **conflict, "read_at": read_at,
                                "time_type": "provider_quote" if stamp is not None else None})
                 continue
-            page = quote_page(meta)
+            page = (provider_page or quote_page)(meta)
             latest = page["bars"][-1] if page["bars"] else None
             observed_now = now_ms()
             session = session_status(meta["source"], meta["symbol"], observed_now, metadata=meta)
@@ -1064,16 +1076,20 @@ def quote_snapshot(body: QuoteQuery):
                     values["ask"] = values["lp"]
                 # Waiting reads are cache-only, including derived fields: a
                 # cold previous-close lookup can otherwise open supplier HTTP.
-                if fetch_status not in ("pending", "stale"):
-                    # Missing prior-session data must not hide a valid last price.
-                    try:
-                        previous = quote_previous_close(meta, latest)
-                        if previous is not None and previous > 0:
-                            delta = Decimal(latest["close"]) - previous
-                            values.update(ch=float(delta), chp=float(delta / previous * 100),
-                                          prev_close_price=float(previous))
-                    except Exception:
-                        pass
+                # Waiting reads may enrich from completed local D1 data, but
+                # must not open supplier IO. Never pair a newer lp with old ch.
+                try:
+                    if fetch_status in ("pending", "stale"):
+                        from .provider_quote_reads import local_previous_close
+                        previous = local_previous_close(meta, latest)
+                    else:
+                        previous = (previous_close or quote_previous_close)(meta, latest)
+                    if previous is not None and previous > 0:
+                        delta = Decimal(latest["close"]) - previous
+                        values.update(ch=float(delta), chp=float(delta / previous * 100),
+                                      prev_close_price=float(previous))
+                except Exception:
+                    pass
             result.append({"s": "ok", "n": ticker, "v": values, **session,
                            **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
                            "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,

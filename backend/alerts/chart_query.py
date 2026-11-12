@@ -271,6 +271,8 @@ def data_sync(body: DataQuery):
                 raise QueryError(503, "平台行情暂不可用，请重试；尚未确认历史边界") from error
         if body.published:
             return published_data(body)
+        from .generic_derivation import prepare_read
+        prepare_read(body.instrument, body.timeframe)
         with transaction() as db:
             if (body.indicators or body.dependency_before) and db.get_bind().dialect.name == "postgresql":
                 db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
@@ -280,6 +282,8 @@ def data_sync(body: DataQuery):
             if body.client:
                 from .market_data import renew_demand
                 renew_demand(db, body.client, inst)
+            from .generic_derivation import check_read
+            check_read(db, inst.id, body.timeframe)
             before = body.before or now_ms() + 1
             # All persisted source history is the common recursive indicator prefix.
             # New bars never move its origin; backfill/revisions deliberately invalidate it.

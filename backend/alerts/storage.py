@@ -639,6 +639,18 @@ def immutable_dataset_identity(db, flush_context, instances):
 
     guard_reference_writes(db)
 
+    # Cover every ORM producer, including manual import, plan retry and volume
+    # backfill. Hints share the work transaction and disappear on rollback.
+    history_models = (ImportJob, ChartHistoryPlan, VolumeBackfillJob)
+    changed = any(isinstance(row, history_models) for row in db.new) or any(
+        isinstance(row, history_models) and any(
+            inspect(row).attrs[name].history.has_changes()
+            for name in ("status", "next_at", "realtime_enabled") if hasattr(row, name))
+        for row in db.dirty)
+    if changed:
+        from .publication_wakeup import HISTORY_CHANNEL, notify
+        notify(db, HISTORY_CHANNEL)
+
     for row in db.deleted:
         if isinstance(row, (SourceMinuteRevision, CompositeInputEvent, SourceMinute, CompositeMinute,
                             CompositeReadAttempt, CompositeMinuteInput, CompositeAggregateBar,
@@ -1160,7 +1172,7 @@ def bootstrap(db_engine=engine):
                             if name == "BTCUSDT"
                             else "dukascopy",
                             basis="last" if name == "BTCUSDT" else "bid",
-                            enabled=name != "BTCUSD",
+                            enabled=False,
                             calendar=calendar,
                             precision=precision,
                         )

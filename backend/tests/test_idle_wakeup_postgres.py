@@ -4,13 +4,17 @@ import os
 import pytest
 from alerts.publication_wakeup import (
     ALERT_CHANNEL,
+    COMPOSITE_CHANNEL,
+    DERIVATION_CHANNEL,
+    HISTORY_CHANNEL,
     NOTICE_CHANNEL,
+    PROVIDER_CHANNEL,
     STREAM_CHANNEL,
     PublicationWakeup,
     notify,
     notify_connection,
 )
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from test_provider_postgres import provider_pg as provider_pg
 
@@ -18,7 +22,7 @@ pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'),
                                reason='Requires isolated Ubuntu PostgreSQL')
 
 
-@pytest.mark.parametrize('channel', [ALERT_CHANNEL, NOTICE_CHANNEL, STREAM_CHANNEL])
+@pytest.mark.parametrize('channel', [ALERT_CHANNEL, NOTICE_CHANNEL, STREAM_CHANNEL, COMPOSITE_CHANNEL, HISTORY_CHANNEL, PROVIDER_CHANNEL, DERIVATION_CHANNEL])
 def test_demand_hints_are_commit_delivered_and_unrelated_publications_do_not_wake(channel):
     engine = create_engine(os.environ['TEST_POSTGRES_URL'])
     try:
@@ -70,6 +74,8 @@ def test_real_source_entrypoints_wake_their_workers_only_after_commit(provider_p
     factory, engine = provider_pg
     monkeypatch.setattr(storage.settings, 'fx_source', 'dukascopy')
     storage.bootstrap(engine)
+    with factory.begin() as db:
+        db.get(storage.Instrument, 'EURUSD').enabled = True
     with PublicationWakeup(engine, channel=NOTICE_CHANNEL) as wake:
         with factory() as db:
             notification_center.accept_browser(db, notification_center.SUBJECT, browser())
@@ -95,6 +101,8 @@ def test_real_source_entrypoints_wake_their_workers_only_after_commit(provider_p
         with factory.begin() as db:
             chart_alert_service.lifecycle(db, ident, 1, 'pause', expected_revision=1, request_id='pause', at=1)
         assert wake.wait(1) == 'notification'
+    with factory.begin() as db:
+        db.get(storage.Instrument, 'EURUSD').enabled = True
     owner = session(factory)
     with PublicationWakeup(engine, channel=STREAM_CHANNEL) as wake:
         market_stream.register(owner, 'page', 'bars', 1,
@@ -107,3 +115,84 @@ def test_real_source_entrypoints_wake_their_workers_only_after_commit(provider_p
         activity = {}
         assert market_stream.claim(activity=activity) is None
         assert activity == {'active': True}
+
+
+def test_monitor_channels_share_connection_and_both_deliver():
+    from alerts.publication_wakeup import CHANNEL
+    engine = create_engine(os.environ['TEST_POSTGRES_URL'])
+    try:
+        with PublicationWakeup(engine, channels=(CHANNEL, ALERT_CHANNEL)) as wake:
+            connection = wake.connection
+            assert connection is not None
+            for channel in (CHANNEL, ALERT_CHANNEL):
+                wake.prepare()
+                with Session(engine) as db, db.begin():
+                    notify(db, channel)
+                assert wake.wait(1) == 'notification'
+                assert wake.connection is connection
+    finally:
+        engine.dispose()
+
+
+def test_history_queue_producers_wake_only_after_commit(provider_pg):
+    from alerts import storage
+    factory, engine = provider_pg
+    storage.bootstrap(engine)
+    def job(db):
+        db.add(storage.ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0))
+        db.flush()
+    with PublicationWakeup(engine, channel=HISTORY_CHANNEL) as wake:
+        with factory() as db:
+            job(db)
+            assert wake.wait(.05) == 'timer'
+            db.rollback()
+        assert wake.wait(.05) == 'timer'
+        with factory.begin() as db:
+            job(db)
+            assert wake.wait(.05) == 'timer'
+        assert wake.wait(1) == 'notification'
+
+        wake.prepare()
+        with factory.begin() as db:
+            row = db.scalar(select(storage.ImportJob))
+            row.status = 'pending'
+            row.next_at = 9999999999999
+        assert wake.wait(1) == 'notification'
+
+
+def test_generic_queue_producers_wake_without_composite_publication_noise(provider_pg):
+    from alerts import chart_aggregation, publication_schedule, storage
+    from alerts.publication_wakeup import CHANNEL
+    factory, engine = provider_pg
+    storage.bootstrap(engine)
+    with PublicationWakeup(engine, channel=DERIVATION_CHANNEL) as generic, PublicationWakeup(engine) as public:
+        with factory.begin() as db:
+            notify(db, CHANNEL)  # The composite completion path.
+        assert public.wait(1) == 'notification'
+        assert generic.wait(.05) == 'timer'
+        for producer in (
+            lambda db: chart_aggregation.enqueue_aggregation(db, 'EURUSD', 0, 60000, 60000),
+            lambda db: publication_schedule.request(db, 'EURUSD', approved=True),
+        ):
+            with factory() as db:
+                producer(db)
+                db.rollback()
+            assert generic.wait(.05) == 'timer'
+            with factory.begin() as db:
+                producer(db)
+                assert generic.wait(.05) == 'timer'
+            assert generic.wait(1) == 'notification'
+            assert public.wait(1) == 'notification'
+            generic.prepare()
+
+
+def test_provider_capacity_revision_is_shared_and_committed_in_postgres(provider_pg, monkeypatch):
+    from test_idle_residual_costs import (
+        test_capacity_recounts_committed_writes_limit_and_hour_but_not_rollback,
+        test_failed_cleanup_never_acknowledges_count_and_expiry_still_runs,
+        test_unchanged_provider_capacity_reuses_committed_revision,
+    )
+    factory, _ = provider_pg
+    test_unchanged_provider_capacity_reuses_committed_revision(factory)
+    test_capacity_recounts_committed_writes_limit_and_hour_but_not_rollback(factory, monkeypatch)
+    test_failed_cleanup_never_acknowledges_count_and_expiry_still_runs(factory)

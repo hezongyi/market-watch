@@ -2,7 +2,7 @@
 
 from alerts.chart_alert_health import summary
 from alerts.chart_alert_service import create
-from alerts.storage import bootstrap
+from alerts.storage import Instrument, bootstrap
 from sqlalchemy.orm import sessionmaker
 from test_chart_alert_postgres import postgres_alerts as postgres_alerts
 from test_chart_alert_service import config
@@ -14,6 +14,8 @@ def test_execution_summary_groups_json_states_on_postgres(postgres_alerts, monke
     monkeypatch.setattr(settings, "fx_source", "dukascopy")
     bootstrap(postgres_alerts)
     factory = sessionmaker(postgres_alerts)
+    with factory.begin() as db:
+        db.get(Instrument, "EURUSD").enabled = True
     with factory() as db:
         assert summary(db, at=1000)["execution"] == {}
 

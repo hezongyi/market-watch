@@ -307,6 +307,36 @@ def run(stop):
         close()
 
 
+def pending_work():
+    """Future retries/leases retain the one-second discovery cadence."""
+    from sqlalchemy import exists, or_
+
+    from .composite_price_confirmation import PREFIX
+    from .storage import ChartAlert, SourceFetch
+
+    with transaction() as db:
+        stamp = now_ms()
+        alerts = select(ChartAlert.runtime['price_confirmation_request'].as_string()).where(
+            ChartAlert.status == 'active',
+            ChartAlert.expires_at.is_(None) | (ChartAlert.expires_at > stamp))
+        return bool(db.scalar(select(or_(
+            exists(select(NativeHistoryLoad.id).where(NativeHistoryLoad.state.in_(ACTIVE))),
+            exists(select(SourceFetch.id).where(SourceFetch.id.startswith(PREFIX),
+                SourceFetch.id.in_(alerts), SourceFetch.result.is_(None) | (SourceFetch.result != 'data')))))))
+
+
+def _idle_wait(stop, wake, seconds):
+    # Native history shares a callback listener. Check stop without adding SQL.
+    from .native_history_signals import healthy
+    deadline = time.monotonic() + seconds
+    while not stop.is_set():
+        if seconds > 1 and not healthy():
+            return
+        remaining = deadline - time.monotonic()
+        if remaining <= 0 or wake.wait(min(.5, remaining)):
+            return
+
+
 def _run(stop, wake):
     from .composite_price_confirmation import once as confirm_price
     from .worker_health import Pulse
@@ -316,6 +346,7 @@ def _run(stop, wake):
     logging.getLogger("httpx").setLevel(logging.WARNING)
     while not stop.is_set():
         wake.clear()
+        failed = False
         try:
             pulse.start()
             confirmation_at, confirmation_started = now_ms(), time.monotonic()
@@ -337,10 +368,13 @@ def _run(stop, wake):
             progress(error=exc)
             log.warning("History worker turn failed type=%s", type(exc).__name__)
             worked = False
-        if worked:
-            stop.wait(0.05)
-        else:
-            wake.wait(1)
+            failed = True
+        try:
+            from .native_history_signals import healthy
+            delay = .05 if worked else 1 if failed or not healthy() or pending_work() else 30
+        except Exception:
+            delay = 1
+        _idle_wait(stop, wake, delay)
 
 
 if __name__ == "__main__":

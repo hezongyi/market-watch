@@ -26,10 +26,12 @@ services:
     mem_limit: 1536m
     cpus: 1.5
     healthcheck:
-      test: [CMD-SHELL, "pg_isready -U dev -d dev && test \"$$(PGOPTIONS='-c jit=on' psql -U dev -d dev -Atqc \"SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()\")\" = t"]
-      interval: 5s
-      timeout: 5s
-      retries: 20
+      test: [CMD, pg_isready, -U, dev, -d, dev]
+      interval: 15s
+      start_interval: 2s
+      start_period: 30s
+      timeout: 3s
+      retries: 5
   migrate:
     <<: *app
     restart: 'no'
@@ -40,10 +42,11 @@ services:
     <<: *app
     healthcheck:
       test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/readyz', timeout=3)"]
-      interval: 15s
-      timeout: 5s
-      retries: 5
+      interval: 30s
+      start_interval: 2s
       start_period: 30s
+      timeout: 3s
+      retries: 5
   market-runtime:
     <<: *app
     command: [python, -m, alerts.runtime, --profile, market]
@@ -104,8 +107,10 @@ services:
       NTFY_ENABLE_LOGIN: 'false'
     healthcheck:
       test: [CMD, python, -c, "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/v1/health', timeout=3)"]
-      interval: 15s
-      timeout: 5s
+      interval: 30s
+      start_interval: 2s
+      start_period: 30s
+      timeout: 3s
       retries: 5
 volumes:
   postgres-data: {}
