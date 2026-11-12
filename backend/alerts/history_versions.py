@@ -52,6 +52,9 @@ def create_version(db, dataset_id, start, end):
         raise ValueError("Unknown dataset")
     if not 0 <= start < end <= (now_ms() - 5000) // 60000 * 60000 or start % 60000 or end % 60000:
         raise ValueError("Historical version requires fixed past UTC minute boundaries")
+    from .publication_wakeup import HISTORY_CHANNEL, notify
+
+    notify(db, HISTORY_CHANNEL)
     if dataset.identity.get("identity_version", 1) == 2:
         from .native_history_archive import create
 
@@ -517,12 +520,12 @@ def _run_cli(args, parser):
             print(json.dumps(version_report(db, version_id)))
         return
     adapter = HistorySources()
-    from .publication_wakeup import PublicationWakeup
+    from .publication_wakeup import HISTORY_CHANNEL, PublicationWakeup
     from .worker_health import Pulse
 
     pulse = Pulse("history_versions")
     try:
-        with PublicationWakeup() as wake:
+        with PublicationWakeup(channel=HISTORY_CHANNEL) as wake:
             while True:
                 # Register before scanning so a committed foreground request
                 # arriving between the scan and idle wait cannot lose its wake.
@@ -538,13 +541,13 @@ def _run_cli(args, parser):
 
 
 def run(stop, *, version_id=None, without_composite_aggregates=True, once=False):
-    from .publication_wakeup import PublicationWakeup
+    from .publication_wakeup import HISTORY_CHANNEL, PublicationWakeup
     from .worker_health import Pulse
 
     adapter = HistorySources()
     pulse = Pulse("history_versions")
     try:
-        with PublicationWakeup() as wake:
+        with PublicationWakeup(channel=HISTORY_CHANNEL) as wake:
             while not stop.is_set():
                 wake.prepare()
                 errors = []
@@ -562,13 +565,13 @@ def run(stop, *, version_id=None, without_composite_aggregates=True, once=False)
 
 def _run_profile_loop(stop, *, network, version_id=None, without_composite_aggregates=True):
     """Keep supplier reads and local preparation work on separate data roles."""
-    from .publication_wakeup import PublicationWakeup
+    from .publication_wakeup import HISTORY_CHANNEL, PublicationWakeup
     from .worker_health import Pulse
 
     adapter = HistorySources() if network else None
     pulse = None if network else Pulse("history_versions")
     try:
-        with PublicationWakeup() as wake:
+        with PublicationWakeup(channel=HISTORY_CHANNEL) as wake:
             while not stop.is_set():
                 wake.prepare()
                 errors = []

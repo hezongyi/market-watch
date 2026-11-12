@@ -193,9 +193,9 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
         parent_id=parent, prefix_end=prefix, cursor=prefix, state=state, status="pending",
         lease_until=0, next_at=0, attempts=0, updated_at=stamp)
         .on_conflict_do_nothing(index_elements=["id"]))
-    from .publication_wakeup import notify
+    from .publication_wakeup import HISTORY_CHANNEL, notify
 
-    notify(db)
+    notify(db, HISTORY_CHANNEL)
     return db.get(FixedIndicatorRun, ident)
 
 
@@ -271,8 +271,10 @@ def claim(run_id=None, *, alert_priority=False):
         else:
             from .indicator_demands import priority, warmup_capacity
 
-            order = priority(db, FixedIndicatorRun.id, stamp, kind="fixed")
             query = query.where(warmup_capacity(FixedIndicatorRun, FixedIndicatorRun.id, stamp))
+            if db.scalar(query.with_only_columns(FixedIndicatorRun.id).limit(1)) is None:
+                return None
+            order = priority(db, FixedIndicatorRun.id, stamp, kind="fixed")
         run = db.scalar(query.order_by(order, FixedIndicatorRun.updated_at, FixedIndicatorRun.id)
             .with_for_update(skip_locked=True).limit(1))
         if not run:

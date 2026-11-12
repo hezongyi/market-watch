@@ -24,15 +24,15 @@ log = logging.getLogger(__name__)
 # Busy yield between slices and the idle floor. Neither is removed by the
 # wakeup: a lost LISTEN connection must still find due tasks by polling.
 BUSY_YIELD = .05
-IDLE_FLOOR = .5
+IDLE_FLOOR = 2
 
 
 def run(stopped, *, wakeup=None):
     """The listener only shortens idle discovery; error backoff stays a plain wait."""
-    from .publication_wakeup import PublicationWakeup
+    from .publication_wakeup import COMPOSITE_CHANNEL, PublicationWakeup
 
     last_error = None
-    listener = wakeup if wakeup is not None else PublicationWakeup()
+    listener = wakeup if wakeup is not None else PublicationWakeup(channel=COMPOSITE_CHANNEL)
     with listener:
         while not stopped.is_set():
             # Register (and drain stale hints) before the durable scan: a commit
@@ -57,14 +57,8 @@ def run(stopped, *, wakeup=None):
             if worked:
                 stopped.wait(BUSY_YIELD)
             elif listener.wait(IDLE_FLOOR, stopped) == "notification":
-                # Chart, display and this worker's own commits publish on the same
-                # channel, so an idle loop can be interrupted for work it does not
-                # own. A queued hint returns from wait() without consuming the
-                # timeout, so re-listening right after an empty scan would spin at
-                # the publication rate. One bounded yield caps an unlucky run at
-                # BUSY_YIELD per empty round. A hint for real input still wakes the
-                # very next scan and finds its task, and hints arriving during this
-                # yield stay queued for prepare(), so none is lost.
+                # Multiple input hints can coalesce before tasks become eligible.
+                # Keep a bounded yield even on an empty notified scan.
                 stopped.wait(BUSY_YIELD)
 
 

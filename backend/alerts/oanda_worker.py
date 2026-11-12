@@ -543,6 +543,24 @@ def collect(adapter, ownership, identities, stopped):
 def run(adapter, stopped):
     catalog = None
     while not stopped.is_set():
+        if catalog is not None:
+            identities = desired_for_mode(adapter.account_id)
+            native = native_specs(adapter.account_id) if settings.oanda_acquisition_mode == "rest_batch" else ()
+            if not identities and not native:
+                # Authentication recovery remains live even after the last
+                # consumer leaves; only ordinary collection leases are skipped.
+                activity = {}
+                probe = claim_auth_probe(adapter.account_id, activity=activity)
+                held = activity.get('auth_hold', False)
+                if probe is not None:
+                    try:
+                        catalog = probe_authentication(adapter, probe)
+                        held = catalog is None
+                    except TimeoutError:
+                        held = True
+                progress(state="waiting_input" if held else "idle")
+                stopped.wait(5)
+                continue
         ownership = claim(adapter.account_id, startup=True)
         if ownership is None:
             probe = claim_auth_probe(adapter.account_id)

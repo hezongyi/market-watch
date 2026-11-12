@@ -167,7 +167,8 @@ def test_fixed_binding_persistent_demand_and_one_transactional_event(database, m
     with database.begin() as db:
         row = db.get(ChartAlert, ident)
         lifecycle(db, ident, row.version, "pause", expected_revision=row.control_revision, request_id="pause", at=next_time)
-    assert not desired_datasets(settings.oanda_account_id)
+    # Pausing a rule does not turn off an explicitly enabled composite.
+    assert set(desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
 
 
 @pytest.mark.parametrize('error', ['unauthorized', 'provider_maintenance'])

@@ -79,7 +79,12 @@ def _desired_dataset_identities(account):
             if enabled(db, instrument_id)
         }
         result = []
-        for row in db.scalars(select(MarketDataset)):
+        for row in db.scalars(select(MarketDataset).where(
+                MarketDataset.identity["source"].as_string() == "oanda",
+                MarketDataset.identity["channel"].as_string() == "v20",
+                MarketDataset.identity["environment"].as_string() == "practice",
+                MarketDataset.identity["account_scope"].as_string() == scope,
+                MarketDataset.identity["calendar_version"].as_string() == settings.oanda_calendar_version)):
             identity = DatasetIdentity.model_validate(row.identity)
             if (identity.source, identity.channel, identity.environment, identity.account_scope) != (
                     "oanda", "v20", "practice", scope):
@@ -147,12 +152,14 @@ def claim(account, *, now=None, startup=False):
         return (key, owner.token)
 
 
-def claim_auth_probe(account, *, now=None):
+def claim_auth_probe(account, *, now=None, activity=None):
     """Reserve the next probe before I/O, including after a worker crash."""
     stamp = now_ms() if now is None else now
     key = account_key(account)
     with transaction() as db:
         owner = db.scalar(select(PricingOwner).where(PricingOwner.id == key).with_for_update())
+        if activity is not None:
+            activity['auth_hold'] = bool(owner and owner.error == 'unauthorized')
         if not owner or owner.error != 'unauthorized' or owner.expires > stamp or owner.next_at > stamp:
             return None
         owner.token = uid()

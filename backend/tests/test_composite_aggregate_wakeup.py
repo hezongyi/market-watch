@@ -142,23 +142,24 @@ def test_changed_input_publishes_one_hint_and_unchanged_input_publishes_none(dat
     _, revision, _ = populated(database, monkeypatch)
     drain(revision, 'M1')
     hints = []
-    monkeypatch.setattr(publication_wakeup, 'notify', lambda db: hints.append(db.in_transaction()))
+    monkeypatch.setattr(publication_wakeup, 'notify', lambda db, channel: hints.append((db.in_transaction(), channel)))
     assert confirm(database, revision)[0]['input_revision'] == 2
     # The hint rides the same transaction that writes the input, so PostgreSQL
     # delivers it only if that transaction commits.
-    assert hints == [True]
+    assert hints == [(True, publication_wakeup.COMPOSITE_CHANNEL),
+                     (True, publication_wakeup.HISTORY_CHANNEL)]
     # Re-confirming the same minute changes no input; waking the worker for it
     # would only produce an empty scan.
     at = latest_minute(database, revision)
     assert confirm(database, revision, start=at, observed=at + 600000) == []
-    assert len(hints) == 1
+    assert len(hints) == 2
 
 
 def test_failed_hint_cannot_roll_back_confirmed_input(database, monkeypatch):
     _, revision, _ = populated(database, monkeypatch)
     drain(revision, 'M1')
 
-    def broken(_db):
+    def broken(_db, channel):
         raise OSError('listener channel unavailable')
 
     monkeypatch.setattr(publication_wakeup, 'notify', broken)

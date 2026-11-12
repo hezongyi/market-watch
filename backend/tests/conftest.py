@@ -14,6 +14,12 @@ def database(monkeypatch):
     )
     storage.bootstrap(engine)
     factory = sessionmaker(engine, expire_on_commit=False)
+    # Most contracts exercise existing, explicitly enabled legacy instruments.
+    # Production bootstrap now seeds them off; bootstrap-default tests use a
+    # separate fresh engine instead of inheriting this compatibility fixture.
+    with factory.begin() as db:
+        for key in ("EURUSD", "XAUUSD", "BTCUSDT"):
+            db.get(storage.Instrument, key).enabled = True
     monkeypatch.setattr(storage, "Session", factory)
     monkeypatch.setattr(api_module, "bootstrap", lambda: None)
     from alerts import provider_chart

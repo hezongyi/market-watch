@@ -4,6 +4,8 @@ import os
 import pytest
 from alerts.publication_wakeup import (
     ALERT_CHANNEL,
+    COMPOSITE_CHANNEL,
+    HISTORY_CHANNEL,
     NOTICE_CHANNEL,
     STREAM_CHANNEL,
     PublicationWakeup,
@@ -18,7 +20,7 @@ pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'),
                                reason='Requires isolated Ubuntu PostgreSQL')
 
 
-@pytest.mark.parametrize('channel', [ALERT_CHANNEL, NOTICE_CHANNEL, STREAM_CHANNEL])
+@pytest.mark.parametrize('channel', [ALERT_CHANNEL, NOTICE_CHANNEL, STREAM_CHANNEL, COMPOSITE_CHANNEL, HISTORY_CHANNEL])
 def test_demand_hints_are_commit_delivered_and_unrelated_publications_do_not_wake(channel):
     engine = create_engine(os.environ['TEST_POSTGRES_URL'])
     try:
@@ -70,6 +72,8 @@ def test_real_source_entrypoints_wake_their_workers_only_after_commit(provider_p
     factory, engine = provider_pg
     monkeypatch.setattr(storage.settings, 'fx_source', 'dukascopy')
     storage.bootstrap(engine)
+    with factory.begin() as db:
+        db.get(storage.Instrument, 'EURUSD').enabled = True
     with PublicationWakeup(engine, channel=NOTICE_CHANNEL) as wake:
         with factory() as db:
             notification_center.accept_browser(db, notification_center.SUBJECT, browser())
@@ -95,6 +99,8 @@ def test_real_source_entrypoints_wake_their_workers_only_after_commit(provider_p
         with factory.begin() as db:
             chart_alert_service.lifecycle(db, ident, 1, 'pause', expected_revision=1, request_id='pause', at=1)
         assert wake.wait(1) == 'notification'
+    with factory.begin() as db:
+        db.get(storage.Instrument, 'EURUSD').enabled = True
     owner = session(factory)
     with PublicationWakeup(engine, channel=STREAM_CHANNEL) as wake:
         market_stream.register(owner, 'page', 'bars', 1,

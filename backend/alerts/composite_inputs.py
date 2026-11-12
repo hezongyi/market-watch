@@ -38,14 +38,15 @@ def _wake_aggregation(db):
     (aborted statement or lost connection) so confirmed minutes this transaction
     already holds are still committed.
     """
-    from .publication_wakeup import notify
+    from .publication_wakeup import COMPOSITE_CHANNEL, HISTORY_CHANNEL, notify
 
     # Flush first: the savepoint may only discard the hint, never input rows this
     # transaction already decided to write.
     db.flush()
     try:
         with db.begin_nested():
-            notify(db)
+            notify(db, COMPOSITE_CHANNEL)
+            notify(db, HISTORY_CHANNEL)
     except Exception as error:
         log.warning("composite_input_wakeup_failed type=%s", type(error).__name__)
 

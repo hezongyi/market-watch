@@ -8,7 +8,7 @@ import pytest
 from alerts import fixed_indicators as jobs
 from alerts import indicator_demands as demands
 from alerts.chart_query import DataQuery, data_sync
-from alerts.publication_wakeup import PublicationWakeup
+from alerts.publication_wakeup import HISTORY_CHANNEL, PublicationWakeup
 from alerts.storage import FixedIndicatorRun, IndicatorDemand
 from sqlalchemy import func, select
 from test_fixed_indicators import history
@@ -63,7 +63,7 @@ def test_new_run_wakes_worker_only_after_committed_enqueue(provider_pg, monkeypa
     factory, engine = provider_pg
     version = history(factory, monkeypatch, count=100)
     page = data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1", limit=7))
-    with PublicationWakeup(engine) as wake:
+    with PublicationWakeup(engine, channel=HISTORY_CHANNEL) as wake:
         with factory.begin() as db:
             jobs.request(db, page, {"name": "EMA", "params": {"period": 23}})
             assert wake.wait(.05) == "timer"

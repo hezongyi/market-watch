@@ -1160,7 +1160,7 @@ def bootstrap(db_engine=engine):
                             if name == "BTCUSDT"
                             else "dukascopy",
                             basis="last" if name == "BTCUSDT" else "bid",
-                            enabled=name != "BTCUSD",
+                            enabled=False,
                             calendar=calendar,
                             precision=precision,
                         )
