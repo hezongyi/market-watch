@@ -70,8 +70,8 @@ def main():
 
 
 def run(stop):
-    from .publication_wakeup import PublicationWakeup
-    with PublicationWakeup() as wakeup:
+    from .publication_wakeup import DERIVATION_CHANNEL, PublicationWakeup
+    with PublicationWakeup(channel=DERIVATION_CHANNEL) as wakeup:
         while not stop.is_set():
             wakeup.prepare()
             started = time.monotonic()

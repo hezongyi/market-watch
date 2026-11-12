@@ -486,8 +486,9 @@ def warm_step(source, after=None, *, activity=None):
     return ident, True
 
 
-def cleanup(*, check_capacity=True):
+def cleanup(*, check_capacity=True, capacity_cache=None):
     now = now_ms()
+    checked = None
     from .storage import NativeHistoryLoad
     # Resolve provider identity outside the cleanup transaction/pool checkout.
     with transaction() as db:
@@ -544,13 +545,32 @@ def cleanup(*, check_capacity=True):
                 # Expired datasets must go regardless of capacity. Count only
                 # when a nonexpired eviction candidate actually needs the quota.
                 if total is None:
+                    # All cache writers advance the dataset revision in the
+                    # same transaction as their bars (including revalidation
+                    # and Yahoo invalidation). Read this small table BEFORE
+                    # counting: a concurrent writer then causes a later retry.
+                    signature = (settings.provider_cache_max_bars, tuple(db.execute(
+                        select(ProviderDataset.id, ProviderDataset.revision, ProviderDataset.updated_at)
+                        .order_by(ProviderDataset.id))))
+                    if (capacity_cache is not None
+                            and capacity_cache.get('signature') == signature
+                            and time.monotonic() < capacity_cache['checked_at'] + 3600):
+                        break
                     total = db.scalar(select(func.count()).select_from(ProviderBar))
+                    checked = dict(signature=signature, checked_at=time.monotonic())
                 if total <= settings.provider_cache_max_bars:
                     break
             count = db.execute(delete(ProviderBar).where(ProviderBar.dataset_id == row.id)).rowcount
             if total is not None:
                 total -= count
             db.delete(row)
+    # Never acknowledge a failed transaction or an unfinished over-quota
+    # eviction. An hourly recount also bounds external/legacy writer drift.
+    if capacity_cache is not None and checked is not None:
+        if total <= settings.provider_cache_max_bars:
+            capacity_cache.update(checked)
+        else:
+            capacity_cache.clear()
 
 
 def start():
@@ -623,11 +643,12 @@ def run_warm(stop, source):
 
 def run_janitor(stop):
     capacity_at = 0
+    capacity_cache = {}
     while not stop.is_set():
         error = None
         try:
             check_capacity = time.monotonic() >= capacity_at
-            cleanup(check_capacity=check_capacity)
+            cleanup(check_capacity=check_capacity, capacity_cache=capacity_cache)
             if check_capacity:
                 # Expiry stays at 60s. Capacity is a soft cache quota; avoid a
                 # million-row scan each minute when there are no consumers.

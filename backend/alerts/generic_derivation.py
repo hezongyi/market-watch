@@ -71,7 +71,7 @@ def touch(db, instrument, *, now=None):
         return False
     stamp = now_ms() if now is None else now
     ident = 'derive:' + hashlib.sha256(instrument.encode()).hexdigest()[:32]
-    from .publication_wakeup import notify
+    from .publication_wakeup import notify_derivation
     from .source_history_store import _insert
 
     # One row per instrument, not per HTTP request. A concurrent reader cannot
@@ -81,7 +81,7 @@ def touch(db, instrument, *, now=None):
             index_elements=['id'], set_={'expires': stamp + 45000, 'updated_at': stamp},
             where=MarketDemand.expires < stamp + 30000))
     if result.rowcount:
-        notify(db)
+        notify_derivation(db)
     return True
 
 

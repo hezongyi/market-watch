@@ -14,6 +14,14 @@ NOTICE_CHANNEL = 'market_watch_notice_ready'
 HISTORY_CHANNEL = 'market_watch_history_work'
 COMPOSITE_CHANNEL = 'market_watch_composite_input'
 PROVIDER_CHANNEL = 'market_watch_provider_demand'
+DERIVATION_CHANNEL = 'market_watch_derivation_work'
+
+
+def notify_derivation(db):
+    # Keep the public hint for alert/read consumers, but only generic work
+    # producers wake the generic worker. Composite period commits use CHANNEL.
+    notify(db)
+    notify(db, DERIVATION_CHANNEL)
 
 
 def notify_connection(connection, channel):
@@ -46,7 +54,7 @@ class PublicationWakeup:
 
     def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL, channels=None):
         selected = tuple(dict.fromkeys(channels if channels is not None else (channel,)))
-        if not selected or any(value not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL, PROVIDER_CHANNEL) for value in selected):
+        if not selected or any(value not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL, PROVIDER_CHANNEL, DERIVATION_CHANNEL) for value in selected):
             raise ValueError('Unknown worker wakeup channel')
         if engine is None:
             from .storage import engine

@@ -312,12 +312,12 @@ def _lock_live_datasets(db, identities, *, confirmation=False):
     # Composite judgments lock datasets before their shared LiveState read.
     # Pin FK parents before changing LiveState or inserting minute evidence;
     # acquiring them during autoflush would invert that order and deadlock.
-    query = select(MarketDataset.id).where(MarketDataset.id.in_(
+    query = select(MarketDataset.id, MarketDataset.instrument_id).where(MarketDataset.id.in_(
         sorted(identity.key for identity in identities))).order_by(MarketDataset.id)
     # Confirmation later calls ingest(), which needs FOR UPDATE. Acquire that
     # final mode now; upgrading after LiveState flush can deadlock chart reads.
-    list(db.scalars(query.with_for_update() if confirmation else
-                    query.with_for_update(read=True, key_share=True)))
+    return dict(db.execute(query.with_for_update() if confirmation else
+                           query.with_for_update(read=True, key_share=True)).all())
 
 
 def begin_connection(ownership, identities, *, now=None):
@@ -377,7 +377,7 @@ def publish_event(ownership, epoch, event, identities, *, now=None, completed_ha
     stamp = now_ms() if now is None else now
     with transaction() as db:
         owner = lock_owner(db, ownership, epoch, now=stamp)
-        _lock_live_datasets(db, identities.values())
+        instruments = _lock_live_datasets(db, identities.values())
         if owner.error == 'unauthorized':
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance':
@@ -420,12 +420,17 @@ def publish_event(ownership, epoch, event, identities, *, now=None, completed_ha
         if previous and previous["source_time"] == event.source_time and all(
                 previous.get(field) == getattr(event, field) for field in ("bid", "ask", "tradeable")):
             return "rejected_duplicate"
+        inst = db.get(Instrument, instruments[event.identity.key])
         state.quote = event.model_dump(mode="json")
         state.received_at = event.received_at
         state.connection = "connected" if state.ready else "recovering"
         state.revision += 1
         minute = event.source_time // 60000 * 60000
-        observation = _minute_observation(db, event.identity, state, minute, stamp)
+        # Do not flush a half-updated LiveState just to read its minute metric.
+        # The final quote/forming snapshot still commits with every observation.
+        with db.no_autoflush:
+            observation = _minute_observation(db, event.identity, state, minute, stamp,
+                                             profile=inst.calendar_profile)
         if observation.expected is not True and event.tradeable and event.bid is not None:
             observation.expected = True
             observation.expectation = "observed_source_tradeable"
@@ -449,8 +454,6 @@ def publish_event(ownership, epoch, event, identities, *, now=None, completed_ha
                 forming = {**forming, "high": str(max(Decimal(forming["high"]), Decimal(event.bid))),
                            "low": str(min(Decimal(forming["low"]), Decimal(event.bid))), "close": event.bid}
             state.forming = forming
-        dataset = db.get(MarketDataset, event.identity.key)
-        inst = db.get(Instrument, dataset.instrument_id)
         from .display_observations import accept
 
         market_session = session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session']
@@ -722,7 +725,7 @@ def confirmation_window(ownership, epoch, identity, *, now=None):
         return start, end
 
 
-def _minute_observation(db, identity, state, start, stamp, cache=None):
+def _minute_observation(db, identity, state, start, stamp, cache=None, *, profile=None):
     metric = (cache.get(start) if cache is not None else db.scalar(select(LiveMinute).where(
         LiveMinute.dataset_id == identity.key, LiveMinute.start == start)))
     if metric and (metric.expected is True or metric.confirmed_at is not None):
@@ -736,9 +739,10 @@ def _minute_observation(db, identity, state, start, stamp, cache=None):
     expected = True if fresh and quote["tradeable"] and quote.get("bid") is not None else None
     expectation = "fresh_source_tradeable" if expected else "unknown_session"
     if expected is None:
-        dataset = db.get(MarketDataset, identity.key)
-        inst = db.get(Instrument, dataset.instrument_id)
-        if session_status(identity.model_dump(), inst.calendar_profile, start)['market_session'] == 'closed':
+        if profile is None:
+            dataset = db.get(MarketDataset, identity.key)
+            profile = db.get(Instrument, dataset.instrument_id).calendar_profile
+        if session_status(identity.model_dump(), profile, start)['market_session'] == 'closed':
             expected = False
             expectation = "reviewed_source_closure"
     if metric:
