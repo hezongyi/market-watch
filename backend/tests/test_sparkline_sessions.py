@@ -2,6 +2,7 @@
 import pytest
 from alerts import provider_cache, provider_chart, sparklines, storage
 from alerts.sparkline_api import SparklineItem
+from alerts.storage import ProviderBar
 from test_sparklines import provider_rows, read, stamp
 
 META = {"source": "yahoo", "symbol": "NVDA", "asset_type": "EQUITY",
@@ -95,7 +96,22 @@ def test_cold_history_reader_crosses_weekend_and_reuses_cache(database, monkeypa
     assert response["preparation"] == "ready"
     assert len(response["items"][0]["points"]) == 390
     assert response["items"][0]["session"] == {"date": "2026-11-06", "previous": True}
+    assert response["items"][0]["session_open_price"] == "100"
     assert calls
     calls.clear()
     sparklines.prepare(SparklineItem(ticker="MWP:NVDA"))
     assert calls == [], "same pre-open request reuses history coverage"
+
+
+@pytest.mark.parametrize("offset,expected", [(0, "120.50"), (60000, None)])
+def test_reference_uses_actual_session_open_and_never_a_later_close(database, monkeypatch, offset, expected):
+    stock(monkeypatch, "2026-11-09T13:00:00+00:00")
+    opening = stamp("2026-11-06T14:30:00+00:00")
+    with database.begin() as db:
+        key = provider_rows(db, META, "M1", [opening + offset], price="123")
+        db.flush()
+        row = db.get(ProviderBar, (key, opening + offset))
+        row.payload = {**row.payload, "open": "120.50"}
+    item = read("MWP:NVDA")[0]
+    assert item["session_open_price"] == expected
+    assert item["points"][0]["price"] == "123"

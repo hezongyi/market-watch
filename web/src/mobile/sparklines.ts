@@ -9,6 +9,7 @@ export type Sparkline = {
   window_end: number;
   valid_until?: number;
   session?: { date: string; previous: boolean };
+  session_open_price?: string | null;
   timeframe: string | null;
   reference_times?: number[];
   points: { time: number; price: string; gap_before: boolean }[];

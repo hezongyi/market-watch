@@ -143,7 +143,7 @@ const server = http.createServer(async (req, res) => {
         window_end: stockSessionPhase === "current" ? left+23400000 : left-63000000,
         valid_until: left+86400000,
         session: {date: new Date(stockSessionPhase === "current" ? left : left-86400000).toISOString().slice(0,10), previous: stockSessionPhase !== "current"},
-        timeframe:"M1", status:"partial", reference_times:[],
+        timeframe:"M1", status:"partial", reference_times:[], session_open_price:"99.75",
         points: (stockSessionPhase === "current" ? [left,left+60000,left+120000] : [left-86400000,left-75000000,left-63060000]).map((time,i)=>({time,price:String(100+[0,0.4,0.2][i])})),
       } : ({
         ticker: item.ticker,
@@ -498,11 +498,14 @@ const server = http.createServer(async (req, res) => {
         assert(Number([...end.matchAll(/[ML]([\d.]+),/g)].at(-1)[1])<10,'current opening data leaves future session blank');
       } else {
         await expect(stockRow.locator('.mobile-spark[data-previous-session]')).toHaveCount(1);
-        await expect(stockRow.locator('.mobile-spark-caption')).toHaveText(phase==='waiting' ? '上一交易日 · 等待今日行情' : '上一交易日');
+        await expect(stockRow.locator('.mobile-spark-caption')).toHaveCount(0);
+        await expect(stockRow.locator('.mobile-spark-session-open')).toHaveCount(1);
+        await expect(stockRow.locator('.mobile-spark-session-open title')).toContainText('开盘价 99.75');
+        assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>el.getAttribute('y1')==='24'),'historical line is centered on its own source open');
         await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(0);
         const gray=await stockRow.locator('.mobile-spark svg').evaluate(svg=>{
-          const caption=svg.parentElement.querySelector('small');
-          return getComputedStyle(svg).color===getComputedStyle(caption).color;
+          const description=svg.closest('.mobile-watch-row').querySelector('.mobile-watch-description');
+          return getComputedStyle(svg).color===getComputedStyle(description).color;
         });
         assert(gray,'previous-session curve uses inactive gray regardless of quote change');
       }

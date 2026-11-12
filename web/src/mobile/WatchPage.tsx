@@ -114,13 +114,11 @@ function Spark({
   online,
   state,
   previousClose,
-  awaitingToday,
 }: {
   item?: Sparkline;
   online: boolean;
   state?: "loading" | "error";
   previousClose?: number;
-  awaitingToday?: boolean;
 }) {
   const gradient = useId();
   const container = useRef<HTMLSpanElement>(null);
@@ -135,7 +133,9 @@ function Spark({
     return () => observer.disconnect();
   }, []);
   const current = item && sparklineExpires(item) > Date.now() ? item : undefined;
-  const reference = current?.session?.previous ? undefined : previousClose;
+  const previousSession = current?.session?.previous;
+  const sessionOpen = current?.session_open_price == null ? undefined : Number(current.session_open_price);
+  const reference = previousSession ? sessionOpen : previousClose;
   const paths = useMemo(() => current ? sparklinePaths(current, width, 48, reference) : [], [current, width, reference]);
   const referenceY = current ? sparklineScale(current, 48, reference).referenceY : undefined;
   if (!current || !paths.length) {
@@ -166,13 +166,13 @@ function Spark({
   return (
     <span ref={container} className="mobile-spark" data-cached={cached || undefined}
       data-previous-session={current.session?.previous || undefined}
-      title={current.session?.previous ? `${current.session.date} · 上一交易日，收到本日行情后自动切换` : undefined}>
+      title={previousSession ? `${current.session!.date} · 历史走势，收到本日行情后自动切换` : undefined}>
       <svg
         viewBox={`0 0 ${width} 48`}
         preserveAspectRatio="none"
         aria-label={
           current.session?.previous
-            ? `${current.session.date} 上一交易日走势${cached ? " · 缓存" : ""}`
+            ? `${current.session.date} 历史走势${cached ? " · 缓存" : ""}`
             : cached
             ? "离线或刷新失败，显示缓存走势"
             : current.reason || "当前窗口日内走势"
@@ -186,9 +186,9 @@ function Spark({
           </linearGradient>
         </defs>
         {referenceY !== undefined && (
-          <line className="mobile-spark-previous-close" x1="0" x2={width}
+          <line className={previousSession ? "mobile-spark-session-open" : "mobile-spark-previous-close"} x1="0" x2={width}
             y1={referenceY} y2={referenceY} vectorEffect="non-scaling-stroke">
-            <title>{`昨收 ${previousClose} · 与报价涨跌幅同基准`}</title>
+            <title>{previousSession ? `${current.session!.date} 开盘价 ${sessionOpen}` : `昨收 ${previousClose} · 与报价涨跌幅同基准`}</title>
           </line>
         )}
         {current.reference_times?.map((at) => (
@@ -227,9 +227,7 @@ function Spark({
           </g>
         ))}
       </svg>
-      {current.session?.previous
-        ? <small className="mobile-spark-caption">上一交易日{cached ? " · 缓存" : awaitingToday ? " · 等待今日行情" : ""}</small>
-        : cached && <small className="mobile-spark-caption">缓存</small>}
+      {cached && <small className="mobile-spark-caption">缓存</small>}
     </span>
   );
 }
@@ -902,7 +900,6 @@ export default function WatchPage({
               </span>
               <Spark
                 online={online}
-                awaitingToday={value?.calendar_verified === true && value?.market_session === "scheduled_open"}
                 previousClose={quote?.s === "ok" && item && !item.session?.previous && value?.read_at >= item.window_start &&
                   value.read_at < sparklineExpires(item) ? value.prev_close_price : undefined}
                 state={sparkStates[ticker]}

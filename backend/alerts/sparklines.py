@@ -92,6 +92,9 @@ def stock_provider(db, keys, datasets, local, stamp):
         date, left, right, frame, rows, revision = chosen
     return left, right, frame, rows, revision, {
         "session": {"date": date.isoformat(), "previous": date < local.date()},
+        # A partial cache beginning later in the day cannot establish its open.
+        "session_open_price": str(rows[0]["open"])
+            if rows and rows[0]["start"] == left and rows[0].get("open") is not None else None,
         "valid_until": valid_until}
 
 
