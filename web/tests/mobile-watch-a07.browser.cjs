@@ -503,14 +503,17 @@ const server = http.createServer(async (req, res) => {
         await expect(stockRow.locator('.mobile-spark-session-open title')).toContainText('开盘价 99.75');
         assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>el.getAttribute('y1')==='24'),'historical line is centered on its own source open');
         await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(0);
-        const gray=await stockRow.locator('.mobile-spark svg').evaluate(svg=>{
-          const description=svg.closest('.mobile-watch-row').querySelector('.mobile-watch-description');
-          return getComputedStyle(svg).color===getComputedStyle(description).color;
-        });
-        assert(gray,'previous-session curve uses inactive gray regardless of quote change');
       }
       for (const theme of ['light','dark']) {
         await page.locator('.mobile-app').evaluate((el,theme)=>el.dataset.theme=theme,theme);
+        if (phase !== 'current') {
+          const colors=await stockRow.locator('.mobile-spark svg').evaluate(svg=>({
+            line:getComputedStyle(svg).color,
+            fill:getComputedStyle(svg.querySelector('stop')).stopColor,
+          }));
+          assert.equal(colors.line,theme==='light' ? 'rgb(100, 136, 184)' : 'rgb(131, 166, 212)');
+          assert.equal(colors.fill,colors.line,'previous-session area follows blue line rather than quote direction');
+        }
         for(const width of [375,412]) {
           await page.setViewportSize({width,height:852});
           await page.screenshot({path:path.join(output,`session-${phase}-${theme}-${width}.png`)});

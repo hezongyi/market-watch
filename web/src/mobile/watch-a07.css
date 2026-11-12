@@ -4,6 +4,7 @@
 .mobile-app[data-page="watch"] {
   --spark-area-up: #65b6a4;
   --spark-area-down: #e39b94;
+  --spark-previous-session: #83a6d4;
   font-family:
     -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
     "Microsoft YaHei", sans-serif;
@@ -14,6 +15,7 @@
 .mobile-app[data-page="watch"][data-theme="light"] {
   --spark-area-up: #238779;
   --spark-area-down: #cf6c65;
+  --spark-previous-session: #6488b8;
 }
 .mobile-watch-row.positive:not(.stale) .mobile-spark:not([data-cached]):not([data-previous-session]) stop {
   stop-color: var(--spark-area-up);
@@ -212,7 +214,7 @@
 }
 .mobile-spark[data-previous-session] > svg {
   height: 100%;
-  color: var(--muted);
+  color: var(--spark-previous-session);
 }
 .mobile-spark[data-previous-session] .mobile-spark-caption {
   position: absolute;
