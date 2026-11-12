@@ -148,10 +148,11 @@ def test_real_current_worker_loops_report_their_own_roles(database, monkeypatch)
 
     monkeypatch.setattr(chart_history_worker, "advance_pending_plans", lambda: None)
     monkeypatch.setattr(chart_history_worker, "import_once", lambda **kw: True)
-    monkeypatch.setattr(chart_history_worker.time, "sleep", stop)
+    history_stop = Event()
+    monkeypatch.setattr(history_stop, "wait", stop)
     import pytest
     with pytest.raises(StopAfterCycle):
-        chart_history_worker.run(lambda *args: None)
+        chart_history_worker.run(lambda *args: None, history_stop)
 
     native_stop = Event()
 
@@ -187,9 +188,10 @@ def test_history_import_does_not_run_directory_refresh(database, monkeypatch):
     monkeypatch.setattr("alerts.providers.fetch_oanda_catalog", failed)
     monkeypatch.setattr(worker, "advance_pending_plans", lambda: None)
     monkeypatch.setattr(worker, "import_once", lambda **kw: imported.append(True) or True)
-    monkeypatch.setattr(worker.time, "sleep", stop)
+    history_stop = Event()
+    monkeypatch.setattr(history_stop, "wait", stop)
     with pytest.raises(StopAfterCycle):
-        worker.run(lambda *args: None)
+        worker.run(lambda *args: None, history_stop)
     with database() as db:
         row = next(row for row in worker_health.services(db) if row["id"] == "chart_history")
     assert imported == [True]
