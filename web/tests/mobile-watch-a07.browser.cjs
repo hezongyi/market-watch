@@ -120,7 +120,7 @@ const server = http.createServer(async (req, res) => {
             description: names[i],
             exchange: sources[i],
             lp: prices[i],
-            display_precision: i === 1 ? 5 : i === 3 ? 3 : 2,
+            display_precision: i === 1 ? 5 : i === 0 || i === 3 ? 3 : 2,
             delay_seconds: i === 4 ? 900 : undefined,
             prev_close_price: i === 5 ? undefined : 100,
             read_at: Date.now(),
@@ -140,6 +140,7 @@ const server = http.createServer(async (req, res) => {
         window_start: left,
         window_end: left + 86400000,
         timeframe: "M1",
+        reference_times: [left+28800000,left+46800000],
         points: [
           { time: left, price: "100" },
           { time: left + 3600000, price: "101" },
@@ -301,13 +302,8 @@ const server = http.createServer(async (req, res) => {
         );
         if (width < 800) {
           // User-approved device feedback deliberately reduces header/nav height.
-          // Keep the A07 horizontal placement; two-line rows now use 72px.
-          for (const element of ["row"])
-            for (const prop of ["x"])
-              assert(
-                Math.abs(actual[element][prop] - expected[element][prop]) <= 3,
-                `${theme}/${width}/${font} ${element}.${prop}: ${actual[element][prop]} vs ${expected[element][prop]}`,
-              );
+          // Feedback reserves more width for the chart with a 16px page inset.
+          assert.equal(actual.row.x, 16);
           if (font === 21) {
             const separated = await page.locator('.mobile-watch-row').first().evaluate(row =>
               row.querySelector('.mobile-watch-symbol').getBoundingClientRect().bottom <= row.querySelector('.mobile-spark').getBoundingClientRect().top);
@@ -320,15 +316,32 @@ const server = http.createServer(async (req, res) => {
           assert(await page.locator('.mobile-spark-previous-close').first().evaluate(el => el.getAttribute('y1') === '24'));
           if (font === 14) {
             assert.equal(actual.row.height, 72);
+            const secondarySizes = await page.locator('.mobile-watch-description, .mobile-watch-origin').evaluateAll(els=>els.map(el=>parseFloat(getComputedStyle(el).fontSize)));
+            assert(secondarySizes.length && secondarySizes.every(size=>Math.abs(size-11)<0.01),'Chinese descriptions and source labels use 11px secondary text');
             assert.equal(actual.header.height, 64);
             const fixedColumns = await page.locator('.mobile-watch-row').evaluateAll(rows => rows.map(row => {
               const bounds = selector => row.querySelector(selector).getBoundingClientRect();
               const symbol=bounds('.mobile-watch-symbol'), chart=bounds('.mobile-spark'), price=bounds('.mobile-watch-price');
               const fitted = [...row.querySelectorAll('.mobile-fit-content')].every(el => el.getBoundingClientRect().width <= el.parentElement.getBoundingClientRect().width + 0.5);
-              return {left:symbol.width,right:price.width,chart:chart.width,fitted};
+              const contained = [...row.querySelectorAll('.mobile-watch-price .mobile-fit-content')].every(el => {
+                const r=el.getBoundingClientRect(); return r.left>=price.left-0.5 && r.right<=price.right+0.5;
+              });
+              return {left:symbol.width,right:price.width,chart:chart.width,fitted,contained};
             }));
-            assert(fixedColumns.every(row => Math.abs(row.left-86.8)<0.1 && Math.abs(row.right-72.8)<0.1 && row.fitted), 'fixed columns fit long code and quote without stealing chart width: '+JSON.stringify(fixedColumns));
+            assert(fixedColumns.every(row => Math.abs(row.left-79.8)<0.1 && Math.abs(row.right-67.2)<0.1 && row.fitted && row.contained), 'fixed columns fit long code and quote without stealing chart width: '+JSON.stringify(fixedColumns));
             assert(Math.max(...fixedColumns.map(row=>row.chart))-Math.min(...fixedColumns.map(row=>row.chart))<0.1);
+            assert(fixedColumns.every(row => row.chart >= width-191.1), 'chart has more space at both phone widths');
+            const priceStyle = await page.locator('.mobile-watch-last-price').first().evaluate(el => ({
+              color:getComputedStyle(el).color,pips:getComputedStyle(el.querySelector('b')).color,
+              weight:getComputedStyle(el).fontWeight,pipWeight:getComputedStyle(el.querySelector('b')).fontWeight
+            }));
+            assert.equal(priceStyle.color,priceStyle.pips,'enlarged digits remain gray');
+            assert.equal(priceStyle.weight,priceStyle.pipWeight,'enlarged digits do not gain bold emphasis');
+            const referenceStyle = await page.locator('.mobile-spark').first().evaluate(el => [...el.querySelectorAll('line')].map(line => {
+              const s=getComputedStyle(line);return {stroke:s.stroke,opacity:s.opacity};
+            }));
+            assert(referenceStyle.length>=2);assert(referenceStyle.every(s=>s.stroke===referenceStyle[0].stroke&&s.opacity===referenceStyle[0].opacity),'horizontal and vertical references share color and opacity');
+            await expect(page.locator('.mobile-watch-last-price').first()).toHaveText('2,684.520');
             await expect(page.locator('.mobile-watch-last-price').nth(3)).toHaveText('147.250');
             await expect(page.locator('.mobile-watch-last-price sup').first()).toHaveText('0');
 
@@ -428,6 +441,19 @@ const server = http.createServer(async (req, res) => {
     await expect(page.locator('.mobile-pull-refresh')).toBeEmpty({timeout:15000});
     assert(preferenceReads>beforePull,'pull refresh re-reads the watchlist');
     slowPreferences=0;
+    // Refresh feedback must finish after visible observations, even if history is slow.
+    const heldHistory = [], heldQuotes = [];
+    await page.route('**/api/market-data/quotes', route => { heldQuotes.push(route); });
+    await page.route('**/api/market-data/sparklines/prepare', route => { heldHistory.push(route); });
+    await swipe(160,304);
+    await expect.poll(() => heldHistory.length).toBeGreaterThan(0);
+    await expect(page.locator('.mobile-pull-refresh')).toBeEmpty({timeout:1500});
+    assert(heldHistory.length > 0 && heldQuotes.length > 0, 'supplier quotes and history remain pending when pull feedback closes');
+    await page.screenshot({path:path.join(output,'pull-complete-history-pending.png')});
+    for (const route of heldHistory) await route.fulfill({json:{as_of:Date.now(),items:[],preparation:'ready'}});
+    await page.unroute('**/api/market-data/sparklines/prepare');
+    for (const route of heldQuotes) await route.fallback();
+    await page.unroute('**/api/market-data/quotes');
     await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:160,y:280},{x:240,y:280}]});
     await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:80,y:280},{x:320,y:280}]});
     await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
@@ -518,7 +544,7 @@ const server = http.createServer(async (req, res) => {
     console.log(
       JSON.stringify({
         checks:
-          "A07 geometry/style comparison, 8 layouts, 3 sheet entries + 28 narrow/large-font control captures, delayed quote, offline cache, empty, loading",
+          "A07 geometry/style comparison, 8 layouts, 3 sheet entries + 28 narrow/large-font control captures, fixed gold price bounds, gray pips, wider charts, pull closes with history pending, pinch, delayed quote, offline cache, empty, loading",
         errors,
         output,
       }),

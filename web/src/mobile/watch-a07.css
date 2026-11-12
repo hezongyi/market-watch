@@ -29,7 +29,7 @@
 }
 .mobile-watch-title {
   min-height: 64px;
-  padding: 4px 20px 6px;
+  padding: 4px 16px 6px;
   grid-template-columns: minmax(0, 1fr) auto minmax(44px, 1fr);
   gap: 6px;
 }
@@ -101,7 +101,7 @@
   background: var(--up);
 }
 .mobile-watch-list {
-  padding: 0 20px 20px;
+  padding: 0 16px 20px;
   scrollbar-width: none;
   /* Scroll is explicitly restored by WatchPage; late quote metadata must not move it. */
   overflow-anchor: none;
@@ -109,8 +109,8 @@
 .mobile-app .mobile-watch-row {
   position: relative;
   grid-template-columns:
-    6.2rem minmax(36px, 1fr) 5.2rem;
-  gap: 8px;
+    5.7rem minmax(36px, 1fr) 4.8rem;
+  gap: 6px;
   min-height: 72px;
   padding: 8px 0;
   border-color: color-mix(in srgb, var(--line) 45%, transparent);
@@ -140,7 +140,7 @@
   display: block;
   margin-top: 2px;
   color: var(--muted);
-  font-size: 0.857143rem;
+  font-size: 0.785714rem;
   line-height: 1.45;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -186,16 +186,16 @@
   height: 100%;
 }
 .mobile-spark-fill-top {
-  stop-opacity: 0.22;
+  stop-opacity: 0.28;
 }
 .mobile-spark-fill-middle {
-  stop-opacity: 0.08;
+  stop-opacity: 0.11;
 }
 .mobile-app[data-theme="dark"] .mobile-spark-fill-top {
-  stop-opacity: 0.18;
+  stop-opacity: 0.24;
 }
 .mobile-app[data-theme="dark"] .mobile-spark-fill-middle {
-  stop-opacity: 0.06;
+  stop-opacity: 0.09;
 }
 .mobile-watch .mobile-watch-row .mobile-spark-empty {
   display: flex;
@@ -220,10 +220,10 @@
 .mobile-watch .mobile-spark line {
   stroke: var(--muted);
   stroke-dasharray: 2 3;
+  opacity: 0.12;
 }
 .mobile-watch .mobile-spark .mobile-spark-previous-close {
   stroke-width: 0.8;
-  opacity: 0.45;
   stroke-dasharray: 3 3;
 }
 .mobile-watch-status {
@@ -597,17 +597,17 @@
 }
 @media (max-width: 390px) {
   .mobile-watch-title {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 16px;
+    padding-right: 16px;
     gap: 2px;
   }
   .mobile-watch-list {
-    padding-left: 18px;
-    padding-right: 18px;
+    padding-left: 16px;
+    padding-right: 16px;
   }
   .mobile-app .mobile-watch-row {
     grid-template-columns:
-      6.2rem minmax(30px, 1fr) 5.2rem;
+      5.7rem minmax(30px, 1fr) 4.8rem;
     gap: 6px;
   }
 }
@@ -677,8 +677,9 @@
 .mobile-fit-content { display: inline-block; white-space: nowrap; max-width: none; }
 .mobile-watch-symbol strong { display: block; width: 100%; min-width: 0; }
 .mobile-watch-price { min-width: 0; font-variant-numeric: tabular-nums; }
-.mobile-watch .mobile-watch-last-price { line-height: 1.5; }
-.mobile-watch .mobile-price-pips { font-size: 1.16em; font-weight: 600; color: var(--text); }
+.mobile-watch .mobile-watch-last-price { width: 100%; min-width: 0; line-height: 1.5; }
+.mobile-watch .mobile-watch-price > strong { width: 100%; min-width: 0; }
+.mobile-watch .mobile-price-pips { font-size: 1.16em; font-weight: inherit; color: inherit; }
 .mobile-watch .stale .mobile-price-pips { color: var(--muted); }
 .mobile-watch-last-price sup { font-size: 0.72em; line-height: 0; vertical-align: 0.45em; margin-left: 1px; }
 .mobile-watch-action-list { display: grid; gap: 8px; }
@@ -692,10 +693,11 @@
 .mobile-watch .mobile-watch-list { overscroll-behavior-y: contain; touch-action: pan-y; }
 .mobile-watch .mobile-watch-symbol strong { line-height: 1.25; }
 .mobile-watch .mobile-watch-symbol .mobile-watch-origin { margin-top: 1px; line-height: 1.25; }
-.mobile-watch-description { color: var(--muted); font-size: 0.857143rem; line-height: 1.25; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile-watch-description { color: var(--muted); font-size: 0.785714rem; line-height: 1.25; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile-pull-refresh { display: flex; flex: none; align-items: center; justify-content: center; gap: 8px; overflow: hidden; color: var(--muted); font-size: 0.857143rem; }
 .mobile-pull-refresh svg { width: 16px; height: 16px; flex: none; }
 @media (prefers-reduced-motion: no-preference) {
+  .mobile-pull-refresh { transition: height 160ms ease-out; }
   .mobile-pull-refresh[data-refreshing] svg { animation: mobile-refresh-turn 900ms linear infinite; }
   @keyframes mobile-refresh-turn { to { transform: rotate(360deg); } }
 }

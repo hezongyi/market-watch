@@ -39,7 +39,7 @@ export function sparklineLoader(
   }
   return {
     cancel,
-    async load(items: { ticker: string; composite_revision_id?: string }[]) {
+    async load(items: { ticker: string; composite_revision_id?: string }[], observed?: () => void) {
       cancel();
       const generation = epoch;
       const distinct = [
@@ -77,7 +77,9 @@ export function sparklineLoader(
           }
         }),
       );
-      // Publish cached rows first; only two visible-symbol history requests run at once.
+      if (generation !== epoch) return;
+      observed?.();
+      // History continues after visible refresh completes; at most two requests run at once.
       await Promise.all([0, 1].map(async () => {
         while (history && generation === epoch && pendingHistory.length) {
           const item = pendingHistory.shift()!;

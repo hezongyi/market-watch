@@ -90,17 +90,18 @@ const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
   // Cache-first observation followed by bounded, cancellable historical preparation.
   const prepared=new Map(), historyCalls=[], historyReceived=[];
   const cached=[0,1,2].map(i=>({ticker:'MWP:'+i,window_start:0,window_end:100,status:'partial',points:[{time:90,price:'2'}]}));
-  let historyActive=0, peakHistory=0;
+  let historyActive=0, peakHistory=0, observationsFinished=0;
   const historyLoader=sparklineLoader(async()=>({as_of:95,items:cached}), rows=>historyReceived.push(rows), error=>{throw error}, {
     prepared, request:(ticker,signal)=>new Promise(resolve=>{
       historyActive++;peakHistory=Math.max(peakHistory,historyActive);
       historyCalls.push({ticker,signal,resolve:()=>{historyActive--;resolve({as_of:95,items:[{...cached.find(row=>row.ticker===ticker),points:[{time:0,price:'1'},{time:90,price:'2'}]}],preparation:'ready'})}});
     })
   });
-  const loadingHistory=historyLoader.load(cached);
+  const loadingHistory=historyLoader.load(cached,()=>{observationsFinished++;});
   await new Promise(resolve=>setImmediate(resolve));
   assert.equal(historyReceived[0][0].points[0].time,90,'existing curve is published before history finishes');
   assert.equal(historyCalls.length,2);
+  assert.equal(observationsFinished,1,'visible refresh completes while historical preparation is still pending');
   historyCalls[0].resolve();historyCalls[1].resolve();
   await new Promise(resolve=>setImmediate(resolve));
   historyCalls[2].resolve();await loadingHistory;

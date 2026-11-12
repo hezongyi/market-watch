@@ -261,11 +261,9 @@ export default function WatchPage({
   const [searching, setSearching] = useState(false);
   const [actionsOpen, setActionsOpen] = useState(false);
   const [refreshSerial, setRefreshSerial] = useState(0), [refreshing, setRefreshing] = useState(false);
-  const pullVersion = useRef(0), pendingPull = useRef(0);
-  const finishPull = (part: number, version: number) => {
-    if (version !== pullVersion.current) return;
-    pendingPull.current &= ~part;
-    if (!pendingPull.current) setRefreshing(false);
+  const pullVersion = useRef(0);
+  const finishPull = (version: number) => {
+    if (version === pullVersion.current) setRefreshing(false);
   };
   const [groupForm, setGroupForm] = useState<"new" | "rename">();
   const [nameError, setNameError] = useState("");
@@ -324,18 +322,20 @@ export default function WatchPage({
     if (!online || refreshing) return;
     const version = ++pullVersion.current;
     setRefreshing(true);
-    pendingPull.current = 3;
     preparedHistory.clear();
     void refresh().then(() => {
       if (version !== pullVersion.current) return;
       setRefreshSerial(version);
-      if (!visibleRows.length) { pendingPull.current = 0; setRefreshing(false); }
-    }).catch(error => { pendingPull.current = 0; setRefreshing(false); report(String(error)); });
+      if (!visibleRows.length) setRefreshing(false);
+    }).catch(error => {
+      if (version !== pullVersion.current) return;
+      setRefreshing(false); report(String(error));
+    });
   };
   const pullDistance = usePullRefresh(list, visible && online && foreground && !sheet && !searching && !actionsOpen, refreshing, requestRefresh);
   useEffect(() => {
     if (!visible || !online || !foreground) {
-      ++pullVersion.current; pendingPull.current = 0; setRefreshing(false);
+      ++pullVersion.current; setRefreshing(false);
     }
   }, [visible, online, foreground]);
   useEffect(() => {
@@ -530,8 +530,6 @@ export default function WatchPage({
         .catch((error) => {
           if (!request.signal.aborted && !controller.signal.aborted)
             report(String(error));
-        }).finally(() => {
-          if (!request.signal.aborted && token === snapshotEpoch) finishPull(1, refreshSerial);
         });
     };
     loadSnapshot();
@@ -666,9 +664,9 @@ export default function WatchPage({
               }
             : {}),
         })),
+        () => { if (active) finishPull(refreshSerial); },
       );
       if (active) {
-        finishPull(2, refreshSerial);
         const boundary = Math.min(
           ...visibleRows.map(
             (ticker) => currentSparks.current[ticker]?.window_end || Infinity,
