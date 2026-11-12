@@ -139,7 +139,8 @@ def test_additive_migration_preserves_existing_dataset(provider_pg):
             migration.downgrade()
 
 
-def test_first_rule_registration_serializes_with_collection(provider_pg, monkeypatch):
+@pytest.mark.parametrize('preloaded', [False, True])
+def test_first_rule_registration_serializes_with_collection(provider_pg, monkeypatch, preloaded):
     from alerts import live_pricing, price_alert_inputs
     from alerts.chart_alert_service import create, current_version
     from alerts.chart_alert_worker import evaluate
@@ -158,6 +159,14 @@ def test_first_rule_registration_serializes_with_collection(provider_pg, monkeyp
         state = db.get(LiveState, target)
         state.quote = {**state.quote, "sequence": 0, "received_at": make.at}
         assert db.get(PriceAlertStream, target) is None
+    completed = set() if preloaded else None
+    owner = (live_pricing.account_key(live_pricing.settings.oanda_account_id), 'test-owner')
+    if preloaded:
+        for seq in (1, 2):
+            live_pricing.publish_event(owner, 1, quote(identity, 1, seq=seq,
+                source=make.at + seq, received_at=make.at + seq, bid='1.110'),
+                {'EUR_USD': identity}, now=make.at + seq, completed_handovers=completed)
+        assert identity.key in completed
     registered, release, collecting_started = threading.Event(), threading.Event(), threading.Event()
     original = price_alert_inputs.register
 
@@ -173,18 +182,19 @@ def test_first_rule_registration_serializes_with_collection(provider_pg, monkeyp
 
     def create_rule():
         with factory.begin() as db:
-            return create(db, "first-price-rule", config, at=make.at).id
+            return create(db, "first-price-rule", config, at=make.at + (10 if preloaded else 0)).id
 
     def collect():
         collecting_started.set()
-        owner = (live_pricing.account_key(live_pricing.settings.oanda_account_id), "test-owner")
-        return live_pricing.publish_event(owner, 1, quote(identity, 1, seq=1,
+        return live_pricing.publish_event(owner, 1, quote(identity, 1, seq=3 if preloaded else 1,
             source=make.at + 100, received_at=make.at + 100, bid="1.120"),
-            {"EUR_USD": identity}, now=make.at + 100)
+            {"EUR_USD": identity}, now=make.at + 100, completed_handovers=completed)
 
     with ThreadPoolExecutor(max_workers=2) as pool:
         creation = pool.submit(create_rule)
-        assert registered.wait(10)
+        if not registered.wait(10):
+            creation.result(timeout=1)  # Surface a failed registration instead of a generic gate timeout.
+            pytest.fail('Registration did not reach the collection fence')
         collection = pool.submit(collect)
         try:
             assert collecting_started.wait(10)

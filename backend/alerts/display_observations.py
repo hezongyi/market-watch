@@ -39,7 +39,7 @@ def _has_capacity(db, dataset_id, stamp):
     return True
 
 
-def accept(db, state, event, *, stamp, profile, market_session=None):
+def accept(db, state, event, *, stamp, profile, market_session=None, observations=None):
     from .live_session import session_status
 
     market_session = market_session or session_status(event.identity.model_dump(), profile, stamp)['market_session']
@@ -51,7 +51,7 @@ def accept(db, state, event, *, stamp, profile, market_session=None):
         return
     start = event.source_time // 60000 * 60000
     key = (state.dataset_id, start, state.epoch)
-    observation = db.get(ObservedMinute, key)
+    observation = observations[key] if observations is not None else db.get(ObservedMinute, key)
     if not observation:
         if not _has_capacity(db, state.dataset_id, stamp):
             return

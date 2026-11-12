@@ -24,6 +24,7 @@ from .storage import (
     LiveMinute,
     LiveState,
     MarketDataset,
+    ObservedMinute,
     Preference,
     PricingOwner,
     now_ms,
@@ -397,7 +398,28 @@ def publish_event(ownership, epoch, event, identities, *, now=None, completed_ha
             return "heartbeat"
         if event.connection_epoch != epoch or event.identity not in identities.values():
             raise ValueError("Quote belongs to another connection or dataset")
-        state = db.get(LiveState, event.identity.key)
+        dataset_id = event.identity.key
+        minute = event.source_time // 60000 * 60000
+        metrics = observations = None
+        if completed_handovers is not None and dataset_id in completed_handovers:
+            # Keep these objects alive for this transaction only. Owner and
+            # dataset locks above retain their original modes and ordering.
+            state, inst, metric, observation = db.execute(
+                select(LiveState, Instrument, LiveMinute, ObservedMinute)
+                .select_from(LiveState)
+                .join(Instrument, Instrument.id == instruments[dataset_id])
+                .outerjoin(LiveMinute, (LiveMinute.dataset_id == LiveState.dataset_id)
+                           & (LiveMinute.start == minute))
+                .outerjoin(ObservedMinute, (ObservedMinute.dataset_id == LiveState.dataset_id)
+                           & (ObservedMinute.start == minute) & (ObservedMinute.epoch == epoch))
+                .where(LiveState.dataset_id == dataset_id)).one()
+            metrics = {minute: metric}
+            observations = {(dataset_id, minute, epoch): observation}
+        else:
+            # Handover may refresh LiveState and adopt a display minute. Do not
+            # preload an absent row before that adoption.
+            state = db.get(LiveState, dataset_id)
+            inst = db.get(Instrument, instruments[dataset_id])
         if state.epoch != epoch:
             raise TimeoutError("Quote generation is obsolete")
         from .display_observations import handover_legacy
@@ -413,23 +435,21 @@ def publish_event(ownership, epoch, event, identities, *, now=None, completed_ha
             if previous.get("connection_epoch") == epoch and event.sequence > previous.get("sequence", 0):
                 from .price_alert_inputs import interrupt
 
-                interrupt(db, event.identity.key, now=stamp, epoch=epoch, reason="out_of_order_price")
+                interrupt(db, dataset_id, now=stamp, epoch=epoch, reason="out_of_order_price")
             return "rejected_old_source"
         if previous and previous["connection_epoch"] == epoch and event.sequence <= previous["sequence"]:
             return "rejected_sequence"
         if previous and previous["source_time"] == event.source_time and all(
                 previous.get(field) == getattr(event, field) for field in ("bid", "ask", "tradeable")):
             return "rejected_duplicate"
-        inst = db.get(Instrument, instruments[event.identity.key])
         state.quote = event.model_dump(mode="json")
         state.received_at = event.received_at
         state.connection = "connected" if state.ready else "recovering"
         state.revision += 1
-        minute = event.source_time // 60000 * 60000
         # Do not flush a half-updated LiveState just to read its minute metric.
         # The final quote/forming snapshot still commits with every observation.
         with db.no_autoflush:
-            observation = _minute_observation(db, event.identity, state, minute, stamp,
+            observation = _minute_observation(db, event.identity, state, minute, stamp, metrics,
                                              profile=inst.calendar_profile)
         if observation.expected is not True and event.tradeable and event.bid is not None:
             observation.expected = True
@@ -451,18 +471,22 @@ def publish_event(ownership, epoch, event, identities, *, now=None, completed_ha
                     "volume": None, "volume_kind": "unavailable", "observation_complete": False,
                     "connection_epoch": epoch, "source": "oanda"}
             else:
-                forming = {**forming, "high": str(max(Decimal(forming["high"]), Decimal(event.bid))),
-                           "low": str(min(Decimal(forming["low"]), Decimal(event.bid))), "close": event.bid}
+                bid = Decimal(event.bid)
+                forming = {**forming, "high": str(max(Decimal(forming["high"]), bid)),
+                           "low": str(min(Decimal(forming["low"]), bid)), "close": event.bid}
             state.forming = forming
         from .display_observations import accept
 
         market_session = session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session']
-        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile, market_session=market_session)
+        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile,
+               market_session=market_session, observations=observations)
         from .price_alert_inputs import record_quote
 
-        record_quote(db, event, now=stamp, profile=inst.calendar_profile, market_session=market_session)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
+        # The consumer read may autoflush: all four quote snapshots are now
+        # complete. Active inputs retain their own sequence/retention flushes.
+        record_quote(db, event, now=stamp, profile=inst.calendar_profile, market_session=market_session)
         return "accepted"
 
 
