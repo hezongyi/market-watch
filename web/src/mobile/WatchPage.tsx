@@ -28,7 +28,7 @@ import {
   type Profile,
 } from "./cache";
 import { type MobileMarket, seriesIdentity } from "./market";
-import { sparklineLoader, sparklinePaths, sparklineScale, type Sparkline } from "./sparklines";
+import { sparklineExpires, sparklineLoader, sparklinePaths, sparklineScale, type Sparkline } from "./sparklines";
 import FitText from "./FitText";
 import { watchDescription } from "./watchIdentity";
 import { PULL_THRESHOLD, usePullRefresh } from "./usePullRefresh";
@@ -114,11 +114,13 @@ function Spark({
   online,
   state,
   previousClose,
+  awaitingToday,
 }: {
   item?: Sparkline;
   online: boolean;
   state?: "loading" | "error";
   previousClose?: number;
+  awaitingToday?: boolean;
 }) {
   const gradient = useId();
   const container = useRef<HTMLSpanElement>(null);
@@ -132,9 +134,10 @@ function Spark({
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
-  const current = item && item.window_end > Date.now() ? item : undefined;
-  const paths = useMemo(() => current ? sparklinePaths(current, width, 48, previousClose) : [], [current, width, previousClose]);
-  const referenceY = current ? sparklineScale(current, 48, previousClose).referenceY : undefined;
+  const current = item && sparklineExpires(item) > Date.now() ? item : undefined;
+  const reference = current?.session?.previous ? undefined : previousClose;
+  const paths = useMemo(() => current ? sparklinePaths(current, width, 48, reference) : [], [current, width, reference]);
+  const referenceY = current ? sparklineScale(current, 48, reference).referenceY : undefined;
   if (!current || !paths.length) {
     const label = !online
       ? "离线无缓存"
@@ -161,12 +164,16 @@ function Spark({
   }
   const cached = !online || state === "error";
   return (
-    <span ref={container} className="mobile-spark" data-cached={cached || undefined}>
+    <span ref={container} className="mobile-spark" data-cached={cached || undefined}
+      data-previous-session={current.session?.previous || undefined}
+      title={current.session?.previous ? `${current.session.date} · 上一交易日，收到本日行情后自动切换` : undefined}>
       <svg
         viewBox={`0 0 ${width} 48`}
         preserveAspectRatio="none"
         aria-label={
-          cached
+          current.session?.previous
+            ? `${current.session.date} 上一交易日走势${cached ? " · 缓存" : ""}`
+            : cached
             ? "离线或刷新失败，显示缓存走势"
             : current.reason || "当前窗口日内走势"
         }
@@ -220,7 +227,9 @@ function Spark({
           </g>
         ))}
       </svg>
-      {cached && <small className="mobile-spark-caption">缓存</small>}
+      {current.session?.previous
+        ? <small className="mobile-spark-caption">上一交易日{cached ? " · 缓存" : awaitingToday ? " · 等待今日行情" : ""}</small>
+        : cached && <small className="mobile-spark-caption">缓存</small>}
     </span>
   );
 }
@@ -368,7 +377,7 @@ export default function WatchPage({
         setSparks(
           Object.fromEntries(
             Object.entries(spark?.value || {}).filter(
-              ([, value]) => value.window_end > Date.now(),
+              ([, value]) => sparklineExpires(value) > Date.now(),
             ),
           ),
         );
@@ -420,7 +429,7 @@ export default function WatchPage({
   useEffect(() => connection?.observe(setTransport), [connection]);
   useEffect(() => {
     const boundary = Math.min(
-      ...Object.values(sparks).map((item) => item.window_end),
+      ...Object.values(sparks).map(sparklineExpires),
     );
     if (!Number.isFinite(boundary)) return;
     const timer = setTimeout(
@@ -428,7 +437,7 @@ export default function WatchPage({
         setSparks((previous) =>
           Object.fromEntries(
             Object.entries(previous).filter(
-              ([, item]) => item.window_end > Date.now(),
+              ([, item]) => sparklineExpires(item) > Date.now(),
             ),
           ),
         ),
@@ -632,7 +641,7 @@ export default function WatchPage({
           next[item.ticker] = item;
         }
         for (const [ticker, item] of Object.entries(next))
-          if (item.window_end <= Date.now()) delete next[ticker];
+          if (sparklineExpires(item) <= Date.now()) delete next[ticker];
         currentSparks.current = next;
         setSparks(next);
         void writeSnapshot(profile, "watch-sparklines", next).catch(() => {});
@@ -650,7 +659,7 @@ export default function WatchPage({
       setSparks((previous) =>
         Object.fromEntries(
           Object.entries(previous).filter(
-            ([, item]) => item.window_end > Date.now(),
+            ([, item]) => sparklineExpires(item) > Date.now(),
           ),
         ),
       );
@@ -669,7 +678,7 @@ export default function WatchPage({
       if (active) {
         const boundary = Math.min(
           ...visibleRows.map(
-            (ticker) => currentSparks.current[ticker]?.window_end || Infinity,
+            (ticker) => currentSparks.current[ticker] ? sparklineExpires(currentSparks.current[ticker]) : Infinity,
           ),
         );
         timer = setTimeout(
@@ -893,8 +902,9 @@ export default function WatchPage({
               </span>
               <Spark
                 online={online}
-                previousClose={quote?.s === "ok" && item && value?.read_at >= item.window_start &&
-                  value.read_at < item.window_end ? value.prev_close_price : undefined}
+                awaitingToday={value?.calendar_verified === true && value?.market_session === "scheduled_open"}
+                previousClose={quote?.s === "ok" && item && !item.session?.previous && value?.read_at >= item.window_start &&
+                  value.read_at < sparklineExpires(item) ? value.prev_close_price : undefined}
                 state={sparkStates[ticker]}
                 item={
                   revision && item?.revision?.composite_revision_id !== revision

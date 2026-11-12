@@ -15,10 +15,10 @@
   --spark-area-up: #238779;
   --spark-area-down: #cf6c65;
 }
-.mobile-watch-row.positive:not(.stale) .mobile-spark:not([data-cached]) stop {
+.mobile-watch-row.positive:not(.stale) .mobile-spark:not([data-cached]):not([data-previous-session]) stop {
   stop-color: var(--spark-area-up);
 }
-.mobile-watch-row.negative:not(.stale) .mobile-spark:not([data-cached]) stop {
+.mobile-watch-row.negative:not(.stale) .mobile-spark:not([data-cached]):not([data-previous-session]) stop {
   stop-color: var(--spark-area-down);
 }
 .mobile-watch {
@@ -209,6 +209,17 @@
 .mobile-spark[data-cached] > svg {
   height: calc(100% - 14px);
   color: var(--muted);
+}
+.mobile-spark[data-previous-session] > svg {
+  height: 100%;
+  color: var(--muted);
+}
+.mobile-spark[data-previous-session] .mobile-spark-caption {
+  position: absolute;
+  right: 0;
+  bottom: -13px;
+  line-height: 12px;
+  font-size: 0.714286rem;
 }
 .mobile-spark-caption {
   display: block;
@@ -692,8 +703,8 @@
 .mobile-watch { touch-action: pan-y; }
 .mobile-watch .mobile-watch-list { overscroll-behavior-y: contain; touch-action: pan-y; }
 .mobile-watch .mobile-watch-symbol strong { line-height: 1.25; }
-.mobile-watch .mobile-watch-symbol .mobile-watch-origin { margin-top: 1px; line-height: 1.25; }
-.mobile-watch-description { color: var(--muted); font-size: 0.785714rem; line-height: 1.25; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile-watch .mobile-watch-symbol .mobile-watch-origin { margin-top: 2px; line-height: 1.35; }
+.mobile-watch-description { color: var(--muted); font-size: 0.785714rem; line-height: 1.35; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile-pull-refresh { display: flex; flex: none; align-items: center; justify-content: center; gap: 8px; overflow: hidden; color: var(--muted); font-size: 0.857143rem; }
 .mobile-pull-refresh svg { width: 16px; height: 16px; flex: none; }
 @media (prefers-reduced-motion: no-preference) {

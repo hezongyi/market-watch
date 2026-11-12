@@ -7,6 +7,8 @@ export type Sparkline = {
   } | null;
   window_start: number;
   window_end: number;
+  valid_until?: number;
+  session?: { date: string; previous: boolean };
   timeframe: string | null;
   reference_times?: number[];
   points: { time: number; price: string; gap_before: boolean }[];
@@ -14,6 +16,11 @@ export type Sparkline = {
   reason: string | null;
   last_data_at: number | null;
 };
+/** Display bounds may be a completed stock session; validity belongs to today. */
+export function sparklineExpires(item: Sparkline) {
+  return item.valid_until ?? item.window_end;
+}
+
 type Request = (
   items: { ticker: string; composite_revision_id?: string }[],
   signal: AbortSignal,
@@ -59,7 +66,7 @@ export function sparklineLoader(
               const response = await request(batch, controller.signal);
               if (generation !== epoch || controller.signal.aborted) continue;
               // A cached HTTP reply can cross midnight; old windows cannot redraw.
-              const current = response.items.filter(item => item.window_end > response.as_of);
+              const current = response.items.filter(item => sparklineExpires(item) > response.as_of);
               receive(current);
               if (history) {
                 for (const [key, end] of history.prepared)
@@ -88,9 +95,11 @@ export function sparklineLoader(
           try {
             const response = await history.request(item.ticker, controller.signal);
             if (generation !== epoch || controller.signal.aborted) continue;
-            receive(response.items.filter(row => row.window_end > response.as_of));
+            receive(response.items.filter(row => sparklineExpires(row) > response.as_of));
             if (response.preparation !== "retry")
-              history.prepared.set(item.ticker + ":" + item.window_start, item.window_end);
+              for (const row of response.items)
+                if (!row.session || (!row.session.previous && row.points.length))
+                  history.prepared.set(row.ticker + ":" + row.window_start, sparklineExpires(row));
           } catch (error) {
             if (generation === epoch && !controller.signal.aborted) failure(error);
           } finally {

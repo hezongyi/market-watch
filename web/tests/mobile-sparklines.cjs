@@ -114,5 +114,16 @@ const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
   assert(historyCalls.slice(3).every(call=>call.signal.aborted));
   historyCalls.slice(3).forEach(call=>call.resolve());await cancelled;
   assert.equal(historyReceived.length,delivered,'late preparation cannot overwrite a new visible generation');
+  // Previous plot bounds are in the past but the snapshot remains valid today.
+  const prior={ticker:'MWP:NVDA',window_start:0,window_end:10,valid_until:200,
+    session:{date:'2026-11-06',previous:true},status:'partial',points:[{time:1,price:'100'}]};
+  const sessionReceived=[],sessionPrepared=new Map();let sessionCalls=0;
+  const sessionLoader=sparklineLoader(async()=>({as_of:100,items:[prior]}),rows=>sessionReceived.push(...rows),error=>{throw error},{
+    prepared:sessionPrepared,request:async()=>{sessionCalls++;return {as_of:100,items:[prior],preparation:'ready'}}
+  });
+  await sessionLoader.load([{ticker:prior.ticker}]);await sessionLoader.load([{ticker:prior.ticker}]);
+  assert(sessionReceived.length===4,'valid previous-session curve survives batch and preparation');
+  assert.equal(sessionCalls,2,'previous session must not suppress next refresh after open');
+  assert.equal(sessionPrepared.size,0);
   console.log('PASS mobile sparklines: bounded batches/concurrency, deduplication, abort/late replies, window expiry and gaps');
 })().catch(error=>{console.error(error);process.exitCode=1;});

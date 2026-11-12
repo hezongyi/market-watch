@@ -44,6 +44,57 @@ def window(stamp, asset):
     return int(left.timestamp() * 1000), int(right.timestamp() * 1000)
 
 
+def stock_clock(meta, stamp):
+    """Only explicit regular-hours stock metadata enables session carry-forward.
+
+    These bounds define the chart axis, not proof that a calendar date is open.
+    The displayed trading date always comes from actual source bars.
+    """
+    if (meta["source"] == "yahoo" and meta.get("asset_type") in {"EQUITY", "ETF", "INDEX"}
+            and meta.get("timezone") and meta.get("session") == "0930-1600:23456"):
+        return datetime.fromtimestamp(stamp / 1000, ZoneInfo(meta["timezone"]))
+    return None
+
+
+def stock_provider(db, keys, datasets, local, stamp):
+    midnight = local.replace(hour=0, minute=0, second=0, microsecond=0)
+    valid_until = int((midnight + timedelta(days=1)).timestamp() * 1000)
+    earliest = int((midnight - timedelta(days=14)).timestamp() * 1000)
+    chosen = None
+    for frame, key in keys.items():
+        if key not in datasets:
+            continue
+        records = db.scalars(select(ProviderBar).where(ProviderBar.dataset_id == key,
+            ProviderBar.start >= earliest, ProviderBar.start <= stamp)
+            .order_by(ProviderBar.start.desc()).limit(MAX_POINTS)).all()
+        records = [row for row in records
+                   if row.complete or row.start <= stamp < row.payload["end"]]
+        if not records:
+            continue
+        date = datetime.fromtimestamp(records[0].start / 1000, local.tzinfo).date()
+        # Prefer today's coarser bars over an older fine-grained cache.
+        if chosen is not None and date <= chosen[0]:
+            continue
+        opening = midnight.replace(year=date.year, month=date.month, day=date.day, hour=9, minute=30)
+        closing = opening.replace(hour=16, minute=0)
+        left, right = int(opening.timestamp() * 1000), int(closing.timestamp() * 1000)
+        rows = [{**row.payload, "start": row.start, "complete": row.complete}
+                for row in reversed(records) if left <= row.start < right]
+        if rows:
+            chosen = (date, left, right, frame, rows, {"cache_revision": datasets[key].revision})
+            if date == local.date():
+                break
+    if chosen is None:
+        left = int(midnight.replace(hour=9, minute=30).timestamp() * 1000)
+        right = int(midnight.replace(hour=16).timestamp() * 1000)
+        date, frame, rows, revision = local.date(), None, [], None
+    else:
+        date, left, right, frame, rows, revision = chosen
+    return left, right, frame, rows, revision, {
+        "session": {"date": date.isoformat(), "previous": date < local.date()},
+        "valid_until": valid_until}
+
+
 def provider(db, symbol, stamp):
     from .history_catalog import oanda_entry
     from .provider_cache import identity
@@ -60,6 +111,9 @@ def provider(db, symbol, stamp):
     keys = {frame: identity(meta, frame) for frame in FRAMES if frame in meta.get("frames", FRAMES)}
     datasets = {row.id: row for row in db.scalars(select(ProviderDataset).where(
         ProviderDataset.id.in_(keys.values())))}
+    local = stock_clock(meta, stamp)
+    if local is not None:
+        return stock_provider(db, keys, datasets, local, stamp)
     for frame, key in keys.items():
         dataset = datasets.get(key)
         if dataset is None:
@@ -142,7 +196,7 @@ def composite(db, symbol, revision_id, stamp):
         "composite_revision_id": revision.id, "input_revision": result["input_revision"]}
 
 
-def result(ticker, left, right, frame, rows, revision, stamp):
+def result(ticker, left, right, frame, rows, revision, stamp, session=None):
     step = FRAMES.get(frame, 60000)
     points = []
     partial = False
@@ -155,7 +209,7 @@ def result(ticker, left, right, frame, rows, revision, stamp):
     partial |= bool(points and (points[0]["time"] > left or previous_end <= stamp - step))
     status = "partial" if points and partial else "ready" if points else "empty"
     references = []
-    if left % 86400000:  # The server selected NY17 from explicit asset metadata.
+    if not session and left % 86400000:  # NY17 from explicit asset metadata.
         for zone in (ZoneInfo("Europe/London"), ZoneInfo("America/New_York")):
             local = datetime.fromtimestamp(left / 1000, zone).replace(hour=8, minute=0, second=0, microsecond=0)
             if local.timestamp() * 1000 < left:
@@ -164,6 +218,7 @@ def result(ticker, left, right, frame, rows, revision, stamp):
             if at < right:
                 references.append(at)
     return {"ticker": ticker, "revision": revision, "window_start": left, "window_end": right,
+        **(session or {}),
         "reference_times": references,
         "timeframe": frame, "points": points, "status": status,
         "reason": "当前窗口缓存含缺口或未确认观测" if status == "partial" else
@@ -190,7 +245,8 @@ def batch(items):
                     values = history(db, symbol, stamp)
                 else:
                     values = composite(db, symbol, item.composite_revision_id, stamp)
-                output.append(result(item.ticker, *values, stamp))
+                output.append(result(item.ticker, *values[:5], stamp,
+                                     session=values[5] if len(values) > 5 else None))
                 # No commit: even incidental ORM bookkeeping cannot persist.
         except (ValueError, QueryError, OSError, TimeoutError) as error:
             left, right = window(stamp, None)
@@ -211,8 +267,8 @@ def prepare(item):
 
     The observation endpoint remains read-only. This separate operation prepares
     the current day of intraday bars, without creating jobs or a second live poller.
-    Count-based readers can cross the day boundary around market closures; only
-    current-window observations are returned.
+    Count-based readers can cross closures; stocks may display the most recent
+    actual session until current-session bars arrive.
     """
     import time
 
@@ -243,6 +299,9 @@ def prepare(item):
                 step = FRAMES[frame]
                 before = stamp // step * step
                 count = min(MAX_POINTS, max(0, (before - left + step - 1) // step))
+                if stock_clock(meta, stamp) is not None:
+                    # Count actual source bars across weekends, even at 00:01.
+                    count = max(count, (390 * 60000 + step - 1) // step)
                 if count:
                     provider_cache.read(meta, frame, before, count, latest=False,
                         deadline=time.monotonic() + max(20, request_seconds(meta["source"])))

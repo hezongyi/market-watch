@@ -21,7 +21,7 @@ const names = [
 ];
 const sources = ["OANDA", "OANDA", "Binance", "FXCM", "Yahoo", "AKShare"];
 const prices = [2684.52, 1.08420, 76428.30, 147.250, 512.84, 9876543.21];
-let preferenceReads = 0, slowPreferences = 0;
+let preferenceReads = 0, slowPreferences = 0, stockSessionPhase = "normal";
 let holdPreferences = false,
   emptyWatch = false;
 const rows = ["monitoring", "blocked", "paused"].map((state, i) => ({
@@ -124,6 +124,8 @@ const server = http.createServer(async (req, res) => {
             delay_seconds: i === 4 ? 900 : undefined,
             prev_close_price: i === 5 ? undefined : 100,
             read_at: Date.now(),
+            calendar_verified: i === 4 && stockSessionPhase === "waiting",
+            market_session: i === 4 && stockSessionPhase === "waiting" ? "scheduled_open" : "unknown",
             chp: [0.69, -0.22, 1.63, 1.24, -0.45, 0.56][i],
             fetch_status: "ok",
             quote_time: Date.now(),
@@ -135,7 +137,15 @@ const server = http.createServer(async (req, res) => {
     const left = Math.floor(Date.now() / 86400000) * 86400000;
     return json({
       as_of: Date.now(),
-      items: body.items.map((item) => ({
+      items: body.items.map((item) => item.ticker === symbols[4] && stockSessionPhase !== "normal" ? {
+        ticker: item.ticker,
+        window_start: stockSessionPhase === "current" ? left : left-86400000,
+        window_end: stockSessionPhase === "current" ? left+23400000 : left-63000000,
+        valid_until: left+86400000,
+        session: {date: new Date(stockSessionPhase === "current" ? left : left-86400000).toISOString().slice(0,10), previous: stockSessionPhase !== "current"},
+        timeframe:"M1", status:"partial", reference_times:[],
+        points: (stockSessionPhase === "current" ? [left,left+60000,left+120000] : [left-86400000,left-75000000,left-63060000]).map((time,i)=>({time,price:String(100+[0,0.4,0.2][i])})),
+      } : ({
         ticker: item.ticker,
         window_start: left,
         window_end: left + 86400000,
@@ -351,7 +361,7 @@ const server = http.createServer(async (req, res) => {
               const price = row.querySelector('.mobile-watch-price').getBoundingClientRect();
               return {symbolHeight:symbol.height,sparkHeight:spark.height,centers:[symbol.y+symbol.height/2,spark.y+spark.height/2,price.y+price.height/2]};
             });
-            assert(alignment.symbolHeight <= 52, 'compact identity stays inside the 72px row');
+            assert(alignment.symbolHeight <= 55, 'compact identity stays inside the 72px row');
             assert(Math.max(...alignment.centers)-Math.min(...alignment.centers)<1,'all three columns vertically centered');
           }
           assert(Math.abs(actual.nav.y + actual.nav.height - height) < 1);
@@ -475,6 +485,36 @@ const server = http.createServer(async (req, res) => {
     await page.getByRole('link', { name: '更多', exact: true }).click();
     assert.deepEqual(await icons(), watchIcons, 'same navigation icon set on every page');
     await page.getByRole('link', { name: '自选', exact: true }).click();
+    const stockRow=page.locator('.mobile-watch-row').nth(4);
+    for (const phase of ['previous','waiting','current']) {
+      stockSessionPhase=phase;
+      await page.getByRole('link',{name:'更多',exact:true}).click();
+      await page.getByRole('link',{name:'自选',exact:true}).click();
+      if (phase === 'current') {
+        await expect(stockRow.locator('.mobile-spark[data-previous-session]')).toHaveCount(0);
+        await expect(stockRow.locator('.mobile-spark-caption')).toHaveCount(0);
+        await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(1);
+        const end=await stockRow.locator('.mobile-spark path[stroke]').getAttribute('d');
+        assert(Number([...end.matchAll(/[ML]([\d.]+),/g)].at(-1)[1])<10,'current opening data leaves future session blank');
+      } else {
+        await expect(stockRow.locator('.mobile-spark[data-previous-session]')).toHaveCount(1);
+        await expect(stockRow.locator('.mobile-spark-caption')).toHaveText(phase==='waiting' ? '上一交易日 · 等待今日行情' : '上一交易日');
+        await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(0);
+        const gray=await stockRow.locator('.mobile-spark svg').evaluate(svg=>{
+          const caption=svg.parentElement.querySelector('small');
+          return getComputedStyle(svg).color===getComputedStyle(caption).color;
+        });
+        assert(gray,'previous-session curve uses inactive gray regardless of quote change');
+      }
+      for (const theme of ['light','dark']) {
+        await page.locator('.mobile-app').evaluate((el,theme)=>el.dataset.theme=theme,theme);
+        for(const width of [375,412]) {
+          await page.setViewportSize({width,height:852});
+          await page.screenshot({path:path.join(output,`session-${phase}-${theme}-${width}.png`)});
+        }
+      }
+    }
+    stockSessionPhase='normal';
     await page.route('**/api/market-data/sparklines', async route => {
       const body = route.request().postDataJSON(), left = Math.floor(Date.now()/86400000)*86400000;
       await route.fulfill({ json: { as_of: Date.now(), items: body.items.map(item => ({...item, window_start: left, window_end: left+86400000, points: [], status: 'empty' })) } });
