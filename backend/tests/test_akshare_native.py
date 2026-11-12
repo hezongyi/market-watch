@@ -226,6 +226,25 @@ def test_provider_cache_stops_at_snapshot_edge_after_minute_refresh_deadline(dat
     assert not older['history_boundary']
 
 
+def test_empty_snapshot_does_not_poison_historical_cache_and_recovers(database, monkeypatch):
+    from alerts import provider_cache as cache
+    from alerts.market_contracts import MarketRequestError
+
+    calls = []
+    def invoke(*args, **kwargs):
+        calls.append(1)
+        return [] if len(calls) == 1 else records('2026-11-10')
+    monkeypatch.setattr(provider, 'invoke', invoke)
+    meta = {**native.native_metadata('tencent-a'), 'id': 'TENCENT-NATIVE:SZSE:000001',
+            'source': 'akshare', 'symbol': 'SZSE:000001', 'precision': 4,
+            'basis': 'last', 'calendar': 'source_date'}
+    with pytest.raises(MarketRequestError):
+        cache.read(meta, 'D1', stamp('2026-11-11'), 2, deadline=time.monotonic() + 2)
+    second = cache.read(meta, 'D1', stamp('2026-11-11'), 2, deadline=time.monotonic() + 2)
+    assert len(second['bars']) == 1 and len(calls) == 2
+    assert not second['history_boundary']
+
+
 def test_new_ticker_round_trip_and_chart_budget():
     from alerts.chart_series import decode, encode
     from alerts.provider_capabilities import instrument_source

@@ -120,7 +120,7 @@ def source_identity(meta, frame):
 
 
 def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
-    from .market_contracts import NativeCandleBatch
+    from .market_contracts import MarketRequestError, NativeCandleBatch, RequestResult
     from .provider_akshare import invoke, parse_records
     from .source_history_store import shared_native_page
     from .storage import now_ms
@@ -137,6 +137,10 @@ def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
         def native_page(self, identity, start, end):
             records = invoke(source.parameters["endpoint"], {"symbol": meta["symbol"],
                 "frame": frame, "count": source.parameters["snapshot_count"]}, deadline=deadline)
+            # An empty snapshot proves neither a listing boundary nor a full
+            # period window. Leave it retryable rather than caching it all day.
+            if not records:
+                raise MarketRequestError(RequestResult(status="unavailable"))
             fetched = now_ms()
             warnings = []
             rows = parse_records(source, records, start=start, end=end, observed_at=fetched,
