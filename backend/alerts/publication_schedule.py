@@ -11,9 +11,9 @@ from weakref import WeakKeyDictionary
 from sqlalchemy import case, func, select, update
 
 from .chart_data import FRAMES
+from .generic_derivation import paused_query
 from .publication_result import PublicationResult
 from .source_history_store import _insert
-from .transaction_retry import is_conflict, retry_conflicts
 from .storage import (
     PUBLICATION_SERVICE_SEQUENCE,
     ChartAggregationJob,
@@ -21,9 +21,9 @@ from .storage import (
     ChartPublication,
     ChartPublicationJob,
     ChartPublicationState,
-    Instrument,
     transaction,
 )
+from .transaction_retry import is_conflict, retry_conflicts
 
 INITIAL = 1
 BARS = 2
@@ -44,7 +44,8 @@ def _service(db, state, stamp):
 
 def _queue(db, stamp, **facts):
     earliest = db.scalar(select(func.min(ChartPublicationState.next_at)).where(
-        ChartPublicationState.requested > ChartPublicationState.processed))
+        ChartPublicationState.requested > ChartPublicationState.processed,
+        ChartPublicationState.instrument_id.not_in(paused_query(stamp))))
     return PublicationResult(**facts, runnable_remaining=earliest is not None and earliest <= stamp,
                              next_due_at=earliest)
 
@@ -107,6 +108,8 @@ def discover(db, stamp):
             (ChartPublicationState.instrument_id == ChartPublicationJob.instrument_id) &
             (ChartPublicationState.timeframe == ChartPublicationJob.timeframe)).where(
         ChartPublicationState.requested == ChartPublicationState.processed,
+        ChartPublicationState.blocked_reason.is_distinct_from('gap'),
+        ChartPublicationState.instrument_id.not_in(paused_query(stamp)),
         ~select(ChartAggregationJob.id).where(
             ChartAggregationJob.instrument_id == ChartPublicationJob.instrument_id,
             ChartAggregationJob.timeframe == case(
@@ -139,7 +142,8 @@ def tick(publisher, corrections):
         candidates = list(db.execute(select(ChartPublicationState.instrument_id,
             ChartPublicationState.timeframe).where(
             ChartPublicationState.requested > ChartPublicationState.processed,
-            ChartPublicationState.next_at <= stamp).order_by(
+            ChartPublicationState.next_at <= stamp,
+            ChartPublicationState.instrument_id.not_in(paused_query(stamp))).order_by(
                 ChartPublicationState.last_service_seq, ChartPublicationState.requested_at,
                 ChartPublicationState.instrument_id, ChartPublicationState.timeframe).limit(20)))
     for ident, frame in candidates:
@@ -155,7 +159,8 @@ def tick(publisher, corrections):
             return result
     with transaction() as db:
         earliest = db.scalar(select(func.min(ChartPublicationState.next_at)).where(
-            ChartPublicationState.requested > ChartPublicationState.processed))
+            ChartPublicationState.requested > ChartPublicationState.processed,
+            ChartPublicationState.instrument_id.not_in(paused_query(stamp))))
         return PublicationResult(next_due_at=max(stamp + 100, earliest) if earliest is not None else None,
                                  blocked_reason='locked' if earliest is not None and earliest <= stamp else None)
 

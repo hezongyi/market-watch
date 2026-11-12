@@ -372,7 +372,7 @@ def begin_connection(ownership, identities, *, now=None):
         return owner.epoch
 
 
-def publish_event(ownership, epoch, event, identities, *, now=None):
+def publish_event(ownership, epoch, event, identities, *, now=None, completed_handovers=None):
     """Return a bounded outcome only after the fenced transaction commits."""
     stamp = now_ms() if now is None else now
     with transaction() as db:
@@ -402,7 +402,12 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
             raise TimeoutError("Quote generation is obsolete")
         from .display_observations import handover_legacy
 
-        handover_legacy(db, state)
+        if completed_handovers is None or state.dataset_id not in completed_handovers:
+            if handover_legacy(db, state) and completed_handovers is not None:
+                from sqlalchemy import event as sql_event
+                dataset_key = state.dataset_id
+                sql_event.listen(db, 'after_commit',
+                    lambda _: completed_handovers.add(dataset_key), once=True)
         previous = state.quote
         if previous and event.source_time < previous["source_time"]:
             if previous.get("connection_epoch") == epoch and event.sequence > previous.get("sequence", 0):
@@ -448,10 +453,11 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
         inst = db.get(Instrument, dataset.instrument_id)
         from .display_observations import accept
 
-        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile)
+        market_session = session_status(event.identity.model_dump(), inst.calendar_profile, stamp)['market_session']
+        accept(db, state, event, stamp=stamp, profile=inst.calendar_profile, market_session=market_session)
         from .price_alert_inputs import record_quote
 
-        record_quote(db, event, now=stamp, profile=inst.calendar_profile)
+        record_quote(db, event, now=stamp, profile=inst.calendar_profile, market_session=market_session)
         inst.last_received = event.received_at
         inst.quality = "receiving" if state.ready else "recovering"
         return "accepted"
@@ -658,6 +664,18 @@ def confirmation_cutoff(stamp):
     return max(0, (stamp - settings.oanda_confirmation_margin_seconds * 1000) // 60000 * 60000)
 
 
+def confirmation_candidates(identities, *, now=None):
+    """One unlocked due-discovery query; window/commit still fence the owner."""
+    stamp = now_ms() if now is None else now
+    if not identities:
+        return []
+    with transaction() as db:
+        due = set(db.scalars(select(LiveState.dataset_id).where(
+            LiveState.dataset_id.in_([identity.key for identity in identities.values()]),
+            LiveState.next_confirm_at <= stamp)))
+    return [identity for identity in identities.values() if identity.key in due]
+
+
 def confirmation_window(ownership, epoch, identity, *, now=None):
     stamp = now_ms() if now is None else now
     with transaction() as db:
@@ -803,7 +821,8 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
         # canonical minutes or a query checkpoint. Data confirmations stay strict.
         if batch.rows or batch.checkpoint is not None:
             apply_minutes(db, record(db, batch))
-        ingest(db, inst, batch.ingestion_payload())
+        from .generic_derivation import is_paused
+        ingest(db, inst, batch.ingestion_payload(), defer_aggregation=is_paused(db, inst.id))
         # Measure completed ingestion, rather than the entry into the fenced
         # transaction. An explicit test clock remains deterministic.
         db.flush()

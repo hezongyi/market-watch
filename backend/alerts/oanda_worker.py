@@ -16,6 +16,7 @@ from .live_pricing import (
     claim,
     claim_auth_probe,
     commit_confirmation,
+    confirmation_candidates,
     confirmation_window,
     desired_dataset_identities,
     desired_datasets,
@@ -376,7 +377,9 @@ def confirm_pages(adapter, ownership, epoch, identities, cancelled):
         with lane("realtime"):
             return adapter.page(identity, *window)
 
-    values = list(identities.values())
+    values = confirmation_candidates(identities)
+    if not values:
+        return None
     with ThreadPoolExecutor(max_workers=2, thread_name_prefix="oanda-confirm-rest") as pool:
         for offset in range(0, len(values), 2):
             if cancelled():
@@ -494,13 +497,14 @@ def collect(adapter, ownership, identities, stopped):
     thread.start()
     result = RequestResult(status="unavailable")
     stage = "stream"
+    completed_handovers = set()
     try:
         for event in adapter.stream(identities, epoch=epoch,
                 stopped=lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set()):
             if stopped.is_set() or connection_stop.is_set() or lost.is_set():
                 break
             stage = "publish"
-            publish_event(ownership, epoch, event, identities)
+            publish_event(ownership, epoch, event, identities, completed_handovers=completed_handovers)
             with health_lock:
                 error_type = "ownership_lost" if lost.is_set() else confirmation_fault[0]
                 progress(state="degraded" if error_type else "running", error=error_type)

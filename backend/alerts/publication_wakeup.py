@@ -113,7 +113,7 @@ class PublicationWakeup:
         """
         stop = stop if stop is not None else Event()
         if seconds < .05 or self.connection is None:
-            stopped = stop.wait(seconds)
+            stopped = stop.wait(min(seconds, 2) if self.connection is None else seconds)
             return 'stopped' if stopped else 'fallback' if self.connection is None else 'timer'
         deadline = self.monotonic() + seconds
         while not stop.is_set():
@@ -125,6 +125,6 @@ class PublicationWakeup:
                     return 'notification'
             except Exception as error:
                 self._failed(error)
-                stopped = stop.wait(max(0, deadline - self.monotonic()))
+                stopped = stop.wait(min(2, max(0, deadline - self.monotonic())))
                 return 'stopped' if stopped else 'fallback'
         return 'stopped'

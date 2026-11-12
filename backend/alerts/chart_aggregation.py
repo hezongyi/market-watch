@@ -13,11 +13,12 @@ PERIODS = ('M5', 'M15', 'H1', 'H4', 'D1')
 MAX_RANGE = 1440 * 60000
 
 
-def _coalesce_observed(db, instrument, frame, left, right):
+def _coalesce_observed(db, instrument, frame, left, right, *, kind='observed', all_kinds=False):
     """The caller owns Instrument; retain bounded ranges and durable retry age."""
     model = ChartAggregationJob
     rows = list(db.scalars(select(model).where(
-        model.instrument_id == instrument, model.timeframe == frame, model.kind == 'observed',
+        model.instrument_id == instrument, model.timeframe == frame,
+        True if all_kinds else model.kind == 'observed',
         model.start <= right, model.end >= left).order_by(model.created_at, model.id).limit(128)))
     merged = []
     for row in rows:
@@ -30,6 +31,10 @@ def _coalesce_observed(db, instrument, frame, left, right):
     target = db.scalar(select(model).where(model.instrument_id == instrument,
         model.timeframe == frame, model.start == left, model.end == right))
     target = target or merged[0]
+    if target not in merged:
+        merged.append(target)
+    strongest = max([kind, *(row.kind for row in merged)],
+                    key=lambda value: {'observed': 0, 'volume': 1, 'price': 2}[value])
     created_at = min(row.created_at for row in merged)
     retry = max(merged, key=lambda row: (row.attempts, row.next_at))
     attempts, error = retry.attempts, retry.error
@@ -40,6 +45,7 @@ def _coalesce_observed(db, instrument, frame, left, right):
     # Release conflicting old unique keys before moving the retained range.
     db.flush()
     target.start, target.end = left, right
+    target.kind = strongest
     target.created_at = min(target.created_at, created_at)
     target.attempts = max(target.attempts, attempts)
     target.next_at = max(target.next_at, next_at)
@@ -51,10 +57,13 @@ def _coalesce_observed(db, instrument, frame, left, right):
 
 def enqueue_aggregation(db, instrument, start, end, now, *, kind="price"):
     """Caller owns the instrument lock and commits this alongside M1 coverage."""
+    from .generic_derivation import is_paused
+    paused = is_paused(db, instrument)
     for left in range(start, end, MAX_RANGE):
         right = min(end, left + MAX_RANGE)
         for frame in PERIODS:
-            if kind == 'observed' and _coalesce_observed(db, instrument, frame, left, right):
+            if (paused or kind == 'observed') and _coalesce_observed(
+                    db, instrument, frame, left, right, kind=kind, all_kinds=paused):
                 continue
             exists = db.scalar(select(ChartAggregationJob).where(
                 ChartAggregationJob.instrument_id == instrument,
@@ -106,6 +115,7 @@ def _wake_unblocked_publications(db, inst, frame, left, right):
 
 
 def aggregate_once():
+    from .generic_derivation import paused_query
     from .market import aggregate_touched
     from .publication_budget import current
     from .storage import instant, now_ms, transaction
@@ -131,7 +141,7 @@ def aggregate_once():
         selected = db.execute(select(model, Instrument).join(Instrument,
             Instrument.id == model.instrument_id).outerjoin(state,
                 (state.instrument_id == model.instrument_id) & (state.timeframe == model.timeframe)
-            ).where(model.next_at <= now).order_by(
+            ).where(model.next_at <= now, model.instrument_id.not_in(paused_query(now))).order_by(
                 func.coalesce(state.last_service_seq, 0), priority,
                 case((aged, model.created_at), else_=-model.end), model.created_at, model.id)
             .limit(1).with_for_update(of=Instrument, skip_locked=True)).first()

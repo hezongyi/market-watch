@@ -1,6 +1,7 @@
 """Independent replayable projection worker; health does not depend on its projection."""
 import argparse
 import logging
+import time
 from threading import Event
 
 from .config import settings
@@ -9,18 +10,34 @@ from .storage import Preference, now_ms, transaction
 
 log = logging.getLogger(__name__)
 BUSY_POLL_SECONDS = .02
-IDLE_POLL_SECONDS = 2
+IDLE_POLL_SECONDS = 30
+ERROR_POLL_SECONDS = 2
+MAINTENANCE_SECONDS = 60
 
 
-def once():
+def once(*, maintenance=True):
     if not settings.notification_center_projection_enabled:
         return 0
     with transaction() as db:
         count = project(db)
-        if count < 100:
+        if maintenance and count < 100:
             count += backfill(db, limit=100-count)
-        if count == 0:
+        if maintenance and count == 0:
             count += reconcile_channels(db)
+        return count
+
+
+class ProjectionSchedule:
+    """Compatibility scans run at startup/minutely; full pages drain promptly."""
+
+    def __init__(self):
+        self.next_maintenance = 0
+
+    def once(self):
+        due = time.monotonic() >= self.next_maintenance
+        count = once(maintenance=due)
+        if due and count < 100:
+            self.next_maintenance = time.monotonic() + MAINTENANCE_SECONDS
         return count
 
 
@@ -38,11 +55,12 @@ def run_projection(stop):
 
 def _run_projection(stop, wake):
     last_report = 0
+    schedule = ProjectionSchedule()
     while not stop.is_set():
         wake.prepare()
         count, error = 0, None
         try:
-            count = once()
+            count = schedule.once()
             if now_ms() - last_report > 30_000:
                 report('ok' if settings.notification_center_projection_enabled else 'paused', count)
                 last_report = now_ms()
@@ -58,7 +76,7 @@ def _run_projection(stop, wake):
         progress(error=error)
         delay = BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS
         if error:
-            stop.wait(IDLE_POLL_SECONDS)
+            stop.wait(ERROR_POLL_SECONDS)
         else:
             wake.wait(delay, stop)
 
@@ -109,11 +127,12 @@ def main():
 def _run_cli(args, wake):
     stop = Event()
     last_report, last_retention = 0, 0
+    schedule = ProjectionSchedule()
     while True:
         wake.prepare()
         error = None
         try:
-            count = once()
+            count = schedule.once()
             if now_ms() - last_report > 30_000:
                 report('ok' if settings.notification_center_projection_enabled else 'paused', count)
                 last_report = now_ms()
@@ -134,7 +153,7 @@ def _run_cli(args, wake):
         if args.once:
             return
         if error:
-            stop.wait(IDLE_POLL_SECONDS)
+            stop.wait(ERROR_POLL_SECONDS)
         else:
             wake.wait(BUSY_POLL_SECONDS if count else IDLE_POLL_SECONDS, stop)
 

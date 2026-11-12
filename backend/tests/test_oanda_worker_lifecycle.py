@@ -30,6 +30,7 @@ def test_confirmations_overlap_transport_but_commit_serially_with_owner_fencing(
     active, peak, completed = 0, 0, []
     caller = threading.get_ident()
     stopped = threading.Event()
+    monkeypatch.setattr(worker, "confirmation_candidates", lambda items: list(items.values()))
     monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
     monkeypatch.setattr(worker, "session_states", lambda items: {key: {"market_session": "open"} for key in items})
 
@@ -58,6 +59,7 @@ def test_confirmation_auth_fault_stops_later_batches_and_keeps_exact_result(monk
     identities = {str(i): SimpleNamespace(key=str(i), provider_symbol=str(i)) for i in range(10)}
     calls, committed = [], []
     denied = RequestResult(status="unauthorized")
+    monkeypatch.setattr(worker, "confirmation_candidates", lambda items: list(items.values()))
     monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
     monkeypatch.setattr(worker, "session_states", lambda items: {key: {"market_session": "open"} for key in items})
 
@@ -75,6 +77,7 @@ def test_cancelled_connection_never_commits_completed_peer_requests(monkeypatch)
     stopped = threading.Event()
     calls, committed = [], []
     identities = {str(i): SimpleNamespace(key=str(i), provider_symbol=str(i)) for i in range(10)}
+    monkeypatch.setattr(worker, "confirmation_candidates", lambda items: list(items.values()))
     monkeypatch.setattr(worker, "confirmation_window", lambda *_: (0, 60000))
     monkeypatch.setattr(worker, "session_states", lambda items: {key: {"market_session": "open"} for key in items})
 

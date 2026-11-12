@@ -81,7 +81,7 @@ def _run(fetch_page, stop, wake):
             if worked:
                 stop.wait(0.2)
             else:
-                wake.wait(1 if pending_work() else 5, stop)
+                wake.wait(1 if pending_work() else 30, stop)
         except Exception as exc:
             pulse.finish(errors=[type(exc).__name__])
             from .runtime_health import progress

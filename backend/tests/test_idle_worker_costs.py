@@ -41,10 +41,10 @@ def test_projection_idle_scan_backs_off_but_backlog_drains_fast(monkeypatch):
     monkeypatch.setattr(runtime_health, 'progress', lambda **kw: None)
     monkeypatch.setattr(notification_center_worker, 'report', lambda *a, **kw: None)
     counts = iter([0, 0, 100, 0])
-    monkeypatch.setattr(notification_center_worker, 'once', lambda: next(counts))
+    monkeypatch.setattr(notification_center_worker, 'once', lambda **kw: next(counts))
     stop = Stop(4)
     notification_center_worker.run_projection(stop)
-    assert stop.delays == [2, 2, .02, 2]
+    assert stop.delays == [30, 30, .02, 30]
 
 
 def test_completed_day_observation_groups_by_bucket_not_by_every_minute(database, monkeypatch):

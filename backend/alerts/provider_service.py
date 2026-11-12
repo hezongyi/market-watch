@@ -596,7 +596,7 @@ def run_live(stop, source):
             if error or active:
                 stop.wait(1)
             else:
-                wake.wait(5, stop)
+                wake.wait(30, stop)
 
 
 def run_warm(stop, source):
@@ -618,7 +618,7 @@ def run_warm(stop, source):
             if error or progressed or activity.get('active'):
                 stop.wait(.05 if progressed and not error else 1)
             else:
-                wake.wait(5, stop)
+                wake.wait(30, stop)
 
 
 def run_janitor(stop):

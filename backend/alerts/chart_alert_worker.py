@@ -172,6 +172,10 @@ def stored_rows(db, version, config, now, *, fixed_origin=None, read_from=None, 
             or instrument.calendar != version.market_identity["calendar"]
             or instrument.calendar_profile != version.market_identity["calendar_profile"]):
         raise ValueError("持久行情身份已改变，需显式编辑告警")
+    from .generic_derivation import is_candidate, pending
+    if is_candidate(db, config.instrument) and pending(
+            db, config.instrument, config.timeframe, published=config.published):
+        raise ValueError("独立行情正在补齐，请稍后重试")
     if config.published:
         from .managed_dataset import read_rows
         origin = config.calculation_origin

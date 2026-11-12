@@ -20,9 +20,9 @@ def collecting(monkeypatch):
     monkeypatch.setattr(worker, "begin_connection", lambda *_: 7)
     monkeypatch.setattr(worker, "renew", lambda _: True)
     monkeypatch.setattr(worker, "desired_datasets", lambda _: identities)
-    monkeypatch.setattr(worker, "confirm_pages", lambda *_: None)
-    monkeypatch.setattr(worker, "confirmation_error", lambda *_: None)
-    monkeypatch.setattr(worker, "publish_event", lambda *_: None)
+    monkeypatch.setattr(worker, "confirm_pages", lambda *_, **kw: None)
+    monkeypatch.setattr(worker, "confirmation_error", lambda *_, **kw: None)
+    monkeypatch.setattr(worker, "publish_event", lambda *_, **kw: None)
     monkeypatch.setattr(worker, "disconnected", lambda *args, **kwargs: disconnected.append((args, kwargs)))
     return identities, disconnected
 
@@ -53,7 +53,7 @@ def test_collect_logs_error_stage_type_and_safe_sqlstate(
             yield {"type": "heartbeat"}
 
     if stage == "publish":
-        def fail_publish(*_):
+        def fail_publish(*_, **kw):
             raise error
         monkeypatch.setattr(worker, "publish_event", fail_publish)
     worker.collect(Adapter(), ("synthetic-account", "owner"), identities, threading.Event())
@@ -108,7 +108,7 @@ def test_ownership_loss_is_visible_without_publishing_after_renew_failure(collec
             yield {"type": "heartbeat"}
 
     monkeypatch.setattr(worker, "renew", cannot_renew)
-    monkeypatch.setattr(worker, "publish_event", lambda *_: published.append(True))
+    monkeypatch.setattr(worker, "publish_event", lambda *_, **kw: published.append(True))
     worker.collect(Adapter(), ("synthetic-account", "owner"), identities, threading.Event())
     assert not published and not disconnected
     assert "pricing_ownership_lost reason=lease_not_renewed" in caplog.text

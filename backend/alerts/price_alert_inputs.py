@@ -45,6 +45,21 @@ def consumers(db, dataset_id, *, now):
     return [(alert, version) for alert, version in rows if is_price_rule(version.config)]
 
 
+def has_consumers(db, dataset_id, *, now):
+    """The collector needs a boolean, not alert/runtime/version ORM graphs.
+
+    Keep the authoritative per-quote read under the existing dataset lock;
+    first-rule registration and expiry retain the exact consumers() predicate.
+    """
+    configs = db.scalars(select(ChartAlertVersion.config).join(ChartAlert,
+        (ChartAlertVersion.alert_id == ChartAlert.id) & (ChartAlertVersion.version == ChartAlert.version)
+    ).where(ChartAlert.status == "active",
+        or_(ChartAlert.expires_at.is_(None), ChartAlert.expires_at > now),
+        ChartAlertVersion.market_identity["target_dataset_id"].as_string() == dataset_id,
+        ChartAlertVersion.config["mode"].as_string() == "intrabar"))
+    return any(is_price_rule(config) for config in configs)
+
+
 def retention_lock(db):
     # One short database mutex protects the global bound. No dataset/LiveState
     # lock may be acquired after this. Cleanup touches only existing log rows.
@@ -74,7 +89,7 @@ def _write(db, stream, *, kind, price, occurred_at, received_at, mode, epoch, ev
 
 
 def interrupt(db, dataset_id, *, now, epoch, reason, mode=None, evidence=None):
-    if not consumers(db, dataset_id, now=now):
+    if not has_consumers(db, dataset_id, now=now):
         return None
     stream = register(db, dataset_id, now=now)
     if stream.interrupted:
@@ -88,7 +103,7 @@ def interrupt(db, dataset_id, *, now, epoch, reason, mode=None, evidence=None):
 
 
 def append(db, dataset_id, *, price, occurred_at, received_at, mode, epoch, event_key, evidence):
-    if not consumers(db, dataset_id, now=received_at):
+    if not has_consumers(db, dataset_id, now=received_at):
         return None
     stream = register(db, dataset_id, now=received_at)
     if stream.last_event_key == event_key:
@@ -118,7 +133,7 @@ def append(db, dataset_id, *, price, occurred_at, received_at, mode, epoch, even
     return row
 
 
-def record_quote(db, event, *, now, profile):
+def record_quote(db, event, *, now, profile, market_session=None):
     from .live_session import session_status
 
     try:
@@ -126,7 +141,7 @@ def record_quote(db, event, *, now, profile):
         valid = bid.is_finite() and ask.is_finite() and 0 < bid <= ask
     except (InvalidOperation, TypeError, ValueError):
         valid = False
-    closed = session_status(event.identity.model_dump(), profile, now)["market_session"] == "closed"
+    closed = (market_session or session_status(event.identity.model_dump(), profile, now)["market_session"]) == "closed"
     if closed:
         return None
     if (not valid or not event.tradeable or not 0 <= event.received_at - event.source_time <= 15000
