@@ -1,7 +1,7 @@
-"""Bounded observations for mobile sparklines; no registration or demand writes.
+"""Bounded mobile sparkline observations and explicit provider history preparation.
 
-Use the same immutable history and composite readers as charts, but never their
-planning, snapshot-lease or provider-cache access-bookkeeping entry points.
+Batch observations never write demand or bookkeeping. Only prepare() invokes the
+shared provider cache writer, without registering an instrument or starting jobs.
 """
 
 import logging
@@ -204,3 +204,50 @@ def batch(items):
             output.append({**result(item.ticker, left, right, None, [], None, stamp),
                 "status": "unavailable", "reason": "本机缓存读取失败，请稍后重试"})
     return {"as_of": stamp, "items": output}
+
+
+def prepare(item):
+    """Explicit visible-watch demand; reuse bounded provider history/cache readers.
+
+    The observation endpoint remains read-only. This separate operation prepares
+    the current day of intraday bars, without creating jobs or a second live poller.
+    Count-based readers can cross the day boundary around market closures; only
+    current-window observations are returned.
+    """
+    import time
+
+    from . import provider_cache
+    from .provider_capabilities import request_seconds
+    from .provider_chart import metadata
+
+    preparation = "ready"
+    try:
+        symbol, kind = decode(item.ticker)
+        if kind != "provider" or item.composite_revision_id is not None:
+            preparation = "unsupported"
+        else:
+            meta = metadata(symbol, cached_only=True)
+            frame = next((frame for frame in FRAMES if frame in meta.get("frames", FRAMES)), None)
+            if frame is None:
+                preparation = "unsupported"
+            else:
+                stamp = storage.now_ms()
+                with storage.Session() as db:
+                    entry = db.get(MarketCatalog, symbol)
+                    asset = meta.get("asset_type") or (entry.asset_type if entry else None)
+                    if entry is None and meta["source"] == "oanda":
+                        from .history_catalog import oanda_entry
+                        entry = oanda_entry(db, meta["symbol"])
+                        asset = asset or (entry.asset_type if entry else None)
+                left, _ = window(stamp, asset)
+                step = FRAMES[frame]
+                before = stamp // step * step
+                count = min(MAX_POINTS, max(0, (before - left + step - 1) // step))
+                if count:
+                    provider_cache.read(meta, frame, before, count, latest=False,
+                        deadline=time.monotonic() + max(20, request_seconds(meta["source"])))
+    except Exception as error:
+        # Keep existing observations on a supplier timeout; retry on the next refresh.
+        log.warning("sparkline_history_prepare_failed type=%s", type(error).__name__)
+        preparation = "retry"
+    return {**batch([item]), "preparation": preparation}

@@ -7,7 +7,7 @@ const { chromium, expect } = require("@playwright/test");
 const dist = path.resolve("dist"),
   output = process.env.MOBILE_VISUAL_OUTPUT || "/tmp/mw-mobile-watch-a07";
 fs.mkdirSync(output, { recursive: true });
-const codes = ["XAUUSD", "EURUSD", "BTCUSDT", "XAGUSD", "QQQ", "600519"];
+const codes = ["XAUUSD", "EURUSD", "BTCUSDT-PERP", "USDJPY", "QQQ", "600519"];
 const symbols = codes.map((code, i) =>
   i < 2 ? "MWC:" + String(i + 1).repeat(64) : "MWP:" + code,
 );
@@ -15,12 +15,13 @@ const names = [
   "现货黄金",
   "欧元 / 美元",
   "比特币",
-  "现货白银",
+  "美元 / 日元",
   "纳指 100 ETF",
   "贵州茅台",
 ];
 const sources = ["OANDA", "OANDA", "Binance", "FXCM", "Yahoo", "AKShare"];
-const prices = [2684.52, 1.08426, 76428.3, 31.245, 512.84, 1538.5];
+const prices = [2684.52, 1.08420, 76428.30, 147.250, 512.84, 9876543.21];
+let preferenceReads = 0, slowPreferences = 0;
 let holdPreferences = false,
   emptyWatch = false;
 const rows = ["monitoring", "blocked", "paused"].map((state, i) => ({
@@ -76,7 +77,9 @@ const server = http.createServer(async (req, res) => {
       chart_alerts: { loop: { state: "idle" } },
     });
   if (url.pathname === "/api/advanced-charts/preferences") {
+    preferenceReads++;
     if (holdPreferences) return;
+    if (slowPreferences) await new Promise(resolve => setTimeout(resolve, slowPreferences));
     return json([
       {
         kind: "setting",
@@ -117,7 +120,7 @@ const server = http.createServer(async (req, res) => {
             description: names[i],
             exchange: sources[i],
             lp: prices[i],
-            display_precision: i === 1 ? 5 : 2,
+            display_precision: i === 1 ? 5 : i === 3 ? 3 : 2,
             delay_seconds: i === 4 ? 900 : undefined,
             prev_close_price: i === 5 ? undefined : 100,
             read_at: Date.now(),
@@ -146,6 +149,7 @@ const server = http.createServer(async (req, res) => {
       })),
     });
   }
+  if (url.pathname === "/api/market-data/sparklines/prepare") return json({as_of:Date.now(),items:[],preparation:"ready"});
   if (url.pathname === "/api/market-data/resolve")
     return json({ id: body.instrument, source: "oanda", frames: ["M1", "H1"] });
   if (url.pathname === "/api/market-data/series/page")
@@ -251,7 +255,7 @@ const server = http.createServer(async (req, res) => {
     await expect(page.locator(".mobile-watch-row")).toHaveCount(6);
     await expect(page.locator(".mobile-watch-row.stale")).toHaveCount(0);
     await expect(page.locator('.mobile-watch-origin')).toHaveText(['Binance', 'FXCM', 'Yahoo', 'AKShare']);
-    await expect(page.locator('.mobile-watch-symbol .mobile-watch-name')).toHaveCount(0);
+    await expect(page.locator('.mobile-watch-description')).toHaveText(['黄金','欧元美元','比特币','美元日元','纳指 100 ETF','贵州茅台']);
     for (const theme of ["dark", "light"])
       for (const [width, height, font] of [
         [412, 852, 14],
@@ -311,19 +315,30 @@ const server = http.createServer(async (req, res) => {
           }
           assert(Math.abs(parseFloat(actual.price.fontSize) - font * 15/14) < 0.01);
           await expect(page.locator('.mobile-watch-price strong').first()).toHaveText('+0.69%');
-          await expect(page.locator('.mobile-watch-last-price').nth(1)).toHaveText('1.08426');
+          await expect(page.locator('.mobile-watch-last-price').nth(1)).toHaveText('1.08420');
           await expect(page.locator('.mobile-spark-previous-close')).toHaveCount(5);
           assert(await page.locator('.mobile-spark-previous-close').first().evaluate(el => el.getAttribute('y1') === '24'));
           if (font === 14) {
             assert.equal(actual.row.height, 72);
             assert.equal(actual.header.height, 64);
+            const fixedColumns = await page.locator('.mobile-watch-row').evaluateAll(rows => rows.map(row => {
+              const bounds = selector => row.querySelector(selector).getBoundingClientRect();
+              const symbol=bounds('.mobile-watch-symbol'), chart=bounds('.mobile-spark'), price=bounds('.mobile-watch-price');
+              const fitted = [...row.querySelectorAll('.mobile-fit-content')].every(el => el.getBoundingClientRect().width <= el.parentElement.getBoundingClientRect().width + 0.5);
+              return {left:symbol.width,right:price.width,chart:chart.width,fitted};
+            }));
+            assert(fixedColumns.every(row => Math.abs(row.left-86.8)<0.1 && Math.abs(row.right-72.8)<0.1 && row.fitted), 'fixed columns fit long code and quote without stealing chart width: '+JSON.stringify(fixedColumns));
+            assert(Math.max(...fixedColumns.map(row=>row.chart))-Math.min(...fixedColumns.map(row=>row.chart))<0.1);
+            await expect(page.locator('.mobile-watch-last-price').nth(3)).toHaveText('147.250');
+            await expect(page.locator('.mobile-watch-last-price sup').first()).toHaveText('0');
+
             const alignment = await page.locator('.mobile-watch-row').first().evaluate(row => {
               const symbol = row.querySelector('.mobile-watch-symbol').getBoundingClientRect();
               const spark = row.querySelector('.mobile-spark').getBoundingClientRect();
               const price = row.querySelector('.mobile-watch-price').getBoundingClientRect();
               return {symbolHeight:symbol.height,sparkHeight:spark.height,centers:[symbol.y+symbol.height/2,spark.y+spark.height/2,price.y+price.height/2]};
             });
-            assert(Math.abs(alignment.symbolHeight-alignment.sparkHeight)<2,'two-line identity matches spark viewport height');
+            assert(alignment.symbolHeight <= 52, 'compact identity stays inside the 72px row');
             assert(Math.max(...alignment.centers)-Math.min(...alignment.centers)<1,'all three columns vertically centered');
           }
           assert(Math.abs(actual.nav.y + actual.nav.height - height) < 1);
@@ -348,6 +363,7 @@ const server = http.createServer(async (req, res) => {
       ["选择自选分组", "groups"],
       ["管理自选", "manage"],
     ]) {
+      if (button !== "选择自选分组") await page.getByRole("button", {name:"自选操作",exact:true}).click();
       await page.getByRole("button", { name: button, exact: true }).click();
       await page.screenshot({ path: path.join(output, name + ".png") });
       await page
@@ -369,13 +385,17 @@ const server = http.createServer(async (req, res) => {
         await page.screenshot({path: path.join(output, `${name}-${theme}-${font}.png`)});
       };
       const close = () => page.getByRole("dialog").last().getByRole("button", {name:"关闭",exact:true}).click();
+      await page.getByRole("button", {name:"自选操作",exact:true}).click();
       await page.getByRole("button", {name:"搜索并添加品种",exact:true}).click();
       await expect(page.locator(".mobile-search-row").first()).toBeVisible();
       await capture("search"); await close();
+      await page.getByRole("button", {name:"自选操作",exact:true}).click();
+      await capture("watch-actions"); await close();
       await page.getByRole("button", {name:"选择自选分组",exact:true}).click();
       await capture("groups");
       await page.getByRole("button", {name:"新建分组",exact:true}).click();
       await capture("new-group"); await close(); await close();
+      await page.getByRole("button", {name:"自选操作",exact:true}).click();
       await page.getByRole("button", {name:"管理自选",exact:true}).click();
       await page.locator(".mobile-form-detail > summary").click();
       await capture("manage-expanded");
@@ -389,6 +409,30 @@ const server = http.createServer(async (req, res) => {
     }
     await page.setViewportSize({width:412,height:852});
     await page.evaluate(() => { document.documentElement.style.fontSize="14px"; });
+    const touch = await context.newCDPSession(page);
+    const swipe = async (startY, endY, end = true) => {
+      await touch.send('Input.dispatchTouchEvent', {type:'touchStart',touchPoints:[{x:180,y:startY}]});
+      for(let y=startY+12;y<=endY;y+=12) await touch.send('Input.dispatchTouchEvent', {type:'touchMove',touchPoints:[{x:180,y}]});
+      if(end) await touch.send('Input.dispatchTouchEvent', {type:'touchEnd',touchPoints:[]});
+    };
+    const beforePull = preferenceReads;
+    await swipe(160,196);
+    assert.equal(preferenceReads,beforePull,'short pull never refreshes');
+    slowPreferences=500;
+    await swipe(160,304,false);
+    await expect(page.locator('.mobile-pull-refresh')).toHaveText('松开刷新');
+    await page.screenshot({path:path.join(output,'pull-release.png')});
+    await touch.send('Input.dispatchTouchEvent', {type:'touchEnd',touchPoints:[]});
+    await expect(page.locator('.mobile-pull-refresh')).toHaveText('正在刷新…');
+    await page.screenshot({path:path.join(output,'pull-loading.png')});
+    await expect(page.locator('.mobile-pull-refresh')).toBeEmpty({timeout:15000});
+    assert(preferenceReads>beforePull,'pull refresh re-reads the watchlist');
+    slowPreferences=0;
+    await touch.send('Input.dispatchTouchEvent',{type:'touchStart',touchPoints:[{x:160,y:280},{x:240,y:280}]});
+    await touch.send('Input.dispatchTouchEvent',{type:'touchMove',touchPoints:[{x:80,y:280},{x:320,y:280}]});
+    await touch.send('Input.dispatchTouchEvent',{type:'touchEnd',touchPoints:[]});
+    assert.equal(await page.evaluate(()=>visualViewport.scale),1,'watch pinch does not scale the page');
+    await touch.detach();
     await page.route("**/api/session", (route) => route.abort());
     await page.evaluate(() => dispatchEvent(new Event("online")));
     await expect(page.locator(".mobile-watch-status")).toContainText(
@@ -474,7 +518,7 @@ const server = http.createServer(async (req, res) => {
     console.log(
       JSON.stringify({
         checks:
-          "A07 geometry/style comparison, 8 layouts, 3 sheet entries + 24 narrow/large-font control captures, delayed quote, offline cache, empty, loading",
+          "A07 geometry/style comparison, 8 layouts, 3 sheet entries + 28 narrow/large-font control captures, delayed quote, offline cache, empty, loading",
         errors,
         output,
       }),

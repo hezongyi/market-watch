@@ -23,6 +23,12 @@ export function sparklineLoader(
   request: Request,
   receive: (items: Sparkline[]) => void,
   failure: (error: unknown) => void,
+  history?: {
+    prepared: Map<string, number>;
+    request: (ticker: string, signal: AbortSignal) => Promise<{
+      as_of: number; items: Sparkline[]; preparation: "ready" | "retry" | "unsupported";
+    }>;
+  },
 ) {
   let epoch = 0;
   const controllers = new Set<AbortController>();
@@ -42,6 +48,7 @@ export function sparklineLoader(
       const queue: (typeof distinct)[] = [];
       for (let i = 0; i < distinct.length; i += 20)
         queue.push(distinct.slice(i, i + 20));
+      const pendingHistory: Sparkline[] = [];
       await Promise.all(
         [0, 1].map(async () => {
           while (generation === epoch && queue.length) {
@@ -52,11 +59,15 @@ export function sparklineLoader(
               const response = await request(batch, controller.signal);
               if (generation !== epoch || controller.signal.aborted) continue;
               // A cached HTTP reply can cross midnight; old windows cannot redraw.
-              receive(
-                response.items.filter(
-                  (item) => item.window_end > response.as_of,
-                ),
-              );
+              const current = response.items.filter(item => item.window_end > response.as_of);
+              receive(current);
+              if (history) {
+                for (const [key, end] of history.prepared)
+                  if (end <= response.as_of) history.prepared.delete(key);
+                pendingHistory.push(...current.filter(item => item.ticker.startsWith("MWP:") &&
+                  (item.status === "partial" || item.status === "empty") &&
+                  !history.prepared.has(item.ticker + ":" + item.window_start)));
+              }
             } catch (error) {
               if (generation === epoch && !controller.signal.aborted)
                 failure(error);
@@ -66,6 +77,25 @@ export function sparklineLoader(
           }
         }),
       );
+      // Publish cached rows first; only two visible-symbol history requests run at once.
+      await Promise.all([0, 1].map(async () => {
+        while (history && generation === epoch && pendingHistory.length) {
+          const item = pendingHistory.shift()!;
+          const controller = new AbortController();
+          controllers.add(controller);
+          try {
+            const response = await history.request(item.ticker, controller.signal);
+            if (generation !== epoch || controller.signal.aborted) continue;
+            receive(response.items.filter(row => row.window_end > response.as_of));
+            if (response.preparation !== "retry")
+              history.prepared.set(item.ticker + ":" + item.window_start, item.window_end);
+          } catch (error) {
+            if (generation === epoch && !controller.signal.aborted) failure(error);
+          } finally {
+            controllers.delete(controller);
+          }
+        }
+      }));
     },
   };
 }

@@ -78,7 +78,7 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();
   await page.getByRole('button',{name:'第一组',exact:true}).click();
   await expect(page.locator('.mobile-watch-row')).toHaveCount(1);assert.equal(writes.length,0,'phone group selection never writes desktop active');
-  await page.getByRole('button',{name:'管理自选',exact:true}).click();
+  await page.getByRole('button',{name:'自选操作',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
   await page.locator('.mobile-form-detail > summary').click();
   await page.getByLabel('分组名称',{exact:true}).first().fill('手机修改组名');
   remote.content.value.active='b';remote.revision++;
@@ -96,7 +96,7 @@ const server=http.createServer(async(req,res)=>{
   await expect(page.getByRole('dialog',{name:'放弃本次修改？',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'放弃修改',exact:true}).click();
   conflict=false;
-  await page.getByRole('button',{name:'搜索并添加品种',exact:true}).click();
+  await page.getByRole('button',{name:'自选操作',exact:true}).click();await page.getByRole('button',{name:'搜索并添加品种',exact:true}).click();
   await expect(page.getByRole('dialog',{name:'搜索品种',exact:true}).getByLabel('搜索代码或中文')).toBeVisible();
   await page.getByRole('dialog',{name:'搜索品种',exact:true}).getByLabel('搜索代码或中文').fill('old');await page.waitForTimeout(300);
   await page.getByRole('dialog',{name:'搜索品种',exact:true}).getByLabel('搜索代码或中文').fill('new');
@@ -112,7 +112,7 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('button',{name:'关闭通知',exact:true}).click();
   await page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
   await page.getByRole('dialog',{name:'搜索品种',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
-  await page.getByRole('button',{name:'管理自选',exact:true}).click();
+  await page.getByRole('button',{name:'自选操作',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
   await page.getByRole('button',{name:'下移TEST',exact:true}).click();
   await expect.poll(()=>remote.content.value.lists[0].symbols.join(',')).toBe([third,first].join(','));
   await page.getByRole('button',{name:'完成',exact:true}).click();

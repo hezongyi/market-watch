@@ -81,5 +81,37 @@ const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
   assert.equal(formatted.formatWatchPrice(690.380000,2),'690.38');
   assert.equal(formatted.formatWatchPrice(0.00000001,8),'0.00000001');
   assert.equal(formatted.formatWatchPrice(NaN,2),'—');
+  assert.equal(formatted.formatWatchPrice(1.1,5), '1.10000');
+  assert.equal(formatted.formatWatchPrice(147.25,3), '147.250');
+  assert.equal(formatted.formatWatchPrice(1.1,4,'EURUSD'), '1.10000');
+  assert.equal(formatted.formatWatchPrice(147.25,5,'USDJPY'), '147.250');
+  assert.equal(formatted.watchPriceParts('1.08420').focus, '42');
+  assert.equal(formatted.watchPriceParts('1.08420').tail, '0');
+  // Cache-first observation followed by bounded, cancellable historical preparation.
+  const prepared=new Map(), historyCalls=[], historyReceived=[];
+  const cached=[0,1,2].map(i=>({ticker:'MWP:'+i,window_start:0,window_end:100,status:'partial',points:[{time:90,price:'2'}]}));
+  let historyActive=0, peakHistory=0;
+  const historyLoader=sparklineLoader(async()=>({as_of:95,items:cached}), rows=>historyReceived.push(rows), error=>{throw error}, {
+    prepared, request:(ticker,signal)=>new Promise(resolve=>{
+      historyActive++;peakHistory=Math.max(peakHistory,historyActive);
+      historyCalls.push({ticker,signal,resolve:()=>{historyActive--;resolve({as_of:95,items:[{...cached.find(row=>row.ticker===ticker),points:[{time:0,price:'1'},{time:90,price:'2'}]}],preparation:'ready'})}});
+    })
+  });
+  const loadingHistory=historyLoader.load(cached);
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(historyReceived[0][0].points[0].time,90,'existing curve is published before history finishes');
+  assert.equal(historyCalls.length,2);
+  historyCalls[0].resolve();historyCalls[1].resolve();
+  await new Promise(resolve=>setImmediate(resolve));
+  historyCalls[2].resolve();await loadingHistory;
+  assert.equal(peakHistory,2);assert.equal(prepared.size,3);
+  assert.equal(historyReceived.at(-1)[0].points[0].time,0,'prepared response includes earlier same-day points');
+  await historyLoader.load(cached);assert.equal(historyCalls.length,3,'already prepared day is not requested again');
+  prepared.clear();const cancelled=historyLoader.load(cached);
+  await new Promise(resolve=>setImmediate(resolve));historyLoader.cancel();
+  const delivered=historyReceived.length;
+  assert(historyCalls.slice(3).every(call=>call.signal.aborted));
+  historyCalls.slice(3).forEach(call=>call.resolve());await cancelled;
+  assert.equal(historyReceived.length,delivered,'late preparation cannot overwrite a new visible generation');
   console.log('PASS mobile sparklines: bounded batches/concurrency, deduplication, abort/late replies, window expiry and gaps');
 })().catch(error=>{console.error(error);process.exitCode=1;});

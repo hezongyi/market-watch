@@ -1,9 +1,9 @@
-"""Authenticated, CSRF-protected cache observations for the mobile watchlist."""
+"""Authenticated, CSRF-protected watch observations and explicit history preparation."""
 
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel, ConfigDict, Field
 
-from .sparklines import batch
+from .sparklines import batch, prepare
 
 
 class SparklineItem(BaseModel):
@@ -23,5 +23,9 @@ def router(authenticated):
     @routes.post("/sparklines")
     def sparklines(body: SparklineRequest):
         return batch(body.items)
+
+    @routes.post("/sparklines/prepare")
+    def prepare_sparkline(body: SparklineItem):
+        return prepare(body)
 
     return routes

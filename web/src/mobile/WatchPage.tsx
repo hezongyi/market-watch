@@ -9,6 +9,8 @@ import {
 } from "react";
 import {
   ChevronDown,
+  ChevronRight,
+  RefreshCw,
   Check,
   Plus,
   ArrowUp,
@@ -27,7 +29,10 @@ import {
 } from "./cache";
 import { type MobileMarket, seriesIdentity } from "./market";
 import { sparklineLoader, sparklinePaths, sparklineScale, type Sparkline } from "./sparklines";
-import { formatWatchPrice } from "./quoteFormat";
+import FitText from "./FitText";
+import { watchDescription } from "./watchIdentity";
+import { PULL_THRESHOLD, usePullRefresh } from "./usePullRefresh";
+import { formatWatchPrice, watchPriceParts } from "./quoteFormat";
 import {
   allSymbols,
   removeGroup,
@@ -254,6 +259,14 @@ export default function WatchPage({
     [hydrated, setHydrated] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [searching, setSearching] = useState(false);
+  const [actionsOpen, setActionsOpen] = useState(false);
+  const [refreshSerial, setRefreshSerial] = useState(0), [refreshing, setRefreshing] = useState(false);
+  const pullVersion = useRef(0), pendingPull = useRef(0);
+  const finishPull = (part: number, version: number) => {
+    if (version !== pullVersion.current) return;
+    pendingPull.current &= ~part;
+    if (!pendingPull.current) setRefreshing(false);
+  };
   const [groupForm, setGroupForm] = useState<"new" | "rename">();
   const [nameError, setNameError] = useState("");
   const [quotes, setQuotes] = useState<Record<string, Quote>>({}),
@@ -282,6 +295,7 @@ export default function WatchPage({
     symbolsKey = JSON.stringify(symbols);
   const currentQuotes = useRef(quotes);
   currentQuotes.current = quotes;
+  const preparedHistory = useMemo(() => new Map<string, number>(), [profile.origin, profile.subject]);
   const currentSparks = useRef(sparks);
   currentSparks.current = sparks;
   const refresh = useCallback(
@@ -306,6 +320,32 @@ export default function WatchPage({
     },
     [profile.origin, profile.subject, report],
   );
+  const requestRefresh = () => {
+    if (!online || refreshing) return;
+    const version = ++pullVersion.current;
+    setRefreshing(true);
+    pendingPull.current = 3;
+    preparedHistory.clear();
+    void refresh().then(() => {
+      if (version !== pullVersion.current) return;
+      setRefreshSerial(version);
+      if (!visibleRows.length) { pendingPull.current = 0; setRefreshing(false); }
+    }).catch(error => { pendingPull.current = 0; setRefreshing(false); report(String(error)); });
+  };
+  const pullDistance = usePullRefresh(list, visible && online && foreground && !sheet && !searching && !actionsOpen, refreshing, requestRefresh);
+  useEffect(() => {
+    if (!visible || !online || !foreground) {
+      ++pullVersion.current; pendingPull.current = 0; setRefreshing(false);
+    }
+  }, [visible, online, foreground]);
+  useEffect(() => {
+    if (!visible) return;
+    const viewport = document.querySelector<HTMLMetaElement>('meta[name="viewport"]');
+    if (!viewport) return;
+    const original = viewport.content;
+    viewport.content = original + ", maximum-scale=1, user-scalable=no";
+    return () => { viewport.content = original; };
+  }, [visible]);
   useEffect(() => {
     let active = true;
     void Promise.all([
@@ -490,6 +530,8 @@ export default function WatchPage({
         .catch((error) => {
           if (!request.signal.aborted && !controller.signal.aborted)
             report(String(error));
+        }).finally(() => {
+          if (!request.signal.aborted && token === snapshotEpoch) finishPull(1, refreshSerial);
         });
     };
     loadSnapshot();
@@ -537,6 +579,7 @@ export default function WatchPage({
     foreground,
     connection,
     rowKey,
+    refreshSerial,
     profile.origin,
     profile.subject,
     report,
@@ -597,7 +640,11 @@ export default function WatchPage({
         void writeSnapshot(profile, "watch-sparklines", next).catch(() => {});
       },
       () => {
-        /* Each failed row shows its own state; periodic refresh retries. */
+        /* Keep existing curves on history failures; periodic refresh retries. */
+      },
+      {
+        prepared: preparedHistory,
+        request: (ticker, signal) => api("/market-data/sparklines/prepare", { ticker }, signal),
       },
     );
     const load = async () => {
@@ -621,6 +668,7 @@ export default function WatchPage({
         })),
       );
       if (active) {
+        finishPull(2, refreshSerial);
         const boundary = Math.min(
           ...visibleRows.map(
             (ticker) => currentSparks.current[ticker]?.window_end || Infinity,
@@ -645,6 +693,8 @@ export default function WatchPage({
     rowKey,
     profile.origin,
     profile.subject,
+    preparedHistory,
+    refreshSerial,
     report,
   ]);
   async function save(lists: WatchList[]) {
@@ -718,20 +768,12 @@ export default function WatchPage({
         </div>
         <div className="mobile-header-actions">
           <button
-            className="mobile-watch-add"
-            aria-label="搜索并添加品种"
-            onClick={() => setSearching(true)}
+            aria-label="自选操作"
+            aria-haspopup="dialog"
+            aria-expanded={actionsOpen}
+            onClick={() => setActionsOpen(true)}
           >
-            <Plus aria-hidden="true" />
-          </button>
-          <button
-            aria-label="管理自选"
-            onClick={() => {
-              setDraft(undefined);
-              setSheet("manage");
-            }}
-          >
-            <WatchIcon name="manage" />
+            <WatchIcon name="/more" />
           </button>
         </div>
       </header>
@@ -759,6 +801,9 @@ export default function WatchPage({
           </button>
         </aside>
       )}
+      <div className="mobile-pull-refresh" style={{height: refreshing ? PULL_THRESHOLD : pullDistance}} aria-live="polite" data-refreshing={refreshing || undefined}>
+        {(refreshing || pullDistance > 8) && <><RefreshCw aria-hidden="true" style={refreshing ? undefined : {transform:`rotate(${pullDistance * 3}deg)`}} /><span>{refreshing ? "正在刷新…" : pullDistance >= PULL_THRESHOLD ? "松开刷新" : "下拉刷新"}</span></>}
+      </div>
       <div
         ref={list}
         className="mobile-watch-list"
@@ -826,18 +871,22 @@ export default function WatchPage({
           const item = sparks[ticker],
             revision = quote?.snapshot?.revision_id;
           const identity = compactIdentity(ticker, quote);
+          const displayCode = code(ticker, quote);
+          const displayPrice = formatWatchPrice(price, value?.display_precision, displayCode);
+          const priceParts = watchPriceParts(displayPrice);
+          const displayChange = typeof change === "number" ? `${change >= 0 ? "+" : ""}${change.toFixed(2)}%` : "—";
           return (
             <button
               key={ticker}
               data-ticker={ticker}
               data-delayed={typeof value?.delay_seconds === "number" && value.delay_seconds > 0 || undefined}
-              data-wide-symbol={code(ticker, quote).length > 8 || undefined}
               title={value?.description}
               className={`mobile-watch-row ${stale ? "stale" : ""} ${typeof change === "number" ? (change >= 0 ? "positive" : "negative") : ""}`}
               onClick={() => open(ticker)}
             >
               <span className="mobile-watch-symbol">
-                <strong>{code(ticker, quote)}</strong>
+                <strong title={displayCode}><FitText text={displayCode} /></strong>
+                {watchDescription(displayCode, identity.name) && <span className="mobile-watch-description" title={identity.name}>{watchDescription(displayCode, identity.name)}</span>}
                 {identity.provider && (
                   <span className="mobile-watch-origin" title={identity.series}>
                     {identity.provider}
@@ -866,12 +915,12 @@ export default function WatchPage({
                         : "down"
                   }
                 >
-                  {typeof change === "number"
-                    ? `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`
-                    : "—"}
+                  <FitText text={displayChange} />
                 </strong>
                 <small className="mobile-watch-last-price" title={typeof price === "number" ? String(price) : undefined}>
-                  {formatWatchPrice(price, value?.display_precision)}
+                  <FitText text={displayPrice}>
+                    {priceParts.prefix}<b className="mobile-price-pips">{priceParts.focus}</b>{priceParts.tail && <sup>{priceParts.tail}</sup>}
+                  </FitText>
                 </small>
                 {typeof value?.delay_seconds === "number" &&
                   value.delay_seconds > 0 && (
@@ -884,6 +933,19 @@ export default function WatchPage({
           );
         })}
       </div>
+      {actionsOpen && <MobileSheet title="自选操作" close={() => setActionsOpen(false)}>
+        <div className="mobile-watch-action-list">
+          <button aria-label="搜索并添加品种" onClick={() => { setActionsOpen(false); setSearching(true); }}>
+            <Plus aria-hidden="true" /><span><strong>添加自选</strong><small>搜索代码或名称</small></span><ChevronRight aria-hidden="true" />
+          </button>
+          <button aria-label="管理自选" onClick={() => { setActionsOpen(false); setDraft(undefined); setSheet("manage"); }}>
+            <WatchIcon name="manage" /><span><strong>管理自选</strong><small>分组、排序与移除</small></span><ChevronRight aria-hidden="true" />
+          </button>
+          <button onClick={() => { setActionsOpen(false); requestRefresh(); }} disabled={!online || refreshing}>
+            <RefreshCw aria-hidden="true" /><span><strong>刷新行情</strong><small>重新读取当前自选与走势</small></span><ChevronRight aria-hidden="true" />
+          </button>
+        </div>
+      </MobileSheet>}
       {searching && (
         <MobileSheet title="搜索品种" close={() => setSearching(false)}>
           <DataPage

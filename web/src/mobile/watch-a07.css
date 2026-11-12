@@ -30,7 +30,7 @@
 .mobile-watch-title {
   min-height: 64px;
   padding: 4px 20px 6px;
-  grid-template-columns: minmax(0, 1fr) auto minmax(96px, 1fr);
+  grid-template-columns: minmax(0, 1fr) auto minmax(44px, 1fr);
   gap: 6px;
 }
 .mobile-watch .mobile-group-button {
@@ -61,7 +61,7 @@
   color: var(--muted);
   flex-shrink: 0;
   border: 1px solid transparent;
-  background: var(--surface);
+  background: transparent;
 }
 .mobile-watch .mobile-header-actions svg {
   width: 22px;
@@ -109,16 +109,12 @@
 .mobile-app .mobile-watch-row {
   position: relative;
   grid-template-columns:
-    var(--mobile-symbol-width, 6.2rem) minmax(36px, 1fr)
-    6rem;
+    6.2rem minmax(36px, 1fr) 5.2rem;
   gap: 8px;
   min-height: 72px;
-  padding: 12px 0;
+  padding: 8px 0;
   border-color: color-mix(in srgb, var(--line) 45%, transparent);
   line-height: 1.45;
-}
-.mobile-watch-row[data-wide-symbol] {
-  --mobile-symbol-width: 8.6rem;
 }
 .mobile-watch-row[data-delayed] { padding-top: 8px; padding-bottom: 8px; }
 .mobile-watch-row[data-delayed] .mobile-watch-price strong { line-height: 1.3; }
@@ -611,8 +607,7 @@
   }
   .mobile-app .mobile-watch-row {
     grid-template-columns:
-      var(--mobile-symbol-width, 6.2rem) minmax(30px, 1fr)
-      5.8rem;
+      6.2rem minmax(30px, 1fr) 5.2rem;
     gap: 6px;
   }
 }
@@ -677,3 +672,30 @@
 
 .mobile-watch .mobile-search-name { display: block; color: var(--muted); font-size: 0.928571rem; line-height: 1.5; margin-top: 3px; overflow-wrap: anywhere; }
 .mobile-watch .mobile-search-info small { margin-top: 4px; }
+
+.mobile-fit-text { display: block; width: 100%; min-width: 0; white-space: nowrap; }
+.mobile-fit-content { display: inline-block; white-space: nowrap; max-width: none; }
+.mobile-watch-symbol strong { display: block; width: 100%; min-width: 0; }
+.mobile-watch-price { min-width: 0; font-variant-numeric: tabular-nums; }
+.mobile-watch .mobile-watch-last-price { line-height: 1.5; }
+.mobile-watch .mobile-price-pips { font-size: 1.16em; font-weight: 600; color: var(--text); }
+.mobile-watch .stale .mobile-price-pips { color: var(--muted); }
+.mobile-watch-last-price sup { font-size: 0.72em; line-height: 0; vertical-align: 0.45em; margin-left: 1px; }
+.mobile-watch-action-list { display: grid; gap: 8px; }
+.mobile-watch .mobile-watch-action-list button { display: flex; align-items: center; gap: 14px; padding: 14px; min-height: 72px; text-align: left; background: var(--surface); }
+.mobile-watch-action-list button > span { flex: 1; }
+.mobile-watch-action-list strong { display: block; font-size: 1.071429rem; font-weight: 600; }
+.mobile-watch-action-list small { display: block; color: var(--muted); font-size: 0.857143rem; margin-top: 4px; }
+.mobile-watch-action-list svg { width: 20px; height: 20px; flex: none; color: var(--muted); }
+
+.mobile-watch { touch-action: pan-y; }
+.mobile-watch .mobile-watch-list { overscroll-behavior-y: contain; touch-action: pan-y; }
+.mobile-watch .mobile-watch-symbol strong { line-height: 1.25; }
+.mobile-watch .mobile-watch-symbol .mobile-watch-origin { margin-top: 1px; line-height: 1.25; }
+.mobile-watch-description { color: var(--muted); font-size: 0.857143rem; line-height: 1.25; margin-top: 1px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile-pull-refresh { display: flex; flex: none; align-items: center; justify-content: center; gap: 8px; overflow: hidden; color: var(--muted); font-size: 0.857143rem; }
+.mobile-pull-refresh svg { width: 16px; height: 16px; flex: none; }
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-pull-refresh[data-refreshing] svg { animation: mobile-refresh-turn 900ms linear infinite; }
+  @keyframes mobile-refresh-turn { to { transform: rotate(360deg); } }
+}
