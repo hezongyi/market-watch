@@ -1,1 +1,1 @@
-export { default } from "./ParticlesLogin";
+export { default } from "./SimpleLogin";

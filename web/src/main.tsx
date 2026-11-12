@@ -44,7 +44,7 @@ function App() {
   const appLocation = useLocation(), navigate = useNavigate();
   const [subject,setSubject]=useState("");
   const [ready, setReady] = useState(false), [logged, setLogged] = useState(false), [connectionError, setConnectionError] = useState("");
-  const [theme, setThemeState] = useState<"dark" | "light">(localStorage.getItem("mw.app-theme") === "light" ? "light" : "dark");
+  const [theme, setThemeState] = useState<"dark" | "light">(() => localStorage.getItem("mw.app-theme") === "dark" ? "dark" : "light");
   const [pending, setPending] = useState(0);
   const guard = useRef<LeaveGuard | null>(null);
   const [leave, setLeave] = useState<{resolve: (allowed: boolean) => void; guard: LeaveGuard} | null>(null);
