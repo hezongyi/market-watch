@@ -1,0 +1,207 @@
+{
+  "base_url": "https://192.168.7.232:18443",
+  "chart": true,
+  "bars": 182,
+  "data_center": true,
+  "health": 200,
+  "runtime": {
+    "market_runtime": [
+      {
+        "role": "pricing",
+        "state": "running",
+        "error": null
+      },
+      {
+        "role": "realtime",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "composite_aggregate",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "alert_indicator",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_alert",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "switch_activation",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "market_ownership",
+        "state": "idle",
+        "error": null
+      }
+    ],
+    "data_runtime": [
+      {
+        "role": "provider_live_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_yahoo",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_yahoo",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_akshare",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_akshare",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_fxcm",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_fxcm",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_janitor",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "catalog_runtime",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_history",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "history_network",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "history_compute",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "native_history",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_aggregation",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "market_stream",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "switch_shadow",
+        "state": "running",
+        "error": null
+      },
+      {
+        "role": "retention",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "data_ownership",
+        "state": "idle",
+        "error": null
+      }
+    ],
+    "notification_runtime": [
+      {
+        "role": "notification_projection",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_retention",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_delivery",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_ownership",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_health",
+        "state": "idle",
+        "error": null
+      }
+    ]
+  },
+  "errors": [],
+  "failedResources": []
+}

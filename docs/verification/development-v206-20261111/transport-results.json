@@ -1,0 +1,32 @@
+{
+  "notification_health": {
+    "at": 1794403654786,
+    "state": "ok",
+    "batch_count": 0,
+    "error_type": null,
+    "pending_sources": 0,
+    "oldest_pending_at": null,
+    "display_enabled": true,
+    "sound_enabled": true
+  },
+  "notification_events": true,
+  "/api/events": {
+    "status": 200,
+    "first_line_type": "event"
+  },
+  "/api/notification-center/stream": {
+    "status": 200,
+    "first_line_type": "comment"
+  },
+  "ntfy": {
+    "healthy": true,
+    "role": "active"
+  },
+  "initialize": {
+    "status": 200
+  },
+  "tools/list": {
+    "status": 200,
+    "tools": 42
+  }
+}

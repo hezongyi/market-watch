@@ -1,0 +1,220 @@
+{
+  "release": "v2.0.6",
+  "commit": "d2a3e0925175376746170e2597c6fa675d2fa43d",
+  "base_url": "https://192.168.7.232:18443",
+  "ready": true,
+  "https_login": true,
+  "coverage_projection": {
+    "enabled": true,
+    "complete": true,
+    "phase": "complete",
+    "maintenance_required": false
+  },
+  "published_complete_bars": 5,
+  "saved_workspaces": 5,
+  "saved_preferences": 36,
+  "chart_alerts": 0,
+  "native_asset_matches_release": true,
+  "native_manifest": {
+    "script": "chart.380038b473f5633e.js",
+    "libraryDirectory": "charting_library_2c027038855aa351"
+  },
+  "runtime": {
+    "market_runtime": [
+      {
+        "role": "pricing",
+        "state": "waiting_input",
+        "error": null
+      },
+      {
+        "role": "realtime",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "composite_aggregate",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "alert_indicator",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_alert",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "switch_activation",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "market_ownership",
+        "state": "idle",
+        "error": null
+      }
+    ],
+    "data_runtime": [
+      {
+        "role": "provider_live_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_yahoo",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_yahoo",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_akshare",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_akshare",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_fxcm",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_fxcm",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_janitor",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "catalog_runtime",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_history",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "history_network",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "history_compute",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "native_history",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_aggregation",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "market_stream",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "switch_shadow",
+        "state": "running",
+        "error": null
+      },
+      {
+        "role": "retention",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "data_ownership",
+        "state": "idle",
+        "error": null
+      }
+    ],
+    "notification_runtime": [
+      {
+        "role": "notification_projection",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_retention",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_delivery",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_ownership",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_health",
+        "state": "idle",
+        "error": null
+      }
+    ]
+  }
+}
