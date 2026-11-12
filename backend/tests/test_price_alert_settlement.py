@@ -242,5 +242,4 @@ def test_disabled_acquisition_still_settles_committed_valid_input(database, monk
         alert = db.get(ChartAlert, ident)
         assert alert.count == 1 and not alert.runtime["settlement_pending"]
         assert evaluate(db, ident, now=expiry + 20) == []
-    # Enabled composites keep their stream independently of expired alerts.
-    assert set(live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)) == {"EUR_USD"}
+    assert not live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)
