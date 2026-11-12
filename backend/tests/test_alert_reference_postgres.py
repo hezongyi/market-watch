@@ -23,6 +23,9 @@ def test_alert_reference_postgres_contracts(provider_pg, monkeypatch, contract):
 
     monkeypatch.setattr(storage.settings, "fx_source", "dukascopy")
     storage.bootstrap(engine)
+    # These compatibility contracts use an explicitly enabled legacy rule.
+    with factory.begin() as db:
+        db.get(storage.Instrument, "EURUSD").enabled = True
     contract(factory, monkeypatch)
     # Discard pooled connections: persisted notice/ack semantics survive reopening.
     engine.dispose()

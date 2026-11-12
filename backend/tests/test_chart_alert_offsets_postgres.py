@@ -7,7 +7,7 @@ import pytest
 import test_chart_alert_offsets as contracts
 from alerts.chart_alert_service import create
 from alerts.chart_alert_worker import evaluate
-from alerts.storage import ChartAlert, Notification, Outbox, SignalRow, bootstrap
+from alerts.storage import ChartAlert, Instrument, Notification, Outbox, SignalRow, bootstrap
 from sqlalchemy import func, select
 from test_provider_postgres import provider_pg as _provider_pg
 
@@ -18,6 +18,10 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
 @pytest.fixture(autouse=True)
 def seeded_instruments(provider_pg):
     bootstrap(provider_pg[1])
+    # Exercise existing legacy alerts without changing bootstrap defaults.
+    with provider_pg[0].begin() as db:
+        for key in ("EURUSD", "XAUUSD", "BTCUSDT"):
+            db.get(Instrument, key).enabled = True
 
 
 @pytest.mark.parametrize("contract", [
