@@ -41,10 +41,16 @@ fs.mkdirSync(out,{recursive:true});
   page.on('pageerror', error => report.errors.push(error.message));
   let csrf;
   const api = async (endpoint,data) => {
-    const result = data === undefined ? await page.request.get(base+'/api'+endpoint)
-      : await page.request.post(base+'/api'+endpoint,{data,headers:{'X-CSRF-Token':csrf || ''},timeout:90000});
-    assert(result.ok(),`${endpoint}: HTTP ${result.status()} ${(await result.text()).slice(0,150)}`);
-    return result.json();
+    // Browser fetch shares both session cookies and task-pinned TLS trust.
+    // Playwright's separate Node request client does not inherit Chromium SPKI.
+    const result = await page.evaluate(async ({endpoint,data,csrf})=>{
+      const response=await fetch('/api'+endpoint,{method:data===undefined?'GET':'POST',
+        headers:{'Content-Type':'application/json','X-CSRF-Token':csrf || ''},
+        body:data===undefined?undefined:JSON.stringify(data),signal:AbortSignal.timeout(90000)});
+      return {ok:response.ok,status:response.status,body:await response.text()};
+    },{endpoint,data,csrf});
+    assert(result.ok,`${endpoint}: HTTP ${result.status} ${result.body.slice(0,150)}`);
+    return JSON.parse(result.body);
   };
   const native = () => page.frames().find(frame=>frame.url().startsWith('blob:'));
   const waitChart = async (ticker,resolution) => {
@@ -58,6 +64,7 @@ fs.mkdirSync(out,{recursive:true});
     },{ticker,resolution},{timeout:120000});
   };
   try {
+    await page.goto(base+'/login');
     await api('/login',{password:credentials.login_password});
     csrf = (await api('/session')).csrf;
     for(const group of cases) for(const symbol of group.symbols) for(const frame of group.frames) {
