@@ -842,7 +842,7 @@ const requestPolicy = (() => {
         query.op==='viewport' || query.op==='historyCache' && !query.background || entry.type==='workspace' ? 'interaction' :
         query.op==='historyCache' && query.background ? 'auxiliary' :
         query.firstDataRequest ? 'first-screen' : 'read');
-    return {management,reserve,quote:query.op==='quotes',
+    return {management,reserve,quote:query.op==='quotes' && !query.args?.snapshot_only,
       nativeHistory:entry.type==='data' && query.series_kind==='provider' && !!query.native_history && !query.native_reserve,
       background:['reserve','release','renewal','quote','auxiliary'].includes(purpose),purpose};
   }
@@ -1287,9 +1287,9 @@ async function searchNativeSymbols(options) {
 // Share outstanding snapshots, not completed quote data. Each consumer keeps
 // its own callback/reset fence and cannot cancel another live consumer.
 const quoteRequests = new Map();
-function readQuoteSnapshot(symbols, isCurrent) {
+function readQuoteSnapshot(symbols, isCurrent, snapshotOnly) {
   const epoch=workspaceEpoch, batch=[...new Set(symbols)].sort();
-  const key=JSON.stringify([epoch,batch]);
+  const key=JSON.stringify([epoch,batch,snapshotOnly]);
   let entry=quoteRequests.get(key);
   if(!entry || !entry.current() || !batch.every(ticker=>
     entry.tokens.get(ticker)===quoteResetTokens.get(ticker))) {
@@ -1298,7 +1298,7 @@ function readQuoteSnapshot(symbols, isCurrent) {
       tokens:new Map(batch.map(ticker=>[ticker,quoteResetTokens.get(ticker)])),
       current:()=>epoch===workspaceEpoch && [...consumers].some(current=>current())};
     const shared=entry;
-    shared.promise=request({op:'quotes',args:{symbols:batch}},'market',shared.current)
+    shared.promise=request({op:'quotes',args:{symbols:batch,snapshot_only:snapshotOnly}},'market',shared.current)
       .finally(()=>{if(quoteRequests.get(key)===shared)quoteRequests.delete(key);});
     quoteRequests.set(key,shared);
   } else entry.consumers.add(isCurrent);
@@ -1314,7 +1314,7 @@ const feed = {
   // Authenticated requests use the application market Interface.
   getServerTime: (cb) => request({op: "serverTime"}, "market")
     .then(cb).catch(error => send({type: "error", error: "服务器时间获取失败：" + String(error)})),
-  getQuotes: (symbols, cb, err, isCurrent = () => true, forceRefresh = false) => {
+  getQuotes: (symbols, cb, err, isCurrent = () => true, forceRefresh = false, snapshotOnly = !marketPollingFallback) => {
     if (!symbols.length) {
       queueMicrotask(() => cb([]));
       return;
@@ -1323,25 +1323,25 @@ const feed = {
     const initialRows = new Map(symbols.map(ticker => [ticker, quoteSnapshotRows.get(ticker)]));
     const resetTokens = new Map(symbols.map(ticker => [ticker, quoteResetTokens.get(ticker)]));
     const currentSymbols = () => symbols.filter(ticker => quoteResetTokens.get(ticker) === resetTokens.get(ticker));
-    // Native details asks for an initial snapshot before it subscribes. An
-    // already subscribed observation must not queue behind a slow mixed-source
-    // refresh on every row click. Subscription refreshes still use the network.
-    const subscribed = new Set([...quoteSubscriptions.values()].flatMap(sub => sub.symbols));
-    if (!forceRefresh && !marketPollingFallback && symbols.every(ticker =>
-      subscribed.has(ticker) && Number.isFinite(initialRows.get(ticker)?.v?.lp))) {
+    // The native library starts subscribeQuotes only after this callback.
+    // Release that handshake with presentation/current observations; waiting
+    // for an external mixed-source snapshot here also blocks the live stream.
+    if (!forceRefresh) {
       setTimeout(() => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
-        const rows = symbols.map(ticker => quoteSnapshotRows.get(ticker));
-        if (currentSymbols().length === symbols.length && rows.every(row => Number.isFinite(row?.v?.lp)))
-          cb(rows.map(presentQuote));
-        else feed.getQuotes(symbols, cb, err, isCurrent, true);
+        const active = currentSymbols();
+        if (!active.length) return;
+        cb(active.flatMap(ticker => {
+          const row = quoteSnapshotRows.get(ticker);
+          return row ? [presentQuote(row)] : seriesPresentationRows([ticker]);
+        }));
       }, 0);
       return;
     }
     // Quotes are independent of chart history. The request queue still keeps
     // a bounded quote lane, while cancellation and epoch checks fence stale
     // callbacks when a workspace or list changes.
-    const snapshot=readQuoteSnapshot(symbols, () => epoch === workspaceEpoch && isCurrent() && currentSymbols().length>0);
+    const snapshot=readQuoteSnapshot(symbols, () => epoch === workspaceEpoch && isCurrent() && currentSymbols().length>0, snapshotOnly);
     snapshot.promise
       .then((rows) => {
         if (epoch !== workspaceEpoch || !isCurrent()) return;
@@ -1392,7 +1392,7 @@ const feed = {
         });
         if(rows.length) cb(rows);
       },0);
-      feed.getQuotes(presented,rows=>{
+      const deliver = rows=>{
         if(quoteSubscriptions.get(id) !== quoteSub) return;
         // Keep the first snapshot beside streaming/polling rows so a timezone
         // or active-chart change can reformat the same stored epoch without
@@ -1405,9 +1405,17 @@ const feed = {
             marketRequestNotice(quoteSub,row.n,'quotes',failed ? Error('报价抓取失败') : null);
         }
         cb(rows);
-      },
-        error=>{if(quoteSubscriptions.get(id)!==quoteSub)return;for(const ticker of presented)marketRequestNotice(quoteSub,ticker,'quotes',error);send({type:"feed-poll-state",key:"@quotes",error:String(error)});},
-        () => quoteSubscriptions.get(id) === quoteSub, true);
+      };
+      const current = () => quoteSubscriptions.get(id) === quoteSub;
+      const failure = tickers => error=>{if(!current())return;for(const ticker of tickers)marketRequestNotice(quoteSub,ticker,'quotes',error);send({type:"feed-poll-state",key:"@quotes",error:String(error)});};
+      feed.getQuotes(presented,deliver,failure(presented),current,true);
+      // Request-only suppliers have no SSE owner. Refresh their rows without
+      // putting the rest of the list behind the same supplier batch.
+      if(!marketPollingFallback) {
+        const requested = presented.filter(ticker=>decode(ticker).series_kind === 'provider' &&
+          /^(AKSHARE|TENCENT):/.test(decode(ticker).symbol));
+        if(requested.length) feed.getQuotes(requested,deliver,failure(requested),current,true,false);
+      }
     }
   },
   unsubscribeQuotes: (id) => {

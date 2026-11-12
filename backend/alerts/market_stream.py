@@ -296,7 +296,7 @@ def renew(session_hash, client):
                     expires=deadline))
 
 
-def claim(exclude=(), owner=None, *, activity=None):
+def claim(exclude=(), owner=None, *, activity=None, allow_provider_quotes=True):
     with transaction() as db:
         stamp = now_ms()
         active = select(MarketStreamSubscription.task_id).join(MarketStreamClient,
@@ -304,7 +304,10 @@ def claim(exclude=(), owner=None, *, activity=None):
             MarketStreamClient.session_hash == LoginSession.token_hash).where(
                 MarketStreamSubscription.active.is_(True), MarketStreamSubscription.expires > stamp,
                 LoginSession.expires > stamp)
-        task = db.scalar(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(MarketStreamTask.id.in_(active),
+        eligible = [] if allow_provider_quotes else [or_(
+            MarketStreamTask.identity['series_kind'].as_string() != 'provider',
+            MarketStreamTask.identity['kind'].as_string() != 'quotes')]
+        task = db.scalar(select(MarketStreamTask).options(defer(MarketStreamTask.payload)).where(*eligible, MarketStreamTask.id.in_(active),
             MarketStreamTask.id.not_in(exclude),
             or_(MarketStreamTask.owner_until <= stamp, MarketStreamTask.owner_token == owner),
             MarketStreamTask.next_at <= stamp, MarketStreamTask.lease_until <= stamp)
