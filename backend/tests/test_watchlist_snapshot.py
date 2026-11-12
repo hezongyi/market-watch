@@ -224,3 +224,19 @@ def test_background_previous_close_survives_new_calculator(database, monkeypatch
         list(closes.entries.values())[0]['future'].result(timeout=2)
     assert PreviousCloses().read(META, latest) == Decimal('1.1')
     assert len(calls) == 1
+
+
+def test_previous_close_refreshes_an_old_daily_tail_even_if_recently_observed(database, monkeypatch):
+    latest = {'start':now_ms() // 60000 * 60000}
+    seed_previous_close(META, {'start':latest['start']-2*86400000})
+    before, _, boundary = provider_chart.previous_close_query(META, latest)
+    calls = []
+    def fetch(meta, frame, cutoff, count, **kw):
+        calls.append((frame, cutoff, count))
+        return {'bars':[
+            {'start':boundary-days*86400000, 'end':boundary-(days-1)*86400000,
+             'chart_time':before-days*86400000, 'open':'1', 'high':'2', 'low':'0',
+             'close':'1.5', 'complete':True} for days in (2, 1)], 'history_boundary':False}
+    monkeypatch.setattr(provider_chart, 'native_page', fetch)
+    assert provider_chart.quote_previous_close(META, latest) == Decimal('1.5')
+    assert calls == [('D1', before, 2)]

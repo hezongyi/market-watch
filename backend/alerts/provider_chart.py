@@ -584,7 +584,7 @@ def quote_previous_close(meta, latest):
     before, count, boundary = previous_close_query(meta, latest)
     key = cache.ensure(meta, 'D1')
     page = cache.fetch_page(key, meta, 'D1', before, count,
-        time.monotonic() + max(23, request_seconds(meta['source'])), kind='history')
+        time.monotonic() + max(23, request_seconds(meta['source'])), kind='history', revalidate=True)
     complete = [bar for bar in page["bars"] if boundary is None or
                 bar["complete"] and bar["end"] <= boundary]
     return Decimal(complete[-1]["close"]) if complete else None
