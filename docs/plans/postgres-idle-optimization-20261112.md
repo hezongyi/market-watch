@@ -1,6 +1,6 @@
 # PostgreSQL 空闲开销优化建议
 
-状态：用户于 2026-11-12 认可执行，实施与验收进行中。延续不跟踪 CI、保留逐报价展示状态更新的要求。风险分类 F1：修改逐报价核心事务及后台派生链路，不修改 schema，须做 PostgreSQL 兼容/并发验证及独立 Standards/Spec review。
+状态：用户于 2026-11-12 认可执行，本轮实施、开发部署及验收已完成。详见 [验收记录](postgres-idle-optimization-20261112-evidence.md)。延续不跟踪 CI、保留逐报价展示状态更新的要求。风险分类 F1：修改逐报价核心事务及后台派生链路，不修改 schema，须做 PostgreSQL 兼容/并发验证及独立 Standards/Spec review。
 
 ## 基线与目标
 
