@@ -17,3 +17,5 @@ Provider follow-up: 95 focused local checks passed. Both independent reviewers f
 Final provider PostgreSQL supplement: 37 passed. Additional alert contracts after compatibility changes: 109 passed / 1 skipped, including HTTP/MCP legacy read lifecycle. Core 115-pass PostgreSQL and 240-pass local results remain the targeted baseline; suites overlap.
 
 Post-deployment measurement caught a listener cost regression: one hundred-millisecond stop check per provider listener increased idle Python wakeups. Regression reproduced as 20 empty notification polls in a two-second wait. The maximum blocking slice is now .5s (four polls); actual notifications still wake immediately, shorter business deadlines are unchanged, and shutdown remains within supervisor budgets. Both independent reviews passed this follow-up. The intermediate r2 CPU sample is retained privately and is not used to claim optimization success.
+
+Final listener supplement: 58 local checks and 17 isolated PostgreSQL checks passed. Both independent reviews accepted the polling slice change and regression test without remaining findings. These groups overlap the earlier suites.
