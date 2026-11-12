@@ -154,7 +154,7 @@ def test_stream_future_work_keeps_fast_cadence_and_empty_queue_sleeps(database, 
     monkeypatch.setattr(worker.stream, 'claim', claim)
     stop = Stop(3)
     worker.run(stop)
-    assert stop.delays == [1, .1, 1]
+    assert stop.delays == [5, .1, 5]
 
 
 def test_capacity_scan_is_separate_from_minute_expiry_and_retries_failure(monkeypatch):
@@ -220,3 +220,22 @@ def test_atomic_native_observation_only_schedules_derived_and_keeps_content_repa
         assert set(db.scalars(select(ChartPublicationJob.timeframe))) == derived | {frame}
         native = db.get(ChartPublicationState, ('BTCUSDT', frame))
         assert native.requested > native.processed
+
+
+def test_stream_error_keeps_existing_retry_instead_of_idle_backoff(database, monkeypatch):
+    from alerts import market_stream_worker as worker
+    from alerts import publication_wakeup, runtime_health
+
+    monkeypatch.setattr(publication_wakeup, 'PublicationWakeup', lambda **kw: Wake())
+    monkeypatch.setattr(runtime_health, 'progress', lambda **kw: None)
+    monkeypatch.setattr(worker.stream, 'cleanup', lambda: None)
+    attempts = []
+    def claim(**kwargs):
+        attempts.append(1)
+        if len(attempts) == 1:
+            raise OSError('transient query failure')
+        kwargs['activity']['active'] = False
+    monkeypatch.setattr(worker.stream, 'claim', claim)
+    stop = Stop(2)
+    worker.run(stop)
+    assert stop.delays == [1, 5]

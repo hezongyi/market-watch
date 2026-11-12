@@ -367,7 +367,7 @@ def _run(stopped, wake):
             if not pending:
                 from .runtime_health import progress
                 progress(error=cycle_error)
-            delay = .01 if worked else .1 if pending or activity.get('active') else 1
+            delay = .01 if worked else .1 if pending or activity.get('active') else 1 if cycle_error else 5
             if cycle_error:
                 stopped.wait(delay)
             else:

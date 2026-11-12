@@ -40,7 +40,8 @@ def test_expiry_saves_valid_delayed_signal_without_restarting_demand(database, m
         alert = db.get(ChartAlert, ident)
         assert alert.status == "expired" and alert.runtime["settlement_pending"] is False
         assert evaluate(db, ident, now=expiry + 300010) == []
-    assert not live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)
+    # Enabled composites keep their stream independently of expired alerts.
+    assert set(live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)) == {"EUR_USD"}
 
 
 @pytest.mark.parametrize("mode", ["intrabar", "close"])
@@ -241,4 +242,5 @@ def test_disabled_acquisition_still_settles_committed_valid_input(database, monk
         alert = db.get(ChartAlert, ident)
         assert alert.count == 1 and not alert.runtime["settlement_pending"]
         assert evaluate(db, ident, now=expiry + 20) == []
-    assert not live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)
+    # Enabled composites keep their stream independently of expired alerts.
+    assert set(live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)) == {"EUR_USD"}

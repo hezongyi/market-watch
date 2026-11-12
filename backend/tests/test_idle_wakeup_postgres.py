@@ -13,7 +13,7 @@ from alerts.publication_wakeup import (
     notify,
     notify_connection,
 )
-from sqlalchemy import create_engine
+from sqlalchemy import create_engine, select
 from sqlalchemy.orm import Session
 from test_provider_postgres import provider_pg as provider_pg
 
@@ -114,3 +114,45 @@ def test_real_source_entrypoints_wake_their_workers_only_after_commit(provider_p
         activity = {}
         assert market_stream.claim(activity=activity) is None
         assert activity == {'active': True}
+
+
+def test_monitor_channels_share_connection_and_both_deliver():
+    from alerts.publication_wakeup import CHANNEL
+    engine = create_engine(os.environ['TEST_POSTGRES_URL'])
+    try:
+        with PublicationWakeup(engine, channels=(CHANNEL, ALERT_CHANNEL)) as wake:
+            connection = wake.connection
+            assert connection is not None
+            for channel in (CHANNEL, ALERT_CHANNEL):
+                wake.prepare()
+                with Session(engine) as db, db.begin():
+                    notify(db, channel)
+                assert wake.wait(1) == 'notification'
+                assert wake.connection is connection
+    finally:
+        engine.dispose()
+
+
+def test_history_queue_producers_wake_only_after_commit(provider_pg):
+    from alerts import storage
+    factory, engine = provider_pg
+    storage.bootstrap(engine)
+    def job(db):
+        db.add(storage.ImportJob(instrument_id='EURUSD', start=0, end=60000, cursor=0))
+        db.flush()
+    with PublicationWakeup(engine, channel=HISTORY_CHANNEL) as wake:
+        with factory() as db:
+            job(db)
+            assert wake.wait(.05) == 'timer'
+            db.rollback()
+        assert wake.wait(.05) == 'timer'
+        with factory.begin() as db:
+            job(db)
+            assert wake.wait(.05) == 'timer'
+        assert wake.wait(1) == 'notification'
+        wake.prepare()
+        with factory.begin() as db:
+            row = db.scalar(select(storage.ImportJob))
+            row.status = 'pending'
+            row.next_at = 9999999999999
+        assert wake.wait(1) == 'notification'

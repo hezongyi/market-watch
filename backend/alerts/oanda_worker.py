@@ -443,13 +443,8 @@ def collect(adapter, ownership, identities, stopped):
         refreshed = 0
         idle_since = None
         while not stopped.is_set() and not connection_stop.is_set():
-            stage = "renew"
+            stage = "subscription"
             try:
-                if not renew(ownership):
-                    log.warning("pricing_ownership_lost reason=lease_not_renewed stage=maintenance epoch=%s", epoch)
-                    lost.set()
-                    report_confirmation("ownership_lost")
-                    return
                 if time.monotonic() - refreshed >= 10:
                     stage = "subscription"
                     desired = desired_datasets(adapter.account_id)

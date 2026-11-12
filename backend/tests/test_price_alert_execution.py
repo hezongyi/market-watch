@@ -166,7 +166,8 @@ def test_legacy_auto_pause_stays_paused_and_receives_one_actionable_notice(datab
         assert len(system_notes(db)) == 1
         assert db.scalar(select(func.count()).select_from(Audit).where(Audit.kind == "notice_source",
             Audit.details["source_id"].as_string() == ident)) == 1
-    assert not desired_datasets(settings.oanda_account_id)
+    # Pausing this alert cannot retire an explicitly enabled composite stream.
+    assert set(desired_datasets(settings.oanda_account_id)) == {"EUR_USD"}
 
 
 def test_execution_projection_distinguishes_creation_expiry_and_count(database, monkeypatch):

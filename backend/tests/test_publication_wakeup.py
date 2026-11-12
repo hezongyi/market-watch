@@ -124,3 +124,17 @@ def test_idle_listener_blocks_between_stop_checks_instead_of_ten_polls_per_secon
     assert len(waits) <= 4
     assert max(waits) <= .5  # shutdown remains bounded; real hints return immediately
     wake.close()
+
+
+def test_multiple_channels_share_one_connection_and_reconnect():
+    from alerts.publication_wakeup import ALERT_CHANNEL, CHANNEL
+    wake, connections, clock = listener()
+    wake.channels = (CHANNEL, ALERT_CHANNEL)
+    wake.prepare()
+    assert len(connections) == 1
+    assert connections[0].commands == ['LISTEN '+CHANNEL, 'LISTEN '+ALERT_CHANNEL]
+    wake.close()
+    wake.prepare()
+    assert len(connections) == 2
+    assert connections[1].commands == connections[0].commands
+    wake.close()

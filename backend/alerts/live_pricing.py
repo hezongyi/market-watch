@@ -382,7 +382,9 @@ def publish_event(ownership, epoch, event, identities, *, now=None):
             raise TimeoutError('Account authentication hold')
         if owner.error == 'provider_maintenance':
             return 'rejected_provider_maintenance'
-        owner.expires = stamp + settings.oanda_stream_lease_seconds * 1000
+        lease_ms = settings.oanda_stream_lease_seconds * 1000
+        if owner.expires - stamp <= lease_ms // 2:
+            owner.expires = stamp + lease_ms
         if not isinstance(event, QuoteEvent):
             if event.get("type") != "heartbeat" or event.get("connection_epoch") != epoch:
                 raise ValueError("Invalid heartbeat generation")

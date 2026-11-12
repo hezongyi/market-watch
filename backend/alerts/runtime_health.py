@@ -128,7 +128,11 @@ class Progress:
 
     def __init__(self, group, role, boot_id, *, deadline_ms=STALE_MS):
         self.group, self.role, self.boot_id = group, role, boot_id
-        self.deadline_ms = deadline_ms
+        self.background = (group == "data" and not role.endswith("ownership")) or (
+            group == "notifications" and role in (
+                "notification_projection", "notification_retention", "notification_delivery"))
+        self.write_ms = 30000 if self.background else WRITE_MS
+        self.deadline_ms = max(deadline_ms, 90000) if self.background else deadline_ms
         self.saved_at, self.saved_signature = None, None
         self.lock = threading.Lock()
 
@@ -151,10 +155,11 @@ class Progress:
     def record(self, *, state="idle", error=None, completed=True, watermark=None):
         stamp = now_ms()
         error_type = type(error).__name__ if isinstance(error, BaseException) else error
-        signature = state, error_type
+        healthy_state = "success" if self.background and state in ("idle", "running") else state
+        signature = healthy_state, error_type, completed
         with self.lock:
             if (self.saved_at is not None and signature == self.saved_signature
-                    and stamp - self.saved_at < WRITE_MS):
+                    and stamp - self.saved_at < self.write_ms):
                 return
             with transaction() as db:
                 row = db.scalar(select(Preference).where(

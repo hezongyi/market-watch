@@ -79,7 +79,7 @@ def test_default_listener_is_created_and_prepared_before_each_scan(monkeypatch):
     alert_monitor.run(stop, period=.25, monotonic=monotonic,
                       report_health=lambda *args, **kwargs: None)
     # One listener for the whole run, sharing the monitor's clock for its waits.
-    assert created == [dict(monotonic=monotonic)]
+    assert created == [dict(monotonic=monotonic, channels=(publication_wakeup.CHANNEL, publication_wakeup.ALERT_CHANNEL))]
     # The commit listener is prepared before every scan and reused afterwards.
     assert [kind for kind, _ in events] == [
         'enter', 'prepare', 'step', 'wait', 'prepare', 'step', 'wait',

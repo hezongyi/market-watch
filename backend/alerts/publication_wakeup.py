@@ -44,13 +44,15 @@ class PublicationWakeup:
     never consumes a slot in the application transaction connection pool.
     """
 
-    def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL):
-        if channel not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL, PROVIDER_CHANNEL):
+    def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL, channels=None):
+        selected = tuple(dict.fromkeys(channels if channels is not None else (channel,)))
+        if not selected or any(value not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL, PROVIDER_CHANNEL) for value in selected):
             raise ValueError('Unknown worker wakeup channel')
         if engine is None:
             from .storage import engine
         self.engine = engine
         self.channel = channel
+        self.channels = selected
         self.monotonic = monotonic
         self.connection = None
         self.retry_at = 0
@@ -93,7 +95,8 @@ class PublicationWakeup:
                 kwargs.update(connect_timeout=2, application_name='market-watch-publication-listener')
                 self.connection = self.engine.dialect.loaded_dbapi.connect(*args, **kwargs)
                 self.connection.autocommit = True
-                self.connection.execute('LISTEN ' + self.channel)
+                for channel in self.channels:
+                    self.connection.execute('LISTEN ' + channel)
                 if self.error:
                     log.info('publication_listener_reconnected')
                 self.error = None

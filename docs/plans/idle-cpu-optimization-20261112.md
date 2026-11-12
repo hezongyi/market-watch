@@ -134,3 +134,14 @@ PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/pytest -q backend/te
 以上是现有回归入口；实施时先为新行为补充前述真实差分/竞态测试，再运行。纯间隔配置不添加镜像实现的测试。
 
 完成条件：各阶段实现/证据可单独审查；两次最终CPU样本和功能验收通过；F1复审无未解决问题；PR已按授权更新。若增量结果与权威结果不一致、出现漏告警、错误新鲜度、跨owner写入或无可靠CPU收益，保留原实现与证据，定位后再继续。不得以CPU下降掩盖处理量减少或后台积压。
+
+## 8. 实施记录（持续补充）
+
+- 探针配置单独部署，启动与容器健康通过；120秒样本包含冷启动和积压追赶，不能作为稳定收益证据。
+- 确认聚合接入worker独占的有界`CurrentBuckets`；多桶追赶保留权威全量路径，单桶后续修订增量替换。无schema或持久格式修改。
+- 报价只在租约剩余不超过TTL一半时续约；5秒guardian继续续约/fence，删除每秒维护线程的重复续约。逐条Instrument、LiveState及临时OHLC更新保留。
+- 成功空闲history与market-stream等待5秒；history未来任务保持1秒，market-stream错误仍1秒，活跃任务原节拍。告警monitor用同一连接监听publication和alert demand，真正无active/待结算才5秒。
+- 普通data/notification后台健康成功写入30秒、超时至少90秒；pricing、market角色与ownership维持原策略。错误/恢复及boot fencing保留。
+- native-history兼有来源确认职责，尚未证明全部确认任务具有独立唤醒提示，因此保留1秒确认检查，避免把真实确认延后；只应用健康写入去重复。确认到期批量调度及小批报价事务仍作为后续候选，不在本批引入。
+- 两轴独立review已完成：Standards无发现；Spec发现market-stream错误退避被误延长，已修复并复核关闭。原测试对暂停/到期告警要求所有订阅为空，与独立启用组合冲突；基线复现后修正预期，组合流继续运行。
+- 后续代码将一起构建部署。最终测量只报告组合收益，不据此给单项优化分摊收益。
