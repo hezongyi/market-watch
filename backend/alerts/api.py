@@ -160,7 +160,7 @@ def logout(request: Request, response: Response):
 
 class PasswordChange(BaseModel):
     current_password: str = Field(min_length=1, max_length=512)
-    new_password: str = Field(min_length=6, max_length=512)
+    new_password: str = Field(min_length=4, max_length=512)
 
 
 @app.post("/api/account/password", dependencies=[Depends(authenticated)])
