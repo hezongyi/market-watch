@@ -49,10 +49,12 @@ fs.mkdirSync(out,{recursive:true});
   const native = () => page.frames().find(frame=>frame.url().startsWith('blob:'));
   const waitChart = async (ticker,resolution) => {
     await page.waitForFunction(({ticker,resolution})=>{
+      try {
       const chart=window.__nativeAcceptanceWidget?.activeChart();
       const range=chart?.getVisibleRange();
       return chart?.symbol().toUpperCase()===ticker.toUpperCase() && chart.resolution()===resolution &&
         chart.dataReady() && range?.to > range?.from;
+      } catch { return false; }
     },{ticker,resolution},{timeout:120000});
   };
   try {
@@ -87,15 +89,21 @@ fs.mkdirSync(out,{recursive:true});
       await expect(native().locator('.dc-window')).toContainText('价格口径：不复权');
       await expect(native().locator('.dc-window').getByRole('link',{name:'添加为自建行情',exact:true})).toHaveCount(0);
       await page.screenshot({path:path.join(out,id.replace(/:/g,'-')+'-directory.png')});
+      await native().getByRole('button',{name:'关闭详情',exact:true}).click();
       await row.getByRole('button',{name:'打开图表',exact:true}).click();
+      await waitChart(ticker,frames[group.frames.includes('H1') ? 'H1' : group.frames[0]]);
       for(const frame of group.frames) {
         const resolution=frames[frame];
         await page.evaluate(resolution=>window.__nativeAcceptanceWidget.activeChart().setResolution(resolution),resolution);
         await waitChart(ticker,resolution);
-        const state=await page.evaluate(()=>{
+        const state=await page.evaluate(async ()=>{
           const chart=window.__nativeAcceptanceWidget.activeChart();
-          return {ticker:chart.symbol(),resolution:chart.resolution(),ready:chart.dataReady(),range:chart.getVisibleRange()};
+          const exported=await chart.exportData({includedStudies:[],includeSeries:true});
+          return {ticker:chart.symbol(),resolution:chart.resolution(),ready:chart.dataReady(),range:chart.getVisibleRange(),
+            rendered_rows:exported.data.length,first:Array.from(exported.data[0] || []),
+            last:Array.from(exported.data.at(-1) || [])};
         });
+        assert(state.rendered_rows>1,`${ticker} ${frame}: chart must contain actual series data`);
         report.charts.push({ticker,frame,...state});
       }
       await page.screenshot({path:path.join(out,id.replace(/:/g,'-')+'-chart.png')});

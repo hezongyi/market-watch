@@ -252,3 +252,38 @@ def test_new_ticker_round_trip_and_chart_budget():
         ticker = encode(symbol, 'provider')
         assert decode(ticker) == (symbol, 'provider')
         assert instrument_source(ticker) == 'akshare'
+
+
+def test_preexisting_legacy_bare_array_snapshot_is_read_without_rewrite(database):
+    import gzip
+    import hashlib
+
+    from alerts.history_mode_sources import dataset_identity
+    from alerts.source_history_store import shared_native_page, store_blob
+    from alerts.storage import SourceBlob, SourceFetch, SourceSeries
+
+    source = provider.collection_identity(
+        dataset_identity('akshare', 'SZSE:000001', 'base_d1', 'qfq'), 'D1')
+    end = stamp('2026-11-13')
+    rows = provider.parse_records(source, records('2026-11-11', '2026-11-12'),
+        start=0, end=end, observed_at=end)
+    original = json.dumps([row.model_dump() for row in rows], sort_keys=True,
+                          separators=(',', ':')).encode()
+    key = hashlib.sha256(f'native|{source.key}|0|{end}'.encode()).hexdigest()
+    with database.begin() as db:
+        db.add(SourceSeries(id=source.key, identity=source.model_dump()))
+        db.flush()
+        content_id, _ = store_blob(db, source.key, original)
+        db.add(SourceFetch(id=key, source_id=source.key, start=0, end=end,
+            checkpoint=end, content_id=content_id, observed_at=end, fetched_at=end,
+            result='data', lease_until=0))
+
+    class ForbiddenFetch:
+        def native_page(self, *args):
+            raise AssertionError('old cache must remain usable without upstream')
+
+    restored = shared_native_page(ForbiddenFetch(), source, 0, end, fresh_after=0,
+                                 volume_kind='quantity', volume_unit='shares')
+    assert restored.rows == rows and restored.source_warnings == ()
+    with database() as db:
+        assert gzip.decompress(db.get(SourceBlob, content_id).content) == original
