@@ -106,7 +106,7 @@ class PublicationWakeup:
     def wait(self, seconds, stop=None):
         """Interrupt idle/due waits on hints; preserve short busy yields.
 
-        No SQL is executed while waiting. stop is checked at most every100ms.
+        No SQL is executed while waiting. stop is checked at most every 500ms.
         """
         stop = stop if stop is not None else Event()
         if seconds < .05 or self.connection is None:
@@ -118,7 +118,7 @@ class PublicationWakeup:
             if remaining <= 0:
                 return 'timer'
             try:
-                if list(self.connection.notifies(timeout=min(.1, remaining), stop_after=1)):
+                if list(self.connection.notifies(timeout=min(.5, remaining), stop_after=1)):
                     return 'notification'
             except Exception as error:
                 self._failed(error)
