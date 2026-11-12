@@ -946,6 +946,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                     meta = metadata(db, ident, kind)
                     shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
                     values = {"short_name": shown, "description": meta.get("presentation_description", meta["name"] + (" · 自建" if kind == "history" else " · 组合")), "exchange": meta["source"].upper()}
+                    values["display_precision"] = meta.get("display_precision", meta.get("precision"))
                     facts = None
                     if kind == "history":
                         values.update(fixed_snapshot(db, ident, meta))
@@ -1046,6 +1047,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                           "read_at":read_at, "time_type": "provider_quote" if stamp is not None else None,
                           "delay_seconds":delay, "fetch_status":snapshot["status"], **session, **conflict}
                 previous = snapshot["previous_close"]
+                values["display_precision"] = meta.get("display_precision", meta.get("precision"))
                 if previous is not None and Decimal(previous) != 0:
                     delta = Decimal(snapshot["price"])-Decimal(previous)
                     values.update(ch=float(delta), chp=float(delta/Decimal(previous)*100),
@@ -1075,6 +1077,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                       **({'error_evidence': page['error_evidence']} if page.get('error_evidence') else {}),
                       "time_type": quote_time_type if latest else None, "resolution": quote_frame}
             if latest:
+                values["display_precision"] = meta.get("display_precision", meta.get("precision"))
                 values["lp"] = float(latest["close"])
                 values.update(quote_time=None, data_start=latest.get("start"), data_end=latest.get("end"))
                 if meta["basis"] == "bid":
@@ -1161,6 +1164,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                 continue
             values = {
                 "lp": float(bar.close),
+                "display_precision": inst.precision,
                 "short_name": presentation["display_symbol"],
                 "description": presentation["presentation_description"],
                 "exchange": inst.source.upper(),

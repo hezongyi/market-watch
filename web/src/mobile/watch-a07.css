@@ -1,0 +1,679 @@
+/* Accepted A07, first implementation: scoped to Watch and sheets launched from it.
+ * Source: docs/prototypes/android-a07-refinement-20261111/refinement.css.
+ * Keep the real quote/cache/subscription and sparkline-window semantics. */
+.mobile-app[data-page="watch"] {
+  --spark-area-up: #65b6a4;
+  --spark-area-down: #e39b94;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
+    "Microsoft YaHei", sans-serif;
+  --quiet-line: color-mix(in srgb, var(--line) 65%, transparent);
+  --selected: color-mix(in srgb, var(--accent) 12%, var(--surface));
+  --inner: inset 0 1px 0 #ffffff04;
+}
+.mobile-app[data-page="watch"][data-theme="light"] {
+  --spark-area-up: #238779;
+  --spark-area-down: #cf6c65;
+}
+.mobile-watch-row.positive:not(.stale) .mobile-spark:not([data-cached]) stop {
+  stop-color: var(--spark-area-up);
+}
+.mobile-watch-row.negative:not(.stale) .mobile-spark:not([data-cached]) stop {
+  stop-color: var(--spark-area-down);
+}
+.mobile-watch {
+  height: calc(
+    100dvh - var(--mobile-nav-height, 64px) - env(safe-area-inset-top)
+  );
+  min-height: 0;
+}
+.mobile-watch-title {
+  min-height: 64px;
+  padding: 4px 20px 6px;
+  grid-template-columns: minmax(0, 1fr) auto minmax(96px, 1fr);
+  gap: 6px;
+}
+.mobile-watch .mobile-group-button {
+  font-size: 1.714286rem;
+  font-weight: 650;
+  gap: 3px;
+  line-height: 1.45;
+  letter-spacing: 0;
+}
+.mobile-watch .mobile-group-button small {
+  font-size: 0.857143rem;
+  font-weight: 400;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 100%;
+}
+.mobile-watch .mobile-group-button svg {
+  width: 16px;
+  height: 16px;
+}
+.mobile-watch .mobile-header-actions button {
+  width: 44px;
+  height: 44px;
+  padding: 10px;
+  border-radius: 12px;
+  color: var(--muted);
+  flex-shrink: 0;
+  border: 1px solid transparent;
+  background: var(--surface);
+}
+.mobile-watch .mobile-header-actions svg {
+  width: 22px;
+  height: 22px;
+  stroke-width: 1.65;
+}
+.mobile-watch .mobile-header-actions .mobile-watch-add {
+  background: var(--selected);
+  color: var(--accent);
+}
+.mobile-watch .mobile-header-actions { gap: 4px; }
+.mobile-watch .mobile-sse small { font-variant-numeric: tabular-nums; white-space: nowrap; }
+.mobile-watch .mobile-sse {
+  font-size: 0.857143rem;
+  gap: 3px;
+  line-height: 1.4;
+}
+.mobile-watch .mobile-sse small {
+  font-size: 0.785714rem;
+  line-height: 1.4;
+  margin-top: 3px;
+}
+.mobile-watch .mobile-sse > span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.mobile-watch .mobile-sse > span:before {
+  content: "";
+  width: 5px;
+  height: 5px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--warning);
+}
+.mobile-watch .mobile-sse[data-connected="true"] > span:before {
+  background: var(--up);
+}
+.mobile-watch-list {
+  padding: 0 20px 20px;
+  scrollbar-width: none;
+  /* Scroll is explicitly restored by WatchPage; late quote metadata must not move it. */
+  overflow-anchor: none;
+}
+.mobile-app .mobile-watch-row {
+  position: relative;
+  grid-template-columns:
+    var(--mobile-symbol-width, 6.2rem) minmax(36px, 1fr)
+    6rem;
+  gap: 8px;
+  min-height: 72px;
+  padding: 12px 0;
+  border-color: color-mix(in srgb, var(--line) 45%, transparent);
+  line-height: 1.45;
+}
+.mobile-watch-row[data-wide-symbol] {
+  --mobile-symbol-width: 8.6rem;
+}
+.mobile-watch-row[data-delayed] { padding-top: 8px; padding-bottom: 8px; }
+.mobile-watch-row[data-delayed] .mobile-watch-price strong { line-height: 1.3; }
+.mobile-watch-row[data-delayed] .mobile-watch-price small { margin-top: 2px; line-height: 1.3; }
+.mobile-watch-row[data-delayed] .mobile-watch-price .mobile-watch-delay {
+  position: static;
+  line-height: 1.2;
+  font-size: 0.714286rem;
+}
+.mobile-watch-symbol strong {
+  font-size: 1.071429rem;
+  font-weight: 650;
+  letter-spacing: 0.2px;
+  line-height: 1.45;
+  margin: 0;
+}
+.mobile-watch-symbol {
+  gap: 0;
+  min-height: 42px;
+  justify-content: center;
+}
+.mobile-watch-symbol .mobile-watch-origin {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.45;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mobile-watch-price .mobile-watch-delay {
+  position: absolute;
+  right: 0;
+  bottom: 1px;
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.714286rem;
+  line-height: 1;
+}
+.mobile-watch-price strong {
+  font-size: 1.071429rem;
+  font-weight: 600;
+  letter-spacing: 0;
+  line-height: 1.45;
+}
+.mobile-watch-price small {
+  font-size: 0.892857rem;
+  line-height: 1.6;
+  margin-top: 5px;
+  letter-spacing: 0.1px;
+}
+.mobile-watch-last-price {
+  color: var(--muted);
+  white-space: nowrap;
+}
+.mobile-watch-row.stale .mobile-watch-price strong {
+  color: var(--muted);
+}
+.mobile-watch .mobile-spark {
+  height: 42px;
+  position: relative;
+  display: block;
+  min-width: 0;
+}
+.mobile-spark > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.mobile-spark-fill-top {
+  stop-opacity: 0.22;
+}
+.mobile-spark-fill-middle {
+  stop-opacity: 0.08;
+}
+.mobile-app[data-theme="dark"] .mobile-spark-fill-top {
+  stop-opacity: 0.18;
+}
+.mobile-app[data-theme="dark"] .mobile-spark-fill-middle {
+  stop-opacity: 0.06;
+}
+.mobile-watch .mobile-watch-row .mobile-spark-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  font-size: 0.785714rem;
+  line-height: 1.4;
+  text-align: center;
+}
+.mobile-spark[data-cached] > svg {
+  height: calc(100% - 14px);
+  color: var(--muted);
+}
+.mobile-spark-caption {
+  display: block;
+  color: var(--muted);
+  text-align: right;
+  font-size: 0.785714rem;
+  line-height: 14px;
+}
+.mobile-watch .mobile-spark line {
+  stroke: var(--muted);
+  stroke-dasharray: 2 3;
+}
+.mobile-watch .mobile-spark .mobile-spark-previous-close {
+  stroke-width: 0.8;
+  opacity: 0.45;
+  stroke-dasharray: 3 3;
+}
+.mobile-watch-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 20px 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: 8px;
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.5;
+  flex: none;
+}
+.mobile-watch-status svg {
+  width: 16px;
+  height: 16px;
+  color: var(--warning);
+  flex: none;
+}
+.mobile-watch-notice {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 4px 12px 12px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface2);
+  flex: none;
+}
+.mobile-watch-notice > div {
+  flex: 1;
+  min-width: 0;
+}
+.mobile-watch-notice strong {
+  font-size: 1rem;
+  font-weight: 600;
+}
+.mobile-watch-notice p {
+  font-size: 0.857143rem;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+.mobile-watch-notice button {
+  min-width: 48px;
+  min-height: 48px;
+  flex: none;
+}
+.mobile-watch-notice .mobile-watch-dismiss {
+  padding: 12px;
+  background: transparent;
+  border: 0;
+  color: var(--muted);
+}
+.mobile-watch-notice svg {
+  width: 22px;
+  height: 22px;
+}
+.mobile-watch-nav-count {
+  position: absolute;
+  right: 2px;
+  top: -4px;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 4px;
+  line-height: 18px;
+  font-size: 12px;
+  border-radius: 9px;
+  background: var(--warning);
+  color: var(--bg);
+  box-shadow: 0 0 0 2px var(--bg);
+}
+.mobile-watch .mobile-state-panel {
+  padding: 64px 16px 40px;
+  gap: 0;
+}
+.mobile-watch .mobile-state-icon {
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--line);
+  border-radius: 20px;
+  margin-bottom: 20px;
+  color: var(--muted);
+}
+.mobile-watch .mobile-state-icon svg {
+  width: 28px;
+  height: 28px;
+}
+.mobile-watch .mobile-state-panel h3 {
+  font-size: 1.285714rem;
+  font-weight: 600;
+  margin: 0 0 10px;
+}
+.mobile-watch .mobile-state-panel p {
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 22em;
+  margin: 0 0 24px;
+}
+.mobile-watch .mobile-state-panel button {
+  min-height: 52px;
+  min-width: 160px;
+  border-radius: 10px;
+  font-size: 1rem;
+  font-weight: 600;
+}
+.mobile-watch .mobile-skeleton {
+  height: 72px;
+  border-color: var(--quiet-line);
+}
+.mobile-watch .mobile-skeleton i {
+  border-radius: 6px;
+}
+
+/* Only Watch-origin sheets inherit the A07 surface/control treatment this round. */
+.mobile-watch .mobile-sheet {
+  width: min(100%, 600px);
+  max-width: min(100%, 600px);
+  padding: 0 20px calc(16px + env(safe-area-inset-bottom));
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -12px 48px #0005;
+  scrollbar-width: none;
+}
+.mobile-watch .mobile-sheet::backdrop {
+  background: #020610a6;
+  backdrop-filter: blur(3px);
+}
+.mobile-watch .mobile-sheet > header {
+  top: 0;
+  min-height: 72px;
+  margin: 0 -20px;
+  padding: 18px 16px 10px 20px;
+  border-color: var(--quiet-line);
+  background: var(--bg);
+  z-index: 5;
+}
+.mobile-watch .mobile-sheet > header:before {
+  content: "";
+  position: absolute;
+  top: 8px;
+  left: calc(50% - 16px);
+  width: 32px;
+  height: 4px;
+  border-radius: 4px;
+  background: var(--line);
+}
+.mobile-watch .mobile-sheet > header h2 {
+  font-size: 1.285714rem;
+  line-height: 1.4;
+  font-weight: 650;
+}
+.mobile-watch .mobile-sheet > header button {
+  border-radius: 12px;
+  color: var(--muted);
+  flex: none;
+  background: var(--surface);
+  width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--quiet-line);
+}
+.mobile-watch .mobile-sheet-body {
+  padding-top: 18px;
+}
+.mobile-watch .mobile-sheet-actions {
+  bottom: calc(-16px - env(safe-area-inset-bottom));
+  padding: 12px 0 calc(16px + env(safe-area-inset-bottom));
+  margin: 20px 0 0;
+  border-color: var(--quiet-line);
+  gap: 10px;
+}
+.mobile-watch .mobile-sheet button {
+  border-radius: 10px;
+  min-height: 48px;
+  box-shadow: var(--inner);
+}
+.mobile-watch .mobile-sheet .primary,
+.mobile-watch .mobile-state-panel .primary {
+  min-height: 52px;
+  background: var(--button);
+  color: white;
+  border: 0;
+  font-weight: 600;
+  box-shadow: inset 0 1px 0 #ffffff18;
+}
+.mobile-watch .mobile-sheet input {
+  min-height: 52px;
+  padding: 13px 14px;
+  border-radius: 10px;
+  font-size: 1.142857rem;
+  box-shadow: var(--inner);
+}
+.mobile-watch .mobile-sheet input::placeholder {
+  color: var(--muted);
+  opacity: 1;
+}
+.mobile-watch .mobile-group-grid button {
+  padding: 12px;
+  min-height: 52px;
+  background: var(--surface);
+  font-size: 1rem;
+}
+.mobile-watch .mobile-group-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.mobile-watch .mobile-group-grid button { display: flex; align-items: center; gap: 10px; min-height: 56px; }
+.mobile-group-label { flex: 1; min-width: 0; }
+.mobile-group-count { color: var(--muted); font-size: 0.857143rem; font-variant-numeric: tabular-nums; }
+.mobile-group-check { width: 18px; height: 18px; flex: none; }
+.mobile-watch .mobile-group-grid button[aria-pressed="true"] {
+  background: var(--selected);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.mobile-watch .mobile-sheet .mobile-hint {
+  background: none;
+  padding: 0;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--muted);
+  margin: 0 0 18px;
+}
+.mobile-watch .mobile-source-filters {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  overflow: auto;
+  scrollbar-width: none;
+}
+.mobile-watch .mobile-source-filters button {
+  flex: none;
+  padding: 0 12px;
+  min-height: 44px;
+  font-size: 0.857143rem;
+  background: var(--surface);
+}
+.mobile-watch .mobile-source-filters button[aria-pressed="true"] {
+  background: var(--selected);
+  color: var(--accent);
+  border-color: var(--accent);
+}
+.mobile-watch .mobile-search-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--quiet-line);
+}
+.mobile-watch .mobile-sheet .mobile-search-add {
+  flex: 0 0 auto;
+  min-width: 104px;
+  padding: 8px 14px;
+  background: var(--selected);
+  color: var(--accent);
+  border-color: transparent;
+  font-weight: 600;
+}
+.mobile-watch .mobile-sheet .mobile-search-add:disabled {
+  background: var(--surface);
+  color: var(--muted);
+  opacity: 1;
+  font-weight: 400;
+}
+.mobile-watch .mobile-search-row .mobile-link-button { flex: 0 0 auto; min-width: 56px; margin-left: auto; }
+.mobile-watch .mobile-search-row .mobile-link-button + .mobile-link-button { margin-left: 0; }
+.mobile-watch .mobile-search-info strong { line-height: 1.5; }
+.mobile-manage-context { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.mobile-manage-context > span, .mobile-manage-context small { color: var(--muted); font-size: 0.857143rem; }
+.mobile-manage-context strong { font-size: 1rem; font-weight: 600; overflow-wrap: anywhere; }
+.mobile-manage-context small { margin-left: auto; }
+.mobile-manage-help { color: var(--muted); font-size: 0.857143rem; line-height: 1.6; margin: 8px 0 16px; }
+.mobile-watch .mobile-form-detail { border: 1px solid var(--quiet-line); background: var(--surface); border-radius: 12px; margin: 0 0 12px; padding: 0 12px; }
+.mobile-watch .mobile-form-detail[open] { padding-bottom: 12px; }
+.mobile-watch .mobile-form-detail summary { line-height: 1.5; }
+.mobile-watch .mobile-form-detail > summary small { display: block; margin: 3px 0 0 16px; }
+.mobile-watch .mobile-sheet button:focus-visible, .mobile-watch .mobile-watch-row:focus-visible { outline-offset: -3px; }
+@media (prefers-reduced-motion: no-preference) {
+  .mobile-watch button { transition: background-color 120ms ease, border-color 120ms ease; }
+}
+.mobile-watch .mobile-search-field {
+  position: relative;
+  display: block;
+  margin: 0;
+  border: 0;
+  padding: 0;
+  background: none;
+}
+.mobile-watch .mobile-search-field > svg {
+  position: absolute;
+  left: 13px;
+  top: 16px;
+  width: 20px;
+  height: 20px;
+  color: var(--muted);
+  z-index: 1;
+}
+.mobile-watch .mobile-search-field input {
+  padding-left: 42px;
+  border: 1px solid var(--quiet-line);
+  background: var(--surface);
+  border-radius: 10px;
+  min-height: 52px;
+}
+.mobile-watch-manage-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid var(--quiet-line);
+  padding: 12px 0;
+}
+.mobile-watch-manage-row > span {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.mobile-watch-manage-row strong {
+  display: block;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.mobile-watch-manage-row small {
+  display: block;
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.5;
+}
+.mobile-watch-list-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+.mobile-watch-list-actions button {
+  padding: 10px;
+  min-width: 48px;
+  min-height: 48px;
+  background: var(--surface);
+}
+.mobile-watch-list-actions svg {
+  width: 18px;
+  height: 18px;
+}
+.mobile-watch-list-actions .mobile-watch-remove {
+  color: var(--down);
+  background: color-mix(in srgb, var(--down) 7%, var(--bg));
+  border-color: transparent;
+}
+.mobile-watch .mobile-search-info {
+  flex-basis: 100%;
+  padding-bottom: 4px;
+}
+.mobile-watch .mobile-search-info strong {
+  font-size: 1rem;
+}
+.mobile-watch .mobile-search-info small {
+  font-size: 0.857143rem;
+}
+.mobile-watch .mobile-search-row button {
+  flex: 1;
+  font-size: 0.928571rem;
+  padding: 10px 12px;
+}
+.mobile-watch button:active {
+  opacity: 1;
+  background-color: var(--surface2);
+}
+.mobile-watch .primary:active {
+  background: color-mix(in srgb, var(--button) 85%, #000);
+}
+@media (max-width: 390px) {
+  .mobile-watch-title {
+    padding-left: 18px;
+    padding-right: 18px;
+    gap: 2px;
+  }
+  .mobile-watch-list {
+    padding-left: 18px;
+    padding-right: 18px;
+  }
+  .mobile-app .mobile-watch-row {
+    grid-template-columns:
+      var(--mobile-symbol-width, 6.2rem) minmax(30px, 1fr)
+      5.8rem;
+    gap: 6px;
+  }
+}
+@container (max-width:22em) {
+  .mobile-watch-title {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .mobile-watch .mobile-sse {
+    grid-column: 1/-1;
+    grid-row: 2;
+    margin-top: 2px;
+    justify-self: center;
+  }
+  .mobile-watch .mobile-header-actions {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .mobile-app .mobile-watch-row {
+    grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 8px;
+  }
+  .mobile-watch-row .mobile-watch-symbol {
+    grid-column: 1;
+    grid-row: 1;
+  }
+  .mobile-watch-row .mobile-watch-price {
+    grid-column: 2;
+    grid-row: 1;
+  }
+  .mobile-watch-price .mobile-watch-delay {
+    position: static;
+    margin-top: 2px;
+  }
+  .mobile-watch-row .mobile-spark {
+    grid-column: 1/-1;
+    grid-row: 2;
+    height: 28px;
+  }
+}
+@media (max-height: 540px) and (min-aspect-ratio: 3/2) {
+  .mobile-watch-title {
+    min-height: 56px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+}
+
+/* Group editing stays compact until the user opens a group's ordering controls. */
+.mobile-watch .mobile-form-detail label { margin: 12px 0; }
+.mobile-watch .mobile-group-create { width: 100%; color: var(--accent); background: var(--selected); }
+.mobile-watch .mobile-manage-group { padding-top: 4px; margin-top: 16px; }
+.mobile-watch .mobile-manage-group > .mobile-inline-actions { justify-content: flex-end; }
+.mobile-watch .mobile-manage-group > .mobile-inline-actions button:last-child { color: var(--down); order: -1; margin-right: auto; }
+.mobile-watch .mobile-group-order { margin-top: 8px; }
+.mobile-watch .mobile-group-order > summary { font-size: 0.928571rem; padding: 12px 0; }
+.mobile-watch .mobile-group-order > summary small { color: var(--muted); margin-left: 8px; font-size: 0.857143rem; }
+.mobile-watch .mobile-group-order .mobile-sheet-row { border-top: 1px solid var(--quiet-line); padding: 8px 0; margin: 0; }
+.mobile-watch .mobile-group-order .mobile-inline-actions { margin-top: 0; }
+.mobile-watch .mobile-group-save-actions { display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; border-top: 1px solid var(--quiet-line); padding-top: 16px; margin-top: 8px; }
+.mobile-watch .mobile-sheet select { min-width: 0; width: 100%; min-height: 52px; border-radius: 10px; }
+.mobile-watch .mobile-sheet-actions > label { margin: 4px 0; }
+
+.mobile-watch .mobile-search-name { display: block; color: var(--muted); font-size: 0.928571rem; line-height: 1.5; margin-top: 3px; overflow-wrap: anywhere; }
+.mobile-watch .mobile-search-info small { margin-top: 4px; }

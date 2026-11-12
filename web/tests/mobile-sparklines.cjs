@@ -3,7 +3,7 @@ const exportsObject={};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/sparklines.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,{exports:exportsObject,Map,Set,Promise,AbortController,Number,Math,JSON});
-const {sparklineLoader,sparklinePaths}=exportsObject;
+const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
 (async()=>{
   const requests=[],received=[],failed=[];let active=0,maxActive=0;
   const loader=sparklineLoader((items,signal)=>new Promise(resolve=>{
@@ -31,5 +31,55 @@ const {sparklineLoader,sparklinePaths}=exportsObject;
     {time:30,price:'3',gap_before:true}]});
   assert.equal(paths.length,2);assert.equal(paths[0].end[0],20);assert.equal(paths[1].end[0],60);
   assert(paths[1].end[0]<200,'future window remains blank instead of stretching points');
+  const dense=Array.from({length:1440},(_,i)=>({time:i,price:String(100+Math.sin(i/60)),gap_before:i===720}));
+  dense[333].price='150';dense[334].price='50';
+  const reduced=sparklinePaths({window_start:0,window_end:1600,points:dense},100);
+  assert.equal(reduced.length,2,'visual simplification must not join data gaps');
+  const coordinates=path=>[...path.line.matchAll(/[ML]([\d.-]+),([\d.-]+)/g)].map(m=>[Number(m[1]),Number(m[2])]);
+  const left=coordinates(reduced[0]),right=coordinates(reduced[1]);
+  assert(left.length<dense.length/3,'dense chart reduces subpixel overdraw');
+  assert(left.some(([x,y])=>x===20.81&&y===5.82),'one-observation peak survives');
+  assert(left.some(([x,y])=>x===20.88&&y===42.18),'adjacent trough survives in chronological order');
+  assert.equal(left[0][0],0);assert.equal(left.at(-1)[0],44.94);
+  assert.equal(right[0][0],45);assert.equal(right.at(-1)[0],89.94,'future space remains blank');
+  for(const segment of [left,right]) assert(segment.every((point,i)=>!i||point[0]>=segment[i-1][0]),'retained observations remain time ordered');
+  for (const [segment, source] of [[left,dense.slice(0,720)],[right,dense.slice(720)]]) {
+    for (const point of source) {
+      const x=point.time/1600*100, y=24-(Number(point.price)-100)/55*20;
+      let nearest=Infinity;
+      for(let i=1;i<segment.length;i++) {
+        const [ax,ay]=segment[i-1], [bx,by]=segment[i], dx=bx-ax,dy=by-ay;
+        const t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1)));
+        nearest=Math.min(nearest,Math.hypot(x-ax-t*dx,y-ay-t*dy));
+      }
+      assert(nearest<=0.72,'rendered simplification stays within subpixel error including rounding');
+    }
+  }
+  const quiet=Array.from({length:1440},(_,i)=>({time:i,price:String(100+i/100+Math.sin(i)*0.015),gap_before:false}));
+  const quietPaths=sparklinePaths({window_start:0,window_end:1600,points:quiet},150);
+  assert(coordinates(quietPaths[0]).length<20,'subpixel noise does not create hundreds of visible corners');
+  const single=sparklinePaths({window_start:0,window_end:100,points:[{time:20,price:'1',gap_before:false}]},100);
+  assert.equal(coordinates(single[0]).length,2,'one observation remains visible as a stroke cap');
+  const opening={window_start:0,window_end:100,points:[{time:0,price:'1.10000'},{time:1,price:'1.10010'}]};
+  const openingScale=sparklineScale(opening,48,1.1);
+  assert.equal(openingScale.referenceY,24,'previous close centered');
+  assert(Math.abs(openingScale.y(1.1001)-openingScale.y(1.1))<0.4,'tiny EURUSD opening move does not fill viewport');
+  const noReference=sparklineScale(opening);
+  assert.equal(noReference.referenceY,undefined,'first observation is not mislabeled previous close');
+  assert.equal(noReference.y(1.1),24);
+  assert.equal(sparklineScale(opening,48,NaN).referenceY,undefined);
+  const gapOpen={...opening,points:[{time:0,price:'1.122'},{time:1,price:'1.123'}]};
+  const gapScale=sparklineScale(gapOpen,48,1.1);
+  assert(gapScale.y(1.122)>4 && gapScale.y(1.122)<10,'real gap is visible above baseline without clipping');
+  assert.equal(gapScale.referenceY,24);
+  const formatted={};
+  vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/quoteFormat.ts','utf8'),{
+    compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
+  }).outputText,{exports:formatted,Number});
+  assert.equal(formatted.formatWatchPrice(1.1101243,5),'1.11012');
+  assert.equal(formatted.formatWatchPrice(147.251234,3),'147.251');
+  assert.equal(formatted.formatWatchPrice(690.380000,2),'690.38');
+  assert.equal(formatted.formatWatchPrice(0.00000001,8),'0.00000001');
+  assert.equal(formatted.formatWatchPrice(NaN,2),'—');
   console.log('PASS mobile sparklines: bounded batches/concurrency, deduplication, abort/late replies, window expiry and gaps');
 })().catch(error=>{console.error(error);process.exitCode=1;});

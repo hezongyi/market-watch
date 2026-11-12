@@ -9,18 +9,24 @@ declare global {
   }
 }
 const protocol = 1;
-function host(action: string) {
+function host(action: string, fields?: { theme: "light" | "dark" }) {
   window.MWMobileHost?.postMessage(
-    JSON.stringify({ version: protocol, action }),
+    JSON.stringify({ version: protocol, action, ...fields }),
   );
 }
 export function useMobileShell(
   flush: () => Promise<void>,
   hasInput: () => boolean,
+  theme: "light" | "dark",
 ) {
   const [info, setInfo] = useState<{
     appVersion?: string;
     webViewVersion?: string;
+    capabilities?: string[];
+  }>();
+  const [appUpdate, setAppUpdate] = useState<{
+    status: string;
+    label: string;
   }>();
   const [update, setUpdate] = useState(false),
     registration = useRef<ServiceWorkerRegistration | undefined>(undefined);
@@ -33,6 +39,7 @@ export function useMobileShell(
         const result = JSON.parse(event.data);
         if (result.version !== protocol || result.error)
           alert(result.error || "请更新 APK：页面协议不兼容");
+        else if (result.appUpdate) setAppUpdate(result.appUpdate);
         else setInfo(result);
       };
       host("hello");
@@ -78,9 +85,33 @@ export function useMobileShell(
       navigator.serviceWorker.removeEventListener("controllerchange", reload);
     };
   }, []);
+  useEffect(() => {
+    if (info?.capabilities?.includes("appearance-v1")) host("appearance", { theme });
+  }, [theme, info]);
   return {
     update,
     info,
+    appUpdate,
+    checkUpdates: async () => {
+      if (latest.current.hasInput())
+        throw Error("请先完成或放弃当前输入，再检查更新");
+      await latest.current.flush();
+      if (latest.current.hasInput())
+        throw Error("请先完成或放弃当前输入，再检查更新");
+      // A webpage update is independent from the native installation package.
+      await registration.current?.update();
+      if (info?.capabilities?.includes("app-update-v1")) {
+        setAppUpdate({ status: "checking", label: "正在检查更新…" });
+        host("check-app-update");
+      } else {
+        setAppUpdate({
+          status: "unsupported",
+          label: window.MWMobileHost
+            ? "当前 APK 尚不支持应用内更新，请先覆盖安装 0.1.2。之后可在这里更新。"
+            : "已检查网页更新；APK 更新请在 Android App 中使用。",
+        });
+      }
+    },
     apply: async () => {
       if (latest.current.hasInput())
         throw Error("请先完成或放弃当前输入，再更新页面");

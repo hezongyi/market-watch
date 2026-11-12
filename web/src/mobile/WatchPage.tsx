@@ -1,6 +1,7 @@
 import {
   useCallback,
   useEffect,
+  useId,
   useLayoutEffect,
   useMemo,
   useRef,
@@ -8,11 +9,13 @@ import {
 } from "react";
 import {
   ChevronDown,
+  Check,
   Plus,
-  SlidersHorizontal,
   ArrowUp,
   ArrowDown,
   Trash2,
+  WifiOff,
+  X,
 } from "lucide-react";
 import { api } from "../api";
 import type { MarketTransportState } from "../advanced/providerSubscriptions";
@@ -23,7 +26,8 @@ import {
   type Profile,
 } from "./cache";
 import { type MobileMarket, seriesIdentity } from "./market";
-import { sparklineLoader, sparklinePaths, type Sparkline } from "./sparklines";
+import { sparklineLoader, sparklinePaths, sparklineScale, type Sparkline } from "./sparklines";
+import { formatWatchPrice } from "./quoteFormat";
 import {
   allSymbols,
   removeGroup,
@@ -35,6 +39,9 @@ import {
   type WatchPreference,
 } from "./watchlists";
 import MobileSheet from "./MobileSheet";
+import WatchIcon from "./WatchIcons";
+import DataPage from "./DataPage";
+import { MobileEmpty, MobileLoading } from "./MobileState";
 
 type Quote = {
   n: string;
@@ -44,59 +51,172 @@ type Quote = {
   [key: string]: any;
 };
 const stamp = (value?: number | null) =>
-  value ? new Date(value).toLocaleTimeString() : "等待首次通信";
-const code = (ticker: string, quote?: Quote) =>
-  quote?.v.short_name || ticker.replace(/^MW[PHC]:/, "");
-function Spark({ item }: { item?: Sparkline }) {
-  if (!item || item.window_end <= Date.now())
-    return <span className="mobile-spark" aria-label="暂无当前窗口日内缓存" />;
-  const paths = sparklinePaths(item);
+  value ? new Date(value).toLocaleTimeString("zh-CN", { hour12: false }) : "等待首次通信";
+const code = (ticker: string, quote?: Quote) => {
+  if (quote?.v?.short_name) return quote.v.short_name;
+  const fallback = ticker.replace(/^MW[PHC]:/, "");
+  // Opaque dataset IDs are not readable symbols; keep the row stable until metadata arrives.
+  return /(?:^|:)[a-f0-9]{32,64}$/i.test(fallback)
+    ? quote && quote.s !== "ok" ? "暂不可用" : "读取中…"
+    : fallback;
+};
+function compactIdentity(ticker: string, quote?: Quote) {
+  const value = quote?.v;
+  const parts = String(value?.description_base || value?.description || "")
+    .split(" · ")
+    .map((part) => part.trim());
+  const kindAt = parts.findIndex((part) =>
+    ["平台", "自建", "组合"].includes(part),
+  );
+  const identity = seriesIdentity(ticker);
+  const kind = (
+    {
+      provider: "平台",
+      history: "自建",
+      managed: "自建",
+      composite: "组合",
+    } as Record<string, string>
+  )[identity.series_kind];
+  const source = (kindAt >= 0 ? parts[kindAt + 1] : value?.exchange) || "来源待确认";
+  const provider = identity.series_kind === "provider"
+    ? ({ "BINANCE": "Binance", "BINANCE SPOT": "Binance", "YAHOO FINANCE": "Yahoo", "YAHOO": "Yahoo" } as Record<string, string>)[source.toUpperCase()] || source
+    : undefined;
+  return {
+    provider,
+    name:
+      kindAt > 0
+        ? parts
+            .slice(parts[0] === code(ticker, quote) ? 1 : 0, kindAt)
+            .join(" · ")
+        : "",
+    series:
+      kindAt >= 0
+        ? parts
+            .slice(kindAt, kindAt + 2)
+            .map((part) =>
+              part === "Binance Spot"
+                ? "Binance"
+                : part === "Yahoo Finance"
+                  ? "Yahoo"
+                  : part,
+            )
+            .join(" · ")
+        : [kind, value?.exchange || "来源待确认"].filter(Boolean).join(" · "),
+  };
+}
+function Spark({
+  item,
+  online,
+  state,
+  previousClose,
+}: {
+  item?: Sparkline;
+  online: boolean;
+  state?: "loading" | "error";
+  previousClose?: number;
+}) {
+  const gradient = useId();
+  const container = useRef<HTMLSpanElement>(null);
+  const [width, setWidth] = useState(200);
+  useLayoutEffect(() => {
+    const element = container.current;
+    if (!element) return;
+    const measure = () => setWidth(Math.max(1, Math.round(element.getBoundingClientRect().width)));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+  const current = item && item.window_end > Date.now() ? item : undefined;
+  const paths = useMemo(() => current ? sparklinePaths(current, width, 48, previousClose) : [], [current, width, previousClose]);
+  const referenceY = current ? sparklineScale(current, 48, previousClose).referenceY : undefined;
+  if (!current || !paths.length) {
+    const label = !online
+      ? "离线无缓存"
+      : state === "loading"
+        ? "加载中"
+        : state === "error"
+          ? "加载失败"
+          : current?.status === "unavailable"
+            ? "走势不可用"
+            : current
+              ? "暂无日内数据"
+              : "等待走势";
+    return (
+      <span
+        ref={container}
+        className="mobile-spark mobile-spark-empty"
+        data-state={!online ? "offline" : state || current?.status || "waiting"}
+        title={current?.reason || label}
+        aria-label={label}
+      >
+        {label}
+      </span>
+    );
+  }
+  const cached = !online || state === "error";
   return (
-    <svg
-      className="mobile-spark"
-      viewBox="0 0 200 48"
-      preserveAspectRatio="none"
-      aria-label={item.reason || "当前窗口日内走势"}
-    >
-      {item.reference_times?.map((at) => (
-        <line
-          key={at}
-          x1={
-            ((at - item.window_start) / (item.window_end - item.window_start)) *
-            200
-          }
-          x2={
-            ((at - item.window_start) / (item.window_end - item.window_start)) *
-            200
-          }
-          y1="0"
-          y2="48"
-          stroke="currentColor"
-          opacity=".2"
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
-      {paths.map((path, i) => (
-        <g key={i}>
-          <path d={path.area} fill="currentColor" opacity=".08" />
-          <path
-            d={path.line}
+    <span ref={container} className="mobile-spark" data-cached={cached || undefined}>
+      <svg
+        viewBox={`0 0 ${width} 48`}
+        preserveAspectRatio="none"
+        aria-label={
+          cached
+            ? "离线或刷新失败，显示缓存走势"
+            : current.reason || "当前窗口日内走势"
+        }
+      >
+        <defs>
+          <linearGradient id={gradient} x1="0" y1="0" x2="0" y2="48" gradientUnits="userSpaceOnUse">
+            <stop offset="0" stopColor="currentColor" className="mobile-spark-fill-top" />
+            <stop offset="55%" stopColor="currentColor" className="mobile-spark-fill-middle" />
+            <stop offset="100%" stopColor="currentColor" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {referenceY !== undefined && (
+          <line className="mobile-spark-previous-close" x1="0" x2={width}
+            y1={referenceY} y2={referenceY} vectorEffect="non-scaling-stroke">
+            <title>{`昨收 ${previousClose} · 与报价涨跌幅同基准`}</title>
+          </line>
+        )}
+        {current.reference_times?.map((at) => (
+          <line
+            key={at}
+            x1={
+              ((at - current.window_start) /
+                (current.window_end - current.window_start)) *
+              width
+            }
+            x2={
+              ((at - current.window_start) /
+                (current.window_end - current.window_start)) *
+              width
+            }
+            y1="0"
+            y2="48"
             stroke="currentColor"
-            strokeWidth="1.4"
-            fill="none"
+            opacity=".12"
             vectorEffect="non-scaling-stroke"
           />
-        </g>
-      ))}
-      {paths.length > 0 && (
-        <circle
-          cx={paths.at(-1)!.end[0]}
-          cy={paths.at(-1)!.end[1]}
-          r="2"
-          fill="currentColor"
-        />
-      )}
-    </svg>
+        ))}
+        {paths.map((path, i) => (
+          <g key={i}>
+            <path d={path.area} fill={`url(#${gradient})`} />
+            <path
+              d={path.line}
+              stroke="currentColor"
+              strokeWidth="1.2"
+              strokeOpacity=".72"
+              strokeLinejoin="round"
+              strokeLinecap="round"
+              fill="none"
+              vectorEffect="non-scaling-stroke"
+            />
+          </g>
+        ))}
+      </svg>
+      {cached && <small className="mobile-spark-caption">缓存</small>}
+    </span>
   );
 }
 
@@ -106,16 +226,20 @@ export default function WatchPage({
   connection,
   visible,
   open,
-  search,
   report,
+  notice,
+  closeNotice,
+  showNotices,
 }: {
   profile: Profile;
   online: boolean;
   connection?: MobileMarket;
   visible: boolean;
   open(ticker: string): void;
-  search(): void;
   report(message: string): void;
+  notice?: string;
+  closeNotice?(): void;
+  showNotices?(): void;
 }) {
   const [preference, setPreference] = useState<WatchPreference>(),
     [loaded, setLoaded] = useState(false);
@@ -129,8 +253,14 @@ export default function WatchPage({
   const [undo, setUndo] = useState<WatchList[]>(),
     [hydrated, setHydrated] = useState(false);
   const [loadError, setLoadError] = useState("");
+  const [searching, setSearching] = useState(false);
+  const [groupForm, setGroupForm] = useState<"new" | "rename">();
+  const [nameError, setNameError] = useState("");
   const [quotes, setQuotes] = useState<Record<string, Quote>>({}),
     [sparks, setSparks] = useState<Record<string, Sparkline>>({});
+  const [sparkStates, setSparkStates] = useState<
+    Record<string, "loading" | "error">
+  >({});
   const [aligned, setAligned] = useState<Set<string>>(new Set());
   const [transport, setTransport] = useState<MarketTransportState>();
   const [foreground, setForeground] = useState(!document.hidden),
@@ -416,7 +546,37 @@ export default function WatchPage({
     let timer: ReturnType<typeof setTimeout>,
       active = true;
     const loader = sparklineLoader(
-      (items, signal) => api("/market-data/sparklines", { items }, signal),
+      async (items, signal) => {
+        setSparkStates((previous) => ({
+          ...previous,
+          ...Object.fromEntries(
+            items.map((item) => [item.ticker, "loading" as const]),
+          ),
+        }));
+        try {
+          const response = await api(
+            "/market-data/sparklines",
+            { items },
+            signal,
+          );
+          if (active && !signal.aborted)
+            setSparkStates((previous) => {
+              const next = { ...previous };
+              for (const item of items) delete next[item.ticker];
+              return next;
+            });
+          return response;
+        } catch (error) {
+          if (active && !signal.aborted)
+            setSparkStates((previous) => ({
+              ...previous,
+              ...Object.fromEntries(
+                items.map((item) => [item.ticker, "error" as const]),
+              ),
+            }));
+          throw error;
+        }
+      },
       (items) => {
         if (!active) return;
         const next = { ...currentSparks.current };
@@ -436,7 +596,9 @@ export default function WatchPage({
         setSparks(next);
         void writeSnapshot(profile, "watch-sparklines", next).catch(() => {});
       },
-      (error) => report(String(error)),
+      () => {
+        /* Each failed row shows its own state; periodic refresh retries. */
+      },
     );
     const load = async () => {
       // Expire old curves before a new request, even when that request fails.
@@ -509,16 +671,25 @@ export default function WatchPage({
   const status = !foreground
     ? "后台暂停"
     : !online
-      ? "SSE 等待连接"
+      ? "等待连接"
       : !transport || transport.state === "idle"
-        ? "SSE 无活跃订阅"
+        ? "等待行情"
         : transport.state === "open"
-          ? "SSE 已连接"
+          ? "已连接"
           : transport.state === "error"
-            ? "SSE 正在重连"
-            : "SSE 连接中";
+            ? "正在重连"
+            : "连接中";
   const last = Math.max(transport?.messageAt || 0, transport?.heartbeatAt || 0);
   const editing = draft || content.lists;
+  const cacheStatus =
+    loaded &&
+    (!online
+      ? "手机离线 · 当前显示上次数据"
+      : loadError
+        ? "刷新失败 · 已保留上次自选"
+        : readAt
+          ? "正在确认 · 当前显示上次自选"
+          : "");
   return (
     <section hidden={!visible} className="mobile-watch">
       <header className="mobile-watch-title">
@@ -537,12 +708,20 @@ export default function WatchPage({
           </span>
           <ChevronDown aria-hidden="true" />
         </button>
-        <div className="mobile-sse" role="status">
+        <div
+          className="mobile-sse"
+          data-connected={online && transport?.state === "open"}
+          role="status"
+        >
           <span>{status}</span>
           <small>{last ? "最近通信 " + stamp(last) : "等待首次通信"}</small>
         </div>
         <div className="mobile-header-actions">
-          <button aria-label="搜索并添加品种" onClick={search}>
+          <button
+            className="mobile-watch-add"
+            aria-label="搜索并添加品种"
+            onClick={() => setSearching(true)}
+          >
             <Plus aria-hidden="true" />
           </button>
           <button
@@ -552,10 +731,34 @@ export default function WatchPage({
               setSheet("manage");
             }}
           >
-            <SlidersHorizontal aria-hidden="true" />
+            <WatchIcon name="manage" />
           </button>
         </div>
       </header>
+      {cacheStatus && (
+        <div className="mobile-watch-status" role="status">
+          <WifiOff aria-hidden="true" />
+          <span>{cacheStatus}</span>
+        </div>
+      )}
+      {notice && (
+        <aside className="mobile-watch-notice" role="status">
+          <div>
+            <strong>有事件需要查看</strong>
+            <p>{notice}</p>
+          </div>
+          <button className="mobile-link-button" onClick={showNotices}>
+            查看
+          </button>
+          <button
+            className="mobile-watch-dismiss"
+            aria-label="关闭事件提醒"
+            onClick={closeNotice}
+          >
+            <X aria-hidden="true" />
+          </button>
+        </aside>
+      )}
       <div
         ref={list}
         className="mobile-watch-list"
@@ -573,27 +776,41 @@ export default function WatchPage({
         }}
       >
         {!loaded ? (
-          <p role="status">
-            {loadError
-              ? "读取失败，暂无可读取的自选缓存"
-              : online
-                ? "正在读取自选…"
-                : "暂无可读取的自选缓存"}
-            {loadError && (
-              <button
-                onClick={() =>
-                  void refresh().catch((error) => {
-                    setLoadError(String(error));
-                    report(String(error));
-                  })
-                }
-              >
-                重试
-              </button>
-            )}
-          </p>
+          online && !loadError ? (
+            <MobileLoading label="正在读取自选…" />
+          ) : (
+            <MobileEmpty
+              offline
+              title="暂无本地数据"
+              action={
+                loadError && (
+                  <button
+                    onClick={() =>
+                      void refresh().catch((error) => {
+                        setLoadError(String(error));
+                        report(String(error));
+                      })
+                    }
+                  >
+                    重试
+                  </button>
+                )
+              }
+            >
+              连接恢复后自动读取。
+            </MobileEmpty>
+          )
         ) : !symbols.length ? (
-          <p>此分组还没有自选，点击右上角添加。</p>
+          <MobileEmpty
+            title="还没有关注品种"
+            action={
+              <button className="primary" onClick={() => setSearching(true)}>
+                搜索品种
+              </button>
+            }
+          >
+            按需选择品种，建立自己的行情清单。
+          </MobileEmpty>
         ) : null}
         {symbols.map((ticker) => {
           const quote = quotes[ticker],
@@ -608,18 +825,30 @@ export default function WatchPage({
             (value?.fetch_status && value.fetch_status !== "ok");
           const item = sparks[ticker],
             revision = quote?.snapshot?.revision_id;
+          const identity = compactIdentity(ticker, quote);
           return (
             <button
               key={ticker}
               data-ticker={ticker}
-              className={`mobile-watch-row ${stale ? "stale" : ""}`}
+              data-delayed={typeof value?.delay_seconds === "number" && value.delay_seconds > 0 || undefined}
+              data-wide-symbol={code(ticker, quote).length > 8 || undefined}
+              title={value?.description}
+              className={`mobile-watch-row ${stale ? "stale" : ""} ${typeof change === "number" ? (change >= 0 ? "positive" : "negative") : ""}`}
               onClick={() => open(ticker)}
             >
               <span className="mobile-watch-symbol">
                 <strong>{code(ticker, quote)}</strong>
-                <small>{value?.description || ticker}</small>
+                {identity.provider && (
+                  <span className="mobile-watch-origin" title={identity.series}>
+                    {identity.provider}
+                  </span>
+                )}
               </span>
               <Spark
+                online={online}
+                previousClose={quote?.s === "ok" && item && value?.read_at >= item.window_start &&
+                  value.read_at < item.window_end ? value.prev_close_price : undefined}
+                state={sparkStates[ticker]}
                 item={
                   revision && item?.revision?.composite_revision_id !== revision
                     ? undefined
@@ -627,14 +856,8 @@ export default function WatchPage({
                 }
               />
               <span className="mobile-watch-price">
-                <strong>
-                  {typeof price === "number"
-                    ? price.toLocaleString(undefined, {
-                        maximumFractionDigits: 8,
-                      })
-                    : "—"}
-                </strong>
-                <small
+                <strong
+                  aria-label={typeof change === "number" ? `涨跌幅 ${change.toFixed(2)}%` : "涨跌幅暂无"}
                   className={
                     typeof change !== "number"
                       ? ""
@@ -646,12 +869,37 @@ export default function WatchPage({
                   {typeof change === "number"
                     ? `${change >= 0 ? "+" : ""}${change.toFixed(2)}%`
                     : "—"}
+                </strong>
+                <small className="mobile-watch-last-price" title={typeof price === "number" ? String(price) : undefined}>
+                  {formatWatchPrice(price, value?.display_precision)}
                 </small>
+                {typeof value?.delay_seconds === "number" &&
+                  value.delay_seconds > 0 && (
+                    <small className="mobile-watch-delay">
+                      延迟{Math.ceil(value.delay_seconds / 60)}分
+                    </small>
+                  )}
               </span>
             </button>
           );
         })}
       </div>
+      {searching && (
+        <MobileSheet title="搜索品种" close={() => setSearching(false)}>
+          <DataPage
+            profile={profile}
+            online={online}
+            visible
+            searchMode
+            initialGroup={group}
+            report={report}
+            open={(ticker) => {
+              setSearching(false);
+              open(ticker);
+            }}
+          />
+        </MobileSheet>
+      )}
       {sheet && (
         <MobileSheet
           title={sheet === "groups" ? "自选分组" : "管理自选"}
@@ -665,215 +913,301 @@ export default function WatchPage({
         >
           {sheet === "groups" ? (
             <>
-              {[{ id: "", title: "全部自选" }, ...content.lists].map((row) => (
+              <div className="mobile-group-grid">
+                {[{ id: "", title: "全部自选" }, ...content.lists].map(
+                  (row) => (
+                    <button
+                      key={row.id}
+                      aria-pressed={group === row.id}
+                      aria-label={row.title}
+                      onClick={() => {
+                        setGroup(row.id);
+                        setSheet(null);
+                        void writeSnapshot(
+                          profile,
+                          "watch-group",
+                          row.id,
+                        ).catch(() => report("分组选择未记住"));
+                      }}
+                    >
+                      <span className="mobile-group-label">{row.title}</span>
+                      <span className="mobile-group-count" aria-hidden="true">{row.id ? content.lists.find(item => item.id === row.id)?.symbols.length : allSymbols(content).length}</span>
+                      {group === row.id && <Check className="mobile-group-check" aria-hidden="true" />}
+                    </button>
+                  ),
+                )}
+              </div>
+              <div className="mobile-sheet-actions">
                 <button
-                  key={row.id}
-                  className="mobile-sheet-row"
-                  aria-pressed={group === row.id}
                   onClick={() => {
-                    setGroup(row.id);
-                    setSheet(null);
-                    void writeSnapshot(profile, "watch-group", row.id).catch(
-                      () => report("分组选择未记住"),
-                    );
+                    setName("");
+                    setNameError("");
+                    setGroupForm("new");
                   }}
                 >
-                  {row.title}
+                  新建分组
                 </button>
-              ))}
-              <button
-                onClick={() => {
-                  setName("");
-                  setSheet("manage");
-                }}
-              >
-                管理分组
-              </button>
+                {group && (
+                  <button
+                    onClick={() => {
+                      setName(
+                        content.lists.find((row) => row.id === group)?.title ||
+                          "",
+                      );
+                      setNameError("");
+                      setGroupForm("rename");
+                    }}
+                  >
+                    重命名当前分组
+                  </button>
+                )}
+                <button
+                  onClick={() => {
+                    setName("");
+                    setSheet("manage");
+                  }}
+                >
+                  管理分组与排序
+                </button>
+              </div>
             </>
           ) : (
             <>
               {!online && <p>上次内容，连接核验后才能修改。</p>}
               {unsaved && (
-                <p role="status">
+                <p className="mobile-submit-status" role="status">
                   尚未保存。冲突时保留当前输入，放弃修改后可查看最新。
                 </p>
               )}
-              <label>
-                新分组名称
-                <input
-                  value={name}
-                  maxLength={100}
-                  onChange={(event) => setName(event.target.value)}
-                />
-              </label>
-              <button
-                disabled={!online || busy || !name.trim()}
-                onClick={() => {
-                  const lists = [
-                    ...editing,
-                    {
-                      id: crypto.randomUUID(),
-                      title: name.trim(),
-                      symbols: [],
-                    },
-                  ];
-                  setDraft(lists);
-                  setName("");
-                }}
-              >
-                添加分组
-              </button>
-              {editing.map((row, index) => (
-                <div key={row.id} className="mobile-manage-group">
-                  <label>
-                    分组名称
-                    <input
-                      value={row.title}
-                      maxLength={100}
-                      onChange={(event) =>
-                        setDraft(
-                          editing.map((item) =>
-                            item.id === row.id
-                              ? { ...item, title: event.target.value }
-                              : item,
-                          ),
-                        )
-                      }
-                    />
-                  </label>
-                  <div className="mobile-inline-actions">
-                    <button
-                      aria-label={`上移分组 ${row.title}`}
-                      disabled={!index}
-                      onClick={() => {
-                        const next = [...editing];
-                        [next[index - 1], next[index]] = [
-                          next[index],
-                          next[index - 1],
-                        ];
-                        setDraft(next);
-                      }}
-                    >
-                      <ArrowUp aria-hidden="true" />
-                    </button>
-                    <button
-                      aria-label={`下移分组 ${row.title}`}
-                      disabled={index === editing.length - 1}
-                      onClick={() => {
-                        const next = [...editing];
-                        [next[index + 1], next[index]] = [
-                          next[index],
-                          next[index + 1],
-                        ];
-                        setDraft(next);
-                      }}
-                    >
-                      <ArrowDown aria-hidden="true" />
-                    </button>
-                    <button
-                      aria-label={`删除分组 ${row.title}`}
-                      onClick={() => {
-                        if (
-                          confirm(
-                            "删除此分组？自选品种将保留在其他分组或未分组中。",
-                          )
-                        )
+              <div className="mobile-manage-context">
+                <span>当前分组</span>
+                <strong>{group ? content.lists.find(row => row.id === group)?.title : "全部自选"}</strong>
+                <small>{symbols.length} 个品种</small>
+              </div>
+              <p className="mobile-manage-help">{group ? "用箭头调整顺序，移除后可撤销。" : "选择具体分组可调整顺序，移除后可撤销。"}</p>
+              <details className="mobile-form-detail">
+                <summary>
+                  管理分组 <small>新建、改名与排序</small>
+                </summary>
+                <label>
+                  新分组名称
+                  <input
+                    value={name}
+                    placeholder="例如：重点关注"
+                    maxLength={100}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </label>
+                <button
+                  className="mobile-group-create"
+                  disabled={!online || busy || !name.trim()}
+                  onClick={() => {
+                    const lists = [
+                      ...editing,
+                      {
+                        id: crypto.randomUUID(),
+                        title: name.trim(),
+                        symbols: [],
+                      },
+                    ];
+                    setDraft(lists);
+                    setName("");
+                  }}
+                >
+                  添加分组
+                </button>
+                {editing.map((row, index) => (
+                  <div key={row.id} className="mobile-manage-group">
+                    <label>
+                      分组名称
+                      <input
+                        value={row.title}
+                        maxLength={100}
+                        onChange={(event) =>
                           setDraft(
-                            removeGroup({ ...content, lists: editing }, row.id),
-                          );
+                            editing.map((item) =>
+                              item.id === row.id
+                                ? { ...item, title: event.target.value }
+                                : item,
+                            ),
+                          )
+                        }
+                      />
+                    </label>
+                    <div className="mobile-inline-actions">
+                      <button
+                        aria-label={`上移分组 ${row.title}`}
+                        disabled={!index}
+                        onClick={() => {
+                          const next = [...editing];
+                          [next[index - 1], next[index]] = [
+                            next[index],
+                            next[index - 1],
+                          ];
+                          setDraft(next);
+                        }}
+                      >
+                        <ArrowUp aria-hidden="true" />
+                      </button>
+                      <button
+                        aria-label={`下移分组 ${row.title}`}
+                        disabled={index === editing.length - 1}
+                        onClick={() => {
+                          const next = [...editing];
+                          [next[index + 1], next[index]] = [
+                            next[index],
+                            next[index + 1],
+                          ];
+                          setDraft(next);
+                        }}
+                      >
+                        <ArrowDown aria-hidden="true" />
+                      </button>
+                      <button
+                        aria-label={`删除分组 ${row.title}`}
+                        onClick={() => {
+                          if (
+                            confirm(
+                              "删除此分组？自选品种将保留在其他分组或未分组中。",
+                            )
+                          )
+                            setDraft(
+                              removeGroup(
+                                { ...content, lists: editing },
+                                row.id,
+                              ),
+                            );
+                        }}
+                      >
+                        <Trash2 aria-hidden="true" />
+                      </button>
+                    </div>
+                    <details className="mobile-group-order">
+                      <summary>品种排序 <small>{row.symbols.length} 个品种</small></summary>
+                    {row.symbols.map((ticker, position) => (
+                      <div className="mobile-sheet-row" key={ticker}>
+                        <span>{code(ticker, quotes[ticker])}</span>
+                        <div className="mobile-inline-actions">
+                          {[
+                            [-1, "上移"],
+                            [1, "下移"],
+                          ].map(([direction, title]) => (
+                            <button
+                              key={String(direction)}
+                              aria-label={`${title}品种 ${code(ticker, quotes[ticker])}（${row.title}）`}
+                              disabled={
+                                Number(direction) < 0
+                                  ? position === 0
+                                  : position === row.symbols.length - 1
+                              }
+                              onClick={() => {
+                                const symbols = [...row.symbols],
+                                  destination = position + Number(direction);
+                                [symbols[position], symbols[destination]] = [
+                                  symbols[destination],
+                                  symbols[position],
+                                ];
+                                setDraft(
+                                  editing.map((item) =>
+                                    item.id === row.id
+                                      ? { ...item, symbols }
+                                      : item,
+                                  ),
+                                );
+                              }}
+                            >
+                              {Number(direction) < 0 ? (
+                                <ArrowUp aria-hidden="true" />
+                              ) : (
+                                <ArrowDown aria-hidden="true" />
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    ))}
+                    </details>
+                  </div>
+                ))}
+                <div className="mobile-group-save-actions">
+                <button
+                  disabled={busy}
+                  onClick={() => {
+                    if (
+                      (!draft && !unsaved) ||
+                      confirm("放弃当前修改并查看最新自选？")
+                    ) {
+                      setDraft(undefined);
+                      setUnsaved(false);
+                      setName("");
+                      void refresh().catch((error) => report(String(error)));
+                    }
+                  }}
+                >
+                  查看最新
+                </button>
+                </div>
+              </details>
+
+              {symbols.map((ticker, position) => (
+                <div key={ticker} className="mobile-watch-manage-row">
+                  <span>
+                    <strong>{code(ticker, quotes[ticker])}</strong>
+                    <small>
+                      {compactIdentity(ticker, quotes[ticker]).name}
+                    </small>
+                  </span>
+                  <div className="mobile-watch-list-actions">
+                    {group &&
+                      [-1, 1].map((direction) => (
+                        <button
+                          key={direction}
+                          aria-label={`${direction < 0 ? "上移" : "下移"}${code(ticker, quotes[ticker])}`}
+                          disabled={
+                            !online ||
+                            busy ||
+                            Boolean(draft) ||
+                            (direction < 0
+                              ? position === 0
+                              : position === symbols.length - 1)
+                          }
+                          onClick={() => {
+                            const next = [...symbols],
+                              target = position + direction;
+                            [next[position], next[target]] = [
+                              next[target],
+                              next[position],
+                            ];
+                            void save(
+                              content.lists.map((row) =>
+                                row.id === group
+                                  ? { ...row, symbols: next }
+                                  : row,
+                              ),
+                            );
+                          }}
+                        >
+                          {direction < 0 ? (
+                            <ArrowUp aria-hidden="true" />
+                          ) : (
+                            <ArrowDown aria-hidden="true" />
+                          )}
+                        </button>
+                      ))}
+                    <button
+                      className="mobile-watch-remove"
+                      disabled={!online || busy || Boolean(draft)}
+                      onClick={async () => {
+                        const previous = content.lists;
+                        if (await save(removeSymbol(content, ticker, group))) {
+                          report("已移除；可在自选管理中撤销本次移除");
+                          setUndo(previous);
+                        }
                       }}
                     >
-                      <Trash2 aria-hidden="true" />
+                      移除
                     </button>
                   </div>
-                  {row.symbols.map((ticker, position) => (
-                    <div className="mobile-sheet-row" key={ticker}>
-                      <span>{code(ticker, quotes[ticker])}</span>
-                      <div className="mobile-inline-actions">
-                        {[
-                          [-1, "上移"],
-                          [1, "下移"],
-                        ].map(([direction, title]) => (
-                          <button
-                            key={String(direction)}
-                            aria-label={`${title}品种 ${code(ticker, quotes[ticker])}（${row.title}）`}
-                            disabled={
-                              Number(direction) < 0
-                                ? position === 0
-                                : position === row.symbols.length - 1
-                            }
-                            onClick={() => {
-                              const symbols = [...row.symbols],
-                                destination = position + Number(direction);
-                              [symbols[position], symbols[destination]] = [
-                                symbols[destination],
-                                symbols[position],
-                              ];
-                              setDraft(
-                                editing.map((item) =>
-                                  item.id === row.id
-                                    ? { ...item, symbols }
-                                    : item,
-                                ),
-                              );
-                            }}
-                          >
-                            {Number(direction) < 0 ? (
-                              <ArrowUp aria-hidden="true" />
-                            ) : (
-                              <ArrowDown aria-hidden="true" />
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ))}
-              <button
-                className="primary"
-                disabled={
-                  !online ||
-                  busy ||
-                  !draft ||
-                  draft.some((row) => !row.title.trim())
-                }
-                onClick={() => void save(editing)}
-              >
-                {busy ? "正在保存…" : "保存分组"}
-              </button>
-              <button
-                disabled={busy}
-                onClick={() => {
-                  if (
-                    (!draft && !unsaved) ||
-                    confirm("放弃当前修改并查看最新自选？")
-                  ) {
-                    setDraft(undefined);
-                    setUnsaved(false);
-                    setName("");
-                    void refresh().catch((error) => report(String(error)));
-                  }
-                }}
-              >
-                查看最新
-              </button>
-              <h3>{group ? "从当前分组移除" : "从全部自选移除"}</h3>
-              {symbols.map((ticker) => (
-                <div key={ticker} className="mobile-sheet-row">
-                  <span>{code(ticker, quotes[ticker])}</span>
-                  <button
-                    disabled={!online || busy}
-                    onClick={async () => {
-                      const previous = content.lists;
-                      if (await save(removeSymbol(content, ticker, group))) {
-                        report("已移除；可在自选管理中撤销本次移除");
-                        setUndo(previous);
-                      }
-                    }}
-                  >
-                    移除
-                  </button>
                 </div>
               ))}
               {undo && (
@@ -886,8 +1220,104 @@ export default function WatchPage({
                   撤销上次移除
                 </button>
               )}
+              <div className="mobile-sheet-actions">
+                {draft ? <button
+                  className="primary"
+                  disabled={!online || busy || draft.some(row => !row.title.trim())}
+                  onClick={() => void save(editing)}
+                >
+                  {busy ? "正在保存…" : "保存分组"}
+                </button> : <button
+                  className="primary"
+                  disabled={busy || unsaved}
+                  onClick={() => {
+                    setSheet(null);
+                    setName("");
+                  }}
+                >
+                  完成
+                </button>}
+              </div>
             </>
           )}
+        </MobileSheet>
+      )}
+      {groupForm && (
+        <MobileSheet
+          title={groupForm === "new" ? "新建分组" : "重命名分组"}
+          dirty={
+            groupForm === "new"
+              ? Boolean(name)
+              : name !==
+                (content.lists.find((row) => row.id === group)?.title || "")
+          }
+          close={() => {
+            setGroupForm(undefined);
+            setName("");
+          }}
+        >
+          <form
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const title = name.trim();
+              if (
+                !title ||
+                title === "全部" ||
+                content.lists.some(
+                  (row) =>
+                    row.title === title &&
+                    (groupForm === "new" || row.id !== group),
+                )
+              ) {
+                setNameError("请输入不重复的分组名称（1–20 字）。");
+                return;
+              }
+              const lists =
+                groupForm === "new"
+                  ? [
+                      ...content.lists,
+                      { id: crypto.randomUUID(), title, symbols: [] },
+                    ]
+                  : content.lists.map((row) =>
+                      row.id === group ? { ...row, title } : row,
+                    );
+              if (await save(lists)) {
+                setGroupForm(undefined);
+                setName("");
+                report("分组已保存");
+              }
+            }}
+          >
+            {unsaved && (
+              <p role="status" className="mobile-submit-status">
+                尚未保存 · 本次输入已保留
+              </p>
+            )}
+            <label>
+              分组名称
+              <input
+                required
+                maxLength={20}
+                placeholder="例如：重点关注"
+                value={name}
+                aria-invalid={Boolean(nameError)}
+                onChange={(event) => {
+                  setName(event.target.value);
+                  setNameError("");
+                }}
+              />
+              {nameError && (
+                <small role="alert" className="mobile-field-error">
+                  {nameError}
+                </small>
+              )}
+            </label>
+            <div className="mobile-sheet-actions">
+              <button className="primary" disabled={!online || busy}>
+                {busy ? "正在保存…" : "保存分组"}
+              </button>
+            </div>
+          </form>
         </MobileSheet>
       )}
     </section>

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api } from "../api";
+import { ChevronRight, Search, Wifi } from "lucide-react";
 import {
   profileActive,
   readSnapshot,
@@ -17,6 +18,7 @@ import {
   type WatchList,
 } from "./watchlists";
 import MobileSheet from "./MobileSheet";
+import { MobileEmpty, MobileLoading } from "./MobileState";
 
 type Row = {
   ticker: string;
@@ -51,14 +53,18 @@ export default function DataPage({
   visible,
   open,
   report,
+  searchMode = false,
+  initialGroup = "",
 }: {
   profile: Profile;
   online: boolean;
   visible: boolean;
   open(ticker: string): void;
   report(message: string): void;
+  searchMode?: boolean;
+  initialGroup?: string;
 }) {
-  const [kind, setKind] = useState("composite"),
+  const [kind, setKind] = useState(searchMode ? "all" : "provider"),
     [query, setQuery] = useState(""),
     [source, setSource] = useState("");
   const [pages, setPages] = useState<{ offset: number; cursor?: string }[]>([
@@ -74,7 +80,7 @@ export default function DataPage({
     [detail, setDetail] = useState<any>(),
     [detailError, setDetailError] = useState("");
   const [groups, setGroups] = useState<WatchList[]>([]),
-    [targetGroup, setTargetGroup] = useState("");
+    [targetGroup, setTargetGroup] = useState(initialGroup);
   const [versions, setVersions] = useState<any[]>();
   const [favorites, setFavorites] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
@@ -85,6 +91,7 @@ export default function DataPage({
     page: number;
     total?: number;
   }>();
+  const [toolsOpen, setToolsOpen] = useState(false);
   const generation = useRef(0);
   const position = pages.at(-1)!;
   const cacheName =
@@ -97,6 +104,7 @@ export default function DataPage({
     setError("");
     setLoaded(false);
     setPage(undefined);
+    setReadAt(undefined);
     const timer = setTimeout(async () => {
       try {
         const cached = await readSnapshot<Page>(profile, cacheName);
@@ -326,7 +334,21 @@ export default function DataPage({
     }
   }
   return (
-    <section hidden={!visible} className="mobile-content mobile-data">
+    <section hidden={!visible} className={searchMode ? "mobile-search-content" : "mobile-content mobile-data"}>
+      {!searchMode && <>
+      <header className="mobile-title">
+        <div>
+          <h1>数据</h1>
+          <small>平台目录、自建行情与组合</small>
+        </div>
+        <button
+          className="mobile-icon-button"
+          aria-label="查看来源状态"
+          onClick={() => void statuses("来源状态")}
+        >
+          <Wifi aria-hidden="true" />
+        </button>
+      </header>
       <div className="mobile-tabs" role="group" aria-label="行情类型">
         {[
           ["provider", "平台"],
@@ -345,10 +367,13 @@ export default function DataPage({
           </button>
         ))}
       </div>
-      <label>
-        搜索代码或中文
+      </>}
+      <label className="mobile-search-field">
+        <Search aria-hidden="true" />
+        <span className="sr-only">搜索代码或中文</span>
         <input
           type="search"
+          placeholder="搜索代码或中文名称"
           value={query}
           maxLength={100}
           onChange={(event) => {
@@ -357,9 +382,11 @@ export default function DataPage({
           }}
         />
       </label>
-      <div className="mobile-inline-actions">
+      {searchMode ? <div className="mobile-source-filters" role="group" aria-label="搜索来源">
+        {sources.map(([value, title]) => <button key={value} aria-pressed={source === value} onClick={() => { setSource(value); setPages([{offset: 0}]); }}>{value ? title : "全部"}</button>)}
+      </div> : <div className="mobile-source-bar">
         <label>
-          来源
+          <span className="sr-only">来源</span>
           <select
             value={source}
             onChange={(event) => {
@@ -374,30 +401,87 @@ export default function DataPage({
             ))}
           </select>
         </label>
-        <button onClick={() => void statuses("任务记录")}>任务记录</button>
-        <button onClick={() => void statuses("来源状态")}>来源状态</button>
-        {kind !== "provider" && (
-          <button onClick={() => void statuses("自建维护")}>维护状态</button>
-        )}
-      </div>
-      {readAt && <p>上次读取 {new Date(readAt).toLocaleString()}</p>}
-      {loading && <p role="status">正在更新目录…</p>}
+        <button
+          className="mobile-link-button"
+          onClick={() => setToolsOpen(true)}
+        >
+          任务与来源
+        </button>
+      </div>}
+      {toolsOpen && (
+        <MobileSheet title="任务与来源" close={() => setToolsOpen(false)}>
+          {[
+            "任务记录",
+            "来源状态",
+            ...(kind !== "provider" ? ["自建维护"] : []),
+          ].map((title) => (
+            <button
+              key={title}
+              className="mobile-sheet-row"
+              onClick={() => {
+                setToolsOpen(false);
+                void statuses(title);
+              }}
+            >
+              {title}
+              <ChevronRight aria-hidden="true" />
+            </button>
+          ))}
+        </MobileSheet>
+      )}
+      {readAt && <p className="mobile-rows-note">上次读取 {new Date(readAt).toLocaleString()} · 当前待确认</p>}
+      {loading && !loaded && <MobileLoading label="正在读取目录…" />}
+      {loading && loaded && <p className="mobile-rows-note" role="status">正在更新目录…</p>}
       {!loading && !loaded && (
-        <p>{online ? "读取失败，暂无本页缓存" : "暂无本页缓存"}</p>
+        <MobileEmpty offline title={online ? "读取失败，暂无本页缓存" : "暂无本地数据"} action={<button disabled={!online} onClick={() => setRetry(value => value + 1)}>重新读取</button>}>连接恢复后自动读取。</MobileEmpty>
       )}
       {error && (
         <button onClick={() => setRetry((value) => value + 1)}>重试读取</button>
       )}
-      {loaded && !page?.items.length && <p>没有符合条件的行情。</p>}
-      {page?.items.map((row) => (
+      {loaded && !page?.items.length && <MobileEmpty title="没有符合条件的行情">尝试其他代码、中文名称或来源。</MobileEmpty>}
+      {page?.items.map((row) => searchMode ? <div className="mobile-search-row" key={row.ticker}>
+        <div className="mobile-search-info"><strong>{row.display_symbol || row.symbol || row.ticker}</strong>
+          {(row.instrument_name || row.description) && <span className="mobile-search-name">{row.instrument_name || row.description}</span>}
+          <small>{row.series_kind_display || { provider: "平台", history: "自建", composite: "组合" }[row.series_kind as "provider"] || row.series_kind} · {row.source_display || row.source}<br />{row.frames?.join(" / ") || "实际周期见详情"}</small></div>
+        <button className="mobile-search-add" disabled={!online || busy || (targetGroup ? groups.find(group => group.id === targetGroup)?.symbols || [] : favorites).includes(row.ticker)} onClick={() => void add(row)}>{(targetGroup ? groups.find(group => group.id === targetGroup)?.symbols || [] : favorites).includes(row.ticker) ? "已添加" : targetGroup ? "+ 分组" : "+ 自选"}</button>
+        <button className="mobile-link-button" onClick={() => setSelected(row)}>详情</button>
+        <button className="mobile-link-button" onClick={() => open(row.ticker)}>开图</button>
+      </div> : (
         <button
           className="mobile-series"
           key={row.ticker}
           onClick={() => setSelected(row)}
         >
-          <strong>{row.display_symbol || row.symbol || row.ticker}</strong>
+          <span className="mobile-series-heading">
+            <strong>
+              {row.display_symbol || row.symbol || row.ticker}
+              {row.instrument_name &&
+              row.instrument_name !== (row.display_symbol || row.symbol)
+                ? ` · ${row.instrument_name}`
+                : ""}
+            </strong>
+            <small className="mobile-badge">
+              {row.series_kind_display ||
+                { provider: "平台", history: "自建", composite: "组合" }[
+                  kind as "provider" | "history" | "composite"
+                ]}
+            </small>
+          </span>
           <span>{row.description || row.ticker}</span>
-          {favorites.includes(row.ticker) && <small>已添加</small>}
+          <span>
+            {kind === "provider"
+              ? "目录可查询 · 不代表已下载行情"
+              : row.latest_at
+                ? `可用数据至 ${new Date(row.latest_at).toLocaleString()}`
+                : "数据范围与维护信息见详情"}
+          </span>
+          <span className="mobile-series-footer">
+            <span>
+              {row.frames?.length ? `${row.frames.length} 个周期 · ` : ""}
+              查看详情{favorites.includes(row.ticker) && " · 已添加"}
+            </span>
+            <ChevronRight aria-hidden="true" />
+          </span>
         </button>
       ))}
       <nav className="mobile-inline-actions" aria-label="行情分页">
@@ -427,17 +511,16 @@ export default function DataPage({
       </nav>
       {selected && (
         <MobileSheet
-          title={selected.display_symbol || selected.symbol || "行情详情"}
+          title="行情详情"
           close={() => setSelected(undefined)}
         >
-          <p>{selected.description || selected.ticker}</p>
+          <h3>{selected.display_symbol || selected.symbol || selected.ticker}{selected.instrument_name ? ` · ${selected.instrument_name}` : ""}</h3>
+          <p className="mobile-rows-note">{selected.description || selected.source}</p>
           <p className="mobile-identity">{selected.ticker}</p>
           {detail?.cachedAt && (
             <p>上次读取 {new Date(detail.cachedAt).toLocaleString()}</p>
           )}
-          {!detail && (
-            <p>{detailError || (!online ? "没有详情缓存" : "正在读取详情…")}</p>
-          )}
+          {!detail && (detailError || !online ? <MobileEmpty offline title="没有详情缓存">{detailError || "连接恢复后自动读取。"}</MobileEmpty> : <MobileLoading label="正在读取详情…" rows={3} />)}
           {detail && (
             <dl className="mobile-facts">
               {[
@@ -448,16 +531,9 @@ export default function DataPage({
                     detail.source ||
                     selected.source,
                 ],
+                ["系列类型", {provider: "平台", history: "自建", composite: "组合"}[seriesIdentity(selected.ticker).series_kind as "provider"] || seriesIdentity(selected.ticker).series_kind],
+                ["数据状态", detail.cachedAt ? "上次读取 · 当前待确认" : selected.ticker.startsWith("MWP:") ? "目录可查询，不代表已下载全部历史" : detail.status || detail.preparation_status || "以可用数据范围为准"],
                 ["价格口径", detail.price_basis_display || detail.basis],
-                [
-                  "支持周期",
-                  (Array.isArray(detail.frames)
-                    ? detail.frames.filter(
-                        (frame: any) => typeof frame === "string",
-                      )
-                    : detail.timeframes || []
-                  ).join(" · "),
-                ],
                 ["当前修订", detail.active_revision_id || detail.revision_id],
                 [
                   "固定历史版本",
@@ -496,6 +572,8 @@ export default function DataPage({
                 ))}
             </dl>
           )}
+          {detail && <><h4>可用周期</h4><div className="mobile-chip-list">{(detail.frames || detail.timeframes || []).filter((frame: any) => typeof frame === "string").map((frame: string) => <span key={frame}>{frame}</span>)}</div><p className="mobile-rows-note">按该系列实际支持情况显示。目录存在不代表行情已经完整获取。</p></>}
+          <div className="mobile-sheet-actions">
           <button
             className="primary"
             onClick={() => {
@@ -525,6 +603,7 @@ export default function DataPage({
           >
             {added ? "已添加" : busy ? "正在添加…" : "加入自选"}
           </button>
+          </div>
           {detail?.periods?.map((period: any) => (
             <p key={period.timeframe}>
               {period.timeframe} · {period.status || "待确认"} ·{" "}
@@ -555,12 +634,12 @@ export default function DataPage({
               查看维护状态
             </button>
           )}
-          <p>来源配置、历史维护与组合重构请在桌面完成。</p>
+          <p className="mobile-rows-note">来源配置、历史维护与组合重构请在桌面完成。</p>
         </MobileSheet>
       )}
       {versions && (
         <MobileSheet title="固定历史版本" close={() => setVersions(undefined)}>
-          {!versions.length && <p>暂无版本。</p>}
+          {!versions.length && <MobileEmpty title="暂无固定历史版本">发布后的可用版本将在这里显示。</MobileEmpty>}
           {versions.map((version) => (
             <article key={version.id} className="mobile-status-card">
               <p>{version.id}</p>
@@ -587,7 +666,8 @@ export default function DataPage({
       )}
       {support && (
         <MobileSheet title={support.title} close={() => setSupport(undefined)}>
-          {!support.rows.length && <p>本页暂无记录。</p>}
+          <p className="mobile-hint">{support.title === "来源状态" ? "目录同步、来源能力与实时连接分别展示；目录已缓存不代表行情实时可用。" : "手机只查看维护信息；创建、编辑、补齐与重构请在桌面完成。"}</p>
+          {!support.rows.length && <MobileEmpty title="本页暂无记录">当前筛选下没有可展示的记录。</MobileEmpty>}
           {support.rows.map((row, index) => (
             <article key={row.id || index} className="mobile-status-card">
               <strong>

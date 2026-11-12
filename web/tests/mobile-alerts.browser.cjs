@@ -87,7 +87,9 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('button',{name:'关闭通知',exact:true}).click();
   await expect(page.locator('.mobile-rule-card')).toContainText('准备中');
   rows[0].config.association={workspace_id:'existing-workspace',chart_id:'existing-chart',generation:'old',object_id:null,object_kind:null};
+  await page.getByRole('button',{name:'更多告警筛选',exact:true}).click();
   await page.getByRole('button',{name:'刷新',exact:true}).click();
+  await page.getByRole('button',{name:'应用筛选',exact:true}).click();
   await page.locator('.mobile-rule-card').click();await page.getByRole('button',{name:'编辑价格告警',exact:true}).click();
   const edit=page.getByRole('dialog',{name:'编辑价格告警',exact:true});
   await edit.getByLabel('目标价格',{exact:true}).fill('124');conflict=true;

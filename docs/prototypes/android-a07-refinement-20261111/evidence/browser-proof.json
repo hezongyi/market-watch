@@ -1,0 +1,817 @@
+{
+  "interactions": [
+    "custom expiry reveals UTC input",
+    "unsaved close asks before discarding",
+    "picker and nested back preserve all input",
+    "save is waiting for takeover, not prematurely active",
+    "failed submission recovers without losing price",
+    "conflict review back retains draft",
+    "explicit conflict reload replaces draft",
+    "search adds the selected instrument",
+    "data detail opens the chosen series and period",
+    "crosshair can be enabled",
+    "Escape exits crosshair",
+    "indicator search adds RSI",
+    "indicator parameters persist through sheet return",
+    "login demo returns to watch with zero network",
+    "theme changes through actual settings",
+    "event notice does not cover the first quote",
+    "submit remains reachable at 375x480 keyboard-like viewport",
+    "overview comparison changes both panes"
+  ],
+  "layouts": [
+    {
+      "page": "watch",
+      "width": 375,
+      "height": 812,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "chart",
+      "width": 375,
+      "height": 812,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "alerts",
+      "width": 375,
+      "height": 812,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "center",
+      "width": 375,
+      "height": 812,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "more",
+      "width": 375,
+      "height": 812,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "login",
+      "width": 375,
+      "height": 812,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "chart",
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "alerts",
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "center",
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "more",
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 812
+    },
+    {
+      "page": "login",
+      "width": 375,
+      "height": 812,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 412,
+      "height": 892,
+      "theme": "dark",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "chart",
+      "width": 412,
+      "height": 892,
+      "theme": "dark",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "alerts",
+      "width": 412,
+      "height": 892,
+      "theme": "dark",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "center",
+      "width": 412,
+      "height": 892,
+      "theme": "dark",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "more",
+      "width": 412,
+      "height": 892,
+      "theme": "dark",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "login",
+      "width": 412,
+      "height": 892,
+      "theme": "dark",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 412,
+      "height": 892,
+      "theme": "light",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "chart",
+      "width": 412,
+      "height": 892,
+      "theme": "light",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "alerts",
+      "width": 412,
+      "height": 892,
+      "theme": "light",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "center",
+      "width": 412,
+      "height": 892,
+      "theme": "light",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "more",
+      "width": 412,
+      "height": 892,
+      "theme": "light",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 892
+    },
+    {
+      "page": "login",
+      "width": 412,
+      "height": 892,
+      "theme": "light",
+      "body": 412,
+      "screen": 412,
+      "client": 412,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 892,
+      "height": 412,
+      "theme": "dark",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "chart",
+      "width": 892,
+      "height": 412,
+      "theme": "dark",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "alerts",
+      "width": 892,
+      "height": 412,
+      "theme": "dark",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "center",
+      "width": 892,
+      "height": 412,
+      "theme": "dark",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "more",
+      "width": 892,
+      "height": 412,
+      "theme": "dark",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "login",
+      "width": 892,
+      "height": 412,
+      "theme": "dark",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 892,
+      "height": 412,
+      "theme": "light",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "chart",
+      "width": 892,
+      "height": 412,
+      "theme": "light",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "alerts",
+      "width": 892,
+      "height": 412,
+      "theme": "light",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "center",
+      "width": 892,
+      "height": 412,
+      "theme": "light",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "more",
+      "width": 892,
+      "height": 412,
+      "theme": "light",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 412
+    },
+    {
+      "page": "login",
+      "width": 892,
+      "height": 412,
+      "theme": "light",
+      "body": 892,
+      "screen": 892,
+      "client": 892,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 375,
+      "height": 540,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "chart",
+      "width": 375,
+      "height": 540,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "alerts",
+      "width": 375,
+      "height": 540,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "center",
+      "width": 375,
+      "height": 540,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "more",
+      "width": 375,
+      "height": 540,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "login",
+      "width": 375,
+      "height": 540,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 375,
+      "height": 540,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "chart",
+      "width": 375,
+      "height": 540,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "alerts",
+      "width": 375,
+      "height": 540,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "center",
+      "width": 375,
+      "height": 540,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "more",
+      "width": 375,
+      "height": 540,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 540
+    },
+    {
+      "page": "login",
+      "width": 375,
+      "height": 540,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375,
+      "nav": 0
+    },
+    {
+      "page": "watch",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "chart",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "alerts",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "center",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "more",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "login",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "dark",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "watch",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "chart",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "alerts",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "center",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "more",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    },
+    {
+      "page": "login",
+      "width": 375,
+      "height": 812,
+      "scale": 150,
+      "theme": "light",
+      "body": 375,
+      "screen": 375,
+      "client": 375
+    }
+  ],
+  "states": [
+    {
+      "name": "create",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "edit",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "search",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "groups",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "manage",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "detail",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "rule",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "events",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "sources",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "indicators",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "connection",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "expired",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "cold",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "loading",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "empty",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "chart-empty",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "offline",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "offline-empty",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "error",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "stale",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "failure",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "conflict",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "ntfy-off",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "capability",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "discard",
+      "body": 375,
+      "sheet": 373,
+      "client": 373,
+      "open": true
+    },
+    {
+      "name": "storage",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    },
+    {
+      "name": "notification",
+      "body": 375,
+      "sheet": 0,
+      "client": 0,
+      "open": false
+    }
+  ],
+  "errors": [],
+  "network": []
+}

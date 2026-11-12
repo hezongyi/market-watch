@@ -1,0 +1,491 @@
+// A07 Watch alignment: built React UI with explicit API fixtures vs accepted prototype.
+const assert = require("node:assert/strict"),
+  fs = require("node:fs"),
+  path = require("node:path"),
+  http = require("node:http");
+const { chromium, expect } = require("@playwright/test");
+const dist = path.resolve("dist"),
+  output = process.env.MOBILE_VISUAL_OUTPUT || "/tmp/mw-mobile-watch-a07";
+fs.mkdirSync(output, { recursive: true });
+const codes = ["XAUUSD", "EURUSD", "BTCUSDT", "XAGUSD", "QQQ", "600519"];
+const symbols = codes.map((code, i) =>
+  i < 2 ? "MWC:" + String(i + 1).repeat(64) : "MWP:" + code,
+);
+const names = [
+  "现货黄金",
+  "欧元 / 美元",
+  "比特币",
+  "现货白银",
+  "纳指 100 ETF",
+  "贵州茅台",
+];
+const sources = ["OANDA", "OANDA", "Binance", "FXCM", "Yahoo", "AKShare"];
+const prices = [2684.52, 1.08426, 76428.3, 31.245, 512.84, 1538.5];
+let holdPreferences = false,
+  emptyWatch = false;
+const rows = ["monitoring", "blocked", "paused"].map((state, i) => ({
+  id: "rule-" + i,
+  name: ["黄金突破提醒", "欧元下破提醒", "指数观察"][i],
+  status: state === "paused" ? "paused" : "active",
+  health: state === "blocked" ? "blocked" : "ready",
+  count: 0,
+  max_triggers: 1,
+  version: 1,
+  control_revision: 1,
+  condition_summary: "向上穿越 2,700.00",
+  display_identity: {
+    code: ["XAUUSD", "EURUSD", "QQQ"][i],
+    source: "oanda",
+    series_kind: "composite",
+  },
+  execution: {
+    state,
+    label: ["监控中", "需要处理", "已暂停"][i],
+    last_evaluated_at: Date.now(),
+  },
+  config: {
+    instrument: "a".repeat(64),
+    series_kind: "composite",
+    source: "composite",
+    timeframe: "H1",
+    mode: "close",
+    notify_ntfy: false,
+    condition: {
+      relation: "cross_up",
+      left: { kind: "price" },
+      right: { kind: "constant", value: "2700" },
+    },
+    expires_at: null,
+  },
+}));
+const server = http.createServer(async (req, res) => {
+  const url = new URL(req.url, "http://localhost");
+  let raw = "";
+  for await (const c of req) raw += c;
+  const body = raw ? JSON.parse(raw) : {};
+  const json = (value) => {
+    res.writeHead(200, { "Content-Type": "application/json" });
+    res.end(JSON.stringify(value));
+  };
+  if (url.pathname === "/api/session")
+    return json({ subject: "admin", csrf: "test" });
+  if (url.pathname === "/api/health")
+    return json({
+      ntfy_configured: false,
+      delivery_enabled: false,
+      chart_alerts: { loop: { state: "idle" } },
+    });
+  if (url.pathname === "/api/advanced-charts/preferences") {
+    if (holdPreferences) return;
+    return json([
+      {
+        kind: "setting",
+        name: "mw.watchlists.v1",
+        revision: 1,
+        content: {
+          value: {
+            active: "all",
+            lists: [
+              {
+                id: "all",
+                title: "重点关注",
+                symbols: emptyWatch ? [] : symbols,
+              },
+            ],
+          },
+        },
+      },
+    ]);
+  }
+  if (url.pathname === "/api/market-data/quotes")
+    return json(
+      body.symbols.map((ticker) => {
+        const i = symbols.indexOf(ticker);
+        return {
+          n: ticker,
+          s: "ok",
+          v: {
+            short_name: codes[i],
+            description_base:
+              codes[i] +
+              " · " +
+              names[i] +
+              " · " +
+              (i < 2 ? "组合" : "平台") +
+              " · " +
+              sources[i],
+            description: names[i],
+            exchange: sources[i],
+            lp: prices[i],
+            display_precision: i === 1 ? 5 : 2,
+            delay_seconds: i === 4 ? 900 : undefined,
+            prev_close_price: i === 5 ? undefined : 100,
+            read_at: Date.now(),
+            chp: [0.69, -0.22, 1.63, 1.24, -0.45, 0.56][i],
+            fetch_status: "ok",
+            quote_time: Date.now(),
+          },
+        };
+      }),
+    );
+  if (url.pathname === "/api/market-data/sparklines") {
+    const left = Math.floor(Date.now() / 86400000) * 86400000;
+    return json({
+      as_of: Date.now(),
+      items: body.items.map((item) => ({
+        ticker: item.ticker,
+        window_start: left,
+        window_end: left + 86400000,
+        timeframe: "M1",
+        points: [
+          { time: left, price: "100" },
+          { time: left + 3600000, price: "101" },
+          { time: left + 7200000, price: "100.5" },
+        ],
+        status: "partial",
+      })),
+    });
+  }
+  if (url.pathname === "/api/market-data/resolve")
+    return json({ id: body.instrument, source: "oanda", frames: ["M1", "H1"] });
+  if (url.pathname === "/api/market-data/series/page")
+    return json({
+      items: [{ticker:"MWP:SPY",symbol:"SPY",display_symbol:"SPY",instrument_name:"标普 500 ETF",series_kind:"provider",source:"yahoo",source_display:"Yahoo",frames:["M1","H1"]}, ...symbols.map((ticker, i) => ({
+        ticker,
+        symbol: codes[i],
+        display_symbol: codes[i],
+        description: names[i],
+        source: sources[i].toLowerCase(),
+        series_kind: i < 2 ? "composite" : "provider",
+        frames: ["M1", "H1"],
+      }))],
+      next_offset: null,
+    });
+  if (url.pathname === "/api/chart-alerts") return json(rows);
+  if (url.pathname === "/api/chart-alerts/events") return json([]);
+  if (url.pathname === "/api/charts/stream/events") {
+    res.writeHead(200, { "Content-Type": "text/event-stream" });
+    res.write("event: heartbeat\ndata: {}\n\n");
+    return;
+  }
+  if (url.pathname.startsWith("/api/charts/stream/")) return json({ ok: true });
+  if (url.pathname.startsWith("/api/notification-center/"))
+    return json({
+      events: [],
+      changes: [],
+      more: false,
+      epoch: "test",
+      after: null,
+      unread: 0,
+      alert_unread: 0,
+      system_unread: 0,
+    });
+  if (url.pathname.startsWith("/api/")) return json({ items: [] });
+  let file = path.join(dist, decodeURIComponent(url.pathname));
+  if (fs.existsSync(file) && fs.statSync(file).isDirectory())
+    file = path.join(file, "index.html");
+  if (!fs.existsSync(file) && url.pathname.startsWith("/m"))
+    file = path.join(dist, "m/index.html");
+  if (!file.startsWith(dist + path.sep) || !fs.existsSync(file)) {
+    res.writeHead(404);
+    return res.end();
+  }
+  res.writeHead(200, {
+    "Content-Type":
+      {
+        ".js": "application/javascript",
+        ".css": "text/css",
+        ".html": "text/html",
+        ".json": "application/json",
+      }[path.extname(file)] || "application/octet-stream",
+  });
+  res.end(fs.readFileSync(file));
+});
+(async () => {
+  await new Promise((resolve) => server.listen(0, "127.0.0.1", resolve));
+  const browser = await chromium.launch({
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined,
+  });
+  const context = await browser.newContext({
+    viewport: { width: 412, height: 852 },
+    locale: "zh-CN",
+    isMobile: true,
+    hasTouch: true,
+  });
+  const page = await context.newPage(),
+    reference = await context.newPage(),
+    errors = [],
+    measurements = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  const url = "http://127.0.0.1:" + server.address().port + "/m/";
+  const prototype = require("node:url").pathToFileURL(
+    path.resolve(
+      "../docs/prototypes/android-a07-refinement-20261111/preview.html",
+    ),
+  ).href;
+  const metrics = async (p, selectors) =>
+    p.evaluate(
+      (s) =>
+        Object.fromEntries(
+          Object.entries(s).map(([name, selector]) => {
+            const el = document.querySelector(selector),
+              r = el.getBoundingClientRect(),
+              cs = getComputedStyle(el);
+            return [
+              name,
+              {
+                x: r.x,
+                y: r.y,
+                width: r.width,
+                height: r.height,
+                fontSize: cs.fontSize,
+                color: cs.color,
+              },
+            ];
+          }),
+        ),
+      selectors,
+    );
+  try {
+    await page.goto(url);
+    await expect(page.locator(".mobile-watch-row")).toHaveCount(6);
+    await expect(page.locator(".mobile-watch-row.stale")).toHaveCount(0);
+    await expect(page.locator('.mobile-watch-origin')).toHaveText(['Binance', 'FXCM', 'Yahoo', 'AKShare']);
+    await expect(page.locator('.mobile-watch-symbol .mobile-watch-name')).toHaveCount(0);
+    for (const theme of ["dark", "light"])
+      for (const [width, height, font] of [
+        [412, 852, 14],
+        [375, 772, 14],
+        [375, 772, 21],
+        [852, 372, 14],
+      ]) {
+        await page.setViewportSize({ width, height });
+        await reference.setViewportSize({ width, height });
+        await page.evaluate(
+          ({ theme, font }) => {
+            document.querySelector(".mobile-app").dataset.theme = theme;
+            document.documentElement.style.fontSize = font + "px";
+          },
+          { theme, font },
+        );
+        await reference.goto(
+          prototype +
+            "?embed=1&page=watch&theme=" +
+            theme +
+            (font === 21 ? "&scale=150" : ""),
+        );
+        await reference.waitForSelector(".quote-row");
+        const actual = await metrics(page, {
+          header: ".mobile-watch-title",
+          row: ".mobile-watch-row",
+          code: ".mobile-watch-symbol strong",
+          price: ".mobile-watch-price strong",
+          nav: ".mobile-nav",
+        });
+        const expected = await metrics(reference, {
+          header: ".app-header",
+          row: ".quote-row",
+          code: ".quote-info strong",
+          price: ".quote-price strong",
+          nav: ".bottom-nav",
+        });
+        assert(
+          await page.evaluate(
+            () => document.documentElement.scrollWidth <= innerWidth,
+          ),
+          "no horizontal overflow",
+        );
+        if (width < 800) {
+          // User-approved device feedback deliberately reduces header/nav height.
+          // Keep the A07 horizontal placement; two-line rows now use 72px.
+          for (const element of ["row"])
+            for (const prop of ["x"])
+              assert(
+                Math.abs(actual[element][prop] - expected[element][prop]) <= 3,
+                `${theme}/${width}/${font} ${element}.${prop}: ${actual[element][prop]} vs ${expected[element][prop]}`,
+              );
+          if (font === 21) {
+            const separated = await page.locator('.mobile-watch-row').first().evaluate(row =>
+              row.querySelector('.mobile-watch-symbol').getBoundingClientRect().bottom <= row.querySelector('.mobile-spark').getBoundingClientRect().top);
+            assert(separated,'large text keeps chart on a separate unobstructed row');
+          }
+          assert(Math.abs(parseFloat(actual.price.fontSize) - font * 15/14) < 0.01);
+          await expect(page.locator('.mobile-watch-price strong').first()).toHaveText('+0.69%');
+          await expect(page.locator('.mobile-watch-last-price').nth(1)).toHaveText('1.08426');
+          await expect(page.locator('.mobile-spark-previous-close')).toHaveCount(5);
+          assert(await page.locator('.mobile-spark-previous-close').first().evaluate(el => el.getAttribute('y1') === '24'));
+          if (font === 14) {
+            assert.equal(actual.row.height, 72);
+            assert.equal(actual.header.height, 64);
+            const alignment = await page.locator('.mobile-watch-row').first().evaluate(row => {
+              const symbol = row.querySelector('.mobile-watch-symbol').getBoundingClientRect();
+              const spark = row.querySelector('.mobile-spark').getBoundingClientRect();
+              const price = row.querySelector('.mobile-watch-price').getBoundingClientRect();
+              return {symbolHeight:symbol.height,sparkHeight:spark.height,centers:[symbol.y+symbol.height/2,spark.y+spark.height/2,price.y+price.height/2]};
+            });
+            assert(Math.abs(alignment.symbolHeight-alignment.sparkHeight)<2,'two-line identity matches spark viewport height');
+            assert(Math.max(...alignment.centers)-Math.min(...alignment.centers)<1,'all three columns vertically centered');
+          }
+          assert(Math.abs(actual.nav.y + actual.nav.height - height) < 1);
+          const watchBottom = await page.locator('.mobile-watch').evaluate(el => el.getBoundingClientRect().bottom);
+          assert(Math.abs(watchBottom - actual.nav.y) < 1, 'content ends above measured navigation');
+        }
+        measurements.push({ width, height, font, theme, actual, expected });
+        await page.screenshot({
+          path: path.join(output, `app-${theme}-${width}-${font}.png`),
+        });
+        await reference.screenshot({
+          path: path.join(output, `a07-${theme}-${width}-${font}.png`),
+        });
+      }
+    await page.setViewportSize({ width: 412, height: 852 });
+    await page.evaluate(() => {
+      document.documentElement.style.fontSize = "14px";
+      document.querySelector(".mobile-app").dataset.theme = "dark";
+    });
+    for (const [button, name] of [
+      ["搜索并添加品种", "search"],
+      ["选择自选分组", "groups"],
+      ["管理自选", "manage"],
+    ]) {
+      await page.getByRole("button", { name: button, exact: true }).click();
+      await page.screenshot({ path: path.join(output, name + ".png") });
+      await page
+        .getByRole("dialog")
+        .last()
+        .getByRole("button", { name: "关闭", exact: true })
+        .click();
+    }
+    // Read-only control screenshots: expanded editors, nested forms, and large text.
+    for (const theme of ["light", "dark"]) for (const font of [14, 21]) {
+      await page.setViewportSize({width: 375, height: 812});
+      await page.evaluate(({theme, font}) => {
+        document.documentElement.style.fontSize = font + "px";
+        document.querySelector(".mobile-app").dataset.theme = theme;
+      }, {theme, font});
+      const capture = async name => {
+        const sheet = page.getByRole("dialog").last();
+        assert(await sheet.evaluate(el => el.scrollWidth <= el.clientWidth + 1), name + " has no horizontal overflow");
+        await page.screenshot({path: path.join(output, `${name}-${theme}-${font}.png`)});
+      };
+      const close = () => page.getByRole("dialog").last().getByRole("button", {name:"关闭",exact:true}).click();
+      await page.getByRole("button", {name:"搜索并添加品种",exact:true}).click();
+      await expect(page.locator(".mobile-search-row").first()).toBeVisible();
+      await capture("search"); await close();
+      await page.getByRole("button", {name:"选择自选分组",exact:true}).click();
+      await capture("groups");
+      await page.getByRole("button", {name:"新建分组",exact:true}).click();
+      await capture("new-group"); await close(); await close();
+      await page.getByRole("button", {name:"管理自选",exact:true}).click();
+      await page.locator(".mobile-form-detail > summary").click();
+      await capture("manage-expanded");
+      await page.locator(".mobile-group-order > summary").first().click();
+      await page.locator(".mobile-group-order > summary").first().scrollIntoViewIfNeeded();
+      await capture("group-order");
+      await page.getByLabel("分组名称", {exact:true}).first().fill("重点关注 · 编辑示例");
+      await expect(page.getByRole("button", {name:"保存分组",exact:true})).toBeInViewport();
+      await capture("group-save"); await close();
+      await page.getByRole("button", {name:"放弃修改",exact:true}).click();
+    }
+    await page.setViewportSize({width:412,height:852});
+    await page.evaluate(() => { document.documentElement.style.fontSize="14px"; });
+    await page.route("**/api/session", (route) => route.abort());
+    await page.evaluate(() => dispatchEvent(new Event("online")));
+    await expect(page.locator(".mobile-watch-status")).toContainText(
+      "手机离线",
+    );
+    await expect(page.locator(".mobile-toast")).toHaveCount(0);
+    await expect(page.locator('.mobile-spark-caption').first()).toHaveText('缓存');
+    await page.screenshot({ path: path.join(output, "offline-cache.png") });
+    await page.unroute("**/api/session");
+    await page.evaluate(() => dispatchEvent(new Event("online")));
+    await expect(page.locator(".mobile-watch-row.stale")).toHaveCount(0);
+    const icons = () => page.locator('.mobile-nav svg').evaluateAll(els => els.map(el => el.outerHTML));
+    const watchIcons = await icons();
+    await page.getByRole('link', { name: '更多', exact: true }).click();
+    assert.deepEqual(await icons(), watchIcons, 'same navigation icon set on every page');
+    await page.getByRole('link', { name: '自选', exact: true }).click();
+    await page.route('**/api/market-data/sparklines', async route => {
+      const body = route.request().postDataJSON(), left = Math.floor(Date.now()/86400000)*86400000;
+      await route.fulfill({ json: { as_of: Date.now(), items: body.items.map(item => ({...item, window_start: left, window_end: left+86400000, points: [], status: 'empty' })) } });
+    });
+    await page.getByRole('link', { name: '更多', exact: true }).click();
+    await page.getByRole('link', { name: '自选', exact: true }).click();
+    await expect(page.locator('.mobile-spark-empty').first()).toHaveText('暂无日内数据');
+    await page.screenshot({ path: path.join(output, 'spark-empty.png') });
+    await page.unroute('**/api/market-data/sparklines');
+    await page.route('**/api/market-data/sparklines', route => route.abort());
+    await page.getByRole('link', { name: '更多', exact: true }).click();
+    await page.getByRole('link', { name: '自选', exact: true }).click();
+    // A failed refresh keeps a valid cached curve, or shows an inline error
+    // when the preceding empty response is the available snapshot.
+    await expect(page.locator('.mobile-spark[data-cached], .mobile-spark-empty[data-state="error"]')).toHaveCount(6);
+    await expect(page.locator('.mobile-toast')).toHaveCount(0);
+    await page.unroute('**/api/market-data/sparklines');
+    emptyWatch = true;
+    await page.evaluate(() =>
+      dispatchEvent(new Event("mw-mobile-watchlists-changed")),
+    );
+    await expect(
+      page.getByText("还没有关注品种", { exact: true }),
+    ).toBeVisible();
+    await page.screenshot({ path: path.join(output, "empty.png") });
+    const native = await browser.newContext({ viewport: { width: 412, height: 852 } });
+    await native.addInitScript(() => {
+      window.appearanceMessages = [];
+      window.MWMobileHost = { postMessage(raw) {
+        const message = JSON.parse(raw);
+        if (message.action === 'appearance') window.appearanceMessages.push(message.theme);
+        if (message.action === 'hello') queueMicrotask(() => window.MWMobileHost.onmessage({ data: JSON.stringify({ version: 1, appVersion: '0.1.3', capabilities: ['app-update-v1', 'appearance-v1'] }) }));
+        if (message.action === 'check-app-update') setTimeout(() => window.MWMobileHost.onmessage({ data: JSON.stringify({ version: 1, appUpdate: { status: 'current', label: '当前已是最新版 0.1.3' } }) }), 100);
+      } };
+    });
+    const updates = await native.newPage();
+    updates.on('pageerror', e => errors.push(e.message));
+    await updates.goto(url);
+    await updates.getByRole('link', { name: '更多', exact: true }).click();
+    await expect.poll(() => updates.evaluate(() => window.appearanceMessages.at(-1))).toBe('dark');
+    await updates.getByRole('button', { name: /显示主题/ }).click();
+    await expect.poll(() => updates.evaluate(() => window.appearanceMessages.at(-1))).toBe('light');
+    await updates.getByRole('button', { name: /显示主题/ }).click();
+    await expect.poll(() => updates.evaluate(() => window.appearanceMessages.at(-1))).toBe('dark');
+    await updates.getByRole('button', { name: /检查更新/ }).click();
+    const updateSheet = updates.getByRole('dialog', { name: '检查更新', exact: true });
+    await expect(updateSheet).toContainText('当前应用：0.1.3');
+    await updateSheet.getByRole('button', { name: '检查更新', exact: true }).click();
+    await expect(updateSheet).toContainText('当前已是最新版 0.1.3');
+    await expect(updateSheet).toContainText('当前应用：0.1.3');
+    await updates.screenshot({ path: path.join(output, 'app-update.png') });
+    await native.close();
+    holdPreferences = true;
+    const fresh = await browser.newContext({
+        viewport: { width: 375, height: 812 },
+      }),
+      cold = await fresh.newPage();
+    await cold.goto(url);
+    await expect(cold.locator(".mobile-loading")).toBeVisible();
+    await cold.screenshot({ path: path.join(output, "cold.png") });
+    await fresh.close();
+    assert.deepEqual(errors, []);
+    fs.writeFileSync(
+      path.join(output, "proof.json"),
+      JSON.stringify({ measurements, errors }, null, 2),
+    );
+    console.log(
+      JSON.stringify({
+        checks:
+          "A07 geometry/style comparison, 8 layouts, 3 sheet entries + 24 narrow/large-font control captures, delayed quote, offline cache, empty, loading",
+        errors,
+        output,
+      }),
+    );
+  } finally {
+    await context.close();
+    await browser.close();
+    server.closeAllConnections();
+    await new Promise((resolve) => server.close(resolve));
+  }
+})().catch((error) => {
+  console.error(error);
+  process.exitCode = 1;
+});

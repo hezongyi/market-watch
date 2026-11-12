@@ -7,6 +7,25 @@ from alerts import provider_yahoo as yahoo, yahoo_catalog
 from alerts.storage import MarketCatalog
 
 
+def test_watch_quote_exposes_display_precision_without_rounding(database, monkeypatch):
+    from alerts import market_data, provider_chart, provider_service
+    from alerts.storage import now_ms
+
+    monkeypatch.setattr(provider_chart, "metadata", lambda *a, **kw: {
+        "source": "yahoo", "symbol": "EURUSD=X", "name": "Euro", "exchange": "CCY",
+        "precision": 8, "display_precision": 5,
+    })
+    monkeypatch.setattr(provider_service, "yahoo_quote", lambda *a, **kw: {
+        "quote_time": now_ms(), "fetched_at": now_ms(), "delay_seconds": 0,
+        "price": "1.1101243", "previous_close": "1.12", "status": "ok",
+    })
+    row = market_data.quote_snapshot(market_data.QuoteQuery(symbols=["MWP:" + yahoo.stable_id("EURUSD=X")]))[0]
+    assert row["s"] == "ok"
+    assert row["v"]["display_precision"] == 5
+    assert row["v"]["lp"] == 1.1101243
+    assert row["v"]["prev_close_price"] == 1.12
+
+
 @pytest.mark.parametrize("kind,symbol,hint,price,expected", [
     ("EQUITY", "MSFT", 2, 530.82, 2),
     ("ETF", "SPY", 2, 650.25, 2),

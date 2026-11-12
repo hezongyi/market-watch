@@ -70,24 +70,72 @@ export function sparklineLoader(
   };
 }
 
-/** Fixed time coordinates and separate paths on every gap; no compression/fill-in. */
-export function sparklinePaths(item: Sparkline, width = 200, height = 48) {
+/** Screen-space simplification (0.7 SVG units), separately for every data segment.
+ * Anchor endpoints and absolute extrema; discard only visually redundant bends.
+ * Coordinates always refer to actual observations, never interpolated prices. */
+function visualPoints(points: [number, number][]) {
+  if (points.length < 3) return points;
+  let low = 0, high = 0;
+  points.forEach((point, i) => {
+    if (point[1] < points[low][1]) low = i;
+    if (point[1] > points[high][1]) high = i;
+  });
+  const keep = new Set([0, low, high, points.length - 1]);
+  const anchors = [...keep].sort((a, b) => a - b);
+  const pending = anchors.slice(1).map((end, i) => [anchors[i], end]);
+  while (pending.length) {
+    const [start, end] = pending.pop()!;
+    const [x, y] = points[start];
+    const dx = points[end][0] - x, dy = points[end][1] - y;
+    const lengthSquared = dx * dx + dy * dy;
+    let farthest = -1, maximum = 0.7 ** 2;
+    for (let i = start + 1; i < end; i++) {
+      const px = points[i][0] - x, py = points[i][1] - y;
+      const t = lengthSquared ? Math.max(0, Math.min(1, (px * dx + py * dy) / lengthSquared)) : 0;
+      const distance = (px - t * dx) ** 2 + (py - t * dy) ** 2;
+      if (distance > maximum) { maximum = distance; farthest = i; }
+    }
+    if (farthest !== -1) {
+      keep.add(farthest);
+      pending.push([start, farthest], [farthest, end]);
+    }
+  }
+  return [...keep].sort((a, b) => a - b).map(index => points[index]);
+}
+
+/** A common percent scale prevents tiny opening moves filling the full height.
+ * Supplier previous close matches the quote's percentage change. With no verified
+ * reference, center on the first observation but never invent a previous-close line. */
+export function sparklineScale(item: Sparkline, height = 48, previousClose?: number) {
+  const prices = item.points.map(point => Number(point.price)).filter(Number.isFinite);
+  const reference = typeof previousClose === "number" && Number.isFinite(previousClose)
+    ? previousClose : undefined;
+  const center = reference ?? prices[0] ?? 0;
+  const extent = Math.max(0, ...prices.map(price => Math.abs(price - center)));
+  const radius = Math.max(Math.abs(center) * 0.005, extent * 1.1, 1e-8);
+  const y = (price: number) => height / 2 - (price - center) / radius * (height / 2 - 4);
+  return { y, referenceY: reference === undefined ? undefined : height / 2 };
+}
+
+/** Width is the rendered CSS width. Fixed time coordinates and separate paths
+ * on every gap remain unchanged; only redundant display points are removed. */
+export function sparklinePaths(item: Sparkline, width = 200, height = 48, previousClose?: number) {
   const prices = item.points.map((point) => Number(point.price));
   if (!prices.length || prices.some((price) => !Number.isFinite(price)))
     return [];
-  const low = Math.min(...prices),
-    high = Math.max(...prices),
-    span = high - low || Math.abs(high) * 0.001 || 1;
+  const scale = sparklineScale(item, height, previousClose);
   const paths: { line: string; area: string; end: [number, number] }[] = [];
   let points: [number, number][] = [];
   const finish = () => {
     if (!points.length) return;
-    const line = points
+    let line = visualPoints(points)
       .map(
         ([x, y], index) =>
           `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`,
       )
       .join(" ");
+    // A single observation remains visible as a round stroke cap.
+    if (points.length === 1) line += ` L${points[0][0].toFixed(2)},${points[0][1].toFixed(2)}`;
     const end = points.at(-1)!;
     paths.push({
       line,
@@ -102,7 +150,7 @@ export function sparklinePaths(item: Sparkline, width = 200, height = 48) {
       ((point.time - item.window_start) /
         (item.window_end - item.window_start)) *
       width;
-    const y = 4 + ((high - prices[index]) / span) * (height - 8);
+    const y = scale.y(prices[index]);
     points.push([x, y]);
   });
   finish();

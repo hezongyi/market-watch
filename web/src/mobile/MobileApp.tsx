@@ -1,4 +1,10 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
 import {
   Bell,
@@ -26,12 +32,14 @@ import {
 } from "./cache";
 import { useMobileShell } from "./shell";
 import { mobileMarket, type MobileMarket } from "./market";
+import type { MarketTransportState } from "../advanced/providerSubscriptions";
 import WatchPage from "./WatchPage";
 import DataPage from "./DataPage";
 import MobileToast from "./MobileToast";
 import AlertsPage from "./AlertsPage";
 import MorePage from "./MorePage";
 import { useMobileNotices } from "./notices";
+import { MobileEmpty, MobileLoading } from "./MobileState";
 
 type Series = {
   ticker: string;
@@ -68,12 +76,30 @@ export default function MobileApp() {
   const [records, setRecords] = useState(false);
   const notices = useMobileNotices(profile, state === "online");
   const [connection, setConnection] = useState<MobileMarket>();
+  const [transport, setTransport] = useState<MarketTransportState>();
+  useEffect(() => connection?.observe(setTransport), [connection]);
   const chart = useRef<MobileChartHandle>(null),
     generation = useRef(0),
     session = useRef<AbortController | undefined>(undefined),
     sessionAllowed = useRef(false),
     signingOut = useRef(false);
   const report = useCallback((value: string) => setMessage(value), []);
+  const navigation = useRef<HTMLElement>(null);
+  useLayoutEffect(() => {
+    const nav = navigation.current;
+    if (!nav) return;
+    const measure = () =>
+      nav.parentElement?.style.setProperty(
+        "--mobile-nav-height",
+        `${nav.getBoundingClientRect().height}px`,
+      );
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(nav);
+    return () => observer.disconnect();
+  }, [Boolean(profile), state === "login"]);
+  const watchHasProfile = useRef(false);
+  watchHasProfile.current = location.pathname === "/" && Boolean(profile);
   useEffect(() => {
     if (!profile || state !== "online") {
       setConnection(undefined);
@@ -93,6 +119,7 @@ export default function MobileApp() {
     () =>
       password.length > 0 ||
       Boolean(document.querySelector('[data-mobile-dirty="true"]')),
+    theme,
   );
   const restore = async (
     value: Profile,
@@ -148,7 +175,10 @@ export default function MobileApp() {
         setPassword("");
       } else {
         setState("offline");
-        report(String(error));
+        // Watch already shows cached-data status inline. Avoid covering its
+        // header with a second notice for background network failures.
+        if (!(error instanceof TypeError && watchHasProfile.current))
+          report(String(error));
       }
     }
   }, [report]);
@@ -268,7 +298,11 @@ export default function MobileApp() {
     );
   }
   return (
-    <div className="mobile-app" data-theme={theme}>
+    <div
+      className="mobile-app"
+      data-theme={theme}
+      data-page={location.pathname === "/" ? "watch" : undefined}
+    >
       <a className="sr-only" href="#mobile-main">
         跳至主要内容
       </a>
@@ -285,7 +319,7 @@ export default function MobileApp() {
           </button>
         </aside>
       )}
-      {notices.popup && !message && (
+      {notices.popup && !message && (location.pathname !== "/" || !profile) && (
         <MobileToast message={notices.popup} close={notices.closePopup} />
       )}
       <main id="mobile-main">
@@ -363,16 +397,22 @@ export default function MobileApp() {
           </section>
         ) : (
           <>
-            {location.pathname !== "/chart" && location.pathname !== "/" && (
+            {location.pathname === "/more" && (
               <header className="mobile-title">
-                <h1>
-                  {pages.find((page) => page.path === location.pathname)
-                    ?.label || "自选"}
-                </h1>
+                <div>
+                  <h1>更多</h1>
+                  <small>
+                    {state === "online" && transport?.state === "open"
+                      ? `最近通信 ${new Date(Math.max(transport.heartbeatAt || 0, transport.messageAt || 0)).toLocaleTimeString()}`
+                      : "连接状态待确认"}
+                  </small>
+                </div>
               </header>
             )}
             {state === "loading" && !profile && (
-              <p role="status">正在读取上次内容…</p>
+              <section className="mobile-content">
+                <MobileLoading label="正在读取上次内容…" />
+              </section>
             )}
             {profile &&
               state === "online" &&
@@ -394,10 +434,21 @@ export default function MobileApp() {
                 />
               )}
             {location.pathname === "/chart" && state !== "online" && (
-              <p>上次图表设置已保留，连接核验后加载专业图表。</p>
+              <MobileEmpty offline title="等待连接图表">
+                上次图表设置已保留，连接核验后加载专业图表。
+              </MobileEmpty>
             )}
             {location.pathname === "/chart" && !symbol && (
-              <p>从数据页选择真实系列打开图表。</p>
+              <MobileEmpty
+                title="选择要查看的品种"
+                action={
+                  <button className="primary" onClick={() => navigate("/data")}>
+                    选择品种
+                  </button>
+                }
+              >
+                从自选或数据页选择真实系列打开图表。
+              </MobileEmpty>
             )}
             {location.pathname === "/chart" && chartDirty && (
               <span className="mobile-unsaved" role="status">
@@ -406,12 +457,18 @@ export default function MobileApp() {
             )}
             {profile && (
               <WatchPage
+                notice={!message ? notices.popup : undefined}
+                closeNotice={notices.closePopup}
+                showNotices={() => {
+                  notices.closePopup();
+                  setRecords(true);
+                  navigate("/alerts");
+                }}
                 profile={profile}
                 online={state === "online"}
                 connection={connection}
                 visible={location.pathname === "/"}
                 report={report}
-                search={() => navigate("/data")}
                 open={(ticker) =>
                   void select({ ticker }).catch((error) =>
                     report(String(error)),
@@ -470,7 +527,7 @@ export default function MobileApp() {
         )}
       </main>
       {profile && state !== "login" && (
-        <nav className="mobile-nav" aria-label="主导航">
+        <nav ref={navigation} className="mobile-nav" aria-label="主导航">
           {pages.map(({ path, label, Icon }) => (
             <NavLink
               key={path}
@@ -487,15 +544,29 @@ export default function MobileApp() {
                 })().catch((error) => report(String(error)));
               }}
             >
-              <Icon aria-hidden="true" />
+              <span className="mobile-nav-icon">
+                <Icon aria-hidden="true" />
+                {location.pathname === "/" &&
+                  path === "/alerts" &&
+                  Boolean(notices.state.alertUnread) && (
+                    <small
+                      className="mobile-watch-nav-count"
+                      aria-label={`${notices.state.alertUnread} 条未处理告警`}
+                    >
+                      {notices.state.alertUnread}
+                    </small>
+                  )}
+              </span>
               <span>
                 {label}
-                {path === "/alerts" && Boolean(notices.state.alertUnread) && (
-                  <small aria-label="未处理告警">
-                    {" "}
-                    · {notices.state.alertUnread}
-                  </small>
-                )}
+                {location.pathname !== "/" &&
+                  path === "/alerts" &&
+                  Boolean(notices.state.alertUnread) && (
+                    <small aria-label="未处理告警">
+                      {" "}
+                      · {notices.state.alertUnread}
+                    </small>
+                  )}
               </span>
             </NavLink>
           ))}

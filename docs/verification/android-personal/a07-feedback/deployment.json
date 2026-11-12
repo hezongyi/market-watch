@@ -1,0 +1,52 @@
+{
+  "at": "2026-11-11T22:36:27.884143+00:00",
+  "host": "quant-server",
+  "url": "https://192.168.7.232:18445",
+  "task": "mw-android-personal-v205",
+  "project": "mw-android-personal-v205",
+  "services": [
+    {
+      "service": "api",
+      "image": "sha256:4ddcbbd552f700d7785692afdcce1b2a696a3f10600e023c432ee420dac97a35",
+      "state": "running",
+      "networks": [
+        "mw-android-personal-v205_default",
+        "mw-android-personal-v205_edge"
+      ]
+    },
+    {
+      "service": "postgres",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "state": "running",
+      "networks": [
+        "mw-android-personal-v205_default"
+      ]
+    },
+    {
+      "service": "web",
+      "image": "sha256:845ae98d5b61c011644364475a8ca0cf87facc7605a2343b4cdb446567494874",
+      "state": "running",
+      "networks": [
+        "mw-android-personal-v205_default"
+      ]
+    },
+    {
+      "service": "tls",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "state": "running",
+      "networks": [
+        "mw-android-personal-v205_default",
+        "mw-android-personal-v205_edge"
+      ]
+    },
+    {
+      "service": "data-worker",
+      "image": "sha256:4ddcbbd552f700d7785692afdcce1b2a696a3f10600e023c432ee420dac97a35",
+      "state": "running",
+      "networks": [
+        "mw-android-personal-v205_default",
+        "mw-android-personal-v205_edge"
+      ]
+    }
+  ]
+}

@@ -4,9 +4,13 @@ import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.net.http.SslError
 import android.os.Bundle
+import android.provider.Settings
+import android.view.View
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.SslErrorHandler
@@ -22,7 +26,10 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.activity.ComponentActivity
+import androidx.activity.enableEdgeToEdge
+import androidx.activity.SystemBarStyle
 import androidx.activity.OnBackPressedCallback
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -34,10 +41,18 @@ class MainActivity : ComponentActivity() {
     private var web: WebView? = null
     private var origin: String? = null
     private var connectionDialog: AlertDialog? = null
+    private var updater: AppUpdater? = null
+    private var safeContainer: View? = null
+    private val lightAppearance get() = preferences.getString("appearance", "dark") == "light"
+    private val surfaceColor get() = Color.parseColor(if (lightAppearance) "#f8f9fc" else "#101317")
+    private val installPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        updater?.permissionResult()
+    }
     private val preferences by lazy { getSharedPreferences("shell", MODE_PRIVATE) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        applyAppearance()
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
@@ -65,6 +80,8 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun configure() {
+        updater?.close(); updater = null
+        origin = null
         connectionDialog?.dismiss(); connectionDialog = null
         web?.destroy(); web = null
         val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(32, 48, 32, 24) }
@@ -74,6 +91,12 @@ class MainActivity : ComponentActivity() {
             hint = "https://服务器地址"; setText(preferences.getString("origin", "")); minHeight = 96
         }
         val error = TextView(this)
+        val foreground = Color.parseColor(if (lightAppearance) "#17202a" else "#f0f2f5")
+        title.setTextColor(foreground)
+        address.setTextColor(foreground)
+        address.setHintTextColor(Color.parseColor(if (lightAppearance) "#596574" else "#aab3bf"))
+        address.backgroundTintList = android.content.res.ColorStateList.valueOf(foreground)
+        error.setTextColor(foreground)
         val connect = Button(this).apply {
             text = "连接"
             setOnClickListener {
@@ -90,7 +113,7 @@ class MainActivity : ComponentActivity() {
             }
         }
         layout.addView(title); layout.addView(address); layout.addView(error); layout.addView(connect)
-        setContentView(layout)
+        setSafeContent(layout)
     }
 
     private fun connectionFailure(view: WebView, message: String) {
@@ -166,21 +189,59 @@ class MainActivity : ComponentActivity() {
             when (payload.optString("action")) {
                 "hello" -> reply.postMessage(JSONObject().put("version", 1)
                     .put("appVersion", BuildConfig.VERSION_NAME)
+                    .put("capabilities", org.json.JSONArray(listOf("app-update-v1", "appearance-v1")))
                     .put("webViewVersion", WebViewCompat.getCurrentWebViewPackage(this)?.versionName).toString())
+                "appearance" -> {
+                    val theme = payload.optString("theme")
+                    if (theme == "light" || theme == "dark") {
+                        preferences.edit().putString("appearance", theme).apply()
+                        applyAppearance()
+                    }
+                }
+                "check-app-update" -> {
+                    if (updater == null) updater = AppUpdater(this, { origin }) {
+                        installPermission.launch(Intent(Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
+                            Uri.parse("package:$packageName")))
+                    }
+                    updater?.check(value) { status, label ->
+                        if (web === view && origin == value) reply.postMessage(JSONObject().put("version", 1)
+                            .put("appUpdate", JSONObject().put("status", status).put("label", label)).toString())
+                    }
+                }
                 "exit" -> { CookieManager.getInstance().flush(); finish() }
                 "clear-session" -> CookieManager.getInstance().removeAllCookies { CookieManager.getInstance().flush() }
                 "configure" -> configure()
             }
         }
+        setSafeContent(view)
+        view.loadUrl("$value/m/")
+    }
+
+    /** System bars are transparent; the safe-area surface follows the trusted page theme. */
+    private fun applyAppearance() {
+        val style = if (lightAppearance) SystemBarStyle.light(Color.TRANSPARENT, Color.TRANSPARENT)
+            else SystemBarStyle.dark(Color.TRANSPARENT)
+        enableEdgeToEdge(statusBarStyle = style, navigationBarStyle = style)
+        window.setBackgroundDrawable(ColorDrawable(surfaceColor))
+        safeContainer?.setBackgroundColor(surfaceColor)
+        web?.setBackgroundColor(surfaceColor)
+    }
+
+    /** Native owns system/keyboard insets once; WebView receives an already safe viewport. */
+    private fun setSafeContent(content: View) {
         val container = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
-        container.addView(view, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
+        safeContainer = container
+        container.setBackgroundColor(surfaceColor)
+        content.setBackgroundColor(surfaceColor)
+        container.addView(content, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT))
         ViewCompat.setOnApplyWindowInsetsListener(container) { target, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout())
-            target.setPadding(bars.left, bars.top, bars.right, bars.bottom)
-            insets
+            val keyboard = insets.getInsets(WindowInsetsCompat.Type.ime())
+            target.setPadding(bars.left, bars.top, bars.right, maxOf(bars.bottom, keyboard.bottom))
+            WindowInsetsCompat.CONSUMED
         }
         setContentView(container)
-        view.loadUrl("$value/m/")
+        ViewCompat.requestApplyInsets(container)
     }
 
     override fun onPause() {
@@ -190,5 +251,5 @@ class MainActivity : ComponentActivity() {
         super.onPause()
     }
     override fun onResume() { super.onResume(); web?.onResume() }
-    override fun onDestroy() { connectionDialog?.dismiss(); web?.destroy(); web = null; super.onDestroy() }
+    override fun onDestroy() { updater?.close(); connectionDialog?.dismiss(); web?.destroy(); web = null; super.onDestroy() }
 }
