@@ -348,9 +348,12 @@ const server = http.createServer(async (req, res) => {
             assert.equal(priceStyle.color,priceStyle.pips,'enlarged digits remain gray');
             assert.equal(priceStyle.weight,priceStyle.pipWeight,'enlarged digits do not gain bold emphasis');
             const referenceStyle = await page.locator('.mobile-spark').first().evaluate(el => [...el.querySelectorAll('line')].map(line => {
-              const s=getComputedStyle(line);return {stroke:s.stroke,opacity:s.opacity};
+              const s=getComputedStyle(line);return {price:line.classList.contains('mobile-spark-previous-close'),stroke:s.stroke,opacity:s.opacity};
             }));
-            assert(referenceStyle.length>=2);assert(referenceStyle.every(s=>s.stroke===referenceStyle[0].stroke&&s.opacity===referenceStyle[0].opacity),'horizontal and vertical references share color and opacity');
+            const priceReference=referenceStyle.find(s=>s.price);
+            assert.equal(priceReference.stroke,theme==='light'?'rgb(120, 145, 173)':'rgb(145, 168, 196)');
+            assert.equal(priceReference.opacity,'0.5');
+            assert(referenceStyle.filter(s=>!s.price).every(s=>s.opacity==='0.12'),'time references remain subordinate');
             await expect(page.locator('.mobile-watch-last-price').first()).toHaveText('2,684.520');
             await expect(page.locator('.mobile-watch-last-price').nth(3)).toHaveText('147.250');
             await expect(page.locator('.mobile-watch-last-price sup').first()).toHaveText('0');
@@ -513,6 +516,9 @@ const server = http.createServer(async (req, res) => {
           }));
           assert.equal(colors.line,theme==='light' ? 'rgb(100, 136, 184)' : 'rgb(131, 166, 212)');
           assert.equal(colors.fill,colors.line,'previous-session area follows blue line rather than quote direction');
+          const reference=await stockRow.locator('.mobile-spark-session-open').evaluate(el=>({color:getComputedStyle(el).stroke,opacity:getComputedStyle(el).opacity}));
+          assert.equal(reference.color,theme==='light'?'rgb(120, 145, 173)':'rgb(145, 168, 196)');
+          assert.equal(reference.opacity,'0.5');
         }
         for(const width of [375,412]) {
           await page.setViewportSize({width,height:852});
