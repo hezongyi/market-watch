@@ -27,6 +27,8 @@ from .storage import now_ms
 
 LEGACY_RULES = "akshare-1.19.3-source-label-v1"
 RULES = "akshare-1.19.3-source-label-hk-precision-v2"
+HK_PLATFORM_POLICY = "sina-hk-platform-invalid-ohlcv-audit-v1"
+HK_QUALITY_NOTE = "新浪港股部分日线记录无效；图表排除异常记录并保留审计，不补价。"
 MINUTES = {"M1": "1", "M5": "5", "M15": "15", "M30": "30", "H1": "60"}
 PERIODS = {"D1": "daily", "W1": "weekly", "MN": "monthly"}
 EXCHANGES = {"SSE", "SZSE", "BSE", "HKEX", "SHFE", "DCE", "CZCE", "CFFEX", "INE", "GFEX"}
@@ -324,9 +326,20 @@ class AKShareHistory:
                             identity.parameters["source_family"])
         if identity.parameters["endpoint"] != expected or identity.parameters["rules"] not in (LEGACY_RULES, RULES):
             raise ValueError("AKShare endpoint rules differ from the fixed acquisition identity")
+        policy = identity.parameters.get("record_policy")
+        if policy is not None and (policy != HK_PLATFORM_POLICY
+                or identity.parameters["source_family"] != "sina-hk"
+                or identity.parameters["adjustment"] != "qfq" or frame != "D1"):
+            raise ValueError("AKShare record policy differs from the fixed acquisition identity")
         records = invoke(expected, request_parameters(identity, start, end), deadline=deadline)
         observed = now_ms()
-        rows = parse_records(identity, records, start=start, end=end, observed_at=observed)
+        warnings = [] if policy == HK_PLATFORM_POLICY else None
+        rows = parse_records(identity, records, start=start, end=end, observed_at=observed,
+                             invalid_records=warnings)
+        # A whole snapshot with no usable candles cannot certify empty history.
+        # Leave failures retryable without storing a successful empty snapshot.
+        if warnings is not None and not rows:
+            raise MarketRequestError(RequestResult(status="invalid_payload" if records else "unavailable"))
         if frame == "D1" and identity.parameters["adjustment"] == "none" and identity.parameters["source_family"] in ("sina-a", "sina-hk"):
             info = symbol_rules(identity.provider_symbol, identity.parameters["source_family"])
             factor_endpoint = "stock_zh_a_daily" if info["source_family"] == "sina-a" else "stock_hk_daily"
@@ -343,7 +356,7 @@ class AKShareHistory:
         return NativeCandleBatch(identity=identity, timeframe=frame, window_start=start,
             window_end=end, checkpoint=end, observed_at=observed,
             rows=rows, result=RequestResult(status="data" if rows else "empty_success"),
-            volume_kind="quantity", volume_unit=info["volume_unit"])
+            volume_kind="quantity", volume_unit=info["volume_unit"], source_warnings=warnings or ())
 
     def close(self):
         pass
@@ -371,6 +384,10 @@ def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
     if meta["source_family"] in ("sina-a", "sina-hk"):
         parameters = {**source.parameters, "adjustment": "qfq",
             "endpoint": endpoint(meta["symbol"], frame, "qfq", source.parameters["source_family"])}
+        if meta["source_family"] == "sina-hk":
+            # Only platform HK qfq opts in. Managed/legacy strict reads keep
+            # their exact identity and never consume this audited snapshot.
+            parameters["record_policy"] = HK_PLATFORM_POLICY
         source = source.model_copy(update={"parameters": parameters})
     observed = now_ms()
     right = min(before, observed)
@@ -407,4 +424,6 @@ def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
         "coverage": [[visible[0]["chart_time"], min(before, observed)]] if visible else [],
         "availability": "observed_window", "series_kind": "provider", "basis": "last",
         "calendar": "source_date", "precision": meta["precision"], "indicators": [],
-        "volume_kind": "quantity", "volume_unit": meta["volume_unit"], "as_of": batch.observed_at}
+        "volume_kind": "quantity", "volume_unit": meta["volume_unit"], "as_of": batch.observed_at,
+        **({"source_warnings": list(batch.source_warnings)}
+           if source.parameters.get("record_policy") == HK_PLATFORM_POLICY else {})}

@@ -4,7 +4,14 @@ import hashlib
 
 from .config import settings
 from .market_contracts import HISTORY_FRAMES, DatasetIdentity
-from .provider_akshare import AKShareHistory, collection_identity, endpoint, invoke, symbol_rules
+from .provider_akshare import (
+    HK_QUALITY_NOTE,
+    AKShareHistory,
+    collection_identity,
+    endpoint,
+    invoke,
+    symbol_rules,
+)
 from .source_history_store import _insert
 from .storage import MarketCatalog, now_ms, transaction
 
@@ -188,6 +195,8 @@ def chart_metadata(ident):
             info.update(symbol_rules(row.symbol, "tencent-a"))
         elif info["source_family"] == "eastmoney-a":
             info.update(symbol_rules(row.symbol, "sina-a"))
+        if info["source_family"] == "sina-hk":
+            info["quality_note"] = HK_QUALITY_NOTE
         return {**info, "id": ident if tencent else row.id,
             "name": row.label, "name_zh": info.get("name_zh"), "symbol": row.symbol,
             "display_symbol": row.symbol, "source": "akshare", "basis": "last",

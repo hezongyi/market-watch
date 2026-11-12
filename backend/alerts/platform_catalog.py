@@ -39,6 +39,10 @@ def _entry(row):
         "capabilities": native, "history_catalog_id": row.get("physical_id", row["id"]),
         "verified_frames": info.get("verified_frames", info.get("archive_verified_frames", {}))}
     family = "tencent-a" if tencent else "sina-a" if info.get("source_family") == "eastmoney-a" else info.get("source_family")
+    if source == "akshare" and not direct and family == "sina-hk":
+        from .provider_akshare import HK_QUALITY_NOTE
+
+        result["quality_note"] = HK_QUALITY_NOTE
     adjustment = info.get("adjustment")
     if direct:
         adjustment = "none"
