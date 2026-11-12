@@ -41,6 +41,7 @@ def test_handled_collection_fault_stays_visible_until_its_source_recovers(databa
     with database.begin() as db:
         db.get(Instrument, "BTCUSDT").enabled = False
         gold = db.get(Instrument, "XAUUSD")
+        gold.enabled = True
         gold.source = "binance"
         gold_symbol = gold.symbol
 
