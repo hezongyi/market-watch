@@ -8,9 +8,18 @@ from sqlalchemy import text
 
 log = logging.getLogger(__name__)
 CHANNEL = 'market_watch_publication_ready'
+STREAM_CHANNEL = 'market_watch_stream_demand'
+ALERT_CHANNEL = 'market_watch_alert_demand'
+NOTICE_CHANNEL = 'market_watch_notice_ready'
 
 
-def notify(db):
+def notify_connection(connection, channel):
+    """Core source hooks share the same commit/rollback delivery guarantee."""
+    if connection.dialect.name == 'postgresql':
+        connection.execute(text("SELECT pg_notify(:channel, '')"), {'channel': channel})
+
+
+def notify(db, channel=CHANNEL):
     """PostgreSQL delivers this hint only if the input transaction commits.
 
     Identical channel/payload notifications coalesce within a transaction,
@@ -18,10 +27,11 @@ def notify(db):
     """
     if db.get_bind().dialect.name == 'postgresql':
         transaction = db.get_nested_transaction() or db.get_transaction()
-        if getattr(transaction, '_publication_wakeup_sent', False):
+        sent = getattr(transaction, '_publication_wakeup_sent', set())
+        if channel in sent:
             return
-        db.execute(text("SELECT pg_notify(:channel, '')"), {'channel': CHANNEL})
-        transaction._publication_wakeup_sent = True
+        db.execute(text("SELECT pg_notify(:channel, '')"), {'channel': channel})
+        transaction._publication_wakeup_sent = sent | {channel}
 
 
 class PublicationWakeup:
@@ -31,10 +41,13 @@ class PublicationWakeup:
     never consumes a slot in the application transaction connection pool.
     """
 
-    def __init__(self, engine=None, *, monotonic=time.monotonic):
+    def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL):
+        if channel not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL):
+            raise ValueError('Unknown worker wakeup channel')
         if engine is None:
             from .storage import engine
         self.engine = engine
+        self.channel = channel
         self.monotonic = monotonic
         self.connection = None
         self.retry_at = 0
@@ -77,7 +90,7 @@ class PublicationWakeup:
                 kwargs.update(connect_timeout=2, application_name='market-watch-publication-listener')
                 self.connection = self.engine.dialect.loaded_dbapi.connect(*args, **kwargs)
                 self.connection.autocommit = True
-                self.connection.execute('LISTEN ' + CHANNEL)
+                self.connection.execute('LISTEN ' + self.channel)
                 if self.error:
                     log.info('publication_listener_reconnected')
                 self.error = None

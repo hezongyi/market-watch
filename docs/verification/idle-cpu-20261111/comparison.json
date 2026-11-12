@@ -1,0 +1,161 @@
+{
+  "method": "Docker CPU nanosecond deltas; exclude first short interval in every phase; 4 CPU host; live input, not replay",
+  "baseline": {
+    "samples": 19,
+    "cpu_intervals": 18,
+    "seconds": 183.47,
+    "cpu_one_core": {
+      "mw-dev-market-runtime-1": 8.85,
+      "mw-dev-data-worker-1": 18.47,
+      "mw-dev-api-1": 8.59,
+      "mw-dev-notification-worker-1": 2.22,
+      "mw-dev-tls-1": 0.0,
+      "mw-dev-web-1": 0.0,
+      "mw-dev-frontend-1": 2.35,
+      "mw-dev-ntfy-1": 1.58,
+      "mw-dev-postgres-1": 11.24
+    },
+    "cpu_4core": 13.32,
+    "db_delta": {
+      "read": 174986,
+      "hit": 3221274,
+      "returned": 7808659,
+      "fetched": 1419516,
+      "inserted": 873,
+      "updated": 13519,
+      "deleted": 715,
+      "commits": 31711
+    },
+    "commits_per_second": 172.84,
+    "workload_zero": true,
+    "enabled_counts": [
+      3
+    ],
+    "shadow_attempt_delta": 0,
+    "shadow_states": [
+      "shadow_ready"
+    ],
+    "aggregation_queue_empty_samples": 15,
+    "publication_job_range": [
+      8,
+      20
+    ],
+    "publication_pending_range": [
+      0,
+      17
+    ],
+    "new_published_bars": 3,
+    "published_revision_delta": 28,
+    "demand_continuously_sampled": false,
+    "supplemental_demand_check": {
+      "interests": 0,
+      "active_alerts": 0,
+      "enabled_instruments": 3
+    }
+  },
+  "stage1": {
+    "samples": 31,
+    "cpu_intervals": 30,
+    "seconds": 304.74,
+    "cpu_one_core": {
+      "mw-dev-api-1": 1.66,
+      "mw-dev-data-worker-1": 19.23,
+      "mw-dev-market-runtime-1": 8.71,
+      "mw-dev-notification-worker-1": 1.7,
+      "mw-dev-tls-1": 0.0,
+      "mw-dev-web-1": 0.0,
+      "mw-dev-frontend-1": 2.32,
+      "mw-dev-ntfy-1": 1.55,
+      "mw-dev-postgres-1": 8.88
+    },
+    "cpu_4core": 11.01,
+    "db_delta": {
+      "read": 60374,
+      "hit": 2251207,
+      "returned": 4867132,
+      "fetched": 948372,
+      "inserted": 1792,
+      "updated": 22971,
+      "deleted": 1376,
+      "commits": 44535
+    },
+    "commits_per_second": 146.14,
+    "workload_zero": true,
+    "enabled_counts": [
+      3,
+      4
+    ],
+    "shadow_attempt_delta": 0,
+    "shadow_states": [
+      "shadow_ready"
+    ],
+    "aggregation_queue_empty_samples": 26,
+    "publication_job_range": [
+      8,
+      19
+    ],
+    "publication_pending_range": [
+      0,
+      13
+    ],
+    "new_published_bars": 8,
+    "published_revision_delta": 74,
+    "demand_continuously_sampled": true
+  },
+  "final": {
+    "samples": 31,
+    "cpu_intervals": 30,
+    "seconds": 304.98,
+    "cpu_one_core": {
+      "mw-dev-api-1": 1.69,
+      "mw-dev-market-runtime-1": 8.39,
+      "mw-dev-data-worker-1": 17.66,
+      "mw-dev-notification-worker-1": 1.71,
+      "mw-dev-tls-1": 0.0,
+      "mw-dev-web-1": 0.0,
+      "mw-dev-frontend-1": 2.31,
+      "mw-dev-ntfy-1": 1.56,
+      "mw-dev-postgres-1": 8.63
+    },
+    "cpu_4core": 10.49,
+    "db_delta": {
+      "read": 63551,
+      "hit": 2188719,
+      "returned": 4822853,
+      "fetched": 908835,
+      "inserted": 1208,
+      "updated": 20365,
+      "deleted": 839,
+      "commits": 42150
+    },
+    "commits_per_second": 138.21,
+    "workload_zero": true,
+    "enabled_counts": [
+      3,
+      4
+    ],
+    "shadow_attempt_delta": 0,
+    "shadow_states": [
+      "shadow_ready"
+    ],
+    "aggregation_queue_empty_samples": 26,
+    "publication_job_range": [
+      8,
+      13
+    ],
+    "publication_pending_range": [
+      0,
+      21
+    ],
+    "new_published_bars": 7,
+    "published_revision_delta": 50,
+    "demand_continuously_sampled": true
+  },
+  "reduction_percent": 21.2,
+  "notes": [
+    "Initial incomplete CPU interval excluded from every phase. Stage1 was previously 10.82% including that interval; consistent recalculation is 11.01%.",
+    "Baseline demand and enabled counts were checked separately; stage1/final sampled those values continuously.",
+    "Enabled Instrument records dynamically vary between 3 and 4; no user switch changed. Live inputs are not replayed, so this is not an identical-load controlled benchmark.",
+    "New published bars and revision sum changes include legitimate additions and content corrections; they are not counts of unnecessary observation revisions."
+  ]
+}

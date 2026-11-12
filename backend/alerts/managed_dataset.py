@@ -229,10 +229,13 @@ def publish_corrections(db, inst, pub, frame, left, right, pending, now):
             pub.complete_count += int(row["complete"])
             pub.revision += 1
         elif old.payload != row:
+            from .publication_observation import content
+            changed = content(old.payload) != content(row)
             pub.complete_count += int(row["complete"]) - int(old.complete)
             old.end, old.complete, old.payload = row["end"], row["complete"], row
-            old.revision += 1
-            pub.revision += 1
+            if changed:
+                old.revision += 1
+                pub.revision += 1
         if job is not None:
             db.delete(job)
             consumed += 1
@@ -408,8 +411,8 @@ def publish_frame(db, inst, plan, frame, now):
         # publication until the missing interval has been repaired.
         return finish(blocked="gap")
     old_start, old_end = pub.start, pub.end
-    existing = {
-        r.start: (r.payload, r.complete)
+    existing_records = {
+        r.start: r
         for r in db.scalars(
             select(ChartPublishedBar).where(
                 ChartPublishedBar.instrument_id == inst.id,
@@ -418,7 +421,15 @@ def publish_frame(db, inst, plan, frame, now):
             )
         )
     }
-    changed = any(existing.get(r["start"], (None, False))[0] != r for r in rows)
+    from .publication_observation import content
+    existing = {at: (r.payload, r.complete) for at, r in existing_records.items()}
+    def content_changed(row):
+        old = existing.get(row["start"], (None, False))[0]
+        return old is None or content(old) != content(row)
+    changed = any(content_changed(r) for r in rows)
+    for row in rows:
+        if not content_changed(row) and existing[row["start"]][0] != row:
+            existing_records[row["start"]].payload = row
     values = [
         dict(
             instrument_id=inst.id,
@@ -429,7 +440,7 @@ def publish_frame(db, inst, plan, frame, now):
             payload=r,
         )
         for r in rows
-        if existing.get(r["start"], (None, False))[0] != r
+        if content_changed(r)
     ]
     insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
     statement = insert(ChartPublishedBar.__table__)
@@ -682,6 +693,11 @@ def data(body):
             rows = read_rows(db, inst, body.timeframe, before, body.limit+1, dataset_start=body.dataset_start)
         eligible = [row for row in rows if row["start"] < before]
         visible = eligible[-body.limit :]
+        if frozen is not None:
+            # The numerical cache is fenced by content revisions. Freshness
+            # can advance independently, so visible bars use current snapshots.
+            visible = read_rows(db, inst, body.timeframe, before, body.limit,
+                                dataset_start=body.dataset_start)
         has_more = len(eligible) > body.limit
         left = max(pub.start, body.dataset_start or pub.start) if pub else None
         revision = pub.revision if pub else 0

@@ -1,0 +1,21 @@
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    environment:
+      POSTGRES_USER: cpu_fix
+      POSTGRES_DB: cpu_fix
+      POSTGRES_PASSWORD: ${CPUFIX_PASSWORD:?}
+    ports: ['127.0.0.1:25473:5432']
+    volumes: ['postgres-data:/var/lib/postgresql/data']
+    mem_limit: 1g
+    cpus: 1
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U cpu_fix -d cpu_fix']
+      interval: 2s
+      timeout: 2s
+      retries: 30
+    networks: [acceptance]
+volumes:
+  postgres-data: {}
+networks:
+  acceptance: {}

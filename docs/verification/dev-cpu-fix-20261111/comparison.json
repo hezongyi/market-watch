@@ -1,0 +1,97 @@
+{
+  "before": {
+    "start": "2026-11-11T14:17:45.402822+00:00",
+    "end": "2026-11-11T14:20:48.384374+00:00",
+    "samples": 19,
+    "cpu_percent_one_core": {
+      "mw-dev-tls-1": 0.0,
+      "mw-dev-web-1": 0.0,
+      "mw-dev-data-worker-1": 42.05,
+      "mw-dev-notification-worker-1": 2.25,
+      "mw-dev-market-runtime-1": 8.97,
+      "mw-dev-api-1": 8.53,
+      "mw-dev-frontend-1": 2.4,
+      "mw-dev-ntfy-1": 1.67,
+      "mw-dev-postgres-1": 20.16
+    },
+    "cpu_cores": 0.86,
+    "host_cpu_percent_4_cores": 21.51,
+    "workload_first": {
+      "clients": 0,
+      "subscriptions": 0,
+      "tasks": 0
+    },
+    "workload_last": {
+      "clients": 0,
+      "subscriptions": 0,
+      "tasks": 0
+    },
+    "workload_constant": true,
+    "shadow_attempt_increase": 660,
+    "shadow_states_last": [
+      "failed",
+      "failed",
+      "failed"
+    ],
+    "new_published_rows": 9,
+    "publication_revision_increase": 5787,
+    "aggregation_queue_empty_samples": 16,
+    "publication_jobs_last": 8,
+    "db_commits": 47204,
+    "db_row_updates": 19490,
+    "sixteen_second_diff": {
+      "added": 0,
+      "rows_changed": 484,
+      "revision_increase": 484,
+      "observation_only_rows": 484
+    }
+  },
+  "after": {
+    "start": "2026-11-11T14:30:20.19276+00:00",
+    "end": "2026-11-11T14:33:23.050424+00:00",
+    "samples": 19,
+    "cpu_percent_one_core": {
+      "mw-dev-tls-1": 0.01,
+      "mw-dev-web-1": 0.0,
+      "mw-dev-data-worker-1": 18.04,
+      "mw-dev-api-1": 8.91,
+      "mw-dev-market-runtime-1": 9.28,
+      "mw-dev-notification-worker-1": 2.22,
+      "mw-dev-frontend-1": 2.39,
+      "mw-dev-ntfy-1": 1.65,
+      "mw-dev-postgres-1": 11.49
+    },
+    "cpu_cores": 0.54,
+    "host_cpu_percent_4_cores": 13.5,
+    "workload_first": {
+      "clients": 0,
+      "subscriptions": 0,
+      "tasks": 0
+    },
+    "workload_last": {
+      "clients": 0,
+      "subscriptions": 0,
+      "tasks": 0
+    },
+    "workload_constant": true,
+    "shadow_attempt_increase": 0,
+    "shadow_states_last": [
+      "shadow_ready",
+      "shadow_ready",
+      "shadow_ready"
+    ],
+    "new_published_rows": 18,
+    "publication_revision_increase": 48,
+    "aggregation_queue_empty_samples": 17,
+    "publication_jobs_last": 8,
+    "db_commits": 30569,
+    "db_row_updates": 15820,
+    "sixteen_second_diff": {
+      "added": 0,
+      "rows_changed": 475,
+      "revision_increase": 0,
+      "observation_only_rows": 475
+    }
+  },
+  "cpu_reduction_percent": 37.2
+}

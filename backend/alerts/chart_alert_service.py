@@ -238,6 +238,8 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
     db.add(Audit(kind="chart_alert_created", details={"alert_id": alert.id, "version": 1}))
     db.flush()
     initialize_price(db, alert, identity, config, at=at)
+    from .publication_wakeup import ALERT_CHANNEL, notify
+    notify(db, ALERT_CHANNEL)
     return alert
 
 
@@ -290,6 +292,8 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
     db.add(Audit(kind="chart_alert_edited", details={"alert_id": alert.id, "version": alert.version}))
     db.flush()
     initialize_price(db, alert, identity, config, at=at)
+    from .publication_wakeup import ALERT_CHANNEL, notify
+    notify(db, ALERT_CHANNEL)
     return alert
 
 
@@ -367,6 +371,8 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
     alert.control_revision += 1
     db.add(ChartAlertAction(alert_id=alert_id, request_id=request_id, request_hash=digest, created_at=at))
     db.add(Audit(kind="chart_alert_" + action, details={"alert_id": alert.id, "run": alert.run}))
+    from .publication_wakeup import ALERT_CHANNEL, notify
+    notify(db, ALERT_CHANNEL)
     return alert
 
 

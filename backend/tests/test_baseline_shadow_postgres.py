@@ -29,6 +29,12 @@ CONTRACTS = [
 ]
 
 
+@pytest.mark.parametrize('failed_before', [False, True])
+def test_pg_already_active_candidate_is_not_recreated(provider_pg, monkeypatch, failed_before):
+    contracts.test_already_active_candidate_finishes_window_without_creation(
+        provider_pg[0], monkeypatch, failed_before)
+
+
 @pytest.mark.parametrize("contract", CONTRACTS, ids=[case.__name__ for case in CONTRACTS])
 def test_shadow_contract(provider_pg, monkeypatch, contract):
     contract(provider_pg[0], monkeypatch)

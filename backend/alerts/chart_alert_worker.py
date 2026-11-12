@@ -51,8 +51,8 @@ def atr_prefix_query(config, binding):
 def atr_price_digest(db, config, binding, end, checkpoint=None):
     """Extend a durable price digest; reread the prefix only on revision change.
 
-    Provider/publication revisions include volume and observation metadata. A
-    changed revision therefore requires comparing the actual ATR price inputs.
+    Provider revisions include observation metadata; publication revisions
+    include volume. A changed revision requires comparing actual ATR prices.
     Streaming keeps the exceptional verification bounded in memory.
     """
     checkpoint = checkpoint or {}

@@ -131,7 +131,9 @@ def shadow_cycle(*, now=None, adapter=None, budget=None, composites=None, prepar
             results.append({"composite_id": composite_id, "status": "error",
                             "error": type(error).__name__})
     return {"scheduled_for": scheduled_for,
-            "worked": any(item["status"] != "skipped" for item in results),
+            # Failed/not-ready checks are not forward progress. Re-evaluate
+            # them on the ordinary poll, retaining same-window recovery.
+            "worked": any(item["status"] == "ready" for item in results),
             "composites": results}
 
 

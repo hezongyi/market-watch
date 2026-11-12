@@ -50,6 +50,8 @@ def _append(connection, kind, source_id, facts):
         return
     connection.execute(Audit.__table__.insert().values(kind='notice_source', at=now_ms(),
         details={'schema_version': 1, 'kind': kind, 'source_id': str(source_id), 'facts': facts}))
+    from .publication_wakeup import NOTICE_CHANNEL, notify_connection
+    notify_connection(connection, NOTICE_CHANNEL)
 
 
 @event.listens_for(SignalRow, 'after_insert')

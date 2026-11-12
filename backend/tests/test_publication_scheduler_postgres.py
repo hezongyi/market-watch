@@ -16,6 +16,44 @@ from test_publication_scheduler import MINUTE, START
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated Ubuntu PostgreSQL')
 
 
+@pytest.mark.parametrize('frame,seconds,derived', [('M15', 900, {'M30'}), ('D1', 86400, {'W1', 'MN'})])
+def test_pg_atomic_observation_queues_derived_only_and_keeps_content_repair(publication_pg, frame, seconds, derived):
+    from test_idle_worker_costs import (
+        test_atomic_native_observation_only_schedules_derived_and_keeps_content_repair,
+    )
+    test_atomic_native_observation_only_schedules_derived_and_keeps_content_repair(
+        publication_pg[0], frame, seconds, derived)
+
+
+def test_pg_incomplete_observation_fallback_retains_full_calculation(publication_pg, monkeypatch):
+    from test_idle_worker_costs import (
+        test_incomplete_day_fallback_reuses_boundaries_without_skipping_full_calculation,
+    )
+    test_incomplete_day_fallback_reuses_boundaries_without_skipping_full_calculation(
+        publication_pg[0], monkeypatch)
+
+
+def test_pg_observation_does_not_revise_unchanged_snapshots(publication_pg, monkeypatch):
+    from test_publication_observation import (
+        test_rolling_observation_keeps_freshness_without_content_revisions,
+    )
+    test_rolling_observation_keeps_freshness_without_content_revisions(publication_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize('damage', ['price', 'volume', 'confirmation', 'incomplete'])
+def test_pg_observation_retains_content_repair(publication_pg, monkeypatch, damage):
+    from test_publication_observation import test_observation_never_masks_unpublished_content
+    test_observation_never_masks_unpublished_content(publication_pg[0], monkeypatch, damage)
+
+
+@pytest.mark.parametrize('frame', ['W1', 'MN'])
+def test_pg_observation_preserves_calendar_snapshot_revisions(publication_pg, monkeypatch, frame):
+    from test_observation_aggregation import (
+        test_day_observation_refreshes_derived_calendar_snapshot,
+    )
+    test_day_observation_refreshes_derived_calendar_snapshot(publication_pg[0], monkeypatch, frame)
+
+
 def test_pg_observed_rolling_windows_keep_all_minutes(publication_pg):
     from test_chart_aggregation import (
         test_unchanged_rolling_minutes_coalesce_without_losing_new_edge,
@@ -187,9 +225,12 @@ def drain():
 
 
 def observe(factory, clock, ident='BTCUSDT'):
+    # Exercise queued content publication and its generation fence. Pure
+    # freshness now commits atomically with ingestion, covered separately.
     with factory.begin() as db:
         market.ingest(db, db.get(storage.Instrument, ident), {'rows': [
-            dict(timestamp=START + 29 * MINUTE, open=10, high=11, low=9, close=10)]},
+            dict(timestamp=START + 29 * MINUTE, open=10, high=11, low=9, close=10,
+                 volume=clock[0])]},
             received_at=clock[0])
 
 
@@ -208,7 +249,7 @@ def test_new_generation_created_after_copy_in_same_transaction_is_not_acknowledg
     def publish(db, inst, plan, frame, stamp):
         result = original(db, inst, plan, frame, stamp)
         market.ingest(db, inst, {'rows': [dict(timestamp=START + 29 * MINUTE,
-            open=10, high=11, low=9, close=10)]}, received_at=later)
+            open=10, high=11, low=9, close=10, volume=later)]}, received_at=later)
         return result
     monkeypatch.setattr(managed, 'publish_frame', publish)
     assert managed.publish_once()

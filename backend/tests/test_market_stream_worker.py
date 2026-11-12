@@ -460,6 +460,28 @@ def test_published_stream_signal_uses_publication_evidence_without_scanning_stag
         "published stream freshness must not rescan raw staging history on every check"
 
 
+def test_published_stream_observation_changes_signal_without_content_revision(database):
+    from alerts.storage import ChartPublication, ChartPublishedBar
+
+    query = DataQuery(instrument='BTCUSDT', series_kind='managed', timeframe='M1', published=True)
+    identity, _ = resolve(Subscription(client='page', listener='chart', generation=1,
+                                      kind='bars', query=query))
+    calculator, work = Calculator(), {'identity': identity}
+    with database.begin() as db:
+        db.add(ChartPublication(instrument_id='BTCUSDT', timeframe='M1', start=60000,
+            end=120000, complete_count=1, initialized=True, revision=1))
+        db.add(ChartPublishedBar(instrument_id='BTCUSDT', timeframe='M1', start=60000,
+            end=120000, complete=True, payload={'observed_at': 1000}))
+    with database.begin() as db:
+        before = calculator._signal(db, work, query)
+        row = db.get(ChartPublishedBar, ('BTCUSDT', 'M1', 60000))
+        row.payload = {'observed_at': 2000}
+    with database.begin() as db:
+        after = calculator._signal(db, work, query)
+        assert db.get(ChartPublication, ('BTCUSDT', 'M1')).revision == 1
+    assert before != after
+
+
 def test_provider_swing_cutoff_uses_source_time_not_daily_display_label(database, monkeypatch):
     from alerts import market_stream_worker as worker
     from alerts import provider_chart as upstream

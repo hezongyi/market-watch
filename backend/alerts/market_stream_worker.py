@@ -108,6 +108,15 @@ class Calculator:
             publication = db.get(ChartPublication, (ident, query.timeframe))
             facts = [publication.start, publication.end, publication.revision,
                      publication.initialized, publication.complete_count] if publication else None
+            if publication:
+                from .storage import ChartPublishedBar
+                tail = db.scalar(select(ChartPublishedBar.payload).where(
+                    ChartPublishedBar.instrument_id == ident,
+                    ChartPublishedBar.timeframe == query.timeframe,
+                    ChartPublishedBar.start >= publication.start,
+                    ChartPublishedBar.start < publication.end,
+                ).order_by(ChartPublishedBar.start.desc()).limit(1))
+                facts.append(tail.get('observed_at') if tail else None)
         else:
             facts = list(db.execute(select(func.count(Bar.id), func.max(Bar.received_at),
                 func.sum(Bar.revision + Bar.volume_revision)).where(Bar.instrument_id == ident)).one())
@@ -300,6 +309,13 @@ def main():
 
 
 def run(stopped):
+    from .publication_wakeup import STREAM_CHANNEL, PublicationWakeup
+
+    with PublicationWakeup(channel=STREAM_CHANNEL) as wake:
+        _run(stopped, wake)
+
+
+def _run(stopped, wake):
     calculators, pending = {}, {}
     shared_buckets = {}
     owner = uid()
@@ -308,6 +324,8 @@ def run(stopped):
     # not serialize every other task behind it; SSE never waits on these slots.
     with ThreadPoolExecutor(max_workers=4, thread_name_prefix="market-stream") as executor:
         while not stopped.is_set():
+            wake.prepare()
+            activity = {}
             worked = False
             cycle_error = None
             try:
@@ -319,7 +337,7 @@ def run(stopped):
                         except Exception as error:
                             log.warning("market task failed: %s", type(error).__name__)
                 if len(pending) < 4:
-                    work = stream.claim(exclude=pending, owner=owner)
+                    work = stream.claim(exclude=pending, owner=owner, activity=activity)
                     if work:
                         key = work["id"]
                         calculator = calculators.pop(key, None) or Calculator()
@@ -349,7 +367,11 @@ def run(stopped):
             if not pending:
                 from .runtime_health import progress
                 progress(error=cycle_error)
-            stopped.wait(.01 if worked else .1)
+            delay = .01 if worked else .1 if pending or activity.get('active') else 1
+            if cycle_error:
+                stopped.wait(delay)
+            else:
+                wake.wait(delay, stopped)
 
 
 if __name__ == "__main__":

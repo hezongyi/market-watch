@@ -48,6 +48,43 @@ def target_identity(db, revision_id):
     return DatasetIdentity.model_validate(target.identity)
 
 
+@pytest.mark.parametrize('failed_before', [False, True])
+def test_already_active_candidate_finishes_window_without_creation(database, monkeypatch, failed_before):
+    from alerts import switch_schedule
+
+    composite, _, candidate, _, _ = candidate_fixture(database, monkeypatch)
+    with database.begin() as db:
+        db.get(MarketComposite, composite).active_revision_id = candidate
+    if failed_before:
+        row = switch_runs.start(baseline_shadow.KIND, composite_id=composite,
+                                scheduled_for=switch_schedule.due_weekly(STAMP))
+        switch_runs.set_state(row['id'], 'failed', phase='shadow_failed')
+    before = baseline_shadow.bindings(composite)
+    def unexpected(*args, **kwargs):
+        pytest.fail('Already active baseline must not be created or prepared again')
+    monkeypatch.setattr(baseline_shadow, 'create_candidate', unexpected)
+    monkeypatch.setattr(baseline_shadow, 'advance', unexpected)
+    first = switch_schedule.shadow_cycle(now=STAMP, composites=(composite,))
+    row = switch_runs.get(first['composites'][0]['run_id'])
+    assert row['shadow_report']['status'] == 'unchanged'
+    assert row['state'] == 'shadow_ready'
+    assert switch_schedule.shadow_cycle(now=STAMP, composites=(composite,))['worked'] is False
+    assert switch_runs.get(row['id'])['attempts'] == int(failed_before)
+    assert switch_schedule.activation_cycle()['worked'] is False
+    assert baseline_shadow.bindings(composite) == before
+
+
+def test_unready_shadow_uses_idle_poll_instead_of_busy_retry(database):
+    from alerts import switch_schedule
+
+    def prepare(composite_id, *, run_id, **kwargs):
+        return {'run': {'id': run_id, 'state': 'failed'}, 'ready': False,
+                'reasons': [{'code': 'preparation_pending'}]}
+    result = switch_schedule.shadow_cycle(now=STAMP, composites=('pending',), prepare=prepare)
+    assert result['composites'][0]['status'] == 'not_ready'
+    assert result['worked'] is False
+
+
 def confirm(database, revision_id, start, close, *, observed_at, reason):
     with database.begin() as db:
         rows = tuple(minute(at, open=close, high=close, low=close, close=close, volume="3")

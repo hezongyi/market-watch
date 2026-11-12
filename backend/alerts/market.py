@@ -6,6 +6,7 @@ import logging
 import os
 import subprocess
 import time
+from bisect import bisect_right
 from dataclasses import dataclass
 from datetime import timedelta
 from decimal import Decimal
@@ -364,12 +365,18 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
     blocked = False
     for timeframe in timeframes:
-        bounds = {bucket_bounds(t, timeframe, calendar) for t in remaining[timeframe]}
+        bounds, pair = set(), None
+        for at in sorted(remaining[timeframe]):
+            if pair is None or not pair[0] <= at < pair[1]:
+                pair = bucket_bounds(at, timeframe, calendar)
+            bounds.add(pair)
+        ranges = [(ms(a), ms(b), (a, b)) for a, b in sorted(bounds)]
+        starts = [a for a, _, _ in ranges]
         grouped = {}
         for row in minute_rows:
-            pair = bucket_bounds(instant(row.start), timeframe, calendar)
-            if pair in bounds:
-                grouped.setdefault(pair, []).append(row)
+            index = bisect_right(starts, row.start) - 1
+            if index >= 0 and row.start < ranges[index][1]:
+                grouped.setdefault(ranges[index][2], []).append(row)
         outputs = []
         for left, right in sorted(bounds):
             rows = grouped.get((left, right), [])
