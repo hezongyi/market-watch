@@ -94,3 +94,12 @@
 新增回归覆盖：无共享任务/已有不完整共享任务时重新打开首快照保留三列；新会话和不同basis隔离；stale价格仍使用本地昨收重算且不开上游；异步昨收持久化后新计算器可直接读取；原生回调不得保留上一笔涨跌。上述用例先在旧实现失败，修复后通过。相关后端组233 passed，前端unit/browser contracts、完整Web构建、Ruff、diff检查通过。部署及真实三列一致性复测结果随后记录。
 
 首个候选的真实D1检查进一步发现，通用ProviderCache的OANDA日期映射会把查询上限夹到本地末根柱标签；缓存停留前几天时，单纯fetch_page可能误判旧尾部已满足昨收查询。最终补丁对缺失会话覆盖的D1执行有租约的重验证，且重验证复用近期观测必须同时证明原始请求上限已有覆盖。新增“最近写入但只覆盖前几天”的红/绿回归，相关后端组增至234 passed。不能只验证涨跌公式内部一致，还必须检查参考D1确为本次会话的前收盘。
+
+### 涨跌列最终部署与真实验收
+
+- Ubuntu本机 `mw-dev` 地址及启停命令不变。后端最终代码 `2221bfbb`，镜像 `market-watch-api:dev-watchlist-changes-r3-20261112`，ID `sha256:3a9cfc3be9ddce668051c2baf296ee6c4876b9bf9b0b94f77358f1c602aee9f3`；Web代码 `7c640247`，镜像 `market-watch-web:dev-watchlist-changes-20261112`，ID `sha256:5051714f4ba43b2eb14ef12aa8a0e8a0761c92126391fed1c5710f6aa96947d9`。两者dirty=false，均通过带task/project/purpose标记的mw-docker构建。只替换应用，PG/TLS/ntfy保留，旧镜像/配置留档于私有目录。
+- 真实验收拦截了首候选的旧D1问题，未将它记为成功。最终部署后首轮，继承的短期报价结果在后台重验证后约15s收敛；重新打开页面时工作区已新增NVDA，故实际验收为14行：首个报价7.296s，14行最新价/涨跌/涨跌%全部显示8.174s。此轮45s内164条接口/SSE报价公式核对、585次DOM三列核对全部通过，零页面错误，没有刷新才能恢复的行。
+- 10个平台品种所选完成D1的end均等于当前来源会话边界：OANDA为2026-11-11 22:00 UTC，Binance为2026-11-12 00:00 UTC。EURUSD/XAUUSD/AUDJPY另直接读取上游原生D1核对，昨收分别为1.10891、3987.475、109.411，与持久缓存及自选返回完全一致。不同来源保持各自原生日界线。
+- 最终相关后端234 passed；前端unit/browser contracts、完整Web构建、Ruff、diff检查通过。无新增CI查询/追踪。
+- 健康检查曾遇到一次上游candles HTTP 504，XAUUSD分钟确认短暂降级；既有重试自动恢复。最终readyz ready，38角色健康，三组合connected/owned/quote_ready/confirmed_tail_ready且无确认错误，旧独立采集器仍关闭。页面存在其他活跃客户端，本轮未把系统当空闲或声称所有订阅为零，也未重新开启CPU验收。
+- 私有新增证据：`changes-before/`、被拦截的`changes-after/`、`changes-r3/`、最终通过的`changes-r3-warm/changes-check.json`与截图、`reference-r3.json`、两次部署前后留档、最终健康/运行状态。真实数据、请求/DOM记录不包含于PR源码；凭据及完整inspect继续仅留私有目录。
