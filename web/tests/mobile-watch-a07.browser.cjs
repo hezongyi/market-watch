@@ -338,9 +338,9 @@ const server = http.createServer(async (req, res) => {
               });
               return {left:symbol.width,right:price.width,chart:chart.width,fitted,contained};
             }));
-            assert(fixedColumns.every(row => Math.abs(row.left-79.8)<0.1 && Math.abs(row.right-67.2)<0.1 && row.fitted && row.contained), 'fixed columns fit long code and quote without stealing chart width: '+JSON.stringify(fixedColumns));
+            assert(fixedColumns.every(row => Math.abs(row.left-71.4)<0.1 && Math.abs(row.right-67.2)<0.1 && row.fitted && row.contained), 'fixed columns fit long code and quote without stealing chart width: '+JSON.stringify(fixedColumns));
             assert(Math.max(...fixedColumns.map(row=>row.chart))-Math.min(...fixedColumns.map(row=>row.chart))<0.1);
-            assert(fixedColumns.every(row => row.chart >= width-191.1), 'chart has more space at both phone widths');
+            assert(fixedColumns.every(row => row.chart >= width-182.7), 'chart has more space at both phone widths');
             const priceStyle = await page.locator('.mobile-watch-last-price').first().evaluate(el => ({
               color:getComputedStyle(el).color,pips:getComputedStyle(el.querySelector('b')).color,
               weight:getComputedStyle(el).fontWeight,pipWeight:getComputedStyle(el.querySelector('b')).fontWeight
