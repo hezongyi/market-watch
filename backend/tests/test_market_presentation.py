@@ -85,16 +85,17 @@ def test_sina_and_tencent_directory_and_resolve_share_names(database, monkeypatc
         row.metadata_json = {**row.metadata_json, 'name_zh': '自定平安银行', 'name_zh_origin': 'manual'}
     with database() as db:
         rows = catalog(db, source='akshare', query='000001')['items']
-    assert len(rows) == 2
+    assert len(rows) == 4
     for row in rows:
         resolved = metadata(row['id'])
         assert row['label'] == resolved['instrument_name'] == '自定平安银行'
         assert row['display_symbol'] == resolved['display_symbol'] == '000001'
         assert row['provider_symbol'] == resolved['symbol'] == 'SZSE:000001'
-        assert row['price_basis_display'] == resolved['price_basis_display'] == '前复权'
+        expected_price = '不复权' if row['id'].startswith(('SINA-NATIVE:', 'TENCENT-NATIVE:')) else '前复权'
+        assert row['price_basis_display'] == resolved['price_basis_display'] == expected_price
         assert row['source_display'] == resolved['source_display']
         assert resolved['presentation_description'].count(row['source_display']) == 1
-    assert len({row['id'] for row in rows}) == 2
+    assert len({row['id'] for row in rows}) == 4
     with database() as db:
         creation = history_catalog(db, source='akshare', query='000001')['items']
     assert creation[0]['source_display'] == '新浪（AKShare）'

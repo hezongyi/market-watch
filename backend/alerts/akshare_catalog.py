@@ -157,17 +157,31 @@ def refresh(market):
 
 
 def chart_metadata(ident):
-    from .provider_akshare import supported_frames
+    from .akshare_native import native_metadata, variant
+    from .provider_akshare import catalog_allowed, supported_frames
 
     if not settings.akshare_enabled:
         raise ValueError("AKShare 行情源未启用")
     tencent = ident.startswith("TENCENT:")
-    symbol = ident.removeprefix("TENCENT:") if tencent else None
+    native = variant(ident)
+    symbol = native[1] if native else ident.removeprefix("TENCENT:") if tencent else None
     with transaction() as db:
-        row = db.get(MarketCatalog, stable_id(symbol)) if tencent else db.get(MarketCatalog, ident)
+        row = db.get(MarketCatalog, stable_id(symbol)) if symbol else db.get(MarketCatalog, ident)
         if not row or row.source != "akshare" or not row.available:
             raise ValueError("未知 AKShare 品种，请刷新目录")
         info = dict(row.metadata_json)
+        if native:
+            if not catalog_allowed(row.symbol) or row.asset_type not in ("EQUITY", "STOCK"):
+                raise ValueError("原生平台入口仅支持既有沪深及港股股票目录")
+            info.update(symbol_rules(row.symbol, native[0]))
+            info.update(native_metadata(native[0]))
+            return {**info, "id": ident, "history_catalog_id": row.id,
+                "name": row.label, "name_zh": info.get("name_zh"), "symbol": row.symbol,
+                "display_symbol": row.symbol, "source": "akshare", "basis": "last",
+                "calendar": "source_date", "series_kind": "provider", "series_kinds": ["provider"],
+                "price_description": "上游原生不复权", "asset_type": "EQUITY",
+                "precision": row.precision, "session": "24x7", "session_verified": False,
+                "stream": False}
         if tencent:
             if not row.symbol.startswith(("SSE:", "SZSE:")):
                 raise ValueError("腾讯平台接口当前仅支持沪深 A 股")

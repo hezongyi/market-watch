@@ -101,7 +101,7 @@ def _metadata(ident, *, deadline=None, cached_only=False):
         from .akshare_catalog import chart_metadata
 
         return chart_metadata("AKSHARE:" + ident[8:].lower())
-    if ident.startswith("TENCENT:"):
+    if ident.startswith(("TENCENT:", "SINA-NATIVE:", "TENCENT-NATIVE:")):
         from .akshare_catalog import chart_metadata
 
         return chart_metadata(ident)

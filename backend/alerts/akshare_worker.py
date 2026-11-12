@@ -7,6 +7,8 @@ import os
 import signal
 import sys
 
+from .akshare_native import OPERATIONS, fetch
+
 ENDPOINTS = {
     "stock_zh_a_hist", "stock_zh_a_hist_min_em", "stock_hk_hist", "stock_hk_hist_min_em",
     "futures_zh_daily_sina", "futures_zh_minute_sina", "stock_info_a_code_name",
@@ -25,18 +27,21 @@ def main():
     try:
         request = json.loads(sys.stdin.read(16384))
         endpoint = request["endpoint"]
-        if endpoint not in ENDPOINTS:
+        if endpoint not in ENDPOINTS and endpoint not in OPERATIONS.values():
             raise ValueError("Unknown endpoint")
         with open(os.devnull, "w") as sink, contextlib.redirect_stdout(sink), contextlib.redirect_stderr(sink):
-            import akshare
+            if endpoint in OPERATIONS.values():
+                records = fetch(endpoint, **request["parameters"], timeout=request.get("timeout", 12))
+            else:
+                import akshare
 
-            data = getattr(akshare, endpoint)(**request["parameters"])
-            if len(data) > 100000:
-                raise ValueError("Bounded snapshot capacity exceeded")
-            # Preserve decimal text supplied by pandas, without JSON NaN/Infinity.
-            records = data.astype(object).where(data.notna(), None).to_dict(orient="records")
-            records = [{str(key): str(value) if value is not None else None
-                        for key, value in row.items()} for row in records]
+                data = getattr(akshare, endpoint)(**request["parameters"])
+                if len(data) > 100000:
+                    raise ValueError("Bounded snapshot capacity exceeded")
+                # Preserve decimal text supplied by pandas, without JSON NaN/Infinity.
+                records = data.astype(object).where(data.notna(), None).to_dict(orient="records")
+                records = [{str(key): str(value) if value is not None else None
+                            for key, value in row.items()} for row in records]
         payload = {"status": "data" if records else "empty_success", "records": records}
     except Exception as error:
         # Never echo SDK exceptions, requests, cookies, environment or proxy URLs.

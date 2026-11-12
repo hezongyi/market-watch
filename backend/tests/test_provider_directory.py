@@ -164,7 +164,9 @@ def test_legacy_eastmoney_rows_advertise_sina_daily_only_and_exclude_etfs(databa
         rows = catalog(db, source="akshare")["items"]
         assert len(rows) == 1 and rows[0]["supported_frames"] == {"none": ["D1"]}
         rows = platform(db, source="akshare")["items"]
-        assert all(row["capabilities"]["native_periods"] == ["D1"] for row in rows)
+        legacy = [row for row in rows if not row["id"].startswith(("SINA-NATIVE:", "TENCENT-NATIVE:"))]
+        assert len(legacy) == 2
+        assert all(row["capabilities"]["native_periods"] == ["D1"] for row in legacy)
         tencent = next(row for row in rows if row["id"].startswith("TENCENT:"))
         describe(db, tencent["history_catalog_id"], "腾讯共用的中文名")
     for symbol in ("SSE:510300", "BSE:920001", "SHFE:RB2612"):
@@ -190,7 +192,7 @@ def test_existing_adjusted_maintenance_matches_exact_identity(database, monkeypa
         db.add(DatasetMaintenance(dataset_id=ident.key, target_start=0, timeframes=["D1"], next_at=now_ms()))
     with database() as db:
         rows = catalog(db, source="akshare")["items"]
-        sina = next(row for row in rows if not row["id"].startswith("TENCENT:"))
+        sina = next(row for row in rows if row["id"] == symbol)
         assert [r["id"] for r in sina["managed_datasets"]] == [ident.key]
         assert next(row for row in rows if row["id"].startswith("TENCENT:"))["managed_datasets"] == []
 

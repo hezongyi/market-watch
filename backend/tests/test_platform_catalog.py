@@ -103,7 +103,8 @@ def test_symbol_search_includes_sina_and_tencent_from_platform_catalog(database,
     for kind in ('provider', 'all'):
         page = search_series_page('000001', kind=kind, source='akshare', symbol_type='stock')
         rows = page['items']
-        assert len(rows) == 2
+        assert len(rows) == 4
+        assert {r['price_basis_display'] for r in rows} == {'前复权', '不复权'}
         assert {r['provider_name'] for r in rows} == {'新浪（AKShare）', '腾讯（AKShare）'}
         assert any(r['ticker'] == 'MWP:TENCENT:SZSE:000001' for r in rows)
         assert all(r['type'] == 'stock' and r['available'] for r in rows)

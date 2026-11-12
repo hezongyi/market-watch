@@ -11,6 +11,8 @@ from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from zoneinfo import ZoneInfo
 
+from pydantic import ValidationError
+
 from .config import settings
 from .history_mode_artifacts import date_bounds
 from .market_contracts import (
@@ -65,6 +67,8 @@ def symbol_rules(symbol, source_family=None):
     if exchange == "HKEX":
         valid = re.fullmatch(r"\d{5}", code)
         family, timezone, unit, close = "sina-hk", "Asia/Hong_Kong", "shares", 16 * 60 + 10
+        if source_family == "tencent-hk":
+            family = source_family
     elif exchange in ("SSE", "SZSE", "BSE"):
         valid = re.fullmatch(r"\d{6}", code)
         family, timezone, unit, close = "eastmoney-a", "Asia/Shanghai", "lots", 15 * 60 + 10
@@ -90,6 +94,8 @@ def endpoint(symbol, frame, adjustment="none", source_family=None):
         raise ValueError("AKShare 不支持此复权口径")
     if frame not in (*MINUTES, *PERIODS):
         raise ValueError("来源没有此原生周期接口")
+    if info["source_family"] == "tencent-hk":
+        raise ValueError("腾讯港股原生接口仅用于独立平台入口")
     if info["source_family"] == "sina-hk":
         if frame != "D1":
             raise ValueError("已验证的新浪港股接口只提供 D1；周月线请选择 D1 基础派生")
@@ -142,7 +148,8 @@ def invoke(endpoint_name, parameters, *, deadline=None):
             text=True, env=env, start_new_session=True)
         try:
             output, _ = process.communicate(json.dumps({"endpoint": endpoint_name,
-                "parameters": parameters}), timeout=max(0.01, deadline - time.monotonic()))
+                "parameters": parameters, "timeout": max(0.01, deadline - time.monotonic())}),
+                timeout=max(0.01, deadline - time.monotonic()))
         except subprocess.TimeoutExpired:
             os.killpg(process.pid, signal.SIGTERM)
             try:
@@ -197,7 +204,7 @@ def request_parameters(source, start, end):
     return values
 
 
-def parse_records(source, records, *, start, end, observed_at):
+def parse_records(source, records, *, start, end, observed_at, invalid_records=None):
     frame, info = source.parameters["timeframe"], symbol_rules(
         source.provider_symbol, source.parameters["source_family"])
     zone = ZoneInfo(info["timezone"])
@@ -262,7 +269,17 @@ def parse_records(source, records, *, start, end, observed_at):
             confirmed = successor
         row["complete"] = confirmed and row["end"] <= min(end, observed_at)
         row["confirmation"] = "next_bar" if row["complete"] and successor else "session_elapsed" if row["complete"] else "unconfirmed"
-    return tuple(NativeBarRow.model_validate(row) for row in normalized)
+    result = []
+    for row in normalized:
+        try:
+            result.append(NativeBarRow.model_validate(row))
+        except ValidationError:
+            if invalid_records is None:
+                raise
+            invalid_records.append({"source_label": row["source_label"],
+                "reason": "invalid_supplier_ohlcv", "record": {key: row[key]
+                    for key in ("open", "high", "low", "close", "volume")}})
+    return tuple(result)
 
 
 def parse_sina_factors(records, rows):
@@ -334,6 +351,10 @@ class AKShareHistory:
 
 def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
     """Selected native frame only, sharing fixed-source content and source slots."""
+    if meta.get("native_operation"):
+        from .akshare_native import platform_page as direct_page
+
+        return direct_page(meta, frame, before, count, deadline=deadline, optional=optional)
     from .history_mode_sources import dataset_identity
     from .source_history_store import shared_native_page
 

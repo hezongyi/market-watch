@@ -162,9 +162,12 @@ def shared_native_page(adapter, identity, start, end, *, fresh_after, volume_kin
             if blob.source_id != source.key or hashlib.sha256(raw).hexdigest() != blob.checksum:
                 raise ValueError("Shared native content checksum mismatch")
             evidence["read_kind"] = "shared_cache"
+            content = json.loads(raw)
+            rows = content["rows"] if isinstance(content, dict) else content
+            warnings = content.get("source_warnings", []) if isinstance(content, dict) else []
             return NativeCandleBatch(identity=source, timeframe=frame, window_start=start,
                 window_end=end, observed_at=fetch.observed_at, checkpoint=fetch.checkpoint,
-                result=RequestResult(status=fetch.result), rows=json.loads(raw),
+                result=RequestResult(status=fetch.result), rows=rows, source_warnings=warnings,
                 volume_kind=volume_kind, volume_unit=volume_unit)
         if fetch.lease_until > now_ms():
             evidence["read_kind"] = "shared_wait"
@@ -186,8 +189,10 @@ def shared_native_page(adapter, identity, start, end, *, fresh_after, volume_kin
             if fetch.lease_token != token or fetch.lease_until <= now_ms():
                 raise AcquisitionBusy("source_page_lease_replaced")
             if batch.result.successful:
-                raw = json.dumps([row.model_dump() for row in batch.rows], sort_keys=True,
-                                 separators=(",", ":")).encode()
+                content = [row.model_dump() for row in batch.rows]
+                if batch.source_warnings:
+                    content = {"rows": content, "source_warnings": batch.source_warnings}
+                raw = json.dumps(content, sort_keys=True, separators=(",", ":")).encode()
                 fetch.content_id, _ = store_blob(db, source.key, raw)
                 fetch.checkpoint, fetch.observed_at = batch.checkpoint, batch.observed_at
                 fetch.result, fetch.fetched_at = batch.result.status, now_ms()

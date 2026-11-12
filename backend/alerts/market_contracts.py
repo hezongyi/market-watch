@@ -387,6 +387,9 @@ class NativeCandleBatch(BaseModel):
     volume_unit: str | None = Field(max_length=40)
     rows: tuple[NativeBarRow, ...] = Field(default=(), max_length=100000)
     checkpoint: StrictInt | None = Field(default=None, ge=0)
+    # Excluded supplier observations retain their original values for audit.
+    # Legacy batches and blobs have no such exclusions.
+    source_warnings: tuple[dict, ...] = Field(default=(), max_length=4000)
 
     @model_validator(mode="after")
     def validate_batch(self):

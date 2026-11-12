@@ -11,7 +11,7 @@ KIND_NAMES = {'provider': '平台', 'managed': '自建',
 def source_name(source, *, family=None, environment=None):
     if source == 'akshare':
         upstream = ('新浪' if (family or '').startswith('sina-') else
-                    '腾讯' if family == 'tencent-a' else '东方财富' if family == 'eastmoney-a' else '')
+                    '腾讯' if family in ('tencent-a', 'tencent-hk') else '东方财富' if family == 'eastmoney-a' else '')
         return upstream + '（AKShare）' if upstream else 'AKShare'
     if source == 'oanda':
         return {'practice': 'OANDA Practice', 'live': 'OANDA Live'}.get(environment, 'OANDA')
@@ -50,6 +50,8 @@ def present(meta, *, identity=None, realtime_identity=None):
         extra = {'historical_source_display': historical, 'live_source_display': live}
     adjustment = meta.get('adjustment_view', meta.get('adjustment', saved.get('adjustment')))
     price = {'qfq': '前复权', 'hfq': '后复权', 'auto': '来源复权', 'supplier': '来源价格'}.get(adjustment)
+    if adjustment == 'none' and (meta.get('native_operation') or saved.get('native_operation')):
+        price = '不复权'
     if not price:
         basis = meta.get('basis') or saved.get('basis')
         price = {'bid': '买价', 'ask': '卖价', 'mid': '中间价', 'adjusted': '来源复权'}.get(basis)

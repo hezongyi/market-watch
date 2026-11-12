@@ -7,11 +7,16 @@ from .source_registry import capabilities
 
 
 def _entry(row):
+    from .akshare_native import native_metadata, variant
+
     info, source = row["metadata_json"], row["source"]
+    direct = variant(row["id"]) if source == "akshare" else None
+    if direct:
+        info = {**info, **native_metadata(direct[0])}
     native = capabilities(source)
     if source == "fxcm":
         native = {**native, "native_periods": info.get("native_frames", ["M1", "H1", "D1"])}
-    if source == "akshare":
+    if source == "akshare" and not direct:
         from .provider_akshare import supported_frames
 
         native = {**native, "native_periods": supported_frames(row["symbol"],
@@ -19,9 +24,13 @@ def _entry(row):
     tencent = row["id"].startswith("TENCENT:")
     if tencent:
         native = {**native, "native_periods": ["D1"], "supported_modes": []}
+    if direct:
+        native = {**native, "native_periods": info["frames"], "supported_modes": []}
     ident = "OANDA:" + row["symbol"] if row["id"].startswith("HC:") else row["id"]
     result = {**row, "id": ident, "label": row["label"],
-        "logical_symbol": None if tencent else row["logical_symbol"],
+        "logical_symbol": None if tencent or direct else row["logical_symbol"],
+        "metadata_json": info,
+        "quality_note": info.get("quality_note"),
         "history_precision": None if info.get("precision_status") == "manual_required" else row["precision"],
         "precision_status": info.get("precision_status", "source_catalog"),
         "available": row["available"] and (source != "yahoo" or settings.yahoo_enabled)
@@ -31,7 +40,9 @@ def _entry(row):
         "verified_frames": info.get("verified_frames", info.get("archive_verified_frames", {}))}
     family = "tencent-a" if tencent else "sina-a" if info.get("source_family") == "eastmoney-a" else info.get("source_family")
     adjustment = info.get("adjustment")
-    if source == "akshare" and family in ("sina-a", "sina-hk", "tencent-a"):
+    if direct:
+        adjustment = "none"
+    elif source == "akshare" and family in ("sina-a", "sina-hk", "tencent-a"):
         adjustment = "qfq"
     elif source == "yahoo" and not adjustment:
         adjustment = "auto" if row["asset_class"] in ("equity", "etf") else "supplier"
@@ -65,7 +76,7 @@ def managed_matches(db, items):
     candidates = {}
     for item in items:
         keys = []
-        if item["id"].startswith("TENCENT:"):
+        if item["id"].startswith(("TENCENT:", "SINA-NATIVE:", "TENCENT-NATIVE:")):
             item["managed_datasets"] = []
             continue
         modern = item["source"] in ("akshare", "yahoo")
