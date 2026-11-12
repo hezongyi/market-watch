@@ -1,0 +1,32 @@
+{
+  "cases": [
+    {
+      "id": "SINA-NATIVE:SZSE:000001",
+      "rows": 1970,
+      "first": 1537833600000,
+      "finite_window": true,
+      "before_left_rows": 0,
+      "not_permanently_exhausted": true,
+      "tail_seconds": 0.024
+    },
+    {
+      "id": "TENCENT-NATIVE:SZSE:000001",
+      "rows": 800,
+      "first": 1690243200000,
+      "finite_window": true,
+      "before_left_rows": 0,
+      "not_permanently_exhausted": true,
+      "tail_seconds": 0.014
+    },
+    {
+      "id": "TENCENT-NATIVE:HKEX:02318",
+      "rows": 800,
+      "first": 1692057600000,
+      "finite_window": true,
+      "before_left_rows": 0,
+      "not_permanently_exhausted": true,
+      "tail_seconds": 0.022
+    }
+  ],
+  "passed": true
+}

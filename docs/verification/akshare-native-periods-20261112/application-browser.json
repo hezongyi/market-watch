@@ -1,0 +1,951 @@
+{
+  "started_at": "2026-11-12T22:07:48.962Z",
+  "base": "https://192.168.7.232:18443",
+  "scope": "real application and native UI",
+  "api": [
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "M1",
+      "rows": 80,
+      "first": 1794461880000,
+      "last": 1794466740000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "M5",
+      "rows": 80,
+      "first": 1794365400000,
+      "last": 1794466500000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "M15",
+      "rows": 80,
+      "first": 1793928600000,
+      "last": 1794465900000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "M30",
+      "rows": 80,
+      "first": 1793323800000,
+      "last": 1794465000000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "H1",
+      "rows": 80,
+      "first": 1792114200000,
+      "last": 1794463200000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "D1",
+      "rows": 80,
+      "first": 1784160000000,
+      "last": 1794441600000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "W1",
+      "rows": 80,
+      "first": 1745798400000,
+      "last": 1794182400000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SSE:600519",
+      "frame": "MN",
+      "rows": 80,
+      "first": 1585699200000,
+      "last": 1793491200000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M1",
+      "rows": 80,
+      "first": 1794461880000,
+      "last": 1794466740000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M5",
+      "rows": 80,
+      "first": 1794365400000,
+      "last": 1794466500000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M15",
+      "rows": 80,
+      "first": 1793928600000,
+      "last": 1794465900000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M30",
+      "rows": 80,
+      "first": 1793323800000,
+      "last": 1794465000000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "H1",
+      "rows": 80,
+      "first": 1792114200000,
+      "last": 1794463200000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "D1",
+      "rows": 80,
+      "first": 1784160000000,
+      "last": 1794441600000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "W1",
+      "rows": 80,
+      "first": 1745798400000,
+      "last": 1794182400000,
+      "source_warnings": [
+        {
+          "source_label": "1992-08-07",
+          "reason": "invalid_supplier_ohlcv",
+          "record": {
+            "open": "46.600",
+            "high": "45.600",
+            "low": "42.000",
+            "close": "45.000",
+            "volume": "3108700"
+          }
+        }
+      ],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "MN",
+      "rows": 80,
+      "first": 1585699200000,
+      "last": 1793491200000,
+      "source_warnings": [
+        {
+          "source_label": "1992-08-31",
+          "reason": "invalid_supplier_ohlcv",
+          "record": {
+            "open": "46.600",
+            "high": "46.500",
+            "low": "40.300",
+            "close": "41.250",
+            "volume": "13189700"
+          }
+        }
+      ],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "M1",
+      "rows": 80,
+      "first": 1794462000000,
+      "last": 1794466740000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "M5",
+      "rows": 80,
+      "first": 1794365400000,
+      "last": 1794466500000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "M15",
+      "rows": 80,
+      "first": 1793928600000,
+      "last": 1794465900000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "M30",
+      "rows": 80,
+      "first": 1793323800000,
+      "last": 1794465000000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "H1",
+      "rows": 80,
+      "first": 1792114200000,
+      "last": 1794463200000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "D1",
+      "rows": 80,
+      "first": 1784160000000,
+      "last": 1794441600000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "W1",
+      "rows": 80,
+      "first": 1745798400000,
+      "last": 1794182400000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SSE:600519",
+      "frame": "MN",
+      "rows": 80,
+      "first": 1585699200000,
+      "last": 1793491200000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M1",
+      "rows": 80,
+      "first": 1794462000000,
+      "last": 1794466740000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M5",
+      "rows": 80,
+      "first": 1794365400000,
+      "last": 1794466500000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M15",
+      "rows": 80,
+      "first": 1793928600000,
+      "last": 1794465900000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M30",
+      "rows": 80,
+      "first": 1793323800000,
+      "last": 1794465000000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "H1",
+      "rows": 80,
+      "first": 1792114200000,
+      "last": 1794463200000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "D1",
+      "rows": 80,
+      "first": 1784160000000,
+      "last": 1794441600000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "W1",
+      "rows": 80,
+      "first": 1745798400000,
+      "last": 1794182400000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "MN",
+      "rows": 80,
+      "first": 1585699200000,
+      "last": 1793491200000,
+      "source_warnings": [],
+      "volume_unit": "lots"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:00700",
+      "frame": "D1",
+      "rows": 80,
+      "first": 1784678400000,
+      "last": 1794441600000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:00700",
+      "frame": "W1",
+      "rows": 80,
+      "first": 1746403200000,
+      "last": 1794182400000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:00700",
+      "frame": "MN",
+      "rows": 80,
+      "first": 1585699200000,
+      "last": 1793491200000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "frame": "D1",
+      "rows": 80,
+      "first": 1784678400000,
+      "last": 1794441600000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "frame": "W1",
+      "rows": 80,
+      "first": 1746403200000,
+      "last": 1794182400000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "frame": "MN",
+      "rows": 80,
+      "first": 1585699200000,
+      "last": 1793491200000,
+      "source_warnings": [],
+      "volume_unit": "shares"
+    }
+  ],
+  "charts": [
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M1",
+      "resolution": "1",
+      "ready": true,
+      "range": {
+        "from": 1794450660,
+        "to": 1794467340
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1793945400000,
+        "open": 11.83,
+        "high": 11.83,
+        "low": 11.82,
+        "close": 11.82,
+        "volume": 607200
+      },
+      "last": {
+        "time": 1794466740000,
+        "open": 11.79,
+        "high": 11.79,
+        "low": 11.79,
+        "close": 11.79,
+        "volume": 1218569,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M5",
+      "resolution": "5",
+      "ready": true,
+      "range": {
+        "from": 1794192300,
+        "to": 1794469500
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1792030200000,
+        "open": 11.42,
+        "high": 11.43,
+        "low": 11.4,
+        "close": 11.41,
+        "volume": 5048000
+      },
+      "last": {
+        "time": 1794466500000,
+        "open": 11.79,
+        "high": 11.8,
+        "low": 11.78,
+        "close": 11.79,
+        "volume": 1946610,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M15",
+      "resolution": "15",
+      "ready": true,
+      "range": {
+        "from": 1793169900,
+        "to": 1794474900
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1786338000000,
+        "open": 11.35,
+        "high": 11.37,
+        "low": 11.33,
+        "close": 11.34,
+        "volume": 3129071
+      },
+      "last": {
+        "time": 1794465900000,
+        "open": 11.81,
+        "high": 11.82,
+        "low": 11.78,
+        "close": 11.79,
+        "volume": 6790210,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "M30",
+      "resolution": "30",
+      "ready": true,
+      "range": {
+        "from": 1791873000,
+        "to": 1794483000
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1778635800000,
+        "open": 11.25,
+        "high": 11.28,
+        "low": 11.18,
+        "close": 11.2,
+        "volume": 23603235
+      },
+      "last": {
+        "time": 1794465000000,
+        "open": 11.8,
+        "high": 11.83,
+        "low": 11.78,
+        "close": 11.79,
+        "volume": 17517610,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "H1",
+      "resolution": "60",
+      "ready": true,
+      "range": {
+        "from": 1788415200,
+        "to": 1794499200
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1762133400000,
+        "open": 11.34,
+        "high": 11.42,
+        "low": 11.3,
+        "close": 11.41,
+        "volume": 46474166
+      },
+      "last": {
+        "time": 1794463200000,
+        "open": 11.78,
+        "high": 11.83,
+        "low": 11.76,
+        "close": 11.79,
+        "volume": 29356910,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "D1",
+      "resolution": "1D",
+      "ready": true,
+      "range": {
+        "from": 1771891200,
+        "to": 1795276800
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1663891200000,
+        "open": 12.24,
+        "high": 12.43,
+        "low": 12.23,
+        "close": 12.29,
+        "volume": 58644106
+      },
+      "last": {
+        "time": 1794441600000,
+        "open": 11.69,
+        "high": 11.83,
+        "low": 11.66,
+        "close": 11.79,
+        "volume": 108272119,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "W1",
+      "resolution": "1W",
+      "ready": true,
+      "range": {
+        "from": 1685923200,
+        "to": 1800201600
+      },
+      "rendered_rows": 1000,
+      "first": {
+        "time": 1169424000000,
+        "open": 17.11,
+        "high": 18.5,
+        "low": 17.11,
+        "close": 18.27,
+        "volume": 259518801
+      },
+      "last": {
+        "time": 1794182400000,
+        "open": 11.78,
+        "high": 11.91,
+        "low": 11.66,
+        "close": 11.79,
+        "volume": 408759250,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "frame": "MN",
+      "resolution": "1M",
+      "ready": true,
+      "range": {
+        "from": 1330560000,
+        "to": 1819728000
+      },
+      "rendered_rows": 425,
+      "first": {
+        "time": 670464000000,
+        "open": 49,
+        "high": 49,
+        "low": 43.68,
+        "close": 43.68,
+        "volume": 11700,
+        "isLastBar": false,
+        "isBarClosed": true
+      },
+      "last": {
+        "time": 1793491200000,
+        "open": 11.6,
+        "high": 11.91,
+        "low": 11.42,
+        "close": 11.79,
+        "volume": 1212880748,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:SINA-NATIVE:SZSE:000001",
+      "restored": true,
+      "url": "https://192.168.7.232:18443/advanced-charts/0cccf1e7-a049-4b95-b931-4b227c135ddb"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M1",
+      "resolution": "1",
+      "ready": true,
+      "range": {
+        "from": 1794450780,
+        "to": 1794467340
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1794202980000,
+        "open": 11.86,
+        "high": 11.87,
+        "low": 11.86,
+        "close": 11.87,
+        "volume": 3144
+      },
+      "last": {
+        "time": 1794466740000,
+        "open": 11.8,
+        "high": 11.8,
+        "low": 11.79,
+        "close": 11.79,
+        "volume": 12186,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M5",
+      "resolution": "5",
+      "ready": true,
+      "range": {
+        "from": 1794192300,
+        "to": 1794469500
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1792551000000,
+        "open": 11.44,
+        "high": 11.45,
+        "low": 11.43,
+        "close": 11.44,
+        "volume": 6867.73
+      },
+      "last": {
+        "time": 1794466500000,
+        "open": 11.79,
+        "high": 11.8,
+        "low": 11.78,
+        "close": 11.79,
+        "volume": 19544,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M15",
+      "resolution": "15",
+      "ready": true,
+      "range": {
+        "from": 1793169900,
+        "to": 1794474900
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1787794200000,
+        "open": 11.7,
+        "high": 11.71,
+        "low": 11.61,
+        "close": 11.65,
+        "volume": 160758.45
+      },
+      "last": {
+        "time": 1794465900000,
+        "open": 11.81,
+        "high": 11.82,
+        "low": 11.78,
+        "close": 11.79,
+        "volume": 68021,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "M30",
+      "resolution": "30",
+      "ready": true,
+      "range": {
+        "from": 1791873000,
+        "to": 1794483000
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1781659800000,
+        "open": 10.97,
+        "high": 10.99,
+        "low": 10.83,
+        "close": 10.85,
+        "volume": 276582.9
+      },
+      "last": {
+        "time": 1794465000000,
+        "open": 11.81,
+        "high": 11.83,
+        "low": 11.78,
+        "close": 11.79,
+        "volume": 175203,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "H1",
+      "resolution": "60",
+      "ready": true,
+      "range": {
+        "from": 1788415200,
+        "to": 1794499200
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1768354200000,
+        "open": 11.47,
+        "high": 11.47,
+        "low": 11.41,
+        "close": 11.43,
+        "volume": 387363.73
+      },
+      "last": {
+        "time": 1794463200000,
+        "open": 11.77,
+        "high": 11.83,
+        "low": 11.76,
+        "close": 11.79,
+        "volume": 293590,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "D1",
+      "resolution": "1D",
+      "ready": true,
+      "range": {
+        "from": 1771891200,
+        "to": 1795276800
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1690243200000,
+        "open": 11.45,
+        "high": 11.73,
+        "low": 11.44,
+        "close": 11.72,
+        "volume": 2032958
+      },
+      "last": {
+        "time": 1794441600000,
+        "open": 11.69,
+        "high": 11.83,
+        "low": 11.66,
+        "close": 11.79,
+        "volume": 1082721,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "W1",
+      "resolution": "1W",
+      "ready": true,
+      "range": {
+        "from": 1685923200,
+        "to": 1800201600
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1301270400000,
+        "open": 16.37,
+        "high": 16.75,
+        "low": 16.01,
+        "close": 16.57,
+        "volume": 1662205.34
+      },
+      "last": {
+        "time": 1794182400000,
+        "open": 11.78,
+        "high": 11.91,
+        "low": 11.66,
+        "close": 11.79,
+        "volume": 4087592,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "frame": "MN",
+      "resolution": "1M",
+      "ready": true,
+      "range": {
+        "from": 1330560000,
+        "to": 1819728000
+      },
+      "rendered_rows": 426,
+      "first": {
+        "time": 670464000000,
+        "open": 49,
+        "high": 49,
+        "low": 43.68,
+        "close": 43.68,
+        "volume": 134,
+        "isLastBar": false,
+        "isBarClosed": true
+      },
+      "last": {
+        "time": 1793491200000,
+        "open": 11.6,
+        "high": 11.91,
+        "low": 11.42,
+        "close": 11.79,
+        "volume": 12128806,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+      "restored": true,
+      "url": "https://192.168.7.232:18443/advanced-charts/0cccf1e7-a049-4b95-b931-4b227c135ddb"
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "frame": "D1",
+      "resolution": "1D",
+      "ready": true,
+      "range": {
+        "from": 1772064000,
+        "to": 1795276800
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1692057600000,
+        "open": 48.5,
+        "high": 49.9,
+        "low": 48.3,
+        "close": 48.8,
+        "volume": 39453271
+      },
+      "last": {
+        "time": 1794441600000,
+        "open": 52.5,
+        "high": 52.6,
+        "low": 52.05,
+        "close": 52.3,
+        "volume": 20217493,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "frame": "W1",
+      "resolution": "1W",
+      "ready": true,
+      "range": {
+        "from": 1687737600,
+        "to": 1800201600
+      },
+      "rendered_rows": 800,
+      "first": {
+        "time": 1310947200000,
+        "open": 78.95,
+        "high": 80.05,
+        "low": 77.1,
+        "close": 78.1,
+        "volume": 32829590,
+        "isLastBar": false,
+        "isBarClosed": true
+      },
+      "last": {
+        "time": 1794182400000,
+        "open": 53.4,
+        "high": 53.6,
+        "low": 52.05,
+        "close": 52.3,
+        "volume": 94859232,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "frame": "MN",
+      "resolution": "1M",
+      "ready": true,
+      "range": {
+        "from": 1330560000,
+        "to": 1819728000
+      },
+      "rendered_rows": 270,
+      "first": {
+        "time": 1086048000000,
+        "open": 10.5,
+        "high": 10.7,
+        "low": 10.3,
+        "close": 10.6,
+        "volume": 408992569
+      },
+      "last": {
+        "time": 1793491200000,
+        "open": 49.8,
+        "high": 53.6,
+        "low": 49.8,
+        "close": 52.3,
+        "volume": 339903148,
+        "isLastBar": true,
+        "isBarClosed": false
+      }
+    },
+    {
+      "ticker": "MWP:TENCENT-NATIVE:HKEX:02318",
+      "restored": true,
+      "url": "https://192.168.7.232:18443/advanced-charts/0cccf1e7-a049-4b95-b931-4b227c135ddb"
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "workspace": "0cccf1e7-a049-4b95-b931-4b227c135ddb",
+  "finished_at": "2026-11-12T22:09:06.971Z"
+}

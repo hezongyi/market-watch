@@ -1,0 +1,103 @@
+{
+  "cases": [
+    {
+      "id": "AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+      "frame": "M1",
+      "http": 200,
+      "seconds": 2.16,
+      "rows": 30,
+      "adjustment": "none",
+      "volume_unit": "contracts",
+      "passed": true
+    },
+    {
+      "id": "AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+      "frame": "M5",
+      "http": 200,
+      "seconds": 3.26,
+      "rows": 30,
+      "adjustment": "none",
+      "volume_unit": "contracts",
+      "passed": true
+    },
+    {
+      "id": "AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+      "frame": "M15",
+      "http": 200,
+      "seconds": 2.05,
+      "rows": 30,
+      "adjustment": "none",
+      "volume_unit": "contracts",
+      "passed": true
+    },
+    {
+      "id": "AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+      "frame": "M30",
+      "http": 200,
+      "seconds": 7.19,
+      "rows": 30,
+      "adjustment": "none",
+      "volume_unit": "contracts",
+      "passed": true
+    },
+    {
+      "id": "AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+      "frame": "H1",
+      "http": 200,
+      "seconds": 2.15,
+      "rows": 30,
+      "adjustment": "none",
+      "volume_unit": "contracts",
+      "passed": true
+    },
+    {
+      "id": "AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+      "frame": "D1",
+      "http": 200,
+      "seconds": 3.73,
+      "rows": 30,
+      "adjustment": "none",
+      "volume_unit": "contracts",
+      "passed": true
+    },
+    {
+      "id": "AKSHARE:430fea2075d156a988cc93abda28cb5e",
+      "frame": "D1",
+      "http": 422,
+      "seconds": 3.31,
+      "error": "{\"detail\":\"1 validation error for NativeBarRow\\n  Value error, Invalid OHLC extremes [type=value_error, input_value={'timeframe': 'D1', 'star...nfirmation': 'next_bar'}, input_type=dict]\\n    For further information visit https://errors.pydantic.dev/2.13/v/value_error\"}",
+      "passed": false
+    },
+    {
+      "id": "AKSHARE:90d538524b028b1708c53834c49bd624",
+      "frame": "D1",
+      "http": 200,
+      "seconds": 5.41,
+      "rows": 30,
+      "adjustment": "qfq",
+      "volume_unit": "shares",
+      "passed": true
+    },
+    {
+      "id": "TENCENT:SZSE:000001",
+      "frame": "D1",
+      "http": 200,
+      "seconds": 5.01,
+      "rows": 30,
+      "adjustment": "qfq",
+      "volume_unit": "lots",
+      "passed": true
+    },
+    {
+      "id": "BTCUSDT",
+      "frame": "H1",
+      "http": 200,
+      "seconds": 4.04,
+      "rows": 30,
+      "adjustment": null,
+      "volume_unit": "BTC",
+      "passed": true
+    }
+  ],
+  "passed": false
+}

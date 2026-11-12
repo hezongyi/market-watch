@@ -10,7 +10,7 @@ const base = process.env.MW_BASE_URL;
 const out = process.env.MW_OUTPUT;
 assert(base && out && process.env.MW_ACCEPTANCE_CREDENTIALS_FILE, 'provide private task configuration');
 const credentials = JSON.parse(fs.readFileSync(process.env.MW_ACCEPTANCE_CREDENTIALS_FILE));
-const cert = new crypto.X509Certificate(fs.readFileSync(credentials.ca_file));
+const cert = new crypto.X509Certificate(fs.readFileSync(credentials.tls_cert_file || credentials.ca_file));
 const spki = crypto.createHash('sha256').update(cert.publicKey.export({format:'der', type:'spki'})).digest('base64');
 const frames = {M1:'1', M5:'5', M15:'15', M30:'30', H1:'60', D1:'1D', W1:'1W', MN:'1M'};
 const cases = [
@@ -18,7 +18,7 @@ const cases = [
   {prefix:'TENCENT-NATIVE:', symbols:['SSE:600519','SZSE:000001'], frames:Object.keys(frames)},
   {prefix:'TENCENT-NATIVE:', symbols:['HKEX:00700','HKEX:02318'], frames:['D1','W1','MN']},
 ];
-const report = {started_at:new Date().toISOString(), base, scope:'real isolated application and native UI',
+const report = {started_at:new Date().toISOString(), base, scope:'real application and native UI',
   api:[], charts:[], errors:[], passed:false};
 fs.mkdirSync(out,{recursive:true});
 (async () => {
@@ -32,8 +32,17 @@ fs.mkdirSync(out,{recursive:true});
     if(event.target?.tagName !== 'SCRIPT' || !event.target.src.endsWith('/charting_library.js') || !window.TradingView?.widget) return;
     const ctor = TradingView.widget;
     TradingView.widget = new Proxy(ctor,{construct(target,args,newTarget) {
+      const feed=args[0].datafeed, getBars=feed.getBars.bind(feed);
+      window.__nativeDelivered={};
+      // Observe exact real bars delivered to the chart without changing them.
+      feed.getBars=(info,resolution,parameters,onResult,onError)=>getBars(info,resolution,parameters,(bars,meta)=>{
+        if(bars.length) window.__nativeDelivered[info.ticker+'|'+resolution]={
+          rows:bars.length,first:bars[0],last:bars.at(-1)};
+        onResult(bars,meta);
+      },onError);
       const widget = Reflect.construct(target,args,newTarget);
       window.__nativeAcceptanceWidget = widget;
+      window.__nativeSaveAdapter = args[0].save_load_adapter;
       return widget;
     }});
   },true));
@@ -69,7 +78,7 @@ fs.mkdirSync(out,{recursive:true});
     csrf = (await api('/session')).csrf;
     for(const group of cases) for(const symbol of group.symbols) for(const frame of group.frames) {
       const ticker='MWP:'+group.prefix+symbol;
-      const result=await api('/charts/data',{instrument:ticker,series_kind:'provider',timeframe:frame,limit:80});
+      const result=await api('/charts/data',{instrument:group.prefix+symbol,series_kind:'provider',timeframe:frame,limit:80});
       assert(result.bars?.length>1,`${ticker} ${frame} must contain actual candles`);
       assert.equal(result.adjustment,'none');
       const starts=result.bars.map(row=>row.start);
@@ -91,31 +100,32 @@ fs.mkdirSync(out,{recursive:true});
       const rowId='platform-'+id.toLowerCase().replace(/[^a-z0-9-]/g,'-');
       const row=native().locator('[id="'+rowId+'"]');
       await expect(row).toBeVisible({timeout:60000});
-      await expect(row).toContainText('不复权');
-      await row.getByRole('button',{name:'详情',exact:true}).click();
+      await expect(row.locator('xpath=..')).toContainText('不复权');
+      await native().locator('[id="'+rowId+'-details"]').click();
       await expect(native().locator('.dc-window')).toContainText('价格口径：不复权');
       await expect(native().locator('.dc-window').getByRole('link',{name:'添加为自建行情',exact:true})).toHaveCount(0);
       await page.screenshot({path:path.join(out,id.replace(/:/g,'-')+'-directory.png')});
       await native().getByRole('button',{name:'关闭详情',exact:true}).click();
-      await row.getByRole('button',{name:'打开图表',exact:true}).click();
+      await native().locator('[id="'+rowId+'-open"]').click();
       await waitChart(ticker,frames[group.frames.includes('H1') ? 'H1' : group.frames[0]]);
       for(const frame of group.frames) {
         const resolution=frames[frame];
         await page.evaluate(resolution=>window.__nativeAcceptanceWidget.activeChart().setResolution(resolution),resolution);
         await waitChart(ticker,resolution);
-        const state=await page.evaluate(async ()=>{
+        const state=await page.evaluate(()=>{
           const chart=window.__nativeAcceptanceWidget.activeChart();
-          const exported=await chart.exportData({includedStudies:[],includeSeries:true});
+          const delivered=window.__nativeDelivered[chart.symbol()+'|'+chart.resolution()];
           return {ticker:chart.symbol(),resolution:chart.resolution(),ready:chart.dataReady(),range:chart.getVisibleRange(),
-            rendered_rows:exported.data.length,first:Array.from(exported.data[0] || []),
-            last:Array.from(exported.data.at(-1) || [])};
+            rendered_rows:delivered?.rows,first:delivered?.first,last:delivered?.last};
         });
         assert(state.rendered_rows>1,`${ticker} ${frame}: chart must contain actual series data`);
         report.charts.push({ticker,frame,...state});
+        fs.writeFileSync(path.join(out,'report.json'),JSON.stringify(report,null,2));
       }
       await page.screenshot({path:path.join(out,id.replace(/:/g,'-')+'-chart.png')});
-      await page.evaluate(()=>new Promise((resolve,reject)=>window.__nativeAcceptanceWidget.saveChartToServer(resolve,reject,
-        {defaultChartName:'原生周期恢复验收'})));
+      await expect(async ()=>{
+        await page.evaluate(id=>window.__nativeSaveAdapter.saveChart({id,name:'原生周期恢复验收'}),workspace.id);
+      }).toPass({timeout:15000,intervals:[500,1000]});
       const savedUrl=page.url();
       await page.reload();
       await waitChart(ticker,frames[group.frames.at(-1)]);
