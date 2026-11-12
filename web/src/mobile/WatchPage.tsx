@@ -111,11 +111,13 @@ function compactIdentity(ticker: string, quote?: Quote) {
 }
 function Spark({
   item,
+  instrument,
   online,
   state,
   previousClose,
 }: {
   item?: Sparkline;
+  instrument: string;
   online: boolean;
   state?: "loading" | "error";
   previousClose?: number;
@@ -136,8 +138,9 @@ function Spark({
   const previousSession = current?.session?.previous;
   const sessionOpen = current?.session_open_price == null ? undefined : Number(current.session_open_price);
   const reference = previousSession ? sessionOpen : previousClose;
-  const paths = useMemo(() => current ? sparklinePaths(current, width, 48, reference) : [], [current, width, reference]);
-  const referenceY = current ? sparklineScale(current, 48, reference).referenceY : undefined;
+  const paths = useMemo(() => current ? sparklinePaths(current, width, 48, reference, instrument) : [], [current, width, reference, instrument]);
+  const scale = current ? sparklineScale(current, 48, reference, instrument) : undefined;
+  const referenceY = scale?.referenceY;
   if (!current || !paths.length) {
     const label = !online
       ? "离线无缓存"
@@ -172,10 +175,10 @@ function Spark({
         preserveAspectRatio="none"
         aria-label={
           current.session?.previous
-            ? `${current.session.date} 历史走势${cached ? " · 缓存" : ""}`
+            ? `${current.session.date} 历史走势${cached ? " · 缓存" : ""}${scale?.referenceOutside ? " · 开盘参考价在曲线显示范围外" : ""}`
             : cached
-            ? "离线或刷新失败，显示缓存走势"
-            : current.reason || "当前窗口日内走势"
+              ? `离线或刷新失败，显示缓存走势${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
+              : `${current.reason || "当前窗口日内走势"}${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
         }
       >
         <defs>
@@ -186,9 +189,9 @@ function Spark({
           </linearGradient>
         </defs>
         {referenceY !== undefined && (
-          <line className={previousSession ? "mobile-spark-session-open" : "mobile-spark-previous-close"} x1="0" x2={width}
+          <line className={`${previousSession ? "mobile-spark-session-open" : "mobile-spark-previous-close"}${scale?.referenceOutside ? " mobile-spark-reference-outside" : ""}`} x1="0" x2={width}
             y1={referenceY} y2={referenceY} vectorEffect="non-scaling-stroke">
-            <title>{previousSession ? `${current.session!.date} 开盘价 ${sessionOpen}` : `昨收 ${previousClose} · 与报价涨跌幅同基准`}</title>
+            <title>{previousSession ? `${current.session!.date} 开盘价 ${sessionOpen}` : `昨收 ${previousClose} · 与报价涨跌幅同基准`}{scale?.referenceOutside ? " · 参考价在曲线显示范围外" : ""}</title>
           </line>
         )}
         {current.reference_times?.map((at) => (
@@ -899,6 +902,7 @@ export default function WatchPage({
                 )}
               </span>
               <Spark
+                instrument={displayCode}
                 online={online}
                 previousClose={quote?.s === "ok" && item && !item.session?.previous && value?.read_at >= item.window_start &&
                   value.read_at < sparklineExpires(item) ? value.prev_close_price : undefined}

@@ -323,7 +323,9 @@ const server = http.createServer(async (req, res) => {
           await expect(page.locator('.mobile-watch-price strong').first()).toHaveText('+0.69%');
           await expect(page.locator('.mobile-watch-last-price').nth(1)).toHaveText('1.08420');
           await expect(page.locator('.mobile-spark-previous-close')).toHaveCount(5);
-          assert(await page.locator('.mobile-spark-previous-close').first().evaluate(el => el.getAttribute('y1') === '24'));
+          const referencePositions=await page.locator('.mobile-spark-previous-close').evaluateAll(els=>els.map(el=>Number(el.getAttribute('y1'))));
+          assert(referencePositions.every(y=>y>=4&&y<=44),'reference price stays in the adaptive vertical domain');
+          assert(referencePositions.some(y=>y!==24),'reference price is not pinned to the center line');
           if (font === 14) {
             assert.equal(actual.row.height, 72);
             const secondarySizes = await page.locator('.mobile-watch-description, .mobile-watch-origin').evaluateAll(els=>els.map(el=>parseFloat(getComputedStyle(el).fontSize)));
@@ -504,7 +506,7 @@ const server = http.createServer(async (req, res) => {
         await expect(stockRow.locator('.mobile-spark-caption')).toHaveCount(0);
         await expect(stockRow.locator('.mobile-spark-session-open')).toHaveCount(1);
         await expect(stockRow.locator('.mobile-spark-session-open title')).toContainText('开盘价 99.75');
-        assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>el.getAttribute('y1')==='24'),'historical line is centered on its own source open');
+        assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>{const y=Number(el.getAttribute('y1'));return y>=4&&y<=44;}),'historical open reference follows the adaptive vertical domain');
         await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(0);
       }
       for (const theme of ['light','dark']) {

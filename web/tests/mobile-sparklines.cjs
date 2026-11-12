@@ -3,7 +3,7 @@ const exportsObject={};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/sparklines.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,{exports:exportsObject,Map,Set,Promise,AbortController,Number,Math,JSON});
-const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
+const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange}=exportsObject;
 (async()=>{
   const requests=[],received=[],failed=[];let active=0,maxActive=0;
   const loader=sparklineLoader((items,signal)=>new Promise(resolve=>{
@@ -33,19 +33,21 @@ const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
   assert(paths[1].end[0]<200,'future window remains blank instead of stretching points');
   const dense=Array.from({length:1440},(_,i)=>({time:i,price:String(100+Math.sin(i/60)),gap_before:i===720}));
   dense[333].price='150';dense[334].price='50';
-  const reduced=sparklinePaths({window_start:0,window_end:1600,points:dense},100);
+  const denseItem={window_start:0,window_end:1600,points:dense};
+  const denseScale=sparklineScale(denseItem);
+  const reduced=sparklinePaths(denseItem,100);
   assert.equal(reduced.length,2,'visual simplification must not join data gaps');
   const coordinates=path=>[...path.line.matchAll(/[ML]([\d.-]+),([\d.-]+)/g)].map(m=>[Number(m[1]),Number(m[2])]);
   const left=coordinates(reduced[0]),right=coordinates(reduced[1]);
   assert(left.length<dense.length/3,'dense chart reduces subpixel overdraw');
-  assert(left.some(([x,y])=>x===20.81&&y===5.82),'one-observation peak survives');
-  assert(left.some(([x,y])=>x===20.88&&y===42.18),'adjacent trough survives in chronological order');
+  assert(left.some(([x,y])=>x===20.81&&Math.abs(y-denseScale.y(150))<0.01),'one-observation peak survives');
+  assert(left.some(([x,y])=>x===20.88&&Math.abs(y-denseScale.y(50))<0.01),'adjacent trough survives in chronological order');
   assert.equal(left[0][0],0);assert.equal(left.at(-1)[0],44.94);
   assert.equal(right[0][0],45);assert.equal(right.at(-1)[0],89.94,'future space remains blank');
   for(const segment of [left,right]) assert(segment.every((point,i)=>!i||point[0]>=segment[i-1][0]),'retained observations remain time ordered');
   for (const [segment, source] of [[left,dense.slice(0,720)],[right,dense.slice(720)]]) {
     for (const point of source) {
-      const x=point.time/1600*100, y=24-(Number(point.price)-100)/55*20;
+      const x=point.time/1600*100, y=denseScale.y(Number(point.price));
       let nearest=Infinity;
       for(let i=1;i<segment.length;i++) {
         const [ax,ay]=segment[i-1], [bx,by]=segment[i], dx=bx-ax,dy=by-ay;
@@ -61,17 +63,22 @@ const {sparklineLoader,sparklinePaths,sparklineScale}=exportsObject;
   const single=sparklinePaths({window_start:0,window_end:100,points:[{time:20,price:'1',gap_before:false}]},100);
   assert.equal(coordinates(single[0]).length,2,'one observation remains visible as a stroke cap');
   const opening={window_start:0,window_end:100,points:[{time:0,price:'1.10000'},{time:1,price:'1.10010'}]};
-  const openingScale=sparklineScale(opening,48,1.1);
-  assert.equal(openingScale.referenceY,24,'previous close centered');
-  assert(Math.abs(openingScale.y(1.1001)-openingScale.y(1.1))<0.4,'tiny EURUSD opening move does not fill viewport');
-  const noReference=sparklineScale(opening);
+  const openingScale=sparklineScale(opening,48,1.1,'EURUSD');
+  assert(Math.abs(openingScale.referenceY-24)<1,'reference line follows the adaptive range, not a fixed center');
+  assert(Math.abs(openingScale.y(1.1001)-openingScale.y(1.1))>1.4,'small EURUSD moves become visible without filling the chart');
+  assert.equal(sparklineMinimumRange('EURUSD'),0.002);
+  assert.equal(sparklineMinimumRange('XAUUSD'),0.005);
+  assert.equal(sparklineMinimumRange('NVDA'),0.01);
+  assert.equal(sparklineMinimumRange('BTCUSDT'),0.02);
+  const noReference=sparklineScale(opening,48,undefined,'EURUSD');
   assert.equal(noReference.referenceY,undefined,'first observation is not mislabeled previous close');
-  assert.equal(noReference.y(1.1),24);
+  assert(Math.abs(noReference.y(1.10005)-24)<0.01);
   assert.equal(sparklineScale(opening,48,NaN).referenceY,undefined);
   const gapOpen={...opening,points:[{time:0,price:'1.122'},{time:1,price:'1.123'}]};
-  const gapScale=sparklineScale(gapOpen,48,1.1);
-  assert(gapScale.y(1.122)>4 && gapScale.y(1.122)<10,'real gap is visible above baseline without clipping');
-  assert.equal(gapScale.referenceY,24);
+  const gapScale=sparklineScale(gapOpen,48,1.1,'EURUSD');
+  assert(gapScale.y(1.122)>30 && gapScale.y(1.122)<33,'the gapped session curve uses the available range');
+  assert.equal(gapScale.referenceY,44);
+  assert.equal(gapScale.referenceOutside,true,'a distant reference is marked at the edge instead of flattening intraday data');
   const formatted={};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/quoteFormat.ts','utf8'),{
     compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}

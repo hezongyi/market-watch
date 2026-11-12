@@ -145,27 +145,45 @@ function visualPoints(points: [number, number][]) {
   return [...keep].sort((a, b) => a - b).map(index => points[index]);
 }
 
-/** A common percent scale prevents tiny opening moves filling the full height.
- * Supplier previous close matches the quote's percentage change. With no verified
- * reference, center on the first observation but never invent a previous-close line. */
-export function sparklineScale(item: Sparkline, height = 48, previousClose?: number) {
+const CURRENCIES = new Set(["USD", "EUR", "GBP", "JPY", "CHF", "CAD", "AUD", "NZD", "NOK", "SEK", "SGD", "HKD"]);
+
+/** Minimum total price range per instrument class, expressed as a fraction of price. */
+export function sparklineMinimumRange(instrument?: string) {
+  const symbol = instrument?.toUpperCase().replace(/[^A-Z]/g, "") || "";
+  if (/^(BTC|ETH|SOL|BNB|XRP|DOGE|LTC|ADA)(USD|USDT|USDC)?$/.test(symbol)) return 0.02;
+  if (/^(XAU|XAG)(USD|EUR|GBP)?$/.test(symbol)) return 0.005;
+  if (symbol.length === 6 && CURRENCIES.has(symbol.slice(0, 3)) && CURRENCIES.has(symbol.slice(3))) return 0.002;
+  return 0.01;
+}
+
+/** Scale to the observed session range, with a class-specific floor so the
+ * opening noise does not fill the chart. Reference price follows the same axis. */
+export function sparklineScale(item: Sparkline, height = 48, previousClose?: number, instrument?: string) {
   const prices = item.points.map(point => Number(point.price)).filter(Number.isFinite);
   const reference = typeof previousClose === "number" && Number.isFinite(previousClose)
     ? previousClose : undefined;
-  const center = reference ?? prices[0] ?? 0;
-  const extent = Math.max(0, ...prices.map(price => Math.abs(price - center)));
-  const radius = Math.max(Math.abs(center) * 0.005, extent * 1.1, 1e-8);
-  const y = (price: number) => height / 2 - (price - center) / radius * (height / 2 - 4);
-  return { y, referenceY: reference === undefined ? undefined : height / 2 };
+  const low = prices.length ? Math.min(...prices) : reference ?? 0;
+  const high = prices.length ? Math.max(...prices) : reference ?? 0;
+  const center = (low + high) / 2;
+  const minimum = Math.abs(reference ?? center) * sparklineMinimumRange(instrument);
+  const span = Math.max(high - low, minimum, 1e-8);
+  const padding = span * 0.1;
+  const domainLow = center - span / 2 - padding;
+  const domainHigh = center + span / 2 + padding;
+  const y = (price: number) => height - 4 - (price - domainLow) / (domainHigh - domainLow) * (height - 8);
+  const referencePosition = reference === undefined ? undefined : y(reference);
+  const referenceOutside = referencePosition !== undefined && (referencePosition < 4 || referencePosition > height - 4);
+  const referenceY = referencePosition === undefined ? undefined : Math.max(4, Math.min(height - 4, referencePosition));
+  return { y, referenceY, referenceOutside };
 }
 
 /** Width is the rendered CSS width. Fixed time coordinates and separate paths
  * on every gap remain unchanged; only redundant display points are removed. */
-export function sparklinePaths(item: Sparkline, width = 200, height = 48, previousClose?: number) {
+export function sparklinePaths(item: Sparkline, width = 200, height = 48, previousClose?: number, instrument?: string) {
   const prices = item.points.map((point) => Number(point.price));
   if (!prices.length || prices.some((price) => !Number.isFinite(price)))
     return [];
-  const scale = sparklineScale(item, height, previousClose);
+  const scale = sparklineScale(item, height, previousClose, instrument);
   const paths: { line: string; area: string; end: [number, number] }[] = [];
   let points: [number, number][] = [];
   const finish = () => {
