@@ -919,7 +919,7 @@ def _session_observation(source, symbol, session, event_at, metadata, *, event_e
     return {}
 
 
-def quote_snapshot(body: QuoteQuery, *, previous_close=None):
+def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None):
     result = []
     # Fetch platform quotes before opening the managed read transaction.
     # Platform watchlists never renew managed M1 demand.
@@ -1048,7 +1048,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None):
                                **session, **conflict, "read_at": read_at,
                                "time_type": "provider_quote" if stamp is not None else None})
                 continue
-            page = quote_page(meta)
+            page = (provider_page or quote_page)(meta)
             latest = page["bars"][-1] if page["bars"] else None
             observed_now = now_ms()
             session = session_status(meta["source"], meta["symbol"], observed_now, metadata=meta)

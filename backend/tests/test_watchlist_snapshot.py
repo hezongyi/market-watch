@@ -82,7 +82,8 @@ def test_shared_worker_returns_last_price_without_waiting_for_previous_close(dat
     from alerts.market_stream_worker import Calculator
     meta={**META,'name':'Test'}
     monkeypatch.setattr(provider_chart,'metadata',lambda *a,**kw:meta)
-    monkeypatch.setattr(provider_chart,'quote_page',lambda *_:{'bars':[{'start':60000,'end':120000,'close':'1.2'}]})
+    from alerts import provider_quote_reads
+    monkeypatch.setattr(provider_quote_reads,'page',lambda *_:{'bars':[{'start':60000,'end':120000,'close':'1.2'}]})
     monkeypatch.setattr(provider_chart,'quote_previous_close',lambda *_:pytest.fail('worker cannot block on previous-close IO'))
     payload,_=Calculator().build({'id':'b'*64,'query':DataQuery(instrument=META['id'],series_kind='provider',timeframe='M1').model_dump(),
         'identity':{'kind':'quotes','metadata':meta,'dataset_id':identity(meta,'M1')}})
@@ -119,3 +120,28 @@ def test_stale_committed_snapshot_preserves_observation_time(database, monkeypat
     value=quote_snapshot(QuoteQuery(symbols=['MWP:'+META['id']],snapshot_only=True))[0]['v']
     assert value['lp']==1.1 and value['fetch_status']=='stale'
     assert value['read_at']==old
+
+
+def test_platform_quote_persists_one_candle_and_alias_reuses_it(database, monkeypatch):
+    from alerts import provider_cache as cache
+    from alerts import provider_quote_reads as reads
+    from alerts.config import settings
+    calls=[]
+    meta={**META,'name':'Test'}
+    monkeypatch.setattr(settings,'oanda_acquisition_mode','stream')
+    stamp=now_ms()//60000*60000+30000
+    monkeypatch.setattr(reads,'now_ms',lambda:stamp)
+    monkeypatch.setattr(cache,'now_ms',lambda:stamp)
+    def fetch(meta,frame,before,count,**kwargs):
+        calls.append((frame,count))
+        return {'bars':[{'start':stamp//60000*60000,'end':stamp//60000*60000+60000,
+            'chart_time':stamp//60000*60000,'open':'1','high':'2','low':'0','close':'1.2','complete':False}],
+            'history_boundary':False}
+    monkeypatch.setattr(provider_chart,'native_page',fetch)
+    first=reads.page(meta)
+    second=reads.page({**meta,'id':'alias'})
+    assert first['bars']==second['bars'] and calls==[('M1',1)]
+    monkeypatch.setattr(provider_chart,'metadata',lambda *a,**kw:meta)
+    value=quote_snapshot(QuoteQuery(symbols=['MWP:'+META['id']],snapshot_only=True))[0]['v']
+    assert value['lp']==1.2 and value['data_start']==stamp//60000*60000
+    assert value['quote_time'] is None and value['time_type']=='source_m1'

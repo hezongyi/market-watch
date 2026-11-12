@@ -94,3 +94,30 @@ class PreviousCloses:
                     break
                 del self.entries[removable]
             return None
+
+
+def page(meta):
+    """One latest native candle, persisted/shared with charts and collectors."""
+    from . import provider_cache as cache
+    from .market_notices import error_evidence
+    from .provider_capabilities import request_seconds
+    from .provider_chart import quote_page
+
+    frame = 'D1' if meta['source'] == 'akshare' else 'M1'
+    before = now_ms() // 15000 * 15000 + 1
+    key = cache.ensure(meta, frame)
+    # Preserve the account collector's exclusive latest ownership. Its waiting
+    # path is cache-only and already carries truthful pending/stale evidence.
+    if meta['source'] == 'oanda' and cache.rest_batch_owner_active(key):
+        return quote_page(meta)
+    try:
+        result = cache.fetch_page(key, meta, frame, before, 1,
+            time.monotonic() + max(23, request_seconds(meta['source'])),
+            kind='history', latest=True)
+    except Exception as error:
+        cached = cache.snapshot(key, before, 1)
+        if not cached['bars']:
+            raise
+        return {**cached, 'fetch_status':'fetch_failed', 'read_at':now_ms(),
+                'error_evidence':error_evidence(error,provider=meta['source'],operation='quote_page')}
+    return {**result, 'fetch_status':'ok', 'read_at':now_ms()}

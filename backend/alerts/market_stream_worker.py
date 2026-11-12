@@ -143,6 +143,7 @@ class Calculator:
         if identity["kind"] == "quotes":
             from .market_data import QuoteQuery, quote_snapshot
             from .provider_capabilities import poll_seconds
+            from .provider_quote_reads import page as shared_quote_page
             source = identity["metadata"]["source"]
             delay = poll_seconds(source) * 1000 if query.series_kind == "provider" else 500
             if query.series_kind == "provider" and settings.oanda_acquisition_mode == "rest_batch":
@@ -165,7 +166,7 @@ class Calculator:
                 if work.get("input_signal") == signal_value:
                     return None, delay
             rows = quote_snapshot(QuoteQuery(symbols=[encode(query.instrument, query.series_kind)],
-                composite_revision_id=query.composite_revision_id, input_revision=query.input_revision), previous_close=self.previous_closes.read)
+                composite_revision_id=query.composite_revision_id, input_revision=query.input_revision), previous_close=self.previous_closes.read, provider_page=shared_quote_page)
             if settings.notification_center_sources_enabled and source == 'oanda' and query.series_kind == 'provider' and any(
                     row.get('v', {}).get('fetch_status') in ('pending', 'stale') for row in rows):
                 # Only reread the collector's cache; never accelerate supplier
