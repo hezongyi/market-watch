@@ -3,14 +3,12 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
-  LockKeyhole,
   Moon,
-  ShieldCheck,
   Sun,
   Waves,
 } from "lucide-react";
 import { useApp } from "./context";
-import { defaultChart, pageName } from "./navigation";
+import { defaultChart } from "./navigation";
 import "./app.css";
 
 export default function SimpleLogin({
@@ -66,15 +64,7 @@ export default function SimpleLogin({
       </header>
       <div className="auth-stage">
         <section className="auth-card" aria-labelledby="login-title">
-          <div className="auth-card-caption">
-            <LockKeyhole size={14} aria-hidden="true" /> 工作区登录
-          </div>
           <h1 id="login-title">登录守望</h1>
-          <p className="auth-description">
-            {deep
-              ? `登录后继续查看${pageName(next.split(/[?#]/)[0])}。`
-              : "进入图表，管理警报与通知。"}
-          </p>
           {connectionError && (
             <p role="alert" className="auth-connection">
               连接失败：{connectionError}
@@ -130,9 +120,6 @@ export default function SimpleLogin({
               {busy ? "正在登录…" : deep ? "登录并继续" : "登录并进入图表"}
               <ArrowRight size={18} aria-hidden="true" />
             </button>
-            <small className="auth-privacy">
-              <ShieldCheck size={14} aria-hidden="true" /> 单人账户 · 私有监控
-            </small>
           </form>
         </section>
       </div>
