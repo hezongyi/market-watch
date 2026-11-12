@@ -101,7 +101,7 @@ function App() {
     void refresh(); const timer = setInterval(refresh, 10000);
     return () => { active = false; clearInterval(timer); };
   }, [logged]);
-  useEffect(() => { document.title = pageName(appLocation.pathname); }, [appLocation.pathname]);
+  useEffect(() => { document.title = appLocation.pathname.startsWith("/advanced-charts") ? "守望终端" : pageName(appLocation.pathname); }, [appLocation.pathname]);
   async function logout() {
     if (!await confirmLeave()) return;
     await api("/logout", {}); setCsrf(""); bypass.current = true; setLogged(false);

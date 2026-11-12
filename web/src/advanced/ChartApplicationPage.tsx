@@ -18,7 +18,6 @@ import {
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate, useParams, NavLink } from "react-router-dom";
 import { useApp } from "../app/context";
-import { pageName } from "../app/navigation";
 import { centerLocation } from "../market-data/location";
 import { api as requestAPI } from "../api";
 import "./advanced.css";
@@ -79,7 +78,7 @@ export default function ChartApplicationPage() {
   const titleHistorical = useRef(false);
   const updateTitle = (immediate = false) => {
     const layout = current.current?.name?.trim();
-    titleText.current = [titleQuote.current || pageName(appLocation.pathname), layout && titleHistorical.current ? `[${layout}]` : layout]
+    titleText.current = [titleQuote.current || "守望终端", layout && titleHistorical.current ? `[${layout}]` : layout]
       .filter(Boolean)
       .join(" ");
     const write = () => {
