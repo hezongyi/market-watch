@@ -402,8 +402,8 @@ def test_retention_idle_loop_is_not_reported_stale_inside_its_deadline(database,
     assert "notifications / notification_retention" in notes(database)[0]["message"]
 
 
-def test_shared_default_window_would_report_a_sixty_second_poll_stale(database, monkeypatch):
-    """The pre-fix 15s default window faults a healthy 60s retention loop."""
+def test_background_default_window_covers_retention_poll_and_still_expires(database, monkeypatch):
+    """The background floor prevents false faults without hiding a stuck loop."""
     from alerts import notification_runtime, runtime_health, storage
 
     scope(monkeypatch, notifications=("notification_retention",))
@@ -415,6 +415,12 @@ def test_shared_default_window_would_report_a_sixty_second_poll_stale(database, 
     reporter.record()
 
     clock[0] += 16_000
+    notification_runtime.inspect_health()
+    assert notes(database) == []
+    clock[0] += 44_000
+    notification_runtime.inspect_health()
+    assert notes(database) == []
+    clock[0] += 30_000
     notification_runtime.inspect_health()
     assert "notifications / notification_retention" in notes(database)[0]["message"]
 

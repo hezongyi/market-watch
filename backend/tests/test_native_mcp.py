@@ -29,6 +29,10 @@ def mcp(database, monkeypatch, tmp_path):
     )
     storage.bootstrap(engine)
     database = sessionmaker(engine, expire_on_commit=False)
+    # This private database exercises existing, explicitly enabled series.
+    with database.begin() as db:
+        for key in ("EURUSD", "XAUUSD", "BTCUSDT"):
+            db.get(storage.Instrument, key).enabled = True
     monkeypatch.setattr(storage, "Session", database)
     monkeypatch.setattr(api.settings, "mcp_enabled", True)
     monkeypatch.setattr(api.settings, "mcp_calls_per_minute", 600)

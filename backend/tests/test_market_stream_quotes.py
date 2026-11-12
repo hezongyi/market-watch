@@ -130,6 +130,10 @@ def test_follow_active_switch_releases_only_previous_task_revision_demand(databa
 
 
 def test_managed_quote_cancellation_releases_only_task_demand(database):
+    from alerts.storage import Instrument
+
+    with database.begin() as db:
+        db.get(Instrument, "BTCUSDT").enabled = True
     owner = session(database)
     query = DataQuery(instrument="BTCUSDT", timeframe="M1")
     identity, serialized = resolve(Subscription(client="page", listener="watchlist", generation=1,

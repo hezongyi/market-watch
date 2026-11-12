@@ -28,10 +28,12 @@ def test_postgres_concurrent_trigger_and_outbox_lease(monkeypatch):
         c.execute(text(f"CREATE SCHEMA {schema}"))
     isolated = create_engine(URL, connect_args={"options": f"-csearch_path={schema}"})
     try:
+        monkeypatch.setattr(storage.settings, "fx_source", "dukascopy")
         storage.bootstrap(isolated)
         factory = sessionmaker(isolated, expire_on_commit=False)
         monkeypatch.setattr(storage, "Session", factory)
         with factory.begin() as db:
+            db.get(storage.Instrument, "EURUSD").enabled = True
             ident = create(db, "race", config(notify_ntfy=True), at=0).id
             consume(db, ident, sample(0, 9), detected_at=0)
 
