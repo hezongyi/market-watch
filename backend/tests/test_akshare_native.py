@@ -3,6 +3,7 @@
 import json
 import subprocess
 import sys
+import time
 
 import pytest
 from alerts import akshare_native as native
@@ -204,6 +205,25 @@ def test_inflight_snapshot_uses_existing_shared_lease_without_second_supplier_ca
     monkeypatch.setattr(provider, 'invoke', invoke)
     assert native.platform_page(meta, 'D1', stamp('2026-11-13'), 100)['bars']
     assert len(calls) == 1
+
+
+def test_provider_cache_stops_at_snapshot_edge_after_minute_refresh_deadline(database, monkeypatch):
+    from alerts import provider_cache as cache
+
+    now = [stamp('2026-11-13') + 20000]
+    monkeypatch.setattr('alerts.storage.now_ms', lambda: now[0])
+    monkeypatch.setattr(cache, 'now_ms', lambda: now[0])
+    calls = []
+    monkeypatch.setattr(provider, 'invoke', lambda *a, **kw: calls.append(1) or records('2026-11-12'))
+    meta = {**native.native_metadata('sina-a'), 'id': 'SINA-NATIVE:SZSE:000001',
+            'source': 'akshare', 'symbol': 'SZSE:000001', 'precision': 4,
+            'basis': 'last', 'calendar': 'source_date'}
+    first = cache.read(meta, 'D1', now[0], 2, deadline=time.monotonic() + 2)
+    assert first['window_limit'] and len(first['bars']) == 1
+    now[0] += 70000
+    older = cache.read(meta, 'D1', stamp('2026-11-11'), 2, deadline=time.monotonic() + 2)
+    assert older['window_limit'] and not older['bars'] and len(calls) == 1
+    assert not older['history_boundary']
 
 
 def test_new_ticker_round_trip_and_chart_budget():

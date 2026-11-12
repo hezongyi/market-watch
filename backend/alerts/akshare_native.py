@@ -155,7 +155,7 @@ def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
             for row in batch.rows if row.start < before]
     visible = bars[-min(4000, count + optional):]
     boundary = {"kind": "rolling_window", "left": batch.rows[0].start,
-        "confirmed_at": batch.observed_at, "retry_at": batch.observed_at + 60000,
+        "confirmed_at": batch.observed_at, "retry_at": window_end,
         "reason": "source_snapshot_window"} if batch.rows else None
     return {"bars": visible, "has_more": len(bars) > len(visible), "history_boundary": False,
         "boundary_evidence": boundary, "availability": "observed_window",
