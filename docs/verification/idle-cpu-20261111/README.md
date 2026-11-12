@@ -1,6 +1,6 @@
 # 空闲 CPU 优化验证
 
-基线：PR #132 / 2d3c4509；实现：37d469a3。风险 F1：重要后台链路，
+基线：PR #132 / 2d3c4509；实现：37d469a3、27dbe782。风险 F1：重要后台链路，
 无 schema 或持久格式变化。用户要求不追踪 CI，本任务没有查询检查或 workflow run。
 
 ## 修改
@@ -41,4 +41,74 @@ M15/D1 快照已完整比对且原子刷新后仍被重复排入 native 发布�
 186 passed；包含真实 PostgreSQL、聚合规则、成交量、发布调度及死锁/交错回归。
 各轮用例有重叠，不合计独立数量。第二轮独立 Standards/Spec review 通过。
 
-开发部署及最终性能验收结果将在实测后补充。
+## 开发实例验收
+
+实际主机 Ubuntu quant-server（4 CPU），project mw-dev。
+入口 <https://192.168.7.232:18443>；ntfy HTTPS 18444。
+运行 clean 实现提交 27dbe7825f582803e144bbf3023a44e7c1bb102e；
+API、market-runtime、data-worker、notification-worker 统一镜像
+`market-watch-api:dev-idle-final-20261111`，镜像 ID
+`sha256:6c4872f0396e7d9090f4221c8f04d27b2b46f553564d77ed6b2b8a089db86dff`。
+使用 mw-docker / market-watch-ubuntu，task mw-dev-idle-20261111、purpose development；
+镜像 dirty=false，四个服务挂载源码 SHA 与提交一致，无重启或 OOM。
+schema 仍为 bd57_notice_source_poll_index。
+
+实际浏览器登录及保存的五图布局均显示数值 OHLC；数据中心 50 条，无脚本或资源错误。
+OANDA、Binance、Dukascopy、Yahoo、AKShare、FXCM 分别读取 40 根实际柱；
+38 个运行角色健康，42 MCP 工具、行情/通知 SSE、ntfy、许可资源通过。
+保留原 Web 镜像、前端开发及私有许可资产挂载。热重载保留，首轮触发到新进程实测 3.19 秒；
+第二轮未修改重载配置，未重复触发。
+
+独立 PG 验收实例 mw-cpu-fix-20261111（PG14.24、1CPU/1GiB、127.0.0.1:25473）
+已停止，volume 保留；未在开发可写库执行回归测试。性能采样期间无测试、构建或 profiler，
+浏览器关闭后等待租约自然过期，不删除客户端或任务记录；其余 Ubuntu 实例保持运行。
+
+私有原始记录、截图、旧配置和脚本位于
+`/home/quant/.local/share/market-watch-dev/updates/idle-final-20261111/`；
+首轮证据位于相邻 idle-fix-20261111，未公开凭据或私有许可库。
+启动 `mw-dev up`；停止 `mw-dev stop`；状态 `mw-dev status`；
+重启后端 `mw-dev restart api market-runtime data-worker notification-worker`。
+
+## 回退与边界
+
+本轮前镜像 `market-watch-api:dev-idle-validated-20261111`（源码 cc8ad83a）保留；
+原优化前镜像、源码及全库备份也保留。compose.env.before / mw-dev.before 在私有证据目录。
+源代码以挂载方式运行，回退需先停止四个 backend，同时恢复对应代码及镜像配置再启动；
+只换镜像不会回退挂载代码。无 schema 变化，不需要数据库降级。
+此前全库备份仅验证 pg_restore 目录可读，没有进行全库恢复，不宣称恢复演练。
+
+未合并 main、未创建正式 tag、未操作生产。按用户要求不查询、轮询或追踪 CI。
+
+## 最终 CPU 实测
+
+[comparison.json](comparison.json) 保存脱敏指标；[acceptance.json](acceptance.json) 保存功能与部署结果。
+同一采样器每约 10 秒取一次 Docker CPU 增量；基线 19 点/183 秒，首轮与最终均
+31 点/约 305 秒。统一排除每段首个不完整 CPU 间隔，按四核折算整个 mw-dev。
+首轮曾报告包含首点的 10.82%，统一口径重算为 11.01%。
+
+| 指标 | 优化前 | 首轮 | 最终 |
+| --- | ---: | ---: | ---: |
+| 整个 mw-dev，占四核 | 13.32% | 11.01% | 10.49% |
+| API，占单核 | 8.59% | 1.66% | 1.69% |
+| data-worker，占单核 | 18.47% | 19.23% | 17.66% |
+| market-runtime，占单核 | 8.85% | 8.71% | 8.39% |
+| PostgreSQL，占单核 | 11.24% | 8.88% | 8.63% |
+| notification-worker，占单核 | 2.22% | 1.70% | 1.71% |
+| 数据库事务提交/秒 | 172.84 | 146.14 | 138.21 |
+| shadow 尝试增量 | 0 | 0 | 0 |
+
+总实例实测下降约 21.2%，约 0.42 核；未达到低于 5% 四核占用。
+首轮到最终仅下降约 0.52 个百分点，不能从这两段实时样本给第二轮单独做精确归因。
+数据 worker 仍是主要开销，最终相对基线只小幅降低；持续行情、源行读取、聚合/派生
+核对及后台心跳仍运行，后续优化不能把必要的真实内容校验简单跳过。
+
+所有段客户端、订阅和 stream task 全程为 0；首轮/最终同时持续记录 0 interest、
+0 active alert，基线由额外只读查询确认这些值。基线 enabled Instrument 记录为 3，
+首轮/最终动态在 3/4 间变化（含运行时维护标志，不能解释为不同品种数）；未改用户开关。
+这是非重放的真实短时观察，不能宣称严格同负载、长期或高负载结论。
+
+最终聚合队列 26/31 点为空，末点聚合队列与发布 pending 都归零；期间发布 pending
+为 0–21，持久 publication job 记录 8–13，并非所有队列每刻为空。shadow 三项
+始终 shadow_ready、尝试不增加。新增 7 条发布行，内容修订总和增加 50，包含正常
+内容变化和新增行，不把该总量当作纯观测错误修订数。采样结束后四个 backend
+继续运行、零重启、零 OOM。
