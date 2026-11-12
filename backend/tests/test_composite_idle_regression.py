@@ -139,7 +139,7 @@ def test_provider_idle_sources_back_off_but_active_live_keeps_cadence(database, 
     monkeypatch.setattr(runtime_health, 'progress', lambda **kw: None)
     idle = Stop(2)
     provider_service.run_live(idle, 'binance')
-    assert idle.delays == [5, 5]
+    assert idle.delays == [30, 30]
     monkeypatch.setattr(provider_service, 'realtime_step', lambda source: True)
     active = Stop(2)
     provider_service.run_live(active, 'binance')
@@ -147,7 +147,7 @@ def test_provider_idle_sources_back_off_but_active_live_keeps_cadence(database, 
     monkeypatch.setattr(provider_service, 'warm_step', lambda *a, **kw: (None, False))
     warm = Stop(2)
     provider_service.run_warm(warm, 'binance')
-    assert warm.delays == [5, 5]
+    assert warm.delays == [30, 30]
 
 
 def test_provider_not_due_subscription_is_active_only_for_its_source(database, monkeypatch):
