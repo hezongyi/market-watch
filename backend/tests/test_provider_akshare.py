@@ -261,12 +261,15 @@ def test_native_chart_uppercases_hashed_sina_ticker_without_losing_catalog_ident
     assert metadata(ident.upper())["source_family"] == "sina-a"
 
 
-def test_daily_platform_quote_uses_daily_source_without_minute_requests(monkeypatch):
+def test_daily_platform_quote_uses_daily_source_without_minute_requests(database, monkeypatch):
     from alerts import provider_chart
     calls = []
     monkeypatch.setattr(provider_chart, "cached_page", lambda meta, frame, before, count, **kw: calls.append((frame, count)) or {"bars": [{"close": "11", "start": stamp("2024-01-02")}], "as_of": 10})
     meta = {"source": "akshare", "symbol": "SZSE:000001", "id": "daily-quote-fixture", "basis": "last", "calendar": "source_date"}
     assert provider_chart.quote_page(meta)["bars"][0]["close"] == "11"
+    from alerts import provider_cache
+    meta.update(source_family="sina-a", adjustment="none", precision=2)
+    monkeypatch.setattr(provider_cache, "fetch_page", lambda key, meta, frame, before, count, *a, **kw: provider_chart.cached_page(meta, frame, before, count, **kw))
     assert provider_chart.quote_previous_close(meta, {"start": stamp("2024-01-03")}) == 11
     assert calls == [("D1", 1), ("D1", 1)]
 

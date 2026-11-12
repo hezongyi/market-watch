@@ -180,6 +180,13 @@ function presentQuote(row) {
   const result = chartQuotePresentation(row, meta);
   const value = result.v && typeof result.v === "object" ? {...result.v} : result.v;
   if (value && typeof value === "object") {
+    // Native quotes merge partial values. Explicitly clear an unavailable
+    // reference so a new price cannot retain the preceding quote's change.
+    if (Number.isFinite(value.lp)) {
+      if (!Number.isFinite(value.ch) || !Number.isFinite(value.chp))
+        value.ch = value.chp = null;
+      if (!Number.isFinite(value.prev_close_price)) value.prev_close_price = null;
+    }
     const base = value.description_base ?? String(value.description || "")
       .replace(/ · (?:最后更新于|最后行情时间|历史数据时间) .*?(?= · |$)/g, "")
       .replace(/ · 来源 M1 分钟数据/g, "");

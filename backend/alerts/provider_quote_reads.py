@@ -4,12 +4,42 @@ import copy
 import threading
 import time
 from collections import OrderedDict
+from decimal import Decimal
 
 from sqlalchemy import select
 
 from .provider_cache import identity
 from .provider_capabilities import fresh_seconds
 from .storage import MarketStreamTask, ProviderBar, ProviderDataset, now_ms, transaction
+
+
+def local_previous_close(meta, latest):
+    """Only reuse D1 observations whose coverage reaches this native session."""
+    from .provider_chart import previous_close_query
+    before, count, boundary = previous_close_query(meta, latest)
+    key = identity(meta, 'D1')
+    with transaction() as db:
+        dataset = db.get(ProviderDataset, key)
+        interval = next((r for r in dataset.coverage if r[0] < before <= r[1]), None) if dataset else None
+        if interval is None:
+            return None
+        bars = list(db.scalars(select(ProviderBar.payload).where(
+            ProviderBar.dataset_id == key, ProviderBar.chart_time < before,
+            ProviderBar.chart_time >= interval[0])
+            .order_by(ProviderBar.chart_time.desc()).limit(count)))
+    return next((Decimal(bar['close']) for bar in bars if boundary is None or
+                 bar['complete'] and bar['end'] <= boundary), None)
+
+
+def with_previous_close(meta, row):
+    values = row['v']
+    if values.get('lp') is not None and values.get('data_start') is not None:
+        previous = local_previous_close(meta, {'start':values['data_start']})
+        if previous is not None and previous > 0:
+            delta = Decimal(str(values['lp'])) - previous
+            values.update(prev_close_price=float(previous), ch=float(delta),
+                          chp=float(delta/previous*100))
+    return row
 
 
 def snapshot(meta):
@@ -29,22 +59,29 @@ def snapshot(meta):
             if values.get('fetch_status') in (None, 'ok') and stamp - read_at > fresh_seconds(meta['source']) * 1000:
                 values.update(fetch_status='stale', wait_reason='shared_refresh',
                               last_success_at=read_at, cache_age_ms=max(0, stamp-read_at))
-            return row
+            # Enrichment is outside the snapshot transaction, with no supplier IO.
+            committed = row
+        else:
+            committed = None
         # A chart/account collector may have a candle before a quote task has
         # published. Yahoo must keep its quote contract, never substitute M1.
-        dataset = db.get(ProviderDataset, key) if meta['source'] != 'yahoo' else None
+        frame = 'D1' if meta['source'] == 'akshare' else 'M1'
+        key = identity(meta, frame)
+        dataset = db.get(ProviderDataset, key) if committed is None and meta['source'] != 'yahoo' else None
         bar = db.scalar(select(ProviderBar.payload).where(ProviderBar.dataset_id == key,
             ProviderBar.start <= stamp).order_by(ProviderBar.start.desc()).limit(1)) if dataset else None
         if bar:
             fresh = stamp - dataset.latest_at <= fresh_seconds(meta['source']) * 1000
             values = dict(lp=float(bar['close']), quote_time=None, data_start=bar['start'],
-                data_end=bar['end'], time_type='source_m1', resolution='M1',
+                data_end=bar['end'], time_type='source_d1' if frame == 'D1' else 'source_m1', resolution=frame,
                 fetched_at=dataset.latest_at or None, read_at=dataset.latest_at or None,
                 fetch_status='ok' if fresh else 'stale', last_success_at=dataset.latest_at or None,
                 cache_age_ms=max(0, stamp-dataset.latest_at))
             if meta['basis'] in ('bid', 'ask'):
                 values[meta['basis']] = values['lp']
-            return {'s':'ok', 'v':values}
+            committed = {'s':'ok', 'v':values}
+    if committed is not None:
+        return with_previous_close(meta, committed)
     return {'s':'ok', 'v':{'fetch_status':'pending', 'wait_reason':'first_quote',
                            'quote_time':None, 'data_start':None, 'read_at':None}}
 
@@ -62,6 +99,9 @@ class PreviousCloses:
 
     def read(self, meta, latest):
         from .provider_chart import label, previous_close_query, quote_previous_close
+        previous = local_previous_close(meta, latest)
+        if previous is not None:
+            return previous
         before, _, _ = previous_close_query(meta, latest)
         session = label(latest['start'], 'D1', meta['calendar']) if meta['source'] == 'fxcm' else before
         key = (identity(meta, 'D1'), session)

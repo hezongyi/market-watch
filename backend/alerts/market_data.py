@@ -1076,16 +1076,20 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                     values["ask"] = values["lp"]
                 # Waiting reads are cache-only, including derived fields: a
                 # cold previous-close lookup can otherwise open supplier HTTP.
-                if fetch_status not in ("pending", "stale"):
-                    # Missing prior-session data must not hide a valid last price.
-                    try:
+                # Waiting reads may enrich from completed local D1 data, but
+                # must not open supplier IO. Never pair a newer lp with old ch.
+                try:
+                    if fetch_status in ("pending", "stale"):
+                        from .provider_quote_reads import local_previous_close
+                        previous = local_previous_close(meta, latest)
+                    else:
                         previous = (previous_close or quote_previous_close)(meta, latest)
-                        if previous is not None and previous > 0:
-                            delta = Decimal(latest["close"]) - previous
-                            values.update(ch=float(delta), chp=float(delta / previous * 100),
-                                          prev_close_price=float(previous))
-                    except Exception:
-                        pass
+                    if previous is not None and previous > 0:
+                        delta = Decimal(latest["close"]) - previous
+                        values.update(ch=float(delta), chp=float(delta / previous * 100),
+                                      prev_close_price=float(previous))
+                except Exception:
+                    pass
             result.append({"s": "ok", "n": ticker, "v": values, **session,
                            **conflict, "fetched_at": page.get("as_of"), "read_at": read_at,
                            "fetch_status": fetch_status, "data_start": latest.get("start") if latest else None,

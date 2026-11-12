@@ -22,6 +22,13 @@ const run=s=>vm.runInContext(s,ctx),pause=()=>new Promise(r=>setTimeout(r,20));
  await handlers.message({data:{type:'market-event',event:{listener:sub.listener,generation:sub.generation,sequence:1,
  type:'quotes',quotes:[{s:'ok',v:{lp:1.2,read_at:100,fetch_status:'ok'}}]}}});
  assert.equal(run('rows.at(-1).v.lp'),1.2,'local composite renders while a platform request remains unresolved');
+ await handlers.message({data:{type:'market-event',event:{listener:sub.listener,generation:sub.generation,sequence:2,
+ type:'quotes',quotes:[{s:'ok',v:{lp:1.3,ch:.1,chp:8.333,prev_close_price:1.2,read_at:200,fetch_status:'ok'}}]}}});
+ await handlers.message({data:{type:'market-event',event:{listener:sub.listener,generation:sub.generation,sequence:3,
+ type:'quotes',quotes:[{s:'ok',v:{lp:1.4,read_at:300,fetch_status:'ok'}}]}}});
+ assert.equal(run('rows.at(-1).v.ch'),null,'a price without a reference must clear the vendor merge cache, not retain an old change');
+ assert.equal(run('rows.at(-1).v.chp'),null);
+ assert.equal(run('rows.at(-1).v.prev_close_price'),null);
  run(`globalThis.requestOnly='MWP:AKSHARE:'+'b'.repeat(32);
  watchlistMetadata.set(requestOnly,{symbol:'TEST',source:'akshare'});
  feed.subscribeQuotes([requestOnly],[],()=>{},'request-only');`);

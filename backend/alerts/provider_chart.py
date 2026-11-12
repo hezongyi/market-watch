@@ -15,7 +15,7 @@ import httpx
 from .chart_data import FRAMES, bounds
 from .config import settings
 from .domain import Calendar, session_bounds
-from .provider_capabilities import SOURCES, fresh_seconds, versions
+from .provider_capabilities import SOURCES, fresh_seconds, request_seconds, versions
 from .provider_capabilities import frames as source_frames
 from .provider_deadline import request_deadline
 from .provider_transport import (
@@ -576,8 +576,15 @@ def previous_close_query(meta, latest):
 
 def quote_previous_close(meta, latest):
     """Previous completed native session close, with the same price basis."""
+    from . import provider_cache as cache
+    from .provider_quote_reads import local_previous_close
+    previous = local_previous_close(meta, latest)
+    if previous is not None:
+        return previous
     before, count, boundary = previous_close_query(meta, latest)
-    page = cached_page(meta, "D1", before, count, quote=True, cache_seconds=300)
+    key = cache.ensure(meta, 'D1')
+    page = cache.fetch_page(key, meta, 'D1', before, count,
+        time.monotonic() + max(23, request_seconds(meta['source'])), kind='history')
     complete = [bar for bar in page["bars"] if boundary is None or
                 bar["complete"] and bar["end"] <= boundary]
     return Decimal(complete[-1]["close"]) if complete else None

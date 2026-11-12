@@ -620,6 +620,8 @@ def test_provider_quotes_use_previous_complete_native_close(database, monkeypatc
             {"complete": False, "end": session_start + 86400000, "close": "110"},
         ]}
     monkeypatch.setattr(provider, "cached_page", page)
+    from alerts import provider_cache
+    monkeypatch.setattr(provider_cache, "fetch_page", lambda key, meta, frame, before, count, *a, **kw: page(meta, frame, before, count, **kw))
     monkeypatch.setattr(provider, "metadata", lambda _: {**META, "name": "Test pair"})
     api_module.app.dependency_overrides[api_module.authenticated] = lambda: "test"
     try:

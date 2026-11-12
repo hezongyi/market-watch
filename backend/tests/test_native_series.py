@@ -116,14 +116,14 @@ def test_custom_quote_uses_same_native_session_and_price_basis(native_catalog, m
     meta = native_series.register(provider_chart.metadata("OANDA:EUR_USD"), values)
     boundary = stamp("2026-10-07T00:00:00+00:00")
 
-    def cached(received, frame, before, count, **kwargs):
+    def cached(key, received, frame, before, count, *args, **kwargs):
         assert received["native_parameters"] == values
         assert frame == "D1" and before == boundary
         return {"bars": [
             {"complete": True, "end": boundary, "close": "1.123456789"},
             {"complete": False, "end": boundary + 86400000, "close": "9.9"}]}
 
-    monkeypatch.setattr(provider_chart, "cached_page", cached)
+    monkeypatch.setattr(provider_cache, "fetch_page", cached)
     assert provider_chart.quote_previous_close(meta, {"start": boundary + 120000}) == Decimal("1.123456789")
 
 
