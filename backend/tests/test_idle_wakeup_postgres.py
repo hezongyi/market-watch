@@ -7,6 +7,7 @@ from alerts.publication_wakeup import (
     COMPOSITE_CHANNEL,
     HISTORY_CHANNEL,
     NOTICE_CHANNEL,
+    PROVIDER_CHANNEL,
     STREAM_CHANNEL,
     PublicationWakeup,
     notify,
@@ -20,7 +21,7 @@ pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'),
                                reason='Requires isolated Ubuntu PostgreSQL')
 
 
-@pytest.mark.parametrize('channel', [ALERT_CHANNEL, NOTICE_CHANNEL, STREAM_CHANNEL, COMPOSITE_CHANNEL, HISTORY_CHANNEL])
+@pytest.mark.parametrize('channel', [ALERT_CHANNEL, NOTICE_CHANNEL, STREAM_CHANNEL, COMPOSITE_CHANNEL, HISTORY_CHANNEL, PROVIDER_CHANNEL])
 def test_demand_hints_are_commit_delivered_and_unrelated_publications_do_not_wake(channel):
     engine = create_engine(os.environ['TEST_POSTGRES_URL'])
     try:

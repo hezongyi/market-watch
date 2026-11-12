@@ -27,6 +27,7 @@ def test_legacy_http_mcp_read_pause_archive(mcp):
     created = client.post("/api/chart-alerts", json={"request_id": "web-rule", "config": payload})
     assert created.status_code == 422
     with database.begin() as db:
+        db.get(storage.Instrument, 'EURUSD').enabled = True
         ident = create(db, "legacy-web-rule", config(), at=0).id
     row = result(client, token, "chart_alerts_get", {"alert_id": ident})
     rejected = call(client, token, "chart_alerts_edit", {

@@ -33,3 +33,22 @@ def test_actual_confirmed_input_wakes_composite_channel(provider_pg, monkeypatch
     with PublicationWakeup(engine, channel=COMPOSITE_CHANNEL) as wake:
         assert confirm(factory, revision)
         assert wake.wait(1) == 'notification'
+
+
+def test_real_provider_demand_wakes_only_on_committed_target(provider_pg, monkeypatch):
+    from alerts import provider_service as service
+    from alerts.publication_wakeup import PROVIDER_CHANNEL
+    from test_provider_cache import META, page, seed
+    from test_provider_service import subscribed
+    factory, engine = provider_pg
+    key = seed(META, 'M5', 100000, page(90000, 100000))
+    with PublicationWakeup(engine, channel=PROVIDER_CHANNEL) as wake:
+        with factory() as db:
+            service.activate('rolled-back', key, 100000, 10, db=db)
+            db.rollback()
+        assert wake.wait(.05) == 'timer'
+        service.activate('committed', key, 100000, 10)
+        assert wake.wait(1) == 'notification'
+        wake.prepare()
+        subscribed(monkeypatch, 'browser', 'chart', 0)
+        assert wake.wait(1) == 'notification'

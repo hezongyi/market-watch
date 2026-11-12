@@ -130,3 +130,50 @@ def test_idle_pricing_keeps_not_due_auth_hold_visible(database, monkeypatch):
     assert states == ['idle', 'waiting_input', 'waiting_input']
     with database() as db:
         assert db.get(PricingOwner, key).next_at == 10**15
+
+
+def test_provider_idle_sources_back_off_but_active_live_keeps_cadence(database, monkeypatch):
+    from alerts import provider_service, publication_wakeup, runtime_health
+    from test_idle_worker_costs import Wake
+    monkeypatch.setattr(publication_wakeup, 'PublicationWakeup', lambda **kw: Wake())
+    monkeypatch.setattr(runtime_health, 'progress', lambda **kw: None)
+    idle = Stop(2)
+    provider_service.run_live(idle, 'binance')
+    assert idle.delays == [5, 5]
+    monkeypatch.setattr(provider_service, 'realtime_step', lambda source: True)
+    active = Stop(2)
+    provider_service.run_live(active, 'binance')
+    assert active.delays == [1, 1]
+    monkeypatch.setattr(provider_service, 'warm_step', lambda *a, **kw: (None, False))
+    warm = Stop(2)
+    provider_service.run_warm(warm, 'binance')
+    assert warm.delays == [5, 5]
+
+
+def test_provider_not_due_subscription_is_active_only_for_its_source(database, monkeypatch):
+    from alerts import provider_service as service
+    from alerts.storage import ProviderInterest
+    from test_provider_service import subscribed
+    subscribed(monkeypatch, 'browser', 'chart', 0)
+    with database.begin() as db:
+        db.scalar(select(ProviderInterest)).next_poll = 10**15
+    assert service.realtime_step('oanda') is True
+    assert service.realtime_step('binance') is False
+
+
+def test_provider_warm_not_due_backlog_keeps_one_second_service(database, monkeypatch):
+    from alerts import provider_service as service
+    from alerts import publication_wakeup, runtime_health
+    from alerts.storage import ProviderInterest
+    from test_idle_worker_costs import Wake
+    from test_provider_cache import META, page, seed
+    key = seed(META, 'M5', 100000, page(90000, 100000))
+    service.activate('history', key, 100000, 10)
+    with database.begin() as db:
+        row = db.scalar(select(ProviderInterest))
+        row.targets = [{**target, 'next_at': 10**15} for target in row.targets]
+    monkeypatch.setattr(publication_wakeup, 'PublicationWakeup', lambda **kw: Wake())
+    monkeypatch.setattr(runtime_health, 'progress', lambda **kw: None)
+    stop = Stop(2)
+    service.run_warm(stop, 'oanda')
+    assert stop.delays == [1, 1]

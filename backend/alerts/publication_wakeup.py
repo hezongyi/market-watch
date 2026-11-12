@@ -13,6 +13,7 @@ ALERT_CHANNEL = 'market_watch_alert_demand'
 NOTICE_CHANNEL = 'market_watch_notice_ready'
 HISTORY_CHANNEL = 'market_watch_history_work'
 COMPOSITE_CHANNEL = 'market_watch_composite_input'
+PROVIDER_CHANNEL = 'market_watch_provider_demand'
 
 
 def notify_connection(connection, channel):
@@ -44,7 +45,7 @@ class PublicationWakeup:
     """
 
     def __init__(self, engine=None, *, monotonic=time.monotonic, channel=CHANNEL):
-        if channel not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL):
+        if channel not in (CHANNEL, STREAM_CHANNEL, ALERT_CHANNEL, NOTICE_CHANNEL, HISTORY_CHANNEL, COMPOSITE_CHANNEL, PROVIDER_CHANNEL):
             raise ValueError('Unknown worker wakeup channel')
         if engine is None:
             from .storage import engine
