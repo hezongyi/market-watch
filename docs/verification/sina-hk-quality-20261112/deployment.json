@@ -1,0 +1,28 @@
+{
+  "host": "Ubuntu quant-server",
+  "project": "mw-dev",
+  "address": "https://192.168.7.232:18443",
+  "source_commit": "8cec2c6fa2c9b41da6a52e4f3b08a506bdcc96e0",
+  "api_image": "sha256:54959714fa8691256ccb93606615e96d85f1198cb7afb9379ab781a490763978",
+  "web_image": "sha256:fbc2c2d223d7fcaac4bc78e3e33a5cb2dcf1008f2a728b5e45da85d97cb8d4b6",
+  "changed_services": [
+    "api",
+    "market-runtime",
+    "data-worker",
+    "notification-worker"
+  ],
+  "schema_migration": false,
+  "private_configuration_preserved": true,
+  "production_changed": false,
+  "backup": {
+    "format": "pg_dump custom",
+    "bytes": 1566417056,
+    "manifest_readable": true,
+    "full_restore_performed": false
+  },
+  "start": "mw-dev up",
+  "status": "mw-dev status",
+  "stop": "mw-dev stop",
+  "restart_apps": "mw-dev restart api market-runtime data-worker notification-worker",
+  "private_config": "~/.local/share/market-watch-dev/updates/sina-hk-ohlc-20261112/run.json"
+}
