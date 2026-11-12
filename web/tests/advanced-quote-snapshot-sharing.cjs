@@ -36,21 +36,26 @@ const finish=async(message,rows,error)=>{
     assert.equal(quotes().length,2,'a completed snapshot is not a quote cache');
     await finish(quotes()[1],[{n:'MWP:EURUSD',s:'ok',v:{lp:3}},{n:'MWP:XAUUSD',s:'ok',v:{lp:4}}]);
 
-    run(`
-      quoteResetTokens.set('MWP:EURUSD',{});quoteSnapshotRows.delete('MWP:EURUSD');
-      feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'old-reset',rows}),e=>errors.push(e),()=>true,true);
-      quoteResetTokens.set('MWP:EURUSD',{});quoteSnapshotRows.delete('MWP:EURUSD');
-      feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'new-reset',rows}),e=>errors.push(e),()=>true,true);
-    `);
-    const old=quotes().at(-1);
-    await finish(old,[{n:'MWP:EURUSD',s:'ok',v:{lp:10}}]);
-    const current=quotes().at(-1);
-    assert.notEqual(current.id,old.id,'object reset generations must create a fresh network snapshot');
-    await finish(current,[{n:'MWP:EURUSD',s:'ok',v:{lp:20}}]);
-    assert.equal(run("received.some(r=>r.owner==='old-reset')"),false,'late pre-reset rows never return to a current consumer');
-    assert.equal(run("quoteSnapshotRows.get('MWP:EURUSD').v.lp"),20);
-    assert.equal(run('errors.length'),0);
-    assert.equal(run('quoteRequests.size'),0);
+    for(const order of ['old-first','new-first']) {
+      run(`
+        quoteResetTokens.set('MWP:EURUSD',{});quoteSnapshotRows.delete('MWP:EURUSD');
+        feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'old-reset-${order}',rows}),e=>errors.push(e),()=>true,true);
+      `);
+      const old=quotes().at(-1);
+      run(`
+        quoteResetTokens.set('MWP:EURUSD',{});quoteSnapshotRows.delete('MWP:EURUSD');
+        feed.getQuotes(['MWP:EURUSD'],rows=>received.push({owner:'new-reset-${order}',rows}),e=>errors.push(e),()=>true,true);
+      `);
+      const current=quotes().at(-1);
+      assert.notEqual(current.id,old.id,'object reset generations must create a fresh network snapshot');
+      const replies=order==='old-first' ? [[old,10],[current,20]] : [[current,20],[old,10]];
+      for(const [message,lp] of replies) await finish(message,[{n:'MWP:EURUSD',s:'ok',v:{lp}}]);
+      assert.equal(run(`received.some(r=>r.owner==='old-reset-${order}')`),false,'late pre-reset rows never return to a current consumer');
+      assert.equal(run(`received.filter(r=>r.owner==='new-reset-${order}').length`),1);
+      assert.equal(run("quoteSnapshotRows.get('MWP:EURUSD').v.lp"),20);
+      assert.equal(run('errors.length'),0);
+      assert.equal(run('quoteRequests.size'),0);
+    }
 
     for(const outcome of ['failure','same-time-result','untimed-result']) {
       run(`

@@ -103,3 +103,11 @@
 - 最终相关后端234 passed；前端unit/browser contracts、完整Web构建、Ruff、diff检查通过。无新增CI查询/追踪。
 - 健康检查曾遇到一次上游candles HTTP 504，XAUUSD分钟确认短暂降级；既有重试自动恢复。最终readyz ready，38角色健康，三组合connected/owned/quote_ready/confirmed_tail_ready且无确认错误，旧独立采集器仍关闭。页面存在其他活跃客户端，本轮未把系统当空闲或声称所有订阅为零，也未重新开启CPU验收。
 - 私有新增证据：`changes-before/`、被拦截的`changes-after/`、`changes-r3/`、最终通过的`changes-r3-warm/changes-check.json`与截图、`reference-r3.json`、两次部署前后留档、最终健康/运行状态。真实数据、请求/DOM记录不包含于PR源码；凭据及完整inspect继续仅留私有目录。
+
+### PR #134 CI测试修复（2026-11-12）
+
+用户要求查看并修复CI。检查head `0996a0b9` 的run `43235972027`：Web checks在`advanced-quote-snapshot-sharing.cjs`失败，Classify/Compose通过，Backend Python tests尚在运行。相同命令本地稳定复现`actual: 4, expected: 4`。
+
+本次分类P0：只调整测试和本地测试入口，无业务代码、构建产物或部署变更。原因是测试仍假设重置后的请求排队发送；本地首快照允许并行后，两个不同请求ID（3和4）已在响应前发送，测试在两次发送之后取last()，误把新请求记作旧请求。现在分别在每次发送后捕获真实句柄，保留请求ID必须不同、旧回调不得交付、最终值只能来自新请求的断言，并验证old-first/new-first两种响应顺序；将此CI用例加入常用single-frontend本地入口，避免入口覆盖缺口。
+
+原失败测试先红后绿；按CI顺序完成`npm run build:ui`及四组75条Web回归命令（含真实浏览器DOM和single-frontend unit），全部通过；diff检查通过。仅为排查启动的本地后端全量测试在尚未完成时停止，不将其表述为全量通过；本补丁没有后端改动，也不将运行中的远端Backend检查记为成功。提交后更新PR；开发实例继续运行已验收的相同业务代码，无需重建或重启服务。
