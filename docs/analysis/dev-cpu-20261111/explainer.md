@@ -2,6 +2,8 @@
 title: 开发实例 CPU 为什么持续偏高
 lang: zh
 ---
+> 历史归档：修复前且有实时订阅的样本。当前结果见 [最新验收](../../verification/idle-cpu-20261111/README.md)。
+
 ## A 诊断结论
 
 ```callout warn 已发现重复后台工作

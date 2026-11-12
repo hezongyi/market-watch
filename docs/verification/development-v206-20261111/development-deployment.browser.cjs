@@ -1,3 +1,4 @@
+// Historical v2.0.6 acceptance artifact; not a current-page regression test.
 // Real development deployment: no fixture writes or external notifications.
 const assert = require('node:assert/strict');
 const fs = require('node:fs');

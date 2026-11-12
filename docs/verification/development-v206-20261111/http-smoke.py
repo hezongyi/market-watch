@@ -1,3 +1,4 @@
+# Historical v2.0.6 acceptance artifact; not a current-deployment check.
 import hashlib,http.cookiejar,json,ssl,urllib.request
 from pathlib import Path
 root=Path.home()/'.local/share/market-watch-dev/updates/v2.0.6-20261111'

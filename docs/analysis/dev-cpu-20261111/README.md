@@ -1,5 +1,9 @@
 # 开发实例持续 CPU 占用诊断
 
+> 历史归档：以下是 2026-11-11 修复前、存在实时订阅时的观测，不能作为当前空闲 CPU。
+> 问题后续修复及当前验收见 [空闲 CPU 优化验证](../../verification/idle-cpu-20261111/README.md)。
+> 归档来源与时间线见 [归档说明](../../verification/dev-investigation-archive-20261111/README.md)。
+
 2026-11-11；范围：只读观察现有 Ubuntu `mw-dev` / v2.0.6，应用基线 `d2a3e092`。
 本次没有调整 worker、轮询频率、业务数据或运行版本，没有执行 shadow、激活或清理。
 

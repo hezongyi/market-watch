@@ -1,5 +1,9 @@
 # 开发实例 v2.0.6 修复与部署验收
 
+> 历史归档：本文记录当时部署和验收，以下工作树、镜像、命令及脚本对应当时环境。
+> 当前开发实例已部署后续 CPU 修复，见 [最新验收](../idle-cpu-20261111/README.md)。
+> 本目录脚本仅保留取证，不适用于当前页面，未在本次归档中重新执行。
+
 2026-11-11，Ubuntu `quant-server` 的持久开发实例 `mw-dev` 已升级到
 v2.0.6 / `d2a3e0925175376746170e2597c6fa675d2fa43d`。
 主线及正式 v2.0.6 标签均指向该提交。风险 F0：既有兼容补丁部署与静态资源修复，
@@ -15,7 +19,7 @@ v2.0.6 / `d2a3e0925175376746170e2597c6fa675d2fa43d`。
    直接请求还可能被 Vite fallback 返回 200 HTML。因此只检查状态码或 manifest 不足以验收。
    从完整新建 web 镜像提取真实文件，确认整个资源目录没有符号链接，并检查资源 MIME 与实际图表加载。
 
-新增 `web/tests/development-deployment.browser.cjs` 已在修复前运行失败：
+新增 `docs/verification/development-v206-20261111/development-deployment.browser.cjs` 已在修复前运行失败：
 `AssertionError: text/html does not match /javascript/`；修复后通过。
 同一脚本还验证图表数据响应、可见 OHLC、数据中心、健康查询及 worker 状态。
 
@@ -59,14 +63,14 @@ mw-dev status
   空闲及 waiting_input 为现有需求下的正常状态。9 个常驻容器均 running，重启计数为 0。
 - 以上为本次短时功能验收；没有发送新的外部通知，未验证手机收件或长期稳定性。
 
-从工作树根目录执行：
+以下为当时从工作树根目录执行的历史命令（浏览器脚本已移至本归档目录）：
 
 ```bash
 python3 docs/verification/development-v206-20261111/http-smoke.py
 NODE_PATH=/home/quant/repos/market-watch/web/node_modules \
 MW_ACCEPTANCE_CREDENTIALS_FILE=/home/quant/.local/share/market-watch-dev/credentials.json \
 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome \
-node web/tests/development-deployment.browser.cjs
+node docs/verification/development-v206-20261111/development-deployment.browser.cjs
 ```
 
 `node --check`、Python 编译检查和 `git diff --check` 通过。
