@@ -1116,10 +1116,7 @@ const server = http.createServer(async (req, res) => {
     ).toBeVisible();
     await expect(
       dialog("创建自建行情").getByRole("button", { name: "H1", exact: true }),
-    ).toHaveAttribute("aria-pressed", "false");
-    await dialog("创建自建行情")
-      .getByRole("button", { name: "H1", exact: true })
-      .click();
+    ).toHaveAttribute("aria-pressed", "true");
     await shot("18-native-periods");
     await dialog("创建自建行情")
       .getByRole("button", { name: "创建并准备历史", exact: true })

@@ -69,10 +69,10 @@ export default function DataCreateSheet({
   const probed = useRef(new Set<string>());
   const initialPeriods =
     initialMode === "base_m1"
-      ? ["M1", "H4", "D1"]
+      ? frames
       : initialMode === "base_d1"
         ? ["D1", "W1", "MN"]
-        : ["H1", "D1"].filter((f) =>
+        : frames.filter((f) =>
             (item.verified_frames?.none || []).includes(f),
           );
   const [periods, setPeriods] = useState(initialPeriods),
@@ -171,18 +171,8 @@ export default function DataCreateSheet({
     return () => controller.abort();
   }, [mode, adjustment, probeEpoch, online, item.catalog_id]);
   useEffect(() => {
-    if (!native) return;
-    setPeriods((old) => {
-      const next = old.filter((f) => allowed.includes(f));
-      return next.length
-        ? next
-        : mode === "base_d1"
-          ? allowed
-          : allowed.filter((f) => ["H1", "D1"].includes(f)).length
-            ? allowed.filter((f) => ["H1", "D1"].includes(f))
-            : allowed.slice(0, 1);
-    });
-  }, [mode, JSON.stringify(allowed)]);
+    setPeriods(allowed);
+  }, [mode, adjustment, JSON.stringify(allowed)]);
   useEffect(() => {
     setChecking(false);
     setCheckError("");
