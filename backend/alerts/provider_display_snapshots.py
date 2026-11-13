@@ -10,7 +10,7 @@ import json
 import logging
 import uuid
 
-from sqlalchemy import delete, select, text
+from sqlalchemy import BigInteger, cast, delete, or_, select, text
 
 from .display_snapshots import DisplaySnapshotError
 from .source_history_store import _insert
@@ -58,20 +58,21 @@ def publish(page):
     stamp = now_ms()
     key = PREFIX + page['provider_snapshot_id']
     with budget_transaction() as db:
-        # A short global lock bounds this small store under concurrent readers.
-        # It never locks the source dataset or participates in its RR snapshot.
-        if db.bind.dialect.name == 'postgresql':
-            db.execute(text('SELECT pg_advisory_xact_lock(8675311)'))
-        old = db.get(Preference, key)
-        if old and old.value['expires'] > stamp + LEASE_MS // 2:
+        expires = cast(Preference.value['expires'].as_string(), BigInteger)
+        expiry = select(expires).where(Preference.key == key)
+        if (db.scalar(expiry) or 0) > stamp + LEASE_MS // 2:
             return
-        retained = list(db.scalars(select(Preference).where(Preference.key.startswith(PREFIX))))
-        expired = [r.key for r in retained if r.value['expires'] <= stamp]
-        live = sorted((r for r in retained if r.key not in expired and r.key != key),
-                      key=lambda r: r.value['expires'])
-        expired.extend(r.key for r in live[:max(0, len(live) + 1 - MAX_SNAPSHOTS)])
-        if expired:
-            db.execute(delete(Preference).where(Preference.key.in_(expired)))
+        # This store limits provider-display Preference rows only. ObservedMinute
+        # admission has a separate capacity and must not queue behind cleanup.
+        if db.bind.dialect.name == 'postgresql':
+            db.execute(text('SELECT pg_advisory_xact_lock(8675320)'))
+        # A competing publisher may have renewed this credential while waiting.
+        if (db.scalar(expiry) or 0) > stamp + LEASE_MS // 2:
+            return
+        excess = select(Preference.key).where(Preference.key.startswith(PREFIX),
+            Preference.key != key, expires > stamp).order_by(expires.desc(), Preference.key).offset(MAX_SNAPSHOTS - 1)
+        db.execute(delete(Preference).where(Preference.key.startswith(PREFIX),
+            or_(expires <= stamp, Preference.key.in_(excess))).execution_options(synchronize_session=False))
         value = {'expires': stamp + LEASE_MS, 'content': content}
         stmt = _insert(db)(Preference).values(key=key, value=value)
         db.execute(stmt.on_conflict_do_update(index_elements=['key'], set_={'value': value}))
