@@ -1,9 +1,9 @@
 """Display precision follows the symbol while Yahoo observations retain precision."""
 
 import pytest
-
+from alerts import provider_yahoo as yahoo
+from alerts import yahoo_catalog
 from alerts.config import settings
-from alerts import provider_yahoo as yahoo, yahoo_catalog
 from alerts.storage import MarketCatalog
 
 
