@@ -10,6 +10,7 @@ import { time } from "./types";
 export type Continuation = {
   dataset_id: string; supported: boolean; reason: string | null; enabled: boolean;
   ready_to_enable: boolean; status: string; default_mapping_id: string | null;
+  configurations: { id: string; active_revision_id: string; created_at: number }[];
   mappings: { id: string; valid_for_selection: boolean; current_account: boolean;
     target_display_symbol?: string; target_identity: { provider_symbol: string }; match: { difference?: string } }[];
   composite: null | { id: string; historical_source_display?: string; live_source_display?: string;
@@ -17,7 +18,7 @@ export type Continuation = {
     preparation: { status: string; confirmed_end: number; error: string | null } };
 };
 export const continuationNames: Record<string, string> = {
-  disabled: "已关闭", preparing: "准备中", receiving: "运行中", recovering: "恢复中",
+  enabled: "已开启", disabled: "已关闭", preparing: "准备中", receiving: "运行中", recovering: "恢复中",
   inactive: "等待实时来源", market_closed: "闭市", attention: "异常",
   account_changed: "账户已变化", unauthorized: "认证异常", provider_maintenance: "来源维护中",
 };
@@ -75,6 +76,13 @@ export function DatasetContinuation({ id }: { id: string }) {
           <Link to={`/market-data/composites/${composite.id}?return_to=${encodeURIComponent(`/market-data/datasets/${id}?section=continuation`)}`}>查看接续修订与健康</Link>
         </div>
       </>}
+      {!!row.configurations?.length && <details><summary>已有接续配置与旧引用</summary>
+        <ul>{row.configurations.map(item => <li key={item.id}>
+          <Link to={`/market-data/composites/${item.id}?return_to=${encodeURIComponent(`/market-data/datasets/${id}?section=continuation`)}`}>
+            {item.id.slice(0, 8)} · {time(item.created_at)}{item.id === composite?.id ? " · 默认配置" : ""}
+          </Link>
+        </li>)}</ul>
+      </details>}
       {!row.enabled && <p>已确认尾部和配置保留；依赖实时接续的告警暂停判定，重新开启后按原规则恢复。</p>}
     </>}
   </section>;

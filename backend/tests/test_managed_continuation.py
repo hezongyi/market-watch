@@ -85,3 +85,22 @@ def test_extension_api_rejects_non_boolean_choice(database, monkeypatch):
             assert client.post(path, json={"enabled": True}).status_code == 422
     finally:
         api.app.dependency_overrides.clear()
+
+
+def test_all_old_configurations_remain_discoverable_after_default_change(database, monkeypatch):
+    catalog = prepare(database, monkeypatch)
+    publish(database)
+    with database.begin() as db:
+        first = save_mapping(db, identity().key, catalog, PROOF)
+        second = save_mapping(db, identity().key, catalog, {**PROOF, "rationale": "A separately reviewed configuration that keeps its own saved identity"})
+        original = configure(db, identity().key, value=True, mapping_id=first.id)
+        changed = configure(db, identity().key, value=True, mapping_id=second.id)
+        assert original["composite"]["id"] != changed["composite"]["id"]
+        assert {item["id"] for item in changed["configurations"]} == {
+            original["composite"]["id"], changed["composite"]["id"]}
+        # Account changes remove eligibility, not the saved reference links.
+        from alerts.config import settings
+        monkeypatch.setattr(settings, "oanda_account_id", "a-different-account")
+        stale = report(db, identity().key)
+        assert not stale["ready_to_enable"]
+        assert len(stale["configurations"]) == 2

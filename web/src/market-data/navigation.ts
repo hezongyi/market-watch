@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useCenter, useLocation, useNavigate, useSearchParams } from "./router";
 import type { Dataset } from "./types";
+import { centerLocation } from "./location";
 
 /** Preserve the originating center filter/page and a stable row on return. */
 export function centerLink(path: string, params: URLSearchParams, row?: string) {
@@ -14,7 +15,8 @@ export function centerLink(path: string, params: URLSearchParams, row?: string) 
 
 export function centerReturn(params: URLSearchParams, fallback = "/market-data") {
   const value = params.get("return_to") || "";
-  return /^\/market-data(?:\?[^#]*)?(?:#[^?]*)?$/.test(value) ? value : fallback;
+  const safe = value.startsWith("/market-data") ? centerLocation(value) : "/market-data";
+  return safe !== "/market-data" || value === "/market-data" ? safe : fallback;
 }
 
 export function useReturnNavigation() {

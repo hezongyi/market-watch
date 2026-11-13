@@ -58,9 +58,14 @@ def report(db, dataset_id):
     current = detail(db, composite.id) if composite else None
     state = ("disabled" if not active else "attention" if not ready else
              current["status"] if current else "preparing")
+    configurations = [{"id": item.id, "active_revision_id": item.active_revision_id,
+        "created_at": item.created_at} for item in db.scalars(select(MarketComposite).where(
+            MarketComposite.dataset_id == dataset_id, MarketComposite.permission_scope == SCOPE)
+            .order_by(MarketComposite.created_at.desc(), MarketComposite.id))]
     return {"dataset_id": dataset_id, "supported": supported, "reason": reason,
         "enabled": active, "ready_to_enable": ready, "status": state,
-        "default_mapping_id": selected, "mappings": options, "composite": current}
+        "default_mapping_id": selected, "mappings": options, "composite": current,
+        "configurations": configurations}
 
 
 def configure(db, dataset_id, *, value, mapping_id=None):

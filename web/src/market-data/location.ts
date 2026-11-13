@@ -12,11 +12,12 @@ export function centerLocation(value: string, base = "/market-data"): string {
   const query = new URLSearchParams();
   for (const [key, item] of url.searchParams) {
     if (!keys.has(key) || item.length > (key === "return_to" ? 1500 : 200)) continue;
-    if (key === "return_to" && !/^\/market-data(?:\?[^#]*)?(?:#[a-z0-9-]+)?$/.test(item)) continue;
     if (key === "version" && !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(item)) continue;
     if (key === "return_key" && !/^[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}$/.test(item)) continue;
     if (key === "return_to") {
+      if (!item.startsWith("/market-data")) continue;
       const back = new URL(item, "https://center.invalid");
+      if (back.origin !== "https://center.invalid" || !knownPath.test(back.pathname)) continue;
       if (back.searchParams.has("return_to") || back.searchParams.has("return_key")) continue;
       query.set(key, centerLocation(item));
       continue;
