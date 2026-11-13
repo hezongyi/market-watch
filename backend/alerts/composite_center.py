@@ -6,7 +6,6 @@ from .composite_definitions import baseline, latest_note
 from .history_catalog import account_scope
 from .market_names import code_search, display_code
 from .market_presentation import present, source_name
-from .market_usage import wanted_instruments
 from .storage import (
     ChartAlert,
     ChartAlertVersion,
@@ -30,19 +29,17 @@ def mapping_report(db, row):
     target = db.get(MarketDataset, row.target_dataset_id)
     identity = target.identity
     note = latest_note(db, row.id)
-    from .composite_matching import PRODUCT_FIELDS, check_match, live_identity
+    from .composite_matching import saved_mapping_valid
 
     valid = False
     try:
         from .history_catalog import catalog
         entries = catalog(db, source="oanda", query=identity["provider_symbol"], page_size=100)["items"]
         entry = next((item for item in entries if item["provider_symbol"] == identity["provider_symbol"]), None)
-        if entry and target.id == live_identity(entry["provider_symbol"]).key:
-            check = check_match(db, row.dataset_id, entry["catalog_id"])
-            valid = check["status"] == "ready" and all(
-                row.match.get(field) == check["suggestion"][field] for field in PRODUCT_FIELDS) and (
-                row.match.get("target_catalog", {}).get("precision") == check["snapshot"]["precision"] and
-                row.match.get("target_catalog", {}).get("type") == check["snapshot"]["asset_type"])
+        if entry:
+            from .storage import MarketCatalog
+
+            valid = saved_mapping_valid(db, row, target, db.get(MarketCatalog, entry["catalog_id"]))
     except ValueError:
         pass
     return {"id": row.id, "dataset_id": row.dataset_id, "created_at": row.created_at,
@@ -73,7 +70,6 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     prep = db.get(CompositePreparation, revision.id)
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     state = db.get(LiveState, mapping.target_dataset_id)
-    wanted = wanted_instruments(db)
     stamp = now_ms()
     chart_count = db.scalar(select(func.count()).select_from(MarketDemand).where(
         MarketDemand.instrument_id == composite.instrument_id, MarketDemand.expires > stamp))
@@ -89,8 +85,7 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     from .composite_quotes import live_snapshot
 
     live = live_snapshot(db, revision, now=stamp)
-    current_account = live["current_account"]
-    active = composite.instrument_id in wanted
+    active = live["realtime_enabled"]
     connection = live["connection"]
     quote_age = live["quote_age_ms"]
     quote_ready = live["quote_ready"]
@@ -98,12 +93,7 @@ def detail(db, composite_id, *, permission_scope=SCOPE):
     sample_ready = live.get("sample_ready", quote_ready)
     confirmed_ready = live["confirmed_tail_ready"]
     from .composite_aggregates import report
-    status = "account_changed" if not current_account else "attention" if prep.error else (
-        "preparing" if prep.status != "queried" else "inactive" if not active else
-        'provider_maintenance' if live['connection_error'] == 'provider_maintenance' else
-        'unauthorized' if live['authentication_hold'] else
-        'market_closed' if live['market_session'] == 'closed' else
-        "receiving" if confirmed_ready else "recovering")
+    status = runtime_status(prep, live, active=active)
     return {"id": composite.id, "instrument_id": composite.instrument_id,
         "dataset_id": dataset.id, "logical_symbol": dataset.logical_symbol,
         "display_symbol": display_code(dataset.logical_symbol, asset_type=dataset.asset_class),
@@ -187,3 +177,13 @@ def read_attempts(db, composite_id, *, page=1, page_size=25, permission_scope=SC
     return {"composite_id": composite_id, "revision_id": row["active_revision_id"],
             "items": [{key: getattr(item, key) for key in fields} for item in rows],
             "total": total, "page": page, "page_size": page_size}
+
+
+def runtime_status(prep, live, *, active):
+    """User intent and current readiness remain separate facts."""
+    return "account_changed" if not live["current_account"] else "attention" if prep.error else (
+        "preparing" if prep.status != "queried" else "inactive" if not active else
+        "provider_maintenance" if live["connection_error"] == "provider_maintenance" else
+        "unauthorized" if live["authentication_hold"] else
+        "market_closed" if live["market_session"] == "closed" else
+        "receiving" if live["confirmed_tail_ready"] else "recovering")

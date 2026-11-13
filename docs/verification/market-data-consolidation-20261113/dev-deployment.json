@@ -1,0 +1,66 @@
+[
+  {
+    "service": "api",
+    "image": "sha256:ebb2178e2faa36a8e08cbf263b55a96d3c60b455e8397ad130cb8509d52e576a",
+    "preserved_container": false,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": "healthy"
+  },
+  {
+    "service": "market-runtime",
+    "image": "sha256:ebb2178e2faa36a8e08cbf263b55a96d3c60b455e8397ad130cb8509d52e576a",
+    "preserved_container": false,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": null
+  },
+  {
+    "service": "data-worker",
+    "image": "sha256:ebb2178e2faa36a8e08cbf263b55a96d3c60b455e8397ad130cb8509d52e576a",
+    "preserved_container": false,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": null
+  },
+  {
+    "service": "notification-worker",
+    "image": "sha256:ebb2178e2faa36a8e08cbf263b55a96d3c60b455e8397ad130cb8509d52e576a",
+    "preserved_container": false,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": null
+  },
+  {
+    "service": "web",
+    "image": "sha256:dddf3fdd9c115d51c922b0fc9607a10d270ee362d4fce7f4b0a6c67ee40ed0a4",
+    "preserved_container": false,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": null
+  },
+  {
+    "service": "postgres",
+    "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "preserved_container": true,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": "healthy"
+  },
+  {
+    "service": "tls",
+    "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+    "preserved_container": true,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": null
+  },
+  {
+    "service": "ntfy",
+    "image": "sha256:9a16317fbe74277ee68d1823b035c7e06d7249126ddb8fe27557a6789a0a586d",
+    "preserved_container": true,
+    "effective_environment_preserved": true,
+    "state": "running",
+    "health": "healthy"
+  }
+]

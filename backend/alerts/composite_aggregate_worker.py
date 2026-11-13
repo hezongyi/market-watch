@@ -29,10 +29,12 @@ IDLE_FLOOR = 2
 
 def run(stopped, *, wakeup=None):
     """The listener only shortens idle discovery; error backoff stays a plain wait."""
+    from .composite_aggregate_inputs import AggregateInputs
     from .composite_realtime import CurrentBuckets
     from .publication_wakeup import COMPOSITE_CHANNEL, PublicationWakeup
 
     buckets = CurrentBuckets()
+    inputs = AggregateInputs()
     last_error = None
     listener = wakeup if wakeup is not None else PublicationWakeup(channel=COMPOSITE_CHANNEL)
     with listener:
@@ -43,7 +45,7 @@ def run(stopped, *, wakeup=None):
             listener.prepare()
             try:
                 errors = []
-                worked = aggregate_tick(on_error=errors.append, runtime_only=True, realtime=buckets)
+                worked = aggregate_tick(on_error=errors.append, runtime_only=True, realtime=buckets, prepared=inputs)
                 last_error = errors[0] if errors else runtime_error()
             except Exception as error:
                 # Preserve the existing bounded local retry for transient DB errors.

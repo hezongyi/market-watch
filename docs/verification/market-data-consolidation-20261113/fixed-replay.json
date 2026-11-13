@@ -1,0 +1,39 @@
+{
+  "baseline_commit": "eaacf47ef86b082f7a80b81841366dc1aa8908e4",
+  "backend": "isolated in-memory SQLite, fixed inputs, tracemalloc enabled",
+  "native_history": {
+    "source_days": 4018,
+    "months": 133,
+    "identical_rows_and_facts": true,
+    "baseline": {
+      "cpu_seconds": 12.76369,
+      "wall_seconds": 12.77468,
+      "peak_mib": 6.37399,
+      "sql": 2131,
+      "checkpoint_page_decodes": 134
+    },
+    "candidate": {
+      "cpu_seconds": 1.84139,
+      "wall_seconds": 1.84182,
+      "peak_mib": 6.04939,
+      "sql": 1734,
+      "checkpoint_page_decodes": 1
+    }
+  },
+  "snapshot_publish": {
+    "existing_snapshots": 2048,
+    "payload_bytes_each": 4096,
+    "baseline": {
+      "cpu_seconds": 0.0825,
+      "wall_seconds": 0.08255,
+      "peak_mib": 17.69507,
+      "sql": 4
+    },
+    "candidate": {
+      "cpu_seconds": 0.0112,
+      "wall_seconds": 0.0112,
+      "peak_mib": 0.02785,
+      "sql": 4
+    }
+  }
+}

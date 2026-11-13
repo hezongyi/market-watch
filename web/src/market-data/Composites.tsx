@@ -165,7 +165,7 @@ export function CompositeList() {
   return (
     <section className="data-center dc-market-page">
       <MarketListHeader
-        title="组合行情"
+        title="自建行情 · 实时接续"
         query={query}
         onQuery={(value) => filter("query", value)}
         refresh={() => setRefresh((value) => value + 1)}
@@ -264,7 +264,7 @@ function CandidateRow({
             aria-busy={opening === d.id || undefined}
             onClick={() => void open(d.id, item.recommended_mapping_id!)}
           >
-            {opening === d.id ? "正在打开…" : "打开组合行情"}
+            {opening === d.id ? "正在打开…" : "打开自建行情 · 实时接续"}
           </button>
         )}
         <Link
@@ -296,7 +296,7 @@ function CandidateRow({
           </p>
           <div className="dc-actions">
             <Link to={centerLink(item.status === "needs_maintenance" ? `/market-data/datasets/${d.id}` : `/market-data/datasets/${d.id}/mapping`, params, id)}>{item.status === "needs_maintenance" ? "去维护" : "配置实时来源"}</Link>
-            {item.status === "ready_to_open" && item.recommended_mapping_id && <button aria-disabled={!!opening || busy} aria-busy={opening === d.id || undefined} onClick={() => void open(d.id, item.recommended_mapping_id!)}>{opening === d.id ? "正在打开…" : "打开组合行情"}</button>}
+            {item.status === "ready_to_open" && item.recommended_mapping_id && <button aria-disabled={!!opening || busy} aria-busy={opening === d.id || undefined} onClick={() => void open(d.id, item.recommended_mapping_id!)}>{opening === d.id ? "正在打开…" : "打开自建行情 · 实时接续"}</button>}
           </div>
         </DetailPanel>
       )}
@@ -335,7 +335,7 @@ function CompositeRow({
       </div>
       {detail.opened && (
         <DetailPanel
-          title={`${row.display_symbol || row.logical_symbol} · 组合行情`}
+          title={`${row.display_symbol || row.logical_symbol} · 自建行情 · 实时接续`}
           close={detail.close}
         >
           <p>
@@ -371,7 +371,7 @@ function CompositeRow({
           <Link
             to={centerLink(`/market-data/composites/${row.id}`, params, id)}
           >
-            管理组合行情
+            管理自建行情 · 实时接续
           </Link>
           </div>
         </DetailPanel>
@@ -405,7 +405,7 @@ export function CompositeDetail() {
   }
   return (
     <section className="data-center">
-      <Link to={centerReturn(params, "/market-data?tab=composite")}>返回组合行情</Link>
+      <Link to={centerReturn(params, "/market-data?tab=composite")}>返回自建行情</Link>
       <Feedback
         error={result.error || error}
         loading={result.loading}
@@ -415,7 +415,8 @@ export function CompositeDetail() {
         <>
           <div className="dc-heading">
             <div>
-              <h1>{row.display_symbol || row.logical_symbol} 组合行情</h1>
+              <h1>{row.display_symbol || row.logical_symbol} · 实时接续</h1>
+              <Link to={`/market-data/datasets/${row.dataset_id}?section=continuation`}>管理所属自建行情</Link>
               <p>
                 {row.source_display || `${names[row.historical_source]} → OANDA Practice`} · {row.price_basis_display || "买价"} ·{" "}
                 {phase(row.calendar)}

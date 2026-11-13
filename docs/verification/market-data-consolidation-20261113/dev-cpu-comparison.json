@@ -1,0 +1,611 @@
+{
+  "before": {
+    "summary": {
+      "host": "quant-server",
+      "at": "2026-11-13T03:13:46.258433+00:00",
+      "seconds": 90.13,
+      "services": {
+        "api": {
+          "cpu_seconds": 0.3981,
+          "single_core_percent": 0.442,
+          "memory_mib": 216.9
+        },
+        "notification-worker": {
+          "cpu_seconds": 0.4169,
+          "single_core_percent": 0.463,
+          "memory_mib": 109.61
+        },
+        "data-worker": {
+          "cpu_seconds": 2.2684,
+          "single_core_percent": 2.521,
+          "memory_mib": 230.3
+        },
+        "market-runtime": {
+          "cpu_seconds": 4.6322,
+          "single_core_percent": 5.147,
+          "memory_mib": 279.36
+        },
+        "web": {
+          "cpu_seconds": 0.0012,
+          "single_core_percent": 0.001,
+          "memory_mib": 6.67
+        },
+        "tls": {
+          "cpu_seconds": 0.0013,
+          "single_core_percent": 0.001,
+          "memory_mib": 6.86
+        },
+        "postgres": {
+          "cpu_seconds": 3.3746,
+          "single_core_percent": 3.75,
+          "memory_mib": 1281.62
+        },
+        "ntfy": {
+          "cpu_seconds": 0.7653,
+          "single_core_percent": 0.85,
+          "memory_mib": 65.97
+        }
+      },
+      "total_single_core_percent": 13.175,
+      "four_core_percent": 3.294,
+      "input_sequence_delta": 0,
+      "clients": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "history_running": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "live": [
+      {
+        "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+        "revision_delta": 194,
+        "revisions_per_second": 2.1524,
+        "connection": "connected",
+        "ready": true,
+        "error": null,
+        "confirmed_end_delta_ms": 120000
+      },
+      {
+        "dataset_id": "48f368cd34ffe7fe6632bd871ee1bf3d4c785a1d411503a3f004cc3a16ffe9fa",
+        "revision_delta": 111,
+        "revisions_per_second": 1.2316,
+        "connection": "connected",
+        "ready": true,
+        "error": null,
+        "confirmed_end_delta_ms": 120000
+      },
+      {
+        "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+        "revision_delta": 53,
+        "revisions_per_second": 0.588,
+        "connection": "connected",
+        "ready": true,
+        "error": null,
+        "confirmed_end_delta_ms": 120000
+      }
+    ],
+    "preparations": [
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "status": "queried",
+        "input_revision_delta": 2,
+        "confirmed_end_delta_ms": 120000,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "status": "queried",
+        "input_revision_delta": 2,
+        "confirmed_end_delta_ms": 120000,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "status": "queried",
+        "input_revision_delta": 2,
+        "confirmed_end_delta_ms": 120000,
+        "error": null
+      }
+    ],
+    "tasks": [
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "D1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "H1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "H4",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M15",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M30",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M5",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "MN",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "W1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "D1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "H1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "H4",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M15",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M30",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M5",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "MN",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "W1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "D1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "H1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "H4",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M1",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M15",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M30",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M5",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "MN",
+        "applied_delta": 2,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "W1",
+        "applied_delta": 2,
+        "error": null
+      }
+    ],
+    "active_alerts": 0,
+    "expired_or_inactive_live_states": 124,
+    "database_delta": {
+      "commits": 3823,
+      "read": 64548,
+      "hit": 125070,
+      "inserted": 150,
+      "updated": 2062,
+      "deleted": 34
+    }
+  },
+  "after": {
+    "summary": {
+      "host": "quant-server",
+      "at": "2026-11-13T03:48:28.756723+00:00",
+      "seconds": 180.12,
+      "services": {
+        "api": {
+          "cpu_seconds": 0.8181,
+          "single_core_percent": 0.454,
+          "memory_mib": 373.9
+        },
+        "market-runtime": {
+          "cpu_seconds": 8.7233,
+          "single_core_percent": 4.846,
+          "memory_mib": 294.75
+        },
+        "data-worker": {
+          "cpu_seconds": 4.7825,
+          "single_core_percent": 2.657,
+          "memory_mib": 272.57
+        },
+        "notification-worker": {
+          "cpu_seconds": 0.8656,
+          "single_core_percent": 0.481,
+          "memory_mib": 114.55
+        },
+        "web": {
+          "cpu_seconds": 0.0024,
+          "single_core_percent": 0.001,
+          "memory_mib": 10.56
+        },
+        "tls": {
+          "cpu_seconds": 0.0027,
+          "single_core_percent": 0.002,
+          "memory_mib": 6.82
+        },
+        "postgres": {
+          "cpu_seconds": 4.9338,
+          "single_core_percent": 2.741,
+          "memory_mib": 1531.36
+        },
+        "ntfy": {
+          "cpu_seconds": 1.5611,
+          "single_core_percent": 0.867,
+          "memory_mib": 66.32
+        }
+      },
+      "total_single_core_percent": 12.049,
+      "four_core_percent": 3.012,
+      "input_sequence_delta": 0,
+      "clients": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "history_running": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ]
+    },
+    "live": [
+      {
+        "dataset_id": "08cb37ede9a86cb9a71c4b8ac870c83d3377e4818229bfeb3fcfe683ee38088a",
+        "revision_delta": 366,
+        "revisions_per_second": 2.032,
+        "connection": "connected",
+        "ready": true,
+        "error": null,
+        "confirmed_end_delta_ms": 180000
+      },
+      {
+        "dataset_id": "48f368cd34ffe7fe6632bd871ee1bf3d4c785a1d411503a3f004cc3a16ffe9fa",
+        "revision_delta": 260,
+        "revisions_per_second": 1.4435,
+        "connection": "connected",
+        "ready": true,
+        "error": null,
+        "confirmed_end_delta_ms": 180000
+      },
+      {
+        "dataset_id": "7fd3d31e7c7c0e43be3df53eb494e5e2c8fc4d0e408f6b213049e6c09e0cf764",
+        "revision_delta": 150,
+        "revisions_per_second": 0.8328,
+        "connection": "connected",
+        "ready": true,
+        "error": null,
+        "confirmed_end_delta_ms": 180000
+      }
+    ],
+    "preparations": [
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "status": "queried",
+        "input_revision_delta": 3,
+        "confirmed_end_delta_ms": 180000,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "status": "queried",
+        "input_revision_delta": 3,
+        "confirmed_end_delta_ms": 180000,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "status": "queried",
+        "input_revision_delta": 3,
+        "confirmed_end_delta_ms": 180000,
+        "error": null
+      }
+    ],
+    "tasks": [
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "D1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "H1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "H4",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M15",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M30",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "M5",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "MN",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+        "timeframe": "W1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "D1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "H1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "H4",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M15",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M30",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "M5",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "MN",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "d87e2bcb-29af-465f-b584-fac497d42875",
+        "timeframe": "W1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "D1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "H1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "H4",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M1",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M15",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M30",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "M5",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "MN",
+        "applied_delta": 3,
+        "error": null
+      },
+      {
+        "revision_id": "fdd44121-2801-4e67-8d70-01c687482822",
+        "timeframe": "W1",
+        "applied_delta": 3,
+        "error": null
+      }
+    ],
+    "active_alerts": 0,
+    "expired_or_inactive_live_states": 124,
+    "database_delta": {
+      "commits": 7483,
+      "read": 2146,
+      "hit": 228330,
+      "inserted": 234,
+      "updated": 4118,
+      "deleted": 49
+    }
+  },
+  "comparison": {
+    "single_core_percentage_point_delta": -1.126,
+    "relative_cpu_change_percent": -8.55,
+    "attribution": "Short, sequential live windows with variable quote arrival; observed change is not a controlled causal whole-service performance result."
+  }
+}

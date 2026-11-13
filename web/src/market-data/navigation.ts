@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { useCenter, useLocation, useNavigate, useSearchParams } from "./router";
 import type { Dataset } from "./types";
+import { centerLocation } from "./location";
 
 /** Preserve the originating center filter/page and a stable row on return. */
 export function centerLink(path: string, params: URLSearchParams, row?: string) {
@@ -14,7 +15,8 @@ export function centerLink(path: string, params: URLSearchParams, row?: string) 
 
 export function centerReturn(params: URLSearchParams, fallback = "/market-data") {
   const value = params.get("return_to") || "";
-  return /^\/market-data(?:\?[^#]*)?(?:#[^?]*)?$/.test(value) ? value : fallback;
+  const safe = value.startsWith("/market-data") ? centerLocation(value) : "/market-data";
+  return safe !== "/market-data" || value === "/market-data" ? safe : fallback;
 }
 
 export function useReturnNavigation() {
@@ -48,7 +50,9 @@ export function useCenterRowRestore(snapshot: unknown) {
     if (restored.current || !snapshot) return;
     const restore = () => {
       if (restored.current) return;
-      const target = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+      const target = location.hash ? document.getElementById(location.hash.slice(1)) ||
+        (/^#composite-[a-f0-9]{64}$/.test(location.hash)
+          ? document.querySelector<HTMLElement>(`[data-composite-ids~="${location.hash.slice(11)}"]`) : null) : null;
       if (location.hash && !target) return;
       restored.current = true;
       if (target) { target.scrollIntoView({block: "center"}); target.focus({preventScroll: true}); }

@@ -14,5 +14,14 @@ assert.equal(centerTab('/market-data?tab=tasks'), 'tasks');
 assert.equal(centerTab('/market-data?tab=invalid-section'), 'managed');
 assert.equal(centerLocation('/market-data?tab=invalid-section'), '/market-data');
 assert.equal(centerLocation('https://other.invalid/market-data?tab=sources'), '/market-data');
-assert.equal(centerTab('/market-data/composites/'+'a'.repeat(64)+'?tab=sources'), 'composite');
+assert.equal(centerTab('/market-data/composites/'+'a'.repeat(64)+'?tab=sources'), 'managed');
 console.log('Data-center source routing, task routing, invalid-tab fallback and URL boundary passed');
+
+assert.equal(centerLocation('/market-data?tab=composite&query=EUR'), '/market-data?tab=managed&query=EUR&view=continuation');
+assert.equal(centerTab('/market-data/datasets/'+'a'.repeat(64)+'/mapping'), 'managed');
+assert.ok(centerLocation('/market-data/datasets/'+'a'.repeat(64)+'?section=continuation').includes('section=continuation'));
+const dataset = 'a'.repeat(64);
+assert.equal(centerLocation(`/market-data/?tab=composite&view=candidates&query=EUR#candidate-${dataset}`),
+  `/market-data?tab=managed&query=EUR#dataset-${dataset}`);
+assert.equal(centerLocation(`/market-data?tab=composite&query=EUR#composite-${dataset}`),
+  `/market-data?tab=managed&query=EUR&view=continuation#composite-${dataset}`);

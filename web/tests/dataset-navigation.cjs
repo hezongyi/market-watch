@@ -3,7 +3,7 @@ const root=path.resolve(__dirname,'../..');
 function moduleFrom(file){const {text}=buildSync({entryPoints:[path.join(root,file)],bundle:true,write:false,platform:'node',format:'cjs',external:['react']}).outputFiles[0];const box={module:{exports:{}},exports:{},require,URL,URLSearchParams,crypto:require('node:crypto').webcrypto};vm.runInNewContext(text,box);return box.module.exports;}
 const {ReturnContexts}=moduleFrom('web/src/market-data/returnContext.ts');
 const {centerLocation,centerPositionKey}=moduleFrom('web/src/market-data/location.ts');
-const {datasetTaskLocation}=moduleFrom('web/src/market-data/navigation.ts');
+const {datasetTaskLocation,centerReturn}=moduleFrom('web/src/market-data/navigation.ts');
 const id='a'.repeat(64),version='11111111-1111-4111-8111-111111111111';
 const store=new ReturnContexts('workspace-A'),other=new ReturnContexts('workspace-B');
 const origin=`/market-data/datasets/${id}?section=coverage&version=${version}&coverage_page=3&return_to=${encodeURIComponent('/market-data?query=EUR&source=dukascopy#dataset-'+id)}`;
@@ -25,3 +25,9 @@ assert.notEqual(centerPositionKey(detail+'?section=coverage&version='+version),c
 assert.notEqual(centerPositionKey(detail+'?section=coverage&coverage_page=1'),centerPositionKey(detail+'?section=coverage&coverage_page=2'));
 assert.notEqual(centerPositionKey(detail+'#dataset-'+id),centerPositionKey(detail));
 console.log('PASS bounded per-window return contexts, workspace isolation, safe paths, preserved detail/list context and authoritative exact task query');
+
+const back=detail+"?section=continuation";
+const next=detail+"/mapping?return_to="+encodeURIComponent(back);
+assert.equal(new URL(centerLocation(next),"https://center.invalid").searchParams.get("return_to"),back);
+assert.equal(centerReturn(new URLSearchParams({return_to:back})),back);
+assert.equal(centerReturn(new URLSearchParams({return_to:"//evil.invalid/market-data"}),"fallback"),"fallback");

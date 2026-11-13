@@ -44,7 +44,7 @@ def test_composite_keeps_both_pinned_sources_even_when_current_account_changes()
     live = {'source': 'oanda', 'environment': 'live', 'provider_symbol': 'EUR_USD', 'basis': 'bid'}
     result = present({'symbol': 'EURUSD', 'name': '欧元 / 美元', 'source': 'composite',
                       'series_kind': 'composite', 'basis': 'bid'}, identity=history, realtime_identity=live)
-    assert result['series_kind_display'] == '组合'
+    assert result['series_kind_display'] == '自建 · 实时接续'
     assert result['source_display'] == '历史：Dukascopy → 实时：OANDA Live'
     assert result['price_basis_display'] == '买价'
     assert result['source'] == 'composite'
@@ -103,7 +103,7 @@ def test_sina_and_tencent_directory_and_resolve_share_names(database, monkeypatc
     futures = metadata(stable_id('SHFE:RB0'))
     assert futures['display_symbol'] == 'RB0'
     assert futures['symbol'] == 'SHFE:RB0'
-    assert futures['presentation_description'] == 'RB0 · 螺纹钢主力连续 · 平台 · 新浪（AKShare） · 原始价格'
+    assert futures['presentation_description'] == 'RB0 · 螺纹钢主力连续 · 原生 · 新浪（AKShare） · 原始价格'
 
 
 def test_managed_manual_instrument_name_is_preserved():

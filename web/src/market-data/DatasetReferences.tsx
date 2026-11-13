@@ -4,7 +4,7 @@ import { NativeUiContext } from "./NativeControls";
 import { useEffect, useRef, useState } from "react";
 import { Link, useActionLock, useMounted, useSearchParams } from "./router";
 import { api, ApiError } from "./api";
-import { Feedback, Pager } from "./Center";
+import { Feedback } from "./Center";
 import { useSnapshot } from "./useSnapshot";
 import { names, phase, time } from "./types";
 
@@ -46,12 +46,6 @@ export function DatasetReferences({
     `/market-data/datasets/${id}/references`,
     refresh,
   );
-  const mappings = useSnapshot<{items: {id: string; current_account: boolean;
-    target_display_symbol?: string; target_identity: {provider_symbol: string; environment: string}; match: {rationale: string}}[]}>(`/market-data/datasets/${id}/mappings`, refresh);
-  const [page, setPage] = useState(1);
-  const composites = useSnapshot<{items: {id: string; calendar: string; active_revision_id: string;
-    historical_source: string; source_display?: string; mapping: {target_display_symbol?: string; target_identity: {provider_symbol: string}}}[]; total: number}>(
-    `/market-data/center/composites?dataset_id=${id}&page=${page}&page_size=25`, refresh);
   const [review, setReview] = useState<ReferenceReport | null>(null),
     [busy, setBusy] = useState(false);
   const [error, setError] = useState(""),
@@ -156,24 +150,8 @@ export function DatasetReferences({
       {current && (
         <>
           <p>暂停维护并归档后，条目从默认列表移除，可在“已归档”列表查看；确认删除后才回收历史价格及周期。来源身份、发布清单和引用记录保留。</p>
-          {deletion && <Link to={`/market-data/datasets/${id}?${referencesParams}`}>查看组合与引用</Link>}
-          {!deletion && <>
-          <p>管理此数据集的实时映射与组合；查看引用不会建立实时需求。</p>
-          <Link to={`/market-data/datasets/${id}/mapping`}>配置与查看实时映射</Link>
-          <Feedback error={mappings.error} loading={mappings.loading} empty={!mappings.data}/>
-          {mappings.data && <DetailDisclosure title={<>已保存映射（{mappings.data.items.length}）</>}>
-            {mappings.data.items.length ? mappings.data.items.map(m => <p key={m.id}>
-              OANDA · {m.target_display_symbol || m.target_identity.provider_symbol} · Bid · {m.target_identity.environment} · {m.current_account ? "当前账户" : "其他账户，需重新配置"}<br/>{m.match.rationale}
-            </p>) : <p>尚未保存实时映射，查看此页不会建立组合。</p>}
-          </DetailDisclosure>}
-          <Feedback error={composites.error} loading={composites.loading} empty={!composites.data}/>
-          {composites.data && <><h3>组合引用（{composites.data.total}）</h3>
-            {composites.data.items.length ? composites.data.items.map(c => <p key={c.id}>
-              <Link to={`/market-data/composites/${c.id}`}>{c.source_display || `${c.historical_source} → OANDA`} {c.mapping.target_display_symbol || c.mapping.target_identity.provider_symbol} · {c.calendar.toUpperCase()} · 查看组合与固定修订</Link>
-            </p>) : <p>尚未建立组合；首次实际使用时准备。</p>}
-            <Pager total={composites.data.total} page={page} size={25} change={setPage}/>
-          </>}
-          </>}
+          {deletion && <Link to={`/market-data/datasets/${id}?${referencesParams}`}>查看引用</Link>}
+          {!deletion && <Link to={`/market-data/datasets/${id}?section=continuation`}>查看实时接续配置与修订</Link>}
           <section aria-label="删除保护引用"><h3>删除保护</h3><p>以下接口返回的引用与任务会阻止删除历史价格，直到依赖按现有业务流程解除。</p>
             {current.items.length ? [...new Set(current.items.map(item=>item.kind))].map(kind=><section key={kind}>
               <h4>{({composite:"组合引用",replay:"回测引用",task:"维护任务",chart_alert:"预警版本引用",strategy:"策略引用",workspace:"工作区引用",signal:"策略事件",derivation:"其他派生版本",demand:"有效使用需求",live:"实时采集"} as Record<string,string>)[kind] || kind}（{current.items.filter(item=>item.kind===kind).length}）</h4>

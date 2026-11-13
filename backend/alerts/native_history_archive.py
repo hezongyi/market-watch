@@ -7,7 +7,10 @@ frame checkpoints never rewrite published input or another worker's results.
 import gzip
 import hashlib
 import json
+import pickle
+import tempfile
 from datetime import UTC, datetime
+from itertools import islice
 
 from sqlalchemy import select
 
@@ -145,39 +148,72 @@ def _rows_from_pages(db, frame):
 
 
 def _merge(db, version, frame):
-    """Merge by month with one bounded source month in memory; old rows survive."""
+    """Decode source pages once; stage bounded groups and merge one month at a time.
+
+    The private temporary stream contains only rows decoded in this call, never
+    externally supplied pickle bytes. Month offsets preserve page/row order, so
+    corrections and even out-of-order checkpoints retain last-write semantics.
+    """
     parent_chunks = list(db.scalars(select(HistoryChunk).where(
         HistoryChunk.version_id == frame.inherited_version_id,
         HistoryChunk.timeframe == frame.timeframe).order_by(HistoryChunk.start))) if frame.inherited_version_id else []
-    months = {datetime.fromtimestamp(chunk.start / 1000, UTC).strftime("%Y-%m") for chunk in parent_chunks}
-    months.update(datetime.fromtimestamp(row["start"] / 1000, UTC).strftime("%Y-%m")
-                  for row in _rows_from_pages(db, frame))
+    def month(at):
+        return datetime.fromtimestamp(at / 1000, UTC).strftime("%Y-%m")
+    parents = {}
+    for chunk in parent_chunks:
+        parents.setdefault(month(chunk.start), []).append(chunk)
     count, first, last, changed = 0, None, None, None
-    for month in sorted(months):
-        rows = {}
-        for chunk in parent_chunks:
-            if datetime.fromtimestamp(chunk.start / 1000, UTC).strftime("%Y-%m") == month:
-                rows.update((row["start"], row) for row in json.loads(raw_chunk(db, chunk)))
-        incoming = [row for row in _rows_from_pages(db, frame)
-                    if datetime.fromtimestamp(row["start"] / 1000, UTC).strftime("%Y-%m") == month]
-        for row in incoming:
-            if row != rows.get(row["start"]):
-                changed = min(changed, row["start"]) if changed is not None else row["start"]
-            rows[row["start"]] = row
-        output = sorted(rows.values(), key=lambda row: row["start"])
-        if not output:
-            continue
-        first = output[0]["start"] if first is None else first
-        last = output[-1]["end"]
-        count += len(output)
-        for offset in range(0, len(output), 4096):
-            part = output[offset:offset + 4096]
-            raw = json.dumps(part, sort_keys=True, separators=(",", ":")).encode()
-            content_id, checksum = store_blob(db, frame.source_id, raw)
-            db.add(HistoryChunk(version_id=version.id, timeframe=frame.timeframe,
-                start=part[0]["start"], end=part[-1]["end"], count=len(part),
-                observed_at=frame.observed_at or 0, checksum=checksum, content_id=content_id,
-                content=b"", result="data", unknown=[]))
+    # One bounded staging file avoids retaining every decoded month or opening
+    # a descriptor for every month of long minute histories.
+    with tempfile.TemporaryFile() as staged:
+        offsets = {}
+        incoming = iter(_rows_from_pages(db, frame))
+        while group := list(islice(incoming, 4096)):
+            grouped = {}
+            for row in group:
+                grouped.setdefault(month(row["start"]), []).append(row)
+            for key, rows in grouped.items():
+                offsets.setdefault(key, []).append(staged.tell())
+                pickle.dump(rows, staged, protocol=pickle.HIGHEST_PROTOCOL)
+        for key in sorted(parents.keys() | offsets.keys()):
+            chunks = parents.get(key, [])
+            rows = {}
+            modified = False
+            if key in offsets:
+                for chunk in chunks:
+                    rows.update((row["start"], row) for row in json.loads(raw_chunk(db, chunk)))
+                for offset in offsets[key]:
+                    staged.seek(offset)
+                    for row in pickle.load(staged):
+                        if row != rows.get(row["start"]):
+                            modified = True
+                            changed = min(changed, row["start"]) if changed is not None else row["start"]
+                        rows[row["start"]] = row
+            if not modified:
+                # Publication below validates every content/source reference.
+                # Unchanged months need neither JSON encoding nor store_blob.
+                for chunk in chunks:
+                    db.add(HistoryChunk(version_id=version.id, timeframe=frame.timeframe,
+                        start=chunk.start, end=chunk.end, count=chunk.count,
+                        observed_at=frame.observed_at or 0, checksum=chunk.checksum,
+                        content_id=chunk.content_id, content=chunk.content,
+                        result=chunk.result, unknown=chunk.unknown))
+                    first = chunk.start if first is None else first
+                    last = chunk.end
+                    count += chunk.count
+                continue
+            output = sorted(rows.values(), key=lambda row: row["start"])
+            first = output[0]["start"] if first is None else first
+            last = output[-1]["end"]
+            count += len(output)
+            for offset in range(0, len(output), 4096):
+                part = output[offset:offset + 4096]
+                raw = json.dumps(part, sort_keys=True, separators=(",", ":")).encode()
+                content_id, checksum = store_blob(db, frame.source_id, raw)
+                db.add(HistoryChunk(version_id=version.id, timeframe=frame.timeframe,
+                    start=part[0]["start"], end=part[-1]["end"], count=len(part),
+                    observed_at=frame.observed_at or 0, checksum=checksum, content_id=content_id,
+                    content=b"", result="data", unknown=[]))
     return {"rows": count, "first": first, "last": last, "changed_from": changed}
 
 

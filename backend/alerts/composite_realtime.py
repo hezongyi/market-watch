@@ -134,7 +134,7 @@ class CurrentBuckets:
         self.limit = limit
         self.builds = self.delta_reads = 0
 
-    def state(self, db, revision, frame, left, right, value, version, segments, *, now=None):
+    def state(self, db, revision, frame, left, right, value, version, segments, *, now=None, prepared=None):
         from sqlalchemy import select
 
         from .composite_inputs import rows
@@ -153,17 +153,18 @@ class CurrentBuckets:
             if revision.seam <= at < lower:
                 state.remove(at)
         if applied < value:
-            changed = list(db.scalars(select(CompositeMinuteInput.start).where(
-                CompositeMinuteInput.revision_id == revision.id,
-                CompositeMinuteInput.input_revision > applied,
-                CompositeMinuteInput.input_revision <= value,
-                CompositeMinuteInput.start >= left, CompositeMinuteInput.start < right).distinct()))
-            for at in changed:
-                confirmed = next(iter(rows(db, revision.id, at, at + 60000,
-                                           input_revision=value, now=now)), None)
-                if confirmed:
-                    state.replace({**confirmed, "segment": "target"})
-            self.delta_reads += len(changed)
+            confirmed = prepared.delta(db, revision.id, applied, value, left, right, now=now) if prepared else None
+            if confirmed is None:
+                changed = list(db.scalars(select(CompositeMinuteInput.start).where(
+                    CompositeMinuteInput.revision_id == revision.id,
+                    CompositeMinuteInput.input_revision > applied,
+                    CompositeMinuteInput.input_revision <= value,
+                    CompositeMinuteInput.start >= left, CompositeMinuteInput.start < right).distinct()))
+                confirmed = list(rows(db, revision.id, min(changed), max(changed) + 60000,
+                    input_revision=value, now=now, starts=changed)) if changed else []
+            for row in confirmed:
+                state.replace({**row, "segment": "target"})
+            self.delta_reads += len(confirmed)
             self.items[key] = (identity, value, state)
         return state
 

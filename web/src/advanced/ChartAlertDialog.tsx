@@ -1099,7 +1099,7 @@ export function ChartAlertDialog({
                         {source.series_kind === "managed"
                           ? "自建系列"
                           : source.series_kind === "composite"
-                            ? "组合行情"
+                            ? "自建行情 · 实时接续"
                             : "平台原生"}{" "}
                         · {source.basis}
                         {!source.price_modes && source.reason ? " · " + source.reason : ""}

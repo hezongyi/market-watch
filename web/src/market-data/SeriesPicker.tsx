@@ -37,7 +37,7 @@ export default function SeriesPicker({ kind, selected, onSelect }: {
   const [source, setSource] = useState(""), [calendar, setCalendar] = useState("");
   const [offsets, setOffsets] = useState([0]), [nextOffset, setNextOffset] = useState<number | null>(null);
   const [pendingPage, setPendingPage] = useState(1), [pendingTotal, setPendingTotal] = useState(0);
-  const title = kind === "history" ? "自建行情" : "组合行情";
+  const title = kind === "history" ? "自建行情" : "自建行情 · 实时接续";
   useEffect(() => {
     const controller = new AbortController();
     setLoading(true); setError("");

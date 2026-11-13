@@ -39,6 +39,12 @@ class UseRequest(BaseModel):
     client: str = Field(min_length=1, max_length=40, pattern=r"^[A-Za-z0-9:_-]+$")
 
 
+class ContinuationRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    enabled: bool = Field(strict=True)
+    mapping_id: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+
+
 def invoke(function, *args, **kwargs):
     try:
         with transaction() as db:
@@ -59,6 +65,18 @@ def router(authenticated):
     routes = APIRouter(prefix="/api/market-data", dependencies=[Depends(authenticated)])
 
     from .composite_revisions import ActivationRequest, RevisionRequest
+
+    @routes.get("/datasets/{dataset_id}/continuation")
+    def continuation(dataset_id: str):
+        from .managed_continuation import report
+
+        return invoke(report, dataset_id)
+
+    @routes.post("/datasets/{dataset_id}/continuation")
+    def configure_continuation(dataset_id: str, body: ContinuationRequest):
+        from .managed_continuation import configure
+
+        return invoke(configure, dataset_id, value=body.enabled, mapping_id=body.mapping_id)
 
     @routes.get("/composites/{composite_id}/revision-options")
     def revision_options(composite_id: str):

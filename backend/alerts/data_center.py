@@ -13,6 +13,7 @@ from .storage import (
     HistoryVersion,
     Instrument,
     MarketDataset,
+    RealtimeMapping,
 )
 
 
@@ -85,14 +86,23 @@ def dataset_detail(db, dataset_id):
         "availability": "available" if ready else "preparing" if maintenance.get("active_version_id") else "needs_maintenance"}
 
 
-def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25):
+def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25,
+                   include_continuations=False):
     if not 1 <= page_size <= 100 or page < 1 or status not in (
             "all", "available", "preparing", "attention", "paused", "archived"):
         raise ValueError("无效的列表范围或状态")
     # Registration also creates provider-only identities and mapping targets.
     # A saved maintenance plan is what makes an identity managed history.
     # Restrict before counting/paging, so directory rows cannot displace it.
-    base = select(MarketDataset.id).join(Instrument).join(DatasetMaintenance)
+    base = select(MarketDataset.id).join(Instrument)
+    if include_continuations:
+        # Legacy fixed histories can own saved continuation mappings without a
+        # newer maintenance plan. Their target/provider-only identities stay out.
+        saved = select(RealtimeMapping.id).where(RealtimeMapping.dataset_id == MarketDataset.id,
+            RealtimeMapping.permission_scope == "workspace:default").exists()
+        base = base.outerjoin(DatasetMaintenance).where(or_(DatasetMaintenance.dataset_id.is_not(None), saved))
+    else:
+        base = base.join(DatasetMaintenance)
     if query:
         # Literal substring search: user wildcards must not expand the query.
         base = base.where(code_search(query, MarketDataset.logical_symbol, Instrument.symbol))
@@ -105,7 +115,7 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
     if status == "archived":
         base = base.where(DatasetMaintenance.archived.is_(True))
     else:
-        base = base.where(DatasetMaintenance.archived.is_(False))
+        base = base.where(DatasetMaintenance.archived.is_not(True))
     usable = select(HistoryVersion.id).join(HistoryArtifact).where(
         HistoryVersion.dataset_id == MarketDataset.id, HistoryVersion.status == "published",
         HistoryArtifact.status == "published", HistoryArtifact.count > 0).exists()
@@ -119,6 +129,12 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
         failure = select(HistoryVersion.id).where(HistoryVersion.id == DatasetMaintenance.active_version_id,
             HistoryVersion.status.in_(("retrying", "configuration_error"))).exists()
         base = base.where(or_(~usable, failure))
+    return base
+
+
+def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25):
+    base = _dataset_query(query=query, source=source, calendar=calendar, asset_class=asset_class,
+        status=status, page=page, page_size=page_size)
     total = db.scalar(select(func.count()).select_from(base.subquery()))
     ids = db.scalars(base.order_by(MarketDataset.logical_symbol, Instrument.source,
         Instrument.calendar, MarketDataset.id).offset((page - 1) * page_size).limit(page_size))

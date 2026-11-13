@@ -1,7 +1,7 @@
 import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { Link } from "./router";
 import { NativeSelect } from "./NativeControls";
-import { OpenChart } from "./OpenChart";
+import { ManagedOpenChart, continuationNames } from "./DatasetContinuation";
 import { centerLink } from "./navigation";
 import { names, phase, time, type Dataset } from "./types";
 import { useSearchParams } from "./router";
@@ -35,9 +35,10 @@ export function ManagedMarket() {
     source,
     asset_class: asset,
     calendar,
+    ...(params.get("view") === "continuation" ? { view: "continuation" } : {}),
   });
   const rows = useMarketRows<Dataset>(
-    "/market-data/center/datasets",
+    "/market-data/center/dataset-summaries",
     filters,
     refresh,
   );
@@ -69,6 +70,7 @@ export function ManagedMarket() {
         items={statuses}
         change={(value) => change("status", value)}
       />
+      {params.get("view") === "continuation" && <p>正在查看已配置实时接续的自建行情。<button onClick={() => change("view", "")}>查看全部自建行情</button></p>}
       <div className="dc-market-table-head">
         <span>品种与来源</span>
         <div className="dc-market-head-filters">
@@ -149,7 +151,7 @@ function ManagedRow({
         : "一次性维护"
     : "未配置维护";
   return (
-    <article className="dc-market-row" id={`dataset-${d.id}`} tabIndex={-1}>
+    <article className="dc-market-row" id={`dataset-${d.id}`} data-composite-ids={d.continuation?.composite_ids?.join(" ")} tabIndex={-1}>
       <div className="dc-market-main">
         <button className="dc-symbol-button" onClick={detail.open}>
           {d.display_symbol || d.logical_symbol}
@@ -158,6 +160,7 @@ function ManagedRow({
           {d.source_display || names[d.identity.source]} · {d.price_basis_display || d.identity.basis} ·{" "}
           {phase(d.aggregation_calendar)}
         </span>
+        {d.continuation && <small>实时接续：{continuationNames[d.continuation.status] || d.continuation.status}</small>}
         <small>
           可用历史：
           {d.available_end
@@ -191,10 +194,10 @@ function ManagedRow({
       </span>
       <div className="dc-market-actions">
         {d.latest_version_id && d.usable_timeframes.length > 0 && (
-          <OpenChart
+          <ManagedOpenChart id={d.id}
             ticker={`MWH:${d.periods.find((p) => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
             frame={d.usable_timeframes[0]}
-            label="打开图表"
+
           />
         )}
         <button onClick={detail.open} aria-expanded={detail.opened}>
@@ -227,9 +230,9 @@ function ManagedRow({
             {d.maintenance.task_error && <p className="error">本次维护：{d.maintenance.task_error}</p>}
           </div>
           <div className="dc-detail-actions" aria-label="行情操作">
-            {d.latest_version_id && d.usable_timeframes.length > 0 && <OpenChart
+            {d.latest_version_id && d.usable_timeframes.length > 0 && <ManagedOpenChart id={d.id}
               ticker={`MWH:${d.periods.find(p => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
-              frame={d.usable_timeframes[0]} label="打开图表" />}
+              frame={d.usable_timeframes[0]} />}
             <Link className="primary" to={centerLink(`/market-data/datasets/${d.id}`, params, `dataset-${d.id}`)}>管理行情</Link>
           </div>
           <div className="dc-detail-lifecycle">

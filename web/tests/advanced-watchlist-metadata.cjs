@@ -28,16 +28,16 @@ for(const file of ['series.js','price-format.js','composite-display-batches.js',
   assert.deepEqual(Array.from(context.rows,r=>r.v.short_name),['EURUSD','BTCUSDT','GBPUSD','AAPL','GBPUSD','EURUSD','EURUSD']);
   assert(context.rows.every(r=>r.v.lp===undefined&&r.v.ch===undefined),'metadata never invents prices');
   assert.deepEqual(Array.from(context.rows,r=>r.n),Array.from(context.tickers),'routing identities are unchanged');
-  assert.equal(context.rows[0].v.description,'EURUSD · 平台',
+  assert.equal(context.rows[0].v.description,'EURUSD · 原生',
     'initial provider description agrees with the actual quote description');
   assert.equal(context.rows[4].v.description,'GBPUSD · 自建',
     'legacy managed metadata must not be mislabeled as a composite');
-  assert.equal(context.rows[2].v.description,'GBPUSD · 平台 · Bid · 来源原生UTC周期');
+  assert.equal(context.rows[2].v.description,'GBPUSD · 原生 · Bid · 来源原生UTC周期');
   assert.equal(context.rows[3].v.description,'Apple Inc. · Yahoo 市场报价 · 延迟 15 分钟',
     'supplier delay remains explicit before the first price');
   vm.runInContext(`
     globalThis.cached=[];globalThis.arriving=[];globalThis.reset=[];globalThis.cancelled=[];
-    const cachedQuote={s:'ok',n:tickers[0],v:{short_name:'EURUSD',description:'EURUSD · 平台',
+    const cachedQuote={s:'ok',n:tickers[0],v:{short_name:'EURUSD',description:'EURUSD · 原生',
       lp:1.12345,read_at:100,market_session:'open',fetch_status:'ok',time_type:'source_m1',
       data_start:100,revision_id:'current'}};
     rememberQuoteRows([cachedQuote]);
@@ -70,7 +70,7 @@ for(const file of ['series.js','price-format.js','composite-display-batches.js',
   vm.runInContext(`
     globalThis.nativeReset=[];globalThis.nativeLatest=[];
     feed.getQuotes([tickers[0]],batch=>nativeLatest.push(...batch),error=>{throw Error(error)});
-    rememberQuoteRows([{s:'ok',n:tickers[0],v:{short_name:'EURUSD',description:'EURUSD · 平台',lp:1.12346,read_at:200}}]);
+    rememberQuoteRows([{s:'ok',n:tickers[0],v:{short_name:'EURUSD',description:'EURUSD · 原生',lp:1.12346,read_at:200}}]);
     feed.getQuotes([tickers[1]],batch=>nativeReset.push(...batch),error=>{throw Error(error)});
     quoteSnapshotRows.delete(tickers[1]);quoteResetTokens.set(tickers[1],{});
   `,context);

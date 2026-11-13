@@ -40,14 +40,24 @@ def live_snapshot(db, revision, *, now=None):
     state = db.get(LiveState, target.id)
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
     stamp = now_ms() if now is None else now
-    realtime_enabled = revision_enabled(db, revision)
+    from .live_confirmation import health, sampling_evidence
+
+    held = bool(owner and owner.error == 'unauthorized' or state and state.error == 'unauthorized')
+    probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if owner and held else None
+    return snapshot_values(target, db.get(Instrument, target.instrument_id), state, owner,
+        stamp=stamp, realtime_enabled=revision_enabled(db, revision),
+        confirmation=health(db, state) if state else {},
+        sampling=sampling_evidence(db, state) if state else {}, probe=probe.value if probe else {})
+
+
+def snapshot_values(target, instrument, state, owner, *, stamp, realtime_enabled, confirmation, sampling, probe):
+    """Pure readiness projection shared by single reads and batched list rows."""
     current = target.identity["account_scope"] == account_scope()
-    session = session_status(target.identity, db.get(Instrument, target.instrument_id).calendar_profile, stamp)
+    session = session_status(target.identity, instrument.calendar_profile, stamp)
     held = bool(current and owner and owner.error == 'unauthorized' or state and state.error == 'unauthorized')
     error = state.error if state else None
     if current and owner and owner.error:
-        probe = db.get(Preference, 'oanda_probe_status:' + owner.id) if held else None
-        error = (probe.value.get('error') if probe else None) or owner.error
+        error = (probe.get('error') if held else None) or owner.error
     available = realtime_enabled and not held and error != 'provider_maintenance' and session['market_session'] != 'closed'
     quote = state.quote if state else {}
     forming = state.forming if state else {}
@@ -68,16 +78,13 @@ def live_snapshot(db, revision, *, now=None):
         and quote.get("connection_epoch") == state.epoch
         and age is not None and 0 <= age <= 15000
         and received_age is not None and 0 <= received_age <= 15000)
-    from .live_confirmation import health, sampling_evidence
-
-    confirmation = health(db, state) if state else {}
     candle_ready = bool(available and owned and state and state.ready and not state.error
         and rest_sample and forming.get("close")
         and received_age is not None and 0 <= received_age <= 15000)
     return {"current_account": current, "owned": owned, "realtime_enabled": realtime_enabled,
         **session, 'authentication_hold': held, 'connection_error': error,
         "confirmation_error": confirmation.get("error"), "confirmation_health": confirmation,
-        "error_evidence": {'sampling': sampling_evidence(db, state) if state else {}, 'confirmation': confirmation.get('evidence', {})},
+        "error_evidence": {'sampling': sampling, 'confirmation': confirmation.get('evidence', {})},
         'next_probe_at': owner.next_at or None if current and owner else None,
         "connection": state.connection if state else "inactive",
         "quote_ready": quote_ready, "candle_ready": candle_ready,

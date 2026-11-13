@@ -112,3 +112,37 @@ def test_symbol_search_includes_sina_and_tencent_from_platform_catalog(database,
     with database() as db:
         assert db.scalar(select(func.count()).select_from(MarketDemand)) == 0
         assert db.scalar(select(func.count()).select_from(ProviderInterest)) == 0
+
+
+def test_directory_revision_is_read_only_and_tracks_names_plans_and_scope(database, monkeypatch):
+    from alerts.catalog_sync import describe
+    from alerts.history_maintenance import configure
+    from alerts.platform_catalog import directory_revision
+    from alerts.storage import DatasetMaintenance
+    from test_market_contracts import identity
+    from test_market_datasets import register
+
+    with database.begin() as db:
+        row = MarketCatalog(id="BINANCE:edit", source="binance", symbol="EDITUSDT", label="Edit",
+            asset_type="CRYPTO", precision=3, calendar="utc0", available=True, updated_at=1000)
+        db.add(row)
+        db.flush()
+        initial = directory_revision(db)
+        assert directory_revision(db) == initial
+        # Same millisecond edits must invalidate the return cache as well.
+        describe(db, row.id, "第一名称")
+        first = directory_revision(db)
+        describe(db, row.id, "第二名称")
+        second = directory_revision(db)
+        assert len({initial, first, second}) == 3
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        planned = directory_revision(db)
+        assert planned != second
+        db.get(DatasetMaintenance, identity().key).updated_at += 1
+        assert directory_revision(db) != planned
+        monkeypatch.setattr(settings, "oanda_account_id", "another-scope")
+        assert directory_revision(db) != planned
+        db.flush()
+        assert not db.dirty and not db.new
+        assert db.scalar(select(func.count()).select_from(MarketDemand)) == 0

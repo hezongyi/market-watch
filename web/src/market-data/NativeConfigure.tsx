@@ -37,7 +37,7 @@ export function NativeConfigure() {
       "/market-data/resolve", { instrument, series_kind: "provider", timeframe: "M1" }, controller.signal,
     ).then(data => {
       if (controller.signal.aborted) return;
-      if (data.source !== "oanda") throw Error("请选择 OANDA 平台行情");
+      if (data.source !== "oanda") throw Error("请选择 OANDA 原生行情");
       setMeta(data); setValues(data.native_parameters);
     }).catch(e => { if (!controller.signal.aborted) setError(String(e)); });
     return () => controller.abort();
@@ -53,9 +53,9 @@ export function NativeConfigure() {
     finally { actionLock.release(); setBusy(false); }
   }
   return <section className="data-center">
-    <Link to={centerReturn(query, "/market-data?tab=platform")}>返回平台行情</Link>
+    <Link to={centerReturn(query, "/market-data?tab=platform")}>返回原生行情</Link>
     <h1>配置原生行情</h1>
-    <p>{meta ? `${meta.name} · ${meta.display_symbol || meta.symbol} · OANDA Practice` : "正在核对平台行情…"}</p>
+    <p>{meta ? `${meta.name} · ${meta.display_symbol || meta.symbol} · OANDA Practice` : "正在核对原生行情…"}</p>
     <p>直接读取 OANDA 返回的各周期原始柱。参数改变会使用独立配置和缓存。</p>
     <form className="dc-form" onSubmit={submit}>
       <fieldset className="dc-native-fields" disabled={!meta || busy}>
@@ -75,7 +75,7 @@ export function NativeConfigure() {
         <label htmlFor="native-week">周对齐</label><NativeSelect id="native-week" value={values.weeklyAlignment} onChange={e => change("weeklyAlignment", e.target.value)}>
           {weekdays.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
         </NativeSelect>
-        <p>这些是原生柱的供应商参数。自建历史与组合行情使用各自保存的聚合规则。</p>
+        <p>这些是原生柱的供应商参数。自建历史与自建行情 · 实时接续使用各自保存的聚合规则。</p>
         <div className="dc-actions"><button type="button" onClick={() => { setValues(defaults); setResult(null); setError(""); }}>恢复默认参数</button>
           <button type="submit" className="primary">{busy ? "保存中…" : "保存原生配置"}</button></div>
       </fieldset>
