@@ -76,6 +76,9 @@ def create_managed(db, body):
         identity = source_identity(raw, "D1" if raw.mode == "base_d1" else selected[0], info)
     else:
         identity = collection_identity(raw)
+    # Repeated creation/configuration and retention use Dataset -> SourceSeries.
+    # A brand new dataset has no readable inputs for retention to protect yet.
+    db.scalar(select(MarketDataset.id).where(MarketDataset.id == raw.key).with_for_update())
     db.execute(_insert(db)(SourceSeries).values(id=identity.key, identity=identity.model_dump())
         .on_conflict_do_nothing(index_elements=["id"]))
     db.scalar(select(SourceSeries).where(SourceSeries.id == identity.key).with_for_update())

@@ -20,6 +20,7 @@ from .storage import (
     ChartPublicationJob,
     ChartPublishedBar,
     ChartWorkspace,
+    CompositePreparation,
     CompositeRevision,
     CompositeWatchBinding,
     DatasetFrameSource,
@@ -80,7 +81,8 @@ def reference_values(row):
     if isinstance(row, FixedIndicatorRun):
         from sqlalchemy import inspect
 
-        return {"history_version_id": row.history_version_id} if not inspect(row).persistent else None
+        return {"history_version_id": row.history_version_id,
+                "composite_revision_id": row.revision_id} if not inspect(row).persistent else None
     if isinstance(row, Watch):
         return {"instrument_id": row.instrument_id, "rule": row.rule}
     if isinstance(row, CompositeWatchBinding):
@@ -140,7 +142,7 @@ def guard_reference_writes(db):
             raise ValueError("共享来源内容已被回收，请重新获取观测")
 
 
-def lock_reference_values(db, document):
+def lock_reference_values(db, document, *, shared=False):
     """Also called explicitly by optimistic SQL workspace updates."""
     values = set(string_values(document))
     if not values:
@@ -152,7 +154,8 @@ def lock_reference_values(db, document):
         if isinstance(value, dict):
             for key, child in value.items():
                 if key in {"version_id", "dataset_version", "parent_version_id", "parent_version",
-                           "derived_from_version", "history_version_id", "dataset_id", "target_dataset_id", "dataset"} and isinstance(child, str):
+                           "derived_from_version", "history_version_id", "dataset_id", "target_dataset_id", "dataset",
+                           "composite_revision_id", "revision_id"} and isinstance(child, str):
                     yield child
                 yield from declared_refs(child)
         elif isinstance(value, (tuple, list)):
@@ -164,8 +167,10 @@ def lock_reference_values(db, document):
     version_ids = {v for v in declared | fixed_ids if re.fullmatch(r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}", v)}
     series_ids = {v for v in values if v.startswith("MD:")}
     series_ids.update(v for v in declared if re.fullmatch(r"[a-f0-9]{64}", v))
+    revision_candidates = declared | {v for v in values if re.fullmatch(
+        r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}", v)}
     revision_ids = set(db.scalars(select(CompositeRevision.id).where(
-        CompositeRevision.id.in_(values)))) if values else set()
+        CompositeRevision.id.in_(revision_candidates)))) if revision_candidates else set()
     if not version_ids and not series_ids and not revision_ids:
         return
     versions = list(db.scalars(select(HistoryVersion).where(HistoryVersion.id.in_(version_ids)))) if version_ids else []
@@ -181,7 +186,13 @@ def lock_reference_values(db, document):
     if not dataset_ids:
         return
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(dataset_ids))
-                    .order_by(MarketDataset.id).with_for_update()))
+                    .order_by(MarketDataset.id).with_for_update(read=shared)))
+    # Recheck after the deletion fence, including Core upsert callers. An old
+    # revision may still exist after its unreferenced live inputs were trimmed.
+    if revision_ids and db.scalar(select(CompositePreparation.revision_id).where(
+            CompositePreparation.revision_id.in_(revision_ids),
+            CompositePreparation.state["live_inputs_trimmed"].as_boolean().is_(True)).limit(1)):
+        raise ValueError("所引用组合修订的实时输入已清理，请选择当前修订")
     if versions and db.scalar(select(HistoryReclamation.version_id).where(
             HistoryReclamation.version_id.in_([v.id for v in versions])).limit(1)):
         raise ValueError("所引用历史版本已回收，请选择仍可用的发布版本")

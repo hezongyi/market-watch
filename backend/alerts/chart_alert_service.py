@@ -23,6 +23,7 @@ from .storage import (
     ChartAlertAction,
     ChartAlertVersion,
     Instrument,
+    MarketDataset,
     Notification,
     Outbox,
     ProviderDataset,
@@ -243,11 +244,47 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
     return alert
 
 
-def locked(db, alert_id, expected_version=None):
-    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update())
-    if alert is None:
+def locked(db, alert_id, expected_version=None, *, config=None, skip_locked=False):
+    """Fence input datasets before the alert, as activation and collectors do.
+
+    Read the immutable binding first, then validate its version after taking
+    the alert lock. A concurrent rebind must not introduce an unlocked dataset.
+    Edits fence both the existing binding and the requested destination.
+    """
+    observed = db.scalar(select(ChartAlert.version).where(ChartAlert.id == alert_id))
+    if observed is None:
+        if skip_locked:
+            return None
         raise LookupError("告警不存在")
-    if expected_version is not None and alert.version != expected_version:
+    identity = db.scalar(select(ChartAlertVersion.market_identity).where(
+        ChartAlertVersion.alert_id == alert_id, ChartAlertVersion.version == observed)) or {}
+    datasets = ({identity[name] for name in ("dataset_id", "target_dataset_id") if identity.get(name)}
+                if identity.get("composite_revision_id") else set())
+    if config and config.series_kind == "composite":
+        from .series_access import composite_definition
+        from .storage import CompositeRevision, HistoryVersion, RealtimeMapping
+
+        dataset_id, mapping_id, _ = composite_definition(db, config.instrument)
+        if config.composite_revision_id:
+            revision = db.get(CompositeRevision, config.composite_revision_id)
+            if revision:
+                dataset_id = db.get(HistoryVersion, revision.history_version_id).dataset_id
+                mapping_id = revision.mapping_id
+        mapping = db.get(RealtimeMapping, mapping_id)
+        datasets.update((dataset_id, mapping.target_dataset_id))
+    rows = list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(datasets))
+        .order_by(MarketDataset.id).with_for_update(skip_locked=skip_locked)))
+    if skip_locked and set(rows) != datasets:
+        return None
+    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id)
+        .with_for_update(skip_locked=skip_locked).execution_options(populate_existing=True))
+    if alert is None:
+        if skip_locked:
+            return None
+        raise LookupError("告警不存在")
+    if alert.version != observed or expected_version is not None and alert.version != expected_version:
+        if skip_locked:
+            return None
         raise Conflict("告警已被更新，请读取当前版本后重试")
     return alert
 
@@ -258,7 +295,7 @@ def execution_history(alert):
 
 
 def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
-    alert = locked(db, alert_id, expected_version)
+    alert = locked(db, alert_id, expected_version, config=config)
     if alert.status == "archived":
         raise ValueError("已删除的告警不能编辑")
     clock = now_ms if at is None else None

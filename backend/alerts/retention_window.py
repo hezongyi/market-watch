@@ -436,6 +436,12 @@ def _delete(db, plan):
     deletable = plan["deletable"]
     touched = plan["touched"]
     counts = _zero_deleted()
+    # A new fixed reader arriving after this commit must not acquire a lease
+    # for input that no longer exists. Identity/manifest rows remain immutable.
+    trimmed = set(touched) | {revision_id for revision_id, _, _, _ in plan["aggregates"]}
+    for prep in db.scalars(select(CompositePreparation).where(
+            CompositePreparation.revision_id.in_(trimmed))):
+        prep.state = {**prep.state, "live_inputs_trimmed": True}
     # A candidate with no references at all (an orphan price revision, or a head
     # row no composite minute ever consumed) has an empty allowlist: its source
     # side still goes, in the same foreign-key order, so such data can be cleared.

@@ -41,7 +41,26 @@ class Deferred(ValueError):
 
 def status(db, composite_id):
     row = db.get(Preference, STATUS_PREFIX + composite_id)
-    return dict(row.value) if row else {"status": "idle"}
+    composite = db.get(MarketComposite, composite_id)
+    active = db.get(CompositeRevision, composite.active_revision_id) if composite else None
+    return window_warning(dict(row.value) if row else {"status": "idle"}, active.seam if active else None)
+
+
+def window_warning(value, seam, *, now=None):
+    """Compute age on reads so an unchanged deferral cannot hide the deadline."""
+    from .live_window import WINDOW_MS
+
+    if seam is None:
+        return value
+    expires = seam + WINDOW_MS
+    remaining = expires - (now_ms() if now is None else now)
+    attention = value.get("status") == "deferred" and remaining <= 3 * 86400000
+    warning = None
+    if attention:
+        warning = ("当前基线已超出30天实时窗口，请处理暂缓原因并更新基线" if remaining <= 0 else
+                   "当前基线将在3天内达到30天实时窗口，请处理暂缓原因并更新基线")
+    return {**value, "window_expires_at": expires, "window_remaining_ms": max(0, remaining),
+            "requires_attention": attention, "warning": warning}
 
 
 def _status(db, composite_id, state, reason=None, **facts):
@@ -75,8 +94,8 @@ def eligible(db, composite):
     return active, selected
 
 
-def successful_version(db, dataset_id):
-    """Latest complete maintenance result; publication alone is insufficient."""
+def successful_versions(db, dataset_id):
+    """Newest-first complete results; callers still check coverage/readability."""
     versions = db.scalars(select(HistoryVersion).join(
         HistoryRun, HistoryRun.version_id == HistoryVersion.id).where(
             HistoryVersion.dataset_id == dataset_id,
@@ -94,52 +113,70 @@ def successful_version(db, dataset_id):
             HistoryArtifact.version_id == version.id))}
         if all(frame in artifacts and artifacts[frame].status == "published"
                and artifacts[frame].count > 0 for frame in requested):
-            return version
-    return None
+            yield version
+
+
+def successful_version(db, dataset_id):
+    return next(successful_versions(db, dataset_id), None)
 
 
 def plan(db, composite_id):
     from .composite_series import period
     from .history_artifacts import chart_page
     from .live_window import require_window
+    from .managed_rollover_coverage import history_coverage
     from .storage import Instrument
 
     composite = db.get(MarketComposite, composite_id)
     active, mapping_id = eligible(db, composite)
-    newest = successful_version(db, composite.dataset_id)
-    if newest is None or newest.id == active.history_version_id:
-        return None
     previous = db.get(HistoryVersion, active.history_version_id)
-    if (newest.end == previous.end and (newest.published_at or 0, newest.id)
-            < (previous.published_at or 0, previous.id)):
-        return None
-    if newest.start > previous.start or newest.end < previous.end:
-        raise Deferred("新历史覆盖范围缩短，保留当前基线")
     dataset = db.get(MarketDataset, composite.dataset_id)
     calendar = db.get(Instrument, dataset.instrument_id).calendar
     if calendar != active.rules.get("aggregation_calendar"):
         raise Deferred("维护日界与当前修订不同")
-    tail = chart_page(db, newest.id, "M1", count=1)["bars"]
-    if not tail:
-        raise Deferred("新历史没有可读的 M1 数据")
-    cutoff = (now_ms() - 5000) // 60000 * 60000
-    seam = period(min(newest.end, tail[-1]["end"], cutoff), "D1", calendar)[0]
-    if seam < active.seam or seam <= newest.start:
-        raise Deferred("新历史尚不能提供不倒退的接续点")
-    require_window(seam, now=now_ms())
-    return {"active_revision_id": active.id, "active_history_version_id": previous.id,
-            "active_seam": active.seam, "version_id": newest.id,
-            "dataset_id": dataset.id, "mapping_id": mapping_id, "seam": seam,
-            "latest_available_version_id": newest.id,
-            "request_id": "managed:" + key([composite.id, active.id, newest.id, mapping_id, seam])}
+    reason = None
+    for newest in successful_versions(db, composite.dataset_id):
+        if newest.id == previous.id:
+            break
+        if (newest.end, newest.published_at or 0, newest.id) <= (
+                previous.end, previous.published_at or 0, previous.id):
+            continue
+        try:
+            if newest.start > previous.start or newest.end < previous.end:
+                raise Deferred("新历史覆盖范围缩短，保留当前基线")
+            tail = chart_page(db, newest.id, "M1", count=1)["bars"]
+            if not tail:
+                raise Deferred("新历史没有可读的 M1 数据")
+            cutoff = (now_ms() - 5000) // 60000 * 60000
+            seam = period(min(newest.end, tail[-1]["end"], cutoff), "D1", calendar)[0]
+            if seam < active.seam or seam <= newest.start:
+                raise Deferred("新历史尚不能提供不倒退的接续点")
+            require_window(seam, now=now_ms())
+            history_coverage(db, active, newest)
+        except ValueError as error:
+            reason = reason or str(error)
+            continue
+        return {"active_revision_id": active.id, "active_history_version_id": previous.id,
+                "active_seam": active.seam, "version_id": newest.id,
+                "dataset_id": dataset.id, "mapping_id": mapping_id, "seam": seam,
+                "latest_available_version_id": newest.id,
+                "request_id": "managed:" + key([composite.id, active.id, newest.id, mapping_id, seam])}
+    if reason:
+        raise Deferred(reason)
+    return None
 
 
-def lock_scope(db, composite):
+def lock_scope(db, composite, candidate=None):
     """Same source datasets -> composite -> preparations order as ingestion."""
     active = db.get(CompositeRevision, composite.active_revision_id)
     mapping = db.get(RealtimeMapping, active.mapping_id)
+    datasets = {composite.dataset_id, mapping.target_dataset_id,
+                db.get(HistoryVersion, active.history_version_id).dataset_id}
+    if candidate:
+        datasets.update((db.get(HistoryVersion, candidate.history_version_id).dataset_id,
+                         db.get(RealtimeMapping, candidate.mapping_id).target_dataset_id))
     list(db.scalars(select(MarketDataset).where(MarketDataset.id.in_(
-        sorted({composite.dataset_id, mapping.target_dataset_id})))
+        sorted(datasets)))
         .order_by(MarketDataset.id).with_for_update()))
     return db.scalar(select(MarketComposite).where(MarketComposite.id == composite.id)
                      .with_for_update().execution_options(populate_existing=True))
@@ -220,6 +257,12 @@ def activation_gate(db, composite, candidate, progress):
     if (frozen(old) or frozen(prep) or max(prep.confirmed_end, candidate.seam) < old.confirmed_end
             or progress["input_revision"] != prep.input_revision):
         raise Deferred("候选正在追赶最新确认分钟")
+    from .managed_rollover_coverage import prove
+
+    try:
+        prove(db, db.get(CompositeRevision, candidate.parent_revision_id), candidate, old, prep)
+    except ValueError as error:
+        raise Deferred(str(error)) from error
     # Geometry/indicator comparison is recomputed for the current alert versions,
     # not trusted from the earlier shadow snapshot.
     blocked = composite_alerts.automatic_blockers(db, composite, candidate, progress)

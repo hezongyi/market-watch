@@ -285,7 +285,8 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
     # dataset reference before acquiring the lease row; permanent composite
     # definitions already retain their own fixed history and mappings.
     with db.no_autoflush:
-        lock_reference_values(db, inst.id)
+        lock_reference_values(db, {"instrument_id": inst.id,
+                                   "composite_revision_id": composite_revision_id})
     stamp = now_ms()
     insert = _insert(db)(MarketDemand).values(id=ident, instrument_id=inst.id,
         composite_revision_id=composite_revision_id, expires=stamp + 120000, updated_at=stamp)

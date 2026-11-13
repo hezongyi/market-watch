@@ -281,9 +281,9 @@ def activate(db, composite_id, revision_id, body):
     candidate = db.get(CompositeRevision, revision_id)
     change = db.get(CompositeRevisionChange, revision_id)
     managed = bool(change and change.manifest.get("managed_rollover") and body.request_id.startswith("auto:"))
-    if managed:
-        from .managed_rollover import lock_scope
-        lock_scope(db, owned(db, composite_id))
+    from .managed_rollover import lock_scope
+
+    lock_scope(db, owned(db, composite_id), candidate)
     composite = owned(db, composite_id, lock=True)
     revision = db.get(CompositeRevision, revision_id)
     if not revision or revision.composite_id != composite.id or not db.get(CompositeRevisionChange, revision.id):

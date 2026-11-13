@@ -1,5 +1,6 @@
 """Daily/source cleanup identity and reference protection, fixture clocks only."""
 
+import pytest
 from alerts import retention_window as window
 from alerts import switch_runs
 from alerts.config import settings
@@ -129,3 +130,35 @@ def test_same_source_multiple_switches_share_one_daily_batch(runtime, monkeypatc
     with runtime() as db:
         assert len(list(db.scalars(select(Preference).where(
             Preference.key.startswith(window.DAILY_PREFIX))))) == 1
+
+
+def aggregate_only_cleanup(factory):
+    """Shared M1 survives, but losing a frozen aggregate fences new readers."""
+    from alerts.fixed_indicators import request
+    from alerts.history_retention import lock_reference_values
+    from alerts.storage import CompositeAggregateBar, CompositeMinute, SourceMinute
+
+    base_graph(factory)
+    with factory.begin() as db:
+        source = db.scalar(select(SourceMinute.revision_id))
+        db.add(CompositeMinute(revision_id="rev-active", start=OLD, source_revision_id=source))
+        db.add(CompositeAggregateBar(revision_id="rev-old", timeframe="M1", start=OLD,
+            input_revision=0, data={"start": OLD, "end": LOWER, "close": "1.1"}))
+    run_id = run(factory)
+    switch_runs.claim_retention(run_id, dry_run=False)
+    totals = {"rows": 0, "bytes": 0, "deleted": window._zero_deleted(), "blob_scan": {}}
+    report = window._apply_chunk(run_id=run_id, lower=LOWER, limit=10, now=NOW,
+        deadline=window.now_ms() + 30000, skip_minutes=(), skip_revisions=(), totals=totals)
+    assert report["deleted"]["market_source_minutes"] == 0
+    assert report["deleted"]["market_composite_aggregate_bars"] == 1
+    with factory.begin() as db:
+        with pytest.raises(ValueError, match="实时输入已清理"):
+            lock_reference_values(db, {"composite_revision_id": "rev-old"})
+        # This is the actual Core INSERT API, including its shared-lock fence.
+        with pytest.raises(ValueError, match="实时输入已清理"):
+            request(db, {"revision_id": "rev-old", "history_version_id": "hist", "timeframe": "M1"},
+                    {"name": "EMA", "params": {"period": 19}})
+
+
+def test_aggregate_only_cleanup_rejects_new_reader_and_indicator(runtime):
+    aggregate_only_cleanup(runtime)

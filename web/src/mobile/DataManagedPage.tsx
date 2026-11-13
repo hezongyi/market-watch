@@ -793,6 +793,9 @@ function ManagedDetails({
                     {live.data.rollover.reason && `：${live.data.rollover.reason}`}
                   </p>
                 )}
+                {live.data?.rollover?.warning && (
+                  <p className="data-caption" role="status">{live.data.rollover.warning}</p>
+                )}
                 {live.data && (
                   <Button
                     variant={live.data.enabled ? "outline" : "secondary"}

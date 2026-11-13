@@ -219,7 +219,9 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
     if now is None:
         clock = clock or now_ms
         now = clock()
-    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update(skip_locked=True))
+    from .chart_alert_service import locked
+
+    alert = locked(db, alert_id, skip_locked=True)
     from .price_alert_settlement import begin, finish, pending, runnable
 
     if not alert or not runnable(alert):
@@ -477,8 +479,9 @@ def step(*, now=None, on_evaluated=None, on_error=None, activity=None):
             with transaction() as db:
                 assert_current(db)
                 business_now = now_ms() if now is None else now
-                row = db.scalar(select(ChartAlert).where(ChartAlert.id == ident)
-                    .with_for_update(skip_locked=True))
+                from .chart_alert_service import locked
+
+                row = locked(db, ident, skip_locked=True)
                 from .price_alert_settlement import runnable
 
                 if row is None or not runnable(row):

@@ -289,7 +289,6 @@ def automatic_blockers(db, composite, target, progress):
     from .chart_alert_service import AlertConfig
     from .price_alert_inputs import is_price_rule
 
-    previous = db.get(CompositeRevision, composite.active_revision_id)
     rules = bound_rules(db, composite.id, lock=True)
     blocked = []
     compared = {item["alert_id"]: item for item in _paused_rules(db, composite.id,
@@ -302,7 +301,11 @@ def automatic_blockers(db, composite, target, progress):
         if is_price_rule(config):
             reason = "固定价格告警“" + alert.name + "”绑定当前基线"
         else:
-            ready, reason = relocatable(db, previous, target, config,
+            bound = db.get(CompositeRevision, current) if current else None
+            if bound is None or bound.composite_id != composite.id:
+                blocked.append({"alert_id": alert.id, "reason": "告警绑定的修订不可用"})
+                continue
+            ready, reason = relocatable(db, bound, target, config,
                 version.market_identity, input_revision=progress["input_revision"])
             shadow = compared.get(alert.id, {})
             if shadow.get("will_pause"):

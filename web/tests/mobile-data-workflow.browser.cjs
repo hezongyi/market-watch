@@ -67,7 +67,8 @@ let logged = false,
   hideExisting = false,
   missingBaseline = false,
   livePrepared = true,
-  defaultOverride = "";
+  defaultOverride = "",
+  rolloverOverride = null;
 let remote = {
   kind: "setting",
   name: "mw.watchlists.v1",
@@ -176,6 +177,7 @@ function continuation(id) {
             ? "请先配置并核对实时来源"
             : null,
     enabled,
+    rollover: rolloverOverride,
     ready_to_enable: !!d?.periods.length && maps.length > 0 && !missingBaseline,
     default_mapping_id:
       (id === eid ? defaultOverride : "") || maps[0]?.id || null,
@@ -1163,6 +1165,19 @@ const server = http.createServer(async (req, res) => {
     proof.checks.push(
       "invalid default among multiple mappings requires explicit selection and reuses the selected mapping",
     );
+    rolloverOverride = {
+      status: "deferred",
+      reason: "固定价格告警仍绑定旧基线",
+      requires_attention: true,
+      warning: "接续点即将超出实时保留窗口，请处理阻止基线轮换的规则",
+      window_remaining_ms: 86400000,
+    };
+    await details();
+    await expect(dialog("自建行情").getByText(rolloverOverride.warning, { exact: true })).toBeVisible();
+    await shot("18b-rollover-window-warning");
+    await close("自建行情");
+    rolloverOverride = null;
+    proof.checks.push("deferred baseline rotation shows actionable retention-window warning in managed details");
     // Archiving is reversible and does not turn off real-time or erase history.
     await details();
     await more();

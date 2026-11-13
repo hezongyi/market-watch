@@ -321,7 +321,9 @@ def require_executable_source(config):
 
 
 def action(db, alert_id: str, body: Action):
-    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update())
+    from .chart_alert_service import locked
+
+    alert = locked(db, alert_id)
     if alert:
         config = AlertConfig.model_validate(current_version(db, alert).config)
         if config.series_kind != "composite" and body.action not in ("pause", "archive"):

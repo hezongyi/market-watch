@@ -1,0 +1,360 @@
+{
+  "fixture_clock": 1800000000000,
+  "host_clock_unchanged": true,
+  "database": "task-owned rollover_test/public",
+  "restore": {
+    "sha256": "1ec305b928c59eb4003cfa29339aecd76a2000c021d7ccaf605a9ba6f59ee3a5",
+    "verified_at": 1794595417929,
+    "tables": 105,
+    "backend": "postgresql",
+    "bytes": 242788,
+    "schema": {
+      "tables": 105,
+      "digest": "dff157a90e6aba287bf83659100385a995b5b8b4175a912e562b640d1d084603",
+      "alembic": null
+    }
+  },
+  "before": {
+    "minutes": 5,
+    "revisions": 5,
+    "composite_minutes": 5,
+    "composite_inputs": 5,
+    "events": 5
+  },
+  "dry_run": {
+    "unlocked": true,
+    "reason": null,
+    "runs": [
+      {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "batch_key": "retention:daily:20833:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:dry_run"
+      }
+    ],
+    "report": {
+      "run": {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "kind": "weekly",
+        "composite_id": "comp",
+        "state": "succeeded",
+        "unlocked": true,
+        "finished_at": 1794595414801,
+        "batch": {}
+      },
+      "dry_run": true,
+      "window_hours": 720,
+      "lower_bound": 1797408000000,
+      "now": 1800000000000,
+      "deleted": {
+        "market_composite_minute_inputs": 0,
+        "market_composite_minutes": 0,
+        "market_composite_input_events": 0,
+        "market_source_minutes": 0,
+        "market_source_minute_revisions": 0,
+        "market_source_fetches": 0,
+        "market_source_blobs": 0,
+        "market_composite_aggregate_bars": 0
+      },
+      "rows": 15,
+      "bytes": 1185,
+      "candidates": {
+        "source_minutes": 3,
+        "source_revisions": 3,
+        "composite_minutes": 3,
+        "composite_inputs": 3,
+        "composite_input_events": 3,
+        "source_fetches": 0,
+        "source_blobs": 0,
+        "aggregate_bars": 0
+      },
+      "protected": {
+        "revisions": 0,
+        "by_reason": {},
+        "detail": [],
+        "detail_truncated": false
+      },
+      "remaining": null,
+      "batch": {
+        "id": "3601bb90-69c8-4cb1-a10f-b6b585517622",
+        "state": "running",
+        "dry_run": true,
+        "attempts": 1,
+        "stats": {}
+      },
+      "skipped": [],
+      "limit": 20000,
+      "chunk": 1000,
+      "budget_ms": 20000,
+      "batch_key": "retention:daily:20833:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:dry_run",
+      "source_ids": [
+        "e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9"
+      ],
+      "payload_bytes": 57,
+      "deletable_revisions": 3
+    }
+  },
+  "missing_restore_gate": {
+    "unlocked": true,
+    "reason": null,
+    "runs": [
+      {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "batch_key": "retention:daily:20833:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:execute"
+      }
+    ],
+    "report": {
+      "run": {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "kind": "weekly",
+        "composite_id": "comp",
+        "state": "succeeded",
+        "unlocked": true,
+        "finished_at": 1794595414801,
+        "batch": {}
+      },
+      "dry_run": false,
+      "window_hours": 720,
+      "lower_bound": 1797408000000,
+      "now": 1800000000000,
+      "deleted": {
+        "market_composite_minute_inputs": 0,
+        "market_composite_minutes": 0,
+        "market_composite_input_events": 0,
+        "market_source_minutes": 0,
+        "market_source_minute_revisions": 0,
+        "market_source_fetches": 0,
+        "market_source_blobs": 0,
+        "market_composite_aggregate_bars": 0
+      },
+      "rows": 0,
+      "bytes": 0,
+      "candidates": {
+        "source_minutes": 0,
+        "source_revisions": 0,
+        "composite_minutes": 0,
+        "composite_inputs": 0,
+        "composite_input_events": 0,
+        "source_fetches": 0,
+        "source_blobs": 0,
+        "aggregate_bars": 0
+      },
+      "protected": {
+        "revisions": 0,
+        "by_reason": {},
+        "detail": [],
+        "detail_truncated": false
+      },
+      "remaining": null,
+      "batch": null,
+      "skipped": [
+        {
+          "reason": "restore_drill_missing",
+          "detail": "\u9996\u6b21\u771f\u5b9e\u5220\u9664\u524d\u5fc5\u987b\u5148\u6267\u884c\u4e00\u6b21\u5907\u4efd\u7684\u5b9e\u9645\u6062\u590d\u6821\u9a8c"
+        }
+      ],
+      "limit": 20000,
+      "chunk": 1000,
+      "budget_ms": 20000,
+      "batch_key": "retention:daily:20833:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:execute",
+      "source_ids": [
+        "e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9"
+      ]
+    }
+  },
+  "resumed": {
+    "unlocked": true,
+    "reason": null,
+    "runs": [
+      {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "batch_key": "retention:daily:20833:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:execute"
+      }
+    ],
+    "report": {
+      "run": {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "kind": "weekly",
+        "composite_id": "comp",
+        "state": "succeeded",
+        "unlocked": true,
+        "finished_at": 1794595414801,
+        "batch": {}
+      },
+      "dry_run": false,
+      "window_hours": 720,
+      "lower_bound": 1797408000000,
+      "now": 1800000000000,
+      "deleted": {
+        "market_composite_minute_inputs": 2,
+        "market_composite_minutes": 2,
+        "market_composite_input_events": 2,
+        "market_source_minutes": 2,
+        "market_source_minute_revisions": 2,
+        "market_source_fetches": 0,
+        "market_source_blobs": 0,
+        "market_composite_aggregate_bars": 0
+      },
+      "rows": 10,
+      "bytes": 790,
+      "candidates": {
+        "source_minutes": 2,
+        "source_revisions": 2,
+        "composite_minutes": 2,
+        "composite_inputs": 2,
+        "composite_input_events": 2,
+        "source_fetches": 0,
+        "source_blobs": 0,
+        "aggregate_bars": 0
+      },
+      "protected": {
+        "revisions": 0,
+        "by_reason": {},
+        "detail": [],
+        "detail_truncated": false
+      },
+      "remaining": {
+        "source_minutes": 0,
+        "source_revisions": 0
+      },
+      "batch": {
+        "id": "8c78b652-ce11-4302-8ab9-541e9c26a554",
+        "state": "completed",
+        "dry_run": false,
+        "attempts": 3,
+        "stats": {
+          "rows": 15,
+          "bytes": 1185,
+          "deleted": {
+            "market_composite_minute_inputs": 3,
+            "market_composite_minutes": 3,
+            "market_composite_input_events": 3,
+            "market_source_minutes": 3,
+            "market_source_minute_revisions": 3,
+            "market_source_fetches": 0,
+            "market_source_blobs": 0,
+            "market_composite_aggregate_bars": 0
+          },
+          "blob_scan": {
+            "cursor": null,
+            "scanned": 0,
+            "complete": true
+          },
+          "remaining": {
+            "source_minutes": 0,
+            "source_revisions": 0
+          },
+          "at": 1794595418341
+        }
+      },
+      "skipped": [],
+      "limit": 20000,
+      "chunk": 1,
+      "budget_ms": 20000,
+      "batch_key": "retention:daily:20833:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:execute",
+      "source_ids": [
+        "e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9"
+      ]
+    }
+  },
+  "next_day": {
+    "unlocked": true,
+    "reason": null,
+    "runs": [
+      {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "batch_key": "retention:daily:20834:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:execute"
+      }
+    ],
+    "report": {
+      "run": {
+        "id": "03133fb1-2914-4d50-91dd-c6680fba75ae",
+        "kind": "weekly",
+        "composite_id": "comp",
+        "state": "succeeded",
+        "unlocked": true,
+        "finished_at": 1794595414801,
+        "batch": {}
+      },
+      "dry_run": false,
+      "window_hours": 720,
+      "lower_bound": 1797494400000,
+      "now": 1800086400000,
+      "deleted": {
+        "market_composite_minute_inputs": 2,
+        "market_composite_minutes": 2,
+        "market_composite_input_events": 2,
+        "market_source_minutes": 2,
+        "market_source_minute_revisions": 2,
+        "market_source_fetches": 0,
+        "market_source_blobs": 0,
+        "market_composite_aggregate_bars": 0
+      },
+      "rows": 10,
+      "bytes": 790,
+      "candidates": {
+        "source_minutes": 2,
+        "source_revisions": 2,
+        "composite_minutes": 2,
+        "composite_inputs": 2,
+        "composite_input_events": 2,
+        "source_fetches": 0,
+        "source_blobs": 0,
+        "aggregate_bars": 0
+      },
+      "protected": {
+        "revisions": 0,
+        "by_reason": {},
+        "detail": [],
+        "detail_truncated": false
+      },
+      "remaining": {
+        "source_minutes": 0,
+        "source_revisions": 0
+      },
+      "batch": {
+        "id": "ce2771db-a705-44f6-9002-24ac48fa3ea3",
+        "state": "completed",
+        "dry_run": false,
+        "attempts": 3,
+        "stats": {
+          "rows": 10,
+          "bytes": 790,
+          "deleted": {
+            "market_composite_minute_inputs": 2,
+            "market_composite_minutes": 2,
+            "market_composite_input_events": 2,
+            "market_source_minutes": 2,
+            "market_source_minute_revisions": 2,
+            "market_source_fetches": 0,
+            "market_source_blobs": 0,
+            "market_composite_aggregate_bars": 0
+          },
+          "blob_scan": {
+            "cursor": null,
+            "scanned": 0,
+            "complete": true
+          },
+          "remaining": {
+            "source_minutes": 0,
+            "source_revisions": 0
+          },
+          "at": 1794595418561
+        }
+      },
+      "skipped": [],
+      "limit": 20000,
+      "chunk": 1,
+      "budget_ms": 20000,
+      "batch_key": "retention:daily:20834:e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9:execute",
+      "source_ids": [
+        "e0cadedf6788d04e9f8ac75ae9ffa22c2fa6d497b6779eba05c8c23cf5ff5ba9"
+      ]
+    }
+  },
+  "after": {
+    "minutes": 0,
+    "revisions": 0,
+    "composite_minutes": 0,
+    "composite_inputs": 0,
+    "events": 0
+  }
+}

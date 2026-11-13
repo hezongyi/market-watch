@@ -101,7 +101,10 @@ def summaries(db, datasets, switches):
             continue
         _, revision, prep, _, source_inst = current
         row["baseline_seam"] = revision.seam
-        row["rollover"] = preferences.get("managed_rollover:" + ident, {"status": "idle"})
+        from .managed_rollover import window_warning
+
+        row["rollover"] = window_warning(preferences.get("managed_rollover:" + ident, {"status": "idle"}),
+                                         revision.seam, now=stamp)
         active = preferences.get("managed_realtime:" + source_inst.id, {}).get("enabled", False)
         # Baseline activation can move the active revision to another mapping.
         # Read that revision's exact target rather than the originally saved one.
