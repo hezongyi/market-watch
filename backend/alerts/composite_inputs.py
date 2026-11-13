@@ -137,7 +137,7 @@ def apply_minutes(db, recorded, *, revision_id=None, reason="live_confirmation")
     return output
 
 
-def rows(db, revision_id, start, end, *, input_revision=None, now=None):
+def rows(db, revision_id, start, end, *, input_revision=None, now=None, metadata=None, starts=None):
     """Bounded immutable input reconstruction, indexed by revision/minute/version."""
     prep = db.get(CompositePreparation, revision_id)
     if not prep:
@@ -150,14 +150,21 @@ def rows(db, revision_id, start, end, *, input_revision=None, now=None):
     start = max(start, lower_bound(now))
     if start >= end:
         return
-    revision = db.get(CompositeRevision, revision_id)
-    mapping = db.get(RealtimeMapping, revision.mapping_id)
-    dataset = db.get(MarketDataset, mapping.target_dataset_id)
-    instrument = db.get(Instrument, dataset.instrument_id)
+    if metadata is not None:
+        _, revision, _, mapping, dataset, instrument = metadata
+        if revision.id != revision_id:
+            raise ValueError("Composite input metadata mismatch")
+    else:
+        revision = db.get(CompositeRevision, revision_id)
+        mapping = db.get(RealtimeMapping, revision.mapping_id)
+        dataset = db.get(MarketDataset, mapping.target_dataset_id)
+        instrument = db.get(Instrument, dataset.instrument_id)
     latest = select(CompositeMinuteInput.start, func.max(CompositeMinuteInput.input_revision).label("latest")).where(
         CompositeMinuteInput.revision_id == revision_id, CompositeMinuteInput.start >= start,
         CompositeMinuteInput.start < end, CompositeMinuteInput.input_revision <= value
     ).group_by(CompositeMinuteInput.start).subquery()
+    if starts is not None:
+        latest = select(latest).where(latest.c.start.in_(starts)).subquery()
     query = select(SourceMinuteRevision).join(CompositeMinuteInput,
         CompositeMinuteInput.source_revision_id == SourceMinuteRevision.id).join(latest, and_(
             CompositeMinuteInput.start == latest.c.start, CompositeMinuteInput.input_revision == latest.c.latest)

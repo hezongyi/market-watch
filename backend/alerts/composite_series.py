@@ -108,13 +108,19 @@ def aggregate(minutes, frame, *, phase, seam, segments, revision_id, input_revis
 
 
 def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_revision=None,
-                provisional=False, now=None, permission_scope="workspace:default", realtime=None, display_snapshot=None):
+                provisional=False, now=None, permission_scope="workspace:default", realtime=None, display_snapshot=None, prepared=None):
     """Read a bounded minute partition; outer pagination/materialization owns long history."""
     stamp = now_ms() if now is None else now
-    composite = db.get(MarketComposite, composite_id)
+    if prepared is not None:
+        if prepared.key != (composite_id, revision_id, input_revision, permission_scope):
+            raise ValueError("Composite aggregate batch identity mismatch")
+        composite, revision, version, mapping, target, target_inst = prepared.context(db)
+    else:
+        composite = db.get(MarketComposite, composite_id)
     if not composite or composite.permission_scope != permission_scope:
         raise ValueError("Composite unavailable in this permission scope")
-    revision = db.get(CompositeRevision, revision_id or composite.active_revision_id)
+    if prepared is None:
+        revision = db.get(CompositeRevision, revision_id or composite.active_revision_id)
     if not revision or revision.composite_id != composite.id:
         raise ValueError("Composite revision does not belong to this definition")
     # A week/month containing the Unix epoch may have a negative bucket start;
@@ -123,10 +129,11 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
         raise ValueError("Use a bounded UTC minute partition of at most 32 days")
     if provisional and input_revision is not None:
         raise ValueError("Fixed confirmed input cannot include mutable stream observations")
-    version = db.get(HistoryVersion, revision.history_version_id)
-    mapping = db.get(RealtimeMapping, revision.mapping_id)
-    target = db.get(MarketDataset, mapping.target_dataset_id)
-    target_inst = db.get(Instrument, target.instrument_id)
+    if prepared is None:
+        version = db.get(HistoryVersion, revision.history_version_id)
+        mapping = db.get(RealtimeMapping, revision.mapping_id)
+        target = db.get(MarketDataset, mapping.target_dataset_id)
+        target_inst = db.get(Instrument, target.instrument_id)
     prep = db.get(CompositePreparation, revision.id)
     value = display_snapshot.input_revision if display_snapshot else prep.input_revision if input_revision is None else input_revision
     if not 0 <= value <= prep.input_revision:
@@ -148,7 +155,7 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
     # Only the shared worker supplies this cache. Public historical reads keep
     # their fixed-input behavior and never depend on mutable worker state.
     state = realtime.state(db, revision, frame, left, right, value, version, segments,
-                           now=stamp) if realtime else None
+                           now=stamp, prepared=prepared) if realtime else None
     minutes = []
     history_left, history_right = max(left, version.start), min(right, revision.seam, version.end)
     if state is None and history_left < history_right:
@@ -159,8 +166,9 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
 
     tail_left = max(left, revision.seam, lower_bound(stamp))
     if state is None and tail_left < right:
-        minutes.extend({**row, "segment": "target"} for row in tail_rows(db, revision.id, tail_left, right,
-                                                                         input_revision=value, now=stamp))
+        confirmed = prepared.minutes(db, revision.id, tail_left, right, input_revision=value, now=stamp) if prepared else tail_rows(
+            db, revision.id, tail_left, right, input_revision=value, now=stamp)
+        minutes.extend({**row, "segment": "target"} for row in confirmed)
     if realtime and state is None:
         state = realtime.initialize(revision, frame, left, version, segments, value, minutes)
     if state:
