@@ -1,0 +1,33 @@
+{
+  "host": "quant-server",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "123f54774cdde0f4",
+  "checks": [
+    "successful login",
+    "actual provider bars rendered",
+    "supported period menu and back",
+    "themed actions Drawer",
+    "provider alert disabled",
+    "native chart settings and cancel",
+    "symbol search and back",
+    "app light theme",
+    "375/412 and 21px font",
+    "navigation keeps one widget",
+    "no persistent business writes"
+  ],
+  "errors": [],
+  "writes": [],
+  "history": [
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 2000
+    },
+    {
+      "status": 200
+    }
+  ],
+  "androidAcceptancePending": true
+}

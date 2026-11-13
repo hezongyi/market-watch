@@ -1,0 +1,301 @@
+/* Login uses the same semantic theme and controls as the signed-in mobile UI. */
+.mobile-login.mobile-controls {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 460px;
+  min-height: calc(100dvh - env(safe-area-inset-top));
+  margin: 0 auto;
+  padding: clamp(48px, 13dvh, 112px) 24px max(24px, env(safe-area-inset-bottom));
+  gap: 40px;
+}
+.mobile-login .login-content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  width: 100%;
+}
+.mobile-login .login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 24px;
+  margin-bottom: 10px;
+}
+.mobile-login .login-brand-mark {
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  padding: 10px;
+  background: white;
+  border: 1px solid var(--quiet-line);
+  border-radius: 19px;
+  box-shadow: 0 4px 16px #00000008;
+}
+.mobile-login .login-brand-mark img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.mobile-login .login-brand h1 {
+  margin: 0;
+  font-size: 1.857143rem;
+  line-height: 1.4;
+  font-weight: 650;
+  letter-spacing: -0.035em;
+}
+.mobile-login .login-brand p {
+  margin: 8px 0 0;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+.mobile-login .login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.mobile-login [data-slot="field"] {
+  gap: 10px;
+}
+.mobile-login [data-slot="field-label"] {
+  font-size: 0.928571rem;
+  font-weight: 550;
+  line-height: 1.5;
+  color: var(--text);
+}
+.mobile-login .login-password {
+  display: flex;
+  align-items: center;
+  height: auto;
+  min-height: 54px;
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+}
+.mobile-login .login-password [data-slot="input-group-control"] {
+  flex: 1;
+  min-width: 0;
+  min-height: 52px;
+  height: auto;
+  padding: 12px 6px;
+  font-size: 1.142857rem;
+  line-height: 1.5;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  outline: 0;
+  box-shadow: none;
+}
+.mobile-login .login-password [data-slot="input-group-control"]::placeholder {
+  color: var(--muted);
+  opacity: 0.7;
+}
+.mobile-login .login-password [data-slot="input-group-addon"] {
+  color: var(--muted);
+  margin: 0;
+  padding: 0 0 0 14px;
+}
+.mobile-login .login-password [data-align="inline-end"] {
+  padding: 0 4px 0 0;
+}
+.mobile-login .login-password [data-slot="input-group-addon"] > svg {
+  width: 18px;
+  height: 18px;
+}
+.mobile-login .login-password button[data-slot="button"] {
+  min-height: 44px;
+  height: 44px;
+  width: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+}
+.mobile-login .login-password button[data-slot="button"] > svg {
+  width: 18px;
+  height: 18px;
+  flex: none;
+}
+.mobile-login .login-password:focus-within {
+  border-color: var(--accent);
+}
+.mobile-login .login-password:has([aria-invalid="true"]) {
+  border-color: var(--down);
+}
+.mobile-login [data-slot="field-error"] {
+  font-size: 0.928571rem;
+  line-height: 1.65;
+  color: var(--down);
+}
+.mobile-login button.login-submit {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 52px;
+  height: auto;
+  padding: 13px 18px;
+  background: var(--button);
+  color: white;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-size: 1.071429rem;
+  line-height: 1.5;
+  font-weight: 600;
+  box-shadow: none;
+}
+.mobile-login .login-submit svg {
+  width: 18px;
+  height: 18px;
+}
+.mobile-login .login-server {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 6px;
+  padding: 16px 0 0;
+  border-top: 1px solid var(--quiet-line);
+}
+.mobile-login .login-server-icon {
+  color: var(--muted);
+  flex: none;
+}
+.mobile-login .login-server-icon svg {
+  width: 18px;
+  height: 18px;
+}
+.mobile-login .login-server > div {
+  min-width: 0;
+}
+.mobile-login .login-server > div > span {
+  color: var(--muted);
+  font-size: 0.785714rem;
+  line-height: 1.5;
+}
+.mobile-login .login-server p {
+  margin: 4px 0 0;
+  color: var(--text);
+  font-size: 0.857143rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.mobile-login .login-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: -12px -10px 0;
+}
+.mobile-login .login-actions button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 44px;
+  height: auto;
+  padding: 10px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.6;
+  white-space: normal;
+}
+.mobile-login .login-actions svg {
+  width: 14px;
+  height: 14px;
+}
+.mobile-login .login-footer {
+  margin-top: auto;
+  color: var(--muted);
+  opacity: 0.75;
+  text-align: center;
+  font-size: 0.785714rem;
+  line-height: 1.6;
+  letter-spacing: 0.15em;
+}
+.mobile-login .login-feedback {
+  padding: 14px;
+  border-color: var(--quiet-line);
+  border-radius: 12px;
+  gap: 6px 10px;
+}
+.mobile-login .login-feedback [data-slot="alert-title"] {
+  font-size: 0.928571rem;
+  line-height: 1.5;
+}
+.mobile-login .login-feedback [data-slot="alert-description"] {
+  font-size: 0.857143rem;
+  line-height: 1.65;
+}
+.mobile-login .login-server-help p {
+  margin: 0 0 16px;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.8;
+}
+.mobile-login .login-server-help > button {
+  width: 100%;
+  min-height: 48px;
+  background: var(--button);
+  color: white;
+  border-radius: 10px;
+}
+@media (max-height: 640px) {
+  .mobile-login.mobile-controls {
+    padding-top: 24px;
+    gap: 24px;
+  }
+  .mobile-login .login-brand {
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+    margin: 0;
+  }
+  .mobile-login .login-brand-mark {
+    width: 48px;
+    height: 48px;
+    border-radius: 14px;
+    padding: 8px;
+    flex: none;
+  }
+  .mobile-login .login-brand h1 {
+    font-size: 1.571429rem;
+  }
+  .mobile-login .login-brand p {
+    margin-top: 4px;
+    font-size: 0.857143rem;
+  }
+  .mobile-login .login-content {
+    gap: 20px;
+  }
+  .mobile-login .login-footer {
+    margin-top: 0;
+  }
+}
+
+.mobile-login .login-content {
+  animation: login-enter 220ms ease-out;
+}
+@keyframes login-enter {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-login .login-content,
+  .mobile-login [data-slot="spinner"] {
+    animation: none;
+  }
+}

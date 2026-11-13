@@ -160,7 +160,7 @@ def logout(request: Request, response: Response):
 
 class PasswordChange(BaseModel):
     current_password: str = Field(min_length=1, max_length=512)
-    new_password: str = Field(min_length=6, max_length=512)
+    new_password: str = Field(min_length=4, max_length=512)
 
 
 @app.post("/api/account/password", dependencies=[Depends(authenticated)])
@@ -852,6 +852,10 @@ app.include_router(advanced_router(authenticated))
 from .market_data import router as market_data_router  # noqa: E402
 
 app.include_router(market_data_router(authenticated))
+
+from .sparkline_api import router as sparkline_router  # noqa: E402
+
+app.include_router(sparkline_router(authenticated))
 
 from .history_api import router as history_router  # noqa: E402
 

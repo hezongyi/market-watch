@@ -1,0 +1,105 @@
+{
+  "evidence": "API fixture with actual licensed widget; browser only",
+  "checks": [
+    "native floating-toolbar touch chunks load over HTTP; real Hammer Manager starts and destroys",
+    "native header replaces outer toolbar; period menu only supported intervals; native star adds direct shortcut; Android back closes period popup; one-tap M1/M5",
+    "native touch creates horizontal line from starred floating shortcut; geometry edits + drawing properties; local reload retains geometry and favorite; native toolbar deletes; native edge and Header share expanded state; reload starts collapsed",
+    "pen Header entry + active highlight; no top gear; native scale menu has no unsupported alert and opens full settings; indicators and parameter discard preserved",
+    "shared discard confirmation; >5 seconds user decision; continue/back preserves input; discard restores applied study",
+    "native symbol search accessible from chart legend; source changes retained by parent; real pending history indicator; favorites add/remove survive reload in mobile local IDB",
+    "saved provider viewport + failed first history: no infinite cover; readable failure; pending retry disabled; real data retry clears failure on same widget; period switch works",
+    "normal pending autosave is silent; study settings restored on reload; actual local write failure is reported; flush retries and persists after storage recovery"
+  ],
+  "layouts": [
+    {
+      "mode": "dark",
+      "width": 375,
+      "font": 14,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 748
+      }
+    },
+    {
+      "mode": "dark",
+      "width": 375,
+      "font": 21,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 748
+      }
+    },
+    {
+      "mode": "dark",
+      "width": 412,
+      "font": 14,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 851
+      }
+    },
+    {
+      "mode": "dark",
+      "width": 412,
+      "font": 21,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 851
+      }
+    },
+    {
+      "mode": "light",
+      "width": 375,
+      "font": 14,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 748
+      }
+    },
+    {
+      "mode": "light",
+      "width": 375,
+      "font": 21,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 375,
+        "height": 748
+      }
+    },
+    {
+      "mode": "light",
+      "width": 412,
+      "font": 14,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 851
+      }
+    },
+    {
+      "mode": "light",
+      "width": 412,
+      "font": 21,
+      "canvas": {
+        "x": 0,
+        "y": 0,
+        "width": 412,
+        "height": 851
+      }
+    }
+  ],
+  "errors": [],
+  "forbidden": []
+}

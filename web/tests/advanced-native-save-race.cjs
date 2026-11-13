@@ -15,7 +15,7 @@ const context = vm.createContext({
   layouts: {}, viewportRestoring: false, rangeGuard: null, edgeGuard: null,
   busySaveNoticeShown: false, initialNativeSave: false, workspace: {id:'example'},
   editRevision: 0, workspaceEpoch: 0, dirty: true, nativeReadonly: false,
-  ready: true, loading: false, grid: {value:'dotted'}, offset:10, messages:[],
+  mobileMode: false, ready: true, loading: false, grid: {value:'dotted'}, offset:10, messages:[],
   chartThemeName:()=>"Dark", setTimeout, requestAnimationFrame: fn => setTimeout(fn,0),
 });
 vm.runInContext(`

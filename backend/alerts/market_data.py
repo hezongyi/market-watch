@@ -303,6 +303,23 @@ def renew_demand(db, client, inst, *, composite_revision_id=None):
         raise ValueError("需求租约身份冲突，请重新打开所选行情")
 
 
+def usable_cached_rows(db, inst, rows, now, *, before=None):
+    """Validity shared by cache pages and sparklines; retain all cached islands."""
+    cutoff = (now - 5000) // 60000 * 60000
+    left = rows[0]["start"] if rows else now
+    right = max(before if before is not None else now + 1, cutoff)
+    coverage = stored_coverage(db, inst, left, right) if rows else []
+    observed_end = db.scalar(select(func.max(Bar.end)).where(
+        Bar.instrument_id == inst.id, Bar.timeframe == "M1",
+        Bar.complete.is_(True), Bar.end <= cutoff)) if any(
+            not row["complete"] for row in rows) else None
+    usable = [row for row in rows if not row.get("pending_aggregation") and (row["complete"] or (
+        observed_end is not None and row["start"] < observed_end <= cutoff < row["end"]
+        and covers_interval(coverage, row["start"], observed_end)
+    ))]
+    return usable, coverage
+
+
 def read_cached_history(body: HistoryQuery):
     """Read observations without planning jobs or taking the instrument writer lock.
 
@@ -316,7 +333,6 @@ def read_cached_history(body: HistoryQuery):
         raise HTTPException(422, "不支持的周期")
     now = now_ms()
     before = min(body.before or now + 1, now + 1)
-    cutoff = (now - 5000) // 60000 * 60000
     with transaction() as db:
         # Resolution/registration is a separate operation. Reads never create
         # instruments, so a truly cold symbol can return immediately.
@@ -327,19 +343,10 @@ def read_cached_history(body: HistoryQuery):
         if inst.source not in ("oanda", "binance"):
             raise HTTPException(422, "此品种尚未接入按需行情服务")
         rows = chart_rows(db, inst, body.timeframe, before, body.limit, now)
-        left = rows[0]["start"] if rows else before
-        coverage = stored_coverage(db, inst, left, max(before, cutoff)) if rows else []
         # A forming candle represents the latest persisted observation, not
         # a promise that the provider has delivered through this wall-clock minute.
         # Advancing time alone must not remove/reinsert its native series point.
-        observed_end = db.scalar(select(func.max(Bar.end)).where(
-            Bar.instrument_id == inst.id, Bar.timeframe == "M1",
-            Bar.complete.is_(True), Bar.end <= cutoff)) if any(
-                not row["complete"] for row in rows) else None
-        usable = [row for row in rows if not row.get("pending_aggregation") and (row["complete"] or (
-            observed_end is not None and row["start"] < observed_end <= cutoff < row["end"]
-            and covers_interval(coverage, row["start"], observed_end)
-        ))]
+        usable, coverage = usable_cached_rows(db, inst, rows, now, before=before)
         # Return a contiguous observed suffix. Do not join cached islands across
         # a trading interval whose provider coverage has not been established.
         contiguous = []
@@ -939,6 +946,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                     meta = metadata(db, ident, kind)
                     shown = (meta.get("display_symbol") or display_code(meta["symbol"], meta["source"], meta.get("asset_type")))
                     values = {"short_name": shown, "description": meta.get("presentation_description", meta["name"] + (" · 自建" if kind == "history" else " · 组合")), "exchange": meta["source"].upper()}
+                    values["display_precision"] = meta.get("display_precision", meta.get("precision"))
                     facts = None
                     if kind == "history":
                         values.update(fixed_snapshot(db, ident, meta))
@@ -1039,6 +1047,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                           "read_at":read_at, "time_type": "provider_quote" if stamp is not None else None,
                           "delay_seconds":delay, "fetch_status":snapshot["status"], **session, **conflict}
                 previous = snapshot["previous_close"]
+                values["display_precision"] = meta.get("display_precision", meta.get("precision"))
                 if previous is not None and Decimal(previous) != 0:
                     delta = Decimal(snapshot["price"])-Decimal(previous)
                     values.update(ch=float(delta), chp=float(delta/Decimal(previous)*100),
@@ -1068,6 +1077,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                       **({'error_evidence': page['error_evidence']} if page.get('error_evidence') else {}),
                       "time_type": quote_time_type if latest else None, "resolution": quote_frame}
             if latest:
+                values["display_precision"] = meta.get("display_precision", meta.get("precision"))
                 values["lp"] = float(latest["close"])
                 values.update(quote_time=None, data_start=latest.get("start"), data_end=latest.get("end"))
                 if meta["basis"] == "bid":
@@ -1154,6 +1164,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                 continue
             values = {
                 "lp": float(bar.close),
+                "display_precision": inst.precision,
                 "short_name": presentation["display_symbol"],
                 "description": presentation["presentation_description"],
                 "exchange": inst.source.upper(),

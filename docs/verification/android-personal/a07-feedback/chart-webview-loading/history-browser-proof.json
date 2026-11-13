@@ -1,0 +1,248 @@
+{
+  "evidence": "API fixture with actual licensed widget; browser only",
+  "checks": [
+    "actual licensed chart; shadcn control audit; supported periods; M5 change; native crosshair/indicator/settings; shared themed Drawer with exit handoff",
+    "shared discard AlertDialog; >5 seconds user decision; continue editing preserves input; back returns to editor; discard restores applied study",
+    "switch symbol through shared search with exit handoff; provider identity and source; one widget retained; unsupported alerts explicitly disabled",
+    "native symbol changes update parent selection, alert eligibility and reload; Drawer follows touch, rebounds and dismisses; slow real history request has nonblocking status and clears on completion",
+    "375/412 widths; dark/light actual chart theme; 14/21px type; 44px targets; long symbol truncation; landscape; offline/cache restore; reduced motion",
+    "saved provider viewport + failed first history: no infinite cover; readable failure; pending retry disabled; real data retry clears failure on same widget; period switch works",
+    "startup failure; readable Alert; retry replaces failed adapter and restores symbol"
+  ],
+  "layouts": [
+    {
+      "mode": "dark",
+      "width": 375,
+      "font": 14,
+      "height": 64,
+      "targets": [
+        {
+          "width": 151,
+          "height": 44
+        },
+        {
+          "width": 64,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "dark",
+      "width": 375,
+      "font": 21,
+      "height": 74.625,
+      "targets": [
+        {
+          "width": 139.046875,
+          "height": 57.625
+        },
+        {
+          "width": 75.953125,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "dark",
+      "width": 412,
+      "font": 14,
+      "height": 64,
+      "targets": [
+        {
+          "width": 176,
+          "height": 44
+        },
+        {
+          "width": 64,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "dark",
+      "width": 412,
+      "font": 21,
+      "height": 74.625,
+      "targets": [
+        {
+          "width": 164.046875,
+          "height": 57.625
+        },
+        {
+          "width": 75.953125,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "light",
+      "width": 375,
+      "font": 14,
+      "height": 64,
+      "targets": [
+        {
+          "width": 151,
+          "height": 44
+        },
+        {
+          "width": 64,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "light",
+      "width": 375,
+      "font": 21,
+      "height": 74.625,
+      "targets": [
+        {
+          "width": 139.046875,
+          "height": 57.625
+        },
+        {
+          "width": 75.953125,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "light",
+      "width": 412,
+      "font": 14,
+      "height": 64,
+      "targets": [
+        {
+          "width": 176,
+          "height": 44
+        },
+        {
+          "width": 64,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    },
+    {
+      "mode": "light",
+      "width": 412,
+      "font": 21,
+      "height": 74.625,
+      "targets": [
+        {
+          "width": 164.046875,
+          "height": 57.625
+        },
+        {
+          "width": 75.953125,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        },
+        {
+          "width": 44,
+          "height": 44
+        }
+      ],
+      "overflow": false
+    }
+  ],
+  "errors": [],
+  "forbidden": []
+}

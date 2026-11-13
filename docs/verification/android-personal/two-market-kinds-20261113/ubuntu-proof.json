@@ -1,0 +1,167 @@
+{
+  "runtime": {
+    "market_runtime": [
+      {
+        "role": "pricing",
+        "state": "disabled"
+      },
+      {
+        "role": "realtime",
+        "state": "idle"
+      },
+      {
+        "role": "composite_aggregate",
+        "state": "idle"
+      },
+      {
+        "role": "alert_indicator",
+        "state": "idle"
+      },
+      {
+        "role": "chart_alert",
+        "state": "idle"
+      },
+      {
+        "role": "switch_activation",
+        "state": "missing"
+      },
+      {
+        "role": "market_ownership",
+        "state": "idle"
+      }
+    ],
+    "data_runtime": [
+      {
+        "role": "provider_warm_oanda",
+        "state": "idle"
+      },
+      {
+        "role": "provider_live_binance",
+        "state": "idle"
+      },
+      {
+        "role": "provider_warm_binance",
+        "state": "idle"
+      },
+      {
+        "role": "provider_live_yahoo",
+        "state": "idle"
+      },
+      {
+        "role": "provider_warm_yahoo",
+        "state": "idle"
+      },
+      {
+        "role": "provider_live_dukascopy",
+        "state": "idle"
+      },
+      {
+        "role": "provider_warm_dukascopy",
+        "state": "idle"
+      },
+      {
+        "role": "provider_transport_oanda",
+        "state": "idle"
+      },
+      {
+        "role": "provider_transport_binance",
+        "state": "idle"
+      },
+      {
+        "role": "provider_transport_dukascopy",
+        "state": "idle"
+      },
+      {
+        "role": "provider_janitor",
+        "state": "idle"
+      },
+      {
+        "role": "catalog_runtime",
+        "state": "idle"
+      },
+      {
+        "role": "chart_history",
+        "state": "idle"
+      },
+      {
+        "role": "history_network",
+        "state": "idle"
+      },
+      {
+        "role": "history_compute",
+        "state": "idle"
+      },
+      {
+        "role": "native_history",
+        "state": "idle"
+      },
+      {
+        "role": "chart_aggregation",
+        "state": "idle"
+      },
+      {
+        "role": "market_stream",
+        "state": "idle"
+      },
+      {
+        "role": "switch_shadow",
+        "state": "idle"
+      },
+      {
+        "role": "retention",
+        "state": "idle"
+      },
+      {
+        "role": "data_ownership",
+        "state": "idle"
+      }
+    ],
+    "notification_runtime": [
+      {
+        "role": "notification_projection",
+        "state": "idle"
+      },
+      {
+        "role": "notification_retention",
+        "state": "idle"
+      },
+      {
+        "role": "notification_delivery",
+        "state": "idle"
+      },
+      {
+        "role": "notification_ownership",
+        "state": "idle"
+      },
+      {
+        "role": "notification_health",
+        "state": "idle"
+      }
+    ]
+  },
+  "phase": "after",
+  "host": "Ubuntu quant-server",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "972efa7556c85285",
+  "errors": [],
+  "writes": [],
+  "responses": [
+    {
+      "path": "/api/market-data/center/dataset-summaries",
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/center/dataset-summaries",
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/center/dataset-summaries",
+      "status": 200
+    },
+    {
+      "path": "/api/market-data/center/dataset-summaries",
+      "status": 200
+    }
+  ],
+  "androidAcceptancePending": true
+}

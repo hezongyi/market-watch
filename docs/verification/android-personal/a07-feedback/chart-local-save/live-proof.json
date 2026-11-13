@@ -1,0 +1,60 @@
+{
+  "host": "quant-server (Ubuntu Docker)",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "e489696f0744a49c",
+  "checks": [
+    "actual XAUUSD chart opens with real bars",
+    "M5 change saves locally without misleading banner",
+    "local stored interval is 5",
+    "reload restores XAUUSD and M5"
+  ],
+  "saved": {
+    "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+    "interval": "5"
+  },
+  "history": [
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 2000
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "actualAndroidAcceptancePending": true
+}

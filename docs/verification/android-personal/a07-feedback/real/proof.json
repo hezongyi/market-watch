@@ -1,0 +1,80 @@
+{
+  "url": "https://192.168.7.232:18445",
+  "build": "b5adb77e34e474b2",
+  "rows": [
+    {
+      "ticker": "MWP:BINANCE:BTCUSDT",
+      "text": "BTCUSDT\n比特币 / USDT\n平台 · Binance\n74,156.01\n+0.49%",
+      "height": 94
+    },
+    {
+      "ticker": "MWP:BINANCE:ETHUSDT",
+      "text": "ETHUSDT\n以太坊 / USDT\n平台 · Binance\n2,065.12\n+0.58%",
+      "height": 94
+    },
+    {
+      "ticker": "MWP:YAHOO:edb0c8f3d3a261a3a3497905f4873c34",
+      "text": "EURUSD\n欧元／美元\n平台 · Yahoo\n1.1093854\n-0.65%",
+      "height": 94
+    },
+    {
+      "ticker": "MWP:YAHOO:652cc40d03a64e41ad50e19a49a0ef77",
+      "text": "GC=F\n黄金期货 · COMEX\n平台 · Yahoo\n3,994.3\n-0.89%\n延迟30分",
+      "height": 94
+    },
+    {
+      "ticker": "MWP:YAHOO:e9c5d7403d908b95343d66b100aef3bf",
+      "text": "QQQ\nInvesco 纳斯达克 100 ETF\n平台 · Yahoo\n690.38\n+2.31%\n延迟15分",
+      "height": 94
+    }
+  ],
+  "sparks": [
+    {
+      "ticker": "MWP:BINANCE:BTCUSDT",
+      "status": "partial",
+      "timeframe": "M1",
+      "window_start": 1794355200000,
+      "window_end": 1794441600000,
+      "last_data_at": 1794436560000,
+      "points": 1357
+    },
+    {
+      "ticker": "MWP:BINANCE:ETHUSDT",
+      "status": "partial",
+      "timeframe": "M1",
+      "window_start": 1794355200000,
+      "window_end": 1794441600000,
+      "last_data_at": 1794436560000,
+      "points": 1357
+    },
+    {
+      "ticker": "MWP:YAHOO:edb0c8f3d3a261a3a3497905f4873c34",
+      "status": "partial",
+      "timeframe": "M1",
+      "window_start": 1794434400000,
+      "window_end": 1794520800000,
+      "last_data_at": 1794436560000,
+      "points": 37
+    },
+    {
+      "ticker": "MWP:YAHOO:652cc40d03a64e41ad50e19a49a0ef77",
+      "status": "partial",
+      "timeframe": "M1",
+      "window_start": 1794355200000,
+      "window_end": 1794441600000,
+      "last_data_at": 1794434280000,
+      "points": 1318
+    },
+    {
+      "ticker": "MWP:YAHOO:e9c5d7403d908b95343d66b100aef3bf",
+      "status": "partial",
+      "timeframe": "M1",
+      "window_start": 1794355200000,
+      "window_end": 1794441600000,
+      "last_data_at": 1794430680000,
+      "points": 389
+    }
+  ],
+  "errors": [],
+  "evidence": "Ubuntu actual isolated provider data and Chromium; Android insets/installer still require phone acceptance"
+}

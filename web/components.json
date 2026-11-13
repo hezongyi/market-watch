@@ -1,0 +1,22 @@
+{
+  "$schema": "https://ui.shadcn.com/schema.json",
+  "style": "base-nova",
+  "rsc": false,
+  "tsx": true,
+  "tailwind": {
+    "config": "",
+    "css": "src/mobile/controls.css",
+    "baseColor": "neutral",
+    "cssVariables": true,
+    "prefix": ""
+  },
+  "iconLibrary": "lucide",
+  "aliases": {
+    "components": "@/mobile/components",
+    "utils": "@/mobile/lib/utils",
+    "ui": "@/mobile/components/ui",
+    "lib": "@/mobile/lib",
+    "hooks": "@/mobile/hooks"
+  },
+  "registries": {}
+}

@@ -23,3 +23,12 @@ advanced-host/charting_library_*/
 /web/node_modules
 /advanced-host/alert-ui.js
 /advanced-host/alert-ui.css
+
+# Task-local build tools and executable binary for tmpfs dependencies.
+/.tools/
+
+/web/dist
+.artifacts/
+
+# Task-local APK delivery; never commit binary candidates.
+/web/vendor/downloads/

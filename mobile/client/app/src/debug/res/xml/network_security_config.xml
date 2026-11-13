@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <base-config cleartextTrafficPermitted="false">
+        <trust-anchors><certificates src="system" /></trust-anchors>
+    </base-config>
+    <!-- This task's public development CA, only for the Ubuntu LAN host.
+         Release builds do not contain this manifest or certificate. -->
+    <domain-config cleartextTrafficPermitted="false">
+        <domain includeSubdomains="false">192.168.7.232</domain>
+        <trust-anchors>
+            <certificates src="system" />
+            <certificates src="@raw/android_personal_dev_ca" />
+        </trust-anchors>
+    </domain-config>
+</network-security-config>

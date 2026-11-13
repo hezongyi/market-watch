@@ -628,6 +628,7 @@ def test_provider_quotes_use_previous_complete_native_close(database, monkeypatc
         with TestClient(api_module.app) as client:
             value = client.post("/api/market-data/quotes", json={"symbols": ["MWP:EURUSD"]}).json()[0]["v"]
             assert value["lp"] == 120 and value["prev_close_price"] == 100
+            assert value["display_precision"] == 5
             assert value["ch"] == 20 and value["chp"] == 20
             assert value["bid"] == 120
             def unavailable(*args):

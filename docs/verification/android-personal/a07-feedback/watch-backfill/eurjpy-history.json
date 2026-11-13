@@ -1,0 +1,33 @@
+{
+  "started": 1794476323690,
+  "elapsed": 1682,
+  "before": {
+    "as_of": 1794476323683,
+    "items": [
+      {
+        "ticker": "MWP:DUKA:cad10416478534822e9f52f34e64050d",
+        "status": "empty",
+        "reason": "本机尚无当前窗口的日内缓存",
+        "window_start": 1794434400000,
+        "window_end": 1794520800000,
+        "points": 0
+      }
+    ]
+  },
+  "after": {
+    "as_of": 1794476325288,
+    "preparation": "ready",
+    "items": [
+      {
+        "ticker": "MWP:DUKA:cad10416478534822e9f52f34e64050d",
+        "status": "partial",
+        "reason": "当前窗口缓存含缺口或未确认观测",
+        "window_start": 1794434400000,
+        "window_end": 1794520800000,
+        "points": 693,
+        "first": 1794434640000,
+        "last": 1794476220000
+      }
+    ]
+  }
+}

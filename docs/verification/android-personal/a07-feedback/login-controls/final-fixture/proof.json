@@ -1,0 +1,608 @@
+{
+  "checks": [
+    "initial session probe; required validation; reveal/hide; inline password/network/503/429 errors; retry retains input; shadcn runtime audit",
+    "shared discard and switch confirmations; back cancels top layer; browser server help Drawer; busy/duplicate fencing; online/server switch abort pending login; late success ignored",
+    "success/logout/expiry; actual app theme flow; 375/412 two themes 150% text; small viewport focused-input submit reachable; reduced motion (browser only)",
+    "native bridge receives configure; browser-only help is not opened"
+  ],
+  "layouts": [
+    {
+      "theme": "dark",
+      "width": 375,
+      "font": 14,
+      "metrics": [
+        {
+          "width": 327,
+          "height": 54,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 245,
+              "scroll": 245
+            },
+            {
+              "tag": "DIV",
+              "x": 302,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 327,
+          "height": 52,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 198.5,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 88.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 88,
+          "client": 88,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 68.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 68,
+          "client": 68,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "font": 21,
+      "metrics": [
+        {
+          "width": 327,
+          "height": 62,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 245,
+              "scroll": 245
+            },
+            {
+              "tag": "DIV",
+              "x": 302,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 327,
+          "height": 61.75,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 206,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 112,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 112,
+          "client": 112,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 92,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 92,
+          "client": 92,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 412,
+      "font": 14,
+      "metrics": [
+        {
+          "width": 364,
+          "height": 54,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 282,
+              "scroll": 282
+            },
+            {
+              "tag": "DIV",
+              "x": 339,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 364,
+          "height": 52,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 217,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 88.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 88,
+          "client": 88,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 68.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 68,
+          "client": 68,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 412,
+      "font": 21,
+      "metrics": [
+        {
+          "width": 364,
+          "height": 62,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 282,
+              "scroll": 282
+            },
+            {
+              "tag": "DIV",
+              "x": 339,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 364,
+          "height": 61.75,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 224.5,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 112,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 112,
+          "client": 112,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 92,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 92,
+          "client": 92,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "font": 14,
+      "metrics": [
+        {
+          "width": 327,
+          "height": 54,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 245,
+              "scroll": 245
+            },
+            {
+              "tag": "DIV",
+              "x": 302,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 327,
+          "height": 52,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 198.5,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 88.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 88,
+          "client": 88,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 68.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 68,
+          "client": 68,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "font": 21,
+      "metrics": [
+        {
+          "width": 327,
+          "height": 62,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 245,
+              "scroll": 245
+            },
+            {
+              "tag": "DIV",
+              "x": 302,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 327,
+          "height": 61.75,
+          "overflow": false,
+          "scroll": 325,
+          "client": 325,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 206,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 112,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 112,
+          "client": 112,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 92,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 92,
+          "client": 92,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 412,
+      "font": 14,
+      "metrics": [
+        {
+          "width": 364,
+          "height": 54,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 282,
+              "scroll": 282
+            },
+            {
+              "tag": "DIV",
+              "x": 339,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 364,
+          "height": 52,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 217,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 88.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 88,
+          "client": 88,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 68.015625,
+          "height": 44,
+          "overflow": false,
+          "scroll": 68,
+          "client": 68,
+          "children": []
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 412,
+      "font": 21,
+      "metrics": [
+        {
+          "width": 364,
+          "height": 62,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "DIV",
+              "x": 25,
+              "width": 32,
+              "scroll": 32
+            },
+            {
+              "tag": "INPUT",
+              "x": 57,
+              "width": 282,
+              "scroll": 282
+            },
+            {
+              "tag": "DIV",
+              "x": 339,
+              "width": 48,
+              "scroll": 48
+            }
+          ]
+        },
+        {
+          "width": 364,
+          "height": 61.75,
+          "overflow": false,
+          "scroll": 362,
+          "client": 362,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 224.5,
+              "width": 18,
+              "scroll": 18
+            }
+          ]
+        },
+        {
+          "width": 112,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 112,
+          "client": 112,
+          "children": [
+            {
+              "tag": "svg",
+              "x": 24,
+              "width": 14,
+              "scroll": 14
+            }
+          ]
+        },
+        {
+          "width": 92,
+          "height": 48.796875,
+          "overflow": false,
+          "scroll": 92,
+          "client": 92,
+          "children": []
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    "checking-dark-412.png",
+    "password-error-dark-412.png",
+    "error-network.png",
+    "error-server.png",
+    "error-throttle.png",
+    "discard-confirm-dark.png",
+    "browser-server-help.png",
+    "submitting-dark-412.png",
+    "login-dark-375-14.png",
+    "login-dark-375-21.png",
+    "login-dark-412-14.png",
+    "login-dark-412-21.png",
+    "focused-small-dark.png",
+    "login-light-375-14.png",
+    "login-light-375-21.png",
+    "login-light-412-14.png",
+    "login-light-412-21.png",
+    "focused-small-light.png"
+  ],
+  "errors": [],
+  "forbiddenWrites": []
+}

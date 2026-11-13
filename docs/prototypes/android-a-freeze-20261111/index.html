@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="color-scheme" content="dark light"><title>守望 · 方案 A 设计定稿预览</title>
+  <link rel="stylesheet" href="./base.css"><link rel="stylesheet" href="./design.css">
+</head>
+<body>
+  <div class="studio">
+    <aside class="intro">
+      <div class="brand"><span class="brandmark">W</span> MARKET WATCH <span class="edition">ANDROID</span></div>
+      <div class="eyebrow">DESIGN BASELINE / A · 06</div>
+      <h1>熟悉的自选，<br>完整的日常。</h1>
+      <p class="lead">方案 A 已选定。<br>图表优先，安静恢复。</p>
+      <div class="design-points"><p><b>01</b><span>五个固定入口<small>自选 · 图表 · 告警 · 数据 · 更多</small></span></p><p><b>02</b><span>数据直接进入<small>目录、自建、组合，详情到开图</small></span></p><p><b>03</b><span>结果明确，操作有反馈<small>保存、等待接管、异常与恢复分开展示</small></span></p></div>
+      <div class="try"><span class="tiny-label">审阅建议</span><p>底部“数据”直接进入目录；图表上方体验十字线、指标搜索/添加/参数。专业图表与指标计算仍为示意，正式版复用项目专业图表。</p></div>
+      <div class="footnote">仅为设计预览，所有数据与状态均为模拟。<br>专业图表区域正式实现时替换；其余界面以本版作为冻结候选。</div>
+    </aside>
+    <section class="device-wrap" aria-label="手机设计预览">
+      <div class="preview-caption"><span>方案 A · 设计预览 · 模拟数据</span><button id="theme" class="plain" aria-label="切换显示主题"></button></div>
+      <div id="device" class="device" data-theme="dark" data-variant="A">
+        <div class="statusbar" aria-hidden="true"><span>09:41</span><span class="camera"></span><span>Wi-Fi &nbsp; 87%</span></div>
+        <header class="app-header" id="header"></header><main id="screen"></main>
+        <nav id="nav" class="bottom-nav" aria-label="主导航"></nav><div class="homebar" aria-hidden="true"><i></i></div>
+        <div id="alert-notice" class="alert-notice" role="status" hidden></div>
+        <div id="operation-notice" class="operation-notice" role="alert" hidden></div>
+        <div id="toast" class="toast" role="status" hidden></div>
+        <dialog id="sheet" aria-labelledby="sheet-title"><div id="sheet-content"></div></dialog>
+      </div>
+      <div class="device-note">A · 自选优先 / UI 冻结候选 06</div>
+    </section>
+  </div>
+  <div class="review-bar" aria-label="设计审阅工具，不属于应用">
+    <span>设计审阅</span><label><span class="sr-only">预览页面</span><select id="review-page"><option value="watch">自选</option><option value="chart">图表</option><option value="alerts">告警</option><option value="more">更多</option><option value="center">数据</option><option value="login">登录</option></select></label>
+    <label><span class="sr-only">预览场景</span><select id="review-scene"><option value="normal">正常场景</option><option value="loading">启动有缓存</option><option value="cold">首次无缓存</option><option value="offline-empty">离线无缓存</option><option value="empty">空列表</option><option value="offline">手机断网</option><option value="error">刷新失败</option><option value="stale">部分行情陈旧</option><option value="save-error">提交失败</option><option value="conflict">并发冲突</option><option value="expired">登录过期</option><option value="ntfy-off">通知未配置</option></select></label>
+    <button type="button" data-action="spark-options">图示</button>
+    <button id="demo-recover" title="演示连接恢复，不清除当前输入">恢复</button>
+    <button id="reset" title="重置模拟状态">重置</button>
+  </div>
+  <script src="./fixtures.js"></script><script src="./app.js"></script>
+</body>
+</html>

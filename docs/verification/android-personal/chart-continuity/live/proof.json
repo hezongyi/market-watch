@@ -1,0 +1,118 @@
+{
+  "host": "quant-server (Ubuntu Docker)",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "6a2eb632ba46d1db",
+  "checks": [
+    "actual XAUUSD native header with real bars",
+    "native favorite adds one-tap period and survives reload",
+    "M5 selected and saved locally",
+    "period → crosshair → indicators → candle type order",
+    "direct crosshair toggle and drag; original edge opens drawings",
+    "plain native window searches and adds actual Python SMA; backend returns calculated result; then browser-local study removed",
+    "top settings removed; bottom scale menu free from unsupported alerts; full settings open",
+    "Android back closes native menus without leaving chart",
+    "no outer symbol/return/more header",
+    "375/412 dark and 375 light screenshots"
+  ],
+  "saved": {
+    "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+    "interval": "5"
+  },
+  "history": [
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "failed",
+      "error": "平台历史暂不可用，请重试"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 209
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    }
+  ],
+  "indicatorResponses": [
+    {
+      "status": 200,
+      "indicators": [
+        {
+          "name": "SMA",
+          "keys": [
+            "name",
+            "version",
+            "params",
+            "pane",
+            "levels",
+            "series",
+            "calculation",
+            "id"
+          ],
+          "points": 1
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "notices": [
+    "TimeoutError: 读取超过时间预算"
+  ],
+  "actualAndroidAcceptancePending": true
+}

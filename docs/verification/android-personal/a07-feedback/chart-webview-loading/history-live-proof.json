@@ -1,0 +1,57 @@
+{
+  "host": "quant-server (Ubuntu Docker)",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "be3c7a266f64bc5e",
+  "checks": [
+    "real XAUUSD history has bars",
+    "same-origin iframe with APK blob-navigation cancellation replay",
+    "actual local XAUUSD saved viewport",
+    "injected first-history failure after reload leaves no infinite loading",
+    "native data retry returns real bars and clears error"
+  ],
+  "history": [
+    {
+      "status": 200,
+      "bars": 2000,
+      "injected": false
+    },
+    {
+      "status": 200,
+      "state": "failed",
+      "error": "平台历史暂不可用，请重试",
+      "injected": true
+    },
+    {
+      "status": 200,
+      "injected": false
+    },
+    {
+      "status": 200,
+      "state": "filling",
+      "injected": false
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready",
+      "injected": false
+    },
+    {
+      "status": 200,
+      "injected": false
+    }
+  ],
+  "saved": {
+    "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+    "viewports": [
+      {
+        "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+        "resolution": "60",
+        "hasRange": true
+      }
+    ]
+  },
+  "errors": [],
+  "writes": [],
+  "actualAndroidAcceptancePending": true
+}

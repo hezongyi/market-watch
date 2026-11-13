@@ -232,6 +232,14 @@ jobs:
           node tests/advanced-provider-subscriptions.cjs
           node tests/advanced-watchlists.cjs
 
+      - name: Mobile state regressions
+        working-directory: web
+        run: |
+          node tests/mobile-cache.cjs
+          node tests/mobile-watchlists.cjs
+          node tests/mobile-sparklines.cjs
+          node tests/mobile-alerts.cjs
+
       - name: Single application regressions
         working-directory: web
         run: |
@@ -257,6 +265,8 @@ jobs:
           # Hosted Ubuntu already includes Chromium runtime libraries. Avoid
           # reinstalling fonts/system packages through the runner's apt mirror.
           npx playwright install chromium
+          node tests/mobile-watch.browser.cjs
+          node tests/mobile-alerts.browser.cjs
           node tests/saved-layout-startup.browser.cjs
           node tests/chart-stream-shared.browser.cjs
           node tests/advanced-watchlist-layout.browser.cjs
@@ -271,6 +281,30 @@ jobs:
           node tests/alert-price-drag.browser.cjs
           node tests/notice-page-exit.browser.cjs
           npm run test:single-frontend -- --unit
+
+  android_checks:
+    name: Android checks
+    needs: changes
+    if: needs.changes.outputs.docs_only != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+      - name: Set up Android tools
+        uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
+      - name: Install Android SDK 35
+        run: sdkmanager "platforms;android-35" "build-tools;35.0.0"
+      - name: Build and lint debug shell
+        working-directory: mobile/client
+        run: ./gradlew :app:assembleDebug :app:lintDebug --no-daemon
 
   compose_checks:
     name: Compose checks

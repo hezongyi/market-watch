@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="com.kookvv.marketwatch.UpdateManifestTest" tests="4" skipped="0" failures="0" errors="0" timestamp="2026-11-11T22:28:34" hostname="quant-server" time="0.08">
+  <properties/>
+  <testcase name="rejectsOtherApplicationsAndInvalidVersions" classname="com.kookvv.marketwatch.UpdateManifestTest" time="0.054"/>
+  <testcase name="validReleaseKeepsExactFileAndDigest" classname="com.kookvv.marketwatch.UpdateManifestTest" time="0.004"/>
+  <testcase name="cannotRedirectDownloadToAnotherPathOrOrigin" classname="com.kookvv.marketwatch.UpdateManifestTest" time="0.016"/>
+  <testcase name="downloadHasFiniteDeclaredSizeAndFullHash" classname="com.kookvv.marketwatch.UpdateManifestTest" time="0.002"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

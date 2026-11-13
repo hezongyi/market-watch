@@ -1,10 +1,12 @@
 import {createHash} from 'node:crypto';
 import {readFileSync, writeFileSync, cpSync, readdirSync, rmSync} from 'node:fs';
+import {prepareNativeTouchAssets} from './native-touch-assets.mjs';
 
 // Give all private library assets a URL derived from the patched bytes.
+const touchBridge = prepareNativeTouchAssets(new URL('charting_library/', import.meta.url));
 const bundle = readFileSync(new URL('charting_library/bundles/library.e2f8b3a016c9e1a0b7a5.js', import.meta.url));
 const toolset = readFileSync(new URL('charting_library/bundles/restricted-toolset.4fbfc823d8551bbb3e53.js', import.meta.url));
-const libraryVersion = createHash('sha256').update(bundle).update(toolset).digest('hex').slice(0,16);
+const libraryVersion = createHash('sha256').update(bundle).update(toolset).update(touchBridge).digest('hex').slice(0,16);
 const libraryDirectory = `charting_library_${libraryVersion}`;
 for (const name of readdirSync(new URL('.',import.meta.url)))
   if (/^charting_library_[a-f0-9]{16}$/.test(name) && name !== libraryDirectory)
@@ -12,7 +14,7 @@ for (const name of readdirSync(new URL('.',import.meta.url)))
 cpSync(new URL('charting_library',import.meta.url), new URL(libraryDirectory,import.meta.url), {recursive:true});
 
 const files = ['series.js', 'price-format.js', 'indicators.js', 'native-indicator-results.js', 'indicator-coordinator.js', 'composite-display-batches.js', 'swing-sr-display.js', 'rolling-range-squeeze-display.js', 'nr-breakout-display.js', 'study-templates.js', 'indicator-picker.js', 'preferences.js', 'chart-style.js', 'chart-theme.js', 'chart-autosave.js',
-  'workspaces.js', 'watchlists.js', 'chart-tab.js', 'symbol-flags.js', 'watchlist-layout.js', 'sync-coordinator.js', 'range-sync.js', 'viewports.js',
+  'mobile-chart.js', 'workspaces.js', 'watchlists.js', 'chart-tab.js', 'symbol-flags.js', 'watchlist-layout.js', 'sync-coordinator.js', 'range-sync.js', 'viewports.js',
   'progressive-history.js', 'history-demand.js', 'native-reserve.js', 'native-navigation.js', 'bar-range-mapping.js', 'chart-account.js', 'sync-settings.js', 'chart-menu.js', 'drawing-projection.js', 'native-alert-price-lines.js', 'chart-alerts.js', 'native-alert-shell.js', 'native-notification-surface.js', 'alert-ui.js', 'chart-maximize.js', 'native-ui.js', 'native-indicator-dialog.js', 'data-center.js', 'chart-notices.js', 'chart-runtime.js'];
 const scope = `
 const listeners=[],timeouts=new Set(),intervals=new Set(),animations=new Set();

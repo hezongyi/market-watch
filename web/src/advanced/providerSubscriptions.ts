@@ -5,7 +5,10 @@ type Subscription = {
 };
 type Stream = { close(): void; onmessage: ((event: MessageEvent) => void) | null;
   onopen?: ((event: Event) => void) | null; onerror?: ((event: Event) => void) | null;
+  addEventListener?: (type: string, listener: (event: MessageEvent) => void) => void;
   readonly readyState?: number };
+export type MarketTransportState = {client: string; state: 'connecting' | 'open' | 'error' | 'idle';
+  openedAt: number | null; messageAt: number | null; heartbeatAt: number | null};
 type FailureKind = 'market' | 'connection' | 'subscription';
 type TransportEvidence = Record<string, string | number | boolean | null>;
 
@@ -19,6 +22,7 @@ export function providerSubscriptions(
   paths = {subscribe: '/charts/stream/subscribe', unsubscribe: '/charts/stream/unsubscribe'},
   observe: (args: Subscription, kind: FailureKind, error: unknown | null, attempt: string, lifecycle?: 'ended', evidence?: TransportEvidence) => void = () => {},
   established: (args: Subscription) => Promise<boolean> = async () => true,
+  transport: (state: MarketTransportState) => void = () => {},
 ) {
   let disposed = false;
   const waiting = new Set<string>();
@@ -76,6 +80,7 @@ export function providerSubscriptions(
     streams.get(client)?.close();
     streams.delete(client);
     reconnects.delete(client);
+    transport({client,state:'idle',openedAt:null,messageAt:null,heartbeatAt:null});
   }
   async function register(args: Subscription) {
     if (disposed || desired.get(keyOf(args)) !== args) return;
@@ -138,12 +143,20 @@ export function providerSubscriptions(
     if (disposed || streams.has(client) || ![...desired.values()].some(args => args.client === client)) return;
     const stream = connect(client);
     streams.set(client, stream);
+    const state: MarketTransportState = {client,state:'connecting',openedAt:null,messageAt:null,heartbeatAt:null};
+    transport({...state});
+    stream.addEventListener?.('heartbeat', () => {
+      if (disposed || streams.get(client) !== stream) return;
+      state.heartbeatAt = Date.now(); transport({...state});
+    });
     const evidence = (): TransportEvidence => ({ready_state: stream.readyState ?? null,
       online: typeof navigator === 'undefined' ? null : navigator.onLine,
       visibility: typeof document === 'undefined' ? null : document.visibilityState,
       observed_at: Date.now(), reconnect_count: reconnects.get(client) || 0});
     stream.onopen = () => {
       if (disposed || streams.get(client) !== stream) return;
+      state.state = 'open'; state.openedAt = Date.now();
+      state.messageAt = null; state.heartbeatAt = null; transport({...state});
       if (connections.has(client)) reconnects.set(client, Math.min(1_000_000, (reconnects.get(client) || 0)+1));
       connection(client, null, false, evidence());
       for (const current of desired.values()) if (current.client === client && !invalid.has(keyOf(current)) && !waiting.has(keyOf(current)))
@@ -155,6 +168,7 @@ export function providerSubscriptions(
       // Native EventSource retries CONNECTING itself. An HTTP error may leave
       // it CLOSED permanently, so recreate only that terminal transport.
       if (disposed || streams.get(client) !== stream) return;
+      state.state = 'error'; state.openedAt = null; transport({...state});
       connection(client, Error('行情事件连接中断，正在重连'), false,
         {...evidence(), occurred_at: Date.now()});
       if (stream.readyState !== 2) return;
@@ -167,6 +181,7 @@ export function providerSubscriptions(
     };
     stream.onmessage = event => {
       if (disposed || streams.get(client) !== stream) return;
+      state.messageAt = Date.now(); transport({...state});
       try {
         const value = JSON.parse(event.data);
         const current = desired.get(client + '|' + value.listener);

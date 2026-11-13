@@ -85,7 +85,7 @@ async function stableId(value: string) {
 export class NoticeRuntime {
   state = { ...initial };
   private listeners = new Set<() => void>();
-  private store = new NoticeStore();
+  constructor(private store = new NoticeStore(), private mobile = false) {}
   private startup: Promise<void> | null = null;
   private faultIngress: Promise<void> = Promise.resolve();
   private subject = "";
@@ -128,7 +128,9 @@ export class NoticeRuntime {
     // reliably finish async IDB callbacks, so only mark this document closed
     // synchronously. Another tab or the next launch promotes those intents.
     try {
-      localStorage.setItem("mw-notice-document-ended:" + this.documentId, String(Date.now()));
+      if (this.mobile) void this.store.update("meta", this.subject + ":ended:" + this.documentId,
+        this.subject, () => Date.now()).catch(() => {});
+      else localStorage.setItem("mw-notice-document-ended:" + this.documentId, String(Date.now()));
     } catch (error) {
       this.patch({ gap: "页面观察结束标记未能保存：" + String(error) });
     }
@@ -227,7 +229,7 @@ export class NoticeRuntime {
       let enabled = await this.store.get("meta", subject + ":sound");
       if (enabled === undefined) {
         try {
-          enabled = localStorage.getItem("mw.web-sound") === "on";
+          enabled = !this.mobile && localStorage.getItem("mw.web-sound") === "on";
         } catch {
           enabled = false;
         }
@@ -811,15 +813,18 @@ export class NoticeRuntime {
         if (!this.current(generation)) return;
         const intent = row.value?.exit;
         if (!row.key.includes(":fault:") || !row.value.open || !intent) continue;
-        const at = Number(localStorage.getItem("mw-notice-document-ended:" + intent.document));
+        const at = Number(this.mobile ? await this.store.get("meta", subject + ":ended:" + intent.document) :
+          localStorage.getItem("mw-notice-document-ended:" + intent.document));
         if (!at) continue;
         await this.store.stage(subject, { ...intent.event, occurred_at: at });
         await this.store.update("meta", row.key, subject, (old) =>
           old?.latest === row.value.latest ? { ...old, open: false, exit: null } : undefined);
         completed.add(intent.document);
       }
-      for (const document of completed)
-        localStorage.removeItem("mw-notice-document-ended:" + document);
+      for (const document of completed) {
+        if (this.mobile) await this.store.remove("meta", subject + ":ended:" + document);
+        else localStorage.removeItem("mw-notice-document-ended:" + document);
+      }
     } catch (error) {
       this.needsEnds = true;
       if (this.current(generation)) this.patch({ gap: "观察结束事实尚未保存：" + String(error) });

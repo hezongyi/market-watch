@@ -1,0 +1,83 @@
+/* Records use the same Drawer geometry as the Watch and More settings. */
+.mobile-controls .mobile-record-tabs {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 16px;
+}
+.mobile-controls .mobile-record-tabs > [data-slot="tabs-list"] {
+  display: flex;
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 12px;
+  background: var(--surface2);
+}
+.mobile-controls .mobile-record-tabs [data-slot="tabs-trigger"] {
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  height: auto;
+  padding: 10px 6px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--muted);
+  font-size: 1rem;
+  line-height: 1.4;
+  white-space: normal;
+}
+.mobile-controls .mobile-record-tabs [data-slot="tabs-trigger"][data-active] {
+  background: var(--surface);
+  color: var(--text);
+  box-shadow: 0 1px 4px #0001;
+}
+.mobile-controls .mobile-record-tabs [data-slot="tabs-content"] {
+  width: 100%;
+  min-width: 0;
+  font-size: 1rem;
+}
+.mobile-records .mobile-status-card {
+  margin: 0 0 12px;
+  padding: 16px;
+  border: 1px solid var(--quiet-line);
+  border-radius: 14px;
+  background: var(--surface);
+  overflow-wrap: anywhere;
+}
+.mobile-records .mobile-status-card p {
+  margin: 8px 0;
+  color: var(--muted);
+  font-size: 0.928571rem;
+  line-height: 1.65;
+}
+.mobile-records button.mobile-record-row[data-variant] {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  width: 100%;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 16px;
+  border: 1px solid var(--quiet-line);
+  border-radius: 14px;
+  background: var(--surface);
+  text-align: left;
+  font-weight: 400;
+  overflow-wrap: anywhere;
+}
+.mobile-records .mobile-record-row strong {
+  font-size: 1rem;
+  line-height: 1.5;
+}
+.mobile-records .mobile-record-row > span {
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.6;
+}
+.mobile-records .mobile-drawer-scroll > p {
+  overflow-wrap: anywhere;
+}
