@@ -1,0 +1,60 @@
+{
+  "host": "quant-server (Ubuntu Docker)",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "692db7eb494e982e",
+  "checks": [
+    "actual XAUUSD native header with real bars",
+    "native favorite adds one-tap period and survives reload",
+    "M5 selected and saved locally",
+    "native drawings/crosshair and indicators open",
+    "Android back closes native menus without leaving chart",
+    "no outer symbol/return/more header",
+    "375/412 dark and 375 light screenshots"
+  ],
+  "saved": {
+    "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+    "interval": "5"
+  },
+  "history": [
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 2000
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "notices": [],
+  "actualAndroidAcceptancePending": true
+}

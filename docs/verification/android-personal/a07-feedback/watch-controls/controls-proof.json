@@ -1,0 +1,57 @@
+{
+  "timings": [
+    {
+      "theme": "light",
+      "duration": "0.3s"
+    },
+    {
+      "theme": "dark",
+      "duration": "0.3s"
+    }
+  ],
+  "gestures": [
+    {
+      "distance": 34,
+      "start": 440.8125,
+      "transform": "matrix(1, 0, 0, 1, 0, 17)",
+      "top": 457.8125,
+      "swiping": true,
+      "outcome": "returned"
+    },
+    {
+      "distance": 350,
+      "start": 440.8125,
+      "transform": "matrix(1, 0, 0, 1, 0, 306.25)",
+      "top": 747.0625,
+      "swiping": true,
+      "outcome": "dismissed"
+    },
+    {
+      "distance": 180,
+      "start": 615.1875,
+      "transform": "matrix(1, 0, 0, 1, 0, 157.5)",
+      "top": 772.6875,
+      "swiping": true,
+      "outcome": "unsaved-protected"
+    }
+  ],
+  "screenshots": [
+    "actions-light",
+    "groups-light",
+    "actions-dark",
+    "groups-dark",
+    "discard-confirm",
+    "compact-form"
+  ],
+  "reducedMotion": true,
+  "reorder": {
+    "order": [
+      "b",
+      "a"
+    ],
+    "animations": 2
+  },
+  "compactViewport": true,
+  "rapidClose": true,
+  "deleteDiscard": true
+}

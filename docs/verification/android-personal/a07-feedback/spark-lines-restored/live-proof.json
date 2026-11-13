@@ -1,0 +1,284 @@
+{
+  "host": "quant-server",
+  "url": "https://192.168.7.232:18445",
+  "build": "e485f62d06d1eb36",
+  "updates": [
+    {
+      "code": "EURUSD",
+      "at": 1794492308746,
+      "previousPrice": "1.10924",
+      "price": "1.10889",
+      "curveChanged": true,
+      "quoteTime": 1794492240000,
+      "historyTail": 1794492180000,
+      "fetchStatus": "ok",
+      "timeType": "source_m1"
+    }
+  ],
+  "historyRequests": [
+    {
+      "path": "/api/market-data/sparklines",
+      "at": 1794492282026
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492283705
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492283706
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492283913
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492284270
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492284570
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492284602
+    },
+    {
+      "path": "/api/market-data/sparklines/prepare",
+      "at": 1794492284898
+    },
+    {
+      "path": "/api/market-data/sparklines",
+      "at": 1794492309423
+    },
+    {
+      "path": "/api/market-data/sparklines",
+      "at": 1794492310120
+    }
+  ],
+  "layouts": [
+    {
+      "theme": "light",
+      "width": 375,
+      "rows": [
+        {
+          "code": "XAUUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "EURUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "GBPUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDCAD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDJPY",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "NVDA",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "AAPL",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 412,
+      "rows": [
+        {
+          "code": "XAUUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "EURUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "GBPUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDCAD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDJPY",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "NVDA",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "AAPL",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "rows": [
+        {
+          "code": "XAUUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "EURUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "GBPUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDCAD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDJPY",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "NVDA",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        },
+        {
+          "code": "AAPL",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 192.421875,
+          "cubic": false
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 412,
+      "rows": [
+        {
+          "code": "XAUUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "EURUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "GBPUSD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDCAD",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "USDJPY",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "NVDA",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        },
+        {
+          "code": "AAPL",
+          "height": 72,
+          "sparkHeight": 50,
+          "width": 229.421875,
+          "cubic": false
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "phoneAcceptancePending": true
+}

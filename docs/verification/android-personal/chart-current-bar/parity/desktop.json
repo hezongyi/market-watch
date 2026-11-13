@@ -1,0 +1,249 @@
+[
+  {
+    "mode": "desktop",
+    "state": {
+      "now": 1794560317462,
+      "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+      "res": "60",
+      "last": [
+        1794553200,
+        3900.326,
+        3905.695,
+        3893.555,
+        3897.085,
+        2.06522,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "offset": 10,
+      "range": {
+        "from": 1793923200,
+        "to": 1794589200
+      },
+      "subs": [
+        {
+          "kind": "bars",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "H1"
+          },
+          "historical": false,
+          "cursor": 0
+        },
+        {
+          "kind": "bars",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "H1"
+          },
+          "historical": false,
+          "cursor": 1794553200000
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "BTCUSDT",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "bars",
+          "last": {
+            "start": 1794553200000,
+            "end": 1794556800000,
+            "chart_time": 1794553200000,
+            "open": "3900.326000",
+            "high": "3905.695000",
+            "low": "3893.555000",
+            "close": "3897.085000",
+            "volume": "2.065220",
+            "complete": true,
+            "volume_complete": true,
+            "time_closed": true,
+            "source_confirmed": null,
+            "completion_basis": "elapsed_native_interval; confirmation_not_supplied"
+          }
+        }
+      ]
+    },
+    "history": [
+      {
+        "count": 2000,
+        "last": {
+          "start": 1794553200000,
+          "end": 1794556800000,
+          "chart_time": 1794553200000,
+          "open": "3900.326000",
+          "high": "3905.695000",
+          "low": "3893.555000",
+          "close": "3897.085000",
+          "volume": "2.065220",
+          "complete": true,
+          "volume_complete": true,
+          "time_closed": true,
+          "source_confirmed": null,
+          "completion_basis": "elapsed_native_interval; confirmation_not_supplied"
+        },
+        "query": {
+          "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+          "series_kind": "provider",
+          "published": false,
+          "client": "416aa724-ab60-467a-9437-71a924630baf",
+          "timeframe": "H1",
+          "limit": 146,
+          "countBack": 146,
+          "from": 1794038367000,
+          "firstDataRequest": true,
+          "native_history": {
+            "chart_count": 1,
+            "focused": true,
+            "historical_navigation": false,
+            "screen_bars": 145,
+            "batch_screens": 1
+          },
+          "history_page_bars": 4000,
+          "indicators": [],
+          "before": 1794560367000,
+          "track_history": false
+        }
+      }
+    ],
+    "blocked": [
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/advanced-charts/native-charts/save",
+      "/api/advanced-charts/preferences/save",
+      "/api/notification-center/events",
+      "/api/notification-center/observations"
+    ],
+    "errors": []
+  }
+]

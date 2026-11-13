@@ -1,0 +1,18 @@
+{
+  "host": "quant-server",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "e814e52dcbac3820",
+  "checks": [
+    "unauthenticated login",
+    "successful credential login",
+    "More reachable",
+    "logout clears password",
+    "two themes through actual app state",
+    "375/412 no overflow",
+    "browser-help drawer",
+    "no business writes"
+  ],
+  "errors": [],
+  "writes": [],
+  "deviceAcceptancePending": true
+}

@@ -1,0 +1,162 @@
+[
+  {
+    "mode": "mobile",
+    "state": {
+      "now": 1794560400839,
+      "symbol": "MWP:DUKA:C2893271B856E9D2550CADC243BDF793",
+      "res": "60",
+      "last": [
+        1794553200,
+        3900.326,
+        3905.695,
+        3893.555,
+        3897.085,
+        2.06522,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "offset": 10,
+      "range": {
+        "from": 1794391200,
+        "to": 1794589200
+      },
+      "subs": [
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "bars",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "H1"
+          },
+          "historical": false,
+          "cursor": 0
+        },
+        {
+          "kind": "bars",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "H1"
+          },
+          "historical": false,
+          "cursor": 1794553200000
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        },
+        {
+          "kind": "quotes",
+          "query": {
+            "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+            "series_kind": "provider",
+            "timeframe": "M1"
+          }
+        }
+      ],
+      "events": [
+        {
+          "type": "bars",
+          "last": {
+            "start": 1794553200000,
+            "end": 1794556800000,
+            "chart_time": 1794553200000,
+            "open": "3900.326000",
+            "high": "3905.695000",
+            "low": "3893.555000",
+            "close": "3897.085000",
+            "volume": "2.065220",
+            "complete": true,
+            "volume_complete": true,
+            "time_closed": true,
+            "source_confirmed": null,
+            "completion_basis": "elapsed_native_interval; confirmation_not_supplied"
+          }
+        }
+      ]
+    },
+    "history": [
+      {
+        "count": 2000,
+        "last": {
+          "start": 1794553200000,
+          "end": 1794556800000,
+          "chart_time": 1794553200000,
+          "open": "3900.326000",
+          "high": "3905.695000",
+          "low": "3893.555000",
+          "close": "3897.085000",
+          "volume": "2.065220",
+          "complete": true,
+          "volume_complete": true,
+          "time_closed": true,
+          "source_confirmed": null,
+          "completion_basis": "elapsed_native_interval; confirmation_not_supplied"
+        },
+        "query": {
+          "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+          "series_kind": "provider",
+          "published": false,
+          "client": "70b78a8d-1cba-4c99-9223-fa8696fa6960",
+          "timeframe": "H1",
+          "limit": 61,
+          "countBack": 61,
+          "from": 1794344448000,
+          "firstDataRequest": true,
+          "native_history": {
+            "chart_count": 1,
+            "focused": true,
+            "historical_navigation": false,
+            "screen_bars": 60,
+            "batch_screens": 1
+          },
+          "history_page_bars": 4000,
+          "indicators": [],
+          "before": 1794560448000,
+          "track_history": false
+        }
+      }
+    ],
+    "blocked": [],
+    "errors": []
+  }
+]

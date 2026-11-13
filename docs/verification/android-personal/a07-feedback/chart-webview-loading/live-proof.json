@@ -1,0 +1,49 @@
+{
+  "host": "quant-server (Ubuntu Docker)",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "376cc5fbcea24616",
+  "checks": [
+    "XAUUSD watch row opens real chart under APK blob-navigation replay",
+    "same-origin HTTPS iframe",
+    "history request reaches API (source availability recorded separately)",
+    "loading cover removed",
+    "navigation and reload restore saved XAUUSD"
+  ],
+  "history": [
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "state": "filling"
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "actualAndroidAcceptancePending": true
+}

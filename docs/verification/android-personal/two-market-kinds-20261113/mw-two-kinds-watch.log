@@ -1,0 +1,31 @@
+{
+  "evidence": "built mobile UI with API doubles",
+  "checks": [
+    "all visible Watch controls use shadcn slots",
+    "source filter selection including all sources",
+    "Select change, Android back and visible success notification",
+    "drawer enter and exit transitions",
+    "touch follows, rebounds and dismisses",
+    "dirty swipe and Android back preserve unsaved input",
+    "reduced-motion close lifecycle",
+    "reorder animation and delete cancel/discard",
+    "small viewport form and rapid repeated close",
+    "saving blocks back and close",
+    "real transport heartbeat status",
+    "navigation retains original SSE and receives live quotes",
+    "background pauses subscriptions; foreground reconnects and refreshes quotes",
+    "hidden Watch pauses historical refresh",
+    "SSE drop grays rows until new connection snapshot aligns",
+    "scroll restored after reload",
+    "visible quote/spark rows and gaps",
+    "375/412 at 150% font",
+    "phone group selection isolated",
+    "latest desktop active and unknown fields retained",
+    "409 keeps input",
+    "late search discarded",
+    "actual supported periods shown",
+    "favorite add and shared refresh",
+    "one market client/SSE"
+  ],
+  "errors": []
+}

@@ -1,0 +1,53 @@
+{
+  "phase": "before",
+  "host": "quant-server",
+  "url": "https://192.168.7.232:18445/m/",
+  "shell": "3321701cf1c6f3b8",
+  "measurements": [
+    {
+      "name": "background",
+      "theme": "light",
+      "width": 412,
+      "height": 400.78125,
+      "titleSize": "18px",
+      "radius": "24px",
+      "shadcn": true
+    },
+    {
+      "name": "records",
+      "theme": "light",
+      "width": 378,
+      "height": 213.1875,
+      "titleSize": "20.0004px",
+      "radius": "23px",
+      "shadcn": false
+    },
+    {
+      "name": "background",
+      "theme": "dark",
+      "width": 412,
+      "height": 452.171875,
+      "titleSize": "18px",
+      "radius": "24px",
+      "shadcn": true
+    },
+    {
+      "name": "records",
+      "theme": "dark",
+      "width": 378,
+      "height": 213.1875,
+      "titleSize": "20.0004px",
+      "radius": "23px",
+      "shadcn": false
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "checks": [
+    "background and records drawers",
+    "record tabs",
+    "both themes",
+    "no preference or market-data writes"
+  ],
+  "deviceAcceptancePending": true
+}

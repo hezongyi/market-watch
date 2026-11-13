@@ -1,0 +1,51 @@
+{
+  "preparations": [
+    {
+      "instrument": "DUKA:c2893271b856e9d2550cadc243bdf793",
+      "timeframe": "H1",
+      "limit": 1,
+      "countBack": 1,
+      "prepare": true
+    }
+  ],
+  "navigationReturnMs": [
+    75,
+    60,
+    67,
+    63,
+    73
+  ],
+  "history": [
+    {
+      "status": 200,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 2000
+    },
+    {
+      "status": 200,
+      "bars": 2000,
+      "state": "ready"
+    },
+    {
+      "status": 200
+    },
+    {
+      "status": 200,
+      "bars": 2000
+    }
+  ],
+  "errors": [],
+  "writes": [],
+  "notices": [],
+  "checks": [
+    "real idle startup preparation observed; existing one-opportunity-page quantities",
+    "real XAUUSD preview visible on reload and removed on live-ready",
+    "five retained-widget navigation returns; browser observations only"
+  ]
+}

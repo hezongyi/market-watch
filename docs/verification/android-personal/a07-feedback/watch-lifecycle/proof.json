@@ -1,0 +1,62 @@
+{
+  "url": "https://192.168.7.232:18445",
+  "host": "quant-server",
+  "build": "7eea96aa83c515bb",
+  "checks": [
+    "More/Data/Watch navigation retained the original SSE and quote listeners",
+    "Background closed SSE; foreground reconnected and fetched quotes while Watch was hidden; returning refreshed curves",
+    "72px rows and 50px sparkline containers on live data",
+    "Foreground on Watch refreshed both quotes and sparkline history"
+  ],
+  "dimensions": [
+    {
+      "row": 72,
+      "spark": 50
+    },
+    {
+      "row": 72,
+      "spark": 50
+    },
+    {
+      "row": 72,
+      "spark": 50
+    },
+    {
+      "row": 72,
+      "spark": 50
+    },
+    {
+      "row": 72,
+      "spark": 50
+    },
+    {
+      "row": 72,
+      "spark": 50
+    },
+    {
+      "row": 72,
+      "spark": 50
+    }
+  ],
+  "transports": [
+    {
+      "id": 1,
+      "opened": true,
+      "closed": true
+    },
+    {
+      "id": 2,
+      "opened": true,
+      "closed": true
+    },
+    {
+      "id": 3,
+      "opened": true,
+      "closed": false
+    }
+  ],
+  "quoteReads": 6,
+  "sparkReads": 4,
+  "errors": [],
+  "androidDeviceAcceptancePending": true
+}
