@@ -193,7 +193,7 @@ export default function AlertsPage({
     const ticker = row ? "MWC:" + row.config.instrument : symbol;
     const identity = seriesIdentity(ticker);
     if (identity.series_kind !== "composite") {
-      report("从自选或数据选择组合行情；平台和固定历史不能新建实时告警");
+      report("请选择已开启实时接续的自建行情；原生行情和固定历史不支持新建实时告警");
       return;
     }
     setBusy(true);
@@ -377,7 +377,7 @@ export default function AlertsPage({
               </select>
             </label>
             {!symbol.startsWith("MWC:") && (
-              <p>从自选或数据选择组合行情后创建价格告警。</p>
+              <p>从自选或数据选择已开启实时接续的自建行情，创建价格告警。</p>
             )}
             <button
               aria-label="刷新"
@@ -435,7 +435,7 @@ export default function AlertsPage({
                 </span>
                 <small>
                   {row.name} ·{" "}
-                  {row.config.series_kind === "composite" ? "组合" : "旧来源"} ·{" "}
+                  {row.config.series_kind === "composite" ? "自建 · 实时接续" : row.config.series_kind === "provider" ? "原生" : "自建"} ·{" "}
                   {row.display_identity?.source || row.config.source}
                 </small>
                 <strong className="mobile-rule-condition">
@@ -682,16 +682,15 @@ export default function AlertsPage({
           />
         )}
       </section>
-      {records && (
-        <RecordsSheet
-          profile={profile}
-          online={online}
-          events={data.events.length ? data.events : cachedEvents}
-          runtime={runtime}
-          close={closeRecords}
-          report={report}
-        />
-      )}
+      <RecordsSheet
+        open={records}
+        profile={profile}
+        online={online}
+        events={data.events.length ? data.events : cachedEvents}
+        runtime={runtime}
+        close={closeRecords}
+        report={report}
+      />
     </>
   );
 }

@@ -125,8 +125,20 @@ return adapter;
         bars:[bar(last,1.19)]});
       const until=Date.now()+10000;
       while(await latestClose()!==1.19){assert.ok(Date.now()<until,'real widget never applied streamed callback');await page.waitForTimeout(30);}
+      // A forming candle is a new bar, then updates at the same timestamp.
+      // Preserve complete:false through the real feed/native callback path.
+      for(const [sequence,close] of [[2,1.23],[3,1.24]]) {
+        send({listener:sub.listener,generation:sub.generation,sequence,type:'bars',
+          bars:[{...bar(last+60000,close),complete:false}]});
+        const end=Date.now()+10000;
+        while(await latestClose()!==close){assert.ok(Date.now()<end,'forming bar was not drawn/updated');await page.waitForTimeout(30);}
+        assert.equal(await page.evaluate(()=>{
+          const bars=testWidget.activeChart()._chartWidget.model().model().mainSeries().bars();
+          return bars.valueAt(bars.lastIndex())[0];
+        }),(last+60000)/1000,'forming bar must keep its current-period timestamp');
+      }
       const before=historyReads;revision++;
-      send({listener:sub.listener,generation:sub.generation,sequence:2,type:'reset',reason:'history_changed'});
+      send({listener:sub.listener,generation:sub.generation,sequence:4,type:'reset',reason:'history_changed'});
       await wait(()=>historyReads>before);
       const end=Date.now()+18000;
       while(await latestClose()!==1.17){assert.ok(Date.now()<end,'reset did not reload authoritative history into real widget');await page.waitForTimeout(30);}

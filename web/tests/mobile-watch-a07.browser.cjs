@@ -114,7 +114,7 @@ const server = http.createServer(async (req, res) => {
               " · " +
               names[i] +
               " · " +
-              (i < 2 ? "组合" : "平台") +
+              (i < 2 ? "自建 · 实时接续" : "原生") +
               " · " +
               sources[i],
             description: names[i],
@@ -324,10 +324,11 @@ const server = http.createServer(async (req, res) => {
           await expect(page.locator('.mobile-watch-last-price').nth(1)).toHaveText('1.08420');
           await expect(page.locator('.mobile-spark-previous-close')).toHaveCount(5);
           const referencePositions=await page.locator('.mobile-spark-previous-close').evaluateAll(els=>els.map(el=>Number(el.getAttribute('y1'))));
-          assert(referencePositions.every(y=>y>=4&&y<=44),'reference price stays in the adaptive vertical domain');
+          assert(referencePositions.every(y=>y>=4&&y<=46),'reference price stays in the adaptive vertical domain');
           assert(referencePositions.some(y=>y!==24),'reference price is not pinned to the center line');
           if (font === 14) {
             assert.equal(actual.row.height, 72);
+            assert.equal(await page.locator('.mobile-spark').first().evaluate(el=>el.getBoundingClientRect().height),50,'sparkline gains vertical space while the watch row stays 72px');
             const secondarySizes = await page.locator('.mobile-watch-description, .mobile-watch-origin').evaluateAll(els=>els.map(el=>parseFloat(getComputedStyle(el).fontSize)));
             assert(secondarySizes.length && secondarySizes.every(size=>Math.abs(size-11)<0.01),'Chinese descriptions and source labels use 11px secondary text');
             assert.equal(actual.header.height, 64);
@@ -374,7 +375,7 @@ const server = http.createServer(async (req, res) => {
           assert(Math.abs(watchBottom - actual.nav.y) < 1, 'content ends above measured navigation');
         }
         measurements.push({ width, height, font, theme, actual, expected });
-        await page.screenshot({
+        await page.screenshot({animations: "disabled",
           path: path.join(output, `app-${theme}-${width}-${font}.png`),
         });
         await reference.screenshot({
@@ -393,7 +394,7 @@ const server = http.createServer(async (req, res) => {
     ]) {
       if (button !== "选择自选分组") await page.getByRole("button", {name:"自选操作",exact:true}).click();
       await page.getByRole("button", { name: button, exact: true }).click();
-      await page.screenshot({ path: path.join(output, name + ".png") });
+      await page.screenshot({animations: "disabled", path: path.join(output, name + ".png") });
       await page
         .getByRole("dialog")
         .last()
@@ -410,9 +411,15 @@ const server = http.createServer(async (req, res) => {
       const capture = async name => {
         const sheet = page.getByRole("dialog").last();
         assert(await sheet.evaluate(el => el.scrollWidth <= el.clientWidth + 1), name + " has no horizontal overflow");
-        await page.screenshot({path: path.join(output, `${name}-${theme}-${font}.png`)});
+        await page.screenshot({animations: "disabled",path: path.join(output, `${name}-${theme}-${font}.png`)});
       };
-      const close = () => page.getByRole("dialog").last().getByRole("button", {name:"关闭",exact:true}).click();
+      const close = async () => {
+        const dialog = page.getByRole("dialog").last();
+        const element = await dialog.elementHandle();
+        await dialog.getByRole("button", {name:"关闭",exact:true}).click();
+        // Dirty forms open confirmation; clean drawers finish their exit first.
+        if (!await page.getByRole("alertdialog").count()) await expect.poll(() => element.evaluate(el => el.isConnected)).toBe(false);
+      };
       await page.getByRole("button", {name:"自选操作",exact:true}).click();
       await page.getByRole("button", {name:"搜索并添加品种",exact:true}).click();
       await expect(page.locator(".mobile-search-row").first()).toBeVisible();
@@ -425,10 +432,12 @@ const server = http.createServer(async (req, res) => {
       await capture("new-group"); await close(); await close();
       await page.getByRole("button", {name:"自选操作",exact:true}).click();
       await page.getByRole("button", {name:"管理自选",exact:true}).click();
-      await page.locator(".mobile-form-detail > summary").click();
+      await page.getByRole("tab",{name:"分组",exact:true}).click();
+      const layout=await page.locator('.watch-manage-tabs').evaluate(el=>({width:el.clientWidth,panels:[...el.querySelectorAll(':scope > [data-slot="tabs-list"],:scope > [data-slot="tabs-content"]')].filter(n=>n.getClientRects().length).map(n=>n.getBoundingClientRect().width)}));
+      assert(layout.panels.every(w=>Math.abs(w-layout.width)<2),'tabs and active panel use full available width');
       await capture("manage-expanded");
-      await page.locator(".mobile-group-order > summary").first().click();
-      await page.locator(".mobile-group-order > summary").first().scrollIntoViewIfNeeded();
+      await page.locator(".mobile-group-order > [data-slot=collapsible-trigger]").first().click();
+      await page.locator(".mobile-group-order > [data-slot=collapsible-trigger]").first().scrollIntoViewIfNeeded();
       await capture("group-order");
       await page.getByLabel("分组名称", {exact:true}).first().fill("重点关注 · 编辑示例");
       await expect(page.getByRole("button", {name:"保存分组",exact:true})).toBeInViewport();
@@ -449,10 +458,10 @@ const server = http.createServer(async (req, res) => {
     slowPreferences=500;
     await swipe(160,304,false);
     await expect(page.locator('.mobile-pull-refresh')).toHaveText('松开刷新');
-    await page.screenshot({path:path.join(output,'pull-release.png')});
+    await page.screenshot({animations: "disabled",path:path.join(output,'pull-release.png')});
     await touch.send('Input.dispatchTouchEvent', {type:'touchEnd',touchPoints:[]});
     await expect(page.locator('.mobile-pull-refresh')).toHaveText('正在刷新…');
-    await page.screenshot({path:path.join(output,'pull-loading.png')});
+    await page.screenshot({animations: "disabled",path:path.join(output,'pull-loading.png')});
     await expect(page.locator('.mobile-pull-refresh')).toBeEmpty({timeout:15000});
     assert(preferenceReads>beforePull,'pull refresh re-reads the watchlist');
     slowPreferences=0;
@@ -464,7 +473,7 @@ const server = http.createServer(async (req, res) => {
     await expect.poll(() => heldHistory.length).toBeGreaterThan(0);
     await expect(page.locator('.mobile-pull-refresh')).toBeEmpty({timeout:1500});
     assert(heldHistory.length > 0 && heldQuotes.length > 0, 'supplier quotes and history remain pending when pull feedback closes');
-    await page.screenshot({path:path.join(output,'pull-complete-history-pending.png')});
+    await page.screenshot({animations: "disabled",path:path.join(output,'pull-complete-history-pending.png')});
     for (const route of heldHistory) await route.fulfill({json:{as_of:Date.now(),items:[],preparation:'ready'}});
     await page.unroute('**/api/market-data/sparklines/prepare');
     for (const route of heldQuotes) await route.fallback();
@@ -481,7 +490,7 @@ const server = http.createServer(async (req, res) => {
     );
     await expect(page.locator(".mobile-toast")).toHaveCount(0);
     await expect(page.locator('.mobile-spark-caption').first()).toHaveText('缓存');
-    await page.screenshot({ path: path.join(output, "offline-cache.png") });
+    await page.screenshot({animations: "disabled", path: path.join(output, "offline-cache.png") });
     await page.unroute("**/api/session");
     await page.evaluate(() => dispatchEvent(new Event("online")));
     await expect(page.locator(".mobile-watch-row.stale")).toHaveCount(0);
@@ -506,7 +515,7 @@ const server = http.createServer(async (req, res) => {
         await expect(stockRow.locator('.mobile-spark-caption')).toHaveCount(0);
         await expect(stockRow.locator('.mobile-spark-session-open')).toHaveCount(1);
         await expect(stockRow.locator('.mobile-spark-session-open title')).toContainText('开盘价 99.75');
-        assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>{const y=Number(el.getAttribute('y1'));return y>=4&&y<=44;}),'historical open reference follows the adaptive vertical domain');
+        assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>{const y=Number(el.getAttribute('y1'));return y>=4&&y<=46;}),'historical open reference follows the adaptive vertical domain');
         await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(0);
       }
       for (const theme of ['light','dark']) {
@@ -528,7 +537,7 @@ const server = http.createServer(async (req, res) => {
         }
         for(const width of [375,412]) {
           await page.setViewportSize({width,height:852});
-          await page.screenshot({path:path.join(output,`session-${phase}-${theme}-${width}.png`)});
+          await page.screenshot({animations: "disabled",path:path.join(output,`session-${phase}-${theme}-${width}.png`)});
         }
       }
     }
@@ -540,7 +549,7 @@ const server = http.createServer(async (req, res) => {
     await page.getByRole('link', { name: '更多', exact: true }).click();
     await page.getByRole('link', { name: '自选', exact: true }).click();
     await expect(page.locator('.mobile-spark-empty').first()).toHaveText('暂无日内数据');
-    await page.screenshot({ path: path.join(output, 'spark-empty.png') });
+    await page.screenshot({animations: "disabled", path: path.join(output, 'spark-empty.png') });
     await page.unroute('**/api/market-data/sparklines');
     await page.route('**/api/market-data/sparklines', route => route.abort());
     await page.getByRole('link', { name: '更多', exact: true }).click();
@@ -557,7 +566,7 @@ const server = http.createServer(async (req, res) => {
     await expect(
       page.getByText("还没有关注品种", { exact: true }),
     ).toBeVisible();
-    await page.screenshot({ path: path.join(output, "empty.png") });
+    await page.screenshot({animations: "disabled", path: path.join(output, "empty.png") });
     const native = await browser.newContext({ viewport: { width: 412, height: 852 } });
     await native.addInitScript(() => {
       window.appearanceMessages = [];
@@ -579,10 +588,10 @@ const server = http.createServer(async (req, res) => {
     await expect.poll(() => updates.evaluate(() => window.appearanceMessages.at(-1))).toBe('dark');
     await updates.getByRole('button', { name: /检查更新/ }).click();
     const updateSheet = updates.getByRole('dialog', { name: '检查更新', exact: true });
-    await expect(updateSheet).toContainText('当前应用：0.1.3');
+    await expect(updateSheet.locator('.mobile-facts > div').filter({has:updates.getByText('当前应用',{exact:true})}).locator('dd')).toHaveText('0.1.3');
     await updateSheet.getByRole('button', { name: '检查更新', exact: true }).click();
     await expect(updateSheet).toContainText('当前已是最新版 0.1.3');
-    await expect(updateSheet).toContainText('当前应用：0.1.3');
+    await expect(updateSheet.locator('.mobile-facts > div').filter({has:updates.getByText('当前应用',{exact:true})}).locator('dd')).toHaveText('0.1.3');
     await updates.screenshot({ path: path.join(output, 'app-update.png') });
     await native.close();
     holdPreferences = true;

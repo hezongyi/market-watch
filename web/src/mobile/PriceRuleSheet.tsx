@@ -400,7 +400,7 @@ export default function PriceRuleSheet({
           {!online
             ? "连接核验后才能提交"
             : !caps
-              ? "正在核验组合能力…"
+              ? "正在核验实时接续能力…"
               : !available?.available
                 ? available?.reason || "此判定方式暂不可用"
                 : "创建时已在目标一侧，不视为已经发生穿越。断线未观测路径不保证能够补判。"}

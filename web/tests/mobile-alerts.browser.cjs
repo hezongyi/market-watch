@@ -96,9 +96,11 @@ const server=http.createServer(async(req,res)=>{
   await edit.getByRole('button',{name:'保存告警',exact:true}).click();
   await expect(edit.getByRole('alert')).toContainText('另一个窗口');await expect(edit.getByLabel('目标价格',{exact:true})).toHaveValue('124');
   assert.deepEqual(edits[0].config.association,rows[0].config.association);
-  page.once('dialog',d=>d.dismiss());await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
+  await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
+  await page.getByRole('dialog',{name:'放弃本次修改？',exact:true}).getByRole('button',{name:'继续编辑',exact:true}).click();
   await expect(edit).toBeVisible();
-  page.once('dialog',d=>d.accept());await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
+  await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
+  await page.getByRole('dialog',{name:'放弃本次修改？',exact:true}).getByRole('button',{name:'放弃修改',exact:true}).click();
   await expect(edit).toHaveCount(0);await expect(page.getByRole('dialog',{name:'手机价格规则',exact:true})).toBeVisible();
   rows[0].execution={...rows[0].execution,state:'monitoring',label:'后台最新监控状态',message:'后台刷新已接管'};
   rows[0].count=1;
@@ -108,11 +110,12 @@ const server=http.createServer(async(req,res)=>{
   conflict=false;await page.getByRole('button',{name:'暂停',exact:true}).click();
   await expect(page.getByRole('button',{name:'恢复',exact:true})).toBeVisible();assert.equal(actions[0].version,1);assert.equal(actions[0].control_revision,1);
   await page.getByRole('button',{name:'关闭',exact:true}).click();
-  await page.getByRole('button',{name:'事件记录',exact:true}).click();await page.getByRole('button',{name:'异常 / 恢复',exact:true}).click();
+  await page.getByRole('button',{name:'事件记录',exact:true}).click();await page.getByRole('tab',{name:'异常 / 恢复',exact:true}).click();
   await page.getByRole('button',{name:/执行缺口/}).click();await expect(page.getByText('查看',{exact:true})).toBeVisible();
   await page.getByRole('button',{name:'标记已处理',exact:true}).click();await expect.poll(()=>observations.filter(v=>v.kind==='handled').length).toBe(1);
   await page.getByRole('button',{name:'关闭通知',exact:true}).click();
-  await page.getByRole('button',{name:'关闭',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'执行缺口',exact:true})).toHaveCount(0);
+  await page.getByRole('dialog',{name:'事件记录',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
   await page.evaluate(()=>document.documentElement.style.fontSize='150%');assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
   await page.screenshot({path:'/tmp/mw-android-personal-v205-alerts.png'});
   assert.deepEqual(errors,[]);

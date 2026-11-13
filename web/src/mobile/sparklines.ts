@@ -22,6 +22,32 @@ export function sparklineExpires(item: Sparkline) {
   return item.valid_until ?? item.window_end;
 }
 
+type SparkQuote = { s: string; v: Record<string, any>; snapshot?: { revision_id?: string } };
+/** A display-only quote overlay. Source clocks, never HTTP receipt time, place
+ * the tail; the original history and cached observations remain untouched. */
+export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Date.now()): Sparkline {
+  const value = quote?.v;
+  if (quote?.s !== "ok" || !value || value.fetch_status !== "ok" || value.session_conflict ||
+      !item.points.length || item.ticker.startsWith("MWH:") || item.session?.previous ||
+      now < item.window_start || now >= item.window_end ||
+      value.time_type === "fixed_history" || value.time_type === "source_d1" ||
+      (quote.snapshot?.revision_id && quote.snapshot.revision_id !== item.revision?.composite_revision_id)) return item;
+  const sourceMinute = value.time_type === "source_m1" || value.resolution === "M1" ||
+    (value.time_type === "composite_snapshot" && ["source_m1", "candle_close_sample"].includes(value.observation_type));
+  const time = Number.isFinite(value.quote_time) ? value.quote_time : sourceMinute ? value.data_start : undefined;
+  const price = value.lp;
+  if (!Number.isFinite(time) || !Number.isFinite(price) || time < item.window_start ||
+      time >= item.window_end || time > now) return item;
+  const last = item.points.at(-1);
+  if (last && time < last.time) return item;
+  if (last && time === last.time && Number(last.price) === price) return item;
+  const step = ({ M1: 60_000, M5: 300_000, M15: 900_000, M30: 1_800_000, H1: 3_600_000 } as Record<string, number>)[item.timeframe || ""] || 60_000;
+  const same = last?.time === time;
+  const gap = last ? Math.floor((time - item.window_start) / step) - Math.floor((last.time - item.window_start) / step) > 1 : false;
+  const point = { time, price: String(price), gap_before: same ? last!.gap_before : gap };
+  return { ...item, points: [...(same ? item.points.slice(0, -1) : item.points), point], last_data_at: time };
+}
+
 type Request = (
   items: { ticker: string; composite_revision_id?: string }[],
   signal: AbortSignal,
@@ -40,15 +66,65 @@ export function sparklineLoader(
 ) {
   let epoch = 0;
   const controllers = new Set<AbortController>();
-  function cancel() {
+  const historyControllers = new Set<AbortController>();
+  const preparations = new Map<string, Promise<void>>();
+  const historyQueue: { item: Sparkline; lifetime: number; resolve(): void; promise: Promise<void> }[] = [];
+  let lifetime = 0, activeHistory = 0;
+  function cancelObservations() {
     ++epoch;
     for (const controller of controllers) controller.abort();
     controllers.clear();
   }
+  function cancel() {
+    cancelObservations();
+    ++lifetime;
+    for (const controller of historyControllers) controller.abort();
+    historyControllers.clear();
+    for (const task of historyQueue.splice(0)) task.resolve();
+    preparations.clear();
+  }
+  function drainHistory() {
+    while (history && activeHistory < 2 && historyQueue.length) {
+      const task = historyQueue.shift()!, key = task.item.ticker + ":" + task.item.window_start;
+      const controller = new AbortController();
+      historyControllers.add(controller);
+      ++activeHistory;
+      void (async () => {
+        try {
+          const response = await history.request(task.item.ticker, controller.signal);
+          if (task.lifetime !== lifetime || controller.signal.aborted) return;
+          receive(response.items.filter(row => sparklineExpires(row) > response.as_of));
+          if (response.preparation !== "retry")
+            for (const row of response.items)
+              if (!row.session || (!row.session.previous && row.points.length))
+                history.prepared.set(row.ticker + ":" + row.window_start, sparklineExpires(row));
+        } catch (error) {
+          if (task.lifetime === lifetime && !controller.signal.aborted) failure(error);
+        } finally {
+          historyControllers.delete(controller);
+          if (preparations.get(key) === task.promise) preparations.delete(key);
+          --activeHistory;
+          task.resolve();
+          drainHistory();
+        }
+      })();
+    }
+  }
+  function prepare(item: Sparkline) {
+    const key = item.ticker + ":" + item.window_start;
+    const pending = preparations.get(key);
+    if (pending) return pending;
+    let resolve!: () => void;
+    const promise = new Promise<void>(done => { resolve = done; });
+    preparations.set(key, promise);
+    historyQueue.push({ item, lifetime, resolve, promise });
+    drainHistory();
+    return promise;
+  }
   return {
     cancel,
     async load(items: { ticker: string; composite_revision_id?: string }[], observed?: () => void) {
-      cancel();
+      cancelObservations();
       const generation = epoch;
       const distinct = [
         ...new Map(items.map((item) => [JSON.stringify(item), item])).values(),
@@ -87,27 +163,9 @@ export function sparklineLoader(
       );
       if (generation !== epoch) return;
       observed?.();
-      // History continues after visible refresh completes; at most two requests run at once.
-      await Promise.all([0, 1].map(async () => {
-        while (history && generation === epoch && pendingHistory.length) {
-          const item = pendingHistory.shift()!;
-          const controller = new AbortController();
-          controllers.add(controller);
-          try {
-            const response = await history.request(item.ticker, controller.signal);
-            if (generation !== epoch || controller.signal.aborted) continue;
-            receive(response.items.filter(row => sparklineExpires(row) > response.as_of));
-            if (response.preparation !== "retry")
-              for (const row of response.items)
-                if (!row.session || (!row.session.previous && row.points.length))
-                  history.prepared.set(row.ticker + ":" + row.window_start, sparklineExpires(row));
-          } catch (error) {
-            if (generation === epoch && !controller.signal.aborted) failure(error);
-          } finally {
-            controllers.delete(controller);
-          }
-        }
-      }));
+      // Preparations survive the next observation poll and share a two-request
+      // queue. Explicit cancel() still ends everything when the page pauses.
+      await Promise.all(pendingHistory.map(prepare));
     },
   };
 }
@@ -159,7 +217,7 @@ export function sparklineMinimumRange(instrument?: string) {
 /** Scale to the observed session range, with a class-specific floor so the
  * opening noise does not fill the chart. Reference price follows the same axis. */
 export function sparklineScale(item: Sparkline, height = 48, previousClose?: number, instrument?: string) {
-  const prices = item.points.map(point => Number(point.price)).filter(Number.isFinite);
+  const prices = sparklineDisplayPoints(item).map(point => Number(point.price)).filter(Number.isFinite);
   const reference = typeof previousClose === "number" && Number.isFinite(previousClose)
     ? previousClose : undefined;
   const low = prices.length ? Math.min(...prices) : reference ?? 0;
@@ -177,10 +235,35 @@ export function sparklineScale(item: Sparkline, height = 48, previousClose?: num
   return { y, referenceY, referenceOutside };
 }
 
+/** Reduce M1 observations only for display, retaining the latest point in each
+ * five-minute bucket and keeping each gap-separated segment independent. */
+export function sparklineDisplayPoints(item: Sparkline) {
+  if (item.timeframe !== "M1" || item.points.length < 2) return item.points;
+  const interval = 5 * 60_000;
+  const sampled: Sparkline["points"] = [];
+  let bucket: number | undefined;
+  let latest: Sparkline["points"][number] | undefined;
+  const flush = () => {
+    if (latest) sampled.push(latest);
+    latest = undefined;
+    bucket = undefined;
+  };
+  for (const point of item.points) {
+    if (point.gap_before) flush();
+    const nextBucket = Math.floor((point.time - item.window_start) / interval);
+    if (bucket !== undefined && nextBucket !== bucket) flush();
+    bucket = nextBucket;
+    latest = latest?.gap_before ? { ...point, gap_before: true } : point;
+  }
+  flush();
+  return sampled;
+}
+
 /** Width is the rendered CSS width. Fixed time coordinates and separate paths
  * on every gap remain unchanged; only redundant display points are removed. */
 export function sparklinePaths(item: Sparkline, width = 200, height = 48, previousClose?: number, instrument?: string) {
-  const prices = item.points.map((point) => Number(point.price));
+  const pointsToDraw = sparklineDisplayPoints(item);
+  const prices = pointsToDraw.map((point) => Number(point.price));
   if (!prices.length || prices.some((price) => !Number.isFinite(price)))
     return [];
   const scale = sparklineScale(item, height, previousClose, instrument);
@@ -204,7 +287,7 @@ export function sparklinePaths(item: Sparkline, width = 200, height = 48, previo
     });
     points = [];
   };
-  item.points.forEach((point, index) => {
+  pointsToDraw.forEach((point, index) => {
     if (point.gap_before) finish();
     const x =
       ((point.time - item.window_start) /

@@ -1,17 +1,31 @@
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { X } from "lucide-react";
+import { useWatchOverlays, WatchDrawer } from "./WatchOverlays";
 
-export default function MobileSheet({
+export type MobileSheetProps = {
+  title: string;
+  description?: string;
+  dirty?: boolean;
+  open?: boolean;
+  fullHeight?: boolean;
+  dismissible?: boolean;
+  close(): void;
+  onClosed?(): void;
+  children: ReactNode;
+};
+
+export default function MobileSheet(props: MobileSheetProps) {
+  const watch = useWatchOverlays();
+  if (watch) return <WatchDrawer {...props} />;
+  return props.open === false ? null : <NativeMobileSheet {...props} />;
+}
+
+function NativeMobileSheet({
   title,
   dirty = false,
   close,
   children,
-}: {
-  title: string;
-  dirty?: boolean;
-  close(): void;
-  children: ReactNode;
-}) {
+}: MobileSheetProps) {
   const dialog = useRef<HTMLDialogElement>(null),
     label = useId();
   const current = useRef({ dirty, close });

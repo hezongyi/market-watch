@@ -1,0 +1,202 @@
+/* Chart-owned controls; the professional canvas retains its native touch UI. */
+.mobile-chart {
+  min-width: 0;
+  min-height: 200px;
+  background: var(--bg);
+}
+.chart-workspace {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  isolation: isolate;
+}
+.chart-workspace > .mobile-chart-canvas {
+  width: 100%;
+  min-width: 0;
+}
+.chart-state-cover {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: auto;
+  padding: 24px;
+  background: var(--bg);
+}
+.mobile-chart .chart-failure {
+  max-width: 360px;
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 8px 12px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+  color: var(--text);
+}
+.mobile-chart .chart-failure > svg {
+  width: 22px;
+  height: 22px;
+  color: var(--muted);
+}
+.mobile-chart .chart-failure [data-slot="alert-title"] {
+  font-size: 1.071429rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+.mobile-chart .chart-failure [data-slot="alert-description"] {
+  grid-column: 2;
+  color: var(--muted);
+  font-size: 0.928571rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.mobile-chart .chart-failure button {
+  grid-column: 1 / -1;
+  margin-top: 12px;
+}
+.mobile-chart .chart-failure button,
+.mobile-chart .chart-empty button {
+  min-height: 48px;
+  height: auto;
+  padding: 12px 16px;
+  gap: 8px;
+  font-size: 1rem;
+  line-height: 1.5;
+  border-radius: 12px;
+  white-space: normal;
+}
+.mobile-chart .chart-failure button {
+  background: var(--surface);
+}
+.mobile-chart .chart-empty button {
+  background: var(--button);
+  color: white;
+  border-color: transparent;
+}
+.chart-loading {
+  flex-direction: column;
+  gap: 28px;
+}
+.chart-loading-skeleton {
+  width: min(100%, 300px);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.chart-loading-skeleton > [data-slot="skeleton"] {
+  height: 12px;
+  border-radius: 6px;
+}
+.chart-loading-skeleton > [data-slot="skeleton"]:first-child {
+  width: 38%;
+}
+.chart-loading-skeleton > [data-slot="skeleton"]:nth-child(2) {
+  width: 100%;
+  height: 100px;
+}
+.chart-loading-skeleton > [data-slot="skeleton"]:last-child {
+  width: 65%;
+}
+.chart-loading p {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 0.928571rem;
+}
+.chart-loading p svg {
+  width: 16px;
+  height: 16px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-chart .chart-loading [data-slot="skeleton"],
+  .mobile-chart .chart-loading [data-slot="spinner"] {
+    animation: none;
+  }
+}
+
+.mobile-chart .chart-empty {
+  border: 0;
+  border-radius: 0;
+}
+.mobile-chart .mobile-search-info strong {
+  display: block;
+  line-height: 1.5;
+}
+.mobile-chart .mobile-search-name {
+  display: block;
+  color: var(--muted);
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+/* InputGroup owns the focus ring; avoid a second rectangle around its input. */
+.mobile-chart
+  .data-search-input
+  [data-slot="input-group-control"]:focus-visible {
+  outline: none;
+  box-shadow: none;
+}
+
+.chart-history-progress {
+  position: absolute;
+  bottom: 48px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.5;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.chart-preview {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  pointer-events: auto;
+}
+.chart-preview img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.chart-preview span { position: absolute; bottom: 18px; padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; background: color-mix(in srgb, var(--surface) 92%, transparent); color: var(--muted); font-size: .82rem; }
+.chart-history-progress, .mobile-chart .chart-history-failure, .chart-state-cover:has(.chart-failure) { z-index: 1; }
+.chart-history-progress svg {
+  width: 14px;
+  height: 14px;
+}
+.mobile-chart .chart-history-failure {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: calc(100% - 24px);
+  max-height: calc(100% - 24px);
+  overflow: auto;
+  padding: 14px;
+  border-color: var(--line);
+  background: var(--surface);
+  color: var(--text);
+}
+.mobile-chart .chart-history-failure [data-slot="alert-description"] {
+  overflow-wrap: anywhere;
+  color: var(--muted);
+}
+.mobile-chart .chart-history-failure button {
+  grid-column: 1 / -1;
+  min-height: 44px;
+  margin-top: 10px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .chart-history-progress [data-slot="spinner"] {
+    animation: none;
+  }
+}

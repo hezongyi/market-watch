@@ -1,0 +1,30 @@
+/* Mobile controls only. Omit Tailwind preflight to preserve existing screens. */
+@import "tailwindcss/theme.css" layer(theme);
+@import "tailwindcss/utilities.css" layer(utilities) source(none);
+@import "tw-animate-css";
+@source "./components";
+
+@theme inline {
+  --color-background: var(--bg);
+  --color-foreground: var(--text);
+  --color-card: var(--surface);
+  --color-card-foreground: var(--text);
+  --color-popover: var(--surface);
+  --color-popover-foreground: var(--text);
+  --color-primary: var(--button);
+  --color-primary-foreground: white;
+  --color-secondary: var(--surface2);
+  --color-secondary-foreground: var(--text);
+  --color-muted: var(--surface2);
+  --color-muted-foreground: var(--muted);
+  --color-accent: var(--selected, var(--surface2));
+  --color-accent-foreground: var(--accent);
+  --color-destructive: var(--down);
+  --color-border: var(--line);
+  --color-input: var(--line);
+  --color-ring: var(--accent);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.5rem;
+}

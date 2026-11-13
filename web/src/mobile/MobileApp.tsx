@@ -2,20 +2,14 @@ import {
   useCallback,
   useEffect,
   useLayoutEffect,
+  useMemo,
   useRef,
   useState,
+  type FormEvent,
 } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import {
-  Bell,
-  CandlestickChart,
-  Database,
-  Ellipsis,
-  List,
-  Eye,
-  EyeOff,
-} from "lucide-react";
-import { api, ApiError, setCsrf } from "../api";
+import { Bell, CandlestickChart, Database, Ellipsis, List } from "lucide-react";
+import { api, ApiError, errorMessage, setCsrf } from "../api";
 import MobileChart, { type MobileChartHandle } from "./MobileChart";
 import {
   allowSession,
@@ -32,14 +26,17 @@ import {
 } from "./cache";
 import { useMobileShell } from "./shell";
 import { mobileMarket, type MobileMarket } from "./market";
-import type { MarketTransportState } from "../advanced/providerSubscriptions";
 import WatchPage from "./WatchPage";
 import DataPage from "./DataPage";
 import MobileToast from "./MobileToast";
 import AlertsPage from "./AlertsPage";
 import MorePage from "./MorePage";
+import LoginPage, { type LoginError, type LoginIntent } from "./LoginPage";
+import { Button } from "./components/ui/button";
+import { MOBILE_OVERLAYS } from "./WatchOverlays";
 import { useMobileNotices } from "./notices";
-import { MobileEmpty, MobileLoading } from "./MobileState";
+import { ChartEmpty } from "./ChartState";
+import { mobileChartPreparation } from "./chartPreparation";
 
 type Series = {
   ticker: string;
@@ -66,24 +63,36 @@ export default function MobileApp() {
     );
   const [message, setMessage] = useState(""),
     [password, setPassword] = useState(""),
-    [reveal, setReveal] = useState(false),
     [busy, setBusy] = useState(false);
+  const [loginError, setLoginError] = useState<LoginError>();
+  const [loginIntent, setLoginIntent] = useState<LoginIntent>();
+  const [checking, setChecking] = useState(false);
   const [symbol, setSymbol] = useState("");
-  const [theme, setTheme] = useState<"dark" | "light">("dark"),
-    [chartDirty, setChartDirty] = useState(false);
+  const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [chartOpened, setChartOpened] = useState(false);
+  const [firstWatchSymbol, setFirstWatchSymbol] = useState("");
   const [createAlert, setCreateAlert] = useState(0);
   const [records, setRecords] = useState(false);
   const notices = useMobileNotices(profile, state === "online");
   const [connection, setConnection] = useState<MobileMarket>();
-  const [transport, setTransport] = useState<MarketTransportState>();
-  useEffect(() => connection?.observe(setTransport), [connection]);
   const chart = useRef<MobileChartHandle>(null),
     generation = useRef(0),
     session = useRef<AbortController | undefined>(undefined),
     sessionAllowed = useRef(false),
     signingOut = useRef(false);
   const report = useCallback((value: string) => setMessage(value), []);
+  const preparation = useMemo(() => profile && state === "online"
+    ? mobileChartPreparation(profile) : undefined,
+    [profile?.origin, profile?.subject, profile?.generation, state === "online"]);
+  useEffect(() => {
+    if (!preparation) return;
+    const visibility = () => preparation.visibility(document.hidden);
+    document.addEventListener("visibilitychange", visibility);
+    return () => { document.removeEventListener("visibilitychange", visibility); preparation.dispose(); };
+  }, [preparation]);
+  useEffect(() => {
+    preparation?.update(symbol, firstWatchSymbol, location.pathname === "/chart");
+  }, [preparation, symbol, firstWatchSymbol, location.pathname]);
   const navigation = useRef<HTMLElement>(null);
   useLayoutEffect(() => {
     const nav = navigation.current;
@@ -98,8 +107,11 @@ export default function MobileApp() {
     observer.observe(nav);
     return () => observer.disconnect();
   }, [Boolean(profile), state === "login"]);
-  const watchHasProfile = useRef(false);
-  watchHasProfile.current = location.pathname === "/" && Boolean(profile);
+  const loginVisible = useRef(false);
+  loginVisible.current = !profile;
+  const cachedPageHasProfile = useRef(false);
+  cachedPageHasProfile.current =
+    ["/", "/data"].includes(location.pathname) && Boolean(profile);
   useEffect(() => {
     if (!profile || state !== "online") {
       setConnection(undefined);
@@ -136,6 +148,7 @@ export default function MobileApp() {
   const refresh = useCallback(async () => {
     if (signingOut.current) return;
     setBusy(false);
+    setChecking(true);
     const token = ++generation.current;
     session.current?.abort();
     const controller = new AbortController();
@@ -172,14 +185,25 @@ export default function MobileApp() {
         setCsrf("");
         setProfile(undefined);
         setState("login");
-        setPassword("");
+        if (!loginVisible.current) setPassword("");
       } else {
         setState("offline");
-        // Watch already shows cached-data status inline. Avoid covering its
-        // header with a second notice for background network failures.
-        if (!(error instanceof TypeError && watchHasProfile.current))
+        // Watch and Data show cached/offline status inline. Keep their headers
+        // clear of duplicate notices for background network failures.
+        if (loginVisible.current) {
+          setLoginError({
+            message:
+              error instanceof TypeError
+                ? "请检查网络和服务器地址，然后重试。"
+                : errorMessage(error),
+          });
+        } else if (!(
+          error instanceof TypeError && cachedPageHasProfile.current
+        ))
           report(String(error));
       }
+    } finally {
+      if (token === generation.current) setChecking(false);
     }
   }, [report]);
   useEffect(() => {
@@ -205,9 +229,11 @@ export default function MobileApp() {
       setProfile(undefined);
       setState("login");
       setPassword("");
-      setChartDirty(false);
       setChartOpened(false);
       setBusy(false);
+      setChecking(false);
+      setLoginIntent(undefined);
+      setLoginError(undefined);
     };
     const foreground = () => {
       if (!document.hidden) void refresh();
@@ -235,14 +261,11 @@ export default function MobileApp() {
     const back = (event: Event) => {
       // On Window, target listeners may run in registration order even when
       // the sheet listener uses capture. Let the open top layer own this event.
-      if (
-        event.defaultPrevented ||
-        document.querySelector("dialog.mobile-sheet[open]")
-      )
+      if (event.defaultPrevented || document.querySelector(MOBILE_OVERLAYS))
         return;
       event.preventDefault();
       if (password) {
-        if (window.confirm("放弃尚未提交的密码输入？")) setPassword("");
+        if (!busy && !checking) setLoginIntent("discard");
         return;
       }
       void (async () => {
@@ -255,7 +278,16 @@ export default function MobileApp() {
     };
     addEventListener("mw-mobile-back", back);
     return () => removeEventListener("mw-mobile-back", back);
-  }, [location.pathname, password, flush, shell, report, navigate]);
+  }, [
+    location.pathname,
+    password,
+    busy,
+    checking,
+    flush,
+    shell,
+    report,
+    navigate,
+  ]);
   async function logout() {
     if (signingOut.current) return;
     signingOut.current = true;
@@ -265,8 +297,10 @@ export default function MobileApp() {
     setRecords(false);
     setProfile(undefined);
     setPassword("");
+    setLoginError(undefined);
+    setLoginIntent(undefined);
+    setChecking(false);
     setSymbol("");
-    setChartDirty(false);
     setChartOpened(false);
     setState("login");
     setBusy(true);
@@ -287,6 +321,46 @@ export default function MobileApp() {
     setCsrf("");
     shell.clearCookies();
     navigate("/", { replace: true });
+  }
+  async function login(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy || checking) return;
+    setBusy(true);
+    setLoginError(undefined);
+    setMessage("");
+    const token = ++generation.current,
+      controller = new AbortController();
+    session.current?.abort();
+    session.current = controller;
+    try {
+      const result = await api("/login", { password }, controller.signal);
+      if (token !== generation.current || controller.signal.aborted) return;
+      setCsrf(result.csrf);
+      setPassword("");
+      sessionAllowed.current = true;
+      await allowSession(
+        window.location.origin,
+        profileFor(window.location.origin, result.subject),
+      ).catch(() => report("本机登录状态未记住"));
+      if (token !== generation.current || controller.signal.aborted) return;
+      setBusy(false);
+      await refresh();
+    } catch (error) {
+      if (token === generation.current && !controller.signal.aborted) {
+        setLoginError({
+          password: error instanceof ApiError && error.status === 401,
+          message:
+            error instanceof ApiError && error.status === 401
+              ? "密码不正确，请重新输入。"
+              : error instanceof TypeError
+                ? "请检查网络和服务器地址，输入的密码已保留。"
+                : errorMessage(error),
+        });
+      }
+    } finally {
+      if (token === generation.current && !controller.signal.aborted)
+        setBusy(false);
+    }
   }
   async function select(row: Series) {
     if (!profile || !row.ticker) return;
@@ -310,110 +384,44 @@ export default function MobileApp() {
       {shell.update && (
         <aside className="mobile-update" role="status">
           页面有更新
-          <button
+          <Button
             onClick={() =>
               void shell.apply().catch((error) => report(String(error)))
             }
           >
             更新页面
-          </button>
+          </Button>
         </aside>
       )}
       {notices.popup && !message && (location.pathname !== "/" || !profile) && (
         <MobileToast message={notices.popup} close={notices.closePopup} />
       )}
       <main id="mobile-main">
-        {state === "login" || (!profile && state !== "loading") ? (
-          <section className="mobile-login">
-            <h1>连接守望</h1>
-            <p>{window.location.origin}</p>
-            <form
-              onSubmit={async (event) => {
-                event.preventDefault();
-                if (busy) return;
-                setBusy(true);
-                setMessage("");
-                const token = ++generation.current,
-                  controller = new AbortController();
-                session.current?.abort();
-                session.current = controller;
-                try {
-                  const result = await api(
-                    "/login",
-                    { password },
-                    controller.signal,
-                  );
-                  if (token !== generation.current || controller.signal.aborted)
-                    return;
-                  setCsrf(result.csrf);
-                  setPassword("");
-                  sessionAllowed.current = true;
-                  await allowSession(
-                    window.location.origin,
-                    profileFor(window.location.origin, result.subject),
-                  ).catch(() => report("本机登录状态未记住"));
-                  if (token !== generation.current || controller.signal.aborted)
-                    return;
-                  setBusy(false);
-                  await refresh();
-                } catch (error) {
-                  if (
-                    token === generation.current &&
-                    !controller.signal.aborted
-                  )
-                    report(String(error));
-                } finally {
-                  if (!controller.signal.aborted) setBusy(false);
-                }
-              }}
-            >
-              <label htmlFor="mobile-password">密码</label>
-              <div className="mobile-password">
-                <input
-                  id="mobile-password"
-                  autoComplete="current-password"
-                  type={reveal ? "text" : "password"}
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                />
-                <button
-                  type="button"
-                  aria-label={reveal ? "隐藏密码" : "显示密码"}
-                  aria-pressed={reveal}
-                  onClick={() => setReveal(!reveal)}
-                >
-                  {reveal ? <EyeOff /> : <Eye />}
-                </button>
-              </div>
-              <button className="primary" disabled={busy}>
-                {busy ? "正在连接…" : "登录"}
-              </button>
-            </form>
-            <button onClick={() => void refresh()}>重新连接</button>
-            <button onClick={() => void logout().then(() => shell.configure())}>
-              换服务器
-            </button>
-          </section>
+        {state === "login" || !profile ? (
+          <LoginPage
+            password={password}
+            changePassword={(value) => {
+              setPassword(value);
+              setLoginError(undefined);
+            }}
+            busy={busy}
+            checking={checking || state === "loading"}
+            error={loginError}
+            intent={loginIntent}
+            setIntent={setLoginIntent}
+            submit={login}
+            reconnect={() => {
+              setLoginError(undefined);
+              void refresh();
+            }}
+            configure={async () => {
+              await logout();
+              setMessage("");
+              if (window.MWMobileHost) shell.configure();
+            }}
+          />
         ) : (
           <>
-            {location.pathname === "/more" && (
-              <header className="mobile-title">
-                <div>
-                  <h1>更多</h1>
-                  <small>
-                    {state === "online" && transport?.state === "open"
-                      ? `最近通信 ${new Date(Math.max(transport.heartbeatAt || 0, transport.messageAt || 0)).toLocaleTimeString()}`
-                      : "连接状态待确认"}
-                  </small>
-                </div>
-              </header>
-            )}
-            {state === "loading" && !profile && (
-              <section className="mobile-content">
-                <MobileLoading label="正在读取上次内容…" />
-              </section>
-            )}
             {profile &&
               state === "online" &&
               connection &&
@@ -423,40 +431,49 @@ export default function MobileApp() {
                   ref={chart}
                   profile={profile}
                   connection={connection}
+                  preparation={preparation!}
                   symbol={symbol}
+                  theme={theme}
+                  rememberSymbol={(ticker) => {
+                    setSymbol(ticker);
+                    void writeSnapshot(
+                      profile,
+                      "chart-selection",
+                      ticker,
+                    ).catch(() => report("本次品种选择未记住"));
+                  }}
                   visible={location.pathname === "/chart"}
                   report={report}
-                  dirty={setChartDirty}
-                  createAlert={() => {
-                    navigate("/alerts");
-                    setCreateAlert((value) => value + 1);
-                  }}
                 />
               )}
             {location.pathname === "/chart" && state !== "online" && (
-              <MobileEmpty offline title="等待连接图表">
-                上次图表设置已保留，连接核验后加载专业图表。
-              </MobileEmpty>
-            )}
-            {location.pathname === "/chart" && !symbol && (
-              <MobileEmpty
-                title="选择要查看的品种"
+              <ChartEmpty
+                offline
+                title="等待连接图表"
                 action={
-                  <button className="primary" onClick={() => navigate("/data")}>
-                    选择品种
-                  </button>
+                  <Button disabled={checking} onClick={() => void refresh()}>
+                    {checking ? "正在连接…" : "重新连接"}
+                  </Button>
                 }
               >
-                从自选或数据页选择真实系列打开图表。
-              </MobileEmpty>
+                上次图表设置已保留，连接核验后加载专业图表。
+              </ChartEmpty>
             )}
-            {location.pathname === "/chart" && chartDirty && (
-              <span className="mobile-unsaved" role="status">
-                本次图表更改尚未记住
-              </span>
-            )}
+            {location.pathname === "/chart" &&
+              state === "online" &&
+              !symbol && (
+                <ChartEmpty
+                  title="选择要查看的品种"
+                  action={
+                    <Button onClick={() => navigate("/data")}>选择品种</Button>
+                  }
+                >
+                  从自选或数据页选择真实系列打开图表。
+                </ChartEmpty>
+              )}
             {profile && (
               <WatchPage
+                firstSymbol={setFirstWatchSymbol}
                 notice={!message ? notices.popup : undefined}
                 closeNotice={notices.closePopup}
                 showNotices={() => {

@@ -53,7 +53,7 @@ const server=http.createServer(async(req,res)=>{
  const base='http://127.0.0.1:'+server.address().port;
  const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE || undefined});
  const context=await browser.newContext({viewport:{width:412,height:915},isMobile:true,hasTouch:true});
- const page=await context.newPage();page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text().slice(0,1800));});page.on('pageerror',error=>{errors.push(error.message);console.error('PAGE ERROR',error.message);});
+ const page=await context.newPage();const native=()=>page.frameLocator('.mobile-chart-canvas iframe');page.on('console',msg=>{if(msg.type()==='error')consoleErrors.push(msg.text().slice(0,1800));});page.on('pageerror',error=>{errors.push(error.message);console.error('PAGE ERROR',error.message);});
  try {
    await page.goto(base+'/m/');await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
    await page.getByLabel('密码',{exact:true}).fill('test-only');await page.getByRole('button',{name:'登录',exact:true}).click();
@@ -62,7 +62,7 @@ const server=http.createServer(async(req,res)=>{
    await page.getByRole('link',{name:'数据',exact:true}).click();
    await page.getByRole('button',{name:/TEST-COMPOSITE/}).click();
    await page.getByRole('button',{name:'打开图表',exact:true}).click();
-   await expect(page.getByRole('button',{name:'指标',exact:true})).toBeEnabled({timeout:30000});
+   await expect(page.locator('.chart-workspace')).toHaveAttribute('aria-busy','false',{timeout:30000});
    await expect.poll(()=>page.evaluate(()=>Boolean(window.MW_TEST_WIDGET?.activeChart().dataReady())),{timeout:30000}).toBe(true);
    assert.equal(await page.evaluate(()=>window.MW_TEST_WIDGET.chartsCount()),1);checks.push('actual pinned widget loads controlled composite through shared market runtime');
    for(const viewport of [{width:375,height:812},{width:412,height:915},{width:915,height:412}]) {
@@ -73,9 +73,9 @@ const server=http.createServer(async(req,res)=>{
    await page.screenshot({path:process.env.MW_MOBILE_SCREENSHOT || '/tmp/mw-android-personal-v205-chart.png'});
    checks.push('375/412 widths and landscape at 150% text without horizontal overflow');
    const registered=await page.evaluate(()=>window.MW_TEST_WIDGET.getStudiesList().length);assert.ok(registered>50);checks.push('actual registered studies: '+registered);
-   await page.getByRole('button',{name:'指标',exact:true}).click();
-   await expect.poll(()=>page.frames().some(frame=>frame.url().startsWith('blob:'))).toBe(true);
-   const frame=page.frames().find(frame=>frame.url().startsWith('blob:'));
+   await native().getByRole('button',{name:'指标 & 策略',exact:true}).click();
+   await expect.poll(()=>page.frames().some(frame=>frame.url().endsWith('/sameorigin.html'))).toBe(true);
+   const frame=page.frames().find(frame=>frame.url().endsWith('/sameorigin.html'));
    await expect(frame.getByRole('dialog').first()).toBeVisible({timeout:30000});
    assert.equal(await frame.locator('.mw-indicator-fallback').count(),0,'mobile must open the real native indicator UI');
    await page.evaluate(()=>window.dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
@@ -86,17 +86,19 @@ const server=http.createServer(async(req,res)=>{
    await page.evaluate(id=>window.MW_TEST_WIDGET.activeChart().showPropertiesDialog(id),study);
    const parameters=frame.locator('[data-name="indicator-properties-dialog"]');await expect(parameters).toBeVisible();
    const number=parameters.locator('input').first();await number.fill('14');
-   page.once('dialog',dialog=>dialog.dismiss());
+
    await page.getByRole('link',{name:'更多',exact:true}).click();
+   await expect(page.getByRole('alertdialog',{name:'放弃未应用的参数？'})).toBeVisible();
+   await page.getByRole('button',{name:'继续编辑',exact:true}).click();
+   await expect(page.getByRole('alertdialog')).toHaveCount(0);
    await expect(page).toHaveURL(/\/m\/chart$/);await expect(number).toHaveValue('14');
    await parameters.getByRole('button',{name:'取消',exact:true}).click();
    await expect.poll(()=>page.evaluate(id=>window.MW_TEST_WIDGET.activeChart().getStudyById(id).getInputValues().find(v=>v.id==='length').value,study)).toBe(9);
    checks.push('back closes top native dialog; declining parameter discard keeps input; cancel retains applied value');
 
-   await page.getByRole('button',{name:'十字线',exact:true}).click();
-   await expect(page.getByRole('button',{name:'十字线',exact:true})).toHaveAttribute('aria-pressed','true');
-   checks.push('native indicator dialog, RSI subpane and touch tracking crosshair');
-   await page.getByLabel('图表周期').selectOption('5');
+   const shortcut=native().locator('.mw-mobile-crosshair-entry:visible');await shortcut.click();await expect(shortcut).toHaveAttribute('aria-pressed','true');await shortcut.click();await expect(shortcut).toHaveAttribute('aria-pressed','false');
+   checks.push('native indicator dialog, RSI subpane and direct touch crosshair toggle');
+   await native().getByRole('radio',{name:'5 分钟',exact:true}).click();
    await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('5');
    await expect.poll(()=>page.evaluate(async()=>{
      const db=await new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile');r.onsuccess=()=>resolve(r.result);r.onerror=()=>reject(r.error);});
@@ -104,7 +106,7 @@ const server=http.createServer(async(req,res)=>{
    }),{timeout:10000}).toBe(1);
    for(let i=0;i<20;i++){await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();}
    assert.equal(await page.locator('.mobile-chart-canvas iframe').count(),1);checks.push('20 navigation switches retain one widget');
-   await page.reload();await expect(page.getByRole('button',{name:'指标',exact:true})).toBeEnabled({timeout:30000});
+   await page.reload();await expect(page.locator('.chart-workspace')).toHaveAttribute('aria-busy','false',{timeout:30000});
    await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().getAllStudies().length)).toBe(1);
    assert.equal(await page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().getStudyById(window.MW_TEST_WIDGET.activeChart().getAllStudies()[0].id).getInputValues().find(v=>v.id==='length').value),9);
    checks.push('real native layout and RSI parameter restore from IDB');
@@ -138,6 +140,8 @@ const server=http.createServer(async(req,res)=>{
    checks.push('shell update preserves unsubmitted input; explicit safe update works; incomplete install retains previous shell');
    await page.getByRole('link',{name:'更多',exact:true}).click();await context.setOffline(true);
    await page.getByRole('button',{name:'退出登录',exact:true}).click();await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
+   // The login view appears before async local logout cleanup finishes. Reload only after completion.
+   await expect(page.getByRole('button',{name:'登录',exact:true})).toBeEnabled();
    await context.setOffline(false);await page.reload();await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
    checks.push('offline logout clears cached profile and prevents automatic reuse of an unrevoked server cookie');
    delayLogin=true;
@@ -154,7 +158,10 @@ const server=http.createServer(async(req,res)=>{
    await page.getByRole('button',{name:'登录',exact:true}).click();
    await expect.poll(()=>Boolean(pendingLogin)).toBe(true);
    await page.getByRole('button',{name:'换服务器',exact:true}).click();
-   await expect(page.getByRole('button',{name:'登录',exact:true})).toBeEnabled();
+   await expect(page.getByRole('dialog',{name:'更换服务器',exact:true})).toBeVisible();
+   await expect(page.locator('.login-submit')).toBeEnabled();
+   await page.getByRole('button',{name:'知道了',exact:true}).click();
+   await expect(page.getByRole('dialog')).toHaveCount(0);
    pendingLogin();await page.waitForTimeout(250);
    await expect(page.getByLabel('密码',{exact:true})).toBeVisible();
    await page.reload();await expect(page.getByLabel('密码',{exact:true})).toBeVisible();

@@ -3,7 +3,7 @@ const exportsObject={};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/sparklines.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,{exports:exportsObject,Map,Set,Promise,AbortController,Number,Math,JSON});
-const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange}=exportsObject;
+const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,sparklineDisplayPoints,sparklineWithQuote}=exportsObject;
 (async()=>{
   const requests=[],received=[],failed=[];let active=0,maxActive=0;
   const loader=sparklineLoader((items,signal)=>new Promise(resolve=>{
@@ -31,13 +31,27 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange}=expo
     {time:30,price:'3',gap_before:true}]});
   assert.equal(paths.length,2);assert.equal(paths[0].end[0],20);assert.equal(paths[1].end[0],60);
   assert(paths[1].end[0]<200,'future window remains blank instead of stretching points');
+  const minutePoints=Array.from({length:31},(_,i)=>({time:i*60_000,price:String(i),gap_before:i===12}));
+  const sampled=sparklineDisplayPoints({timeframe:'M1',window_start:0,window_end:31*60_000,points:minutePoints});
+  assert.equal(JSON.stringify(sampled.map(point=>point.time)),JSON.stringify([4,9,11,14,19,24,29,30].map(i=>i*60_000)),'M1 display sampling keeps the latest observation in each five-minute bucket and each gap segment');
+  assert.equal(sampled[3].gap_before,true,'the first sampled point after a data gap keeps the gap marker');
+  assert.equal(sparklineDisplayPoints({timeframe:'M5',window_start:0,window_end:1,points:minutePoints}).length,minutePoints.length,'native non-M1 observations are not resampled');
+  const intrabucketSpike={timeframe:'M1',window_start:0,window_end:5*60_000,points:[
+    {time:0,price:'100',gap_before:false},{time:60_000,price:'1000',gap_before:false},
+    {time:4*60_000,price:'101',gap_before:false},{time:5*60_000,price:'100',gap_before:false},
+    {time:9*60_000,price:'102',gap_before:false}
+  ]};
+  assert(sparklineScale(intrabucketSpike,50).y(101)>40,'display scale ignores M1 observations omitted from the rendered M5 samples');
+  const minutePaths=sparklinePaths({timeframe:'M1',window_start:0,window_end:31*60_000,points:minutePoints},200,50);
+  assert.equal(minutePaths.length,2,'sampling does not join separate data segments');
+  assert.equal(minutePaths.at(-1).end[0],minutePoints.at(-1).time/(31*60_000)*200,'the newest M1 observation remains visible');
   const dense=Array.from({length:1440},(_,i)=>({time:i,price:String(100+Math.sin(i/60)),gap_before:i===720}));
   dense[333].price='150';dense[334].price='50';
   const denseItem={window_start:0,window_end:1600,points:dense};
   const denseScale=sparklineScale(denseItem);
   const reduced=sparklinePaths(denseItem,100);
   assert.equal(reduced.length,2,'visual simplification must not join data gaps');
-  const coordinates=path=>[...path.line.matchAll(/[ML]([\d.-]+),([\d.-]+)/g)].map(m=>[Number(m[1]),Number(m[2])]);
+  const coordinates=path=>[...path.line.matchAll(/[ML]([^ML]+)/g)].map(m=>m[1].trim().split(/[ ,]+/).map(Number).slice(-2));
   const left=coordinates(reduced[0]),right=coordinates(reduced[1]);
   assert(left.length<dense.length/3,'dense chart reduces subpixel overdraw');
   assert(left.some(([x,y])=>x===20.81&&Math.abs(y-denseScale.y(150))<0.01),'one-observation peak survives');
@@ -54,7 +68,7 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange}=expo
         const t=Math.max(0,Math.min(1,((x-ax)*dx+(y-ay)*dy)/(dx*dx+dy*dy||1)));
         nearest=Math.min(nearest,Math.hypot(x-ax-t*dx,y-ay-t*dy));
       }
-      assert(nearest<=0.72,'rendered simplification stays within subpixel error including rounding');
+      assert(nearest<=0.72,'pixel simplification keeps a bounded error including rounding');
     }
   }
   const quiet=Array.from({length:1440},(_,i)=>({time:i,price:String(100+i/100+Math.sin(i)*0.015),gap_before:false}));
@@ -62,22 +76,45 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange}=expo
   assert(coordinates(quietPaths[0]).length<20,'subpixel noise does not create hundreds of visible corners');
   const single=sparklinePaths({window_start:0,window_end:100,points:[{time:20,price:'1',gap_before:false}]},100);
   assert.equal(coordinates(single[0]).length,2,'one observation remains visible as a stroke cap');
+  const turning={window_start:0,window_end:120,points:[0,1,2,3,4,5,6].map((i)=>({time:i*15,price:String([100,104,101,106,99,103,102][i])}))};
+  const straight=sparklinePaths(turning,200,50)[0];
+  assert(straight.line.includes('L')&&!straight.line.includes('C'),'retained bends use the previous straight-line rendering');
+  const minute=60_000, liveItem={ticker:'MWP:TEST',timeframe:'M1',window_start:0,window_end:100*minute,points:[{time:10*minute,price:'100',gap_before:false},{time:11*minute,price:'101',gap_before:false}]};
+  const liveQuote={s:'ok',v:{fetch_status:'ok',lp:102,quote_time:11.5*minute}};
+  const live=sparklineWithQuote(liveItem,liveQuote,12*minute);
+  assert.equal(live.points.at(-1).price,'102','a received quote immediately moves the display tail');
+  assert.equal(live.points.at(-1).time,11.5*minute,'quote source timestamp places the tail');
+  assert.equal(liveItem.points.length,2,'temporary live point never mutates historical cache');
+  assert.equal(sparklineWithQuote(liveItem,{s:'ok',v:{fetch_status:'ok',lp:103,time_type:'source_m1',data_start:11*minute}},12*minute).points.at(-1).price,'103','source M1 close uses its bar time');
+  for(const bad of [
+    {...liveQuote,v:{...liveQuote.v,quote_time:undefined,read_at:12*minute}},
+    {...liveQuote,v:{...liveQuote.v,quote_time:9*minute}},
+    {...liveQuote,v:{...liveQuote.v,quote_time:13*minute}},
+    {...liveQuote,v:{...liveQuote.v,fetch_status:'stale'}},
+    {...liveQuote,v:{...liveQuote.v,time_type:'source_d1'}},
+    {...liveQuote,snapshot:{revision_id:'wrong'}}
+  ]) assert.equal(sparklineWithQuote(liveItem,bad,12*minute),liveItem,'unknown, older, future, stale, daily and mismatched quotes must not alter the curve');
+  const previousSession={...liveItem,session:{previous:true,date:'yesterday'}};
+  assert.equal(sparklineWithQuote(previousSession,liveQuote,12*minute),previousSession,'previous trading day stays untouched');
+  const emptyHistory={...liveItem,points:[]};
+  assert.equal(sparklineWithQuote(emptyHistory,liveQuote,12*minute),emptyHistory,'a live quote alone cannot fabricate an intraday history');
+  assert.equal(sparklineWithQuote(liveItem,{...liveQuote,v:{...liveQuote.v,quote_time:15*minute}},16*minute).points.at(-1).gap_before,true,'unknown missing minutes remain a gap');
   const opening={window_start:0,window_end:100,points:[{time:0,price:'1.10000'},{time:1,price:'1.10010'}]};
-  const openingScale=sparklineScale(opening,48,1.1,'EURUSD');
-  assert(Math.abs(openingScale.referenceY-24)<1,'reference line follows the adaptive range, not a fixed center');
+  const openingScale=sparklineScale(opening,50,1.1,'EURUSD');
+  assert(Math.abs(openingScale.referenceY-25)<1,'reference line follows the adaptive range, not a fixed center');
   assert(Math.abs(openingScale.y(1.1001)-openingScale.y(1.1))>1.4,'small EURUSD moves become visible without filling the chart');
   assert.equal(sparklineMinimumRange('EURUSD'),0.002);
   assert.equal(sparklineMinimumRange('XAUUSD'),0.005);
   assert.equal(sparklineMinimumRange('NVDA'),0.01);
   assert.equal(sparklineMinimumRange('BTCUSDT'),0.02);
-  const noReference=sparklineScale(opening,48,undefined,'EURUSD');
+  const noReference=sparklineScale(opening,50,undefined,'EURUSD');
   assert.equal(noReference.referenceY,undefined,'first observation is not mislabeled previous close');
-  assert(Math.abs(noReference.y(1.10005)-24)<0.01);
+  assert(Math.abs(noReference.y(1.10005)-25)<0.01);
   assert.equal(sparklineScale(opening,48,NaN).referenceY,undefined);
   const gapOpen={...opening,points:[{time:0,price:'1.122'},{time:1,price:'1.123'}]};
-  const gapScale=sparklineScale(gapOpen,48,1.1,'EURUSD');
+  const gapScale=sparklineScale(gapOpen,50,1.1,'EURUSD');
   assert(gapScale.y(1.122)>30 && gapScale.y(1.122)<33,'the gapped session curve uses the available range');
-  assert.equal(gapScale.referenceY,44);
+  assert.equal(gapScale.referenceY,46);
   assert.equal(gapScale.referenceOutside,true,'a distant reference is marked at the edge instead of flattening intraday data');
   const formatted={};
   vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/quoteFormat.ts','utf8'),{
@@ -109,9 +146,14 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange}=expo
   assert.equal(historyReceived[0][0].points[0].time,90,'existing curve is published before history finishes');
   assert.equal(historyCalls.length,2);
   assert.equal(observationsFinished,1,'visible refresh completes while historical preparation is still pending');
+  const overlapping=historyLoader.load(cached,()=>{observationsFinished++;});
+  await new Promise(resolve=>setImmediate(resolve));
+  assert.equal(observationsFinished,2,'new observation poll completes independently of slow preparations');
+  assert.equal(historyCalls.length,2,'overlapping observation polls deduplicate pending preparation');
+  assert(historyCalls.every(call=>!call.signal.aborted),'observation polling must not cancel pending history');
   historyCalls[0].resolve();historyCalls[1].resolve();
   await new Promise(resolve=>setImmediate(resolve));
-  historyCalls[2].resolve();await loadingHistory;
+  historyCalls[2].resolve();await Promise.all([loadingHistory,overlapping]);
   assert.equal(peakHistory,2);assert.equal(prepared.size,3);
   assert.equal(historyReceived.at(-1)[0].points[0].time,0,'prepared response includes earlier same-day points');
   await historyLoader.load(cached);assert.equal(historyCalls.length,3,'already prepared day is not requested again');

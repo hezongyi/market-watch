@@ -235,39 +235,6 @@ select:focus-visible {
 .mobile-chart[hidden] {
   display: none;
 }
-.mobile-chart-tools {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 6px 12px;
-}
-.mobile-chart-tools > div {
-  display: flex;
-  gap: 4px;
-}
-.mobile-chart-tools button {
-  width: 48px;
-  padding: 12px;
-  border: 0;
-  background: transparent;
-  color: var(--muted);
-}
-.mobile-chart-tools select {
-  border: 0;
-  background: transparent;
-  font-size: 1.1429rem;
-  font-weight: 600;
-}
-.mobile-chart-tools button[aria-pressed="true"] {
-  background: var(--surface2);
-}
-.mobile-chart-tools button[aria-pressed="true"] {
-  color: var(--accent);
-  border-color: var(--accent);
-}
-.mobile-chart-tools select {
-  max-width: 110px;
-}
 .mobile-chart-canvas {
   flex: 1;
   min-height: 0;
@@ -305,15 +272,6 @@ select:focus-visible {
   top: auto;
   bottom: 80px;
   z-index: 25;
-}
-.mobile-unsaved {
-  position: fixed;
-  bottom: 78px;
-  left: 16px;
-  padding: 6px 10px;
-  background: var(--surface);
-  color: var(--warning);
-  font-size: 0.75rem;
 }
 .mobile-app .mobile-series {
   width: 100%;

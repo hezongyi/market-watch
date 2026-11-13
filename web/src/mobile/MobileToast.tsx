@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
+import { Button } from "./components/ui/button";
+import { MOBILE_OVERLAYS } from "./WatchOverlays";
 
 /** Native modal dialogs make outside controls inert; keep feedback inside the top layer. */
 export default function MobileToast({
@@ -13,7 +15,7 @@ export default function MobileToast({
   useEffect(() => {
     const observe = () =>
       setTarget(
-        [...document.querySelectorAll("dialog.mobile-sheet[open]")].at(-1) ||
+        [...document.querySelectorAll(MOBILE_OVERLAYS)].at(-1) ||
           null,
       );
     observe();
@@ -22,7 +24,7 @@ export default function MobileToast({
       childList: true,
       subtree: true,
       attributes: true,
-      attributeFilter: ["open"],
+      attributeFilter: ["open", "data-mobile-overlay"],
     });
     return () => observer.disconnect();
   }, []);
@@ -30,9 +32,9 @@ export default function MobileToast({
   const toast = (
     <aside className="mobile-toast" role="alert">
       <span>{message}</span>
-      <button aria-label="关闭通知" onClick={close}>
+      <Button variant="ghost" aria-label="关闭通知" onClick={close}>
         关闭
-      </button>
+      </Button>
     </aside>
   );
   return target ? createPortal(toast, target) : toast;

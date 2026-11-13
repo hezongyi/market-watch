@@ -88,12 +88,12 @@ const server = http.createServer(async (req, res) => {
               codes[i] +
               " · " +
               ["D1 synthetic D1_BTCUSDT", "欧元 / 美元"][i] +
-              " · 平台 · " +
+              " · 原生 · " +
               ["Binance Spot", "OANDA"][i] +
               " · 成交价",
             description:
               codes[i] +
-              " · 很长的行情描述 · 平台 · " +
+              " · 很长的行情描述 · 原生 · " +
               ["Binance Spot", "OANDA"][i] +
               " · 时段未核实 · 最后行情时间 2026-11-11 11:59:00 UTC",
             exchange: ["BINANCE", "OANDA"][i],
@@ -132,8 +132,8 @@ const server = http.createServer(async (req, res) => {
         symbol: codes[i],
         display_symbol: codes[i],
         description: [
-          "比特币 · 平台 · Binance Spot",
-          "欧元 / 美元 · 平台 · OANDA",
+          "比特币 · 原生 · Binance Spot",
+          "欧元 / 美元 · 原生 · OANDA",
         ][i],
         source: ["binance", "oanda"][i],
         frames: ["M1", "H1"],
@@ -212,18 +212,19 @@ const server = http.createServer(async (req, res) => {
           range = document.createRange();
         range.selectNodeContents(price);
         return {
-          priceLines: range.getClientRects().length,
+          priceFits: price.scrollWidth <= price.clientWidth + 1 && [...range.getClientRects()].every(rect => rect.left >= price.getBoundingClientRect().left - 1 && rect.right <= price.getBoundingClientRect().right + 1),
           height: row.getBoundingClientRect().height,
         };
       });
-    check(metrics.priceLines === 1, "A06 watch price stays on one line");
+    check(metrics.priceFits, "watch price with superscript fits its fixed column");
     check(
       metrics.height <= 130,
       "A06 watch identity must not become a paragraph",
     );
     await page.getByRole("link", { name: "更多", exact: true }).click();
+    await expect(page.locator(".mobile-more .mobile-profile")).toBeVisible();
     check(
-      (await page.locator(".mobile-profile").count()) === 1,
+      (await page.locator(".mobile-profile:visible").count()) === 1,
       "A06 More profile header",
     );
     check(
@@ -247,10 +248,12 @@ const server = http.createServer(async (req, res) => {
       "A06 compact source filter and task row",
     );
     check(
-      await page
-        .locator(".mobile-data .mobile-tabs")
-        .evaluate((e) => getComputedStyle(e).borderBottomStyle !== "none"),
-      "A06 underlined data tabs",
+      (await page.getByRole("tab", {name: "平台", exact: true}).getAttribute("aria-selected")) === "true",
+      "data categories use accessible shadcn tabs",
+    );
+    check(
+      await page.getByRole("tablist", {name: "行情类型"}).evaluate(el => el.scrollWidth <= el.clientWidth),
+      "data categories fit the available width",
     );
     for (const [width, height, font] of [
       [360, 791, 100],
@@ -279,9 +282,9 @@ const server = http.createServer(async (req, res) => {
         if (name === "数据")
           await expect(page.locator(".mobile-series")).toHaveCount(2);
         if (name === "自选")
-          await expect(page.locator(".mobile-spark path[stroke]")).toHaveCount(
-            2,
-          );
+          await expect.poll(() => page.locator(".mobile-spark").evaluateAll(els =>
+            els.length === 2 && els.every(el => el.querySelector("path[stroke]")),
+          )).toBe(true);
         check(
           await page.evaluate(
             () => document.documentElement.scrollWidth <= innerWidth,

@@ -1,4 +1,4 @@
-let activePreferences;
+let activePreferences, mobileHeaderEntry, mobileContinuity;
 let disposed = false;
 const send = value => { if (!disposed) application.observe(value, adapter); };
 const pending = new Map();
@@ -438,10 +438,10 @@ function startIndicatorCoordinator(catalog) {
           dependencyBefore:page.dependency_before ?? old.dependencyBefore,
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
     },
-    status:(consumer,state,error,quality)=>send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
+    status:(consumer,state,error,quality)=>{if(mobileMode)mobileContinuity?.indicator(state);send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
       id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
       quality,
-      previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null}),
+      previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null});},
     occurrence:(error,consumer,attempt)=>{if(!['HISTORY_CANCELLED','DISPLAY_SNAPSHOT_EXPIRED'].includes(error.code))emitNotice(indicatorFault(consumer,error,attempt));},
     recovered:consumer=>emitNotice(indicatorFault(consumer),true),
     report:error=>{if(error.code!=='HISTORY_CANCELLED')send({type:'error',error:'指标读取失败：'+String(error)});},
@@ -1785,7 +1785,10 @@ const feed = {
     } catch (e) {
       err(e);
       finishTerminal();
-      if (e.code !== "HISTORY_CANCELLED" && e.code !== "NATIVE_HISTORY_CAPACITY_EXCEEDED")
+      // Mobile primary-series failures have a persistent inline retry surface.
+      // Keep indicator errors and desktop reporting on their existing channel.
+      if ((!mobileMode || decode(s.ticker).spec) &&
+          e.code !== "HISTORY_CANCELLED" && e.code !== "NATIVE_HISTORY_CAPACITY_EXCEEDED")
         send({ type: "error", error: String(e) });
     } finally {
       // Keep the notice through native callback processing and the next paint.
@@ -2238,9 +2241,16 @@ function snapshot(manual = true) {
       if (disposed || epoch !== workspaceEpoch) return;
       if (revision !== editRevision) return;
       const primary = state._mwViewports[0];
-      await request({op:'save',args:{engine:'tv31',schemaVersion:1,state,
-        symbol:primary.symbol,interval:primary.resolution,theme:chartThemeName(widget.getTheme())}}, 'workspace');
-      if (revision === editRevision) {dirty = false; send({type:'mobile-saved'});}
+      const document={engine:'tv31',schemaVersion:1,state,
+        symbol:primary.symbol,interval:primary.resolution,theme:chartThemeName(widget.getTheme())};
+      await request({op:'save',args:document}, 'workspace');
+      savedDoc=document;
+      if (revision === editRevision) {
+        dirty = false; send({type:'mobile-saved'});
+        // Keep the preview bound to the document that was actually persisted,
+        // including saves made without navigating away from the chart.
+        void mobileContinuity?.capture();
+      }
     })().catch(error => {send({type:'error',error:'本次图表设置未记住：'+String(error)});throw error;})
       .finally(() => {mobileSaving = undefined;});
     // Background callers report via observe; explicit flush callers can await rejection.
@@ -2386,16 +2396,41 @@ function boot(
     pendingViewports = undefined;
     if (!viewports) return;
     const epoch = workspaceEpoch;
+    let interrupted = false, historyChanged;
+    // A failed first history read does not emit the vendor's dataReady. Saved
+    // viewport geometry is optional: stop restoring it on that real terminal
+    // failure, while keeping the native error and its explicit retry intact.
+    const historyFailed = mobileMode ? new Promise((_, reject) => {
+      historyChanged = () => {
+        if (disposed || epoch !== workspaceEpoch || interrupted) return;
+        for (let index = 0; index < widget.chartsCount(); index++) {
+          if (!MWNativeNavigation.failure(widget.chart(index))) continue;
+          interrupted = true;
+          reject(Object.assign(Error('历史读取失败，跳过保存的视区'), {
+            code: 'VIEWPORT_HISTORY_UNAVAILABLE',
+          }));
+          return;
+        }
+      };
+      globalThis.addEventListener('mw-history-state', historyChanged);
+    }) : undefined;
     viewportRestoring = true;
     try {
       await restoreChartViewports(
         widget,
         viewports,
-        () => epoch === workspaceEpoch,
+        () => !disposed && epoch === workspaceEpoch && !interrupted,
+        historyFailed ? promise => {
+          const waiting = Promise.race([promise, historyFailed]);
+          historyChanged();
+          return waiting;
+        } : undefined,
       );
     } catch (e) {
-      send({ type: "error", error: "视区恢复失败：" + String(e) });
+      if (e?.code !== 'VIEWPORT_HISTORY_UNAVAILABLE')
+        send({ type: "error", error: "视区恢复失败：" + String(e) });
     } finally {
+      if (historyChanged) globalThis.removeEventListener('mw-history-state', historyChanged);
       if (epoch === workspaceEpoch) viewportRestoring = false;
     }
   };
@@ -2678,6 +2713,9 @@ function boot(
   squeezeDisplay?.dispose();
   studyTemplates?.dispose();
   indicatorPicker?.dispose();
+  mobileHeaderEntry?.dispose();
+  mobileHeaderEntry = undefined;
+  mobileContinuity?.dispose(); mobileContinuity=undefined;
   barRangeMapping?.dispose();
   barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
     markWorkspaceDirty();
@@ -2690,14 +2728,14 @@ function boot(
   unbindActiveChartEvent();
   MWNativeIndicatorResults.configure(catalog,{enable:globalThis.MW_NATIVE_RESERVE_ENABLED!==false});
   widget = new TradingView.widget({
-    context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
+    context_menu:{items_processor:(items,factory,params)=>mobileMode ? items : alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
     custom_indicators_getter: (PineJS) =>
       Promise.resolve(pythonStudies(PineJS, catalog)),
     container,
     library_path: globalThis.MW_CHART_LIBRARY_PATH || "/charting_library/",
-    custom_css_url: "/chart-menu.css",
+    custom_css_url: mobileMode ? undefined : "/chart-menu.css",
     datafeed: feed,
     widgetbar: {
       watchlist: !mobileMode,
@@ -2724,7 +2762,7 @@ function boot(
     // A constructor symbol overrides the first MainSeries in saved_data.
     // Existing layouts may have stale/display-only top-level metadata; the
     // saved chart state is authoritative when restoring a layout.
-    ...(!chartState?.charts?.length ? {symbol: doc.symbol || "XAUUSD"} : {}),
+    ...(mobileMode || !chartState?.charts?.length ? {symbol: doc.symbol || "XAUUSD"} : {}),
     interval: doc.interval || "240",
     ...(!chartState && decode(doc.symbol || "XAUUSD").series_kind === "managed" && ["1D", "1W", "1M"].includes(doc.interval)
       ? { timeframe: "3M" }
@@ -2737,6 +2775,7 @@ function boot(
       return null;
     },
     autosize: true,
+    ...(mobileMode ? {header_widget_buttons_mode: "adaptive", favorites: {intervals: ["5", "60"]}} : {}),
     theme: selectedTheme,
     overrides: {"mainSeriesProperties.statusViewStyle.showExchange": false},
     settings_overrides: {"mainSeriesProperties.statusViewStyle.showExchange": false},
@@ -2746,18 +2785,20 @@ function boot(
       : undefined,
     auto_save_delay: 2,
     enabled_features: [
+      // The Android shell permits same-origin HTTPS navigation and cancels
+      // blob: subframes. Use the library's supported same-origin bootstrap.
+      ...(mobileMode ? ["iframe_loading_same_origin", "hide_left_toolbar_by_default"] : []),
       ...(!mobileMode ? ["support_multicharts", "header_layouttoggle"] : []),
       "determine_first_data_request_size_using_visible_range",
       "header_in_fullscreen_mode",
       "disable_resolution_rebuild",
       "prefer_quote_short_name",
       "use_symbol_name_for_header_toolbar",
-      "study_templates",
+      ...(!mobileMode ? ["study_templates", "chart_template_storage"] : []),
       "items_favoriting",
-      "chart_template_storage",
     ],
     disabled_features: [
-      ...(mobileMode ? ["header_widget", "left_toolbar", "right_toolbar", "timeframes_toolbar", "control_bar", "header_saveload", "study_templates", "chart_template_storage"] : []),
+      ...(mobileMode ? ["right_toolbar", "timeframes_toolbar", "control_bar", "header_saveload", "header_compare", "header_symbol_search", "header_layouttoggle", "header_undo_redo", "header_screenshot", "header_fullscreen_button", "header_settings", "header_quick_search", "study_templates", "chart_template_storage"] : []),
       "widget_logo",
       "use_localstorage_for_settings",
       "open_account_manager",
@@ -2774,6 +2815,14 @@ function boot(
         : []),
     ],
   });
+  if (mobileMode) widget.headerReady().then(() => {
+    if (disposed) return;
+    const doc = container.querySelector('iframe').contentDocument;
+    const style = doc.createElement('style');
+    style.textContent = '.chart-container .tv-spinner{display:none!important}';
+    doc.head.append(style);
+    send({type:'mobile-shell-ready'});
+  }).catch(e => send({type:'error',error:String(e)}));
   if (!mobileMode) widget
     .headerReady()
     .then(async () => {
@@ -2800,10 +2849,18 @@ function boot(
     })
     .catch((e) => send({ type: "error", error: String(e) }));
   widget.onChartReady(async () => {
+    if (mobileMode) {
+      await widget.headerReady();
+      const report = error => send({type: "error", error: String(error)});
+      indicatorPicker = mobileChartNativeIndicators(widget, container.querySelector('iframe').contentDocument);
+      mobileHeaderEntry = mobileChartCrosshairEntry(widget, report);
+    }
     await restoreTheme();
     activeTab?.dispose();
     activeTab = chartTab({widget,feed,send,workspace:()=>currentNativeWorkspace,epoch:()=>workspaceEpoch,metadata:presentationFor});
     startIndicatorCoordinator(catalog);
+    if(mobileMode)mobileContinuity=mobileChartContinuity(widget,container.querySelector('iframe').contentDocument,send,()=>JSON.stringify(savedDoc),
+      (target,current)=>indicatorCoordinator.settle((ticker,res)=>ticker===target.symbol && res===target.resolution,current),()=>ready && !loading && !mobileChartParameterEditing(container));
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
     syncCoordinator.refreshCharts();
@@ -2937,13 +2994,14 @@ function boot(
     );
     }
     if (mobileMode) {
-      const doc = container.querySelector("iframe").contentDocument;
-      indicatorPicker = chartIndicatorPicker(widget, catalog, error=>send({type:"error",error:String(error)}), undefined, doc);
       const changed = () => {
         markWorkspaceDirty();
         const chart = widget.activeChart();
-        const metadata = presentationFor(chart.symbol());
-        send({type:"mobile-series",symbol:chart.symbol(),resolution:chart.resolution(),
+        const ticker = chart.symbolExt?.()?.ticker || chart.symbol();
+        const metadata = presentationFor(ticker);
+        send({type:"mobile-series",symbol:ticker,resolution:chart.resolution(),
+          display_symbol:metadata?.display_symbol || metadata?.symbol || chart.symbolExt?.()?.name || MWSeries.display(decode(ticker).symbol),
+          source:metadata?.source && !["composite","history"].includes(metadata.source) ? metadata.source : "",
           resolutions:chart.symbolExt?.()?.supported_resolutions || (metadata?.frames ? resolutions.filter(r=>metadata.frames.includes(frames[r])) : resolutions)});
       };
       widget.activeChart().onSymbolChanged().subscribe(null, changed);
@@ -3088,7 +3146,9 @@ function boot(
     undoStack.onChange().subscribe(null,undoChanged);
     addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true});
     await alertUIAttach();
+    if (mobileMode) reportHistoryFailures();
     send({ type: "ready" });
+    if(mobileMode)void mobileContinuity?.loaded();
     clearInterval(progressivePoll);
     demandReporter?.dispose();
     demandReporter=undefined;
@@ -3251,24 +3311,28 @@ async function update(m) {
   if (m.type === "mobile-command" && mobileMode && ready) {
     try {
       if (m.action === "indicators") await indicatorPicker.open();
+      else if (m.action === "settings") widget.activeChart().executeActionById("chartProperties");
       else if (m.action === "resolution") await widget.activeChart().setResolution(m.resolution);
       else if (m.action === "symbol") await widget.activeChart().setSymbol(m.symbol);
       else if (m.action === "crosshair") {
-        mobileCrosshair = mobileChartCrosshair(widget, m.enabled);
+        await mobileHeaderEntry.setEnabled(m.enabled);
+        mobileCrosshair = m.enabled;
         send({type:"mobile-crosshair",enabled:mobileCrosshair});
       } else if (m.action === "back" || m.action === "can-leave") {
         const doc=container.querySelector("iframe").contentDocument;
-        const dialog=[...doc.querySelectorAll('[role="dialog"],.mw-indicator-picker')].some(node=>!node.hidden && node.getBoundingClientRect().height>0);
+        const dialog=[...doc.querySelectorAll('[role="dialog"],[role="menu"],[role="listbox"],[role="treegrid"],[data-role="menuitem"],.mw-indicator-picker')].some(node=>!node.hidden && node.getBoundingClientRect().height>0);
         const allowed=!mobileChartParameterEditing(container) || await request({},'confirm-leave');
-        if(dialog && allowed) {indicatorPicker?.close();widget.closePopupsAndDialogs();}
+        if(dialog && allowed) {
+          mobileChartCancelParameters(container);
+          indicatorPicker?.close();widget.closePopupsAndDialogs();
+        }
         send({type:"mobile-flushed",request:m.request,consumed:m.action==='back' ? dialog : !allowed});
       } else if (m.action === "leave") {
-        mobileCrosshair = mobileChartCrosshair(widget, false);
         indicatorPicker?.close(); widget.closePopupsAndDialogs();
-        send({type:"mobile-crosshair",enabled:false});
         await snapshot(false);
       } else if (m.action === "flush") {
         await snapshot(true);
+        await mobileContinuity?.capture();
         send({type:"mobile-flushed",request:m.request});
       }
     } catch (error) {send({type:"error",error:String(error)}); if(m.request)send({type:"mobile-flushed",request:m.request,error:String(error)});}
@@ -3330,7 +3394,12 @@ async function update(m) {
   } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&
       Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
     const chart=widget.chart(m.index);
-    if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) MWNativeNavigation.recoverInitial(chart,true);
+    if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) {
+      // The mobile widget has one chart. v31 requires clearing its datafeed
+      // cache before resetData can retry a failed first read.
+      if (mobileMode) widget.resetCache();
+      MWNativeNavigation.recoverInitial(chart,true);
+    }
   } else if (m.type === "init" && !widget) {
     mobileMode = m.mode === "mobile";
     if (mobileMode && typeof m.mobile_client === "string" && /^[A-Za-z0-9_-]{1,64}$/.test(m.mobile_client))
@@ -3362,6 +3431,7 @@ async function update(m) {
   else if (m.type === "open-alerts") { restoreAlertsPanel = true; alertUI?.open?.(); }
   else if (m.type === "save") snapshot();
   else if (m.type === "theme" && ready) {
+    if (mobileMode && widget.getTheme() === m.theme) return;
     savedDoc.theme = m.theme;
     await widget.changeTheme(m.theme);
     snapshot();
@@ -3370,6 +3440,9 @@ async function update(m) {
 
 
 function disposeChart() {
+  ignoreTeardownFailure(() => mobileContinuity?.dispose()); mobileContinuity=undefined;
+  ignoreTeardownFailure(() => mobileHeaderEntry?.dispose());
+  mobileHeaderEntry = undefined;
   resolveDisposed=true; chartResolves.clear();
   ignoreTeardownFailure(() => compositeDisplayBatches.dispose());
   ignoreTeardownFailure(() => activePreferences?.dispose());

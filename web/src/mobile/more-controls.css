@@ -1,0 +1,193 @@
+/* More shares the opt-in mobile controls and theme; settings remain a compact list. */
+.mobile-more {
+  padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
+  max-width: 600px;
+  margin: 0 auto;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans CJK SC",
+    "Microsoft YaHei", sans-serif;
+}
+.mobile-more .mobile-profile {
+  gap: 12px;
+  padding: 8px 2px 24px;
+}
+.mobile-more .mobile-profile-mark {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: white;
+  border: 1px solid var(--quiet-line);
+}
+.mobile-more .mobile-profile-mark img {
+  width: 30px;
+  height: 30px;
+}
+.mobile-more .mobile-profile > div {
+  min-width: 0;
+  flex: 1;
+}
+.mobile-more .mobile-profile h1 {
+  font-size: 1.428571rem;
+  line-height: 1.4;
+  letter-spacing: -0.02em;
+  margin: 0;
+  font-weight: 650;
+}
+.mobile-more .mobile-profile small {
+  margin-top: 3px;
+  font-size: 0.857143rem;
+  line-height: 1.5;
+}
+.mobile-more .more-device {
+  font-size: 0.857143rem;
+  line-height: 1.5;
+  color: var(--muted);
+  flex: none;
+}
+.mobile-more .mobile-setting-group {
+  margin: 0 0 20px;
+}
+.mobile-more .mobile-setting-group h2 {
+  margin: 0 0 8px 12px;
+  font-size: 0.857143rem;
+  line-height: 1.5;
+  font-weight: 500;
+  color: var(--muted);
+}
+.mobile-more .mobile-setting-group > div {
+  border: 1px solid var(--quiet-line);
+  border-radius: 14px;
+  background: var(--surface);
+  margin: 0;
+  overflow: hidden;
+}
+.mobile-more button.mobile-setting-row[data-variant] {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 58px;
+  height: auto;
+  gap: 10px;
+  padding: 12px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  text-align: left;
+  font-size: 1rem;
+  line-height: 1.5;
+  font-weight: 500;
+  white-space: normal;
+  box-shadow: none;
+  transition: background-color 140ms ease;
+}
+.mobile-more
+  button.mobile-setting-row[data-variant]
+  + button.mobile-setting-row {
+  border-top: 1px solid var(--quiet-line);
+}
+.mobile-more .mobile-setting-row > .more-setting-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  flex: none;
+  border-radius: 8px;
+  background: var(--surface2);
+  color: var(--muted);
+}
+.mobile-more .mobile-setting-row > .more-setting-label {
+  display: block;
+  min-width: 0;
+  flex: 1;
+}
+.mobile-more .mobile-setting-row > small {
+  flex: 0 1 auto;
+  max-width: 44%;
+  font-size: 0.857143rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.mobile-more .mobile-setting-row svg {
+  width: 17px;
+  height: 17px;
+  color: currentColor;
+}
+.mobile-more .mobile-setting-row > svg {
+  width: 15px;
+  height: 15px;
+  flex: none;
+  color: var(--muted);
+  opacity: 0.65;
+}
+.mobile-more button.mobile-setting-row:active {
+  background: var(--selected);
+  transform: none;
+  opacity: 1;
+}
+.mobile-more button.more-logout[data-variant] {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  height: auto;
+  justify-content: center;
+  gap: 8px;
+  margin: 4px 0 0;
+  padding: 12px;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 0.928571rem;
+  line-height: 1.5;
+  font-weight: 400;
+}
+.mobile-more .more-logout:active {
+  color: var(--down);
+  background: var(--surface);
+}
+.mobile-more .more-facts {
+  margin: 0;
+  border-top: 0;
+}
+.mobile-more .more-facts > div {
+  grid-template-columns: 5.5em minmax(0, 1fr);
+  gap: 16px;
+  padding: 14px 0;
+  font-size: 1rem;
+  line-height: 1.6;
+  border-color: var(--quiet-line);
+}
+.mobile-more .more-facts > div:first-child {
+  padding-top: 4px;
+}
+.mobile-more .more-facts dd {
+  min-width: 0;
+}
+.mobile-more .more-description {
+  margin: 0 0 16px;
+  font-size: 0.928571rem;
+  line-height: 1.75;
+  color: var(--muted);
+}
+.mobile-more .more-facts + .more-description {
+  margin: 16px 0 0;
+}
+.mobile-more .more-panel-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.mobile-more .more-panel-actions > button {
+  width: 100%;
+}
+.mobile-more .more-panel-actions > button[data-variant="ghost"] {
+  color: var(--muted);
+}
+@media (prefers-reduced-motion: reduce) {
+  .mobile-more button.mobile-setting-row {
+    transition: none;
+  }
+}
