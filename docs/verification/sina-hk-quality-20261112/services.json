@@ -1,0 +1,270 @@
+{
+  "commit": "8cec2c6fa2c9b41da6a52e4f3b08a506bdcc96e0",
+  "at": 1794524673.001547,
+  "sources": [
+    {
+      "source": "oanda",
+      "timeframe": "H1",
+      "status": "ok",
+      "bars": 40,
+      "instrument": "EURUSD",
+      "seconds": 1.39
+    },
+    {
+      "source": "binance",
+      "timeframe": "H1",
+      "status": "ok",
+      "bars": 40,
+      "instrument": "BINANCE:BTCUSDT",
+      "seconds": 0.74
+    },
+    {
+      "source": "dukascopy",
+      "timeframe": "H1",
+      "status": "ok",
+      "bars": 40,
+      "instrument": "DUKA:9105c84af42600ccfa4f03132cc2472b",
+      "seconds": 1.2
+    },
+    {
+      "source": "yahoo",
+      "timeframe": "D1",
+      "status": "ok",
+      "bars": 40,
+      "instrument": "YAHOO:652cc40d03a64e41ad50e19a49a0ef77",
+      "seconds": 11.16
+    },
+    {
+      "source": "akshare",
+      "timeframe": "D1",
+      "status": "ok",
+      "bars": 40,
+      "instrument": "AKSHARE:90d538524b028b1708c53834c49bd624",
+      "seconds": 0.34
+    },
+    {
+      "source": "fxcm",
+      "timeframe": "H1",
+      "status": "ok",
+      "bars": 40,
+      "instrument": "FXCM:941424ca250383292ab3a5b2d04e2623",
+      "seconds": 14.47
+    }
+  ],
+  "ready": "ready",
+  "runtime": {
+    "market_runtime": [
+      {
+        "role": "pricing",
+        "state": "running",
+        "error_type": null
+      },
+      {
+        "role": "realtime",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "composite_aggregate",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "alert_indicator",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "chart_alert",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "switch_activation",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "market_ownership",
+        "state": "idle",
+        "error_type": null
+      }
+    ],
+    "data_runtime": [
+      {
+        "role": "provider_live_oanda",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_oanda",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_binance",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_binance",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_yahoo",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_yahoo",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_dukascopy",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_dukascopy",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_akshare",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_akshare",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_live_fxcm",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_warm_fxcm",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_transport_oanda",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_transport_binance",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_transport_dukascopy",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "provider_janitor",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "catalog_runtime",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "chart_history",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "history_network",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "history_compute",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "native_history",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "chart_aggregation",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "market_stream",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "switch_shadow",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "retention",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "data_ownership",
+        "state": "idle",
+        "error_type": null
+      }
+    ],
+    "notification_runtime": [
+      {
+        "role": "notification_projection",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_retention",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_delivery",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_ownership",
+        "state": "idle",
+        "error_type": null
+      },
+      {
+        "role": "notification_health",
+        "state": "idle",
+        "error_type": null
+      }
+    ]
+  },
+  "runtime_healthy": true,
+  "/api/events": true,
+  "/api/notification-center/stream": true,
+  "notification_health": {
+    "at": 1794524675467,
+    "state": "ok",
+    "batch_count": 0,
+    "error_type": null,
+    "pending_sources": 0,
+    "oldest_pending_at": null,
+    "display_enabled": true,
+    "sound_enabled": true
+  },
+  "ntfy": true,
+  "native_asset": true,
+  "mcp_tools": 42,
+  "passed": true
+}

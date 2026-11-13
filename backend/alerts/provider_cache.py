@@ -277,7 +277,7 @@ def snapshot_transaction(key, before, count, *, observation=None, bounded_limit=
             **volume_metadata(metadata.source, metadata.symbol),
             **({k: metadata.metadata_json.get(k) for k in
                 ("source", "symbol", "adjustment", "price_description", "volume_kind", "volume_unit",
-                 "completion_basis", "session_verified")}
+                 "completion_basis", "session_verified", "source_warnings")}
                if metadata.source in ("yahoo", "dukascopy", "akshare", "fxcm") else {}),
             "window_limit": window_limit, "history_window": window or None,
             "availability": "window_limit" if window_limit else "available",
@@ -494,6 +494,8 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
                 raise ValueError("平台覆盖证明无效")
             dataset.coverage = merge_ranges(dataset.coverage + proven)
         evidence = page.get("boundary_evidence")
+        if "source_warnings" in page:
+            dataset.metadata_json = {**dataset.metadata_json, "source_warnings": page["source_warnings"]}
         if evidence and evidence.get("kind") == "rolling_window":
             dataset.metadata_json = {**dataset.metadata_json, "history_window": evidence}
         dataset.earliest = dataset.earliest or boundary

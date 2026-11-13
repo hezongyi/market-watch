@@ -52,6 +52,13 @@ def _search_text(columns):
     return value
 
 
+def _variant(ident):
+    """Platform source/price variants share a physical catalog, not an identity."""
+    return case((ident.startswith("TENCENT:"), 1),
+                (ident.startswith("SINA-NATIVE:"), 2),
+                (ident.startswith("TENCENT-NATIVE:"), 3), else_=0)
+
+
 def _statement(db, *, source=None, managed=False, query="", asset=None):
     from .config import settings
     from .fxcm_history import account_scope as fxcm_scope
@@ -87,9 +94,12 @@ def _statement(db, *, source=None, managed=False, query="", asset=None):
                c.calendar, c.updated_at, c.available, c.metadata_json, c.id.label("physical_id"))
     branches = [select(*columns, literal(0).label("priority")).where(visible)]
     if not managed and source in (None, "akshare"):
-        branches.append(select((literal("TENCENT:") + c.symbol).label("id"),
-            *columns[1:], literal(0).label("priority")).where(visible, c.source == "akshare",
-                or_(c.symbol.startswith("SSE:"), c.symbol.startswith("SZSE:"))))
+        for prefix, exchanges in (("TENCENT:", ("SSE:", "SZSE:")),
+                                  ("SINA-NATIVE:", ("SSE:", "SZSE:")),
+                                  ("TENCENT-NATIVE:", ("SSE:", "SZSE:", "HKEX:"))):
+            branches.append(select((literal(prefix) + c.symbol).label("id"),
+                *columns[1:], literal(0).label("priority")).where(visible, c.source == "akshare",
+                    or_(*(c.symbol.startswith(exchange) for exchange in exchanges))))
     if not managed and source in (None, "oanda", "binance"):
         i = Instrument
         branches.append(select(i.id, i.source, i.symbol, i.label,
@@ -109,7 +119,7 @@ def _statement(db, *, source=None, managed=False, query="", asset=None):
     qualified = filtered.subquery()
     numbered = select(qualified.c.id, qualified.c.source, qualified.c.symbol, qualified.c.physical_id,
         func.row_number().over(
-        partition_by=(qualified.c.source, qualified.c.symbol, qualified.c.id.startswith("TENCENT:")),
+        partition_by=(qualified.c.source, qualified.c.symbol, _variant(qualified.c.id)),
         order_by=(qualified.c.priority, qualified.c.id.startswith("HC:"), qualified.c.id)
     ).label("position")).subquery()
     return select(numbered).where(numbered.c.position == 1), numbered
@@ -160,9 +170,9 @@ def search(db, *, query="", source=None, asset=None, managed=False, offset=0, li
     statement, rows = _statement(db, source=source, managed=managed, query=query, asset=asset)
     # Counting identities does not need window ordering or supplier metadata.
     if include_total:
-        tencent = rows.c.id.startswith("TENCENT:")
-        identities = select(rows.c.source, rows.c.symbol, tencent).group_by(
-            rows.c.source, rows.c.symbol, tencent).subquery()
+        variant = _variant(rows.c.id)
+        identities = select(rows.c.source, rows.c.symbol, variant).group_by(
+            rows.c.source, rows.c.symbol, variant).subquery()
         total = db.scalar(select(func.count()).select_from(identities))
     # Until the first runtime sync, keep the pinned SDK directory discoverable.
     # It is explicitly marked unverified and never performs network I/O.

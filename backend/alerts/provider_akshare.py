@@ -11,6 +11,8 @@ from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from zoneinfo import ZoneInfo
 
+from pydantic import ValidationError
+
 from .config import settings
 from .history_mode_artifacts import date_bounds
 from .market_contracts import (
@@ -25,6 +27,8 @@ from .storage import now_ms
 
 LEGACY_RULES = "akshare-1.19.3-source-label-v1"
 RULES = "akshare-1.19.3-source-label-hk-precision-v2"
+HK_PLATFORM_POLICY = "sina-hk-platform-invalid-ohlcv-audit-v1"
+HK_QUALITY_NOTE = "新浪港股部分日线记录无效；图表排除异常记录并保留审计，不补价。"
 MINUTES = {"M1": "1", "M5": "5", "M15": "15", "M30": "30", "H1": "60"}
 PERIODS = {"D1": "daily", "W1": "weekly", "MN": "monthly"}
 EXCHANGES = {"SSE", "SZSE", "BSE", "HKEX", "SHFE", "DCE", "CZCE", "CFFEX", "INE", "GFEX"}
@@ -65,6 +69,8 @@ def symbol_rules(symbol, source_family=None):
     if exchange == "HKEX":
         valid = re.fullmatch(r"\d{5}", code)
         family, timezone, unit, close = "sina-hk", "Asia/Hong_Kong", "shares", 16 * 60 + 10
+        if source_family == "tencent-hk":
+            family = source_family
     elif exchange in ("SSE", "SZSE", "BSE"):
         valid = re.fullmatch(r"\d{6}", code)
         family, timezone, unit, close = "eastmoney-a", "Asia/Shanghai", "lots", 15 * 60 + 10
@@ -90,6 +96,8 @@ def endpoint(symbol, frame, adjustment="none", source_family=None):
         raise ValueError("AKShare 不支持此复权口径")
     if frame not in (*MINUTES, *PERIODS):
         raise ValueError("来源没有此原生周期接口")
+    if info["source_family"] == "tencent-hk":
+        raise ValueError("腾讯港股原生接口仅用于独立平台入口")
     if info["source_family"] == "sina-hk":
         if frame != "D1":
             raise ValueError("已验证的新浪港股接口只提供 D1；周月线请选择 D1 基础派生")
@@ -142,7 +150,8 @@ def invoke(endpoint_name, parameters, *, deadline=None):
             text=True, env=env, start_new_session=True)
         try:
             output, _ = process.communicate(json.dumps({"endpoint": endpoint_name,
-                "parameters": parameters}), timeout=max(0.01, deadline - time.monotonic()))
+                "parameters": parameters, "timeout": max(0.01, deadline - time.monotonic())}),
+                timeout=max(0.01, deadline - time.monotonic()))
         except subprocess.TimeoutExpired:
             os.killpg(process.pid, signal.SIGTERM)
             try:
@@ -197,7 +206,7 @@ def request_parameters(source, start, end):
     return values
 
 
-def parse_records(source, records, *, start, end, observed_at):
+def parse_records(source, records, *, start, end, observed_at, invalid_records=None):
     frame, info = source.parameters["timeframe"], symbol_rules(
         source.provider_symbol, source.parameters["source_family"])
     zone = ZoneInfo(info["timezone"])
@@ -262,7 +271,17 @@ def parse_records(source, records, *, start, end, observed_at):
             confirmed = successor
         row["complete"] = confirmed and row["end"] <= min(end, observed_at)
         row["confirmation"] = "next_bar" if row["complete"] and successor else "session_elapsed" if row["complete"] else "unconfirmed"
-    return tuple(NativeBarRow.model_validate(row) for row in normalized)
+    result = []
+    for row in normalized:
+        try:
+            result.append(NativeBarRow.model_validate(row))
+        except ValidationError:
+            if invalid_records is None:
+                raise
+            invalid_records.append({"source_label": row["source_label"],
+                "reason": "invalid_supplier_ohlcv", "record": {key: row[key]
+                    for key in ("open", "high", "low", "close", "volume")}})
+    return tuple(result)
 
 
 def parse_sina_factors(records, rows):
@@ -307,9 +326,20 @@ class AKShareHistory:
                             identity.parameters["source_family"])
         if identity.parameters["endpoint"] != expected or identity.parameters["rules"] not in (LEGACY_RULES, RULES):
             raise ValueError("AKShare endpoint rules differ from the fixed acquisition identity")
+        policy = identity.parameters.get("record_policy")
+        if policy is not None and (policy != HK_PLATFORM_POLICY
+                or identity.parameters["source_family"] != "sina-hk"
+                or identity.parameters["adjustment"] != "qfq" or frame != "D1"):
+            raise ValueError("AKShare record policy differs from the fixed acquisition identity")
         records = invoke(expected, request_parameters(identity, start, end), deadline=deadline)
         observed = now_ms()
-        rows = parse_records(identity, records, start=start, end=end, observed_at=observed)
+        warnings = [] if policy == HK_PLATFORM_POLICY else None
+        rows = parse_records(identity, records, start=start, end=end, observed_at=observed,
+                             invalid_records=warnings)
+        # A whole snapshot with no usable candles cannot certify empty history.
+        # Leave failures retryable without storing a successful empty snapshot.
+        if warnings is not None and not rows:
+            raise MarketRequestError(RequestResult(status="invalid_payload" if records else "unavailable"))
         if frame == "D1" and identity.parameters["adjustment"] == "none" and identity.parameters["source_family"] in ("sina-a", "sina-hk"):
             info = symbol_rules(identity.provider_symbol, identity.parameters["source_family"])
             factor_endpoint = "stock_zh_a_daily" if info["source_family"] == "sina-a" else "stock_hk_daily"
@@ -326,7 +356,7 @@ class AKShareHistory:
         return NativeCandleBatch(identity=identity, timeframe=frame, window_start=start,
             window_end=end, checkpoint=end, observed_at=observed,
             rows=rows, result=RequestResult(status="data" if rows else "empty_success"),
-            volume_kind="quantity", volume_unit=info["volume_unit"])
+            volume_kind="quantity", volume_unit=info["volume_unit"], source_warnings=warnings or ())
 
     def close(self):
         pass
@@ -334,6 +364,10 @@ class AKShareHistory:
 
 def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
     """Selected native frame only, sharing fixed-source content and source slots."""
+    if meta.get("native_operation"):
+        from .akshare_native import platform_page as direct_page
+
+        return direct_page(meta, frame, before, count, deadline=deadline, optional=optional)
     from .history_mode_sources import dataset_identity
     from .source_history_store import shared_native_page
 
@@ -350,6 +384,10 @@ def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
     if meta["source_family"] in ("sina-a", "sina-hk"):
         parameters = {**source.parameters, "adjustment": "qfq",
             "endpoint": endpoint(meta["symbol"], frame, "qfq", source.parameters["source_family"])}
+        if meta["source_family"] == "sina-hk":
+            # Only platform HK qfq opts in. Managed/legacy strict reads keep
+            # their exact identity and never consume this audited snapshot.
+            parameters["record_policy"] = HK_PLATFORM_POLICY
         source = source.model_copy(update={"parameters": parameters})
     observed = now_ms()
     right = min(before, observed)
@@ -386,4 +424,6 @@ def platform_page(meta, frame, before, count, *, deadline=None, optional=0):
         "coverage": [[visible[0]["chart_time"], min(before, observed)]] if visible else [],
         "availability": "observed_window", "series_kind": "provider", "basis": "last",
         "calendar": "source_date", "precision": meta["precision"], "indicators": [],
-        "volume_kind": "quantity", "volume_unit": meta["volume_unit"], "as_of": batch.observed_at}
+        "volume_kind": "quantity", "volume_unit": meta["volume_unit"], "as_of": batch.observed_at,
+        **({"source_warnings": list(batch.source_warnings)}
+           if source.parameters.get("record_policy") == HK_PLATFORM_POLICY else {})}

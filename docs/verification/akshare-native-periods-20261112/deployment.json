@@ -1,0 +1,26 @@
+{
+  "host": "Ubuntu quant-server",
+  "project": "mw-dev",
+  "address": "https://192.168.7.232:18443",
+  "authorization": "user requested acceptance on the existing development instance",
+  "source_commit": "833d1ccf9046128b72d7000b38ad536e8a2be89d",
+  "images": {
+    "api": "sha256:92151cd5bbad2eb379df5edcd378ec037b18522641b893d0fe6689b6974f41c3",
+    "web": "sha256:fbc2c2d223d7fcaac4bc78e3e33a5cb2dcf1008f2a728b5e45da85d97cb8d4b6"
+  },
+  "changed_backend_source_hashes": "running-source.json",
+  "backup": {
+    "format": "pg_dump custom",
+    "bytes": 1564674129,
+    "manifest_readable": true,
+    "full_restore_performed": false
+  },
+  "schema_migration": false,
+  "start": "mw-dev up",
+  "status": "mw-dev status",
+  "stop": "mw-dev stop",
+  "restart_apps": "mw-dev restart api market-runtime data-worker notification-worker",
+  "private_config": "~/.local/share/market-watch-dev/updates/akshare-native-20261112/run.json",
+  "not_isolated_preview": true,
+  "production_changed": false
+}

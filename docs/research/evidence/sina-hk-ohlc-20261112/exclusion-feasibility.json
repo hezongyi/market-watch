@@ -1,0 +1,30 @@
+{
+  "input_rows": 5510,
+  "valid_rows": 5508,
+  "warnings": [
+    {
+      "source_label": "2006-06-13",
+      "reason": "invalid_supplier_ohlcv",
+      "record": {
+        "open": "2.763",
+        "high": "2.9325",
+        "low": "2.8475",
+        "close": "2.763",
+        "volume": "48000.0"
+      }
+    },
+    {
+      "source_label": "2009-01-01",
+      "reason": "invalid_supplier_ohlcv",
+      "record": {
+        "open": "8.5334",
+        "high": "8.448",
+        "low": "8.448",
+        "close": "8.5334",
+        "volume": "0.0"
+      }
+    }
+  ],
+  "valid_ohlcv_unchanged": true,
+  "latest": "2026-11-12"
+}

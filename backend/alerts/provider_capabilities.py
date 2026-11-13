@@ -15,6 +15,7 @@ def instrument_source(instrument):
     prefix = instrument.upper().removeprefix("MWP:").partition(":")[0]
     return {"OANDA": "oanda", "NATIVE": "oanda", "BINANCE": "binance", "YAHOO": "yahoo",
             "DUKA": "dukascopy", "AKSHARE": "akshare", "TENCENT": "akshare",
+            "SINA-NATIVE": "akshare", "TENCENT-NATIVE": "akshare",
             "FXCM": "fxcm"}.get(prefix)
 
 
@@ -95,7 +96,7 @@ def versions(meta):
     if meta["source"] == "akshare":
         from .provider_akshare import RULES
 
-        return (RULES + ":" + meta["source_family"] + ":" + meta["adjustment"], "akshare-quantity-v1")
+        return (meta.get("native_rules", RULES) + ":" + meta["source_family"] + ":" + meta["adjustment"], "akshare-quantity-v1")
     return ("native-bid-ny17-sunday-v1", "volume-v1")
 
 

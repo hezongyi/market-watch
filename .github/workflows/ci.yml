@@ -47,7 +47,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs_only != 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    # The full PostgreSQL suite already takes about 28 minutes on main.
+    # Reserve time for setup, compatibility checks and hosted-runner variance.
+    timeout-minutes: 45
     env:
       TEST_POSTGRES_URL: postgresql+psycopg://ci:ci@127.0.0.1:5432/ci
       CHART_ALERT_TEST_DATABASE_URL: postgresql+psycopg://ci:ci@127.0.0.1:5432/ci
@@ -156,7 +158,9 @@ jobs:
     needs: changes
     if: needs.changes.outputs.docs_only != 'true'
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    # Checkout/network time counts toward this budget too; a slow fetch must
+    # leave enough time for the build and complete browser regressions.
+    timeout-minutes: 30
     steps:
       - name: Check out source
         uses: actions/checkout@v4
