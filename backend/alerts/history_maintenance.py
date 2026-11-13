@@ -285,8 +285,14 @@ def finish_run(db, version_id):
 
 def task_status(db, version):
     run = db.get(HistoryRun, version.id)
-    if version.status == "published" and db.scalar(select(HistoryArtifact.id).where(
-            HistoryArtifact.version_id == version.id, HistoryArtifact.status == "unavailable").limit(1)):
+    unavailable = version.status == "published" and db.scalar(select(HistoryArtifact.id).where(
+            HistoryArtifact.version_id == version.id, HistoryArtifact.status == "unavailable").limit(1))
+    return task_state(version, run, bool(unavailable))
+
+
+def task_state(version, run, unavailable=False):
+    """Same task state for individual detail and bounded summary readers."""
+    if version.status == "published" and unavailable:
         return "partial"
     if version.status != "published" or not run or run.completed_at is not None:
         return "partial" if version.status == "published" and version.manifest.get("result") == "partial" else version.status

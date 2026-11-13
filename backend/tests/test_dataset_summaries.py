@@ -198,3 +198,39 @@ def test_legacy_continuation_without_maintenance_is_listed_without_creating_plan
         assert summaries(db, status="archived")["total"] == 0
         assert summaries(db, status="paused")["total"] == 0
         assert db.scalar(select(func.count()).select_from(DatasetMaintenance)) == 0
+
+
+def test_summary_task_state_matches_detail_during_download_derivation_and_partial(database):
+    """A published base is still deriving until its requested frames finish."""
+    from alerts.history_maintenance import task_status
+    from alerts.storage import HistoryArtifact, HistoryVersion
+    from sqlalchemy import select
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1", "H4"])
+        ident = create_run(db, identity().key, end=120000, request_id="summary-state").id
+        version = db.get(HistoryVersion, ident)
+        for state in ("pending", "running", "retrying", "configuration_error", "paused", "failed"):
+            version.status = state
+            db.flush()
+            assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == state
+        version.status = "pending"
+    import_page(Adapter(), version_id=ident)
+    from alerts.history_maintenance import task_control
+
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == "deriving"
+        task_control(db, ident, "pause")
+        db.flush()
+        assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == "paused"
+        task_control(db, ident, "resume")
+        artifact = db.scalar(select(HistoryArtifact).where(HistoryArtifact.version_id == ident, HistoryArtifact.timeframe == "H4"))
+        artifact.status = "unavailable"
+        db.flush()
+    while artifact_tick(ident):
+        pass
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == "partial"

@@ -557,7 +557,314 @@
   }
 }
 
-.mobile-data .data-search-input [data-slot="input-group-control"]:focus-visible {
+.mobile-data
+  .data-search-input
+  [data-slot="input-group-control"]:focus-visible {
   outline: none;
   box-shadow: none;
+}
+
+/* Managed data: one maintenance surface, with a quiet catalog entry. */
+.data-managed .data-title {
+  min-height: 80px;
+  padding-bottom: 16px;
+}
+.data-managed .data-title > h1 {
+  margin: 0;
+}
+.data-list-filter {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.data-list-filter .data-search-input {
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+.data-list-filter > button {
+  flex: 0 0 44px;
+}
+.data-list-caption {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.mobile-data button.data-managed-row[data-slot="button"] {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 16px;
+  gap: 12px;
+  width: 100%;
+  text-align: left;
+  padding: 18px 2px;
+  border-bottom: 1px solid var(--quiet-line);
+  border-radius: 0;
+  border: 0;
+  border-bottom: 1px solid var(--quiet-line);
+  background: transparent;
+}
+.data-managed-symbol,
+.data-managed-status {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 5px;
+}
+.data-managed-symbol strong {
+  font-size: 1.12rem;
+  letter-spacing: -0.02em;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+.data-managed-symbol > span {
+  font-size: 0.92rem;
+  font-weight: 400;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.data-managed-symbol small,
+.data-managed-status small {
+  font-size: 0.76rem;
+  line-height: 1.5;
+  font-weight: 400;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.data-managed-status {
+  align-items: flex-end;
+  text-align: right;
+}
+.data-managed-status [data-slot="badge"] {
+  max-width: 100%;
+  white-space: normal;
+}
+.data-managed-row > svg {
+  color: var(--muted);
+}
+.data-workflow-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+}
+.data-workflow-form form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.data-workflow-form [data-slot="field-group"] {
+  gap: 18px;
+}
+.data-workflow-form [data-slot="field-set"] {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.data-workflow-form [data-slot="input"] {
+  min-height: 48px;
+  width: 100%;
+  font-size: 1.05rem;
+  background: var(--surface);
+}
+.data-workflow-form [data-slot="select-trigger"] {
+  min-height: 48px;
+  width: 100%;
+}
+.data-workflow-form [data-slot="field-label"] {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+.data-selection {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 2px 0 8px;
+  min-width: 0;
+}
+.data-selection strong {
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+  overflow-wrap: anywhere;
+}
+.data-selection > span {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+}
+.data-caption {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.85rem;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.data-primary {
+  width: 100%;
+  min-height: 48px;
+  margin-top: 4px;
+}
+.data-frame-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+.data-frame-options [data-slot="toggle-group-item"] {
+  min-height: 44px;
+  min-width: 52px;
+}
+.mobile-controls
+  .data-workflow-form
+  button[data-slot="toggle-group-item"][data-variant] {
+  color: var(--muted);
+  background: var(--surface);
+  border: 1px solid var(--line);
+}
+.mobile-controls
+  .data-workflow-form
+  button[data-slot="toggle-group-item"][aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--selected);
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--line));
+}
+.data-workflow-form [aria-label="确认产品差异"],
+.data-workflow-form [aria-label="确认产品差异"] button {
+  width: 100%;
+  height: auto;
+  min-height: 48px;
+  white-space: normal;
+  line-height: 1.6;
+}
+.data-more {
+  min-width: 0;
+  border-top: 1px solid var(--quiet-line);
+}
+.data-more > [data-slot="collapsible-trigger"] {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-height: 48px;
+  padding-inline: 0;
+}
+.data-more > [data-slot="collapsible-content"] {
+  padding: 8px 0 12px;
+}
+.data-more-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.data-more-actions > button {
+  justify-content: flex-start;
+}
+.data-catalog-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  width: 100%;
+  padding: 15px 2px;
+  text-align: left;
+  border-bottom: 1px solid var(--quiet-line);
+  border-radius: 0;
+}
+.data-catalog-row > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 5px;
+}
+.data-catalog-row strong {
+  font-size: 1.07rem;
+  overflow-wrap: anywhere;
+}
+.data-catalog-row span > span {
+  font-size: 0.9rem;
+  font-weight: 400;
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+.data-catalog-row small {
+  color: var(--muted);
+  font-size: 0.8rem;
+  font-weight: 400;
+}
+.data-catalog-row > svg {
+  color: var(--muted);
+}
+.data-pager {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+.data-detail-section {
+  border: 1px solid var(--quiet-line);
+  border-radius: 16px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.data-detail-section h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1rem;
+}
+.data-detail-section h3 svg {
+  width: 17px;
+  height: 17px;
+  color: var(--muted);
+}
+.data-detail-section p {
+  margin: 0;
+}
+.data-action-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.data-action-row > button {
+  flex: 1;
+  min-height: 48px;
+}
+.data-task-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border: 1px solid var(--quiet-line);
+  border-radius: 14px;
+  padding: 14px;
+}
+.data-task-card > div:first-child {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.data-task-card p {
+  margin: 0;
+  font-size: 0.86rem;
+  color: var(--muted);
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+.data-period-settings {
+  border-bottom: 1px solid var(--quiet-line) !important;
+  padding-block: 12px !important;
+}
+@media (prefers-reduced-motion: reduce) {
+  .data-managed * {
+    scroll-behavior: auto;
+  }
 }

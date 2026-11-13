@@ -6,11 +6,13 @@ from sqlalchemy import func, select
 
 from .data_center import _dataset_query
 from .history_api import dataset_report
+from .history_maintenance import task_state
 from .storage import (
     DatasetMaintenance,
     HistoryArtifact,
     HistoryArtifactBlock,
     HistoryReclamation,
+    HistoryRun,
     HistoryVersion,
     Instrument,
     MarketComposite,
@@ -83,6 +85,9 @@ def _rows(db, selected):
     missing = version_ids - versions.keys()
     if missing:
         versions.update((row.id, row) for row in db.scalars(select(HistoryVersion).where(HistoryVersion.id.in_(missing))))
+    runs = {row.version_id: row for row in db.scalars(select(HistoryRun).where(HistoryRun.version_id.in_(versions)))}
+    unavailable = set(db.scalars(select(HistoryArtifact.version_id).where(
+        HistoryArtifact.version_id.in_(versions), HistoryArtifact.status == "unavailable").distinct()))
     bounds = {ident: (start, end) for ident, start, end in db.execute(select(
         HistoryArtifactBlock.artifact_id, func.min(HistoryArtifactBlock.start), func.max(HistoryArtifactBlock.end)
     ).where(HistoryArtifactBlock.artifact_id.in_([item.id for item in artifacts])).group_by(HistoryArtifactBlock.artifact_id))}
@@ -108,6 +113,8 @@ def _rows(db, selected):
             "frequency", "paused", "archived", "last_attempt", "last_success", "active_version_id")}
         maintenance.update(configured=plan is not None, paused=bool(plan and plan.paused),
             archived=bool(plan and plan.archived), task_error=active.error if active else None,
+            task_status=task_state(active, runs.get(active.id), active.id in unavailable) if active else
+            task_state(parent, runs.get(parent.id), parent.id in unavailable) if parent else None,
             next_at=plan.next_at if plan and plan.frequency == "daily" and not plan.paused and not plan.archived else None)
         output.append({**dataset_report(dataset, inst), "position": position, "maintenance": maintenance,
             "latest_version_id": parent.id if parent else None, "available_start": parent.start if parent else None,

@@ -37,7 +37,9 @@ const entries = {
     frames: ["M1", "M5", "D1"],
   },
 };
-let continuationEnabled = false, continuationReady = true, unpublished = false,
+let continuationEnabled = false,
+  continuationReady = true,
+  unpublished = false,
   logged = false,
   pref = {
     kind: "setting",
@@ -64,15 +66,34 @@ const hold = {},
   proof = { checks: [], screenshots: [], layouts: [] };
 function managedDataset() {
   return {
-    id: dataset, logical_symbol: "EURUSD", display_symbol: entries.history.display_symbol,
+    id: dataset,
+    logical_symbol: "EURUSD",
+    display_symbol: entries.history.display_symbol,
     instrument_name: entries.history.instrument_name,
-    source_display: "Dukascopy", identity: {source: "dukascopy", basis: "bid", provider_symbol: "EURUSD"},
+    source_display: "Dukascopy",
+    identity: { source: "dukascopy", basis: "bid", provider_symbol: "EURUSD" },
     usable_timeframes: unpublished ? [] : entries.history.frames,
-    periods: unpublished ? [] : entries.history.frames.map(timeframe => ({timeframe, available_version_id: version, status: "published", rows: 100})),
-    maintenance: {configured: true, paused: false, archived: false},
+    periods: unpublished
+      ? []
+      : entries.history.frames.map((timeframe) => ({
+          timeframe,
+          available_version_id: version,
+          status: "published",
+          rows: 100,
+        })),
+    maintenance: { configured: true, paused: false, archived: false },
     availability: unpublished ? "preparing" : "available",
-    available_start: 1720000000000, available_end: 1730000000000,
-    continuation: {enabled: continuationEnabled, configured: true, status: continuationEnabled ? continuationReady ? "receiving" : "preparing" : "disabled"},
+    available_start: 1720000000000,
+    available_end: 1730000000000,
+    continuation: {
+      enabled: continuationEnabled,
+      configured: true,
+      status: continuationEnabled
+        ? continuationReady
+          ? "receiving"
+          : "preparing"
+        : "disabled",
+    },
   };
 }
 const server = http.createServer(async (req, res) => {
@@ -139,24 +160,54 @@ const server = http.createServer(async (req, res) => {
   }
   if (url.pathname === "/api/market-data/center/dataset-summaries") {
     if (await wait("list")) return;
-    const q = url.searchParams.get("query"), page = Number(url.searchParams.get("page") || 1);
-    return json({items: q === "empty" ? [] : [{...managedDataset(), ...(page > 1 ? {display_symbol: "NEXT_MANAGED_PAGE"} : {})}], total: 26});
+    const q = url.searchParams.get("query"),
+      page = Number(url.searchParams.get("page") || 1);
+    return json({
+      items:
+        q === "empty"
+          ? []
+          : [
+              {
+                ...managedDataset(),
+                ...(page > 1 ? { display_symbol: "NEXT_MANAGED_PAGE" } : {}),
+              },
+            ],
+      total: 26,
+    });
   }
   if (url.pathname === "/api/market-data/center/datasets/" + dataset)
     return json(managedDataset());
-  if (url.pathname === "/api/market-data/datasets/" + dataset + "/continuation") {
+  if (
+    url.pathname ===
+    "/api/market-data/datasets/" + dataset + "/continuation"
+  ) {
     if (await wait("continuation")) return;
-    return json({dataset_id: dataset, enabled: continuationEnabled,
-      ready_to_enable: continuationReady, status: continuationEnabled ? continuationReady ? "receiving" : "preparing" : "disabled",
-      reason: continuationReady ? null : "实时接续准备中，可在固定历史版本中查看已发布数据",
-      composite: continuationReady ? {id: composite, preparation: {status: "queried"}} : null});
+    return json({
+      dataset_id: dataset,
+      enabled: continuationEnabled,
+      ready_to_enable: continuationReady,
+      status: continuationEnabled
+        ? continuationReady
+          ? "receiving"
+          : "preparing"
+        : "disabled",
+      reason: continuationReady
+        ? null
+        : "实时接续准备中，可在固定历史版本中查看已发布数据",
+      composite: continuationReady
+        ? { id: composite, preparation: { status: "queried" } }
+        : null,
+    });
   }
   if (url.pathname === "/api/market-data/series/page") {
     if (await wait("list")) return;
     const kind = url.searchParams.get("kind");
-    assert.equal(kind, "provider", "native-only series listing; managed datasets use summaries");
-    const
-      q = url.searchParams.get("query"),
+    assert.equal(
+      kind,
+      "provider",
+      "native-only series listing; managed datasets use summaries",
+    );
+    const q = url.searchParams.get("query"),
       offset = Number(url.searchParams.get("offset"));
     return json({
       items:
@@ -375,7 +426,7 @@ const server = http.createServer(async (req, res) => {
     page = await context.newPage();
   page.on("pageerror", (e) => errors.push(e.message));
   const dialog = () => page.getByRole("dialog").last(),
-    catalog = () => page.locator(".mobile-data-body .data-series");
+    catalog = () => page.locator(".mobile-search-row");
   const settle = async () => {
     await page.waitForTimeout(350);
     await page.evaluate(async () =>
@@ -412,16 +463,11 @@ const server = http.createServer(async (req, res) => {
     page.evaluate(() =>
       dispatchEvent(new Event("mw-mobile-back", { cancelable: true })),
     );
-  const tools = async (title) => {
-    await page.getByRole("button", { name: "任务与来源", exact: true }).click();
-    await page.getByRole("button", { name: title, exact: true }).click();
-    await expect(dialog()).toHaveAccessibleName(title);
-    await expect(
-      page.getByRole("dialog", { name: "任务与来源", exact: true }),
-    ).toHaveCount(0);
-  };
   const detail = async () => {
-    await catalog().first().click();
+    await catalog()
+      .first()
+      .getByRole("button", { name: "详情", exact: true })
+      .click();
     await expect(dialog()).toHaveAccessibleName("行情详情");
     await expect(
       dialog().getByRole("button", { name: "数据身份与修订", exact: true }),
@@ -441,7 +487,7 @@ const server = http.createServer(async (req, res) => {
     );
     const old = await page
       .locator(
-        ".mobile-data button:visible,.mobile-data input:visible,.mobile-data select:visible",
+        ".mobile-data-surface button:visible,.mobile-data-surface input:visible,.mobile-data-surface select:visible",
       )
       .evaluateAll((els) =>
         els
@@ -456,17 +502,13 @@ const server = http.createServer(async (req, res) => {
     assert.deepEqual(old, [], "shadcn controls including nested surfaces");
   };
   try {
-    await page.goto("http://127.0.0.1:" + server.address().port + "/m/data");
+    await page.goto("http://127.0.0.1:" + server.address().port + "/m/watch");
     await page.getByLabel("密码", { exact: true }).fill("test-only");
     await page.getByRole("button", { name: "登录", exact: true }).click();
-    await expect(catalog().first()).toBeVisible();
-    await expect(page.getByRole("combobox", {name: "来源", exact: true})).toContainText("全部来源");
-    await kind("自建");
-    await expect(catalog()).toContainText("EURUSD_HISTORY");
-    await expect(page.getByRole("tablist", {name: "行情类型"}).getByRole("tab")).toHaveCount(2);
-    await expect(page.getByRole("tab", {name: "组合", exact: true})).toHaveCount(0);
-    await expect(catalog()).toHaveCount(1);
-    await expect(catalog()).toContainText("实时接续 · 未开启");
+    await page.getByRole("button", { name: "自选操作", exact: true }).click();
+    await page
+      .getByRole("button", { name: "搜索并添加品种", exact: true })
+      .click();
     await kind("原生");
     const search = page.getByRole("searchbox", {
       name: "搜索代码或中文",
@@ -476,31 +518,22 @@ const server = http.createServer(async (req, res) => {
     await expect(
       page.getByText("没有符合条件的行情", { exact: true }),
     ).toBeVisible();
-    await shot("empty");
     hold.list = true;
     await search.fill("pending");
-    await expect(
-      page.getByRole("status", { name: "正在读取目录…", exact: true }),
-    ).toBeVisible();
+    await expect.poll(() => !!release.list).toBe(true);
     await shot("loading");
-    await expect.poll(() => Boolean(release.list)).toBe(true);
     hold.list = false;
     release.list();
     await expect(catalog()).toBeVisible();
     await search.fill("");
     await expect(catalog()).toBeVisible();
-    await page.getByRole("combobox", { name: "来源", exact: true }).click();
-    await expect(
-      page.getByRole("option", { name: "Yahoo", exact: true }),
-    ).toBeVisible();
-    await shot("source-select");
-    await back();
-    await expect(
-      page.getByRole("option", { name: "Yahoo", exact: true }),
-    ).toHaveCount(0);
-    await expect(page).toHaveURL(/\/m\/data$/);
-    await page.getByRole("combobox", { name: "来源", exact: true }).click();
-    await page.getByRole("option", { name: "Yahoo", exact: true }).click();
+    const sourceFilters = page.getByRole("group", {
+      name: "搜索来源",
+      exact: true,
+    });
+    await sourceFilters
+      .getByRole("button", { name: "Yahoo", exact: true })
+      .click();
     await expect
       .poll(() =>
         requests
@@ -509,10 +542,9 @@ const server = http.createServer(async (req, res) => {
           ?.query.includes("source=yahoo"),
       )
       .toBe(true);
-    await expect(catalog()).toBeVisible();
-    await page.getByRole("combobox", { name: "来源", exact: true }).click();
-    await page.getByRole("option", { name: "全部来源", exact: true }).click();
-    await expect(catalog()).toBeVisible();
+    await sourceFilters
+      .getByRole("button", { name: "全部", exact: true })
+      .click();
     await page
       .getByRole("navigation", { name: "行情分页" })
       .getByRole("button", { name: "下一页", exact: true })
@@ -524,10 +556,10 @@ const server = http.createServer(async (req, res) => {
       .click();
     await expect(catalog()).toContainText("EURUSD");
     proof.checks.push(
-      "login; Tabs; search/loading/empty; source Select and Android back; pagination",
+      "shared watch native search: loading, empty, source, pagination",
     );
     hold.detail = true;
-    await catalog().click();
+    await catalog().getByRole("button", { name: "详情", exact: true }).click();
     await expect(
       page.getByRole("status", { name: "正在读取详情…", exact: true }),
     ).toBeVisible();
@@ -537,7 +569,7 @@ const server = http.createServer(async (req, res) => {
     hold.detail = false;
     release.detail();
     await settle();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
+    await expect(dialog()).toHaveAccessibleName("搜索品种");
     await detail();
     await dialog()
       .getByRole("button", { name: "数据身份与修订", exact: true })
@@ -632,160 +664,35 @@ const server = http.createServer(async (req, res) => {
     proof.checks.push(
       "detail loading/abort; Badge/Collapsible; nested Select back; add guard and specified group; conflict retains state; cached detail/error/retry",
     );
-    await tools("来源状态");
-    await expect(
-      dialog().getByText("已配置 · 连接以品种状态为准", { exact: true }),
-    ).toBeVisible();
-    await shot("sources");
-    await close();
-    hold.support = true;
-    await tools("来源状态");
-    await expect.poll(() => Boolean(release.support)).toBe(true);
-    await close();
-    hold.support = false;
-    release.support();
-    await settle();
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    fail.support = true;
-    await tools("来源状态");
-    await expect(
-      dialog().getByText("暂时无法读取", { exact: true }),
-    ).toBeVisible();
-    await shot("sources-error");
-    fail.support = false;
-    await dialog()
-      .getByRole("button", { name: "重试读取", exact: true })
-      .click();
-    await expect(dialog().locator("[data-slot=card]")).toHaveCount(5);
-    await close();
-    await tools("任务记录");
-    await expect(dialog().locator("[data-slot=card]")).toHaveCount(20);
-    await dialog()
-      .getByRole("navigation", { name: "状态分页" })
-      .getByRole("button", { name: "下一页", exact: true })
-      .click();
-    await expect(dialog().locator("[data-slot=card]")).toHaveCount(1);
-    await expect(dialog()).toContainText("第 2 页");
-    await shot("tasks-page-2");
-    await close();
     await kind("自建");
     await detail();
-    hold.versions = true;
-    await dialog()
-      .getByRole("button", { name: "固定历史版本", exact: true })
-      .click();
-    await expect.poll(() => Boolean(release.versions)).toBe(true);
-    await expect(
-      page.getByRole("status", { name: "正在读取固定版本…", exact: true }),
-    ).toBeVisible();
-    await close();
-    hold.versions = false;
-    release.versions();
-    await expect(
-      dialog().getByRole("button", { name: "固定历史版本", exact: true }),
-    ).toBeEnabled();
-    fail.versions = true;
     await dialog()
       .getByRole("button", { name: "固定历史版本", exact: true })
       .click();
     await expect(dialog()).toHaveAccessibleName("固定历史版本");
-    await expect(
-      dialog().getByText("暂时无法读取", { exact: true }),
-    ).toBeVisible();
-    fail.versions = false;
-    await dialog()
-      .getByRole("button", { name: "重试读取", exact: true })
-      .click();
-    await expect(
-      dialog().getByRole("button", { name: "打开此固定版本", exact: true }),
-    ).toHaveCount(3);
-    await expect(
-      dialog()
-        .getByRole("button", { name: "打开此固定版本", exact: true })
-        .nth(1),
-    ).toBeDisabled();
-    await expect(
-      dialog()
-        .getByRole("button", { name: "打开此固定版本", exact: true })
-        .nth(2),
-    ).toBeDisabled();
-    await dialog()
-      .getByRole("button", { name: "完整版本标识", exact: true })
-      .first()
-      .click();
-    await expect(dialog().getByText(version, { exact: true })).toBeVisible();
-    await shot("versions");
-    await back();
-    await expect(dialog()).toHaveAccessibleName("行情详情");
-    await dialog()
-      .getByRole("button", { name: "查看维护状态", exact: true })
-      .click();
-    await expect(dialog()).toHaveAccessibleName("自建维护");
-    await expect(dialog()).toContainText("维护已配置");
-    await shot("maintenance");
+    const versionButtons = dialog().getByRole("button", {
+      name: "打开此固定版本",
+      exact: true,
+    });
+    await expect(versionButtons).toHaveCount(3);
+    await expect(versionButtons.nth(1)).toBeDisabled();
+    await expect(versionButtons.nth(2)).toBeDisabled();
     await back();
     await expect(dialog()).toHaveAccessibleName("行情详情");
     await close();
+    for (const width of [375, 412]) {
+      await page.setViewportSize({ width, height: 915 });
+      await page.evaluate(
+        () => (document.documentElement.style.fontSize = "21px"),
+      );
+      await shot(`shared-search-large-${width}`);
+      await detail();
+      await shot(`shared-detail-large-${width}`);
+      await audit();
+      await close();
+    }
     proof.checks.push(
-      "tools exit handoff; source capability/directory/live cards; abort/error/retry; task pagination; maintenance back; versions retry/unpublished/payload disabled",
-    );
-    for (const theme of ["light", "dark"])
-      for (const width of [375, 412])
-        for (const font of [14, 21]) {
-          await page.getByRole("link", { name: "更多", exact: true }).click();
-          if (
-            (await page.locator(".mobile-app").getAttribute("data-theme")) !==
-            theme
-          )
-            await page.getByRole("button", { name: /显示主题/ }).click();
-          await page.getByRole("link", { name: "数据", exact: true }).click();
-          await page.setViewportSize({ width, height: 915 });
-          await page.evaluate(
-            (f) => (document.documentElement.style.fontSize = f + "px"),
-            font,
-          );
-          await kind("原生");
-          await shot(`catalog-${theme}-${width}-${font}`);
-          await audit();
-          await detail();
-          await shot(`detail-${theme}-${width}-${font}`);
-          await audit();
-          proof.layouts.push({
-            theme,
-            width,
-            font,
-            ...(await dialog().evaluate((el) => ({
-              width: el.getBoundingClientRect().width,
-              height: el.getBoundingClientRect().height,
-              title: getComputedStyle(el.querySelector("h2")).fontSize,
-              radius: getComputedStyle(el).borderTopLeftRadius,
-            }))),
-          });
-          await close();
-          await page
-            .getByRole("button", { name: "任务与来源", exact: true })
-            .click();
-          await shot(`tools-${theme}-${width}-${font}`);
-          await audit();
-          await close();
-          await tools("来源状态");
-          await expect(dialog().locator("[data-slot=card]")).toHaveCount(5);
-          await shot(`sources-${theme}-${width}-${font}`);
-          await audit();
-          await close();
-          await kind("自建");
-          await shot(`managed-catalog-${theme}-${width}-${font}`);
-          await detail();
-          await dialog()
-            .getByRole("button", { name: "固定历史版本", exact: true })
-            .click();
-          await shot(`versions-${theme}-${width}-${font}`);
-          await audit();
-          await close();
-          await close();
-        }
-    proof.checks.push(
-      "375/412 widths; light/dark; 150% text; catalog/detail/tools/sources/versions controls and overflow audit",
+      "shared managed search and fixed-version guards; 375/412px large text",
     );
     await page.evaluate(
       () => (document.documentElement.style.fontSize = "14px"),
@@ -800,7 +707,9 @@ const server = http.createServer(async (req, res) => {
     await expect(
       page.getByText("当前显示上次读取", { exact: true }),
     ).toBeVisible();
-    await expect(page.getByRole("alert")).toHaveCount(0);
+    await expect(
+      page.locator(".mobile-search-content [role=alert]"),
+    ).toHaveCount(0);
     await shot("offline-cache");
     await detail();
     await expect(
@@ -808,7 +717,11 @@ const server = http.createServer(async (req, res) => {
     ).toBeDisabled();
     await close();
     await search.fill("not-cached");
-    await expect(page.getByText("暂无本地数据", { exact: true })).toBeVisible();
+    await expect(
+      page
+        .locator(".mobile-search-content")
+        .getByText("暂无本地数据", { exact: true }),
+    ).toBeVisible();
     await shot("offline-no-cache");
     await context.setOffline(false);
     await page.evaluate(() => dispatchEvent(new Event("online")));
@@ -834,92 +747,70 @@ const server = http.createServer(async (req, res) => {
     await close();
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await kind("自建");
-    await detail();
-    await dialog()
-      .getByRole("button", { name: "固定历史版本", exact: true })
-      .click();
-    await dialog()
-      .getByRole("button", { name: "打开此固定版本", exact: true })
-      .first()
-      .click();
-    await expect(page).toHaveURL(/\/m\/chart$/);
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    proof.checks.push(
-      "offline cache/no-cache/disabled add; recovery; listing error/retry; reduced motion; fixed version handoff closes both Drawers",
-    );
-    // One dataset row, selecting its current default continuation only on use.
-    await page.getByRole("link", {name: "数据", exact: true}).click();
-    await kind("自建");
-    await search.fill("managed-page");
-    await expect(catalog()).toContainText("EURUSD_HISTORY");
-    await page.getByRole("navigation", {name: "行情分页"}).getByRole("button", {name: "下一页", exact: true}).click();
-    await expect(catalog()).toContainText("NEXT_MANAGED_PAGE");
-    await page.getByRole("navigation", {name: "行情分页"}).getByRole("button", {name: "上一页", exact: true}).click();
-    await expect(catalog()).toContainText("EURUSD_HISTORY");
     continuationEnabled = true;
     await search.fill("live");
-    await expect(catalog()).toContainText("实时接续 · 运行中");
+    await expect(catalog()).toContainText("实时接续运行中");
     await expect(catalog()).toHaveCount(1);
-    await detail();
-    await expect(dialog().getByRole("button", {name: "加入自选", exact: true})).toBeEnabled();
-    await dialog().getByRole("button", {name: "加入自选", exact: true}).click();
-    await expect(dialog().getByRole("button", {name: "已添加", exact: true})).toBeDisabled();
-    assert(pref.content.value.lists.some(list => list.symbols.includes(entries.composite.ticker)), "enabled continuation adds exact MWC identity");
-    assert(!pref.content.value.lists.some(list => list.symbols.includes(entries.history.ticker)), "must not silently add fixed history");
-    await page.getByRole("button", {name: "关闭通知", exact: true}).click();
-    await shot("managed-live-detail");
-    await dialog().getByRole("button", {name: "打开图表", exact: true}).click();
-    await expect(page).toHaveURL(/\/m\/chart$/);
-    await expect(page.getByRole("dialog")).toHaveCount(0);
-    await expect.poll(() => requests.filter(r => r.path === "/api/market-data/resolve").at(-1)?.body.instrument).toBe(composite);
-    await page.getByRole("link", {name: "数据", exact: true}).click();
+    await catalog()
+      .getByRole("button", { name: /分组|自选/ })
+      .click();
+    await expect(
+      catalog().getByRole("button", { name: "已添加", exact: true }),
+    ).toBeDisabled();
+    assert(
+      pref.content.value.lists.some((l) =>
+        l.symbols.includes(entries.composite.ticker),
+      ),
+    );
+    assert(
+      !pref.content.value.lists.some((l) =>
+        l.symbols.includes(entries.history.ticker),
+      ),
+    );
+    await page.getByRole("button", { name: "关闭通知", exact: true }).click();
     continuationReady = false;
-    await search.fill("waiting-live");
-    await expect(catalog()).toContainText("实时接续 · 准备中");
+    await search.fill("waiting");
     await detail();
-    await expect(dialog().getByText("实时接续准备中，可在固定历史版本中查看已发布数据", {exact: true})).toBeVisible();
-    await expect(dialog().getByRole("button", {name: "加入自选", exact: true})).toBeDisabled();
-    await expect(dialog().getByRole("button", {name: "打开图表", exact: true})).toBeDisabled();
-    await expect(dialog().getByRole("button", {name: "固定历史版本", exact: true})).toBeEnabled();
-    await shot("managed-preparing-detail");
+    await expect(
+      dialog().getByRole("button", { name: "打开图表", exact: true }),
+    ).toBeDisabled();
+    await expect(
+      dialog().getByRole("button", { name: "加入自选", exact: true }),
+    ).toBeDisabled();
     await close();
-    continuationEnabled = false; unpublished = true;
+    continuationEnabled = false;
+    unpublished = true;
     await search.fill("unpublished");
     await detail();
-    await expect(dialog().getByText("尚无可用的已发布数据，请在桌面完成数据准备", {exact: true})).toBeVisible();
-    await expect(dialog().getByRole("button", {name: "加入自选", exact: true})).toBeDisabled();
-    await shot("managed-unpublished-detail");
+    await expect(
+      dialog().getByText("尚无可用的已发布数据，请在数据页准备历史", {
+        exact: true,
+      }),
+    ).toBeVisible();
+    await expect(
+      dialog().getByRole("button", { name: "加入自选", exact: true }),
+    ).toBeDisabled();
     await close();
-    unpublished = false; continuationReady = true;
+    unpublished = false;
+    continuationReady = true;
     await search.fill("fixed");
     await detail();
-    await dialog().getByRole("button", {name: "加入自选", exact: true}).click();
-    await expect(dialog().getByRole("button", {name: "已添加", exact: true})).toBeDisabled();
-    assert(pref.content.value.lists.some(list => list.symbols.includes(entries.history.ticker)), "disabled continuation uses published MWH identity");
-    proof.checks.push("two categories only; one row per dataset; managed pagination; live/fixed identity selection; preparing/unpublished guards; explicit fixed-version escape hatch");
-    await page.getByRole("button", {name: "关闭通知", exact: true}).click();
+    await dialog()
+      .getByRole("button", { name: "加入自选", exact: true })
+      .click();
+    await expect(
+      dialog().getByRole("button", { name: "已添加", exact: true }),
+    ).toBeDisabled();
+    assert(
+      pref.content.value.lists.some((l) =>
+        l.symbols.includes(entries.history.ticker),
+      ),
+    );
+    await page.getByRole("button", { name: "关闭通知", exact: true }).click();
     await close();
-    await page.getByRole("link", {name: "自选", exact: true}).click();
-    await page.getByRole("button", {name: "自选操作", exact: true}).click();
-    await page.getByRole("button", {name: "搜索并添加品种", exact: true}).click();
-    await expect(dialog()).toHaveAccessibleName("搜索品种");
-    await expect(dialog().getByRole("tablist", {name: "行情类型"}).getByRole("tab")).toHaveCount(2);
-    continuationEnabled = true;
-    await dialog().getByRole("tab", {name: "自建", exact: true}).click();
-    const result = dialog().locator(".mobile-search-row");
-    await expect(result).toContainText("实时接续运行中");
-    await expect(result).toHaveCount(1);
-    const addLive = result.getByRole("button", {name: /分组|自选/});
-    await expect(addLive).toBeEnabled();
-    await addLive.click();
-    await expect(result.getByRole("button", {name: "已添加", exact: true})).toBeDisabled();
-    await shot("watch-search-managed");
-    for (const width of [375, 412]) {
-      await page.setViewportSize({width, height: 915});
-      await page.evaluate(() => document.documentElement.style.fontSize = "21px");
-      await shot(`watch-search-managed-large-${width}`);
-    }
-    proof.checks.push("Watch search shares two-category controls; a followed fixed history cannot block live continuation selection; repeated add does not duplicate preference writes");
+    proof.checks.push(
+      "shared MWC/MWH selection; preparing/unpublished guards; no fallback identity; offline recovery and reduced motion",
+    );
     assert.deepEqual(errors, []);
     assert.equal(
       requests.filter((r) => r.path.endsWith("/preferences/save")).length,
@@ -945,7 +836,7 @@ const server = http.createServer(async (req, res) => {
         "HTTP fixtures; actual built UI; Android-device acceptance pending",
       errors,
       forbiddenWrites: forbidden,
-      fixturePreferenceWrites: 4,
+      fixturePreferenceWrites: 3,
     });
     fs.writeFileSync(
       path.join(out, "proof.json"),

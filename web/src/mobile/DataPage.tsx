@@ -61,6 +61,7 @@ import {
 } from "./DataStates";
 
 import type { Dataset } from "../market-data/types";
+import DataManagedPage from "./DataManagedPage";
 import {
   actionableRow,
   continuationLabel,
@@ -141,7 +142,14 @@ export default function DataPage(props: DataPageProps) {
       className="mobile-content mobile-data mobile-controls"
     >
       <MobileOverlaysProvider>
-        <DataContent {...props} />
+        <DataManagedPage
+          key={JSON.stringify([
+            props.profile.origin,
+            props.profile.subject,
+            props.profile.generation,
+          ])}
+          {...props}
+        />
       </MobileOverlaysProvider>
     </section>
   );

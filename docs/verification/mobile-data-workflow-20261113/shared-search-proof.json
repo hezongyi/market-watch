@@ -1,0 +1,28 @@
+{
+  "checks": [
+    "shared watch native search: loading, empty, source, pagination",
+    "detail loading/abort; Badge/Collapsible; nested Select back; add guard and specified group; conflict retains state; cached detail/error/retry",
+    "shared managed search and fixed-version guards; 375/412px large text",
+    "shared MWC/MWH selection; preparing/unpublished guards; no fallback identity; offline recovery and reduced motion"
+  ],
+  "screenshots": [
+    "loading",
+    "detail-loading",
+    "detail-identity",
+    "detail-error-cache",
+    "shared-search-large-375",
+    "shared-detail-large-375",
+    "shared-search-large-412",
+    "shared-detail-large-412",
+    "offline-cache",
+    "offline-no-cache",
+    "catalog-error"
+  ],
+  "layouts": [],
+  "evidence": "Actual built UI with explicit synthetic HTTP fixtures; not real supplier or Android-device acceptance",
+  "errors": [],
+  "forbiddenWrites": [],
+  "fixturePreferenceWrites": 3,
+  "buildFingerprint": "87b321e523535038",
+  "repositoryScreenshots": []
+}

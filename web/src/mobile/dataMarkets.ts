@@ -70,7 +70,7 @@ export async function loadManaged(
       current.ticker = `MWC:${continuation.composite.id}`;
     }
   } else if (!current.ticker) {
-    selectionError = "尚无可用的已发布数据，请在桌面完成数据准备";
+    selectionError = "尚无可用的已发布数据，请在数据页准备历史";
   }
   return { ...current, continuation, selectionError };
 }
