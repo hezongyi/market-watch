@@ -138,3 +138,17 @@ def check_match(db, dataset_id, catalog_id, draft=None):
         "conclusion": ("同标的同币种，已知报价产品差异" if difference else
             "同标的同币种、同类外汇/金属报价；不代表相同经纪商合约") if defaults else "产品关系待核实"}
     return result
+
+
+def saved_mapping_valid(db, row, target, entry):
+    """One selection check for detail and batched summary readers."""
+    if not entry or target.id != live_identity(entry.symbol).key:
+        return False
+    try:
+        match = check_match(db, row.dataset_id, entry.id)
+        return (match["status"] == "ready" and all(
+            row.match.get(field) == match["suggestion"][field] for field in PRODUCT_FIELDS) and
+            row.match.get("target_catalog", {}).get("precision") == match["snapshot"]["precision"] and
+            row.match.get("target_catalog", {}).get("type") == match["snapshot"]["asset_type"])
+    except ValueError:
+        return False

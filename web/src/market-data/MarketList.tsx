@@ -75,129 +75,102 @@ export function MarketTabs({
   );
 }
 
-/** Keep a refreshed prefix of server pages; continuation failures retain earlier rows. */
+type RowSnapshot<T> = { signature: string; items: T[]; total: number; complete: boolean; at: number; loaded: number };
+const rowCache = new Map<string, RowSnapshot<any>>();
+const rowKey = (row: any): string => row.dataset?.id || row.id;
+
+/** Append new pages; refresh loaded IDs without replaying the whole prefix. */
 export function useMarketRows<
   T extends { id: string } | { dataset: { id: string } },
 >(endpoint: string, filters: URLSearchParams, refresh: number) {
-  const [params, setParams] = useSearchParams(),
-    { location } = useCenter();
+  const [params, setParams] = useSearchParams(), { location, workspace } = useCenter();
   const latest = useRef({ params, setParams });
   latest.current = { params, setParams };
-  const signature = endpoint + "?" + filters.toString();
-  const [pages, setPages] = useState(
-    Math.max(1, Math.min(100, Number(params.get("page")) || 1)),
-  );
-  const [snapshot, setSnapshot] = useState<{
-    signature: string;
-    items: T[];
-    total: number;
-    complete: boolean;
-    at: number;
-  } | null>(null);
-  const [loading, setLoading] = useState(true),
-    [error, setError] = useState("");
+  const signature = (workspace || "") + ":" + endpoint + "?" + filters.toString();
+  const [paging, setPaging] = useState({ signature, count: Math.max(1, Math.min(100, Number(params.get("page")) || 1)) });
+  const pages = paging.signature === signature ? paging.count : Math.max(1, Math.min(100, Number(params.get("page")) || 1));
+  const [snapshot, setSnapshot] = useState<RowSnapshot<T> | null>(() => rowCache.get(signature) || null);
+  const [loading, setLoading] = useState(true), [error, setError] = useState("");
   const [retry, setRetry] = useState(0);
-  const active = useRef(signature),
-    list = useRef<HTMLDivElement>(null),
-    sentinel = useRef<HTMLDivElement>(null);
-  const snapshotRef = useRef(snapshot);
-  snapshotRef.current = snapshot;
-  const items = snapshot?.signature === signature ? snapshot.items : [];
-  const total = snapshot?.signature === signature ? snapshot.total : null;
+  const list = useRef<HTMLDivElement>(null), sentinel = useRef<HTMLDivElement>(null);
+  const snapshotRef = useRef(snapshot); snapshotRef.current = snapshot;
+  const current = snapshot?.signature === signature ? snapshot : rowCache.get(signature);
+  const items: T[] = current?.items || [], total = current?.total ?? null;
+  const batch = endpoint.endsWith("/dataset-summaries");
   useEffect(() => {
-    if (active.current !== signature) {
-      active.current = signature;
-      setPages(1);
-    }
-  }, [signature]);
-  useEffect(() => {
-    if (signature !== active.current) return;
     const abort = new AbortController();
-    let timer: ReturnType<typeof setTimeout>;
-    const requestedPages = pages;
+    let timer: ReturnType<typeof setTimeout>, running = false;
+    function accept(value: RowSnapshot<T>) {
+      if (abort.signal.aborted) return;
+      snapshotRef.current = value; setSnapshot(value);
+      rowCache.delete(signature); rowCache.set(signature, value);
+      while (rowCache.size > 10) rowCache.delete(rowCache.keys().next().value!);
+      const next = new URLSearchParams(latest.current.params);
+      next.set("page", String(value.loaded));
+      if (next.toString() !== latest.current.params.toString()) latest.current.setParams(next, { replace: true });
+    }
+    async function requestPage(page: number) {
+      const query = new URLSearchParams(filters);
+      query.set("page", String(page)); query.set("page_size", "25");
+      return api<Page<T>>(`${endpoint}?${query}`, undefined, abort.signal);
+    }
+    async function prefix(previous: RowSnapshot<T> | null, target: number) {
+      const unique = new Map<string, T>((previous?.items || []).map(row => [rowKey(row), row]));
+      let total = previous?.total || 0, loaded = previous?.loaded || 0, complete = previous?.complete || false;
+      for (let page = loaded + 1; page <= target && !complete; page++) {
+        const response = await requestPage(page); total = response.total; loaded = page;
+        for (const row of response.items) unique.set(rowKey(row), row);
+        complete = !response.items.length || page * 25 >= total;
+        // Restore progressively on a cold return; continuation keeps existing rows.
+        accept({ signature, items: [...unique.values()], total, loaded, complete, at: Date.now() });
+      }
+      return { signature, items: [...unique.values()], total, loaded, complete, at: Date.now() };
+    }
+    async function poll(previous: RowSnapshot<T>) {
+      if (!batch || !previous.items.length) return prefix(null, Math.max(1, previous.loaded));
+      const updated: T[] = [];
+      let total = previous.total;
+      for (let offset = 0; offset < previous.items.length; offset += 100) {
+        const query = new URLSearchParams(filters);
+        query.set("ids", previous.items.slice(offset, offset + 100).map(rowKey).join(","));
+        const response = await api<Page<T>>(`${endpoint}?${query}`, undefined, abort.signal);
+        total = response.total; updated.push(...response.items);
+      }
+      const byId = new Map(updated.map(row => [rowKey(row), row]));
+      const rows = previous.items.map(row => byId.get(rowKey(row)));
+      // Membership/order changes require a fresh prefix, including a formerly
+      // complete last page that gained a row. An unchanged list stays batched.
+      if (rows.some((row, index) => !row || (row as any).position !== index + 1) ||
+          rows.length !== Math.min(total, previous.loaded * 25)) return prefix(null, Math.max(1, previous.loaded));
+      return { ...previous, items: rows as T[], total, complete: previous.loaded * 25 >= total, at: Date.now() };
+    }
     async function read() {
-      setLoading(true);
-      setError("");
+      if (abort.signal.aborted || running || document.hidden) return;
+      running = true; setLoading(true); setError("");
       try {
-        const unique = new Map<string, T>();
-        let total = 0;
-        let complete = false;
-        for (let page = 1; page <= requestedPages; page++) {
-          const query = new URLSearchParams(filters);
-          query.set("page", String(page));
-          query.set("page_size", "25");
-          const result = await api<Page<T>>(
-            `${endpoint}?${query}`,
-            undefined,
-            abort.signal,
-          );
-          total = result.total;
-          for (const row of result.items)
-            unique.set("dataset" in row ? row.dataset.id : row.id, row);
-          const rows = [...unique.values()];
-          complete = !result.items.length || page * 25 >= total;
-          // Initial restoration may show its first batch. A continuation or
-          // periodic refresh keeps the entire previous prefix until success.
-          if (
-            !abort.signal.aborted &&
-            snapshotRef.current?.signature !== signature
-          )
-            setSnapshot({
-              signature,
-              items: rows,
-              total,
-              complete,
-              at: Date.now(),
-            });
-          if (complete) break;
-        }
-        if (!abort.signal.aborted) {
-          setSnapshot({
-            signature,
-            items: [...unique.values()],
-            total,
-            complete,
-            at: Date.now(),
-          });
-          const next = new URLSearchParams(latest.current.params);
-          next.set("page", String(requestedPages));
-          if (next.toString() !== latest.current.params.toString())
-            latest.current.setParams(next, { replace: true });
-        }
-      } catch (error) {
-        if (!abort.signal.aborted) setError(String(error));
-      } finally {
-        if (!abort.signal.aborted) {
-          setLoading(false);
-          timer = setTimeout(read, 10000);
-        }
+        const previous = snapshotRef.current?.signature === signature ? snapshotRef.current : rowCache.get(signature) || null;
+        const value = !previous || previous.loaded < pages ? await prefix(previous, pages) : await poll(previous);
+        accept(value);
+      } catch (error) { if (!abort.signal.aborted) setError(String(error)); }
+      finally {
+        running = false;
+        if (!abort.signal.aborted) { setLoading(false); if (!document.hidden) timer = setTimeout(read, 10000); }
       }
     }
-    void read();
-    return () => {
-      abort.abort();
-      clearTimeout(timer);
-    };
+    const visibility = () => { clearTimeout(timer); if (!document.hidden) void read(); };
+    document.addEventListener("visibilitychange", visibility);
+    // Search text updates immediately; only the network query is debounced.
+    timer = setTimeout(read, filters.get("query") ? 200 : 0);
+    return () => { abort.abort(); clearTimeout(timer); document.removeEventListener("visibilitychange", visibility); };
   }, [signature, pages, refresh, retry]);
   useEffect(() => {
-    if (
-      !sentinel.current ||
-      loading ||
-      error ||
-      total === null ||
-      snapshot?.complete
-    )
-      return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting))
-          setPages((value) => value + 1);
-      },
-      { root: list.current, rootMargin: "0px 0px 40px" },
-    );
+    if (!sentinel.current || loading || error || total === null || current?.complete) return;
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) setPaging({ signature, count: Math.min(100, pages + 1) });
+    }, { root: list.current, rootMargin: "0px 0px 40px" });
     observer.observe(sentinel.current);
     return () => observer.disconnect();
-  }, [loading, error, total, items.length, snapshot?.complete]);
+  }, [signature, pages, loading, error, total, items.length, current?.complete]);
   useCenterRowRestore(snapshot?.signature === signature ? snapshot : null);
   // A section round trip can have a saved scroll position without a row hash.
   useEffect(() => {

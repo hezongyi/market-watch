@@ -85,7 +85,7 @@ def dataset_detail(db, dataset_id):
         "availability": "available" if ready else "preparing" if maintenance.get("active_version_id") else "needs_maintenance"}
 
 
-def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25):
+def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25):
     if not 1 <= page_size <= 100 or page < 1 or status not in (
             "all", "available", "preparing", "attention", "paused", "archived"):
         raise ValueError("无效的列表范围或状态")
@@ -119,6 +119,12 @@ def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, 
         failure = select(HistoryVersion.id).where(HistoryVersion.id == DatasetMaintenance.active_version_id,
             HistoryVersion.status.in_(("retrying", "configuration_error"))).exists()
         base = base.where(or_(~usable, failure))
+    return base
+
+
+def dataset_list(db, *, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25):
+    base = _dataset_query(query=query, source=source, calendar=calendar, asset_class=asset_class,
+        status=status, page=page, page_size=page_size)
     total = db.scalar(select(func.count()).select_from(base.subquery()))
     ids = db.scalars(base.order_by(MarketDataset.logical_symbol, Instrument.source,
         Instrument.calendar, MarketDataset.id).offset((page - 1) * page_size).limit(page_size))

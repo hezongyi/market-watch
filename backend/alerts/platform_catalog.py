@@ -67,7 +67,28 @@ def catalog(db, *, query="", source=None, page=1, page_size=25, asset=None):
     result = search(db, query=query, source=source or None, asset=asset,
                     offset=(page - 1) * page_size, limit=page_size)
     return {**result, "items": managed_matches(db, [_entry(row) for row in result["items"]]),
-            "page": page, "page_size": page_size}
+            "page": page, "page_size": page_size, "revision": directory_revision(db)}
+
+
+def directory_revision(db):
+    """A compact invalidation hint for cached directory rows, never candles."""
+    import hashlib
+    import json
+
+    from sqlalchemy import func, select
+
+    from .history_catalog import account_scope
+    from .storage import DatasetMaintenance, MarketCatalog, Preference
+
+    catalog = db.execute(select(func.count(), func.max(MarketCatalog.updated_at),
+        func.sum(MarketCatalog.updated_at))).one()
+    plans = db.execute(select(func.count(), func.max(DatasetMaintenance.updated_at),
+        func.sum(DatasetMaintenance.updated_at))).one()
+    edit = db.get(Preference, "directory-display-edit")
+    facts = [[int(item) if item is not None else None for item in catalog],
+        [int(item) if item is not None else None for item in plans], edit.value if edit else None, account_scope(),
+        settings.yahoo_enabled, settings.akshare_enabled, settings.fxcm_enabled]
+    return hashlib.sha256(json.dumps(facts, sort_keys=True).encode()).hexdigest()
 
 
 def managed_matches(db, items):

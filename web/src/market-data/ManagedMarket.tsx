@@ -1,7 +1,7 @@
 import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { Link } from "./router";
 import { NativeSelect } from "./NativeControls";
-import { ManagedOpenChart } from "./DatasetContinuation";
+import { ManagedOpenChart, continuationNames } from "./DatasetContinuation";
 import { centerLink } from "./navigation";
 import { names, phase, time, type Dataset } from "./types";
 import { useSearchParams } from "./router";
@@ -35,9 +35,10 @@ export function ManagedMarket() {
     source,
     asset_class: asset,
     calendar,
+    ...(params.get("view") === "continuation" ? { view: "continuation" } : {}),
   });
   const rows = useMarketRows<Dataset>(
-    "/market-data/center/datasets",
+    "/market-data/center/dataset-summaries",
     filters,
     refresh,
   );
@@ -69,6 +70,7 @@ export function ManagedMarket() {
         items={statuses}
         change={(value) => change("status", value)}
       />
+      {params.get("view") === "continuation" && <p>正在查看已配置实时接续的自建行情。<button onClick={() => change("view", "")}>查看全部自建行情</button></p>}
       <div className="dc-market-table-head">
         <span>品种与来源</span>
         <div className="dc-market-head-filters">
@@ -158,6 +160,7 @@ function ManagedRow({
           {d.source_display || names[d.identity.source]} · {d.price_basis_display || d.identity.basis} ·{" "}
           {phase(d.aggregation_calendar)}
         </span>
+        {d.continuation && <small>实时接续：{continuationNames[d.continuation.status] || d.continuation.status}</small>}
         <small>
           可用历史：
           {d.available_end
@@ -194,7 +197,7 @@ function ManagedRow({
           <ManagedOpenChart id={d.id}
             ticker={`MWH:${d.periods.find((p) => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
             frame={d.usable_timeframes[0]}
-           
+
           />
         )}
         <button onClick={detail.open} aria-expanded={detail.opened}>

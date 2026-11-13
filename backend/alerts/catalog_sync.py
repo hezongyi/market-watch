@@ -119,6 +119,13 @@ def describe(db, ident, name):
     if row is None:
         raise ValueError("目录品种不存在，请先更新供应商目录")
     row.metadata_json = {**row.metadata_json, "name_zh": name.strip(), "name_zh_origin": "manual"}
+    from .storage import uid
+
+    revision = db.get(Preference, "directory-display-edit")
+    if revision:
+        revision.value = {"revision": uid()}
+    else:
+        db.add(Preference(key="directory-display-edit", value={"revision": uid()}))
     return {"id": row.id, "name_zh": name.strip(), "name_zh_origin": "manual"}
 
 

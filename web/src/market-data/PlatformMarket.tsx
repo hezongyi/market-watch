@@ -26,11 +26,14 @@ type Instrument = {
   capabilities: { native_periods: string[]; history_m1: boolean; native_confirmation: string; supported_modes?: string[] };
 };
 type SearchRequest = { text?: string; type?: string; exchange?: string; start?: number; signal: AbortSignal };
+type DirectoryPage = Page<Instrument> & { revision?: string };
+type SearchPage = { symbols: Record<string, any>[]; symbols_remaining: number; items: Instrument[] };
+const directoryCache = new Map<string, DirectoryPage>();
 const rowId = (id: string) => `platform-${id.toLowerCase().replace(/[^a-z0-9-]/g, "-")}`;
 
 /** Native symbol-search presentation with management actions and platform-only data. */
 export function PlatformMarket() {
-  const ui = useContext(NativeUiContext), { apply, busy } = useCenter(), mounted = useMounted();
+  const ui = useContext(NativeUiContext), { apply, busy, workspace } = useCenter(), mounted = useMounted();
   const [params, setParams] = useSearchParams();
   const [detail, setDetail] = useState<Instrument | null>(null), [error, setError] = useState("");
   const [refresh, setRefresh] = useState(0);
@@ -59,15 +62,35 @@ export function PlatformMarket() {
     next.set("tab", "platform"); next.set("query", text); next.set("source", source); next.set("asset_class", asset); next.delete("page");
     const filtersChanged = text !== (previous.get("query") || "") || source !== (previous.get("source") || "") || asset !== (previous.get("asset_class") || "");
     if (filtersChanged) { setDetail(null); latest.current.setParams(next, { replace: true }); }
-    const result = await api<Page<Instrument>>(`/market-data/center/platform?${search}`, undefined, signal);
+    const cacheKey = JSON.stringify([workspace, signature, refresh]);
+    const cached = start === 0 ? directoryCache.get(cacheKey) : null;
+    const result: DirectoryPage = cached
+      ? { ...cached, items: cached.items.slice(0, restorePages * size) }
+      : await api<DirectoryPage>(`/market-data/center/platform?${search}`, undefined, signal);
+    if (cached) {
+      // Return the remembered rows immediately; only an invalidated directory
+      // rebuilds its prefix. This background read cannot create source demand.
+      void api<{ revision: string }>("/market-data/center/platform-revision", undefined, signal).then(current => {
+        if (!signal.aborted && mounted.current && current.revision !== cached.revision) {
+          directoryCache.delete(cacheKey); setRefresh(value => value + 1);
+        }
+      }).catch(error => { if (!signal.aborted && mounted.current) setError(String(error)); });
+    }
     // Returning from a management form restores the loaded prefix and row.
     // Filters still start at page one; the UI never exposes page controls.
-    for (let nextPage = 2; nextPage <= restorePages && result.items.length < result.total; nextPage++) {
+    for (let nextPage = Math.ceil(result.items.length / size) + 1; start === 0 && nextPage <= restorePages && result.items.length < result.total; nextPage++) {
       search.set("page", String(nextPage));
-      const continuation = await api<Page<Instrument>>(`/market-data/center/platform?${search}`, undefined, signal);
+      const continuation = await api<DirectoryPage>(`/market-data/center/platform?${search}`, undefined, signal);
       result.items.push(...continuation.items);
     }
     if (signal.aborted || !mounted.current || signature !== active.current) throw new DOMException("查询已取消", "AbortError");
+    if (!cached) {
+      const previousPage = directoryCache.get(cacheKey);
+      const prefix = start > 0 && previousPage?.items.length === start ? previousPage.items : [];
+      directoryCache.delete(cacheKey);
+      directoryCache.set(cacheKey, { ...result, items: [...prefix, ...result.items] });
+      while (directoryCache.size > 10) directoryCache.delete(directoryCache.keys().next().value!);
+    }
     const remembered = new URLSearchParams(next);
     remembered.set("page", String(start === 0 ? Math.ceil(result.items.length / size) || 1 : page));
     if (remembered.toString() !== latest.current.params.toString()) latest.current.setParams(remembered, { replace: true });
@@ -80,8 +103,8 @@ export function PlatformMarket() {
         available: row.available && row.capabilities.native_periods.length > 0 };
     });
     setRevision(value => value + 1);
-    return { symbols, symbols_remaining: Math.max(0, result.total - start - result.items.length) };
-  }, [mounted]);
+    return { symbols, symbols_remaining: Math.max(0, result.total - start - result.items.length), items: result.items };
+  }, [mounted, workspace, refresh]);
   const open = useCallback(async (ticker: string) => {
     const row = known.current.get(ticker);
     if (!row?.available || !row.capabilities.native_periods.length) { setError("所选行情已变化，请重新查询。"); throw Error("所选行情已变化，请重新查询。"); }
@@ -100,7 +123,7 @@ export function PlatformMarket() {
     {ui ? <NativeSlot key={refresh} kind="platformSearch" className="dc-platform-search" props={{
       query, source, asset: Object.entries(assetTypes).find(([, value]) => value === asset)?.[0] || asset,
       symbolTypes, getPage, onOpen: open, onDetails: selectDetail, busy,
-    }} /> : <PlatformFallback key={refresh} query={query} source={source} asset={asset}
+    }} /> : <PlatformFallback key={refresh} query={query} source={source} asset={asset} getPage={getPage}
       filter={(key, value) => { const next = new URLSearchParams(params); next.set(key, value); next.delete("page"); setDetail(null); setParams(next); }} onDetails={row => { setDetail(row); panel.open(); }} />}
     {detail && panel.opened && <DetailPanel title={`${detail.display_symbol || detail.provider_symbol} · ${detail.label}`} close={() => { setDetail(null); panel.close(); }}>
       <p>来源：{detail.provider_name || names[detail.source] || detail.source} · 原生周期：{detail.capabilities.native_periods.join(" · ") || "尚未接入"}</p>
@@ -122,35 +145,37 @@ export function PlatformMarket() {
 }
 
 /** Resource/version fallback retains the same continuous-list workflow. */
-function PlatformFallback({ query, source, asset, filter, onDetails }: {
+function PlatformFallback({ query, source, asset, filter, onDetails, getPage }: {
   query: string; source: string; asset: string; filter: (key: string, value: string) => void; onDetails: (row: Instrument) => void;
+  getPage: (request: SearchRequest) => Promise<SearchPage>;
 }) {
   return <div className="dc-platform-fallback">
     <NativeInput type="search" aria-label="搜索品种" value={query} placeholder="品种代码或名称" onChange={event => filter("query", event.target.value)} />
     <nav className="dc-platform-categories" aria-label="品种类别">{categories.map(([type, label]) => <button key={type} aria-pressed={asset === (assetTypes[type] || type)} onClick={() => filter("asset_class", assetTypes[type] || type)}>{label}</button>)}</nav>
     <div className="dc-platform-table-heading"><span>商品代码</span><span>描述</span><NativeSelect aria-label="来源" value={source} onChange={event => filter("source", event.target.value)}><option value="">全部来源</option>{Object.entries(names).map(([value, name]) => <option key={value} value={value}>{name}</option>)}</NativeSelect></div>
-    <FallbackRows key={`${query}:${source}:${asset}`} query={query} source={source} asset={asset} onDetails={onDetails} />
+    <FallbackRows key={`${query}:${source}:${asset}`} query={query} source={source} asset={asset} onDetails={onDetails} getPage={getPage} />
   </div>;
 }
 
-function FallbackRows({query, source, asset, onDetails}: {query:string;source:string;asset:string;onDetails:(row:Instrument)=>void}) {
+function FallbackRows({query, source, asset, onDetails, getPage}: {query:string;source:string;asset:string;onDetails:(row:Instrument)=>void;getPage:(request:SearchRequest)=>Promise<SearchPage>}) {
   const [items, setItems] = useState<Instrument[]>([]), [error, setError] = useState("");
   const [loading, setLoading] = useState(true), [remaining, setRemaining] = useState(true), [retry, setRetry] = useState(0);
-  const [page, setPage] = useState(1), list = useRef<HTMLDivElement>(null), sentinel = useRef<HTMLDivElement>(null);
+  const [start, setStart] = useState(0), list = useRef<HTMLDivElement>(null), sentinel = useRef<HTMLDivElement>(null);
+  const loaded = useRef(0);
   useEffect(() => {
     const abort = new AbortController(); setLoading(true); setError("");
-    const search = new URLSearchParams({ query, source, asset_class: asset, page: String(page), page_size: "50" });
-    api<Page<Instrument>>(`/market-data/center/platform?${search}`, undefined, abort.signal).then(result => {
+    getPage({ text: query, exchange: source, type: Object.entries(assetTypes).find(([, value]) => value === asset)?.[0] || asset, start, signal: abort.signal }).then(result => {
       if (abort.signal.aborted) return;
       setItems(old => [...new Map([...old, ...result.items].map(row => [row.id, row])).values()]);
-      setRemaining(page * 50 < result.total);
+      loaded.current = start + result.items.length;
+      setRemaining(result.symbols_remaining > 0);
     }).catch(error => { if (!abort.signal.aborted) setError(String(error)); })
       .finally(() => { if (!abort.signal.aborted) setLoading(false); });
     return () => abort.abort();
-  }, [query, source, asset, page, retry]);
+  }, [query, source, asset, start, retry, getPage]);
   useEffect(() => {
     if (!sentinel.current || loading || error || !remaining) return;
-    const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) setPage(value => value + 1); }, { root: list.current, rootMargin: "0px 0px 80px" });
+    const observer = new IntersectionObserver(entries => { if (entries.some(entry => entry.isIntersecting)) setStart(loaded.current); }, { root: list.current, rootMargin: "0px 0px 80px" });
     observer.observe(sentinel.current); return () => observer.disconnect();
   }, [loading, error, remaining]);
   return <div className="dc-platform-fallback-list dc-table" ref={list}>

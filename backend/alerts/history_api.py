@@ -150,6 +150,19 @@ def router(authenticated):
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
+    @routes.get("/center/dataset-summaries")
+    def dataset_summaries(query: str = "", source: str | None = None, calendar: str | None = None,
+                          asset_class: str | None = None, status: str = "all", page: int = 1,
+                          page_size: int = 25, ids: str | None = None, view: str | None = None):
+        from .dataset_summaries import summaries
+
+        try:
+            with transaction() as db:
+                return summaries(db, ids=ids, view=view, query=query, source=source, calendar=calendar,
+                    asset_class=asset_class, status=status, page=page, page_size=page_size)
+        except ValueError as error:
+            raise HTTPException(422, str(error)) from None
+
     @routes.get("/center/tasks")
     def center_tasks(dataset_id: str | None = None, page: int = 1, page_size: int = 25,
                      query: str = "", source: str | None = None, status: str = "all"):
@@ -173,6 +186,13 @@ def router(authenticated):
                     status=status, page_size=page_size, snapshot=snapshot, before=before, ids=ids)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
+
+    @routes.get("/center/platform-revision")
+    def platform_revision():
+        from .platform_catalog import directory_revision
+
+        with transaction() as db:
+            return {"revision": directory_revision(db)}
 
     @routes.get("/center/platform")
     def center_platform(query: str = "", source: str | None = None, page: int = 1, page_size: int = 25, asset_class: str | None = None):

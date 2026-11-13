@@ -96,6 +96,7 @@ export type Dataset = {
     mode?: string;
     adjustment?: string;
   };
+  continuation?: { enabled: boolean; configured: boolean; status: string };
   maintenance: Plan;
   available_start?: number;
   available_end?: number;
