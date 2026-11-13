@@ -87,7 +87,7 @@ PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q 
 - 离开页面后，两次相隔约 98 秒的独立观测证明实时接收和确认分钟推进；当时图表/策略/告警消费者均为零。
 - 立即更新历史发布新版本，已启用实时的 revision、历史基线及拼接点保持不变。
 - 数据页打开专业图表，收到真实非空 K 线；桌面维护表单只读回归通过。
-- 已启用的 27 个运行角色检查时无 stale/missing/error，六个常驻服务零重启，迁移正常退出。
+- 初次验收 27 个运行角色检查时无 stale/missing/error；后续启用全部六个供应商后 31 个角色检查正常，EURUSD/黄金实时恢复。六个常驻服务零重启，迁移正常退出。
 
 启动：
 
@@ -101,7 +101,7 @@ PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q 
 /home/quant/.local/share/market-watch-docker/previews/mw-mobile-data-workflow-20261113/stop.sh
 ```
 
-完整隔离、构建依据、真实观测与限制见 [Ubuntu 验收记录](ubuntu-acceptance.md)。环境保持运行供用户验收；没有新建 APK、更新 PR/CI、合并、正式 tag 或生产部署。
+供应商已按后续要求全部启用，包含 AKShare 与 FXCM；手机搜索目录可直接选择。完整隔离、构建依据、真实观测与限制见 [Ubuntu 验收记录](ubuntu-acceptance.md)。环境保持运行供用户验收；没有新建 APK、更新 PR/CI、合并、正式 tag 或生产部署。
 
 ## 待 Android 真机确认
 

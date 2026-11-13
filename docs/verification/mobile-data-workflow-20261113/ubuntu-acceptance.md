@@ -8,7 +8,7 @@
 - 独立服务：PostgreSQL 14.24、一次性 migrate、API、data worker、market runtime、web、TLS；独立 `_default` / `_egress` 网络与 `mw-mobile-data-workflow-20261113_postgres-data` volume、数据库和登录凭据。仅 TLS 在 loopback/LAN 18446 暴露，PG/API 无宿主发布端口。
 - 私有配置及启停脚本：`/home/quant/.local/share/market-watch-docker/previews/mw-mobile-data-workflow-20261113/`。`run.json` 固定运行镜像 ID。此目录含凭据/证书，不提交 Git，也不是 preview 管理器的 prepare 记录。
 - 服务预算约 4 GiB RAM / 3.85 CPU；用户清理后磁盘约 53–55 GiB 可用。保持其他任务实例。
-- OANDA Practice/代理仅复用已有私有连接配置；Yahoo 开启，AKShare/FXCM 与外部通知关闭。OANDA stream，常驻 symbol 列表为空，持续需求由明确的手机实时开关产生。
+- OANDA Practice/代理仅复用已有私有连接配置；初次验收时 Yahoo 开启、AKShare/FXCM 与外部通知关闭；按用户后续要求已开启全部供应商，见下方补验。OANDA stream，常驻 symbol 列表为空，持续需求由明确的手机实时开关产生。
 - 构建均通过 `mw-docker compose-build` 关联 task/project/purpose=acceptance。完整 API 依赖下载极慢，终止本任务构建后，核实既有 v2.0.11 API 镜像 `requirements.lock` / `pyproject.toml` 与当前一致，再以其为依赖 base，删除并复制本分支 backend/migrations，执行 `pip install --no-deps --no-build-isolation .`。未直接复用旧应用代码。
 - 依赖 base：`market-watch-api:android-personal-v205-two-kinds-20261113`，ID `sha256:d98ab8f2db8cc7dde6eb11075b49efdc8b41a6fb6b02006043820d8519544c70`。
 - 实际 API：`sha256:dc9e1624c17081435a1d11ad3a53f181b22e78ed83cc83ebe2e721e1eac6f849`；最终 web：`sha256:0c708700ae4177a2a23de202340da751a33f191aa83154ad0ca26d88e14cb37e`，详见 [镜像清单](real/images.json)。这些是验收镜像，不是正式发布 tag。
@@ -49,3 +49,20 @@ Yahoo API 的 display_symbol 是内部逻辑编号，provider_display_symbol 才
 ## 剩余验收
 
 Android 系统返回键、键盘、安全区、抽屉拖动、真实网络切换仍待用户在 APK 确认。当前无 ADB 设备；环境继续运行。未更新 PR/CI、合并、正式 tag、发布生产，也未退役仍需验收的数据 volume。
+
+## 全供应商启用补验
+
+用户要求“把所有供应商源都打开”后，已在同一 Ubuntu 验收实例启用全部六个来源，并持久写入私有 compose.json / run.json。API、data worker、market runtime 均核实 enabled_sources(history=True) 为 OANDA、Binance、Yahoo、Dukascopy、AKShare、FXCM。
+
+FXCM 使用已有模拟账户连接的任务私有副本，SDK/helper 及凭据只读挂载；凭据为 0600、属容器 app uid 10001，configured()=true，动态库可解析。没有修改其他实例配置，没有提交私有材料；旧配置私有备份保留。API/worker 以原固定镜像重新创建，数据 volume 保留。
+
+| 来源 | 当前可搜索目录条数 |
+| --- | ---: |
+| OANDA | 127 |
+| Binance | 3742 |
+| Yahoo | 8108 |
+| Dukascopy | 1504 |
+| AKShare | 8114 |
+| FXCM | 517 |
+
+FXCM 真实目录刷新成功；AKShare A 股 5223、港股 2808、期货 83，均真实刷新成功。这里验证配置与目录连接，不代表逐个品种/周期均完成历史拉取。31 个已启用运行角色状态正常；重启后 EURUSD/黄金恢复 connected/receiving，quote_ready=true。[目录证据](real/all-sources.json) · [角色](real/runtime-health-all-sources.json) · [实时恢复](real/live-all-sources.json)。访问地址与启停命令不变。
