@@ -43,8 +43,8 @@ def stats(container):
 SQL = """BEGIN READ ONLY;
 SELECT json_build_object(
  'at',clock_timestamp(),
- 'clients',(select count(*) from market_stream_clients),
- 'subscriptions',(select count(*) from market_stream_subscriptions),
+ 'clients',(select count(*) from market_stream_clients where expires > extract(epoch from clock_timestamp())*1000),
+ 'subscriptions',(select count(*) from market_stream_subscriptions where active and expires > extract(epoch from clock_timestamp())*1000),
  'active_alerts',(select count(*) from chart_alerts where status='active'),
  'history_running',(select count(*) from market_history_versions where status in ('pending','running','retrying')),
  'live',(select coalesce(json_agg(t),'[]') from (select dataset_id,revision,connection,ready,error,received_at,confirmed_end from market_live_states order by dataset_id)t),

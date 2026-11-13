@@ -1,0 +1,509 @@
+{
+  "base": "https://192.168.7.232:18443",
+  "ready": true,
+  "login": true,
+  "preserved": {
+    "/api/advanced-charts/workspaces": {
+      "count": 7,
+      "sha256": "6687652e6efee4e91dfa880a3e7b440853da30dc1dea7c05f8f5b65c102a3a51"
+    },
+    "/api/advanced-charts/preferences": {
+      "count": 38,
+      "sha256": "eb6938c88e7b21cd6a62bd0985c45bc0f03f90a91154c1755316bd5df6b42d9b"
+    },
+    "/api/chart-alerts": {
+      "count": 0,
+      "sha256": "4f53cda18c2baa0c0354bb5f9a3ecbe5ed12ab4d8e11ba873c2f11161202b945"
+    }
+  },
+  "preference_metadata_only_changes": [
+    "widgetbar.layout-settings"
+  ],
+  "continuations": [
+    {
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "status": "attention",
+      "runtime_status": "receiving",
+      "configuration_review_required": true,
+      "configuration_reason": "请先配置并核对实时来源",
+      "revision": "d87e2bcb-29af-465f-b584-fac497d42875",
+      "confirmed_end": 1794541380000
+    },
+    {
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "status": "attention",
+      "runtime_status": "receiving",
+      "configuration_review_required": true,
+      "configuration_reason": "当前账户目录中没有已核实可接续的品种，请检查来源目录与产品规则",
+      "revision": "fdd44121-2801-4e67-8d70-01c687482822",
+      "confirmed_end": 1794541380000
+    },
+    {
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "status": "attention",
+      "runtime_status": "receiving",
+      "configuration_review_required": true,
+      "configuration_reason": "请先配置并核对实时来源",
+      "revision": "26a88bb0-6521-496a-b6ab-e7e432a28d60",
+      "confirmed_end": 1794541380000
+    }
+  ],
+  "charts": [
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "M1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "M5",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "M15",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "M30",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "H1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "H4",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "D1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "W1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "b3f55bdfc39e3f5c5508371e3692ac31576dc92fd3c22048275e134f7ae33ac3",
+      "frame": "MN",
+      "bars": 40
+    },
+    {
+      "kind": "history",
+      "id": "f2130b08-5b47-48eb-b0bf-bb3e9842c0f6",
+      "frame": "H1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "M1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "M5",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "M15",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "M30",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "H1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "H4",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "D1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "W1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "165357cab37ab40796ce58c408e8771ac0e9f7e92bfc0d47bae82f74f504eb42",
+      "frame": "MN",
+      "bars": 40
+    },
+    {
+      "kind": "history",
+      "id": "f5bbc7fa-8fd7-4875-96ac-6195f5ccf735",
+      "frame": "H1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "M1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "M5",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "M15",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "M30",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "H1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "H4",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "D1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "W1",
+      "bars": 40
+    },
+    {
+      "kind": "composite",
+      "id": "41d0533cc59c4bb1598f6a8ca9b3e7ed2a13fbe56d485a0a0df157b75763cc44",
+      "frame": "MN",
+      "bars": 40
+    },
+    {
+      "kind": "history",
+      "id": "60feaf73-2128-4096-bec3-7e4178f70115",
+      "frame": "H1",
+      "bars": 40
+    }
+  ],
+  "sources": [
+    {
+      "source": "oanda",
+      "bars": 40,
+      "frame": "H1"
+    },
+    {
+      "source": "binance",
+      "bars": 40,
+      "frame": "H1"
+    },
+    {
+      "source": "dukascopy",
+      "bars": 40,
+      "frame": "H1"
+    },
+    {
+      "source": "yahoo",
+      "bars": 40,
+      "frame": "D1"
+    },
+    {
+      "source": "akshare",
+      "bars": 40,
+      "frame": "D1"
+    },
+    {
+      "source": "fxcm",
+      "bars": 40,
+      "frame": "H1"
+    }
+  ],
+  "latency": {
+    "summary": {
+      "median_ms": 64.27,
+      "p95_ms": 88.4,
+      "requests": 20
+    },
+    "legacy_full": {
+      "median_ms": 10.2,
+      "p95_ms": 15.65,
+      "requests": 20
+    }
+  },
+  "mcp": [
+    {
+      "tool": "composite_get_bars",
+      "bars": 40,
+      "passed": true
+    },
+    {
+      "tool": "history_get_bars",
+      "bars": 40,
+      "passed": true
+    },
+    {
+      "tool": "composite_get_bars",
+      "bars": 40,
+      "passed": true
+    },
+    {
+      "tool": "history_get_bars",
+      "bars": 40,
+      "passed": true
+    },
+    {
+      "tool": "composite_get_bars",
+      "bars": 40,
+      "passed": true
+    },
+    {
+      "tool": "history_get_bars",
+      "bars": 40,
+      "passed": true
+    }
+  ],
+  "mcp_credential_revoked": true,
+  "runtime": {
+    "market_runtime": [
+      {
+        "role": "pricing",
+        "state": "running",
+        "error": null
+      },
+      {
+        "role": "realtime",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "composite_aggregate",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "alert_indicator",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_alert",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "switch_activation",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "market_ownership",
+        "state": "idle",
+        "error": null
+      }
+    ],
+    "data_runtime": [
+      {
+        "role": "provider_live_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_yahoo",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_yahoo",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_akshare",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_akshare",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_live_fxcm",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_warm_fxcm",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_oanda",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_binance",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_transport_dukascopy",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "provider_janitor",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "catalog_runtime",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_history",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "history_network",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "history_compute",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "native_history",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "chart_aggregation",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "market_stream",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "switch_shadow",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "retention",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "data_ownership",
+        "state": "idle",
+        "error": null
+      }
+    ],
+    "notification_runtime": [
+      {
+        "role": "notification_projection",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_retention",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_delivery",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_ownership",
+        "state": "idle",
+        "error": null
+      },
+      {
+        "role": "notification_health",
+        "state": "idle",
+        "error": null
+      }
+    ]
+  },
+  "passed": true
+}
