@@ -11,6 +11,7 @@ import {
 } from "./router";
 import { api } from "./api";
 import { OpenChart } from "./OpenChart";
+import { DatasetContinuation, ManagedOpenChart } from "./DatasetContinuation";
 import { useDirtyForm, useActionLock } from "./router";
 import { Feedback } from "./Center";
 import { useSnapshot } from "./useSnapshot";
@@ -186,7 +187,7 @@ export function DatasetDetail() {
             <div className="dc-dataset-statusbar"><span className="dc-status-pill">{lifecycleStatus}</span><span>{maintenanceSummary}</span><span>可用到 {time(dataset.available_end)}</span></div>
           </div>
           <div className="dc-dataset-hero-actions" aria-label="行情快捷操作">
-            {chosen?.status === "published" && chosen.payload_available !== false && <OpenChart ticker={`MWH:${chosen.id}`} label="打开图表"/>}
+            {chosen?.status === "published" && chosen.payload_available !== false && <ManagedOpenChart id={dataset.id} ticker={`MWH:${chosen.id}`} />}
             <details ref={more} className="dc-more"><summary>更多操作</summary><div className="dc-more-actions">
 
               {dataset.maintenance.configured && <button disabled={busy} onClick={()=>{closeMore();void act(`/market-data/datasets/${id}/tasks`,{request_id:crypto.randomUUID()});}}>立即更新</button>}
@@ -195,7 +196,7 @@ export function DatasetDetail() {
           </div>
         </div>
         <nav className="dc-tabs dc-dataset-nav" aria-label="自建行情管理">
-          {[["overview","概览"],["coverage","覆盖与质量"],["versions","发布版本"],["maintenance","维护设置"],["references","组合与引用"]].map(([key,label])=><button id={`dc-dataset-section-${key}`} key={key} aria-current={section===key?"page":undefined} onClick={()=>select("section",key)}>{label}</button>)}
+          {[["overview","概览"],["coverage","覆盖与质量"],["versions","发布版本"],["maintenance","维护设置"],["continuation","实时接续"],["references","引用"]].map(([key,label])=><button id={`dc-dataset-section-${key}`} key={key} aria-current={section===key?"page":undefined} onClick={()=>select("section",key)}>{label}</button>)}
         </nav>
       </>}
     </div>
@@ -204,6 +205,7 @@ export function DatasetDetail() {
       {error && <p role="alert" className="error">{error}</p>}
       {notice && <p role="status">{notice}</p>}
       {dataset.maintenance.task_error && <p className="error">本次更新失败，旧版本仍可使用</p>}
+      {section === "continuation" && <DatasetContinuation id={dataset.id} />}
       {section === "overview" && <section className="dc-management-section">
         <PeriodOverview dataset={dataset}/>
         <p>最近尝试：{time(dataset.maintenance.last_attempt)}；最近成功：{time(dataset.maintenance.last_success)}</p>

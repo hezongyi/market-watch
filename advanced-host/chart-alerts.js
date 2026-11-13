@@ -108,7 +108,7 @@ function chartAlertBridge({
       display_identity: {code: meta.display_symbol || meta.logical_symbol || meta.symbol || meta.name || identity.symbol,
         series_kind: identity.series_kind, source: meta.source, basis: meta.basis, timeframe: frames[chart.resolution()]},
       display_label: [meta.display_symbol || meta.symbol || meta.logical_symbol || meta.name || identity.symbol,
-        ({provider:'平台',managed:'自建',composite:'组合',history:'自建'})[identity.series_kind],
+        ({provider:'原生',managed:'自建',composite:'自建 · 实时接续',history:'自建'})[identity.series_kind],
         meta.price_description || meta.basis, frames[chart.resolution()]].filter(Boolean).join(' · '),
       calculation_origin:
         calculationOrigin(chart.symbol(), chart.resolution()) ?? null,

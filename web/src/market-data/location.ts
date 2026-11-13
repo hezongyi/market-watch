@@ -26,10 +26,14 @@ export function centerLocation(value: string, base = "/market-data"): string {
     if (["page", "coverage_page", "request_page", "before", "precision"].includes(key) && !/^\d{1,16}$/.test(item)) continue;
     if (key === "frame" && !["M1","M5","M15","M30","H1","H4","D1","W1","MN"].includes(item)) continue;
     if (key === "tab" && !["managed","platform","composite","tasks","sources","calendar"].includes(item)) continue;
-    if (key === "section" && !["overview","coverage","versions","maintenance","references","chart","seam","usage"].includes(item)) continue;
+    if (key === "section" && !["overview","coverage","versions","maintenance","references","chart","seam","usage","continuation"].includes(item)) continue;
     if (key === "source" && !["", "dukascopy","oanda","fxcm","binance","yahoo"].includes(item)) continue;
     if (key === "calendar" && !["", "ny17", "utc0"].includes(item)) continue;
     query.set(key, item);
+  }
+  if (url.pathname === "/market-data" && query.get("tab") === "composite") {
+    query.set("tab", "managed");
+    query.set("view", "continuation");
   }
   const hash = /^#[a-z0-9-]{1,90}$/.test(url.hash) ? url.hash : "";
   return url.pathname.replace(/\/$/, "") + (query.size ? `?${query}` : "") + hash;
@@ -37,7 +41,7 @@ export function centerLocation(value: string, base = "/market-data"): string {
 
 export function centerTab(value: string) {
   const url = new URL(value, "https://center.invalid");
-  if (url.pathname.includes("/composites/") || url.pathname.endsWith("/mapping")) return "composite";
+  if (url.pathname.includes("/composites/") || url.pathname.endsWith("/mapping")) return "managed";
   if (url.pathname.includes("/platform/")) return "platform";
   const tab = url.searchParams.get("tab") || "managed";
   return ["managed", "platform", "composite", "tasks", "sources", "calendar"].includes(tab) ? tab : "managed";

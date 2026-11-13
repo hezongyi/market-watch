@@ -297,7 +297,7 @@ export default function ChartApplicationPage() {
       : requestedPlatform
         ? mobile
           ? refresh().then(list => list.filter(row => row.document.symbol === requestedPlatform))
-          : createEntry("platform:" + requestedPlatform, {name:"平台行情",symbol:requestedPlatform}).then(row => [row])
+          : createEntry("platform:" + requestedPlatform, {name:"原生行情",symbol:requestedPlatform}).then(row => [row])
       : refresh().then(async list => {
           const last = localStorage.getItem("mw.last-workspace.v1");
           if (last) { const found = list.find(row => row.id === last); if (found) return [found]; }

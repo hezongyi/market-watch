@@ -6,6 +6,7 @@ import { NativeButton, NativeInput, NativeSelect, NativeTextarea } from "./Nativ
 import { centerReturn } from "./navigation";
 import { useActionLock, useCenter, useDirtyForm, useMounted, useNavigate, useParams, useSearchParams } from "./router";
 import { useSnapshot } from "./useSnapshot";
+import type { Continuation } from "./DatasetContinuation";
 import { names, phase, type Dataset, type Page } from "./types";
 import { initialMatch, matchFields, matchKey, products, validMatch, type ProductMatch,
   type SavedMapping, type MatchCheck, type CatalogSnapshot } from "./mapping";
@@ -51,7 +52,7 @@ function MappingEditor({ dataset, mappings, readError }: { dataset: Dataset; map
   const lastSnapshot = useRef("");
   const saved = useRef<{ signature: string; mapping: SavedMapping } | null>(null), uncertainOpen = useRef(false);
   const composites = useSnapshot<{ items: ExistingComposite[] }>(`/market-data/center/composites?dataset_id=${dataset.id}&page_size=100`);
-  const back = centerReturn(params, "/market-data?tab=composite&view=candidates");
+  const back = centerReturn(params, `/market-data/datasets/${dataset.id}?section=continuation`);
   const frozen = busy || centerBusy || !!uncertain;
   useDirtyForm("mapping", dirty, savedEpoch);
   const localErrors = validMatch(match), draftKey = matchKey(match);
@@ -150,7 +151,7 @@ function MappingEditor({ dataset, mappings, readError }: { dataset: Dataset; map
   }
   async function open(mapping: SavedMapping) {
     if (!mounted.current) return;
-    setNotice("配置已保存，正在建立或打开组合行情…");
+    setNotice("配置已保存，正在建立或打开自建行情 · 实时接续…");
     try {
       const clientKey = "market-watch-composite-chart-client";
       let client = sessionStorage.getItem(clientKey);
@@ -160,15 +161,16 @@ function MappingEditor({ dataset, mappings, readError }: { dataset: Dataset; map
         if (!mounted.current) return;
       }
       uncertainOpen.current = true;
-      const row = await api<{ id: string; preparation: { status: string } }>("/market-data/composites/use", {
-        dataset_id: dataset.id, mapping_id: mapping.id, client });
+      const extension = await api<Continuation>(`/market-data/datasets/${dataset.id}/continuation`, { enabled: true, mapping_id: mapping.id });
+      const row = extension.composite;
+      if (!row) throw Error("实时接续配置尚未就绪");
       if (!mounted.current) return;
       if (!/^[a-f0-9]{64}$/.test(row.id)) throw Error("打开结果不完整，请核查后重试");
       uncertainOpen.current = false;
       setNotice(row.preparation.status === "queried" ? "配置已保存，正在打开图表。覆盖完整及策略就绪单独核验。" : "配置已保存，接续准备中；图表可读取已发布历史。");
       await apply(`MWC:${row.id}`, "M1");
     } catch (e) {
-      if (mounted.current) { setOpenFailed(true); setNotice("配置已保存。"); setError(`打开组合行情失败：${String(e)}。可重试打开。`); }
+      if (mounted.current) { setOpenFailed(true); setNotice("配置已保存。"); setError(`打开自建行情 · 实时接续失败：${String(e)}。可重试打开。`); }
     }
   }
   async function submit(wantsOpen: boolean) {
@@ -233,7 +235,7 @@ function MappingEditor({ dataset, mappings, readError }: { dataset: Dataset; map
       <option value="same_underlying_different_product">同标的、不同报价产品</option></NativeSelect>)}
   </>;
   return <section className="data-center dc-create-page dc-mapping-page">
-    <header className="dc-create-title"><NativeButton onClick={() => navigate(back)}>返回组合行情</NativeButton>
+    <header className="dc-create-title"><NativeButton onClick={() => navigate(back)}>返回自建行情</NativeButton>
       <h1>配置实时来源 · {dataset.display_symbol || dataset.logical_symbol}</h1></header>
     <div className="dc-create-steps" aria-label="配置步骤"><span aria-current={step === 1 ? "step" : undefined}>① 选择实时品种</span>
       <span aria-current={step === 2 ? "step" : undefined}>② 配置并创建</span></div>

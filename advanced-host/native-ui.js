@@ -54,7 +54,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
       const SearchContext = req(886925).SymbolSearchItemsDialogContext;
       const BodyContext = req(48591).SymbolSearchDialogBodyContext;
       const SearchRow = req(620748).SymbolSearchDialogContentItem;
-      if(!Search || !SearchContext || !BodyContext || !SearchRow) throw Error("原生平台行情搜索不可用");
+      if(!Search || !SearchContext || !BodyContext || !SearchRow) throw Error("原生原生行情搜索不可用");
       const PlatformContext = R.createContext(null);
       const listClasses = req(198629), rowClasses = req(910890), headerClasses = req(86731);
       const Select = req(221339).Select, createPortal = req(129365).createPortal, searchClasses=req(176871);
@@ -116,7 +116,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
         });
         const items=ctx.searchSources.filter(item=>!platform.latest.current.allowedSources || !item.value() || platform.latest.current.allowedSources.includes(item.value().toLowerCase())).map(item=>({value:item.value().toLowerCase(),content:item.value() ? item.name() : "全部来源"}));
         return R.createElement(SearchContext.Provider,{value:scoped},R.createElement("div",{
-          ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"平台行情搜索",
+          ref:container,className:"mw-platform-inline",onKeyDown:keyboard,"aria-label":"原生行情搜索",
         },platform.latest.current.mode !== "select" && R.createElement("small",{className:"mw-platform-status"},"打开将关闭品种和周期同步，保留其他图格。"),props.render(),sourceHeader && createPortal(platform.latest.current.fixedSource ? R.createElement("span",{className:"mw-platform-source"},"OANDA Practice · 当前账户") : R.createElement("div",{className:"dc-select-control mw-platform-source"},
           R.createElement("div",{className:"dc-native-slot","data-native-component":"select"},
             R.createElement(Select,{value:source,items,onChange:value=>{setSource(value);ctx.setSelectedIndex(-1);},
@@ -232,8 +232,8 @@ function chartNativeUi(widget, doc, searchSymbols) {
         const scoped={...ctx,selectedSearchSource:selected,setSelectedSearchSource:item=>setSource(item.value().toLowerCase()),
           symbolSearchContent:{...ctx.symbolSearchContent,currentSelectedSearchSource:selected,canChangeExchange:false}};
         const sources=ctx.searchSources.map(item=>({value:item.value().toLowerCase(),content:item.value()?item.name():"全部来源"}));
-        const kinds=[{value:"all",content:"全部行情"},{value:"provider",content:"平台"},
-          {value:"history",content:"自建"},{value:"composite",content:"组合"}];
+        const kinds=[{value:"all",content:"全部行情"},{value:"provider",content:"原生行情"},
+          {value:"history",content:"自建 · 固定历史"},{value:"composite",content:"自建 · 实时接续"}];
         const control=(label,value,items,onChange)=>R.createElement("div",{className:"dc-select-control mw-symbol-search-select","data-native-component":"select"},
           R.createElement(Select,{"aria-label":label,value,items,onChange:next=>{
             if(next===value) return;
@@ -242,7 +242,7 @@ function chartNativeUi(widget, doc, searchSymbols) {
             ctx.setSymbolSearchState("loading");onChange(next);
           },size:"small",className:"dc-native-select"}));
         const controls=R.createElement("div",{className:"mw-symbol-search-filters"},
-          control("行情类型",kind,kinds,setKind),control("来源",source,sources,setSource));
+          control("行情视图",kind,kinds,setKind),control("来源",source,sources,setSource));
         if(NativeDialog) {
           // Keep the connected watchlist dialog and its Enter/Shift+Enter,
           // add/remove callbacks, footer and watchlist context intact.

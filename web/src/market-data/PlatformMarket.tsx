@@ -94,7 +94,7 @@ export function PlatformMarket() {
   const selectDetail = useCallback((ticker: string) => { panel.open(); setDetail(known.current.get(ticker) || null); }, [panel.open]);
   useCenterRowRestore(revision);
   return <section className="data-center dc-platform">
-    <h1 className="dc-platform-title">平台行情</h1>
+    <h1 className="dc-platform-title">原生行情</h1>
     <DirectoryTools source={source} refreshed={() => setRefresh(v => v + 1)} />
     {error && <p role="alert" className="error">{error}</p>}
     {ui ? <NativeSlot key={refresh} kind="platformSearch" className="dc-platform-search" props={{

@@ -4,8 +4,8 @@ Names never participate in acquisition identities, account scopes or prices.
 """
 from .market_names import chinese_name, display_code
 
-KIND_NAMES = {'provider': '平台', 'managed': '自建',
-              'history': '自建', 'composite': '组合'}
+KIND_NAMES = {'provider': '原生', 'managed': '自建',
+              'history': '自建', 'composite': '自建 · 实时接续'}
 
 
 def source_name(source, *, family=None, environment=None):

@@ -2,7 +2,7 @@ import { Tasks } from "./Tasks";
 import { useCenter, useLocation, useSearchParams } from "./router";
 import { DatasetDetail } from "./DatasetDetail";
 import { DatasetCreate } from "./DatasetCreate";
-import { CompositeDetail, CompositeList, MappingForm } from "./Composites";
+import { CompositeDetail, MappingForm } from "./Composites";
 import { NativeConfigure } from "./NativeConfigure";
 import { PlatformMarket } from "./PlatformMarket";
 import { ManagedMarket } from "./ManagedMarket";
@@ -67,7 +67,7 @@ function CenterPage() {
     return <CompositeDetail key={pathname} />;
   if (params.get("tab") === "platform") return <PlatformMarket />;
   if ((params.get("tab") || "managed") === "managed") return <ManagedMarket />;
-  if (params.get("tab") === "composite") return <CompositeList />;
+  if (params.get("tab") === "composite") return <ManagedMarket />;
   if (params.get("tab") === "tasks") return <Tasks />;
   if (params.get("tab") === "sources") return <LiveProviderStatus />;
   if (params.get("tab") === "calendar") return <CalendarView />;

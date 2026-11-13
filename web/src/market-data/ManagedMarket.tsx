@@ -1,7 +1,7 @@
 import { DetailPanel, useDetailPanel } from "./DetailPanel";
 import { Link } from "./router";
 import { NativeSelect } from "./NativeControls";
-import { OpenChart } from "./OpenChart";
+import { ManagedOpenChart } from "./DatasetContinuation";
 import { centerLink } from "./navigation";
 import { names, phase, time, type Dataset } from "./types";
 import { useSearchParams } from "./router";
@@ -191,10 +191,10 @@ function ManagedRow({
       </span>
       <div className="dc-market-actions">
         {d.latest_version_id && d.usable_timeframes.length > 0 && (
-          <OpenChart
+          <ManagedOpenChart id={d.id}
             ticker={`MWH:${d.periods.find((p) => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
             frame={d.usable_timeframes[0]}
-            label="打开图表"
+           
           />
         )}
         <button onClick={detail.open} aria-expanded={detail.opened}>
@@ -227,9 +227,9 @@ function ManagedRow({
             {d.maintenance.task_error && <p className="error">本次维护：{d.maintenance.task_error}</p>}
           </div>
           <div className="dc-detail-actions" aria-label="行情操作">
-            {d.latest_version_id && d.usable_timeframes.length > 0 && <OpenChart
+            {d.latest_version_id && d.usable_timeframes.length > 0 && <ManagedOpenChart id={d.id}
               ticker={`MWH:${d.periods.find(p => p.timeframe === d.usable_timeframes[0])?.available_version_id || d.latest_version_id}`}
-              frame={d.usable_timeframes[0]} label="打开图表" />}
+              frame={d.usable_timeframes[0]} />}
             <Link className="primary" to={centerLink(`/market-data/datasets/${d.id}`, params, `dataset-${d.id}`)}>管理行情</Link>
           </div>
           <div className="dc-detail-lifecycle">

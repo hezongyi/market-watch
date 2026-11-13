@@ -91,7 +91,7 @@ export function DatasetCreate() {
   const errorBox = useRef<HTMLDivElement>(null),
     configHeading = useRef<HTMLHeadingElement>(null);
   const back = centerReturn(params),
-    backLabel = back.includes("tab=platform") ? "返回平台行情" : "返回自建行情";
+    backLabel = back.includes("tab=platform") ? "返回原生行情" : "返回自建行情";
   const dataset = {
     source,
     logical_symbol: logical,

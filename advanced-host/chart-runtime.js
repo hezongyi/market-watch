@@ -1226,9 +1226,9 @@ function seriesPresentationRows(symbols) {
     const prefix = meta?.presentation_description || (meta?.source === 'yahoo' ? (meta.name || shown) + " · Yahoo 市场报价" +
       (meta.delay_seconds > 0 ? " · 延迟 " + Math.floor(meta.delay_seconds / 60) + " 分钟" :
         meta.delay_seconds === 0 ? " · 实时" : " · 延迟未知") :
-      identity.series_kind === 'provider' ? shown + " · 平台" + (meta?.price_description ? " · " + meta.price_description : "") :
+      identity.series_kind === 'provider' ? shown + " · 原生" + (meta?.price_description ? " · " + meta.price_description : "") :
       identity.series_kind === 'history' ? (meta?.name || shown) + " · 自建" :
-      identity.series_kind === 'composite' ? (meta?.name || shown) + " · 组合" : shown + " · 自建");
+      identity.series_kind === 'composite' ? (meta?.name || shown) + " · 自建 · 实时接续" : shown + " · 自建");
     const base = prefix + (meta?.presentation_description && meta.source === "yahoo" ?
       (meta.delay_seconds > 0 ? " · 延迟 " + Math.floor(meta.delay_seconds / 60) + " 分钟" :
         meta.delay_seconds === 0 ? " · 实时" : " · 延迟未知") : "");
@@ -1498,7 +1498,7 @@ const feed = {
         ticker,
         // Informational estimate only; actual pagination remains backend-owned.
         mw_historyPageBars: meta.native_page_capacity || (meta.source === "binance" ? 1000 : 4000),
-        description: (meta.presentation_description || ((meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 平台 · " : series_kind === "composite" ? " · 组合 · " : " · 自建 · ") + (meta.price_description || meta.basis))) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "tick_count" ? " · 价格变动次数" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
+        description: (meta.presentation_description || ((meta.source === "yahoo" ? meta.name + " · " + (meta.display_symbol || meta.symbol) : meta.display_symbol || meta.symbol || MWSeries.display(symbol)) + (series_kind === "provider" ? " · 原生 · " : series_kind === "composite" ? " · 自建 · 实时接续 · " : " · 自建 · ") + (meta.price_description || meta.basis))) + (meta.volume_kind === "tick" ? " · OANDA 报价量" : meta.volume_kind === "tick_count" ? " · 价格变动次数" : meta.volume_kind === "base" ? " · 成交量 / " + meta.volume_unit : meta.volume_kind === "quantity" ? " · 来源量" : " · 量不可用"),
         exchange: meta.exchange || meta.source.toUpperCase(),
         listed_exchange: meta.exchange || meta.source.toUpperCase(),
         mw_range_source: meta.source,
