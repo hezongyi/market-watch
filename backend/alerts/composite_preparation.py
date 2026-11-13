@@ -32,6 +32,10 @@ def read_id(token):
     return hashlib.sha256(("composite-read:" + token).encode()).hexdigest()[:36]
 
 
+def query_cutoff(prep):
+    return max(prep.cutoff, prep.state.get("managed_tail_cutoff", prep.cutoff))
+
+
 def claim(revision_id=None):
     with transaction() as db:
         stamp = now_ms()
@@ -54,7 +58,8 @@ def claim(revision_id=None):
             previous = db.get(CompositeReadAttempt, read_id(prep.lease_token))
             if previous and previous.finished_at is None:
                 previous.result, previous.finished_at = "interrupted", stamp
-        if prep.cursor >= prep.cutoff:
+        cutoff = query_cutoff(prep)
+        if prep.cursor >= cutoff:
             prep.status, prep.lease_token, prep.lease_until = "queried", None, 0
             prep.state = {**prep.state, "stage": "tail_queried", "query_complete": True,
                           "coverage": "observations_only; missing minutes remain unknown"}
@@ -62,7 +67,7 @@ def claim(revision_id=None):
         revision = db.get(CompositeRevision, prep.revision_id)
         mapping = db.get(RealtimeMapping, revision.mapping_id)
         dataset = db.get(MarketDataset, mapping.target_dataset_id)
-        end = page_end(dataset.identity, prep.cursor, prep.cutoff)
+        end = page_end(dataset.identity, prep.cursor, cutoff)
         prep.lease_token, prep.lease_until, prep.status = uid(), stamp + 60000, "running"
         db.add(CompositeReadAttempt(id=read_id(prep.lease_token), revision_id=revision.id,
             start=prep.cursor, end=end, started_at=stamp))
@@ -112,7 +117,7 @@ def commit(ownership, batch, *, read_kind="supplier_request"):
         apply_minutes(db, recorded, revision_id=prep.revision_id, reason="preparation")
         prep.cursor = batch.checkpoint
         prep.error, prep.lease_token, prep.lease_until, prep.next_at = None, None, 0, 0
-        complete = prep.cursor == prep.cutoff
+        complete = prep.cursor >= query_cutoff(prep)
         prep.status = "queried" if complete else "pending"
         prep.state = {**prep.state, "stage": "tail_queried" if complete else "confirm_recent_m1",
             "query_complete": complete, "attempts": 0,

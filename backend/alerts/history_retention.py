@@ -101,7 +101,9 @@ def reference_values(row):
         return {"version_id": row.version_id}
     if isinstance(row, HistoryFrameRun):
         return {"version_id": row.version_id, "parent_version_id": row.inherited_version_id}
-    if isinstance(row, (MarketDemand, ChartHistoryPlan, WeeklyHistoryRequest)):
+    if isinstance(row, MarketDemand):
+        return {"instrument_id": row.instrument_id, "composite_revision_id": row.composite_revision_id}
+    if isinstance(row, (ChartHistoryPlan, WeeklyHistoryRequest)):
         return row.instrument_id
     return None
 
@@ -162,12 +164,18 @@ def lock_reference_values(db, document):
     version_ids = {v for v in declared | fixed_ids if re.fullmatch(r"[a-f0-9]{8}(?:-[a-f0-9]{4}){3}-[a-f0-9]{12}", v)}
     series_ids = {v for v in values if v.startswith("MD:")}
     series_ids.update(v for v in declared if re.fullmatch(r"[a-f0-9]{64}", v))
-    if not version_ids and not series_ids:
+    revision_ids = set(db.scalars(select(CompositeRevision.id).where(
+        CompositeRevision.id.in_(values)))) if values else set()
+    if not version_ids and not series_ids and not revision_ids:
         return
     versions = list(db.scalars(select(HistoryVersion).where(HistoryVersion.id.in_(version_ids)))) if version_ids else []
     if fixed_ids and len({row.id for row in versions} & fixed_ids) != len(fixed_ids):
         raise ValueError("所引用固定历史版本不存在")
     dataset_ids = {v.dataset_id for v in versions}
+    if revision_ids:
+        dataset_ids.update(db.scalars(select(HistoryVersion.dataset_id).join(
+            CompositeRevision, CompositeRevision.history_version_id == HistoryVersion.id)
+            .where(CompositeRevision.id.in_(revision_ids))))
     dataset_ids.update(db.scalars(select(MarketDataset.id).where(
         or_(MarketDataset.id.in_(series_ids), MarketDataset.instrument_id.in_(series_ids)))))
     if not dataset_ids:

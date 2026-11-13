@@ -280,6 +280,16 @@ def finish_run(db, version_id):
         if not unavailable:
             plan.last_success = run.completed_at
         plan.updated_at = now_ms()
+    from .config import settings
+    if settings.managed_rollover_enabled and not unavailable:
+        from .publication_wakeup import COMPOSITE_CHANNEL, notify
+        # Delivered after commit; polling HistoryRun also recovers a lost hint.
+        db.flush()
+        try:
+            with db.begin_nested():
+                notify(db, COMPOSITE_CHANNEL)
+        except Exception:
+            pass  # The hint must never roll back successful maintenance.
     return True
 
 

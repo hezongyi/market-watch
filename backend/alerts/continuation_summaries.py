@@ -68,6 +68,7 @@ def summaries(db, datasets, switches):
     states = {state.dataset_id: state for state in db.scalars(select(LiveState).where(LiveState.dataset_id.in_(targets)))}
     owner = db.get(PricingOwner, account_key(settings.oanda_account_id))
     keys = [default_key(ident) for ident in ids]
+    keys += ["managed_rollover:" + ident for ident in configurations]
     keys += ["managed_realtime:" + source_inst.id for *_, source_inst in configurations.values()]
     keys += [prefix + ident for prefix in ("live_confirmation:v1:", "live_sampling:v1:") for ident in targets]
     if owner:
@@ -99,6 +100,8 @@ def summaries(db, datasets, switches):
             row["status"] = "preparing"
             continue
         _, revision, prep, _, source_inst = current
+        row["baseline_seam"] = revision.seam
+        row["rollover"] = preferences.get("managed_rollover:" + ident, {"status": "idle"})
         active = preferences.get("managed_realtime:" + source_inst.id, {}).get("enabled", False)
         # Baseline activation can move the active revision to another mapping.
         # Read that revision's exact target rather than the originally saved one.

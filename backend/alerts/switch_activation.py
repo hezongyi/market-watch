@@ -235,6 +235,14 @@ def publish(db, *, composite, revision, body, progress, now):
         boundary = now // 60000 * 60000
         stage = "alerts"
         shadow = shadow_pauses(db, composite_id=composite.id, revision_id=revision.id)
+        from .storage import CompositeRevisionChange
+        change = db.get(CompositeRevisionChange, revision.id)
+        managed = bool(change and change.manifest.get("managed_rollover")
+                       and body.request_id.startswith("auto:"))
+        if managed:
+            # activate() locked and rechecked the current rules. An old weekly
+            # report must not pause an edited rule after that fresh preflight.
+            shadow = {}
         alerts = composite_alerts.rebind_active(db, composite, previous=previous,
             target=revision, boundary=boundary, run_id=run.id, now=now,
             input_revision=progress["input_revision"], source=source, shadow=shadow)
@@ -269,6 +277,10 @@ def publish(db, *, composite, revision, body, progress, now):
             "input_revision": progress["input_revision"], "event_boundary": boundary,
             "at": now, "run_id": run.id}
         advance_to(run, "succeeded", now, phase="activated")
+        if managed:
+            from .managed_rollover import _status
+            _status(db, composite.id, "updated", history_version_id=revision.history_version_id,
+                    baseline_seam=revision.seam, activated_at=now, run_id=run.id)
         if alerts["paused"]:
             # A succeeded switch still owes one report when it could not move a rule.
             from .switch_runs import _record

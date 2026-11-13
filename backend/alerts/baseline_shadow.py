@@ -500,7 +500,8 @@ def _run(run_id, scheduled_for, composite_id, previous_revision_id):
     return record
 
 
-def shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budget=BUDGET):
+def shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budget=BUDGET,
+           plan_override=None):
     """Prepare the Sunday candidate, compare it, and persist the report on its run."""
     started = now_ms()
     before = bindings(composite_id)
@@ -515,7 +516,7 @@ def shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budge
                                              "切换运行已进入激活阶段，不能覆盖其 shadow 报告"))
             return _finish(report, before, composite_id, record, None)
         with transaction() as db:
-            plan = candidate_plan(db, composite_id)
+            plan = candidate_plan(db, composite_id) if plan_override is None else plan_override
             active = db.get(CompositeRevision, plan.get("active_revision_id") or before["active_revision_id"])
             report["history_version"] = {
                 "latest_available_version_id": plan.get("latest_available_version_id"),
@@ -535,7 +536,7 @@ def shadow(composite_id, *, scheduled_for=None, run_id=None, adapter=None, budge
             # A completed no-op window is not an activation verdict or a
             # successful activation run, and cannot unlock retention.
             return _finish(report, before, composite_id, record, None)
-        candidate_id = create_candidate(composite_id, plan)
+        candidate_id = plan.get("candidate_revision_id") or create_candidate(composite_id, plan)
         switch_runs.record_target(record["id"], candidate_id,
                                   previous_revision_id=plan["active_revision_id"])
         advance(candidate_id, adapter=adapter, budget=budget)
@@ -581,6 +582,9 @@ def _finish(report, before, composite_id, record, candidate_id):
                                                  "candidate_revision_id": candidate_id,
                                                  "reasons": report["reasons"][:8]})
             report["run"] = {**report["run"], "state": "failed"}
+            # Managed automation defers rather than disabling a user's rule.
+            if record["kind"] == "managed_rollover":
+                return report
             from . import composite_alerts, switch_notice
             from .live_window import lower_bound
 

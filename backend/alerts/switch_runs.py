@@ -10,7 +10,7 @@ from datetime import UTC, datetime
 
 from sqlalchemy import select
 
-from .storage import MarketSwitchRun, now_ms, transaction, uid
+from .storage import MarketSwitchRun, Preference, now_ms, transaction, uid
 
 UNLOCKED = "succeeded"
 STATES = ("preparing", "shadow_ready", "activating", UNLOCKED, "failed", "partial")
@@ -170,13 +170,34 @@ def unlocked_runs(limit=20):
         return [_record(row) for row in rows]
 
 
-def claim_retention(run_id, *, dry_run):
+def retention_owner(db, run_id, batch_key=None):
+    """A dated source batch is progress, never a fabricated switch success."""
+    run = _row(db, run_id)
+    if run.state != UNLOCKED:
+        raise ValueError("只有 succeeded 的切换运行可以解锁清理")
+    if batch_key is None:
+        return run, dict(run.retention or {})
+    row = db.scalar(select(Preference).where(Preference.key == batch_key).with_for_update())
+    if row is None or row.value.get("run_id") != run_id:
+        raise ValueError("清理日期批次缺少可核对的成功切换授权")
+    return row, dict(row.value.get("retention") or {})
+
+
+def save_retention(owner, segment):
+    if isinstance(owner, Preference):
+        owner.value = {**owner.value, "retention": segment}
+    else:
+        owner.retention = segment
+
+
+def retention_record(run, segment):
+    return {**_record(run), "retention": segment}
+
+
+def claim_retention(run_id, *, dry_run, batch_key=None):
     """Claim the cleanup batch of a succeeded run; a retry keeps the same batch."""
     with transaction() as db:
-        row = _row(db, run_id)
-        if row.state != UNLOCKED:
-            raise ValueError("只有 succeeded 的切换运行可以解锁清理")
-        segment = dict(row.retention or {})
+        row, segment = retention_owner(db, run_id, batch_key)
         same_pass = segment.get("batch_id") and segment.get("dry_run") == bool(dry_run)
         if not same_pass:
             segment = {"batch_id": uid(), "state": "running", "dry_run": bool(dry_run),
@@ -185,21 +206,20 @@ def claim_retention(run_id, *, dry_run):
         elif segment["state"] == "interrupted":
             segment.update(state="running", claimed_at=now_ms(),
                            attempts=segment.get("attempts", 0) + 1)
-        row.retention = segment
-        return _record(row)
+        save_retention(row, segment)
+        return retention_record(_row(db, run_id), segment)
 
 
-def release_retention(run_id, *, outcome, stats):
+def release_retention(run_id, *, outcome, stats, batch_key=None):
     """Write the batch result and its counts; a released batch can be resumed."""
     if outcome not in BATCH_OUTCOMES:
         raise ValueError("未知的清理结果：" + str(outcome))
     with transaction() as db:
-        row = _row(db, run_id)
-        segment = dict(row.retention or {})
+        row, segment = retention_owner(db, run_id, batch_key)
         if not segment.get("batch_id"):
             raise ValueError("该切换运行没有清理批次")
         if segment["state"] != "completed":
             segment.update(state=outcome, released_at=now_ms(),
                            stats={**segment.get("stats", {}), **stats})
-        row.retention = segment
-        return _record(row)
+        save_retention(row, segment)
+        return retention_record(_row(db, run_id), segment)

@@ -8,6 +8,8 @@ import { useSnapshot } from "./useSnapshot";
 import { time } from "./types";
 
 export type Continuation = {
+  baseline_seam?: number | null;
+  rollover?: { status: string; reason?: string | null; updated_at?: number } | null;
   dataset_id: string; supported: boolean; reason: string | null; enabled: boolean;
   ready_to_enable: boolean; status: string; default_mapping_id: string | null;
   configurations: { id: string; active_revision_id: string; created_at: number }[];

@@ -29,6 +29,7 @@ from .storage import (
     CompositePreparation,
     CompositeRevision,
     HistoryChunk,
+    HistoryVersion,
     MarketComposite,
     MarketDataset,
     MarketSwitchRun,
@@ -51,6 +52,8 @@ DEFAULT_BUDGET_MS = 20000
 MAX_IN_LIST = 500
 MAX_DETAIL = 50
 RESTORE_KEY = "retention:restore_drill"
+DAILY_PREFIX = "retention:daily:"
+DAILY_CURSOR = "retention:daily_cursor"
 
 # Real foreign keys force this order: complete minutes and their input rows
 # reference the source revisions, and the source head row references its
@@ -164,6 +167,44 @@ def _protected_revisions(db, now):
             mark(revision_id, "active_alert_old_revision")
         else:
             mark(revision_id, "alert_bound_revision")
+    from .history_retention import string_values
+    from .storage import (
+        AdvancedPreference,
+        AdvancedWorkspace,
+        ChartWorkspace,
+        CompositeWatchBinding,
+        FixedIndicatorRun,
+        IndicatorDemand,
+        MarketDemand,
+        Replay,
+        Watch,
+    )
+
+    for revision_id in db.scalars(select(MarketDemand.composite_revision_id).where(
+            MarketDemand.expires > now, MarketDemand.composite_revision_id.is_not(None))):
+        mark(revision_id, "active_fixed_reader")
+    for revision_id in db.scalars(select(CompositeWatchBinding.revision_id).join(
+            Watch, Watch.id == CompositeWatchBinding.watch_id).where(Watch.status != "archived")):
+        mark(revision_id, "strategy_bound_revision")
+    for revision_id in db.scalars(select(FixedIndicatorRun.revision_id).where(
+            FixedIndicatorRun.revision_id.is_not(None), or_(
+                FixedIndicatorRun.status != "complete", FixedIndicatorRun.lease_until > now,
+                exists().where(IndicatorDemand.run_id == FixedIndicatorRun.id,
+                               IndicatorDemand.expires > now, IndicatorDemand.released.is_(False))))):
+        mark(revision_id, "indicator_reader_or_task")
+    # Replays and saved fixed inputs are independent of the current MWC head.
+    # Only exact revision ids protect live rows; MWH refers to fixed historical
+    # payloads which this cleanup never deletes.
+    known = set(db.scalars(select(CompositeRevision.id)))
+    for model, field, reason in (
+        (Replay, Replay.input_manifest, "replay_fixed_input"),
+        (ChartWorkspace, ChartWorkspace.document, "saved_fixed_input"),
+        (AdvancedWorkspace, AdvancedWorkspace.document, "saved_fixed_input"),
+        (AdvancedPreference, AdvancedPreference.content, "saved_fixed_input"),
+    ):
+        for document in db.scalars(select(field)):
+            for revision_id in known.intersection(string_values(document)):
+                mark(revision_id, reason)
     return {revision: frozenset(value) for revision, value in reasons.items()}
 
 
@@ -544,6 +585,28 @@ def _source_scope(db, run):
     return sorted(sources)
 
 
+def _daily_source_scope(db, run, stamp):
+    """A succeeded record authorizes only a still serviceable current baseline."""
+    from .history_artifacts import read_artifact
+    from .storage import HistoryReclamation
+
+    composite = db.get(MarketComposite, run["composite_id"])
+    active = db.get(CompositeRevision, composite.active_revision_id) if composite else None
+    history = db.get(HistoryVersion, active.history_version_id) if active else None
+    if (not active or not history or history.status != "published"
+            or db.get(HistoryReclamation, history.id)
+            or not history.start < active.seam <= history.end
+            or active.seam < lower_bound(stamp)):
+        return []
+    try:
+        rows = read_artifact(db, history.id, "M1", end=active.seam, limit=1, newest_first=True)
+    except ValueError:
+        return []
+    if not rows:
+        return []
+    return _source_scope(db, run)
+
+
 def _remaining(lower, sources):
     with transaction() as db:
         head_pointer = exists().where(
@@ -577,7 +640,7 @@ def _blank_report(*, dry_run, stamp, lower):
 
 
 def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
-          budget_ms=DEFAULT_BUDGET_MS, now=None):
+          budget_ms=DEFAULT_BUDGET_MS, now=None, batch_key=None):
     run = switch_runs.get(run_id)
     if run is None:
         raise ValueError("切换运行不存在：" + str(run_id))
@@ -595,19 +658,26 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
         return report
     with transaction() as db:
         sources = _source_scope(db, run)
+        if batch_key:
+            owner, _ = switch_runs.retention_owner(db, run_id, batch_key)
+            sources = [owner.value["source_id"]] if owner.value["source_id"] in _daily_source_scope(db, run, stamp) else []
+            # A resumed pass uses its original boundary, even after midnight.
+            stamp = owner.value["now"]
+            lower = owner.value["lower_bound"]
+            report.update(now=stamp, lower_bound=lower, batch_key=batch_key)
     report["source_ids"] = sources
     if not sources:
         report["skipped"].append({"reason": "switch_source_scope_missing",
                                   "detail": "成功切换未绑定可核对的实时来源，不清理"})
         return report
     if dry_run:
-        claimed = switch_runs.claim_retention(run_id, dry_run=True)
+        claimed = switch_runs.claim_retention(run_id, dry_run=True, batch_key=batch_key)
         report["batch"] = _batch_summary(claimed)
         deadline = now_ms() + budget_ms
         with transaction() as db:
             plan = _plan(db, lower=lower, limit=limit, now=stamp, deadline=deadline, sources=sources)
         report.update(_plan_report(plan))
-        switch_runs.release_retention(run_id, outcome="completed", stats={
+        switch_runs.release_retention(run_id, outcome="completed", batch_key=batch_key, stats={
             "planned_rows": report["rows"], "planned_bytes": report["bytes"],
             "dry_run": True, "at": stamp})
         return report
@@ -615,7 +685,7 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
     if not gate["ok"]:
         report["skipped"].append({"reason": gate["reason"], "detail": gate["detail"]})
         return report
-    claimed = switch_runs.claim_retention(run_id, dry_run=False)
+    claimed = switch_runs.claim_retention(run_id, dry_run=False, batch_key=batch_key)
     report["batch"] = _batch_summary(claimed)
     segment = dict(claimed.get("retention") or {})
     if segment.get("state") == "completed":
@@ -640,7 +710,8 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
             size = min(chunk, limit - processed)
             applied = _apply_chunk(run_id=run_id, lower=lower, limit=size, now=stamp,
                                    deadline=deadline, skip_minutes=skip_minutes,
-                                   skip_revisions=skip_revisions, totals=totals)
+                                   skip_revisions=skip_revisions, totals=totals,
+                                   batch_key=batch_key)
             summary, deleted, planned_bytes = (applied["summary"], applied["deleted"],
                                                applied["bytes"])
             # A protected candidate cannot become deletable inside one pass, so the
@@ -679,18 +750,18 @@ def _pass(run_id, *, dry_run, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
                 # Nothing removed and nothing newly classified: a real stall, so
                 # keep the batch resumable instead of spinning.
                 break
-            _checkpoint(run_id, totals)
+            _checkpoint(run_id, totals, batch_key=batch_key)
             if now_ms() > deadline:
                 break
     except Exception:
-        switch_runs.release_retention(run_id, outcome="interrupted", stats=_stats(totals, None))
+        switch_runs.release_retention(run_id, outcome="interrupted", stats=_stats(totals, None), batch_key=batch_key)
         raise
     heads, orphans = _remaining(lower, sources)
     report["remaining"] = {"source_minutes": heads, "source_revisions": orphans}
     finished = exhausted
     released = switch_runs.release_retention(
         run_id, outcome="completed" if finished else "interrupted",
-        stats=_stats(totals, report["remaining"]))
+        stats=_stats(totals, report["remaining"]), batch_key=batch_key)
     report["batch"] = _batch_summary(released)
     return report
 
@@ -715,23 +786,21 @@ def _project(totals, deleted, planned_bytes):
     }
 
 
-def _persist(db, run_id, totals):
+def _persist(db, run_id, totals, *, batch_key=None):
     """Write the batch counts inside the caller's transaction, never after it."""
-    row = db.get(MarketSwitchRun, run_id)
-    if row is None:
-        raise ValueError("切换运行不存在：" + str(run_id))
-    segment = dict(row.retention or {})
+    row, segment = switch_runs.retention_owner(db, run_id, batch_key)
     segment["stats"] = _stats(totals, None)
-    row.retention = segment
+    switch_runs.save_retention(row, segment)
 
 
-def _checkpoint(run_id, totals):
+def _checkpoint(run_id, totals, *, batch_key=None):
     """Leave committed progress resumable on the same batch."""
-    switch_runs.release_retention(run_id, outcome="interrupted", stats=_stats(totals, None))
-    switch_runs.claim_retention(run_id, dry_run=False)
+    switch_runs.release_retention(run_id, outcome="interrupted", stats=_stats(totals, None), batch_key=batch_key)
+    switch_runs.claim_retention(run_id, dry_run=False, batch_key=batch_key)
 
 
-def _apply_chunk(*, run_id, lower, limit, now, deadline, skip_minutes, skip_revisions, totals):
+def _apply_chunk(*, run_id, lower, limit, now, deadline, skip_minutes, skip_revisions, totals,
+                 batch_key=None):
     """Delete one chunk and record its counts before the commit.
 
     The batch statistics are written in the deletion transaction, so a process
@@ -741,6 +810,21 @@ def _apply_chunk(*, run_id, lower, limit, now, deadline, skip_minutes, skip_revi
     with transaction() as db:
         run = switch_runs._record(db.get(MarketSwitchRun, run_id))
         sources = _source_scope(db, run)
+        if batch_key:
+            owner, _ = switch_runs.retention_owner(db, run_id, batch_key)
+            sources = [owner.value["source_id"]] if owner.value["source_id"] in _daily_source_scope(db, run, now) else []
+        from .source_registry import collection_identity
+        # Reference writers fence on dataset rows. Acquire those before the
+        # source lock and re-read semantic references in the deletion transaction.
+        dataset_ids = [dataset.id for dataset in db.scalars(select(MarketDataset))
+                       if collection_identity(dataset.identity).key in sources]
+        history_ids = list(db.scalars(select(HistoryVersion.dataset_id).join(
+            CompositeRevision, CompositeRevision.history_version_id == HistoryVersion.id).join(
+            RealtimeMapping, RealtimeMapping.id == CompositeRevision.mapping_id).where(
+                RealtimeMapping.target_dataset_id.in_(dataset_ids))))
+        list(db.scalars(select(MarketDataset.id).where(
+            MarketDataset.id.in_(sorted(set(dataset_ids + history_ids))))
+            .order_by(MarketDataset.id).with_for_update()))
         list(db.scalars(select(SourceSeries).where(SourceSeries.id.in_(sources))
                         .order_by(SourceSeries.id).with_for_update()))
         plan = _plan(db, lower=lower, limit=limit, now=now, deadline=deadline, sources=sources,
@@ -750,7 +834,7 @@ def _apply_chunk(*, run_id, lower, limit, now, deadline, skip_minutes, skip_revi
         deleted = _delete(db, plan)
         projected = _project(totals, deleted, plan["bytes"])
         projected["blob_scan"] = plan["blob_scan"]
-        _persist(db, run_id, projected)
+        _persist(db, run_id, projected, batch_key=batch_key)
         applied = {"summary": summary, "deleted": deleted, "bytes": plan["bytes"],
                    "blob_scan": plan["blob_scan"],
                    "blocked_minutes": plan["blocked_minutes"],
@@ -807,6 +891,10 @@ def tick(*, dry_run=True, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
     shadow_ready and activating rows are visibly refused rather than silently
     skipped.
     """
+    from .config import settings
+    if settings.managed_rollover_enabled:
+        return daily_tick(dry_run=dry_run, limit=limit, chunk=chunk,
+                          budget_ms=budget_ms, now=now)
     with transaction() as db:
         ids = list(db.execute(select(MarketSwitchRun.id).order_by(
             MarketSwitchRun.created_at.desc(), MarketSwitchRun.id).limit(20)).scalars())
@@ -832,3 +920,51 @@ def tick(*, dry_run=True, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
     report = _pass(target["id"], dry_run=dry_run, limit=limit, chunk=chunk,
                    budget_ms=budget_ms, now=now)
     return {"unlocked": True, "reason": None, "runs": verdicts, "report": report}
+
+
+def daily_tick(*, dry_run=True, limit=DEFAULT_LIMIT, chunk=DEFAULT_CHUNK,
+               budget_ms=DEFAULT_BUDGET_MS, now=None):
+    """One source/UTC date/mode batch, authorized by a real succeeded run.
+
+    A persistent keyset scans succeeded runs, so newer failures or already
+    completed runs cannot hide an older source. Batch progress is separate from
+    switch state; interrupted batches survive midnight and mode changes.
+    """
+    stamp = now_ms() if now is None else int(now)
+    day = stamp // 86400000
+    mode = "dry_run" if dry_run else "execute"
+    with transaction() as db:
+        cursor = db.get(Preference, DAILY_CURSOR)
+        after = cursor.value.get("after", "") if cursor else ""
+        runs = list(db.scalars(select(MarketSwitchRun).where(
+            MarketSwitchRun.state == switch_runs.UNLOCKED, MarketSwitchRun.id > after)
+            .order_by(MarketSwitchRun.id).limit(20)))
+        value = {"after": runs[-1].id if len(runs) == 20 else ""}
+        if cursor:
+            cursor.value = value
+        else:
+            db.add(Preference(key=DAILY_CURSOR, value=value))
+        for run in runs:
+            for source_id in _daily_source_scope(db, switch_runs._record(run), stamp):
+                name = f"{DAILY_PREFIX}{day}:{source_id}:{mode}"
+                if db.get(Preference, name) is None:
+                    db.add(Preference(key=name, value={"run_id": run.id,
+                        "source_id": source_id, "date": day, "mode": mode,
+                        "now": stamp, "lower_bound": lower_bound(stamp),
+                        "last_checked": 0, "retention": {}}))
+        db.flush()
+        pending = db.scalar(select(Preference).where(
+            Preference.key.startswith(DAILY_PREFIX),
+            Preference.value["mode"].as_string() == mode,
+            or_(Preference.value["retention"]["state"].as_string().is_(None),
+                Preference.value["retention"]["state"].as_string() != "completed"),
+        ).order_by(cast(Preference.value["last_checked"].as_string(), BigInteger),
+                   Preference.key).limit(1).with_for_update())
+        if pending is None:
+            return {"unlocked": False, "reason": "no_unlocked_batch", "runs": [], "report": None}
+        batch_key, run_id = pending.key, pending.value["run_id"]
+        pending.value = {**pending.value, "last_checked": stamp}
+    report = _pass(run_id, dry_run=dry_run, limit=limit, chunk=chunk,
+                   budget_ms=budget_ms, now=stamp, batch_key=batch_key)
+    return {"unlocked": True, "reason": None,
+            "runs": [{"id": run_id, "batch_key": batch_key}], "report": report}

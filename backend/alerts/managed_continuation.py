@@ -62,10 +62,13 @@ def report(db, dataset_id):
         "created_at": item.created_at} for item in db.scalars(select(MarketComposite).where(
             MarketComposite.dataset_id == dataset_id, MarketComposite.permission_scope == SCOPE)
             .order_by(MarketComposite.created_at.desc(), MarketComposite.id))]
+    from .managed_rollover import status as rollover_status
+    rollover = rollover_status(db, composite.id) if composite else None
     return {"dataset_id": dataset_id, "supported": supported, "reason": reason,
         "enabled": active, "ready_to_enable": ready, "status": state,
         "default_mapping_id": selected, "mappings": options, "composite": current,
-        "configurations": configurations}
+        "configurations": configurations, "rollover": rollover,
+        "baseline_seam": current["revision"]["seam"] if current else None}
 
 
 def configure(db, dataset_id, *, value, mapping_id=None):

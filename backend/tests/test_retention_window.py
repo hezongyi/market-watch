@@ -394,7 +394,7 @@ def contract_kill_between_commit_and_release_keeps_counts(factory):
     drill()
     original = window._checkpoint
 
-    def killed(run_id_arg, totals):
+    def killed(run_id_arg, totals, **kwargs):
         raise KeyboardInterrupt("process killed between commit and release")
 
     window._checkpoint = killed

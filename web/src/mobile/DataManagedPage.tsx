@@ -784,6 +784,15 @@ function ManagedDetails({
                 {live.data?.reason && (
                   <p className="data-caption">{live.data.reason}</p>
                 )}
+                {live.data?.baseline_seam != null && (
+                  <p className="data-caption">基线至 {dataTime(live.data.baseline_seam)}</p>
+                )}
+                {live.data?.rollover && ["preparing", "ready", "deferred", "updated"].includes(live.data.rollover.status) && (
+                  <p className="data-caption" role="status">
+                    {{ preparing: "新基线准备中", ready: "新基线即将接管", deferred: "基线轮换暂缓", updated: "基线已更新" }[live.data.rollover.status]}
+                    {live.data.rollover.reason && `：${live.data.rollover.reason}`}
+                  </p>
+                )}
                 {live.data && (
                   <Button
                     variant={live.data.enabled ? "outline" : "secondary"}
