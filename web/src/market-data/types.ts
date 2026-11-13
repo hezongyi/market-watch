@@ -96,7 +96,7 @@ export type Dataset = {
     mode?: string;
     adjustment?: string;
   };
-  continuation?: { enabled: boolean; configured: boolean; status: string };
+  continuation?: { enabled: boolean; configured: boolean; status: string; composite_ids?: string[] };
   maintenance: Plan;
   available_start?: number;
   available_end?: number;
@@ -137,6 +137,7 @@ export type Task = {
   };
 };
 export type Page<T> = {
+  anchor_position?: number | null;
   items: T[];
   total: number;
   page: number;

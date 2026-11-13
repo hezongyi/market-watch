@@ -40,15 +40,19 @@ def summaries(db, datasets, switches):
         return result
     # Keep references to all selected ORM objects for the lifetime of this read;
     # check_match/definition can reuse identity-map lookups without extra SQL.
-    configurations = {composite.id: (composite, revision, prep, source, source_inst)
-        for composite, revision, prep, source, source_inst in db.execute(
+    configuration_rows = list(db.execute(
         select(MarketComposite, CompositeRevision, CompositePreparation, MarketDataset, Instrument)
-            .join(CompositeRevision, CompositeRevision.id == MarketComposite.active_revision_id)
-            .join(CompositePreparation, CompositePreparation.revision_id == CompositeRevision.id)
-            .join(HistoryVersion, HistoryVersion.id == CompositeRevision.history_version_id)
-            .join(MarketDataset, MarketDataset.id == HistoryVersion.dataset_id)
-            .join(Instrument, Instrument.id == MarketDataset.instrument_id).where(
-                MarketComposite.dataset_id.in_(ids), MarketComposite.permission_scope == SCOPE))}
+            .outerjoin(CompositeRevision, CompositeRevision.id == MarketComposite.active_revision_id)
+            .outerjoin(CompositePreparation, CompositePreparation.revision_id == CompositeRevision.id)
+            .outerjoin(HistoryVersion, HistoryVersion.id == CompositeRevision.history_version_id)
+            .outerjoin(MarketDataset, MarketDataset.id == HistoryVersion.dataset_id)
+            .outerjoin(Instrument, Instrument.id == MarketDataset.instrument_id).where(
+                MarketComposite.dataset_id.in_(ids), MarketComposite.permission_scope == SCOPE)))
+    for composite, *_ in configuration_rows:
+        result[composite.dataset_id].setdefault("composite_ids", []).append(composite.id)
+    configurations = {composite.id: (composite, revision, prep, source, source_inst)
+        for composite, revision, prep, source, source_inst in configuration_rows
+        if revision is not None and prep is not None and source is not None and source_inst is not None}
     original_mapping_ids = {mapping.id for mapping, _, _ in mapped}
     missing = {revision.mapping_id for _, revision, *_ in configurations.values()} - original_mapping_ids
     if missing:

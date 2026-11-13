@@ -13,13 +13,14 @@ from .storage import (
     HistoryReclamation,
     HistoryVersion,
     Instrument,
+    MarketComposite,
     MarketDataset,
     Preference,
     RealtimeMapping,
 )
 
 
-def summaries(db, *, ids=None, view=None, **filters):
+def summaries(db, *, ids=None, view=None, anchor=None, **filters):
     base = _dataset_query(**filters)
     if view == "continuation":
         base = base.where(select(RealtimeMapping.id).where(
@@ -35,6 +36,14 @@ def summaries(db, *, ids=None, view=None, **filters):
     total = db.scalar(select(func.count()).select_from(base.subquery()))
     ordering = (MarketDataset.logical_symbol, Instrument.source, Instrument.calendar, MarketDataset.id)
     ranked = base.add_columns(func.row_number().over(order_by=ordering).label("position")).subquery()
+    anchor_position = None
+    if anchor is not None:
+        if not re.fullmatch(r"(?:dataset|composite)-[a-f0-9]{64}", anchor):
+            raise ValueError("无效的列表定位目标")
+        kind, ident = anchor.split("-", 1)
+        dataset_id = ident if kind == "dataset" else select(MarketComposite.dataset_id).where(
+            MarketComposite.id == ident, MarketComposite.permission_scope == "workspace:default").scalar_subquery()
+        anchor_position = db.scalar(select(ranked.c.position).where(ranked.c.id == dataset_id))
     query = select(MarketDataset, Instrument, DatasetMaintenance, ranked.c.position).join(
         Instrument).join(DatasetMaintenance).join(ranked, ranked.c.id == MarketDataset.id)
     if requested is not None:
@@ -45,7 +54,7 @@ def summaries(db, *, ids=None, view=None, **filters):
     selected = db.execute(query.order_by(ranked.c.position)).all()
     items = _rows(db, selected)
     return {"items": items, "total": total, "page": filters.get("page", 1),
-            "page_size": filters.get("page_size", 25)}
+            "page_size": filters.get("page_size", 25), "anchor_position": anchor_position}
 
 
 def _rows(db, selected):

@@ -32,11 +32,14 @@ export function centerLocation(value: string, base = "/market-data"): string {
     if (key === "calendar" && !["", "ny17", "utc0"].includes(item)) continue;
     query.set(key, item);
   }
-  if (url.pathname === "/market-data" && query.get("tab") === "composite") {
+  let hash = /^#[a-z0-9-]{1,90}$/.test(url.hash) ? url.hash : "";
+  if (url.pathname.replace(/\/$/, "") === "/market-data" && query.get("tab") === "composite") {
     query.set("tab", "managed");
-    query.set("view", "continuation");
+    if (query.get("view") === "candidates" || /^#candidate-[a-f0-9]{64}$/.test(hash)) {
+      query.delete("view");
+      hash = hash.replace(/^#candidate-/, "#dataset-");
+    } else query.set("view", "continuation");
   }
-  const hash = /^#[a-z0-9-]{1,90}$/.test(url.hash) ? url.hash : "";
   return url.pathname.replace(/\/$/, "") + (query.size ? `?${query}` : "") + hash;
 }
 

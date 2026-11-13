@@ -50,7 +50,9 @@ export function useCenterRowRestore(snapshot: unknown) {
     if (restored.current || !snapshot) return;
     const restore = () => {
       if (restored.current) return;
-      const target = location.hash ? document.getElementById(location.hash.slice(1)) : null;
+      const target = location.hash ? document.getElementById(location.hash.slice(1)) ||
+        (/^#composite-[a-f0-9]{64}$/.test(location.hash)
+          ? document.querySelector<HTMLElement>(`[data-composite-ids~="${location.hash.slice(11)}"]`) : null) : null;
       if (location.hash && !target) return;
       restored.current = true;
       if (target) { target.scrollIntoView({block: "center"}); target.focus({preventScroll: true}); }

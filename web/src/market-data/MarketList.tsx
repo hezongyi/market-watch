@@ -97,9 +97,15 @@ export function useMarketRows<
   const current = snapshot?.signature === signature ? snapshot : rowCache.get(signature);
   const items: T[] = current?.items || [], total = current?.total ?? null;
   const batch = endpoint.endsWith("/dataset-summaries");
+  const anchor = batch && /#(?:dataset|composite)-[a-f0-9]{64}$/.test(location) ? location.split("#")[1] : "";
   useEffect(() => {
     const abort = new AbortController();
     let timer: ReturnType<typeof setTimeout>, running = false;
+    let anchorResolved = !anchor, targetPages = pages;
+    function locate(response: Page<T>) {
+      if (response.anchor_position) targetPages = Math.max(targetPages, Math.min(100, Math.ceil(response.anchor_position / 25)));
+      anchorResolved = true;
+    }
     function accept(value: RowSnapshot<T>) {
       if (abort.signal.aborted) return;
       snapshotRef.current = value; setSnapshot(value);
@@ -111,13 +117,16 @@ export function useMarketRows<
     }
     async function requestPage(page: number) {
       const query = new URLSearchParams(filters);
+      if (!anchorResolved) query.set("anchor", anchor);
       query.set("page", String(page)); query.set("page_size", "25");
-      return api<Page<T>>(`${endpoint}?${query}`, undefined, abort.signal);
+      const response = await api<Page<T>>(`${endpoint}?${query}`, undefined, abort.signal);
+      locate(response);
+      return response;
     }
     async function prefix(previous: RowSnapshot<T> | null, target: number) {
       const unique = new Map<string, T>((previous?.items || []).map(row => [rowKey(row), row]));
       let total = previous?.total || 0, loaded = previous?.loaded || 0, complete = previous?.complete || false;
-      for (let page = loaded + 1; page <= target && !complete; page++) {
+      for (let page = loaded + 1; page <= Math.max(target, targetPages) && !complete; page++) {
         const response = await requestPage(page); total = response.total; loaded = page;
         for (const row of response.items) unique.set(rowKey(row), row);
         complete = !response.items.length || page * 25 >= total;
@@ -132,8 +141,10 @@ export function useMarketRows<
       let total = previous.total;
       for (let offset = 0; offset < previous.items.length; offset += 100) {
         const query = new URLSearchParams(filters);
+        if (!anchorResolved) query.set("anchor", anchor);
         query.set("ids", previous.items.slice(offset, offset + 100).map(rowKey).join(","));
         const response = await api<Page<T>>(`${endpoint}?${query}`, undefined, abort.signal);
+        locate(response);
         total = response.total; updated.push(...response.items);
       }
       const byId = new Map(updated.map(row => [rowKey(row), row]));
@@ -142,14 +153,15 @@ export function useMarketRows<
       // complete last page that gained a row. An unchanged list stays batched.
       if (rows.some((row, index) => !row || (row as any).position !== index + 1) ||
           rows.length !== Math.min(total, previous.loaded * 25)) return prefix(null, Math.max(1, previous.loaded));
-      return { ...previous, items: rows as T[], total, complete: previous.loaded * 25 >= total, at: Date.now() };
+      const refreshed = { ...previous, items: rows as T[], total, complete: previous.loaded * 25 >= total, at: Date.now() };
+      return targetPages > previous.loaded ? prefix(refreshed, targetPages) : refreshed;
     }
     async function read() {
       if (abort.signal.aborted || running || document.hidden) return;
       running = true; setLoading(true); setError("");
       try {
         const previous = snapshotRef.current?.signature === signature ? snapshotRef.current : rowCache.get(signature) || null;
-        const value = !previous || previous.loaded < pages ? await prefix(previous, pages) : await poll(previous);
+        const value = !previous || (!previous.complete && previous.loaded < pages) ? await prefix(previous, pages) : await poll(previous);
         accept(value);
       } catch (error) { if (!abort.signal.aborted) setError(String(error)); }
       finally {
@@ -162,7 +174,7 @@ export function useMarketRows<
     // Search text updates immediately; only the network query is debounced.
     timer = setTimeout(read, filters.get("query") ? 200 : 0);
     return () => { abort.abort(); clearTimeout(timer); document.removeEventListener("visibilitychange", visibility); };
-  }, [signature, pages, refresh, retry]);
+  }, [signature, pages, refresh, retry, anchor]);
   useEffect(() => {
     if (!sentinel.current || loading || error || total === null || current?.complete) return;
     const observer = new IntersectionObserver(entries => {

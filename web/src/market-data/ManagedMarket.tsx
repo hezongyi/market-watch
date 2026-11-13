@@ -151,7 +151,7 @@ function ManagedRow({
         : "一次性维护"
     : "未配置维护";
   return (
-    <article className="dc-market-row" id={`dataset-${d.id}`} tabIndex={-1}>
+    <article className="dc-market-row" id={`dataset-${d.id}`} data-composite-ids={d.continuation?.composite_ids?.join(" ")} tabIndex={-1}>
       <div className="dc-market-main">
         <button className="dc-symbol-button" onClick={detail.open}>
           {d.display_symbol || d.logical_symbol}

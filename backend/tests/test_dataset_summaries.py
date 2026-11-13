@@ -74,6 +74,8 @@ def test_batch_reports_removed_members_and_rank_changes(database):
         shifted = summaries(db, ids=selected)
         assert [row["position"] for row in shifted["items"]] == [2, 3]
         assert shifted["total"] == 3
+        assert summaries(db, anchor="dataset-" + initial[1]["id"])["anchor_position"] == 3
+        assert summaries(db, query="AAA", anchor="dataset-" + initial[1]["id"])["anchor_position"] is None
         db.get(DatasetMaintenance, identity(provider_symbol="BBB").key).archived = True
         db.flush()
         removed = summaries(db, ids=selected)
@@ -97,6 +99,7 @@ def test_summary_api_validates_batch_and_preserves_full_endpoint(database):
             assert client.get(base + "dataset-summaries?ids=invalid").status_code == 422
             assert client.get(base + "dataset-summaries?page_size=101").status_code == 422
             assert client.get(base + "dataset-summaries?view=invalid").status_code == 422
+            assert client.get(base + "dataset-summaries?anchor=invalid").status_code == 422
             full = client.get(base + "datasets").json()["items"][0]
             assert "input_timeframes" in full and "maintenance" in full
             assert client.get(base + "platform-revision").status_code == 200
@@ -133,7 +136,12 @@ def test_selected_continuation_health_is_batched_and_old_errors_do_not_taint_it(
         db.flush()
         assert summaries(db)["items"][0]["continuation"]["status"] == "attention"
         continuation(db, identity().key, value=False)
-        assert summaries(db)["items"][0]["continuation"]["status"] == "disabled"
+        db.delete(db.get(CompositePreparation, original["composite"]["active_revision_id"]))
+        db.flush()
+        summary = summaries(db)["items"][0]["continuation"]
+        assert summary["status"] == "disabled"
+        assert set(summary["composite_ids"]) == {original["composite"]["id"], selected["composite"]["id"]}
+        assert summaries(db, anchor="composite-" + original["composite"]["id"])["anchor_position"] == 1
 
 
 def test_active_calendar_revision_outside_page_retains_its_mapping_and_switch(database, monkeypatch):
@@ -141,7 +149,9 @@ def test_active_calendar_revision_outside_page_retains_its_mapping_and_switch(da
     from alerts.realtime_switch import set_enabled
     from alerts.storage import CompositeRevision, HistoryVersion, MarketComposite, MarketDataset
     from sqlalchemy import select
-    from test_composite_revisions import test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity
+    from test_composite_revisions import (
+        test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity,
+    )
 
     test_calendar_derivation_and_mapping_keep_old_rule_and_series_identity(database, monkeypatch)
     with database.begin() as db:
