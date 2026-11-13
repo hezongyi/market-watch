@@ -21,7 +21,7 @@ from .storage import (
 
 
 def summaries(db, *, ids=None, view=None, anchor=None, **filters):
-    base = _dataset_query(**filters)
+    base = _dataset_query(include_continuations=True, **filters)
     if view == "continuation":
         base = base.where(select(RealtimeMapping.id).where(
             RealtimeMapping.dataset_id == MarketDataset.id,
@@ -45,7 +45,7 @@ def summaries(db, *, ids=None, view=None, anchor=None, **filters):
             MarketComposite.id == ident, MarketComposite.permission_scope == "workspace:default").scalar_subquery()
         anchor_position = db.scalar(select(ranked.c.position).where(ranked.c.id == dataset_id))
     query = select(MarketDataset, Instrument, DatasetMaintenance, ranked.c.position).join(
-        Instrument).join(DatasetMaintenance).join(ranked, ranked.c.id == MarketDataset.id)
+        Instrument).outerjoin(DatasetMaintenance).join(ranked, ranked.c.id == MarketDataset.id)
     if requested is not None:
         query = query.where(MarketDataset.id.in_(requested))
     else:
@@ -76,7 +76,7 @@ def _rows(db, selected):
         HistoryArtifact.count > 0).subquery()
     artifacts = list(db.scalars(select(HistoryArtifact).join(artifacts_rank,
         artifacts_rank.c.id == HistoryArtifact.id).where(artifacts_rank.c.position == 1)))
-    version_ids = {value for _, _, plan, _ in selected
+    version_ids = {value for _, _, plan, _ in selected if plan is not None
                    for value in (plan.latest_version_id, plan.active_version_id) if value}
     version_ids.update(artifact.version_id for artifact in artifacts)
     versions = {row.id: row for row in latest.values()}
@@ -101,13 +101,14 @@ def _rows(db, selected):
     continuations = continuation_summaries(db, [dataset for dataset, *_ in selected], switches)
     output = []
     for dataset, inst, plan, position in selected:
-        parent = versions.get(plan.latest_version_id) if plan.latest_version_id else latest.get(dataset.id)
-        active = versions.get(plan.active_version_id)
+        parent = versions.get(plan.latest_version_id) if plan and plan.latest_version_id else latest.get(dataset.id)
+        active = versions.get(plan.active_version_id) if plan else None
         ready = sorted(periods[dataset.id], key=lambda item: item["timeframe"])
-        maintenance = {key: getattr(plan, key) for key in (
+        maintenance = {key: getattr(plan, key, None) for key in (
             "frequency", "paused", "archived", "last_attempt", "last_success", "active_version_id")}
-        maintenance.update(configured=True, task_error=active.error if active else None,
-            next_at=plan.next_at if plan.frequency == "daily" and not plan.paused and not plan.archived else None)
+        maintenance.update(configured=plan is not None, paused=bool(plan and plan.paused),
+            archived=bool(plan and plan.archived), task_error=active.error if active else None,
+            next_at=plan.next_at if plan and plan.frequency == "daily" and not plan.paused and not plan.archived else None)
         output.append({**dataset_report(dataset, inst), "position": position, "maintenance": maintenance,
             "latest_version_id": parent.id if parent else None, "available_start": parent.start if parent else None,
             "available_end": parent.end if parent else None,

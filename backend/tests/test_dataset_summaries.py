@@ -170,3 +170,31 @@ def test_active_calendar_revision_outside_page_retains_its_mapping_and_switch(da
             expected = report(db, original.id)
             assert row["continuation"]["status"] == expected["status"]
             assert row["continuation"]["status"] != "attention"
+
+
+def test_legacy_continuation_without_maintenance_is_listed_without_creating_plan(database, monkeypatch):
+    from alerts.composite_definitions import save_mapping
+    from alerts.managed_continuation import configure as continuation
+    from alerts.storage import MarketDataset
+    from sqlalchemy import func, select
+    from test_composite_definitions import PROOF, prepare, publish
+
+    catalog = prepare(database, monkeypatch)
+    publish(database)
+    with database.begin() as db:
+        mapping = save_mapping(db, identity().key, catalog, PROOF)
+        saved = continuation(db, identity().key, value=True, mapping_id=mapping.id)
+        assert db.scalar(select(func.count()).select_from(MarketDataset)) > 1
+        assert db.scalar(select(func.count()).select_from(DatasetMaintenance)) == 0
+        assert dataset_list(db)["total"] == 0  # Existing full endpoint remains compatible.
+        response = summaries(db, view="continuation", anchor="composite-" + saved["composite"]["id"])
+        assert response["total"] == response["anchor_position"] == 1
+        row = response["items"][0]
+        assert row["id"] == identity().key and row["usable_timeframes"]
+        assert row["maintenance"]["configured"] is False
+        assert row["maintenance"]["archived"] is False
+        assert row["continuation"]["enabled"] is True
+        assert row["continuation"]["composite_ids"] == [saved["composite"]["id"]]
+        assert summaries(db, status="archived")["total"] == 0
+        assert summaries(db, status="paused")["total"] == 0
+        assert db.scalar(select(func.count()).select_from(DatasetMaintenance)) == 0

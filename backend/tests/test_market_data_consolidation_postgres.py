@@ -26,6 +26,7 @@ pytestmark = pytest.mark.skipif(not os.getenv("TEST_POSTGRES_URL"), reason="Requ
     continuation.test_all_old_configurations_remain_discoverable_after_default_change,
     lists.test_selected_continuation_health_is_batched_and_old_errors_do_not_taint_it,
     lists.test_active_calendar_revision_outside_page_retains_its_mapping_and_switch,
+    lists.test_legacy_continuation_without_maintenance_is_listed_without_creating_plan,
     history.test_checkpoint_pages_decode_once_and_inherited_period_is_not_reencoded,
     history.test_unordered_corrections_across_staging_groups_match_ordered_oracle,
     history.test_inherited_refs_are_revalidated_before_publication,
