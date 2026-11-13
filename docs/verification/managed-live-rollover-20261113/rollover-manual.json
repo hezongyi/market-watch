@@ -1,0 +1,439 @@
+{
+  "task": "mw-managed-live-rollover-20261113",
+  "origin": "https://127.0.0.1:18447",
+  "phase": "manual",
+  "evidence": "real supplier / browser, not Android device",
+  "checks": [
+    "Real licensed MWC chart loaded with M5, study and drawing",
+    "Immediate update submitted via actual mobile UI",
+    "Successful real maintenance automatically changed baseline; MWC, mapping and live switch retained",
+    "Original chart accepted stream reset, retained viewport/timeframe/study/drawing and forming bar; MWH fixed history unchanged"
+  ],
+  "history": [
+    {
+      "at": 1794598431346,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 61,
+      "first": 1794380400000,
+      "last": 1794596400000,
+      "current": true
+    },
+    {
+      "at": 1794598431918,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 56,
+      "first": 1794398400000,
+      "last": 1794596400000,
+      "current": true
+    },
+    {
+      "at": 1794598432004,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 14,
+      "first": 1794348000000,
+      "last": 1794394800000,
+      "current": false
+    },
+    {
+      "at": 1794598432358,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 56,
+      "first": 1794581700000,
+      "last": 1794598200000,
+      "current": true
+    },
+    {
+      "at": 1794598432546,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 19,
+      "first": 1794576000000,
+      "last": 1794581400000,
+      "current": false
+    },
+    {
+      "at": 1794598432677,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 9,
+      "first": 1794573300000,
+      "last": 1794575700000,
+      "current": false
+    },
+    {
+      "at": 1794598432779,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 56,
+      "first": 1794556500000,
+      "last": 1794573000000,
+      "current": false
+    },
+    {
+      "at": 1794598432884,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 9,
+      "first": 1794553800000,
+      "last": 1794556200000,
+      "current": false
+    },
+    {
+      "at": 1794598432992,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 56,
+      "first": 1794537000000,
+      "last": 1794553500000,
+      "current": false
+    },
+    {
+      "at": 1794598462140,
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "input": 1,
+      "count": 75,
+      "first": 1794576000000,
+      "last": 1794598200000,
+      "current": true
+    },
+    {
+      "at": 1794598462266,
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "input": 1,
+      "count": 56,
+      "first": 1794559200000,
+      "last": 1794575700000,
+      "current": false
+    },
+    {
+      "at": 1794598462380,
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "input": 1,
+      "count": 9,
+      "first": 1794556500000,
+      "last": 1794558900000,
+      "current": false
+    },
+    {
+      "at": 1794598462799,
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "input": 1,
+      "count": 56,
+      "first": 1794539700000,
+      "last": 1794556200000,
+      "current": false
+    }
+  ],
+  "screenshots": [
+    "rollover-manual-before",
+    "rollover-manual-after"
+  ],
+  "errors": [],
+  "dataset": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+  "before": {
+    "composite": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+    "revision": {
+      "id": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "history_version_id": "9b847387-9b55-402a-b79d-195392895eea",
+      "history_start": 1794348000000,
+      "history_end": 1794598320000,
+      "history_checksum": "1ee177b6134554ec348a8983fb5c01bda9f9ffe09cfefe68ea711ebe754758e6",
+      "seam": 1794520800000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "latest-day-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "user-forex-ny17-v1"
+      },
+      "activated_at": 1794598405228
+    },
+    "preparation": {
+      "status": "queried",
+      "cursor": 1794598380000,
+      "cutoff": 1794598380000,
+      "confirmed_end": 1794598380000,
+      "input_revision": 1,
+      "error": null,
+      "next_at": 0,
+      "state": {
+        "stage": "tail_queried",
+        "target_identity": {
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "calendar_version": "ny17-candidate-v1"
+        },
+        "historical_input": {
+          "version_id": "9b847387-9b55-402a-b79d-195392895eea",
+          "checksum": "1ee177b6134554ec348a8983fb5c01bda9f9ffe09cfefe68ea711ebe754758e6",
+          "start": 1794348000000,
+          "end": 1794520800000
+        },
+        "activation_watermark": 1794598020000,
+        "managed_tail_cutoff": 1794598380000,
+        "activation_ready": true,
+        "activation_checked_at": 1794598403359,
+        "query_complete": true,
+        "attempts": 0,
+        "coverage": "observations_only; missing minutes remain unknown",
+        "activation_input_revision": 1,
+        "managed_coverage": {
+          "fingerprint": [
+            "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+            4,
+            "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+            1
+          ],
+          "changed_history_observations": 1595,
+          "tail_observations": 1282,
+          "missing_observations": 0
+        }
+      }
+    },
+    "rollover": {
+      "status": "updated",
+      "reason": null,
+      "history_version_id": "9b847387-9b55-402a-b79d-195392895eea",
+      "baseline_seam": 1794520800000,
+      "activated_at": 1794598405228,
+      "run_id": "6f0adfe5-be81-43a6-9599-54eee9784a75",
+      "updated_at": 1794598405287,
+      "window_expires_at": 1797112800000,
+      "window_remaining_ms": 2514371301,
+      "requires_attention": false,
+      "warning": null
+    }
+  },
+  "chartBefore": {
+    "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+    "resolution": "5",
+    "visible": {
+      "from": 1794584700,
+      "to": 1794601200
+    },
+    "studies": [
+      {
+        "id": "pZjwrG",
+        "name": "Moving Average"
+      }
+    ],
+    "shapes": [
+      {
+        "id": "UnuPzy",
+        "name": "horizontal_line"
+      }
+    ]
+  },
+  "after": {
+    "composite": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+    "revision": {
+      "id": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "history_version_id": "9a8e013f-9c62-41b9-85dc-e0cbafa1ebc4",
+      "history_start": 1794348000000,
+      "history_end": 1794598380000,
+      "history_checksum": "99b0a1896e3a000a228cffa28ffa61311e53a0ac7494e348ab8c897e77cc1e97",
+      "seam": 1794520800000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "latest-day-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "user-forex-ny17-v1"
+      },
+      "activated_at": 1794598461074
+    },
+    "preparation": {
+      "status": "queried",
+      "cursor": 1794598380000,
+      "cutoff": 1794598380000,
+      "confirmed_end": 1794598380000,
+      "input_revision": 1,
+      "error": null,
+      "next_at": 0,
+      "state": {
+        "stage": "tail_queried",
+        "target_identity": {
+          "source": "oanda",
+          "channel": "v20",
+          "environment": "practice",
+          "account_scope": "sha256:c141ad0c5c8e89986347262c5f03bd93bf6d3e1b22e095341f12a0e1e9d0dcfd",
+          "provider_symbol": "EUR_USD",
+          "basis": "bid",
+          "calendar_version": "ny17-candidate-v1"
+        },
+        "historical_input": {
+          "version_id": "9a8e013f-9c62-41b9-85dc-e0cbafa1ebc4",
+          "checksum": "99b0a1896e3a000a228cffa28ffa61311e53a0ac7494e348ab8c897e77cc1e97",
+          "start": 1794348000000,
+          "end": 1794520800000
+        },
+        "activation_watermark": 1794598380000,
+        "managed_tail_cutoff": 1794598380000,
+        "activation_ready": true,
+        "activation_checked_at": 1794598455551,
+        "query_complete": true,
+        "attempts": 0,
+        "coverage": "observations_only; missing minutes remain unknown",
+        "activation_input_revision": 1,
+        "managed_coverage": {
+          "fingerprint": [
+            "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+            1,
+            "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+            1
+          ],
+          "changed_history_observations": 1592,
+          "tail_observations": 1288,
+          "missing_observations": 0
+        }
+      }
+    },
+    "rollover": {
+      "status": "updated",
+      "reason": null,
+      "history_version_id": "9a8e013f-9c62-41b9-85dc-e0cbafa1ebc4",
+      "baseline_seam": 1794520800000,
+      "activated_at": 1794598461074,
+      "run_id": "a6978399-de0d-4944-b282-989f10fcc2ed",
+      "updated_at": 1794598461103,
+      "window_expires_at": 1797112800000,
+      "window_remaining_ms": 2514337182,
+      "requires_attention": false,
+      "warning": null
+    },
+    "elapsedMs": 29400
+  },
+  "newTasks": [
+    {
+      "id": "9a8e013f-9c62-41b9-85dc-e0cbafa1ebc4",
+      "status": "published"
+    }
+  ],
+  "chartAfter": {
+    "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+    "resolution": "5",
+    "visible": {
+      "from": 1794584700,
+      "to": 1794601200
+    },
+    "studies": [
+      {
+        "id": "pZjwrG",
+        "name": "Moving Average"
+      }
+    ],
+    "shapes": [
+      {
+        "id": "UnuPzy",
+        "name": "horizontal_line"
+      }
+    ]
+  },
+  "events": [
+    {
+      "at": 1794598431732,
+      "type": "quotes",
+      "generation": 5
+    },
+    {
+      "at": 1794598431733,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598431733,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "generation": 7
+    },
+    {
+      "at": 1794598432268,
+      "type": "quotes",
+      "generation": 5
+    },
+    {
+      "at": 1794598432269,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598432824,
+      "type": "bars",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "last": 1794598200000,
+      "complete": false,
+      "generation": 15
+    },
+    {
+      "at": 1794598433410,
+      "type": "bars",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "last": 1794598200000,
+      "complete": false,
+      "generation": 16
+    },
+    {
+      "at": 1794598440624,
+      "type": "quotes",
+      "generation": 5
+    },
+    {
+      "at": 1794598440625,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598440625,
+      "type": "bars",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 16
+    },
+    {
+      "at": 1794598461960,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "generation": 5
+    },
+    {
+      "at": 1794598461960,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "generation": 8
+    },
+    {
+      "at": 1794598461960,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "6b9e7bc3-5e84-4957-b3c3-5e617042a2a4",
+      "generation": 16
+    },
+    {
+      "at": 1794598462665,
+      "type": "quotes",
+      "generation": 17
+    },
+    {
+      "at": 1794598462666,
+      "type": "quotes",
+      "generation": 18
+    }
+  ],
+  "fixedHistory": {
+    "version": "9b847387-9b55-402a-b79d-195392895eea",
+    "count": 20,
+    "unchanged": true
+  }
+}

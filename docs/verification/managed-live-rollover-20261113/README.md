@@ -40,11 +40,15 @@
 | 上述10项告警PostgreSQL模块，补私有CHART_ALERT_TEST_DATABASE_URL重跑 | 10 passed，19.46s；20条既有Alembic弃用提示 |
 | 早期 history/continuation/shadow/revisions/schedule/activation | 73 passed |
 | 早期 retention/switch schedule | 50 passed |
-| PostgreSQL retention（早期） | 13 passed |
+| PostgreSQL baseline shadow / composite revisions / switch activation / retention（评审修复后） | 50 passed，149.55s |
+| 最终状态竞争修复后的轮换回归 | SQLite18 passed（含2条新增），PostgreSQL19 passed |
+| unified chart stream / historical reset | 两个Node脚本通过，覆盖generation/顺序fence、reset/reload与历史缺口 |
 | migration兼容回归（含alerts MCP） | 42 passed；既有Alembic弃用提示 |
 | web生产构建 | TypeScript/Vite/native hooks/mobile shell通过，fingerprint db0e3cdc6c2e0bd3 |
 | mobile-data-workflow.browser.cjs | 14组检查通过，55张截图，零运行异常；含全周期默认与轮换暂缓窗口提示 |
 | mobile-data.browser.cjs | 4组检查通过，零运行异常；固定读取、搜索、详情、嵌套返回及状态回归 |
+
+表中部分测试集重叠，不相加作为独立总数。
 
 命令使用项目 `.venv`，`PYTHONPATH=backend`；PG URL从任务私有test-env注入，测试按UUID schema隔离，绝不使用手机验收DB。
 告警模块额外把 `CHART_ALERT_TEST_DATABASE_URL` 设置为同一任务测试DB URL。
@@ -78,11 +82,26 @@ Standards与Spec独立review均完成。评审后修复：
 - 告警以实际绑定修订判定可迁移性，固定价格等不安全规则暂缓轮换，旧流/告警保持。
 - 暂缓状态按旧接续点动态计算窗口剩余时间，接近30天显示处理提示。
 
-两位reviewer已确认原阻断及追加遗漏代码层面关闭；PG61项和浏览器回归在修复后完成。
+两位reviewer已确认原阻断及追加遗漏代码层面关闭；PG61项和浏览器回归在修复后完成。真实验收后又发现旧shadow回报可覆盖成功激活状态，增加活动head锁内核对并经Standards增量复核关闭；SQLite18项与PG19项回归通过。
 
 ## 真实供应商验收
 
 使用 `web/tests/managed-live-rollover.real.cjs`；只允许本任务18447原点，真实API/供应商与许可widget。
 通过原生widget句柄观察图表，未mock API或伪造历史发布。真实EURUSD由数据页搜索Dukascopy、创建、完成历史、明确选择OANDA默认映射并开启实时。
 
-手动与定时更新、旧新revision/seam、确认尾部/当前bar及原图表连续性验证仍在进行；本记录暂不宣称整项收口。
+定时更新已通过：真实计划调度发布新历史，约65秒后完成轮换，手机和独立桌面上下文里的原图表收到binding_changed reset；品种、M5、视区、均线与绘图保留，新修订包含正在形成的bar。固定MWH的20根数据完全不变。临时改动的维护时间已通过配置revision核对后恢复。
+
+最终镜像的手动入口复核通过：轮换状态保持updated，确认水位不倒退，新修订当前bar存在，原手机图表视区/周期/均线/绘图保留，固定MWH数据不变。实际跨日seam前移及30天时钟使用明确夹具验证，真实供应商部分为同一交易日的版本轮换，不声称等待了30天。
+
+`runtime.json`固定实际API/Web/PG镜像及五个关键模块的宿主/容器一致SHA-256。没有因为文档或测试脚本修改重新构建产品镜像。
+
+Android系统WebView和真机交互仍需用户确认；本任务机器验证不替代这一边界。
+
+
+真实结果：[手动轮换](rollover-manual.json)、[定时轮换](rollover-scheduled.json)、[数据库只读核对](real-runtime-state.json)。原始运行包含验收脚本入口/观测方式修正后的重跑；最终两份JSON对应实际通过的完整运行，未把失败的脚本观测登记为产品通过。
+
+截图：[手动前](rollover-manual-before.png) / [手动后](rollover-manual-after.png)，[定时手机前](rollover-scheduled-before.png) / [定时手机后](rollover-scheduled-after.png)，[定时桌面前](rollover-scheduled-desktop-before.png) / [定时桌面后](rollover-scheduled-desktop-after.png)。
+
+- manual：history `9b847387-9b55-402a-b79d-195392895eea` → `9a8e013f-9c62-41b9-85dc-e0cbafa1ebc4`；revision `210a7d0b-08d0-4f1c-b76b-1acbfde4eab0` → `6b9e7bc3-5e84-4957-b3c3-5e617042a2a4`，约 29.4s，seam `1794520800000`。
+
+- scheduled：history `7aaab3a1-680a-47d8-9bcf-2e66ab44a008` → `9b847387-9b55-402a-b79d-195392895eea`；revision `adf2abbd-cf8e-461c-ad11-af2f10781df9` → `210a7d0b-08d0-4f1c-b76b-1acbfde4eab0`，约 65.2s，seam `1794520800000`。

@@ -1,6 +1,6 @@
 # 自建实时行情：历史基线自动轮换与实时数据定期清理
 
-日期：2026-11-13。状态：**已实现，真实供应商图表连续性验收中**。本方案在独立 Ubuntu Docker 实例实施；验证结果和实际执行边界见 [验收记录](verification/managed-live-rollover-20261113/README.md)，不代表生产环境已启用。
+日期：2026-11-13。状态：**已实现，Ubuntu自动验收通过；Android真机待用户确认**。本方案在独立 Ubuntu Docker 实例实施；验证结果和实际执行边界见 [验收记录](verification/managed-live-rollover-20261113/README.md)，不代表生产环境已启用。
 
 ## 1. 目标与实施基线
 

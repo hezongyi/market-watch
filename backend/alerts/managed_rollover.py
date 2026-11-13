@@ -271,6 +271,7 @@ def activation_gate(db, composite, candidate, progress):
 
 
 def reconcile(composite_id, *, adapter=None, budget=baseline_shadow.BUDGET):
+    selected = None
     try:
         result = _candidate(composite_id)
         if result is None:
@@ -290,16 +291,24 @@ def reconcile(composite_id, *, adapter=None, budget=baseline_shadow.BUDGET):
         state = "ready" if report["ready"] else "preparing"
         reason = "；".join(item["detail"] for item in report["reasons"])
         with transaction() as db:
+            composite = lock_scope(db, db.get(MarketComposite, composite_id))
+            # Activation runs independently while shadow work performs I/O.
+            # Its committed status owns the new head; stale work must not
+            # replace "updated" with preparing/deferred after it has switched.
+            if composite.active_revision_id != selected["active_revision_id"]:
+                return {"composite_id": composite_id, "status": "current"}
             if report["ready"]:
                 from .composite_revisions import readiness
                 candidate = db.get(CompositeRevision, candidate_id)
-                composite = lock_scope(db, db.get(MarketComposite, composite_id))
                 activation_gate(db, composite, candidate, readiness(db, candidate))
             _status(db, composite_id, state, reason or None,
                     candidate_revision_id=candidate_id, history_version_id=selected["version_id"], run_id=run_id)
         return {"composite_id": composite_id, "status": state}
     except (Deferred, ValueError) as error:
         with transaction() as db:
+            composite = lock_scope(db, db.get(MarketComposite, composite_id))
+            if selected and composite.active_revision_id != selected["active_revision_id"]:
+                return {"composite_id": composite_id, "status": "current"}
             _status(db, composite_id, "deferred", str(error))
         return {"composite_id": composite_id, "status": "deferred", "reason": str(error)}
 

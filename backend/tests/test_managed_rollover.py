@@ -296,3 +296,24 @@ def test_newest_materially_degraded_fixed_history_does_not_hide_good_version(dat
     with database() as db:
         selected = rollover.plan(db, composite)
         assert selected["version_id"] == good and selected["active_revision_id"] == active
+
+
+@pytest.mark.parametrize("late_error", [False, True])
+def test_shadow_result_cannot_overwrite_concurrent_successful_activation(database, monkeypatch, late_error):
+    composite, _, _, ident, _ = candidate(database, monkeypatch)
+    shadow = rollover.baseline_shadow.shadow
+
+    def concurrent_activation(*args, **kwargs):
+        result = shadow(*args, **kwargs)
+        assert result["ready"]
+        cycle = switch_schedule.activation_cycle()
+        assert [item["status"] for item in cycle["candidates"]] == ["activated"]
+        if late_error:
+            raise rollover.Deferred("stale shadow response")
+        return result
+
+    monkeypatch.setattr(rollover.baseline_shadow, "shadow", concurrent_activation)
+    assert rollover.reconcile(composite, budget=16)["status"] == "current"
+    with database() as db:
+        assert db.get(MarketComposite, composite).active_revision_id == ident
+        assert rollover.status(db, composite)["status"] == "updated"

@@ -1,0 +1,534 @@
+{
+  "task": "mw-managed-live-rollover-20261113",
+  "origin": "https://127.0.0.1:18447",
+  "phase": "scheduled",
+  "evidence": "real supplier / browser, not Android device",
+  "checks": [
+    "Real licensed MWC chart loaded with M5, study and drawing",
+    "Daily maintenance set shortly ahead via UI; host clock unchanged",
+    "Successful real maintenance automatically changed baseline; MWC, mapping and live switch retained",
+    "Desktop chart also retained symbol, period, viewport, drawing and study across the same real rotation",
+    "Original chart accepted stream reset, retained viewport/timeframe/study/drawing and forming bar; MWH fixed history unchanged"
+  ],
+  "history": [
+    {
+      "at": 1794598338144,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 60,
+      "first": 1794384000000,
+      "last": 1794596400000,
+      "current": true
+    },
+    {
+      "at": 1794598338408,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 10,
+      "first": 1794348000000,
+      "last": 1794380400000,
+      "current": false
+    },
+    {
+      "at": 1794598339017,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 60,
+      "first": 1794580200000,
+      "last": 1794597900000,
+      "current": true
+    },
+    {
+      "at": 1794598339244,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 19,
+      "first": 1794574500000,
+      "last": 1794579900000,
+      "current": false
+    },
+    {
+      "at": 1794598339369,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 9,
+      "first": 1794571800000,
+      "last": 1794574200000,
+      "current": false
+    },
+    {
+      "at": 1794598339500,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 56,
+      "first": 1794555000000,
+      "last": 1794571500000,
+      "current": false
+    },
+    {
+      "at": 1794598339615,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 9,
+      "first": 1794552300000,
+      "last": 1794554700000,
+      "current": false
+    },
+    {
+      "at": 1794598339745,
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "input": 4,
+      "count": 56,
+      "first": 1794535500000,
+      "last": 1794552000000,
+      "current": false
+    },
+    {
+      "at": 1794598406302,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 75,
+      "first": 1794576000000,
+      "last": 1794598200000,
+      "current": true
+    },
+    {
+      "at": 1794598406722,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 56,
+      "first": 1794559200000,
+      "last": 1794575700000,
+      "current": false
+    },
+    {
+      "at": 1794598406937,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 9,
+      "first": 1794556500000,
+      "last": 1794558900000,
+      "current": false
+    },
+    {
+      "at": 1794598407194,
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "input": 1,
+      "count": 56,
+      "first": 1794539700000,
+      "last": 1794556200000,
+      "current": false
+    }
+  ],
+  "screenshots": [
+    "rollover-scheduled-before",
+    "rollover-scheduled-desktop-before",
+    "rollover-scheduled-desktop-after",
+    "rollover-scheduled-after"
+  ],
+  "errors": [],
+  "dataset": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+  "before": {
+    "composite": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+    "revision": {
+      "id": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "history_version_id": "7aaab3a1-680a-47d8-9bcf-2e66ab44a008",
+      "history_start": 1794348000000,
+      "history_end": 1794597840000,
+      "history_checksum": "c35587b801b5a0ad2ca8d59a7affe429ea3556a97f426abd06335b40916d550f",
+      "seam": 1794520800000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "latest-day-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "user-forex-ny17-v1"
+      },
+      "activated_at": 1794597890482
+    },
+    "rollover": {
+      "status": "current",
+      "reason": null,
+      "updated_at": 1794597916009,
+      "window_expires_at": 1797112800000,
+      "window_remaining_ms": 2514464947,
+      "requires_attention": false,
+      "warning": null
+    }
+  },
+  "chartBefore": {
+    "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+    "resolution": "5",
+    "visible": {
+      "from": 1794584400,
+      "to": 1794600900
+    },
+    "studies": [
+      {
+        "id": "2CGnfo",
+        "name": "Moving Average"
+      }
+    ],
+    "shapes": [
+      {
+        "id": "dC21T3",
+        "name": "horizontal_line"
+      }
+    ]
+  },
+  "desktopBefore": {
+    "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+    "resolution": "5",
+    "visible": {
+      "from": 1794552900,
+      "to": 1794600900
+    },
+    "studies": [
+      {
+        "id": "NjYVwE",
+        "name": "Moving Average"
+      }
+    ],
+    "shapes": [
+      {
+        "id": "D9FF91",
+        "name": "horizontal_line"
+      }
+    ]
+  },
+  "after": {
+    "composite": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+    "revision": {
+      "id": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "history_version_id": "9b847387-9b55-402a-b79d-195392895eea",
+      "history_start": 1794348000000,
+      "history_end": 1794598320000,
+      "history_checksum": "1ee177b6134554ec348a8983fb5c01bda9f9ffe09cfefe68ea711ebe754758e6",
+      "seam": 1794520800000,
+      "rules": {
+        "aggregation": "configured-phase-m1-v1",
+        "seam": "latest-day-boundary-v1",
+        "selection": "history-before-T-target-from-T-v1",
+        "tail_revisions": "source-confirmed-replace-audit-v1",
+        "aggregation_calendar": "ny17",
+        "historical_calendar_version": "user-forex-ny17-v1"
+      },
+      "activated_at": 1794598405228
+    },
+    "rollover": {
+      "status": "updated",
+      "reason": null,
+      "history_version_id": "9b847387-9b55-402a-b79d-195392895eea",
+      "baseline_seam": 1794520800000,
+      "activated_at": 1794598405228,
+      "run_id": "6f0adfe5-be81-43a6-9599-54eee9784a75",
+      "updated_at": 1794598405287,
+      "window_expires_at": 1797112800000,
+      "window_remaining_ms": 2514390529,
+      "requires_attention": false,
+      "warning": null
+    },
+    "elapsedMs": 65177
+  },
+  "newTasks": [
+    {
+      "id": "9b847387-9b55-402a-b79d-195392895eea",
+      "status": "published"
+    }
+  ],
+  "chartAfter": {
+    "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+    "resolution": "5",
+    "visible": {
+      "from": 1794584700,
+      "to": 1794601200
+    },
+    "studies": [
+      {
+        "id": "2CGnfo",
+        "name": "Moving Average"
+      }
+    ],
+    "shapes": [
+      {
+        "id": "dC21T3",
+        "name": "horizontal_line"
+      }
+    ]
+  },
+  "events": [
+    {
+      "at": 1794598338216,
+      "type": "quotes",
+      "generation": 5
+    },
+    {
+      "at": 1794598338685,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598338685,
+      "type": "bars",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "last": 1794596400000,
+      "complete": false,
+      "generation": 7
+    },
+    {
+      "at": 1794598339813,
+      "type": "bars",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "last": 1794597900000,
+      "complete": false,
+      "generation": 13
+    },
+    {
+      "at": 1794598342539,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598342542,
+      "type": "quotes",
+      "generation": 5
+    },
+    {
+      "at": 1794598380128,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598380129,
+      "type": "quotes",
+      "generation": 5
+    },
+    {
+      "at": 1794598380647,
+      "type": "bars",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "generation": 13
+    },
+    {
+      "at": 1794598405912,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 8
+    },
+    {
+      "at": 1794598405913,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 13
+    },
+    {
+      "at": 1794598405920,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 5
+    },
+    {
+      "at": 1794598406512,
+      "type": "quotes",
+      "generation": 14
+    },
+    {
+      "at": 1794598406516,
+      "type": "quotes",
+      "generation": 16
+    },
+    {
+      "at": 1794598407146,
+      "type": "quotes",
+      "generation": 14
+    },
+    {
+      "at": 1794598407147,
+      "type": "bars",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "last": 1794598200000,
+      "complete": false,
+      "generation": 19
+    },
+    {
+      "at": 1794598407148,
+      "type": "quotes",
+      "generation": 16
+    },
+    {
+      "at": 1794598407662,
+      "type": "quotes",
+      "generation": 14
+    },
+    {
+      "at": 1794598407662,
+      "type": "quotes",
+      "generation": 16
+    }
+  ],
+  "desktopAfter": {
+    "symbol": "MWC:8C490DF00408ED7102D9106E2AD6D3991D3E6488DE0B0905D92A2EC052343CBB",
+    "resolution": "5",
+    "visible": {
+      "from": 1794553200,
+      "to": 1794601200
+    },
+    "studies": [
+      {
+        "id": "NjYVwE",
+        "name": "Moving Average"
+      }
+    ],
+    "shapes": [
+      {
+        "id": "D9FF91",
+        "name": "horizontal_line"
+      }
+    ]
+  },
+  "desktopEvents": [
+    {
+      "at": 1794598342685,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598343271,
+      "type": "bars",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "last": 1794592800000,
+      "complete": false,
+      "generation": 7
+    },
+    {
+      "at": 1794598344586,
+      "type": "quotes",
+      "generation": 15
+    },
+    {
+      "at": 1794598345173,
+      "type": "bars",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "last": 1794597900000,
+      "complete": false,
+      "generation": 25
+    },
+    {
+      "at": 1794598346704,
+      "type": "quotes",
+      "generation": 22
+    },
+    {
+      "at": 1794598361588,
+      "type": "quotes",
+      "generation": 22
+    },
+    {
+      "at": 1794598376955,
+      "type": "quotes",
+      "generation": 22
+    },
+    {
+      "at": 1794598380560,
+      "type": "quotes",
+      "generation": 8
+    },
+    {
+      "at": 1794598380561,
+      "type": "quotes",
+      "generation": 15
+    },
+    {
+      "at": 1794598380562,
+      "type": "bars",
+      "revision": "adf2abbd-cf8e-461c-ad11-af2f10781df9",
+      "generation": 25
+    },
+    {
+      "at": 1794598392401,
+      "type": "quotes",
+      "generation": 22
+    },
+    {
+      "at": 1794598406073,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 8
+    },
+    {
+      "at": 1794598406074,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 15
+    },
+    {
+      "at": 1794598406074,
+      "type": "reset",
+      "reason": "binding_changed",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "generation": 25
+    },
+    {
+      "at": 1794598406672,
+      "type": "bars",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "last": 1794598200000,
+      "complete": false,
+      "generation": 30
+    },
+    {
+      "at": 1794598406674,
+      "type": "quotes",
+      "generation": 26
+    },
+    {
+      "at": 1794598406674,
+      "type": "quotes",
+      "generation": 27
+    },
+    {
+      "at": 1794598407387,
+      "type": "bars",
+      "revision": "210a7d0b-08d0-4f1c-b76b-1acbfde4eab0",
+      "last": 1794598200000,
+      "complete": false,
+      "generation": 31
+    },
+    {
+      "at": 1794598407389,
+      "type": "quotes",
+      "generation": 26
+    },
+    {
+      "at": 1794598407389,
+      "type": "quotes",
+      "generation": 26
+    },
+    {
+      "at": 1794598407389,
+      "type": "quotes",
+      "generation": 27
+    },
+    {
+      "at": 1794598407390,
+      "type": "quotes",
+      "generation": 27
+    },
+    {
+      "at": 1794598407390,
+      "type": "quotes",
+      "generation": 22
+    }
+  ],
+  "fixedHistory": {
+    "version": "7aaab3a1-680a-47d8-9bcf-2e66ab44a008",
+    "count": 20,
+    "unchanged": true
+  }
+}
