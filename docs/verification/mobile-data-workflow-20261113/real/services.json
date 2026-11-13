@@ -1,0 +1,51 @@
+[
+  {
+    "service": "web",
+    "status": "running",
+    "exitCode": 0,
+    "health": null,
+    "restarts": 0
+  },
+  {
+    "service": "tls",
+    "status": "running",
+    "exitCode": 0,
+    "health": null,
+    "restarts": 0
+  },
+  {
+    "service": "data-worker",
+    "status": "running",
+    "exitCode": 0,
+    "health": null,
+    "restarts": 0
+  },
+  {
+    "service": "api",
+    "status": "running",
+    "exitCode": 0,
+    "health": "healthy",
+    "restarts": 0
+  },
+  {
+    "service": "market-runtime",
+    "status": "running",
+    "exitCode": 0,
+    "health": null,
+    "restarts": 0
+  },
+  {
+    "service": "migrate",
+    "status": "exited",
+    "exitCode": 0,
+    "health": null,
+    "restarts": 0
+  },
+  {
+    "service": "postgres",
+    "status": "running",
+    "exitCode": 0,
+    "health": "healthy",
+    "restarts": 0
+  }
+]

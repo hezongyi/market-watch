@@ -1,0 +1,253 @@
+{
+  "observedAt": 1794589709882,
+  "deployment": "mw-mobile-data-workflow-20261113",
+  "disabledMarketRoles": [
+    "chart_alert",
+    "switch_activation"
+  ],
+  "roles": [
+    {
+      "group": "market",
+      "role": "pricing",
+      "state": "running",
+      "checked_at": 1794589707919,
+      "last_success_at": 1794589707919,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "realtime",
+      "state": "idle",
+      "checked_at": 1794589707596,
+      "last_success_at": 1794589707596,
+      "error_type": null,
+      "stale_after_ms": 60000
+    },
+    {
+      "group": "market",
+      "role": "composite_aggregate",
+      "state": "idle",
+      "checked_at": 1794589704996,
+      "last_success_at": 1794589704996,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "alert_indicator",
+      "state": "idle",
+      "checked_at": 1794589705601,
+      "last_success_at": 1794589705601,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "market_ownership",
+      "state": "idle",
+      "checked_at": 1794589709113,
+      "last_success_at": 1794589709113,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_oanda",
+      "state": "idle",
+      "checked_at": 1794589682682,
+      "last_success_at": 1794589682682,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_oanda",
+      "state": "idle",
+      "checked_at": 1794589683355,
+      "last_success_at": 1794589683355,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_binance",
+      "state": "idle",
+      "checked_at": 1794589683083,
+      "last_success_at": 1794589683083,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_binance",
+      "state": "idle",
+      "checked_at": 1794589682509,
+      "last_success_at": 1794589682509,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_yahoo",
+      "state": "idle",
+      "checked_at": 1794589683069,
+      "last_success_at": 1794589683069,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_yahoo",
+      "state": "idle",
+      "checked_at": 1794589683351,
+      "last_success_at": 1794589683351,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_dukascopy",
+      "state": "idle",
+      "checked_at": 1794589683257,
+      "last_success_at": 1794589683257,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_dukascopy",
+      "state": "idle",
+      "checked_at": 1794589682913,
+      "last_success_at": 1794589682913,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_oanda",
+      "state": "idle",
+      "checked_at": 1794589682076,
+      "last_success_at": 1794589682076,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_binance",
+      "state": "idle",
+      "checked_at": 1794589697829,
+      "last_success_at": 1794589697829,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_dukascopy",
+      "state": "idle",
+      "checked_at": 1794589683042,
+      "last_success_at": 1794589683042,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_janitor",
+      "state": "idle",
+      "checked_at": 1794589682922,
+      "last_success_at": 1794589682922,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "catalog_runtime",
+      "state": "idle",
+      "checked_at": 1794589701948,
+      "last_success_at": 1794589701948,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "chart_history",
+      "state": "idle",
+      "checked_at": 1794589696724,
+      "last_success_at": 1794589696724,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "history_network",
+      "state": "idle",
+      "checked_at": 1794589681858,
+      "last_success_at": 1794589681858,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "history_compute",
+      "state": "idle",
+      "checked_at": 1794589681862,
+      "last_success_at": 1794589681862,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "native_history",
+      "state": "idle",
+      "checked_at": 1794589684115,
+      "last_success_at": 1794589684115,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "chart_aggregation",
+      "state": "idle",
+      "checked_at": 1794589697798,
+      "last_success_at": 1794589697798,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "market_stream",
+      "state": "idle",
+      "checked_at": 1794589689915,
+      "last_success_at": 1794589689915,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "switch_shadow",
+      "state": "idle",
+      "checked_at": 1794589685421,
+      "last_success_at": 1794589685421,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "retention",
+      "state": "idle",
+      "checked_at": 1794589682983,
+      "last_success_at": 1794589682983,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "data_ownership",
+      "state": "idle",
+      "checked_at": 1794589709328,
+      "last_success_at": 1794589709328,
+      "error_type": null,
+      "stale_after_ms": 90000
+    }
+  ]
+}

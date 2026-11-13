@@ -1,6 +1,6 @@
 # 手机数据页：实施与验证记录
 
-日期：2026-11-13。状态：**本地实现与夹具验证通过；真实供应商、Ubuntu Docker 与 Android 真机验收待完成**。
+日期：2026-11-13。状态：**本地构建、夹具交互及 Ubuntu 独立 Docker 真实供应商流程通过；Android 真机验收待用户确认**。
 
 ## 范围与基线
 
@@ -8,7 +8,7 @@
 - 基线：`v2.0.11` / `e1d3cd8de3c76d6eba20b1ffeb820cd39f932d71`。
 - 工作树：`/home/quant/repos/market-watch-mobile-data-workflow-20261113`。
 - 原始要求与接口依据：[全流程方案](../../mobile-data-workflow-plan-20261113.md)。该文保留初始规划语态，本记录说明实际进度。
-- 风险分类 **F0**：手机端增加现有写接口的操作入口，后端兼容增加摘要任务状态；不改 schema、行情身份、后台采集规则或持久协议。最小验证选择本地构建、相关后端用例、浏览器交互/截图和待执行 Ubuntu R1 smoke。
+- 风险分类 **F0**：手机端增加现有写接口的操作入口，后端兼容增加摘要任务状态；不改 schema、行情身份、后台采集规则或持久协议。最小验证选择本地构建、相关后端用例、浏览器交互/截图和已通过 Ubuntu R1 smoke。
 
 ## 已实现的常用流程
 
@@ -41,7 +41,7 @@
 
 | 检查 | 结果 |
 | --- | --- |
-| `cd web && npm run build` | 通过 TypeScript、Vite 及许可图表 hooks/shell 检查；shell 指纹 `87b321e523535038` |
+| `cd web && npm run build` | 通过 TypeScript、Vite 及许可图表 hooks/shell 检查；shell 指纹 `4fe27040ab40b361` |
 | 下列相关后端 pytest | **46 passed in 10.17s** |
 | 三个改动 Python 文件 Ruff | 通过 |
 | `git diff --check` | 通过 |
@@ -77,21 +77,34 @@ PYTHONPATH=backend /home/quant/repos/market-watch/.venv/bin/python -m pytest -q 
 | 实时核对 / 黄金确认 | [实时](live-confirm.png) · [黄金差异](gold-difference.png) |
 | 小视口表单 | [聚焦与提交](form-small-viewport.png) |
 
-## 未完成的真实验收与资源条件
+## Ubuntu 真实流程验收
 
-本任务尚未创建 Docker project、网络、volume 或私有配置，未部署新服务，**没有本次改动的可访问预览地址**。既有旧版预览不能代表本次实现。没有构建新 APK、更新 PR/CI、合并、正式 tag 或生产部署。
+用户清理磁盘后，原空间限制已解除，已在 Ubuntu 本机 `quant-server` 的独立 Docker project `mw-mobile-data-workflow-20261113` 启动本次实现。
 
-Ubuntu 本机磁盘仍约剩 **13 GiB**。按照仓库 `AGENTS.md` 和 [Ubuntu 部署说明](../../../deploy/ubuntu/README.md)，API/UI R1 启动要求 ≥23 GiB，带 worker 要求 **≥26 GiB**，所以真实流程验收尚未启动。没有停止或删除其他任务资源；已向用户说明并请求协调空间。内存约 8.9 GiB 可用，当前首要限制是磁盘。
+- 手机页面：**https://192.168.7.232:18446/m/data**；APK 服务器地址使用 **https://192.168.7.232:18446**。登录凭据私有保存，不写入 Git。
+- Dukascopy EURUSD / XAUUSD：实际历史发布、维护设置、实时匹配、开启/关闭/复用配置通过。
+- Yahoo AAPL：实际历史发布和人类可读代码展示通过；不支持当前实时接续时明确禁用。
+- 离开页面后，两次相隔约 98 秒的独立观测证明实时接收和确认分钟推进；当时图表/策略/告警消费者均为零。
+- 立即更新历史发布新版本，已启用实时的 revision、历史基线及拼接点保持不变。
+- 数据页打开专业图表，收到真实非空 K 线；桌面维护表单只读回归通过。
+- 已启用的 27 个运行角色检查时无 stale/missing/error，六个常驻服务零重启，迁移正常退出。
 
-释放空间后，继续使用独立 task/project `mw-mobile-data-workflow-20261113`，独立端口、数据库、网络和私有配置，并通过 `mw-docker compose-build` 构建。记录实际 Ubuntu 主机、地址、启动/停止命令和检查结果后才能交付地址。
+启动：
 
-待执行的最小真实验收：
+```bash
+/home/quant/.local/share/market-watch-docker/previews/mw-mobile-data-workflow-20261113/start.sh
+```
 
-1. Dukascopy 普通 M1 Bid 自建：搜索、创建、实际发布、更新与任务状态一致。
-2. OANDA Practice：核对当前账户、保存匹配、开启接续；离开数据页后仍收到服务端实时数据，明确关闭后停止对应需求。
-3. XAUUSD：保留产品差异确认；检查真实价格精度和匹配结果。
-4. Yahoo：目录/必要探测、历史创建、发布与计划保存；不支持实时时说明清楚。
-5. 后续历史维护保持既有实时固定基线；桌面数据中心/维护/匹配基本回归。
-6. Android APK：返回键、软键盘、安全区、抽屉拖动与实际网络恢复，再由用户协助真机验收。
+停止（保留本任务数据）：
 
-实时能力仍受已有后端边界限制：需要已发布且非空 M1 Bid 和日界前历史基线，目前已核实 EURUSD、USDCAD、XAUUSD 到当前 OANDA Practice 的匹配。其他来源可创建维护历史，并不因此获得实时接续能力；同一历史 instrument 身份上的实时选择可能影响多个数据集。
+```bash
+/home/quant/.local/share/market-watch-docker/previews/mw-mobile-data-workflow-20261113/stop.sh
+```
+
+完整隔离、构建依据、真实观测与限制见 [Ubuntu 验收记录](ubuntu-acceptance.md)。环境保持运行供用户验收；没有新建 APK、更新 PR/CI、合并、正式 tag 或生产部署。
+
+## 待 Android 真机确认
+
+浏览器验证不能替代 APK 的系统返回键、软键盘、安全区、抽屉拖动和真实网络恢复手感。当前无 ADB 设备；等待用户在已安装 APK 切换上述服务器后反馈。页面代码由新环境提供，无需仅为本次 Web 改动重装 APK。
+
+实时能力仍受已有后端边界限制：需要已发布且非空 M1 Bid 和日界前历史基线，本次实测 EURUSD、XAUUSD 到 OANDA Practice 的匹配。其他来源可创建维护历史，并不因此获得实时接续能力；同一历史 instrument 身份上的实时选择可能影响多个数据集。

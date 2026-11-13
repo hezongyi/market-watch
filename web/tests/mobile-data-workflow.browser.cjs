@@ -93,7 +93,8 @@ function make(entry, id, ready = false) {
     id,
     instrument_id: "H:" + id.slice(0, 10),
     logical_symbol: entry.logical_symbol,
-    display_symbol: entry.display_symbol,
+    display_symbol: entry.source === "yahoo" ? entry.logical_symbol : entry.display_symbol,
+    provider_display_symbol: entry.display_symbol,
     instrument_name: entry.label,
     precision: entry.precision,
     source_display: entry.source === "yahoo" ? "Yahoo Finance" : "Dukascopy",
@@ -252,7 +253,7 @@ const server = http.createServer(async (req, res) => {
         s = url.searchParams.get("source");
       if (q)
         rows = rows.filter((d) =>
-          (d.display_symbol + d.instrument_name).includes(q),
+          (d.display_symbol + d.provider_display_symbol + d.instrument_name).includes(q),
         );
       if (s) rows = rows.filter((d) => d.identity.source === s);
       const anchor = url.searchParams.get("anchor")?.slice(8),

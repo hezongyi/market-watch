@@ -1,0 +1,30 @@
+{
+  "postgres": {
+    "imageId": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "tag": "postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872"
+  },
+  "migrate": {
+    "imageId": "sha256:dc9e1624c17081435a1d11ad3a53f181b22e78ed83cc83ebe2e721e1eac6f849",
+    "tag": "market-watch-api:mobile-data-workflow-20261113"
+  },
+  "api": {
+    "imageId": "sha256:dc9e1624c17081435a1d11ad3a53f181b22e78ed83cc83ebe2e721e1eac6f849",
+    "tag": "market-watch-api:mobile-data-workflow-20261113"
+  },
+  "data-worker": {
+    "imageId": "sha256:dc9e1624c17081435a1d11ad3a53f181b22e78ed83cc83ebe2e721e1eac6f849",
+    "tag": "market-watch-api:mobile-data-workflow-20261113"
+  },
+  "market-runtime": {
+    "imageId": "sha256:dc9e1624c17081435a1d11ad3a53f181b22e78ed83cc83ebe2e721e1eac6f849",
+    "tag": "market-watch-api:mobile-data-workflow-20261113"
+  },
+  "web": {
+    "imageId": "sha256:0c708700ae4177a2a23de202340da751a33f191aa83154ad0ca26d88e14cb37e",
+    "tag": "market-watch-web:mobile-data-workflow-20261113"
+  },
+  "tls": {
+    "imageId": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+    "tag": "nginx:1.28-alpine@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592"
+  }
+}

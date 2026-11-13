@@ -18,6 +18,10 @@ export type MarketRow = {
 export const rowKey = (row: MarketRow) =>
   row.managed ? `dataset:${row.dataset_id}` : row.ticker;
 
+export function managedCode(dataset: Pick<Dataset, "provider_display_symbol" | "display_symbol" | "logical_symbol">) {
+  return dataset.provider_display_symbol || dataset.display_symbol || dataset.logical_symbol;
+}
+
 export function datasetRow(dataset: Dataset): MarketRow {
   const frame = dataset.usable_timeframes[0];
   const version = dataset.periods.find(
@@ -25,6 +29,7 @@ export function datasetRow(dataset: Dataset): MarketRow {
   )?.available_version_id;
   return {
     ...dataset,
+    display_symbol: managedCode(dataset),
     managed: true,
     dataset_id: dataset.id,
     ticker: version && !dataset.continuation?.enabled ? `MWH:${version}` : "",

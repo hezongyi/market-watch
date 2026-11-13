@@ -1,0 +1,78 @@
+{
+  "task": "mw-mobile-data-workflow-20261113",
+  "origin": "https://127.0.0.1:18446",
+  "checks": [
+    "Isolated Docker mobile UI login and managed-only data home",
+    "EURUSD maintenance plan saved via mobile UI and independently read back",
+    "Pausing scheduled history maintenance does not change live selection"
+  ],
+  "screenshots": [
+    "real-maintenance-saved",
+    "real-history-ready"
+  ],
+  "datasets": [
+    {
+      "id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "symbol": "EURUSD",
+      "source": "dukascopy",
+      "availability": "available",
+      "availableStart": 1794348000000,
+      "availableEnd": 1794588480000,
+      "usableTimeframes": [
+        "D1",
+        "H4",
+        "M1"
+      ],
+      "maintenance": {
+        "frequency": "daily",
+        "paused": true,
+        "archived": false,
+        "last_attempt": 1794588539390,
+        "last_success": 1794588543778,
+        "active_version_id": null,
+        "configured": true,
+        "task_error": null,
+        "task_status": "published",
+        "next_at": null
+      },
+      "continuation": {
+        "enabled": false,
+        "configured": false,
+        "status": "disabled"
+      }
+    },
+    {
+      "id": "a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2",
+      "symbol": "XAUUSD",
+      "source": "dukascopy",
+      "availability": "available",
+      "availableStart": 1794348000000,
+      "availableEnd": 1794588480000,
+      "usableTimeframes": [
+        "D1",
+        "H4",
+        "M1"
+      ],
+      "maintenance": {
+        "frequency": "daily",
+        "paused": false,
+        "archived": false,
+        "last_attempt": 1794588543311,
+        "last_success": 1794588549291,
+        "active_version_id": null,
+        "configured": true,
+        "task_error": null,
+        "task_status": "published",
+        "next_at": 1794615300000
+      },
+      "continuation": {
+        "enabled": false,
+        "configured": false,
+        "status": "disabled"
+      }
+    }
+  ],
+  "runtimeErrors": [],
+  "lastSuccessfulPhase": "maintain",
+  "evidenceNote": "Successful checks from task-owned real supplier acceptance; screenshot names enumerate temporary captures, only a curated subset is committed. Enable phase is a historical setup snapshot; final.json contains the corrected Yahoo display and final state."
+}

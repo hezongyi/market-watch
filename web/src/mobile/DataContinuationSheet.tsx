@@ -13,6 +13,7 @@ import {
 } from "../market-data/mapping";
 import type { Profile } from "./cache";
 import MobileSheet from "./MobileSheet";
+import { managedCode } from "./dataMarkets";
 import { Button } from "./components/ui/button";
 import { FieldGroup } from "./components/ui/field";
 import { ToggleGroup, ToggleGroupItem } from "./components/ui/toggle-group";
@@ -240,7 +241,7 @@ export default function DataContinuationSheet({
     >
       <div className="data-workflow-form">
         <div className="data-selection">
-          <strong>{dataset.display_symbol || dataset.logical_symbol}</strong>
+          <strong>{managedCode(dataset)}</strong>
           <span>{sourceName(dataset.identity.source)} → OANDA Practice</span>
         </div>
         <DataFeedback

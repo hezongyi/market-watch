@@ -11,6 +11,7 @@ import {
 import { tradingDate } from "../market-data/MaintenanceSettings";
 import { type Profile } from "./cache";
 import MobileSheet from "./MobileSheet";
+import { managedCode } from "./dataMarkets";
 import { MobileConfirm } from "./WatchOverlays";
 import { Button } from "./components/ui/button";
 import { Badge } from "./components/ui/badge";
@@ -342,7 +343,7 @@ export default function DataMaintenanceSheet({
     >
       <div className="data-workflow-form">
         <div className="data-selection">
-          <strong>{dataset.display_symbol || dataset.logical_symbol}</strong>
+          <strong>{managedCode(dataset)}</strong>
           <span>{dataset.source_display || dataset.identity.source}</span>
         </div>
         {view === "settings" && (

@@ -11,7 +11,7 @@ import { api } from "../api";
 import type { Dataset, Task } from "../market-data/types";
 import type { Continuation } from "../market-data/DatasetContinuation";
 import { profileActive, writeSnapshot, type Profile } from "./cache";
-import { actionableRow, continuationLabel, datasetRow } from "./dataMarkets";
+import { actionableRow, continuationLabel, datasetRow, managedCode } from "./dataMarkets";
 import {
   addSymbol,
   allSymbols,
@@ -298,7 +298,7 @@ export default function DataManagedPage(props: Props) {
             >
               <span className="data-managed-symbol">
                 <strong>
-                  {dataset.display_symbol || dataset.logical_symbol}
+                  {managedCode(dataset)}
                 </strong>
                 <span>
                   {dataset.instrument_name ||
@@ -696,7 +696,7 @@ function ManagedDetails({
             <>
               <div className="data-selection">
                 <strong>
-                  {dataset.display_symbol || dataset.logical_symbol}
+                  {managedCode(dataset)}
                 </strong>
                 <span>
                   {dataset.instrument_name} ·{" "}
@@ -1064,7 +1064,7 @@ function DataTools({
           >
             <span>
               <strong>
-                {task.dataset.display_symbol || task.dataset.logical_symbol}
+                {managedCode(task.dataset)}
               </strong>
               <small>
                 {taskName(task.status)} · {dataTime(task.updated_at)}
