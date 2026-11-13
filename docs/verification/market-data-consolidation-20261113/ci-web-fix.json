@@ -1,0 +1,44 @@
+{
+  "failure_head": "0fd0b68767f10db61d2b73828a7b30d617e003fa",
+  "failure_job": "https://github.com/hezongyi/market-watch/actions/runs/43361768389/job/131676784508",
+  "risk": "P0: test assertions/fixtures and verification docs only; application behavior unchanged",
+  "cause": "Watchlist provider metadata still expected the old 平台 label after the approved 原生 rename",
+  "node": "v22.23.2",
+  "web_ci_steps": [
+    {
+      "step": "Build web application",
+      "passed": true,
+      "seconds": 10.09
+    },
+    {
+      "step": "Indicator runtime regressions",
+      "passed": true,
+      "seconds": 1.9
+    },
+    {
+      "step": "Chart runtime regressions",
+      "passed": true,
+      "seconds": 7.31
+    },
+    {
+      "step": "Single application regressions",
+      "passed": true,
+      "seconds": 2.15
+    },
+    {
+      "step": "Watchlist native DOM regressions",
+      "passed": true,
+      "seconds": 70.07
+    }
+  ],
+  "web_ci_test_commands": 75,
+  "extra_checks": [
+    "data-center-location.cjs",
+    "dataset-navigation.cjs",
+    "market-data-consolidation.browser.cjs"
+  ],
+  "local_environment": "Existing locked npm dependencies and installed Chromium reused; npm ci and browser installation were not repeated. All build/test commands from the five Web CI run steps passed.",
+  "original_backend_check": "success",
+  "original_compose_check": "success",
+  "git_diff_check": "passed"
+}
