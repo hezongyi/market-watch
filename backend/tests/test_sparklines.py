@@ -85,7 +85,7 @@ def test_provider_prefers_current_m1_retains_gaps_precision_and_source_times(dat
         assert db.get(ProviderDataset, key).accessed_at == 1
 
 
-def test_period_fallback_never_reuses_yesterday_or_daily_labels(database, monkeypatch):
+def test_period_fallback_prefers_current_then_labels_previous_without_daily_fabrication(database, monkeypatch):
     now = stamp("2026-11-11T00:10:00+00:00")
     left, _ = sparklines.window(now, None)
     monkeypatch.setattr(storage, "now_ms", lambda: now)
@@ -99,7 +99,8 @@ def test_period_fallback_never_reuses_yesterday_or_daily_labels(database, monkey
     assert read("MWP:TEST")[0]["timeframe"] == "M5"
     monkeypatch.setattr(storage, "now_ms", lambda: now + 86400000)
     item = read("MWP:TEST")[0]
-    assert item["status"] == "empty" and item["points"] == [] and item["timeframe"] is None
+    assert item["points"] and item["timeframe"] == "M5"
+    assert item["session"]["previous"] and item["display_state"] == "previous"
 
 
 def test_type_comes_from_metadata_and_never_ticker_text(database, monkeypatch):
@@ -168,7 +169,8 @@ def test_fixed_history_composite_revision_and_snapshot_observations(database, mo
     # This UTC window starts on day 2; the fixed snapshot has two real M1 prices.
     assert historical["status"] == "partial" and len(historical["points"]) == 2
     assert combined["revision"] == {"composite_revision_id": revision_id, "input_revision": 1}
-    assert combined["status"] == "empty"  # No previous-day seam/tail is reused.
+    assert combined["status"] == "partial" and not combined["session"]["previous"]
+    assert combined["window_start"] == combined["target_window_start"], "configured NY17 phase wins over the old asset-only UTC guess"
     monkeypatch.setattr(storage, "now_ms", lambda: 170000000)
     combined = sparklines.batch([SparklineItem(ticker="MWC:" + composite_id,
         composite_revision_id=revision_id)])["items"][0]

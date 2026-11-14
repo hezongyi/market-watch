@@ -31,7 +31,7 @@ import {
   type Profile,
 } from "./cache";
 import { type MobileMarket, seriesIdentity } from "./market";
-import { sparklineExpires, sparklineLoader, sparklinePaths, sparklineScale, sparklineWithQuote, type Sparkline } from "./sparklines";
+import { sparklineExpires, sparklineLoader, sparklinePaths, sparklineScale, sparklineWithQuote, mergeSparkline, sparklineNeedsRecheck, type Sparkline } from "./sparklines";
 import FitText from "./FitText";
 import SymbolInfo from "./SymbolInfo";
 import { SymbolSearchButton } from "./SymbolSearch";
@@ -152,6 +152,7 @@ function Spark({
   const current = useMemo(() => item && sparklineExpires(item) > Date.now()
     ? sparklineWithQuote(item, quote) : undefined, [item, quote]);
   const previousSession = current?.session?.previous;
+  const blueSession = previousSession || current?.display_state === "closed";
   const sessionOpen = current?.session_open_price == null ? undefined : Number(current.session_open_price);
   const reference = previousSession ? sessionOpen : previousClose;
   const paths = useMemo(() => current ? sparklinePaths(current, width, 50, reference, instrument) : [], [current, width, reference, instrument]);
@@ -184,8 +185,8 @@ function Spark({
   const cached = !online || state === "error";
   return (
     <span ref={container} className="mobile-spark" data-cached={cached || undefined}
-      data-previous-session={current.session?.previous || undefined}
-      title={previousSession ? `${current.session!.date} · 历史走势，收到本日行情后自动切换` : undefined}>
+      data-previous-session={blueSession || undefined}
+      title={previousSession ? `${current.session!.date} · 历史走势${current.ticker.startsWith("MWH:") ? " · 所选固定版本" : "，收到本日行情后自动切换"}` : current.display_state === "closed" ? `${current.session?.date} · 常规交易时段已结束` : undefined}>
       <svg
         viewBox={`0 0 ${width} 50`}
         preserveAspectRatio="none"
@@ -194,7 +195,7 @@ function Spark({
             ? `${current.session.date} 历史走势${cached ? " · 缓存" : ""}${scale?.referenceOutside ? " · 开盘参考价在曲线显示范围外" : ""}`
             : cached
               ? `离线或刷新失败，显示缓存走势${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
-              : `${current.reason || "当前窗口日内走势"}${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
+              : `${current.display_state === "closed" ? "常规交易时段已结束" : current.display_state === "unknown" ? "日内走势 · 交易时段未确认" : current.reason || "当前窗口日内走势"}${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
         }
       >
         <defs>
@@ -246,6 +247,7 @@ function Spark({
           </g>
         ))}
       </svg>
+      {current.display_state === "historical" && <small className="mobile-spark-history-date">历史 · {current.session?.date}</small>}
       {cached && <small className="mobile-spark-caption">缓存</small>}
     </span>
   );
@@ -334,6 +336,8 @@ export default function WatchPage({
   }, [hydrated, symbols[0], firstSymbol]);
   const currentQuotes = useRef(quotes);
   currentQuotes.current = quotes;
+  const sparkReload = useRef<(() => void) | undefined>(undefined);
+  const lastSparkTrigger = useRef(0);
   const preparedHistory = useMemo(() => new Map<string, number>(), [profile.origin, profile.subject]);
   const currentSparks = useRef(sparks);
   currentSparks.current = sparks;
@@ -473,7 +477,7 @@ export default function WatchPage({
             ),
           ),
         ),
-      Math.max(1, boundary - Date.now()),
+      Math.min(86400000, Math.max(1, boundary - Date.now())),
     );
     return () => clearTimeout(timer);
   }, [sparks]);
@@ -556,6 +560,9 @@ export default function WatchPage({
       }
       currentQuotes.current = next;
       setQuotes(next);
+      if (Date.now() - lastSparkTrigger.current >= 10000 && rows.some(row => sparklineNeedsRecheck(currentSparks.current[row.n], row))) {
+        lastSparkTrigger.current = Date.now(); sparkReload.current?.();
+      }
       if (ready)
         setAligned(
           (previous) => new Set([...previous, ...rows.map((row) => row.n)]),
@@ -630,8 +637,14 @@ export default function WatchPage({
   ]);
   useEffect(() => {
     if (!online || !visible || !foreground || !visibleRows.length) return;
-    let timer: ReturnType<typeof setTimeout>,
+    let timer: ReturnType<typeof setTimeout> | undefined,
       active = true;
+    const schedule = () => {
+      clearTimeout(timer);
+      const boundary = Math.min(...visibleRows.map(ticker =>
+        currentSparks.current[ticker] ? Math.min(sparklineExpires(currentSparks.current[ticker]), currentSparks.current[ticker].next_check_at ?? Infinity) : Infinity));
+      timer = setTimeout(load, boundary > Date.now() ? Math.min(60000, boundary - Date.now()) : 60000);
+    };
     const loader = sparklineLoader(
       async (items, signal) => {
         setSparkStates((previous) => ({
@@ -671,17 +684,20 @@ export default function WatchPage({
           const quoteRevision =
             currentQuotes.current[item.ticker]?.snapshot?.revision_id;
           if (
-            quoteRevision &&
+            item.status !== "unavailable" && quoteRevision &&
             item.revision?.composite_revision_id !== quoteRevision
           )
             continue;
-          next[item.ticker] = item;
+          next[item.ticker] = mergeSparkline(next[item.ticker], item);
         }
         for (const [ticker, item] of Object.entries(next))
           if (sparklineExpires(item) <= Date.now()) delete next[ticker];
         currentSparks.current = next;
         setSparks(next);
         void writeSnapshot(profile, "watch-sparklines", next).catch(() => {});
+        // Preparation may discover an earlier closing boundary after the
+        // observation timer was scheduled; update that existing timer.
+        if (timer !== undefined) schedule();
       },
       () => {
         /* Keep existing curves on history failures; periodic refresh retries. */
@@ -692,6 +708,8 @@ export default function WatchPage({
       },
     );
     const load = () => {
+      clearTimeout(timer);
+      timer = undefined;
       // Expire old curves before a new request, even when that request fails.
       setSparks((previous) =>
         Object.fromEntries(
@@ -715,14 +733,14 @@ export default function WatchPage({
           finishPull(refreshSerial);
           // Start the next observation interval now; history preparation has
           // its own bounded queue and must not delay visible freshness.
-          const boundary = Math.min(...visibleRows.map(ticker =>
-            currentSparks.current[ticker] ? sparklineExpires(currentSparks.current[ticker]) : Infinity));
-          timer = setTimeout(load, Math.max(1, Math.min(60000, boundary - Date.now())));
+          schedule();
         },
       );
     };
+    sparkReload.current = load;
     void load();
     return () => {
+      sparkReload.current = undefined;
       active = false;
       clearTimeout(timer);
       loader.cancel();
@@ -935,7 +953,7 @@ export default function WatchPage({
                   value.read_at < sparklineExpires(item) ? value.prev_close_price : undefined}
                 state={sparkStates[ticker]}
                 item={
-                  revision && item?.revision?.composite_revision_id !== revision
+                  item?.status !== "unavailable" && revision && item?.revision?.composite_revision_id !== revision
                     ? undefined
                     : item
                 }

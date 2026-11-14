@@ -5,11 +5,12 @@ shared provider cache writer, without registering an instrument or starting jobs
 """
 
 import logging
+import json
 from datetime import UTC, datetime, timedelta
 from itertools import islice
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from . import storage
 from .chart_series import decode
@@ -17,6 +18,11 @@ from .query_errors import QueryError
 from .storage import (
     CompositeRevision,
     HistoryArtifact,
+    HistoryChunk,
+    HistoryReclamation,
+    CompositeMinute,
+    RealtimeMapping,
+    ObservedMinute,
     HistoryVersion,
     Instrument,
     MarketCatalog,
@@ -56,46 +62,72 @@ def stock_clock(meta, stamp):
     return None
 
 
-def stock_provider(db, keys, datasets, local, stamp):
-    midnight = local.replace(hour=0, minute=0, second=0, microsecond=0)
-    valid_until = int((midnight + timedelta(days=1)).timestamp() * 1000)
-    earliest = int((midnight - timedelta(days=14)).timestamp() * 1000)
+LOOKBACK = 14 * 86400000
+
+
+def selection(candidates, stamp, bounds, *, stock=None, sessions=None, fixed=False, intraday=True):
+    """Choose the latest actual window across frames; current coarse beats old M1.
+
+    Source readers alone own identity, revision and bounded payload validation.
+    Calendar bounds are axes; only dated source evidence proves a stock close.
+    """
+    target_left, target_right = bounds(stamp)
     chosen = None
-    for frame, key in keys.items():
-        if key not in datasets:
+    for frame, values, revision in candidates:
+        values = [row for row in values if row["start"] <= stamp]
+        if not values:
             continue
-        records = db.scalars(select(ProviderBar).where(ProviderBar.dataset_id == key,
-            ProviderBar.start >= earliest, ProviderBar.start <= stamp)
-            .order_by(ProviderBar.start.desc()).limit(MAX_POINTS)).all()
-        records = [row for row in records
-                   if row.complete or row.start <= stamp < row.payload["end"]]
-        if not records:
+        left, right = bounds(values[-1]["start"])
+        rows = [row for row in values if left <= row["start"] < right]
+        if not rows or chosen is not None and left <= chosen[0]:
             continue
-        date = datetime.fromtimestamp(records[0].start / 1000, local.tzinfo).date()
-        # Prefer today's coarser bars over an older fine-grained cache.
-        if chosen is not None and date <= chosen[0]:
-            continue
-        opening = midnight.replace(year=date.year, month=date.month, day=date.day, hour=9, minute=30)
-        closing = opening.replace(hour=16, minute=0)
-        left, right = int(opening.timestamp() * 1000), int(closing.timestamp() * 1000)
-        rows = [{**row.payload, "start": row.start, "complete": row.complete}
-                for row in reversed(records) if left <= row.start < right]
-        if rows:
-            chosen = (date, left, right, frame, rows, {"cache_revision": datasets[key].revision})
-            if date == local.date():
-                break
-    if chosen is None:
-        left = int(midnight.replace(hour=9, minute=30).timestamp() * 1000)
-        right = int(midnight.replace(hour=16).timestamp() * 1000)
-        date, frame, rows, revision = local.date(), None, [], None
-    else:
-        date, left, right, frame, rows, revision = chosen
+        chosen = left, right, frame, rows, revision
+    left, right, frame, rows, revision = chosen or (target_left, target_right, None, [], None)
+    previous = bool(rows and left != target_left)
+    historical = bool(previous and right < stamp - LOOKBACK)
+    date = datetime.fromtimestamp(left / 1000, stock.tzinfo if stock else UTC).date().isoformat()
+    evidence = (sessions or {}).get(date)
+    state = "historical" if historical else "previous" if previous else "empty" if not rows else "unknown" if stock else "current"
+    if rows and not previous and evidence:
+        state = "closed" if stamp >= evidence["end"] else "current" if stamp >= evidence["start"] else "unknown"
+    # A display window's end is not its expiry: keep a valid fallback offline.
+    valid_until = stamp + 30 * 86400000 if fixed else max(stamp + 60000, right + LOOKBACK)
+    next_check = min(stamp + 60000, target_right) if target_right > stamp else stamp + 60000
+    if evidence:
+        next_check = min([next_check] + [at for at in (evidence["start"], evidence["end"]) if at > stamp])
     return left, right, frame, rows, revision, {
-        "session": {"date": date.isoformat(), "previous": date < local.date()},
-        # A partial cache beginning later in the day cannot establish its open.
-        "session_open_price": str(rows[0]["open"])
-            if rows and rows[0]["start"] == left and rows[0].get("open") is not None else None,
-        "valid_until": valid_until}
+        "stock_session": bool(stock),
+        "target_window_start": target_left, "target_window_end": target_right,
+        "session": {"date": date, "previous": previous},
+        "display_state": state if intraday else "unsupported",
+        "session_open_price": str(rows[0]["open"]) if rows and rows[0]["start"] == left and rows[0].get("open") is not None else None,
+        "valid_until": valid_until, "next_check_at": max(stamp + 1, next_check)}
+
+
+def stock_bounds(local, sessions):
+    def bounds(at):
+        current = datetime.fromtimestamp(at / 1000, local.tzinfo)
+        evidence = sessions.get(current.date().isoformat())
+        if evidence:
+            return evidence["start"], evidence["end"]
+        return (int(current.replace(hour=9, minute=30, second=0, microsecond=0).timestamp() * 1000),
+                int(current.replace(hour=16, minute=0, second=0, microsecond=0).timestamp() * 1000))
+    return bounds
+
+
+def dataset_bounds(db, dataset, stamp, *, revision=None, version=None):
+    instrument = db.get(Instrument, dataset.instrument_id) if dataset and revision is None else None
+    phase = revision.rules.get("aggregation_calendar") if revision else (version.manifest or {}).get("aggregation_calendar") if version else None
+    phase = phase or (instrument.calendar if instrument else None)
+    if phase == "source_date":
+        params = (dataset.identity or {}).get("parameters", {})
+        zone = ZoneInfo(params.get("timezone") or "UTC")
+        def bounds(at):
+            local = datetime.fromtimestamp(at / 1000, zone).replace(hour=0, minute=0, second=0, microsecond=0)
+            return int(local.timestamp() * 1000), int((local + timedelta(days=1)).timestamp() * 1000)
+        return bounds
+    asset = "forex" if phase == "ny17" else "unknown" if phase == "utc0" else dataset.asset_class if dataset else None
+    return lambda at: window(at, asset)
 
 
 def provider(db, symbol, stamp):
@@ -115,21 +147,31 @@ def provider(db, symbol, stamp):
     datasets = {row.id: row for row in db.scalars(select(ProviderDataset).where(
         ProviderDataset.id.in_(keys.values())))}
     local = stock_clock(meta, stamp)
-    if local is not None:
-        return stock_provider(db, keys, datasets, local, stamp)
+    sessions = {}
+    for dataset in datasets.values():
+        sessions.update(dataset.metadata_json.get("sparkline_sessions") or {})
+    sessions.update(meta.get("sparkline_sessions") or {})
+    bounds = stock_bounds(local, sessions) if local else lambda at: window(at, asset)
+    candidates = []
     for frame, key in keys.items():
         dataset = datasets.get(key)
         if dataset is None:
             continue
         records = db.scalars(select(ProviderBar).where(ProviderBar.dataset_id == key,
-            ProviderBar.start >= left, ProviderBar.start < min(right, stamp + 1))
-            .order_by(ProviderBar.start).limit(MAX_POINTS)).all()
-        # Intraday source timestamps are authoritative; never use chart labels.
+            ProviderBar.start >= stamp - LOOKBACK, ProviderBar.start <= stamp)
+            .order_by(ProviderBar.start.desc()).limit(MAX_POINTS)).all()
         rows = [{**row.payload, "start": row.start, "complete": row.complete}
-                for row in records if row.complete or row.start <= stamp < row.payload["end"]]
-        if rows:
-            return left, right, frame, rows, {"cache_revision": dataset.revision}
-    return left, right, None, [], None
+                for row in reversed(records) if row.complete or row.start <= stamp < row.payload["end"]]
+        if local:
+            rows = [row for row in rows if bounds(row["start"])[0] <= row["start"] < bounds(row["start"])[1]]
+        candidates.append((frame, rows, {"cache_revision": dataset.revision}))
+    output = selection(candidates, stamp, bounds, stock=local, sessions=sessions, intraday=bool(keys))
+    key = keys.get(output[2]) or next(iter(keys.values()), None)
+    dataset = datasets.get(key)
+    # Yahoo price revalidation revokes old adjusted values without changing the
+    # source's stable dataset key. Empty replies must not resurrect those prices.
+    output[5]["identity_key"] = json.dumps([key, (dataset.metadata_json or {}).get("revalidation_generation", 0) if dataset else 0])
+    return output
 
 
 def managed(db, symbol, stamp):
@@ -138,15 +180,29 @@ def managed(db, symbol, stamp):
 
     instrument = db.get(Instrument, symbol)
     dataset = db.scalar(select(MarketDataset).where(MarketDataset.instrument_id == symbol))
-    left, right = window(stamp, dataset.asset_class if dataset else None)
-    if instrument is None:
-        return left, right, None, [], None
-    for frame in FRAMES:
-        rows = chart_rows(db, instrument, frame, min(right, stamp + 1), MAX_POINTS, stamp, after=left)
-        rows, _ = usable_cached_rows(db, instrument, rows, stamp)
-        if rows:
-            return left, right, frame, rows, None
-    return left, right, None, [], None
+    bounds = dataset_bounds(db, dataset, stamp)
+    candidates = []
+    if instrument is not None:
+        for frame in FRAMES:
+            rows = chart_rows(db, instrument, frame, stamp + 1, MAX_POINTS, stamp, after=stamp - LOOKBACK)
+            rows, _ = usable_cached_rows(db, instrument, rows, stamp)
+            candidates.append((frame, rows, None))
+    return selection(candidates, stamp, bounds)
+
+
+def latest_history_at(db, version, cutoff):
+    from .history_versions import raw_chunk
+    # Published partitions are indexed by version/frame/start. Two bounded
+    # partitions cover the exclusive seam without scanning a calendar day loop.
+    chunks = db.scalars(select(HistoryChunk).where(HistoryChunk.version_id == version.id,
+        HistoryChunk.timeframe == "M1", HistoryChunk.count > 0, HistoryChunk.start < cutoff)
+        .order_by(HistoryChunk.start.desc()).limit(2))
+    for chunk in chunks:
+        rows = json.loads(raw_chunk(db, chunk))
+        times = [row["timestamp"] for row in rows if version.start <= row["timestamp"] < cutoff]
+        if times:
+            return max(times)
+    return None
 
 
 def history(db, symbol, stamp):
@@ -156,27 +212,30 @@ def history(db, symbol, stamp):
     version = db.get(HistoryVersion, symbol)
     if not version or version.status != "published":
         raise ValueError("固定历史版本尚未发布或不存在")
+    if db.get(HistoryReclamation, version.id):
+        raise ValueError("该历史版本价格数据已回收")
     dataset = db.get(MarketDataset, version.dataset_id)
-    left, right = window(stamp, dataset.asset_class)
+    bounds = dataset_bounds(db, dataset, stamp, version=version)
     revision = {"history_version_id": version.id}
-    start, end = max(left, version.start), min(right, stamp // 60000 * 60000, version.end)
-    if start >= end:
-        return left, right, None, [], revision
-    if version.manifest.get("schema") != "managed-period-snapshot-v2":
-        rows = [{**row, "start": row["timestamp"], "end": row["timestamp"] + 60000}
-                for row in islice(snapshot_rows(db, symbol, start=start, end=end), MAX_POINTS)]
-        if rows:
-            return left, right, "M1", rows, revision
-    available = set(db.scalars(select(HistoryArtifact.timeframe).where(
+    candidates = []
+    cutoff = min(stamp // 60000 * 60000, version.end)
+    if version.manifest.get("schema") != "managed-period-snapshot-v2" and cutoff > version.start:
+        at = latest_history_at(db, version, cutoff)
+        if at is not None:
+            left, right = bounds(at)
+            rows = [{**row, "start": row["timestamp"], "end": row["timestamp"] + 60000}
+                for row in islice(snapshot_rows(db, symbol, start=max(version.start, left),
+                    end=min(cutoff, right)), MAX_POINTS)]
+            candidates.append(("M1", rows, revision))
+    available = set() if candidates else set(db.scalars(select(HistoryArtifact.timeframe).where(
         HistoryArtifact.version_id == symbol, HistoryArtifact.status == "published",
         HistoryArtifact.timeframe.in_(FRAMES))))
     for frame in FRAMES:
-        if frame not in available:
-            continue
-        rows = read_artifact(db, symbol, frame, start=left, end=min(right, stamp + 1), limit=MAX_POINTS)
-        if rows:
-            return left, right, frame, rows, revision
-    return left, right, None, [], revision
+        if frame in available:
+            rows = read_artifact(db, symbol, frame, end=stamp + 1, limit=MAX_POINTS, newest_first=True)
+            candidates.append((frame, rows, revision))
+    output = selection(candidates, stamp, bounds, fixed=True, intraday=bool(candidates or available))
+    return (*output[:4], revision, output[5])
 
 
 def composite(db, symbol, revision_id, stamp):
@@ -189,14 +248,48 @@ def composite(db, symbol, revision_id, stamp):
     if not revision or revision.composite_id != symbol:
         raise ValueError("组合修订不属于所选行情")
     dataset = db.get(MarketDataset, definition.dataset_id)
-    left, right = window(stamp, dataset.asset_class)
-    # A single repeatable-read observation fixes preparation waterline and the
-    # durable display overlay together. Do not create/renew a display token.
-    result = read_window(db, symbol, "M1", left, right, revision_id=revision.id,
-                         provisional=True, now=stamp)
-    rows = [row for row in result["bars"] if row["start"] <= stamp]
-    return left, right, "M1" if rows else None, rows, {
-        "composite_revision_id": revision.id, "input_revision": result["input_revision"]}
+    bounds = dataset_bounds(db, dataset, stamp, revision=revision)
+    target_left, target_right = bounds(stamp)
+    mapping = db.get(RealtimeMapping, revision.mapping_id)
+    latest, observed = db.execute(select(
+        select(func.max(CompositeMinute.start)).where(
+            CompositeMinute.revision_id == revision.id, CompositeMinute.start <= stamp,
+            CompositeMinute.start >= stamp - LOOKBACK).scalar_subquery(),
+        select(func.max(ObservedMinute.start)).where(
+            ObservedMinute.dataset_id == mapping.target_dataset_id,
+            ObservedMinute.start >= max(revision.seam, stamp - LOOKBACK),
+            ObservedMinute.start <= stamp).scalar_subquery())).one()
+    choices = [at for at in (latest, observed) if at is not None]
+    result = None
+    rows = []
+    # Indexed evidence avoids executing an expensive empty current-window read
+    # before the previous-day read. read_window still validates every candidate.
+    if choices and max(choices) >= target_left:
+        result = read_window(db, symbol, "M1", target_left, target_right, revision_id=revision.id,
+                             provisional=True, now=stamp)
+        rows = [row for row in result["bars"] if row["start"] <= stamp]
+    if not rows:
+        version = db.get(HistoryVersion, revision.history_version_id)
+        history_at = latest_history_at(db, version, min(stamp + 1, revision.seam, version.end))
+        if history_at is not None:
+            choices.append(history_at)
+        for at in sorted(set(choices), reverse=True):
+            if at < stamp - LOOKBACK:
+                continue
+            left, right = bounds(at)
+            if result is not None and left == target_left:
+                continue
+            result = read_window(db, symbol, "M1", left, right, revision_id=revision.id,
+                                 provisional=True, now=stamp)
+            rows = [row for row in result["bars"] if row["start"] <= stamp]
+            if rows:
+                break
+    if result is None:
+        result = read_window(db, symbol, "M1", target_left, target_right, revision_id=revision.id,
+                             provisional=True, now=stamp)
+    marker = {"composite_revision_id": revision.id, "input_revision": result["input_revision"]}
+    output = selection([("M1", rows, marker)], stamp, bounds)
+    return (*output[:4], marker, output[5])
 
 
 def result(ticker, left, right, frame, rows, revision, stamp, session=None):
@@ -212,7 +305,7 @@ def result(ticker, left, right, frame, rows, revision, stamp, session=None):
     partial |= bool(points and (points[0]["time"] > left or previous_end <= stamp - step))
     status = "partial" if points and partial else "ready" if points else "empty"
     references = []
-    if not session and left % 86400000:  # NY17 from explicit asset metadata.
+    if left % 86400000 and not (session or {}).get("stock_session"):  # NY17 from explicit asset metadata.
         for zone in (ZoneInfo("Europe/London"), ZoneInfo("America/New_York")):
             local = datetime.fromtimestamp(left / 1000, zone).replace(hour=8, minute=0, second=0, microsecond=0)
             if local.timestamp() * 1000 < left:
@@ -224,8 +317,9 @@ def result(ticker, left, right, frame, rows, revision, stamp, session=None):
         **(session or {}),
         "reference_times": references,
         "timeframe": frame, "points": points, "status": status,
-        "reason": "当前窗口缓存含缺口或未确认观测" if status == "partial" else
-                  "本机尚无当前窗口的日内缓存" if status == "empty" else None,
+        "reason": "此品种没有日内产物" if (session or {}).get("display_state") == "unsupported" else
+                  "所示窗口缓存含缺口或未确认观测" if status == "partial" else
+                  "本机尚无可展示的日内缓存" if status == "empty" else None,
         "last_data_at": points[-1]["time"] if points else None}
 
 
@@ -298,10 +392,13 @@ def prepare(item):
                         from .history_catalog import oanda_entry
                         entry = oanda_entry(db, meta["symbol"])
                         asset = asset or (entry.asset_type if entry else None)
-                left, _ = window(stamp, asset)
+                if stock_clock(meta, stamp) is not None:
+                    from .sparkline_calendar import refresh
+                    refresh(symbol, meta, stamp)
+                left, right = window(stamp, asset)
                 step = FRAMES[frame]
                 before = stamp // step * step
-                count = min(MAX_POINTS, max(0, (before - left + step - 1) // step))
+                count = min(MAX_POINTS, max((right - left + step - 1) // step, (before - left + step - 1) // step))
                 if stock_clock(meta, stamp) is not None:
                     # Count actual source bars across weekends, even at 00:01.
                     count = max(count, (390 * 60000 + step - 1) // step)
@@ -312,4 +409,7 @@ def prepare(item):
         # Keep existing observations on a supplier timeout; retry on the next refresh.
         log.warning("sparkline_history_prepare_failed type=%s", type(error).__name__)
         preparation = "retry"
-    return {**batch([item]), "preparation": preparation}
+    response = batch([item])
+    if preparation == "ready" and not any(row["points"] for row in response["items"]):
+        preparation = "retry"
+    return {**response, "preparation": preparation}

@@ -1,6 +1,6 @@
 # 手机自选 sparkline 跨日回显与收盘状态实施方案
 
-状态：待实现。用户于2026-11-14要求归入待实现；方案方向已认可，尚未授权实施。本文件不授权代码修改或部署。
+状态：代码、本地验证与 Ubuntu R1 已完成，待 Android 真机复核。用户后续已授权将待实现实施并验证；本任务验收实例已更新，详见 [实施与验收记录](../../verification/mobile-pending-20261114/README.md)。未进行生产发布。
 
 ## 项目与基线
 
@@ -70,11 +70,13 @@
 从工作树执行。先确认依赖解释器可导入alerts及pytest；缺依赖时使用现有项目环境或独立测试环境，不连接验收数据库跑破坏性测试。
 
 ```sh
-PYTHONPATH=backend pytest -q backend/tests/test_sparklines.py \
+PYTHONPATH=backend pytest -q backend/tests/test_sparkline_rollover.py \
+  backend/tests/test_sparklines.py \
   backend/tests/test_sparkline_sessions.py backend/tests/test_sparkline_backfill.py
 cd web
 node tests/mobile-sparklines.cjs
 npm run build
+node tests/mobile-sparkline-session.browser.cjs
 MOBILE_VISUAL_SCOPE=identity MOBILE_VISUAL_OUTPUT=/tmp/mw-sparkline-session-regression \
 PLAYWRIGHT_CHROMIUM_EXECUTABLE=/home/quant/.cache/ms-playwright/chromium-1243/chrome-linux64/chrome \
 node tests/mobile-watch-a07.browser.cjs

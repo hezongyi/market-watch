@@ -67,7 +67,9 @@ const server = http.createServer(async (req, res) => {
   const scroll=page.locator('.mobile-drawer-scroll').last();await scroll.evaluate(el=>el.scrollTop=900);const before=await scroll.evaluate(el=>el.scrollTop);
   await rows().nth(12).locator('.symbol-search-body').click();await expect(dialog()).toHaveAccessibleName('行情详情');await close();
   assert(Math.abs(await scroll.evaluate(el=>el.scrollTop)-before)<4,'detail return keeps position');await expect(rows()).toHaveCount(56);
-  const search=dialog().getByRole('searchbox');await search.fill('old');await page.waitForTimeout(320);await search.fill('new');await expect(rows().first()).toContainText('NEW0');await page.waitForTimeout(950);await expect(rows()).toHaveCount(1);await expect(rows()).not.toContainText(['OLD0']);
+  const search=dialog().getByRole('searchbox');await search.fill('old');
+  assert.equal(await search.evaluate(el=>getComputedStyle(el).outlineStyle),'none','InputGroup owns the focus indicator, without an inner outline');
+  const clear=dialog().getByRole('button',{name:'清空搜索',exact:true});const target=await clear.boundingBox();assert(target.width>=44&&target.height>=44,'clear search retains a full touch target');await page.waitForTimeout(320);await search.fill('new');await expect(rows().first()).toContainText('NEW0');await page.waitForTimeout(950);await expect(rows()).toHaveCount(1);await expect(rows()).not.toContainText(['OLD0']);
   await search.fill('fail');await expect(rows()).toHaveCount(25);await bottom();await expect(page.getByText('下一批失败',{exact:true})).toBeVisible();const failed=calls.filter(c=>c.q==='fail').length;await settle();await bottom();assert.equal(calls.filter(c=>c.q==='fail').length,failed,'failed next page does not loop');await expect(rows()).toHaveCount(25);
   await page.getByRole('button',{name:'重试',exact:true}).click();await expect(rows()).toHaveCount(50);await bottom();await expect(rows()).toHaveCount(56);
   await scroll.evaluate(el=>el.scrollTop=0);

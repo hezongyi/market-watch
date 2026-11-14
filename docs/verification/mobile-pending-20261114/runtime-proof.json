@@ -1,0 +1,151 @@
+{
+  "checked_at": "2026-11-14T04:57:49.677Z",
+  "host": "Ubuntu quant-server local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "base_url": "https://192.168.7.232:18447",
+  "readyz_status": 200,
+  "mobile_shell": "dd6b873e0cd41452",
+  "images": {
+    "api": {
+      "id": "sha256:a35ffd70b195b13df0b285f764a4e3fcec29d4e5c9d9f52f9028090b61807923",
+      "labels": {
+        "io.market-watch.built-at": "2026-11-14T04:37:34.312877+00:00",
+        "io.market-watch.commit": "113e03975c0950293c947bcbb4170489699cee35",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-11-21T04:37:34.312877+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-managed-live-rollover-20261113",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-managed-live-rollover-20261113"
+      }
+    },
+    "web": {
+      "id": "sha256:1094c7410294497bc7c666bc288d5b913061924563f40ad6b6b00a59b72f33e2",
+      "labels": {
+        "io.market-watch.built-at": "2026-11-14T04:55:02.888944+00:00",
+        "io.market-watch.commit": "113e03975c0950293c947bcbb4170489699cee35",
+        "io.market-watch.dirty": "true",
+        "io.market-watch.expires-at": "2026-11-21T04:55:02.888944+00:00",
+        "io.market-watch.managed": "true",
+        "io.market-watch.project": "mw-managed-live-rollover-20261113",
+        "io.market-watch.purpose": "acceptance",
+        "io.market-watch.task": "mw-managed-live-rollover-20261113"
+      }
+    }
+  },
+  "assets": [
+    {
+      "path": "/assets/mobile-CkU5Y6FO.css",
+      "local_sha256": "66783c13532f3196b8da52a838deee5a48408f2ad583563eca11694029579fe3",
+      "online_sha256": "66783c13532f3196b8da52a838deee5a48408f2ad583563eca11694029579fe3"
+    },
+    {
+      "path": "/assets/mobile-DLgE96Q8.js",
+      "local_sha256": "0120b0bb73df114bb1d2722753ed1fd9c306f4c297323fba34303372a30ee176",
+      "online_sha256": "0120b0bb73df114bb1d2722753ed1fd9c306f4c297323fba34303372a30ee176"
+    }
+  ],
+  "modules": [
+    {
+      "module": "sparklines",
+      "local_sha256": "19b852c911ea8587e02e249183956ee59b9eef1e1ed4f397e90663ab411ef984",
+      "runtime_sha256": "19b852c911ea8587e02e249183956ee59b9eef1e1ed4f397e90663ab411ef984"
+    },
+    {
+      "module": "sparkline_calendar",
+      "local_sha256": "251f9c9f953db87a2ab2c9421d015e8d36f23757b17ec55cf9c52486e40df16e",
+      "runtime_sha256": "251f9c9f953db87a2ab2c9421d015e8d36f23757b17ec55cf9c52486e40df16e"
+    },
+    {
+      "module": "provider_yahoo",
+      "local_sha256": "9d20b271f67f0a21687121c671f4f50a9e31974e5b563b553fe2f9a91dd0083f",
+      "runtime_sha256": "9d20b271f67f0a21687121c671f4f50a9e31974e5b563b553fe2f9a91dd0083f"
+    }
+  ],
+  "sparklines": {
+    "as_of": 1794632267107,
+    "items": [
+      {
+        "ticker": "MWH:fd00e425-53a2-4de2-bad3-4c8239b092ef",
+        "revision": {
+          "history_version_id": "fd00e425-53a2-4de2-bad3-4c8239b092ef"
+        },
+        "window_start": 1794520800000,
+        "window_end": 1794607200000,
+        "stock_session": false,
+        "target_window_start": 1794607200000,
+        "target_window_end": 1794693600000,
+        "session": {
+          "date": "2026-11-12",
+          "previous": true
+        },
+        "display_state": "previous",
+        "session_open_price": "1.105430",
+        "valid_until": 1797224267107,
+        "next_check_at": 1794632327107,
+        "reference_times": [
+          1794556800000,
+          1794574800000
+        ],
+        "timeframe": "M1",
+        "status": "partial",
+        "reason": "所示窗口缓存含缺口或未确认观测",
+        "last_data_at": 1794607140000,
+        "point_count": 1439,
+        "first_point": {
+          "time": 1794520800000,
+          "price": "1.105190",
+          "gap_before": false
+        },
+        "last_point": {
+          "time": 1794607140000,
+          "price": "1.102220",
+          "gap_before": false
+        }
+      },
+      {
+        "ticker": "MWP:OANDA:GBP_USD",
+        "revision": {
+          "cache_revision": 74
+        },
+        "window_start": 1794520800000,
+        "window_end": 1794607200000,
+        "stock_session": false,
+        "target_window_start": 1794607200000,
+        "target_window_end": 1794693600000,
+        "session": {
+          "date": "2026-11-12",
+          "previous": true
+        },
+        "display_state": "previous",
+        "session_open_price": null,
+        "valid_until": 1795816800000,
+        "next_check_at": 1794632327107,
+        "identity_key": "[\"9d8477677439cb407857203cc7d86f83332aa09f8998f69656394047a950a782\", 0]",
+        "reference_times": [
+          1794556800000,
+          1794574800000
+        ],
+        "timeframe": "M1",
+        "status": "partial",
+        "reason": "所示窗口缓存含缺口或未确认观测",
+        "last_data_at": 1794607140000,
+        "point_count": 1435,
+        "first_point": {
+          "time": 1794521040000,
+          "price": "1.32355",
+          "gap_before": false
+        },
+        "last_point": {
+          "time": 1794607140000,
+          "price": "1.3208",
+          "gap_before": false
+        }
+      }
+    ]
+  },
+  "limitations": [
+    "Yahoo disabled in this task instance; Yahoo sessions tested with source fixtures",
+    "Android system keyboard, back and gestures await device acceptance"
+  ]
+}

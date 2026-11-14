@@ -746,3 +746,5 @@
   .mobile-pull-refresh[data-refreshing] svg { animation: mobile-refresh-turn 900ms linear infinite; }
   @keyframes mobile-refresh-turn { to { transform: rotate(360deg); } }
 }
+
+.mobile-spark-history-date { position: absolute; bottom: -6px; left: 2px; font-size: .642857rem; color: var(--muted); line-height: 1.2; white-space: nowrap; }
