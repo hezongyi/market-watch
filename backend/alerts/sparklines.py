@@ -144,8 +144,9 @@ def provider(db, symbol, stamp):
     asset = meta.get("asset_type") or (entry.asset_type if entry else None)
     left, right = window(stamp, asset)
     keys = {frame: identity(meta, frame) for frame in FRAMES if frame in meta.get("frames", FRAMES)}
+    daily_key = identity(meta, "D1") if "D1" in meta.get("frames", ()) else None
     datasets = {row.id: row for row in db.scalars(select(ProviderDataset).where(
-        ProviderDataset.id.in_(keys.values())))}
+        ProviderDataset.id.in_([*keys.values(), *([daily_key] if daily_key else [])])))}
     local = stock_clock(meta, stamp)
     sessions = {}
     for dataset in datasets.values():
@@ -166,6 +167,19 @@ def provider(db, symbol, stamp):
             rows = [row for row in rows if bounds(row["start"])[0] <= row["start"] < bounds(row["start"])[1]]
         candidates.append((frame, rows, {"cache_revision": dataset.revision}))
     output = selection(candidates, stamp, bounds, stock=local, sessions=sessions, intraday=bool(keys))
+    if output[3]:
+        # A sparse first M1 is not the open. The native daily candle can prove
+        # it, but only when its *source* interval exactly matches this axis.
+        daily = db.scalar(select(ProviderBar).where(
+            ProviderBar.dataset_id == daily_key, ProviderBar.start == output[0])) if daily_key in datasets else None
+        if daily and daily.payload.get("end") == output[1] and daily.payload.get("open") is not None:
+            output[5]["session_open_price"] = str(daily.payload["open"])
+        elif output[5]["session_open_price"] is None:
+            for _, values, _ in candidates:
+                first = next((row for row in values if row["start"] == output[0]), None)
+                if first and first.get("open") is not None:
+                    output[5]["session_open_price"] = str(first["open"])
+                    break
     key = keys.get(output[2]) or next(iter(keys.values()), None)
     dataset = datasets.get(key)
     # Yahoo price revalidation revokes old adjusted values without changing the
@@ -374,6 +388,7 @@ def prepare(item):
     from .provider_chart import metadata
 
     preparation = "ready"
+    preparation_error = None
     try:
         symbol, kind = decode(item.ticker)
         if kind != "provider" or item.composite_revision_id is not None:
@@ -405,11 +420,32 @@ def prepare(item):
                 if count:
                     provider_cache.read(meta, frame, before, count, latest=False,
                         deadline=time.monotonic() + max(20, request_seconds(meta["source"])))
+                observed = batch([item])["items"][0]
+                if observed["points"] and observed.get("session_open_price") is None and "D1" in meta.get("frames", ()):
+                    # NY-aligned OANDA and UTC Binance have daily candles with
+                    # this exact source interval. Dukascopy's UTC day cannot
+                    # supply an NY17 open; never substitute that day's UTC open.
+                    compatible = (meta["source"] == "oanda" or
+                        meta["source"] == "binance" and observed["window_start"] % 86400000 == 0)
+                    if compatible:
+                        from .provider_chart import label
+                        try:
+                            # An exact reference has a fixed date. Generic high-
+                            # period read may legally return an older cached day
+                            # after clamping to its last observable source label.
+                            provider_cache.fetch_page(provider_cache.ensure(meta, "D1"), meta, "D1",
+                                label(observed["window_start"], "D1", meta["calendar"]) + 1,
+                                1, time.monotonic() + max(20, request_seconds(meta["source"])), revalidate=True)
+                        except Exception as error:
+                            log.warning("sparkline_reference_prepare_failed type=%s", type(error).__name__)
     except Exception as error:
         # Keep existing observations on a supplier timeout; retry on the next refresh.
         log.warning("sparkline_history_prepare_failed type=%s", type(error).__name__)
         preparation = "retry"
+        preparation_error = "历史补取暂未成功，稍后重试"
     response = batch([item])
+    for row in response["items"]:
+        row["preparation_error"] = preparation_error
     if preparation == "ready" and not any(row["points"] for row in response["items"]):
         preparation = "retry"
-    return {**response, "preparation": preparation}
+    return {**response, "preparation": preparation, "preparation_error": preparation_error}

@@ -2,13 +2,14 @@
 const assert = require('node:assert/strict');
 const fs = require('node:fs'), path = require('node:path'), http = require('node:http');
 const { chromium, expect } = require('@playwright/test');
-const dist = path.resolve('dist'), out = '/tmp/mw-symbol-search-20261114';
+const dist = path.resolve('dist'), out = '/tmp/mw-mobile-feedback-20261114';
 fs.mkdirSync(out, {recursive:true});
 let logged = false, failNext = true;
 let pref = {kind:'setting',name:'mw.watchlists.v1',tool:'',revision:1,content:{value:{active:'second',unknown:'keep',lists:[{id:'first',title:'第一组',symbols:[]},{id:'second',title:'第二组',symbols:['MWP:N0']}]}}};
 const calls = [], errors = [], writes = [];
 const row = (i, q = '') => ({ticker:'MWP:N'+i,display_symbol: q==='old'?'OLD'+i:q==='new'?'NEW'+i:'ITEM'+i,description:'测试品种 · 原生 · Yahoo',source:i % 2 ? 'yahoo':'oanda'});
 const catalog = i => ({catalog_id:'HC:'+i,source:'yahoo',provider_symbol:'ITEM'+i,display_symbol:'ITEM'+i,logical_symbol:'ITEM'+i,label:'测试品种',asset_class:'stock',precision:2,default_mode:'native_periods',supported_modes:['native_periods'],supported_frames:{none:['D1']},default_start_date:'2020-01-01'});
+const managed = i => ({maintenance:{active_version_id:null},id:'managed-'+i,logical_symbol:'ITEM'+i,display_symbol:'ITEM'+i,provider_display_symbol:'ITEM'+i,identity:{source:'yahoo',basis:'bid',mode:'native_periods'},usable_timeframes:['M1'],periods:[{timeframe:'M1',available_version_id:'v-'+i}],continuation:{enabled:false}});
 const server = http.createServer(async (req, res) => {
  const url = new URL(req.url, 'http://localhost'); let raw=''; for await (const chunk of req) raw+=chunk; const body=raw?JSON.parse(raw):{};
  const json = (value,status=200) => {if(res.destroyed)return;res.writeHead(status,{'content-type':'application/json'});res.end(JSON.stringify(value));};
@@ -32,7 +33,14 @@ const server = http.createServer(async (req, res) => {
   const offset=Number(url.searchParams.get('offset')||0);calls.push({kind:'catalog',offset});
   return json({items:Array.from({length:Math.min(25,55-offset)},(_,i)=>catalog(offset+i)),total:55,sources:[]});
  }
- if(p==='/api/market-data/center/dataset-summaries')return json({items:[],total:0});
+ if(p==='/api/market-data/center/dataset-summaries'){
+  const q=url.searchParams.get('query')||'', page=Number(url.searchParams.get('page')||1), total=['old','new'].includes(q)?0:27;
+  calls.push({kind:'managed',q,page});
+  return json({items:Array.from({length:Math.min(25,Math.max(0,total-(page-1)*25))},(_,i)=>managed((page-1)*25+i)),total});
+ }
+ const dataset=p.match(/^\/api\/market-data\/center\/datasets\/managed-(\d+)$/);
+ if(dataset)return json(managed(Number(dataset[1])));
+ if(/^\/api\/market-data\/datasets\/managed-\d+\/continuation$/.test(p))return json({enabled:false});
  if(p==='/api/market-data/resolve')return json({source:'yahoo',frames:['M1','D1'],precision:2});
  if(p==='/api/market-data/quotes')return json([]);
  if(p==='/api/market-data/sparklines')return json({as_of:Date.now(),items:[]});
@@ -55,31 +63,41 @@ const server = http.createServer(async (req, res) => {
  try {
   await page.goto('http://127.0.0.1:'+server.address().port+'/m/watch');await page.getByLabel('密码',{exact:true}).fill('fixture');await page.getByRole('button',{name:'登录',exact:true}).click();
   await page.getByRole('button',{name:'添加自选',exact:true}).click();
-  await expect(rows()).toHaveCount(25);
-  await expect(dialog().getByRole('combobox',{name:'添加到分组'})).toContainText('第一组');
-  await expect(rows().first().getByRole('button',{name:'添加 ITEM0',exact:true})).toBeEnabled();
-  await rows().first().getByRole('button',{name:'添加 ITEM0',exact:true}).click();
-  await expect(rows().first().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();
+  await expect(rows()).toHaveCount(50);
+  await expect(dialog().getByRole('tab')).toHaveCount(0);
+  await expect(dialog().getByRole('combobox')).toHaveCount(0);
+  const nativeZero=()=>rows().filter({hasText:'ITEM0'}).filter({hasNotText:'自建'}).first();
+  const managedZero=()=>rows().filter({hasText:'ITEM0'}).filter({hasText:'自建'}).first();
+  await expect(nativeZero().getByRole('button',{name:'添加 ITEM0',exact:true})).toBeEnabled();
+  await nativeZero().getByRole('button',{name:'添加 ITEM0',exact:true}).click();
+  await expect(nativeZero().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();
   assert(pref.content.value.lists[0].symbols.includes('MWP:N0'));assert.equal(pref.content.value.active,'second');assert.equal(writes.length,1);await page.getByRole('button',{name:'关闭通知',exact:true}).click();
-  await bottom();await expect(rows()).toHaveCount(50);await bottom();await expect(rows()).toHaveCount(56);
+  await managedZero().getByRole('button',{name:'添加 ITEM0',exact:true}).click();await expect(managedZero().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();assert(pref.content.value.lists[0].symbols.includes('MWH:v-0'));await page.getByRole('button',{name:'关闭通知',exact:true}).click();
+  await bottom();await expect(rows()).toHaveCount(77);await bottom();await expect(rows()).toHaveCount(83);
   await expect(page.getByText('已显示全部',{exact:true})).toBeVisible();const endCount=calls.length;await bottom();await settle();assert.equal(calls.length,endCount,'end stops requests');
-  assert.equal(await rows().filter({hasText:/ITEM0/}).count(),2,'same code across identities retained');
+  assert.equal(await rows().filter({hasText:/ITEM0/}).count(),3,'same code across native sources and managed identities retained');
   const scroll=page.locator('.mobile-drawer-scroll').last();await scroll.evaluate(el=>el.scrollTop=900);const before=await scroll.evaluate(el=>el.scrollTop);
   await rows().nth(12).locator('.symbol-search-body').click();await expect(dialog()).toHaveAccessibleName('行情详情');await close();
-  assert(Math.abs(await scroll.evaluate(el=>el.scrollTop)-before)<4,'detail return keeps position');await expect(rows()).toHaveCount(56);
+  assert(Math.abs(await scroll.evaluate(el=>el.scrollTop)-before)<4,'detail return keeps position');await expect(rows()).toHaveCount(83);
   const search=dialog().getByRole('searchbox');await search.fill('old');
   assert.equal(await search.evaluate(el=>getComputedStyle(el).outlineStyle),'none','InputGroup owns the focus indicator, without an inner outline');
   const clear=dialog().getByRole('button',{name:'清空搜索',exact:true});const target=await clear.boundingBox();assert(target.width>=44&&target.height>=44,'clear search retains a full touch target');await page.waitForTimeout(320);await search.fill('new');await expect(rows().first()).toContainText('NEW0');await page.waitForTimeout(950);await expect(rows()).toHaveCount(1);await expect(rows()).not.toContainText(['OLD0']);
-  await search.fill('fail');await expect(rows()).toHaveCount(25);await bottom();await expect(page.getByText('下一批失败',{exact:true})).toBeVisible();const failed=calls.filter(c=>c.q==='fail').length;await settle();await bottom();assert.equal(calls.filter(c=>c.q==='fail').length,failed,'failed next page does not loop');await expect(rows()).toHaveCount(25);
-  await page.getByRole('button',{name:'重试',exact:true}).click();await expect(rows()).toHaveCount(50);await bottom();await expect(rows()).toHaveCount(56);
+  await search.fill('fail');await expect(rows()).toHaveCount(50);await bottom();await expect(page.getByText('下一批失败',{exact:true})).toBeVisible();const failed=calls.filter(c=>c.q==='fail').length;await settle();await bottom();assert.equal(calls.filter(c=>c.q==='fail').length,failed,'failed next page does not loop');await expect(rows()).toHaveCount(50);
+  await page.getByRole('button',{name:'重试',exact:true}).click();await expect(rows()).toHaveCount(77);await bottom();await expect(rows()).toHaveCount(83);
   await scroll.evaluate(el=>el.scrollTop=0);
   for(const width of [375,412])for(const theme of ['light','dark'])for(const font of [14,21]){
    await page.setViewportSize({width,height:915});await page.evaluate(({theme,font})=>{document.querySelector('.mobile-app').dataset.theme=theme;document.documentElement.style.fontSize=font+'px';},{theme,font});await settle();
    assert(await dialog().evaluate(el=>el.scrollWidth<=el.clientWidth+1),'no drawer overflow');await page.screenshot({path:`${out}/watch-search-${width}-${theme}-${font}.png`});
   }
-  await page.evaluate(()=>document.documentElement.style.fontSize='14px');await close();await page.getByRole('link',{name:'数据',exact:true}).click();await page.getByRole('button',{name:'搜索并添加行情',exact:true}).click();await expect(page.locator('.data-catalog-row')).toHaveCount(25);await bottom();await expect(page.locator('.data-catalog-row')).toHaveCount(50);
+  await page.evaluate(()=>document.documentElement.style.fontSize='14px');await close();
+  await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('radio',{name:'第二组',exact:true}).click();
+  await page.getByRole('button',{name:'添加自选',exact:true}).click();await expect(rows()).toHaveCount(50);
+  await expect(nativeZero().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();
+  const one=rows().filter({hasNotText:'自建'}).filter({has:page.locator('strong').filter({hasText:/^ITEM1$/})}).first();await one.getByRole('button',{name:'添加 ITEM1',exact:true}).click();
+  await expect(one.getByRole('button',{name:'已添加 ITEM1',exact:true})).toBeDisabled();assert(pref.content.value.lists[1].symbols.includes('MWP:N1'));assert(!pref.content.value.lists[0].symbols.includes('MWP:N1'));await page.getByRole('button',{name:'关闭通知',exact:true}).click();await close();
+  await page.getByRole('link' ,{name:'数据',exact:true}).click();await page.getByRole('button',{name:'搜索并添加行情',exact:true}).click();await expect(page.locator('.data-catalog-row')).toHaveCount(25);await bottom();await expect(page.locator('.data-catalog-row')).toHaveCount(50);
   const catalogScroll=page.locator('.mobile-drawer-scroll').last();await catalogScroll.evaluate(el=>el.scrollTop=600);
   await page.locator('.data-catalog-row').nth(9).click();await expect(dialog().getByRole('button',{name:'更换品种',exact:true})).toBeVisible();await dialog().getByRole('button',{name:'更换品种',exact:true}).click();await expect(page.locator('.data-catalog-row')).toHaveCount(50);assert(await catalogScroll.evaluate(el=>el.scrollTop)>400,'creation return keeps position');await bottom();await expect(page.locator('.data-catalog-row')).toHaveCount(55);
-  await close();assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['shared entries','actual default group and group-specific duplicates','continuous add','auto append','identity dedup','end stop','late query rejected','next-page failure retains rows and waits for retry','detail and creation return keep rows and scroll','375/412 light/dark 150% typography'],calls:calls.length,writes:writes.length,out}));
+  await close();assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['shared entries','no tabs or filters or group picker','both directory page chains exhaust independently','actual current/default group and group-specific duplicates','continuous add','auto append','identity dedup','end stop','late query rejected','next-page failure retains rows and waits for retry','detail and creation return keep rows and scroll','375/412 light/dark 150% typography'],calls:calls.length,writes:writes.length,out}));
  } finally {await context.close();await browser.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

@@ -17,6 +17,7 @@ export type Sparkline = {
   display_state?: "current" | "closed" | "previous" | "historical" | "unknown" | "empty" | "unsupported";
   session?: { date: string; previous: boolean };
   session_open_price?: string | null;
+  preparation_error?: string | null;
   timeframe: string | null;
   reference_times?: number[];
   points: { time: number; price: string; gap_before: boolean }[];
@@ -57,6 +58,11 @@ export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Da
 
 /** Empty refreshes do not erase a still-valid, identity-matched curve. */
 export function mergeSparkline(old: Sparkline | undefined, next: Sparkline, now = Date.now()): Sparkline {
+  if (!next.points.length && next.status !== "unavailable" && next.display_state !== "unsupported" && next.preparation_error === undefined &&
+      old?.preparation_error && old.ticker === next.ticker && old.identity_key === next.identity_key &&
+      old.revision?.input_revision === next.revision?.input_revision &&
+      old.revision?.composite_revision_id === next.revision?.composite_revision_id && sparklineExpires(old) > now)
+    next = { ...next, preparation_error: old.preparation_error };
   if (!old?.points.length || next.points.length || next.status === "unavailable" || next.display_state === "unsupported" ||
       sparklineExpires(old) <= now || old.ticker !== next.ticker ||
       old.identity_key !== next.identity_key ||

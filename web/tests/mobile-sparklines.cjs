@@ -179,6 +179,11 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,spark
   assert.equal(sessionPrepared.size,1);
   const empty={...prior,points:[],status:'empty'};
   assert.equal(mergeSparkline(prior,empty,100).points.length,1,'empty success retains valid fallback');
+  const failedEmpty={...empty,preparation_error:'历史补取暂未成功，稍后重试'};
+  assert.equal(mergeSparkline(failedEmpty,empty,100).preparation_error,failedEmpty.preparation_error,'an empty observation cannot hide a failed preparation');
+  assert.equal(mergeSparkline(failedEmpty,{...empty,preparation_error:null},100).preparation_error,null,'successful preparation clears its error');
+  assert.equal(mergeSparkline(failedEmpty,{...empty,identity_key:'other'},100).preparation_error,undefined,'a changed identity never inherits preparation errors');
+
   assert.equal(mergeSparkline(prior,{...empty,status:'unavailable'},100).points.length,0,'explicit failure never masked');
   assert.equal(mergeSparkline({...prior,identity_key:'old'},{...empty,identity_key:'new'},100).points.length,0,'changed account/source cache cannot reuse another identity');
   assert(sparklineNeedsRecheck(prior,{s:'ok',v:{fetch_status:'ok',quote_time:30}},100),'current quote triggers recheck without painting onto yesterday');

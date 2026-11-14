@@ -8,7 +8,7 @@ fs.mkdirSync(output, { recursive: true });
 const day = 86400000, minute = 60000;
 const ids = ['MWP:NVDA', 'MWP:EURUSD', 'MWH:11111111-1111-4111-8111-111111111111', 'MWP:DAILY', 'MWC:' + 'a'.repeat(64)];
 let now = Date.parse('2026-11-13T20:59:59Z'), close = now + 1000;
-let currentFX = false, emptyFX = false, unavailableFX = false, failed = false, unavailableComposite = false;
+let currentFX = false, emptyFX = false, unavailableFX = false, failed = false, unavailableComposite = false, prepareFailedFX = false;
 let reads = 0, prepares = 0, logged = false, calendarReady = false;
 const errors = [], streams = new Set(), subscriptions = new Map();
 const fxLeft = Date.parse('2026-11-12T22:00:00Z');
@@ -79,7 +79,7 @@ const server = http.createServer(async (req, res) => {
     if (failed) return json({ detail: 'fixture offline' }, 503);
     return json({ as_of: now, items: body.items.map(row => item(row.ticker)) }); }
   if (p === '/api/market-data/sparklines/prepare') { prepares++; if (body.ticker === ids[0]) calendarReady = true;
-    return json({ as_of: now, items: [item(body.ticker)], preparation: body.ticker === ids[3] ? 'unsupported' : 'ready' }); }
+    return json({ as_of: now, items: [{...item(body.ticker), preparation_error: prepareFailedFX && body.ticker === ids[1] ? '历史补取暂未成功，稍后重试' : null}], preparation: body.ticker === ids[3] ? 'unsupported' : 'ready' }); }
   if (p === '/api/charts/stream/events') {
     res.writeHead(200, { 'content-type': 'text/event-stream' });
     streams.add(res); res.write('event: heartbeat\ndata: {}\n\n'); res.on('close', () => streams.delete(res)); return;
@@ -145,7 +145,19 @@ const server = http.createServer(async (req, res) => {
     await expect(spark(1)).toHaveAttribute('data-cached', 'true');
     failed = false; unavailableFX = true; await refresh();
     await expect(spark(1)).toContainText('走势不可用');
-    unavailableFX = false; unavailableComposite = true; await refresh();
+    unavailableFX = false; emptyFX = true; prepareFailedFX = true;
+    // Navigation respects preparation backoff; an explicit pull retries now.
+    const touch = await context.newCDPSession(page);
+    const bounds = await page.locator('.mobile-watch-list').boundingBox();
+    assert(bounds, 'watch list is visible');
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x: 180, y: bounds.y + 25 }] });
+    for (let step = 1; step <= 8; step++) {
+      await touch.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: 180, y: bounds.y + 25 + step * 20 }] });
+      await page.waitForTimeout(25);
+    }
+    await touch.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await expect(spark(1)).toContainText('历史补取失败');
+    unavailableComposite = true; await refresh();
     await expect(spark(4)).toContainText('走势不可用');
     for (const width of [375, 412]) for (const theme of ['light', 'dark']) for (const font of [14, 21]) {
       await page.setViewportSize({ width, height: 915 });
@@ -166,7 +178,7 @@ const server = http.createServer(async (req, res) => {
     console.log(JSON.stringify({ passed: true, reads, prepares, output,
       checks: ['ordinary and early-close timers after prepared session evidence', 'same-day reference unchanged', 'previous axis and gaps retained',
         'real first-current quote rechecks once', 'empty success preserves curve', 'explicit unavailable clears native and revision-fenced composite curves',
-        'network failure marks cache', 'old fixed history date', 'missing open is not fabricated', '375/412 themes and 150% type'] }));
+        'failed preparation is distinct from no data', 'network failure marks cache', 'old fixed history date', 'missing open is not fabricated', '375/412 themes and 150% type'] }));
   } finally {
     await context.close(); await browser.close();
     for (const stream of streams) stream.end();

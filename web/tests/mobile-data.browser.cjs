@@ -107,7 +107,7 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify(v));
   };
   const wait = async (key) => {
-    if (hold[key]) await new Promise((resolve) => (release[key] = resolve));
+    if (hold[key]) await new Promise((resolve) => { const previous = release[key]; release[key] = () => { previous?.(); resolve(); }; });
     return fail[key]
       ? (json({ detail: key + "读取失败（夹具）" }, 400), true)
       : false;
@@ -425,8 +425,9 @@ const server = http.createServer(async (req, res) => {
     }),
     page = await context.newPage();
   page.on("pageerror", (e) => errors.push(e.message));
+  let selectedKind = "原生";
   const dialog = () => page.getByRole("dialog").last(),
-    catalog = () => page.locator(".symbol-search-row");
+    catalog = () => selectedKind === "自建" ? page.locator(".symbol-search-row").filter({hasText:"自建"}) : page.locator(".symbol-search-row").filter({hasNotText:"自建"});
   const settle = async () => {
     await page.waitForTimeout(350);
     await page.evaluate(async () =>
@@ -474,11 +475,9 @@ const server = http.createServer(async (req, res) => {
     ).toBeVisible();
   };
   const kind = async (label) => {
-    await page.getByRole("tab", { name: label, exact: true }).click();
+    selectedKind = label;
+    await expect(page.getByRole('tab', {name:/^(原生|自建)$/})).toHaveCount(0);
     await expect(catalog().first()).toBeVisible();
-    await expect(
-      page.getByRole("tab", { name: label, exact: true }),
-    ).toHaveAttribute("aria-selected", "true");
   };
   const audit = async () => {
     assert.equal(
@@ -524,16 +523,13 @@ const server = http.createServer(async (req, res) => {
     await expect(catalog().first()).toBeVisible();
     await search.fill("");
     await expect(catalog().first()).toBeVisible();
-    const sourceFilters = dialog().getByRole("combobox", { name: "来源", exact: true });
-    await sourceFilters.click(); await page.getByRole("option", {name: "Yahoo", exact: true}).click();
-    await expect.poll(() => requests.filter(r => r.path.endsWith("/series/page")).at(-1)?.query.includes("source=yahoo")).toBe(true);
-    await sourceFilters.click(); await page.getByRole("option", {name: "全部来源", exact: true}).click();
+    await expect(dialog().getByRole('combobox', {name:'来源', exact:true})).toHaveCount(0);
     await page.locator(".symbol-search-footer").scrollIntoViewIfNeeded();
     await expect(catalog().filter({hasText: "NEXT_PAGE_SAMPLE"})).toBeVisible();
     await expect(catalog().filter({hasText: "EURUSD"})).toBeVisible();
     await expect(page.getByRole("navigation", {name: "行情分页"})).toHaveCount(0);
     proof.checks.push(
-      "shared watch native search: loading, empty, source, pagination",
+      "unified watch search: loading, empty, no filters, independent pagination",
     );
     hold.detail = true;
     await catalog().first().locator(".symbol-search-body").click();
@@ -555,23 +551,7 @@ const server = http.createServer(async (req, res) => {
       dialog().getByText(entries.provider.ticker, { exact: true }),
     ).toBeVisible();
     await shot("detail-identity");
-    await dialog()
-      .getByRole("combobox", { name: "添加到分组", exact: true })
-      .click();
-    await expect(
-      page.getByRole("option", {
-        name: "长期观察 · 外汇与全球市场",
-        exact: true,
-      }),
-    ).toBeVisible();
-    await back();
-    await expect(dialog()).toHaveAccessibleName("行情详情");
-    await dialog()
-      .getByRole("combobox", { name: "添加到分组", exact: true })
-      .click();
-    await page
-      .getByRole("option", { name: "长期观察 · 外汇与全球市场", exact: true })
-      .click();
+    await expect(dialog().getByRole('combobox', {name:'添加到分组',exact:true})).toHaveCount(0);
     hold.save = true;
     await dialog()
       .getByRole("button", { name: "加入自选", exact: true })
@@ -595,17 +575,17 @@ const server = http.createServer(async (req, res) => {
       1,
     );
     assert.deepEqual(
-      pref.content.value.lists.find((x) => x.id === "long").symbols,
+      pref.content.value.lists.find((x) => x.id === "main").symbols,
       [entries.provider.ticker],
     );
     assert.equal(pref.content.value.active, "desktop");
     await page.getByRole("button", { name: "关闭通知", exact: true }).click();
     await close();
     await detail();
-    await dialog()
-      .getByRole("combobox", { name: "添加到分组", exact: true })
-      .click();
-    await page.getByRole("option", { name: "主要观察", exact: true }).click();
+    // Another window removed the member; a failed re-add must keep the detail.
+    pref.content.value.lists[0].symbols = [];
+    await close(); await close();
+    await page.getByRole('button',{name:'添加自选',exact:true}).click();await kind('原生');await detail();
     fail.save = true;
     await dialog()
       .getByRole("button", { name: "加入自选", exact: true })
@@ -639,7 +619,7 @@ const server = http.createServer(async (req, res) => {
     ).toHaveCount(0);
     await close();
     proof.checks.push(
-      "detail loading/abort; Badge/Collapsible; nested Select back; add guard and specified group; conflict retains state; cached detail/error/retry",
+      "detail loading/abort; Badge/Collapsible; current-group add guard; conflict retains state; cached detail/error/retry",
     );
     await kind("自建");
     await detail();

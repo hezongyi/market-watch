@@ -163,6 +163,8 @@ function Spark({
       ? "离线无缓存"
       : state === "loading"
         ? "加载中"
+        : current?.preparation_error
+          ? "历史补取失败"
         : state === "error"
           ? "加载失败"
           : current?.status === "unavailable"
@@ -175,7 +177,7 @@ function Spark({
         ref={container}
         className="mobile-spark mobile-spark-empty"
         data-state={!online ? "offline" : state || current?.status || "waiting"}
-        title={current?.reason || label}
+        title={current?.preparation_error || current?.reason || label}
         aria-label={label}
       >
         {label}

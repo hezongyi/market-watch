@@ -22,6 +22,7 @@ const server=http.createServer(async(req,res)=>{
   if(conflict||body.revision!==remote.revision)return json({detail:'自选冲突'},409);
   remote={...remote,...body,revision:remote.revision+1};return json(remote);
  }
+ if(url.pathname==='/api/market-data/center/dataset-summaries')return json({items:[],total:0});
  if(url.pathname==='/api/market-data/series/page'){
   const query=url.searchParams.get('query');
   if(query==='old')return setTimeout(()=>json({items:[{ticker:first,symbol:'OLD-RESULT'}]}),700);
@@ -255,11 +256,7 @@ const server=http.createServer(async(req,res)=>{
   conflict=false;
   await page.getByRole('button',{name:'添加自选',exact:true}).click();
   await expect(page.getByRole('dialog',{name:'添加自选',exact:true}).getByLabel('搜索代码或中文')).toBeVisible();
-  const sourceFilters=page.getByRole('dialog',{name:'添加自选',exact:true}).getByRole('combobox',{name:'来源',exact:true});
-  await sourceFilters.click(); await page.getByRole('option',{name:'Yahoo',exact:true}).click();
-  await expect(sourceFilters).toContainText('Yahoo');
-  await sourceFilters.click(); await page.getByRole('option',{name:'全部来源',exact:true}).click();
-  await expect(sourceFilters).toContainText('全部来源');
+  await expect(page.getByRole('dialog',{name:'添加自选',exact:true}).getByRole('combobox')).toHaveCount(0);
   await captureControl('search-controls');
   await page.getByRole('dialog',{name:'添加自选',exact:true}).getByLabel('搜索代码或中文').fill('old');await page.waitForTimeout(300);
   await page.getByRole('dialog',{name:'添加自选',exact:true}).getByLabel('搜索代码或中文').fill('new');
@@ -269,20 +266,8 @@ const server=http.createServer(async(req,res)=>{
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).locator('.mobile-chip-list')).toContainText('M1');
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).locator('.mobile-chip-list')).toContainText('M5');
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).locator('.mobile-chip-list')).toContainText('H1');
-  const targetSelect=page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('combobox',{name:'添加到分组',exact:true});
-  await expect(targetSelect).toContainText('手机修改组名');
-  await targetSelect.click();
-  await expect(page.getByRole('option',{name:'默认自选列表',exact:true})).toBeVisible();
+  await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('combobox',{name:'添加到分组',exact:true})).toHaveCount(0);
   await auditControls();
-  await page.evaluate(()=>dispatchEvent(new Event('mw-mobile-back',{cancelable:true})));
-  await expect(page.getByRole('listbox')).toHaveCount(0);
-  await expect(page.getByRole('dialog',{name:'行情详情',exact:true})).toBeVisible();
-  await targetSelect.click();
-  await page.getByRole('option',{name:'默认自选列表',exact:true}).click();
-  await expect(targetSelect).toContainText('默认自选列表');
-  await targetSelect.click();
-  await page.getByRole('option',{name:'手机修改组名',exact:true}).click();
-  await expect(targetSelect).toContainText('手机修改组名');
   await captureControl('details-select');
   await page.getByRole('button',{name:'加入自选',exact:true}).click();
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('button',{name:'已添加',exact:true})).toBeVisible();
@@ -311,6 +296,6 @@ const server=http.createServer(async(req,res)=>{
   await expect.poll(()=>page.locator('.mobile-watch-list').evaluate(el=>el.scrollTop)).toBe(700);
   assert.equal(clientCountBeforeReload,1,'one application market client');assert.equal(maxStreams,1,'only one SSE channel');
   assert.deepEqual(errors,[]);
-  console.log(JSON.stringify({evidence:'built mobile UI with API doubles',checks:['all visible Watch controls use shadcn slots','source filter selection including all sources','Select change, Android back and visible success notification','drawer enter and exit transitions','touch follows, rebounds and dismisses','dirty swipe and Android back preserve unsaved input','reduced-motion close lifecycle','reorder animation and delete cancel/discard','small viewport form and rapid repeated close','saving blocks back and close','real transport heartbeat status','navigation retains original SSE and receives live quotes','background pauses subscriptions; foreground reconnects and refreshes quotes','hidden Watch pauses historical refresh','SSE drop grays rows until new connection snapshot aligns','scroll restored after reload','visible quote/spark rows and gaps','375/412 at 150% font','phone group selection isolated','latest desktop active and unknown fields retained','409 keeps input','late search discarded','actual supported periods shown','favorite add and shared refresh','one market client/SSE'],errors},null,2));
+  console.log(JSON.stringify({evidence:'built mobile UI with API doubles',checks:['all visible Watch controls use shadcn slots','unified search without source or group filters','current group add and visible success notification; simulated Android back','drawer enter and exit transitions','touch follows, rebounds and dismisses','dirty swipe and Android back preserve unsaved input','reduced-motion close lifecycle','reorder animation and delete cancel/discard','small viewport form and rapid repeated close','saving blocks back and close','real transport heartbeat status','navigation retains original SSE and receives live quotes','background pauses subscriptions; foreground reconnects and refreshes quotes','hidden Watch pauses historical refresh','SSE drop grays rows until new connection snapshot aligns','scroll restored after reload','visible quote/spark rows and gaps','375/412 at 150% font','phone group selection isolated','latest desktop active and unknown fields retained','409 keeps input','late search discarded','actual supported periods shown','favorite add and shared refresh','one market client/SSE'],errors},null,2));
  }finally{for(const response of streams)response.end();await context.close();await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -1,6 +1,7 @@
 import SymbolInfo from "./SymbolInfo";
 import { SymbolSearchPanel, SymbolSearchRow } from "./SymbolSearch";
 import { useSymbolSearch } from "./useSymbolSearch";
+import { watchSymbolPage } from "./watchSymbolSearch";
 import { useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../api";
 import {
@@ -33,8 +34,6 @@ import {
 import MobileSheet from "./MobileSheet";
 import { Button as MobileButton } from "./components/ui/button";
 import { MobileOverlaysProvider } from "./WatchOverlays";
-import MobileSelect from "./MobileSelect";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
 import { Badge } from "./components/ui/badge";
 import {
   Card,
@@ -50,37 +49,27 @@ import {
   CollapsibleTrigger,
   CollapsibleContent,
 } from "./components/ui/collapsible";
-import WatchGroupSelect from "./WatchGroupSelect";
 import {
   InputGroup,
   InputGroupInput,
   InputGroupAddon,
 } from "./components/ui/input-group";
 import { ToggleGroup, ToggleGroupItem } from "./components/ui/toggle-group";
-import { FieldGroup, Field, FieldLabel } from "./components/ui/field";
 import {
   DataEmpty as MobileEmpty,
   DataLoading as MobileLoading,
 } from "./DataStates";
 
-import type { Dataset } from "../market-data/types";
 import DataManagedPage from "./DataManagedPage";
 import {
   actionableRow,
   continuationLabel,
-  datasetRow,
   loadManaged,
   marketType,
   rowKey,
   type MarketRow as Row,
 } from "./dataMarkets";
 
-type Page = {
-  items: Row[];
-  next_offset?: number | null;
-  next_cursor?: string | null;
-  has_more?: boolean;
-};
 const dateTime = (value: number) =>
   new Date(value).toLocaleString("zh-CN", {
     hour12: false,
@@ -167,16 +156,14 @@ function DataContent({
   searchMode = false,
   initialGroup = "",
 }: DataPageProps) {
-  const [kind, setKind] = useState("native"),
-    [query, setQuery] = useState(""),
-    [source, setSource] = useState("");
+  const [query, setQuery] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailRetry, setDetailRetry] = useState(0);
   const [selected, setSelected] = useState<Row>(),
     [detail, setDetail] = useState<any>(),
     [detailError, setDetailError] = useState("");
-  const [groups, setGroups] = useState<WatchList[]>([]),
-    [targetGroup, setTargetGroup] = useState(initialGroup);
+  const [groups, setGroups] = useState<WatchList[]>([]);
+  const targetGroup = initialGroup;
   const [versions, setVersions] = useState<any[]>();
   const [favorites, setFavorites] = useState<string[]>([]),
     [busy, setBusy] = useState(false),
@@ -209,56 +196,11 @@ function DataContent({
   );
   const result = useSymbolSearch<Row>({
     profile,
-    queryKey: JSON.stringify(["watch", kind, query, source]),
+    queryKey: JSON.stringify(["watch-unified", query]),
     active: visible && !detailsOpen,
     online,
     identity: rowKey,
-    fetchPage: async (cursor, signal) => {
-      const position = cursor ? JSON.parse(cursor) : { offset: 0, page: 1 };
-      const params = new URLSearchParams({
-        query,
-        source,
-        page_size: "25",
-        ...(kind === "native"
-          ? {
-              kind: "provider",
-              include_total: "false",
-              offset: String(position.offset),
-            }
-          : { page: String(position.page) }),
-      });
-      if (position.cursor) params.set("cursor", position.cursor);
-      if (kind === "managed") {
-        const value = await api<{ items: Dataset[]; total: number }>(
-          "/market-data/center/dataset-summaries?" + params,
-          undefined,
-          signal,
-        );
-        return {
-          items: value.items.map(datasetRow),
-          next:
-            position.page * 25 < value.total
-              ? JSON.stringify({ page: position.page + 1 })
-              : undefined,
-        };
-      }
-      const value = await api<Page>(
-        "/market-data/series/page?" + params,
-        undefined,
-        signal,
-      );
-      return {
-        items: value.items,
-        next:
-          value.has_more !== false &&
-          (value.next_cursor || value.next_offset != null)
-            ? JSON.stringify({
-                offset: value.next_offset ?? position.offset + 25,
-                cursor: value.next_cursor,
-              })
-            : undefined,
-      };
-    },
+    fetchPage: (cursor, signal) => watchSymbolPage(query, cursor, signal),
   });
   const destination =
     groups.find((item) => item.id === targetGroup) || groups[0];
@@ -394,7 +336,9 @@ function DataContent({
         report("自选已保存，本机快照未更新"),
       );
       dispatchEvent(new Event("mw-mobile-watchlists-changed"));
-      report("已加入自选");
+      const savedLists = watchContent(saved).lists;
+      const savedGroup = savedLists.find((list) => list.id === targetGroup) || savedLists[0];
+      report("已加入自选 · " + (savedGroup?.title || "自选列表"));
     } catch (error) {
       report(String(error));
     } finally {
@@ -444,7 +388,6 @@ function DataContent({
         page: String(pageNumber),
         page_size: "20",
         query,
-        source,
       });
       if (title === "来源状态") {
         const [capabilities, directory, live] = await Promise.all([
@@ -569,7 +512,7 @@ function DataContent({
   const listing = (
     <SymbolSearchPanel
       query={query}
-      resetKey={JSON.stringify([kind, query, source])}
+      resetKey={query}
       onQuery={setQuery}
       label="搜索代码或中文"
       active={visible && !detailsOpen}
@@ -580,28 +523,6 @@ function DataContent({
       retry={result.retry}
       hasNext={!!result.next}
       loadNext={result.loadNext}
-      filters={
-        <div className="symbol-search-filters">
-          <MobileSelect
-            label="来源"
-            value={source || "all"}
-            onChange={(value) => setSource(value === "all" ? "" : value)}
-            items={sources.map(([value, label]) => ({
-              value: value || "all",
-              label,
-            }))}
-          />
-          <div className="symbol-target-group">
-            <span>添加到</span>
-            <WatchGroupSelect
-              value={destination?.id || ""}
-              onChange={setTargetGroup}
-              groups={groups}
-              disabled={busy}
-            />
-          </div>
-        </div>
-      }
       note={
         result.readAt && (
           <p className="data-caption">
@@ -612,7 +533,7 @@ function DataContent({
     >
       {result.loaded && !result.items.length && (
         <MobileEmpty title="没有符合条件的行情">
-          尝试其他代码、中文名称或来源。
+          尝试其他代码或中文名称。
         </MobileEmpty>
       )}
       <div className="symbol-search-results">
@@ -650,12 +571,12 @@ function DataContent({
                 code={row.display_symbol || row.symbol || row.ticker}
                 name={row.instrument_name || row.description || ""}
                 source={displaySource(row)}
-                custom={kind === "managed"}
+                custom={!!row.managed}
               />
-              {kind === "managed" &&
+              {row.managed &&
                 result.items.filter(
                   (other) =>
-                    other.display_symbol === row.display_symbol &&
+                    other.managed && other.display_symbol === row.display_symbol &&
                     other.source === row.source,
                 ).length > 1 && (
                   <small className="symbol-configuration">
@@ -702,21 +623,7 @@ function DataContent({
           </MobileButton>
         </header>
       )}
-      <Tabs
-        value={kind}
-        className="data-kind-tabs"
-        onValueChange={(value) => {
-          setKind(String(value));
-        }}
-      >
-        <TabsList aria-label="行情类型">
-          <TabsTrigger value="native">原生</TabsTrigger>
-          <TabsTrigger value="managed">自建</TabsTrigger>
-        </TabsList>
-        <TabsContent key={kind} value={kind}>
-          {listing}
-        </TabsContent>
-      </Tabs>
+      {listing}
       <MobileSheet
         title="任务与来源"
         open={toolsOpen}
@@ -739,15 +646,11 @@ function DataContent({
               description: "来源能力、目录与实时连接",
               icon: Radio,
             },
-            ...(kind === "managed"
-              ? [
-                  {
-                    title: "自建维护",
-                    description: "查看维护配置与最近执行",
-                    icon: Database,
-                  },
-                ]
-              : []),
+            {
+              title: "自建维护",
+              description: "查看维护配置与最近执行",
+              icon: Database,
+            },
           ].map(({ title, description, icon: Icon }) => (
             <MobileButton
               variant="ghost"
@@ -973,17 +876,6 @@ function DataContent({
               </>
             )}
             <div className="mobile-sheet-actions watch-detail-actions data-detail-actions">
-              <FieldGroup>
-                <Field orientation="horizontal" className="watch-target-group">
-                  <FieldLabel>添加到分组</FieldLabel>
-                  <WatchGroupSelect
-                    value={targetGroup}
-                    onChange={setTargetGroup}
-                    groups={groups}
-                    disabled={busy}
-                  />
-                </Field>
-              </FieldGroup>
               <div className="watch-detail-buttons">
                 <MobileButton
                   variant="outline"

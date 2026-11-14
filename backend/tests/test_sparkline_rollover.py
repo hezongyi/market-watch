@@ -281,3 +281,70 @@ def test_provider_revalidation_changes_cache_identity_even_when_empty(database, 
         db.execute(delete(ProviderBar).where(ProviderBar.dataset_id == key))
     new = read('MWP:TEST')[0]
     assert not new['points'] and old['identity_key'] != new['identity_key']
+
+
+def test_native_daily_open_fills_sparse_minutes_without_borrowing_another_source_day(database, monkeypatch):
+    from alerts.storage import ProviderBar
+    now = stamp('2026-11-13T23:00:00+00:00')
+    left = stamp('2026-11-12T22:00:00+00:00')
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        catalog(db, asset='CURRENCY')
+    meta = provider_chart.metadata('TEST', cached_only=True)
+    with database.begin() as db:
+        provider_rows(db, meta, 'M1', [left + 240000], price='1.2')
+        daily_key = provider_rows(db, meta, 'D1', [left], price='1.3')
+        day = db.get(ProviderBar, (daily_key, left))
+        day.payload = {**day.payload, 'open': '1.1', 'end': left + 86400000}
+    assert read('MWP:TEST')[0]['session_open_price'] == '1.1'
+    with database.begin() as db:
+        day = db.get(ProviderBar, (daily_key, left))
+        day.payload = {**day.payload, 'end': left + 3600000}
+    assert read('MWP:TEST')[0]['session_open_price'] is None
+
+
+def test_prepare_failed_history_is_explicit_not_empty_success(database, monkeypatch):
+    from alerts import provider_cache
+    now = stamp('2026-11-13T23:00:00+00:00')
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        catalog(db)
+    def fail(*args, **kwargs):
+        raise TimeoutError('test supplier failure')
+    monkeypatch.setattr(provider_cache, 'read', fail)
+    response = sparklines.prepare(SparklineItem(ticker='MWP:TEST'))
+    assert response['preparation'] == 'retry'
+    assert response['items'][0]['preparation_error'] == '历史补取暂未成功，稍后重试'
+    assert not response['items'][0]['points']
+
+
+def test_prepare_sparse_oanda_requests_one_matching_native_daily_open(database, monkeypatch):
+    from alerts import provider_cache
+    from alerts.storage import ProviderBar
+    now = stamp('2026-11-14T00:00:00+00:00')
+    left = stamp('2026-11-12T22:00:00+00:00')
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        catalog(db, asset='CURRENCY')
+    meta = {**provider_chart.metadata('TEST', cached_only=True), 'source':'oanda', 'symbol':'USD_CAD', 'calendar':'ny17', 'frames':['M1','D1']}
+    monkeypatch.setattr(provider_chart, 'metadata', lambda *args, **kwargs: meta)
+    with database.begin() as db:
+        provider_rows(db, meta, 'M1', [left + 240000], price='1.4')
+    from test_provider_cache import seed
+    label = stamp('2026-11-13T00:00:00+00:00')
+    def daily(at, chart_time, opening):
+        return {'bars':[{'start':at, 'end':at+86400000, 'chart_time':chart_time,
+            'open':opening, 'high':'1.5', 'low':'1.3', 'close':'1.4', 'complete':True}], 'history_boundary':False}
+    key = seed(meta, 'D1', label, daily(left-86400000, label-86400000, '1.38'))
+    assert provider_cache.snapshot(key, label+1, 1)['satisfied'], 'reproduce the older-day cache hit'
+    calls = []
+    monkeypatch.setattr(provider_cache, 'read', lambda *args, **kwargs: None)
+    def fetch(meta, frame, before, count, **kwargs):
+        calls.append((frame, before, count))
+        assert frame == 'D1' and before == label+1 and count == 1
+        return daily(left, label, '1.39')
+    monkeypatch.setattr(provider_chart, 'native_page', fetch)
+    result = sparklines.prepare(SparklineItem(ticker='MWP:TEST'))
+    assert calls == [('D1', label+1, 1)]
+    assert result['items'][0]['session_open_price'] == '1.39'
+    assert result['items'][0]['timeframe'] == 'M1' and len(result['items'][0]['points']) == 1

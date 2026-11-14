@@ -1,6 +1,6 @@
 # 手机自选 sparkline 跨日回显与收盘状态实施方案
 
-状态：代码、本地验证与 Ubuntu R1 已完成，待 Android 真机复核。用户后续已授权将待实现实施并验证；本任务验收实例已更新，详见 [实施与验收记录](../../verification/mobile-pending-20261114/README.md)。未进行生产发布。
+状态：首轮已实施并收到真机反馈；原生开盘参考线补取已修复并实测 OANDA，Dukascopy USDCAD 因 TLS EOF 仍未通过，不能标全部完成。最新见 [反馈修复记录](../../verification/mobile-feedback-20261114/README.md)。用户后续已授权将待实现实施并验证；本任务验收实例已更新，详见 [实施与验收记录](../../verification/mobile-pending-20261114/README.md)。未进行生产发布。
 
 ## 项目与基线
 
