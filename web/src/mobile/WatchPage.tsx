@@ -94,11 +94,23 @@ function compactIdentity(ticker: string, quote?: Quote) {
       composite: "自建",
     } as Record<string, string>
   )[identity.series_kind];
-  const source = (kindAt >= 0 ? parts[kindAt + 1] : value?.exchange) || "来源待确认";
-  const provider = identity.series_kind === "provider"
-    ? ({ "BINANCE": "Binance", "BINANCE SPOT": "Binance", "YAHOO FINANCE": "Yahoo", "YAHOO": "Yahoo" } as Record<string, string>)[source.toUpperCase()] || source
-    : undefined;
+  const custom = identity.series_kind !== "provider";
+  const source = (kindAt >= 0
+    ? parts.slice(kindAt + 1).find(part => part !== "实时接续")
+    : value?.exchange) || "来源待确认";
+  // Continuations show the historical supplier here; details retain both sources.
+  const historicalSource = source.replace(/^历史[：:]\s*/, "").split(/\s*→\s*实时[：:]/)[0].trim();
+  const aliases: Record<string, string> = {
+    "BINANCE": "Binance", "BINANCE SPOT": "Binance",
+    "YAHOO FINANCE": "Yahoo", "YAHOO": "Yahoo",
+  };
+  const provider = custom
+    ? ({ "DUKASCOPY": "Dukas", "OANDA PRACTICE": "OANDA", "OANDA LIVE": "OANDA",
+        "FXCM DEMO": "FXCM", "FXCM REAL": "FXCM" } as Record<string, string>)[historicalSource.toUpperCase()]
+      || aliases[historicalSource.toUpperCase()] || historicalSource
+    : aliases[source.toUpperCase()] || source;
   return {
+    custom,
     provider,
     name:
       kindAt > 0
@@ -106,19 +118,7 @@ function compactIdentity(ticker: string, quote?: Quote) {
             .slice(parts[0] === code(ticker, quote) ? 1 : 0, kindAt)
             .join(" · ")
         : "",
-    series:
-      kindAt >= 0
-        ? parts
-            .slice(kindAt, kindAt + 2)
-            .map((part) =>
-              part === "Binance Spot"
-                ? "Binance"
-                : part === "Yahoo Finance"
-                  ? "Yahoo"
-                  : part,
-            )
-            .join(" · ")
-        : [kind, value?.exchange || "来源待确认"].filter(Boolean).join(" · "),
+    series: [kind, source].filter(Boolean).join(" · "),
   };
 }
 function Spark({
@@ -925,6 +925,8 @@ export default function WatchPage({
             revision = quote?.snapshot?.revision_id;
           const identity = compactIdentity(ticker, quote);
           const displayCode = code(ticker, quote);
+          const description = watchDescription(displayCode, identity.name) ||
+            (identity.custom ? identity.name || "名称待确认" : "");
           const displayPrice = formatWatchPrice(price, value?.display_precision, displayCode);
           const priceParts = watchPriceParts(displayPrice);
           const displayChange = typeof change === "number" ? `${change >= 0 ? "+" : ""}${change.toFixed(2)}%` : "—";
@@ -939,10 +941,11 @@ export default function WatchPage({
             >
               <span className="mobile-watch-symbol">
                 <strong title={displayCode}><FitText text={displayCode} /></strong>
-                {watchDescription(displayCode, identity.name) && <span className="mobile-watch-description" title={identity.name}>{watchDescription(displayCode, identity.name)}</span>}
+                {description && <span className="mobile-watch-description" title={identity.name}>{description}</span>}
                 {identity.provider && (
-                  <span className="mobile-watch-origin" title={identity.series}>
-                    {identity.provider}
+                  <span className={`mobile-watch-origin${identity.custom ? " mobile-watch-origin-custom" : ""}`} title={identity.series}>
+                    {identity.custom && <span className="mobile-watch-kind">自建</span>}
+                    <span className="mobile-watch-provider">{identity.provider}</span>
                   </span>
                 )}
               </span>

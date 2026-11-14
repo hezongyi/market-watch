@@ -19,7 +19,7 @@ const names = [
   "纳指 100 ETF",
   "贵州茅台",
 ];
-const sources = ["OANDA", "OANDA", "Binance", "FXCM", "Yahoo", "AKShare"];
+const sources = ["OANDA", "Dukascopy", "Binance", "FXCM", "Yahoo", "AKShare"];
 const prices = [2684.52, 1.08420, 76428.30, 147.250, 512.84, 9876543.21];
 let preferenceReads = 0, slowPreferences = 0, stockSessionPhase = "normal";
 let holdPreferences = false,
@@ -109,14 +109,11 @@ const server = http.createServer(async (req, res) => {
           s: "ok",
           v: {
             short_name: codes[i],
-            description_base:
-              codes[i] +
-              " · " +
-              names[i] +
-              " · " +
-              (i < 2 ? "自建 · 实时接续" : "原生") +
-              " · " +
-              sources[i],
+            description_base: [
+              codes[i], i === 1 ? "" : names[i],
+              i < 2 ? "自建 · 实时接续" : "原生",
+              i < 2 ? `历史：${sources[i]} → 实时：OANDA Practice` : sources[i],
+            ].filter(Boolean).join(" · "),
             description: names[i],
             exchange: sources[i],
             lp: prices[i],
@@ -265,7 +262,8 @@ const server = http.createServer(async (req, res) => {
     await page.goto(url);
     await expect(page.locator(".mobile-watch-row")).toHaveCount(6);
     await expect(page.locator(".mobile-watch-row.stale")).toHaveCount(0);
-    await expect(page.locator('.mobile-watch-origin')).toHaveText(['Binance', 'FXCM', 'Yahoo', 'AKShare']);
+    await expect(page.locator('.mobile-watch-origin')).toHaveText(['自建OANDA', '自建Dukas', 'Binance', 'FXCM', 'Yahoo', 'AKShare']);
+    await expect(page.locator('.mobile-watch-origin-custom').nth(1)).toHaveAttribute('title', '自建 · 历史：Dukascopy → 实时：OANDA Practice');
     await expect(page.locator('.mobile-watch-description')).toHaveText(['黄金','欧元美元','比特币','美元日元','纳指 100 ETF','贵州茅台']);
     for (const theme of ["dark", "light"])
       for (const [width, height, font] of [

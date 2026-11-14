@@ -721,6 +721,22 @@
 .mobile-watch .mobile-watch-list { overscroll-behavior-y: contain; touch-action: pan-y; }
 .mobile-watch .mobile-watch-symbol strong { line-height: 1.25; }
 .mobile-watch .mobile-watch-symbol .mobile-watch-origin { margin-top: 2px; line-height: 1.35; }
+.mobile-watch .mobile-watch-symbol .mobile-watch-origin-custom {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: color-mix(in srgb, var(--accent) 72%, var(--muted));
+}
+.mobile-watch-origin-custom .mobile-watch-kind {
+  flex: none;
+  padding: 0 3px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+  font-size: 0.642857rem;
+  line-height: 1.55;
+}
+.mobile-watch-provider { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.mobile-watch-origin-custom .mobile-watch-provider { font-size: 0.714286rem; }
 .mobile-watch-description { color: var(--muted); font-size: 0.785714rem; line-height: 1.35; margin-top: 3px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mobile-pull-refresh { display: flex; flex: none; align-items: center; justify-content: center; gap: 8px; overflow: hidden; color: var(--muted); font-size: 0.857143rem; }
 .mobile-pull-refresh svg { width: 16px; height: 16px; flex: none; }
