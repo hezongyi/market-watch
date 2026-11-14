@@ -316,6 +316,14 @@ const server = http.createServer(async (req, res) => {
             const separated = await page.locator('.mobile-watch-row').first().evaluate(row =>
               row.querySelector('.mobile-watch-symbol').getBoundingClientRect().bottom <= row.querySelector('.mobile-spark').getBoundingClientRect().top);
             assert(separated,'large text keeps chart on a separate unobstructed row');
+            const contained = await page.locator('.mobile-watch-row').evaluateAll(rows => rows.every(row => {
+              const bounds = row.getBoundingClientRect();
+              return [...row.children].every(child => {
+                const rect = child.getBoundingClientRect();
+                return rect.top >= bounds.top && rect.bottom <= bounds.bottom;
+              });
+            }));
+            assert(contained, 'large text and third identity line stay within their own watch row');
           }
           assert(Math.abs(parseFloat(actual.price.fontSize) - font * 15/14) < 0.01);
           await expect(page.locator('.mobile-watch-price strong').first()).toHaveText('+0.69%');
@@ -381,6 +389,12 @@ const server = http.createServer(async (req, res) => {
         });
       }
     await page.setViewportSize({ width: 412, height: 852 });
+    if (process.env.MOBILE_VISUAL_SCOPE === "identity") {
+      assert.deepEqual(errors, []);
+      fs.writeFileSync(path.join(output, "proof.json"), JSON.stringify({ measurements, errors }, null, 2));
+      console.log(JSON.stringify({ checks: "8 watch identity/geometry layouts", errors, output }));
+      return;
+    }
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "14px";
       document.querySelector(".mobile-app").dataset.theme = "dark";
