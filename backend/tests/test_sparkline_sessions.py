@@ -88,7 +88,7 @@ def test_cold_history_reader_crosses_weekend_and_reuses_cache(database, monkeypa
         calls.append((before, count))
         return {"bars": [{"start": at, "chart_time": at, "end": at + 60000,
             "open": "100", "high": "100", "low": "100", "close": "100", "complete": True}
-            for at in range(opening, opening + 390 * 60000, 60000) if at < before],
+            for at in [opening - 86400000 + 389 * 60000, *range(opening, opening + 390 * 60000, 60000)] if at < before],
             "history_boundary": True}
 
     monkeypatch.setattr(provider_chart, "native_page", fetch)

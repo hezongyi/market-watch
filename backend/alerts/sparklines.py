@@ -4,32 +4,32 @@ Batch observations never write demand or bookkeeping. Only prepare() invokes the
 shared provider cache writer, without registering an instrument or starting jobs.
 """
 
-import logging
 import json
+import logging
 from datetime import UTC, datetime, timedelta
 from itertools import islice
 from zoneinfo import ZoneInfo
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 
 from . import storage
 from .chart_series import decode
 from .query_errors import QueryError
 from .storage import (
+    CompositeMinute,
     CompositeRevision,
     HistoryArtifact,
     HistoryChunk,
     HistoryReclamation,
-    CompositeMinute,
-    RealtimeMapping,
-    ObservedMinute,
     HistoryVersion,
     Instrument,
     MarketCatalog,
     MarketComposite,
     MarketDataset,
+    ObservedMinute,
     ProviderBar,
     ProviderDataset,
+    RealtimeMapping,
 )
 
 FRAMES = {"M1": 60000, "M5": 300000, "M15": 900000, "M30": 1800000, "H1": 3600000}
@@ -63,6 +63,19 @@ def stock_clock(meta, stamp):
 
 
 LOOKBACK = 14 * 86400000
+
+
+def closing_reference(candidates, left, bounds):
+    """Only a finished bar at the prior actual session's end proves its close."""
+    previous = [row for _, rows, _ in candidates for row in rows
+        if row["start"] < left and row.get("complete") and row.get("close") is not None
+        and row["start"] >= left - LOOKBACK]
+    latest = max((bounds(row["start"])[0] for row in previous), default=None)
+    evidence = [row for row in previous if bounds(row["start"])[0] == latest
+        and row.get("end") == bounds(row["start"])[1]]
+    row = max(evidence, key=lambda row: row["start"], default=None)
+    return {"previous_close_price": str(row["close"]) if row else None,
+        "previous_close_at": row["end"] if row else None}
 
 
 def selection(candidates, stamp, bounds, *, stock=None, sessions=None, fixed=False, intraday=True):
@@ -101,6 +114,7 @@ def selection(candidates, stamp, bounds, *, stock=None, sessions=None, fixed=Fal
         "session": {"date": date, "previous": previous},
         "display_state": state if intraday else "unsupported",
         "session_open_price": str(rows[0]["open"]) if rows and rows[0]["start"] == left and rows[0].get("open") is not None else None,
+        **closing_reference(candidates, left, bounds),
         "valid_until": valid_until, "next_check_at": max(stamp + 1, next_check)}
 
 
@@ -130,14 +144,9 @@ def dataset_bounds(db, dataset, stamp, *, revision=None, version=None):
     return lambda at: window(at, asset)
 
 
-def provider(db, symbol, stamp):
+def provider(db, symbol, stamp, meta):
     from .history_catalog import oanda_entry
     from .provider_cache import identity
-    from .provider_chart import metadata
-
-    # cached_only prevents Yahoo metadata I/O. Other metadata branches read
-    # local catalogs/configuration only, including account and native parameters.
-    meta = metadata(symbol, cached_only=True)
     entry = db.get(MarketCatalog, symbol)
     if entry is None and meta["source"] == "oanda":
         entry = oanda_entry(db, meta["symbol"])
@@ -167,6 +176,23 @@ def provider(db, symbol, stamp):
             rows = [row for row in rows if bounds(row["start"])[0] <= row["start"] < bounds(row["start"])[1]]
         candidates.append((frame, rows, {"cache_revision": dataset.revision}))
     output = selection(candidates, stamp, bounds, stock=local, sessions=sessions, intraday=bool(keys))
+    if output[3]:
+        # The current session may consume the entire bounded page. Read one
+        # earlier finished bar using the same cache identity, not another feed.
+        reference_candidates = list(candidates)
+        reference_frames = list(dict.fromkeys([output[2], "D1"]))
+        for frame in reference_frames:
+            key = daily_key if frame == "D1" else keys.get(frame)
+            if frame != "D1" and any(candidate_frame == frame and len(values) < MAX_POINTS for candidate_frame, values, _ in candidates):
+                continue  # The bounded cache read already included every preceding row.
+            if key not in datasets:
+                continue
+            prior = db.scalar(select(ProviderBar).where(ProviderBar.dataset_id == key,
+                ProviderBar.start < output[0], ProviderBar.start >= output[0] - LOOKBACK,
+                ProviderBar.complete.is_(True)).order_by(ProviderBar.start.desc()).limit(1))
+            if prior:
+                reference_candidates.append((frame, [{**prior.payload, "start": prior.start, "complete": True}], None))
+        output[5].update(closing_reference(reference_candidates, output[0], bounds))
     if output[3]:
         # A sparse first M1 is not the open. The native daily candle can prove
         # it, but only when its *source* interval exactly matches this axis.
@@ -249,6 +275,16 @@ def history(db, symbol, stamp):
             rows = read_artifact(db, symbol, frame, end=stamp + 1, limit=MAX_POINTS, newest_first=True)
             candidates.append((frame, rows, revision))
     output = selection(candidates, stamp, bounds, fixed=True, intraday=bool(candidates or available))
+    if output[3] and output[5]["previous_close_price"] is None:
+        frame = output[2]
+        if version.manifest.get("schema") != "managed-period-snapshot-v2" and frame == "M1":
+            at = latest_history_at(db, version, min(output[0], version.end))
+            previous = [] if at is None else [{**row, "start": row["timestamp"], "end": row["timestamp"] + 60000}
+                for row in islice(snapshot_rows(db, symbol, start=max(version.start, bounds(at)[0]),
+                    end=min(output[0], version.end)), MAX_POINTS)]
+        else:
+            previous = read_artifact(db, symbol, frame, end=output[0], limit=1, newest_first=True)
+        output[5].update(closing_reference([(frame, previous, revision)], output[0], bounds))
     return (*output[:4], revision, output[5])
 
 
@@ -303,6 +339,22 @@ def composite(db, symbol, revision_id, stamp):
                              provisional=True, now=stamp)
     marker = {"composite_revision_id": revision.id, "input_revision": result["input_revision"]}
     output = selection([("M1", rows, marker)], stamp, bounds)
+    if rows:
+        # Reuse the exact selected revision for both sides of the reference.
+        prior = db.scalar(select(func.max(CompositeMinute.start)).where(
+            CompositeMinute.revision_id == revision.id, CompositeMinute.start < output[0],
+            CompositeMinute.start >= output[0] - LOOKBACK))
+        observed_prior = db.scalar(select(func.max(ObservedMinute.start)).where(
+            ObservedMinute.dataset_id == mapping.target_dataset_id, ObservedMinute.start < output[0],
+            ObservedMinute.start >= max(revision.seam, output[0] - LOOKBACK)))
+        version = db.get(HistoryVersion, revision.history_version_id)
+        historical_prior = latest_history_at(db, version, min(output[0], revision.seam, version.end))
+        at = max((at for at in (prior, observed_prior, historical_prior) if at is not None), default=None)
+        if at is not None and at >= output[0] - LOOKBACK:
+            prior_left, prior_right = bounds(at)
+            prior_result = read_window(db, symbol, "M1", prior_left, prior_right,
+                revision_id=revision.id, provisional=False, now=stamp)
+            output[5].update(closing_reference([("M1", prior_result["bars"], marker)], output[0], bounds))
     return (*output[:4], marker, output[5])
 
 
@@ -338,6 +390,8 @@ def result(ticker, left, right, frame, rows, revision, stamp, session=None):
 
 
 def batch(items):
+    from .provider_chart import metadata
+
     stamp = storage.now_ms()
     output = []
     for item in items:
@@ -345,11 +399,15 @@ def batch(items):
             symbol, kind = decode(item.ticker)
             if item.composite_revision_id is not None and kind != "composite":
                 raise ValueError("仅组合行情接受组合修订")
+            # Metadata has its own short catalog transaction. Resolve it before
+            # checking out the snapshot connection, so concurrent reads cannot
+            # each hold a connection while waiting for a second one.
+            meta = metadata(symbol, cached_only=True) if kind == "provider" else None
             with storage.Session() as db:
                 if db.get_bind().dialect.name == "postgresql":
                     db.connection(execution_options={"isolation_level": "REPEATABLE READ"})
                 if kind == "provider":
-                    values = provider(db, symbol, stamp)
+                    values = provider(db, symbol, stamp, meta)
                 elif kind == "managed":
                     values = managed(db, symbol, stamp)
                 elif kind == "history":
@@ -421,6 +479,16 @@ def prepare(item):
                     provider_cache.read(meta, frame, before, count, latest=False,
                         deadline=time.monotonic() + max(20, request_seconds(meta["source"])))
                 observed = batch([item])["items"][0]
+                if observed["points"] and observed.get("previous_close_price") is None:
+                    # Fetch the close *before the displayed day*. A fallback
+                    # Friday curve needs Thursday's close, not Friday's open.
+                    from .provider_chart import label
+                    reference_frame = "D1" if ("D1" in meta.get("frames", ()) and
+                        (meta["source"] == "oanda" or meta["source"] == "binance" and
+                         observed["window_start"] % 86400000 == 0)) else frame
+                    provider_cache.fetch_page(provider_cache.ensure(meta, reference_frame), meta, reference_frame,
+                        label(observed["window_start"], reference_frame, meta["calendar"]), 3,
+                        time.monotonic() + max(20, request_seconds(meta["source"])), revalidate=True)
                 if observed["points"] and observed.get("session_open_price") is None and "D1" in meta.get("frames", ()):
                     # NY-aligned OANDA and UTC Binance have daily candles with
                     # this exact source interval. Dukascopy's UTC day cannot

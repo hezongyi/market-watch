@@ -390,13 +390,13 @@
 .mobile-controls .mobile-manage-group > [data-slot="field-group"] { grid-column: 1/-1; margin: 0; }
 .mobile-controls .mobile-manage-group [data-slot="input"] { background: var(--bg); }
 .mobile-controls .mobile-manage-group > .mobile-inline-actions {
-  grid-column: 2; grid-row: 2; align-self: start; gap: 4px; margin: 0;
+  grid-column: 2; grid-row: 1; align-self: center; gap: 4px; margin: 0;
   position: relative; z-index: 1;
 }
 .mobile-controls .mobile-manage-group > .mobile-inline-actions button:last-child { order: 0; margin: 0; }
 .mobile-controls .mobile-manage-group > .mobile-group-order { grid-column: 1/-1; grid-row: 2; margin: 0; }
 .mobile-controls .mobile-control-drawer .mobile-group-order button.watch-disclosure[data-variant] {
-  padding: 2px 148px 2px 0; gap: 6px; min-height: 44px;
+  padding: 2px 0; gap: 6px; min-height: 44px;
 }
 .mobile-controls .mobile-group-order .watch-disclosure > svg { display: block; width: 14px; height: 14px; }
 .mobile-controls .mobile-group-order .watch-disclosure > span { font-size: .928571rem; }
@@ -458,3 +458,10 @@
 .mobile-controls .watch-select-popup [data-slot="select-item"] > span { white-space: normal; overflow-wrap: anywhere; }
 .mobile-controls .watch-detail-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .mobile-controls .mobile-group-button[data-variant="plain"], .mobile-controls .mobile-watch-row[data-variant="plain"] { box-shadow: none; }
+
+.mobile-controls .mobile-drawer-actions { display: flex; align-items: center; gap: 2px; flex: none; }
+.mobile-controls .watch-group-choice { display: flex; align-items: center; gap: 2px; }
+.mobile-controls .watch-group-choice > [data-slot="radio-group-item"] { flex: 1; min-width: 0; }
+.mobile-controls .watch-group-choice > button[data-slot="button"] { flex: none; min-width: 44px; min-height: 44px; }
+.mobile-manage-group-name { grid-column: 1; grid-row: 1; align-self: center; min-width: 0; overflow-wrap: anywhere; font-size: 1rem; }
+.mobile-controls .mobile-drawer-actions button[data-variant]:not([aria-label="关闭"]) { background: transparent; }

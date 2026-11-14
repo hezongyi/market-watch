@@ -28,7 +28,7 @@ def creation_request(body):
             dataset.pop(key, None)
     if not maintenance.get("frame_plan"):
         maintenance.pop("frame_plan", None)
-    return {**body, "create_only": body.get("create_only", False), "dataset": dataset, "maintenance": maintenance}
+    return {**body, "create_only": body.get("create_only", False), "mobile_unique": body.get("mobile_unique", False), "dataset": dataset, "maintenance": maintenance}
 
 
 class CreationConflict(ValueError):
@@ -91,6 +91,20 @@ def create_managed(db, body):
         if creation_request(original) != request:
             raise ValueError("相同提交标识不能更改创建配置")
         return {"dataset": dataset_detail(db, raw.key), "task": version_report(db, version.id)}
+    if body.mobile_unique:
+        from .mobile_symbol_search import existing_product
+        # Serialize different mode/calendar creations of the same exact source
+        # product too, without changing the persistent identity or schema.
+        if db.get_bind().dialect.name == "postgresql":
+            import hashlib
+
+            from sqlalchemy import text
+            product = "|".join((raw.source, raw.provider_symbol, raw.account_scope, raw.environment))
+            lock = int.from_bytes(hashlib.sha256(product.encode()).digest()[:8], "big", signed=True)
+            db.execute(text("SELECT pg_advisory_xact_lock(:key)"), {"key": lock})
+        existing = existing_product(db, raw)
+        if existing:
+            raise CreationConflict(existing.id)
     if body.create_only and db.get(DatasetMaintenance, raw.key) is not None:
         raise CreationConflict(raw.key)
     registration = body.dataset.model_dump()

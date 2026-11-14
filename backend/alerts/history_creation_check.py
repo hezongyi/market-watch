@@ -13,7 +13,7 @@ class CreationCheckError(ValueError):
         self.field = field
 
 
-def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=50):
+def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=50, mobile=False, exclude_existing=False):
     from .fxcm_history import configured as fxcm_configured
     from .history_catalog import creation_entry
     from .instrument_directory import SOURCES, has_entries, search
@@ -23,7 +23,7 @@ def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=5
         raise ValueError("请选择支持自建历史的来源")
     asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
     result = search(db, source=source or None, query=query, asset=asset, managed=True,
-                    offset=offset, limit=limit)
+                    offset=offset, limit=limit, mobile=mobile, exclude_existing=exclude_existing)
     sources = []
     for name in [source] if source else SOURCES:
         sources.append({"source": name,
@@ -33,7 +33,7 @@ def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=5
     return {**result, "items": [creation_entry(row) for row in result["items"]], "sources": sources}
 
 
-def check_creation(db, body):
+def check_creation(db, body, *, mobile_unique=False):
     from .data_center import dataset_detail
     from .history_api import CreationCheckRequest
     from .managed_dataset import date_start
@@ -71,11 +71,12 @@ def check_creation(db, body):
             raise CreationCheckError(
                 "价格精度与当前来源目录不一致，请重新选择品种", "create-precision"
             )
-    existing = db.get(MarketDataset, identity.key)
+    from .mobile_symbol_search import existing_product
+    existing = existing_product(db, identity) if mobile_unique else db.get(MarketDataset, identity.key)
     if existing:
         inst = db.get(Instrument, existing.instrument_id)
         if (
-            db.get(DatasetMaintenance, identity.key)
+            db.get(DatasetMaintenance, existing.id)
             or existing.logical_symbol != body.logical_symbol
             or body.precision is not None
             and inst.precision != body.precision
@@ -83,7 +84,7 @@ def check_creation(db, body):
             return {
                 "status": "existing",
                 "start": None,
-                "existing": dataset_detail(db, identity.key),
+                "existing": dataset_detail(db, existing.id),
             }
     start = None
     if body.start_date:

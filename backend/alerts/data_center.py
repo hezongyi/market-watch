@@ -87,7 +87,7 @@ def dataset_detail(db, dataset_id):
 
 
 def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25,
-                   include_continuations=False):
+                   include_continuations=False, mobile=False, exclude_watch=False, excluded_watch_ids=()):
     if not 1 <= page_size <= 100 or page < 1 or status not in (
             "all", "available", "preparing", "attention", "paused", "archived"):
         raise ValueError("无效的列表范围或状态")
@@ -103,7 +103,15 @@ def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, st
         base = base.outerjoin(DatasetMaintenance).where(or_(DatasetMaintenance.dataset_id.is_not(None), saved))
     else:
         base = base.join(DatasetMaintenance)
-    if query:
+    if exclude_watch:
+        base = base.where(MarketDataset.id.not_in(excluded_watch_ids))
+    if mobile:
+        from .mobile_symbol_search import predicate
+        base = base.where(predicate(query, Instrument.source,
+            MarketDataset.identity["provider_symbol"].as_string(), MarketDataset.asset_class,
+            MarketDataset.logical_symbol, Instrument.label,
+            exchange=func.coalesce(MarketDataset.identity["parameters"]["exchange_code"].as_string(), MarketDataset.identity["parameters"]["exchange"].as_string())))
+    elif query:
         # Literal substring search: user wildcards must not expand the query.
         base = base.where(code_search(query, MarketDataset.logical_symbol, Instrument.symbol))
     if source:

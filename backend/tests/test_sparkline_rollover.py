@@ -2,8 +2,58 @@
 import pytest
 from alerts import provider_chart, sparklines, storage
 from alerts.sparkline_api import SparklineItem
-from test_sparklines import catalog, provider_rows, read, stamp
 from test_sparkline_sessions import META
+from test_sparklines import catalog, provider_rows, read, stamp
+
+
+@pytest.mark.parametrize("asset", ["METAL", "CURRENCY", "CRYPTO"])
+def test_reference_is_close_before_displayed_day_not_its_open_or_today(database, monkeypatch, asset):
+    now = stamp("2026-11-14T12:00:00+00:00")
+    left, right = sparklines.window(stamp("2026-11-13T12:00:00+00:00"), asset)
+    monkeypatch.setattr(storage, "now_ms", lambda: now)
+    with database.begin() as db:
+        catalog(db, asset=asset)
+    meta = provider_chart.metadata("TEST", cached_only=True)
+    with database.begin() as db:
+        key = provider_rows(db, meta, "M1", [left - 60000, left, right - 60000])
+        from alerts.storage import ProviderBar
+        for at, opening, closing in ((left - 60000, "99", "101.23400"), (left, "104", "105"), (right - 60000, "106", "107")):
+            bar = db.get(ProviderBar, (key, at))
+            bar.payload = {**bar.payload, "open": opening, "close": closing}
+    result = read("MWP:TEST")[0]
+    assert result["session"]["previous"]
+    assert result["previous_close_price"] == "101.23400"
+    assert result["previous_close_at"] == left
+    assert result["session_open_price"] == "104"
+
+
+def test_missing_terminal_close_never_uses_sparse_minute_or_misaligned_daily(database, monkeypatch):
+    now = stamp("2026-11-13T12:00:00+00:00")
+    left, _ = sparklines.window(now, "METAL")
+    monkeypatch.setattr(storage, "now_ms", lambda: now)
+    with database.begin() as db:
+        catalog(db, asset="METAL")
+    meta = provider_chart.metadata("TEST", cached_only=True)
+    with database.begin() as db:
+        provider_rows(db, meta, "M1", [left - 120000, left], price="9")
+        provider_rows(db, meta, "D1", [left // 86400000 * 86400000 - 86400000], price="999")
+    result = read("MWP:TEST")[0]
+    assert result["points"] and result["previous_close_price"] is None
+
+
+def test_matching_daily_close_handles_weekend_and_missing_open_minute(database, monkeypatch):
+    now = stamp("2026-11-16T12:00:00+00:00")
+    friday_left, friday_right = sparklines.window(stamp("2026-11-13T12:00:00+00:00"), "METAL")
+    current_left, _ = sparklines.window(now, "METAL")
+    monkeypatch.setattr(storage, "now_ms", lambda: now)
+    with database.begin() as db:
+        catalog(db, asset="METAL")
+    meta = provider_chart.metadata("TEST", cached_only=True)
+    with database.begin() as db:
+        provider_rows(db, meta, "M1", [current_left + 60000], price="106")
+        provider_rows(db, meta, "D1", [friday_left], price="103.500")
+    result = read("MWP:TEST")[0]
+    assert result["previous_close_price"] == "103.500" and result["previous_close_at"] == friday_right
 
 
 @pytest.mark.parametrize("asset,now,previous", [
@@ -131,8 +181,8 @@ def test_daily_only_is_explicitly_unsupported_for_intraday(database, monkeypatch
 
 
 def test_old_fixed_version_retains_its_identity_with_visible_history_semantics(database, monkeypatch):
-    from test_composite_preparation import ready
     from alerts.storage import CompositeRevision
+    from test_composite_preparation import ready
     revision = ready(database, monkeypatch)
     with database() as db:
         version = db.get(CompositeRevision, revision).history_version_id
@@ -181,6 +231,7 @@ def test_source_date_bounds_use_exchange_timezone_and_dst():
 def test_source_transport_keeps_valid_meta_when_sdk_has_no_prices(monkeypatch):
     from contextlib import contextmanager
     from types import SimpleNamespace
+
     from alerts import provider_yahoo
     from yfinance.exceptions import YFPricesMissingError
     opening, end = stamp("2026-11-27T14:30:00+00:00"), stamp("2026-11-27T18:00:00+00:00")
@@ -202,6 +253,7 @@ def test_source_transport_keeps_valid_meta_when_sdk_has_no_prices(monkeypatch):
 
 def test_managed_cache_rolls_from_previous_day_to_first_current_bar(database, monkeypatch):
     from decimal import Decimal
+
     from alerts.storage import Bar
     now = stamp('2026-11-14T00:01:00+00:00')
     left = stamp('2026-11-14T00:00:00+00:00')
@@ -222,7 +274,7 @@ def test_managed_cache_rolls_from_previous_day_to_first_current_bar(database, mo
 
 
 def test_composite_previous_window_and_first_current_observation(database, monkeypatch):
-    from alerts.storage import CompositeRevision, MarketDataset, ObservedMinute, RealtimeMapping
+    from alerts.storage import CompositeRevision, ObservedMinute, RealtimeMapping
     from test_composite_preparation import ready
     from test_market_contracts import minute
     revision_id = ready(database, monkeypatch)
@@ -248,8 +300,7 @@ def test_composite_previous_window_and_first_current_observation(database, monke
 
 def test_active_revision_switch_never_reuses_another_revision_tail(database, monkeypatch):
     from alerts.composite_revisions import activate, create
-    from alerts.storage import CompositeRevision
-    from test_composite_revisions import request, prepared
+    from test_composite_revisions import prepared, request
     composite_id, old, body = request(database, monkeypatch)
     with database.begin() as db:
         new = create(db, composite_id, body).id
@@ -320,7 +371,6 @@ def test_prepare_failed_history_is_explicit_not_empty_success(database, monkeypa
 
 def test_prepare_sparse_oanda_requests_one_matching_native_daily_open(database, monkeypatch):
     from alerts import provider_cache
-    from alerts.storage import ProviderBar
     now = stamp('2026-11-14T00:00:00+00:00')
     left = stamp('2026-11-12T22:00:00+00:00')
     monkeypatch.setattr(storage, 'now_ms', lambda: now)

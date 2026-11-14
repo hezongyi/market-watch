@@ -252,7 +252,8 @@ def test_history_and_composite_reads_have_no_writes_or_task_growth(database, mon
     event.listen(engine, "before_cursor_execute", observe)
     try:
         read("MWH:" + version_id, "MWC:" + composite_id)
-        assert len(statements) <= 30, len(statements)
+        # Includes bounded prior-session reads for both immutable identities.
+        assert len(statements) <= 40, len(statements)
     finally:
         event.remove(engine, "before_cursor_execute", observe)
     with database() as db:

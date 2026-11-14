@@ -137,7 +137,7 @@ def chinese_name(source, symbol):
 
 
 
-def alias_search(query, source, symbol):
+def alias_search(query, source, symbol, *, compact=False):
     """Add only matching stable legacy aliases; ordinary SQL searches stay small."""
     from sqlalchemy import and_, false, or_
 
@@ -145,11 +145,15 @@ def alias_search(query, source, symbol):
     if not any("\u4e00" <= char <= "\u9fff" for char in term):
         return false()
     matches = []
+    if compact:
+        aliases = [code for code, names in ALIASES.items() if term in re.sub(r"[\s/_-]", "", names[0]).casefold()]
+        if aliases:
+            matches.append(and_(source == "yahoo", symbol.in_(aliases)))
     for provider in ("oanda", "dukascopy", "fxcm"):
         codes = dict(_OANDA)
         codes.update({base + "_" + quote: base_name + " / " + quote_name
             for base, base_name in _CURRENCIES.items() for quote, quote_name in _CURRENCIES.items()})
-        aliases = [code for code, name in codes.items() if term in name.casefold()]
+        aliases = [code for code, name in codes.items() if term in (re.sub(r"[\s/_-]", "", name) if compact else name).casefold()]
         if provider != "oanda":
             aliases = [code.replace("_", "/") for code in aliases]
         if aliases:

@@ -7,7 +7,7 @@ fs.mkdirSync(out, {recursive:true});
 let logged = false, failNext = true;
 let pref = {kind:'setting',name:'mw.watchlists.v1',tool:'',revision:1,content:{value:{active:'second',unknown:'keep',lists:[{id:'first',title:'第一组',symbols:[]},{id:'second',title:'第二组',symbols:['MWP:N0']}]}}};
 const calls = [], errors = [], writes = [];
-const row = (i, q = '') => ({ticker:'MWP:N'+i,display_symbol: q==='old'?'OLD'+i:q==='new'?'NEW'+i:'ITEM'+i,description:'测试品种 · 原生 · Yahoo',source:i % 2 ? 'yahoo':'oanda'});
+const row = (i, q = '') => ({ticker:'MWP:'+(['old','new'].includes(q)?q:'')+'N'+i,display_symbol: q==='old'?'OLD'+i:q==='new'?'NEW'+i:'ITEM'+i,description:'测试品种 · 原生 · Yahoo',source:i % 2 ? 'yahoo':'oanda'});
 const catalog = i => ({catalog_id:'HC:'+i,source:'yahoo',provider_symbol:'ITEM'+i,display_symbol:'ITEM'+i,logical_symbol:'ITEM'+i,label:'测试品种',asset_class:'stock',precision:2,default_mode:'native_periods',supported_modes:['native_periods'],supported_frames:{none:['D1']},default_start_date:'2020-01-01'});
 const managed = i => ({maintenance:{active_version_id:null},id:'managed-'+i,logical_symbol:'ITEM'+i,display_symbol:'ITEM'+i,provider_display_symbol:'ITEM'+i,identity:{source:'yahoo',basis:'bid',mode:'native_periods'},usable_timeframes:['M1'],periods:[{timeframe:'M1',available_version_id:'v-'+i}],continuation:{enabled:false}});
 const server = http.createServer(async (req, res) => {
@@ -23,11 +23,14 @@ const server = http.createServer(async (req, res) => {
   if(q==='old')await new Promise(r=>setTimeout(r,900));
   if(q==='fail'&&offset===25&&failNext){failNext=false;return json({detail:'下一批失败'},400);}
   const count=q==='new'||q==='old'?1:55;
-  const items=Array.from({length:Math.min(25,Math.max(0,count-offset))},(_,i)=>row(offset+i,q));
-  if(offset)items.unshift(row(offset-1,q));
-  // Same display code, distinct native identities must survive.
-  if(offset===50)items.push({...row(90,q),display_symbol:'ITEM0',source:'dukascopy'});
-  return json({items,next_offset:offset+25<count?offset+25:null});
+  const watched=new Set(pref.content.value.lists.flatMap(group=>group.symbols));
+  const all=Array.from({length:count},(_,i)=>row(i,q));
+  if(count===55)all.push({...row(90,q),display_symbol:'ITEM0',source:'dukascopy'});
+  const qualified=all.filter(item=>!watched.has(item.ticker));
+  const items=qualified.slice(offset,offset+25);
+  if(offset&&qualified[offset-1])items.unshift(qualified[offset-1]);
+  assert.equal(url.searchParams.get('mobile'),'true');assert.equal(url.searchParams.get('exclude_watch'),'true');
+  return json({items,next_offset:offset+25<qualified.length?offset+25:null});
  }
  if(p==='/api/market-data/history-catalog/search'){
   const offset=Number(url.searchParams.get('offset')||0);calls.push({kind:'catalog',offset});
@@ -36,7 +39,9 @@ const server = http.createServer(async (req, res) => {
  if(p==='/api/market-data/center/dataset-summaries'){
   const q=url.searchParams.get('query')||'', page=Number(url.searchParams.get('page')||1), total=['old','new'].includes(q)?0:27;
   calls.push({kind:'managed',q,page});
-  return json({items:Array.from({length:Math.min(25,Math.max(0,total-(page-1)*25))},(_,i)=>managed((page-1)*25+i)),total});
+  const watched=new Set(pref.content.value.lists.flatMap(group=>group.symbols));
+  const qualified=Array.from({length:total},(_,i)=>managed(i)).filter(item=>!watched.has('MWH:v-'+item.id.split('-')[1]));
+  return json({items:qualified.slice((page-1)*25,page*25),total:qualified.length});
  }
  const dataset=p.match(/^\/api\/market-data\/center\/datasets\/managed-(\d+)$/);
  if(dataset)return json(managed(Number(dataset[1])));
@@ -68,22 +73,23 @@ const server = http.createServer(async (req, res) => {
   await expect(dialog().getByRole('combobox')).toHaveCount(0);
   const nativeZero=()=>rows().filter({hasText:'ITEM0'}).filter({hasNotText:'自建'}).first();
   const managedZero=()=>rows().filter({hasText:'ITEM0'}).filter({hasText:'自建'}).first();
-  await expect(nativeZero().getByRole('button',{name:'添加 ITEM0',exact:true})).toBeEnabled();
-  await nativeZero().getByRole('button',{name:'添加 ITEM0',exact:true}).click();
-  await expect(nativeZero().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();
-  assert(pref.content.value.lists[0].symbols.includes('MWP:N0'));assert.equal(pref.content.value.active,'second');assert.equal(writes.length,1);await page.getByRole('button',{name:'关闭通知',exact:true}).click();
-  await managedZero().getByRole('button',{name:'添加 ITEM0',exact:true}).click();await expect(managedZero().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();assert(pref.content.value.lists[0].symbols.includes('MWH:v-0'));await page.getByRole('button',{name:'关闭通知',exact:true}).click();
-  await bottom();await expect(rows()).toHaveCount(77);await bottom();await expect(rows()).toHaveCount(83);
+  await expect(nativeZero()).toHaveCount(0);assert(!pref.content.value.lists[0].symbols.includes('MWP:N0'),'other group membership is hidden globally');
+  const nativeOne=()=>rows().filter({hasNotText:'自建'}).filter({has:page.locator('strong').filter({hasText:/^ITEM1$/})}).first();
+  await nativeOne().getByRole('button',{name:'添加 ITEM1',exact:true}).click();
+  await expect(nativeOne()).toHaveCount(0);await expect(rows()).toHaveCount(50);
+  assert(pref.content.value.lists[0].symbols.includes('MWP:N1'));assert.equal(pref.content.value.active,'second');assert.equal(writes.length,1);await page.getByRole('button',{name:'关闭通知',exact:true}).click();
+  await managedZero().getByRole('button',{name:'添加 ITEM0',exact:true}).click();await expect(managedZero()).toHaveCount(0);assert(pref.content.value.lists[0].symbols.includes('MWH:v-0'));await page.getByRole('button',{name:'关闭通知',exact:true}).click();
+  await bottom();await expect(rows()).toHaveCount(76);await bottom();await expect(rows()).toHaveCount(80);
   await expect(page.getByText('已显示全部',{exact:true})).toBeVisible();const endCount=calls.length;await bottom();await settle();assert.equal(calls.length,endCount,'end stops requests');
-  assert.equal(await rows().filter({hasText:/ITEM0/}).count(),3,'same code across native sources and managed identities retained');
+  assert.equal(await rows().filter({hasText:/ITEM0/}).count(),1,'already watched identities hidden; distinct remaining source retained');
   const scroll=page.locator('.mobile-drawer-scroll').last();await scroll.evaluate(el=>el.scrollTop=900);const before=await scroll.evaluate(el=>el.scrollTop);
   await rows().nth(12).locator('.symbol-search-body').click();await expect(dialog()).toHaveAccessibleName('行情详情');await close();
-  assert(Math.abs(await scroll.evaluate(el=>el.scrollTop)-before)<4,'detail return keeps position');await expect(rows()).toHaveCount(83);
+  assert(Math.abs(await scroll.evaluate(el=>el.scrollTop)-before)<4,'detail return keeps position');await expect(rows()).toHaveCount(80);
   const search=dialog().getByRole('searchbox');await search.fill('old');
   assert.equal(await search.evaluate(el=>getComputedStyle(el).outlineStyle),'none','InputGroup owns the focus indicator, without an inner outline');
   const clear=dialog().getByRole('button',{name:'清空搜索',exact:true});const target=await clear.boundingBox();assert(target.width>=44&&target.height>=44,'clear search retains a full touch target');await page.waitForTimeout(320);await search.fill('new');await expect(rows().first()).toContainText('NEW0');await page.waitForTimeout(950);await expect(rows()).toHaveCount(1);await expect(rows()).not.toContainText(['OLD0']);
   await search.fill('fail');await expect(rows()).toHaveCount(50);await bottom();await expect(page.getByText('下一批失败',{exact:true})).toBeVisible();const failed=calls.filter(c=>c.q==='fail').length;await settle();await bottom();assert.equal(calls.filter(c=>c.q==='fail').length,failed,'failed next page does not loop');await expect(rows()).toHaveCount(50);
-  await page.getByRole('button',{name:'重试',exact:true}).click();await expect(rows()).toHaveCount(77);await bottom();await expect(rows()).toHaveCount(83);
+  await page.getByRole('button',{name:'重试',exact:true}).click();await expect(rows()).toHaveCount(76);await bottom();await expect(rows()).toHaveCount(80);
   await scroll.evaluate(el=>el.scrollTop=0);
   for(const width of [375,412])for(const theme of ['light','dark'])for(const font of [14,21]){
    await page.setViewportSize({width,height:915});await page.evaluate(({theme,font})=>{document.querySelector('.mobile-app').dataset.theme=theme;document.documentElement.style.fontSize=font+'px';},{theme,font});await settle();
@@ -92,12 +98,12 @@ const server = http.createServer(async (req, res) => {
   await page.evaluate(()=>document.documentElement.style.fontSize='14px');await close();
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('radio',{name:'第二组',exact:true}).click();
   await page.getByRole('button',{name:'添加自选',exact:true}).click();await expect(rows()).toHaveCount(50);
-  await expect(nativeZero().getByRole('button',{name:'已添加 ITEM0',exact:true})).toBeDisabled();
-  const one=rows().filter({hasNotText:'自建'}).filter({has:page.locator('strong').filter({hasText:/^ITEM1$/})}).first();await one.getByRole('button',{name:'添加 ITEM1',exact:true}).click();
-  await expect(one.getByRole('button',{name:'已添加 ITEM1',exact:true})).toBeDisabled();assert(pref.content.value.lists[1].symbols.includes('MWP:N1'));assert(!pref.content.value.lists[0].symbols.includes('MWP:N1'));await page.getByRole('button',{name:'关闭通知',exact:true}).click();await close();
+  const nativeTwo=()=>rows().filter({hasNotText:'自建'}).filter({has:page.locator('strong').filter({hasText:/^ITEM2$/})}).first();
+  await nativeTwo().getByRole('button',{name:'添加 ITEM2',exact:true}).click();
+  await expect(nativeTwo()).toHaveCount(0);assert(pref.content.value.lists[1].symbols.includes('MWP:N2'));assert(!pref.content.value.lists[0].symbols.includes('MWP:N2'));await page.getByRole('button',{name:'关闭通知',exact:true}).click();await close();
   await page.getByRole('link' ,{name:'数据',exact:true}).click();await page.getByRole('button',{name:'搜索并添加行情',exact:true}).click();await expect(page.locator('.data-catalog-row')).toHaveCount(25);await bottom();await expect(page.locator('.data-catalog-row')).toHaveCount(50);
   const catalogScroll=page.locator('.mobile-drawer-scroll').last();await catalogScroll.evaluate(el=>el.scrollTop=600);
   await page.locator('.data-catalog-row').nth(9).click();await expect(dialog().getByRole('button',{name:'更换品种',exact:true})).toBeVisible();await dialog().getByRole('button',{name:'更换品种',exact:true}).click();await expect(page.locator('.data-catalog-row')).toHaveCount(50);assert(await catalogScroll.evaluate(el=>el.scrollTop)>400,'creation return keeps position');await bottom();await expect(page.locator('.data-catalog-row')).toHaveCount(55);
-  await close();assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['shared entries','no tabs or filters or group picker','both directory page chains exhaust independently','actual current/default group and group-specific duplicates','continuous add','auto append','identity dedup','end stop','late query rejected','next-page failure retains rows and waits for retry','detail and creation return keep rows and scroll','375/412 light/dark 150% typography'],calls:calls.length,writes:writes.length,out}));
+  await close();assert.deepEqual(errors,[]);console.log(JSON.stringify({passed:true,checks:['shared entries','no tabs or filters or group picker','both directory page chains exhaust independently','current/default group and global duplicate exclusion before paging','continuous add','auto append','identity dedup','end stop','late query rejected','next-page failure retains rows and waits for retry','detail and creation return keep rows and scroll','375/412 light/dark 150% typography'],calls:calls.length,writes:writes.length,out}));
  } finally {await context.close();await browser.close();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

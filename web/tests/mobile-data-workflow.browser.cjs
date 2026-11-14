@@ -62,6 +62,8 @@ let logged = false,
   mappingLost = false,
   enableLost = false,
   failEnable = false,
+  commandPreparing = false,
+  summaryGate = null,
   conflict = false,
   failProbe = false,
   hideExisting = false,
@@ -246,6 +248,7 @@ const server = http.createServer(async (req, res) => {
         unread: 0,
       });
     if (p === "/api/market-data/center/dataset-summaries") {
+      if (summaryGate) await summaryGate;
       let rows = [...datasets.values()].filter((d) =>
         url.searchParams.get("status") === "archived"
           ? d.maintenance.archived
@@ -261,7 +264,7 @@ const server = http.createServer(async (req, res) => {
       const anchor = url.searchParams.get("anchor")?.slice(8),
         pos = rows.findIndex((d) => d.id === anchor) + 1;
       return json({
-        items: rows,
+        items: rows.map(d => { const c=continuation(d.id); return {...d,continuation:{...c,configured:c.mappings.length>0,can_enable:c.supported&&c.ready_to_enable,can_disable:c.enabled,disabled_reason:!c.supported?'不支持':!c.mappings.length?'待配置':'待历史'}}; }),
         total: rows.length,
         anchor_position: pos || null,
       });
@@ -498,6 +501,10 @@ const server = http.createServer(async (req, res) => {
           };
           liveEnabled = body.enabled;
           if (body.enabled && id === eid) defaultOverride = body.mapping_id;
+          if (body.enabled && commandPreparing) {
+            commandPreparing = false;
+            return json({ ...continuation(id), status: "preparing" });
+          }
         }
         return json(continuation(id));
       }
@@ -689,7 +696,7 @@ const server = http.createServer(async (req, res) => {
     await settle();
   }
   async function details(code = "EURUSD") {
-    await page.locator(".data-managed-row").filter({ hasText: code }).click();
+    await page.locator(".data-managed-row").filter({ hasText: code }).locator(".data-managed-open").click();
     await expect(
       dialog("自建行情").getByRole("button", { name: "维护设置", exact: true }),
     ).toBeVisible();
@@ -910,6 +917,44 @@ const server = http.createServer(async (req, res) => {
     await shot("09-range");
     await close("区间维护");
     await close("自建行情");
+    const rowSwitch=()=>page.getByRole('switch',{name:'EURUSD 实时',exact:true});
+    await expect(rowSwitch()).toBeChecked();
+    await rowSwitch().click();
+    await expect(rowSwitch()).not.toBeChecked();
+    await expect(page.getByRole('alertdialog')).toHaveCount(0);
+    assert.equal(datasets.get(eid).continuation.enabled,false);
+    failEnable=true;
+    await rowSwitch().click();
+    await expect(rowSwitch()).not.toBeChecked();
+    await expect(rowSwitch()).toBeEnabled();
+    failEnable=false;
+    // Command response protects against the old disk snapshot, then yields to
+    // a fresh summary even when runtime has already advanced to receiving.
+    publish(eid);
+    datasets.get(eid).maintenance.paused = false;
+    commandPreparing = true;
+    let releaseSummary;
+    summaryGate = new Promise(resolve => { releaseSummary = resolve; });
+    await rowSwitch().click();
+    await expect(rowSwitch()).toBeChecked();
+    // The cached maintenance status is older; the Switch must stay enabled.
+    await page.waitForTimeout(200);
+    await expect(rowSwitch()).toBeChecked();
+    summaryGate = null;
+    releaseSummary();
+    const liveRow = page.locator('.data-managed-row').filter({ has: rowSwitch() });
+    await expect(liveRow.getByText('实时运行中', { exact: true })).toBeVisible();
+    // A change by another client must replace the command response on polling.
+    datasets.get(eid).continuation.enabled = false;
+    await expect(rowSwitch()).not.toBeChecked({ timeout: 20000 });
+    await expect(liveRow.getByText('历史可用', { exact: true })).toBeVisible();
+    proof.checks.push('preparing command survives stale snapshot, yields to fresh receiving summary and later external disable');
+    enableLost=true;
+    await rowSwitch().click();
+    await expect(rowSwitch()).toBeChecked();
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await shot('09a-row-live-switch');
+    proof.checks.push('list Switch directly stops, failure rolls back, lost enable response reads back; no confirmation or detail navigation');
     await page
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();

@@ -164,7 +164,7 @@ const server = http.createServer(async (req, res) => {
       page = Number(url.searchParams.get("page") || 1);
     return json({
       items:
-        q === "empty"
+        q === "empty" || (url.searchParams.get("exclude_watch") === "true" && pref.content.value.lists.some(l=>l.symbols.includes(entries.composite.ticker) || l.symbols.includes(entries.history.ticker)))
           ? []
           : [
               {
@@ -711,9 +711,8 @@ const server = http.createServer(async (req, res) => {
     await catalog()
       .getByRole("button", { name: /^添加 / })
       .click();
-    await expect(
-      catalog().getByRole("button", { name: /^已添加 / }),
-    ).toBeDisabled();
+    await expect.poll(() => pref.content.value.lists.some(l => l.symbols.includes(entries.composite.ticker))).toBe(true);
+    await expect(catalog()).toHaveCount(0);
     assert(
       pref.content.value.lists.some((l) =>
         l.symbols.includes(entries.composite.ticker),
@@ -725,6 +724,8 @@ const server = http.createServer(async (req, res) => {
       ),
     );
     await page.getByRole("button", { name: "关闭通知", exact: true }).click();
+    // A different client removes the watched identity before eligibility checks.
+    pref.content.value.lists.forEach(l => l.symbols = []);
     continuationReady = false;
     await search.fill("waiting");
     await detail();

@@ -1,0 +1,14 @@
+{
+  "passed": true,
+  "host": "Ubuntu quant-server Docker",
+  "url": "https://192.168.7.232:18447",
+  "checks": [
+    "real authenticated watch/data",
+    "read-only group header and rename actions",
+    "data row Switch present",
+    "create search gold AND OANDA, no filters",
+    "375/412 and 150% layout no overflow"
+  ],
+  "errors": [],
+  "server_failures": []
+}

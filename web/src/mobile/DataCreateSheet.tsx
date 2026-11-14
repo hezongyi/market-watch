@@ -193,7 +193,7 @@ export default function DataCreateSheet({
     const timer = setTimeout(() => {
       void dataRequest<Check>(
         profile,
-        "/market-data/center/datasets/check",
+        "/market-data/center/datasets/check?mobile_unique=true",
         JSON.parse(key),
         controller.signal,
       )
@@ -221,6 +221,7 @@ export default function DataCreateSheet({
           body: {
             request_id: requestId.current,
             create_only: true,
+            mobile_unique: true,
             dataset,
             maintenance: {
               target_start: current.start,

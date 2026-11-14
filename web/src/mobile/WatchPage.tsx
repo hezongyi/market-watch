@@ -15,6 +15,7 @@ import {
   Layers3,
   FolderPlus,
   Pencil,
+  SlidersHorizontal,
   Plus,
   ArrowUp,
   ArrowDown,
@@ -48,6 +49,7 @@ import {
   type WatchPreference,
 } from "./watchlists";
 import MobileSheet from "./MobileSheet";
+import MobileSelect from "./MobileSelect";
 import { WatchOverlaysProvider, WatchConfirm } from "./WatchOverlays";
 import { Button } from "./components/ui/button";
 import { RadioGroup, RadioGroupItem } from "./components/ui/radio-group";
@@ -127,14 +129,12 @@ function Spark({
   instrument,
   online,
   state,
-  previousClose,
   quote,
 }: {
   item?: Sparkline;
   instrument: string;
   online: boolean;
   state?: "loading" | "error";
-  previousClose?: number;
   quote?: Quote;
 }) {
   const gradient = useId();
@@ -153,8 +153,7 @@ function Spark({
     ? sparklineWithQuote(item, quote) : undefined, [item, quote]);
   const previousSession = current?.session?.previous;
   const blueSession = previousSession || current?.display_state === "closed";
-  const sessionOpen = current?.session_open_price == null ? undefined : Number(current.session_open_price);
-  const reference = previousSession ? sessionOpen : previousClose;
+  const reference = current?.previous_close_price == null ? undefined : Number(current.previous_close_price);
   const paths = useMemo(() => current ? sparklinePaths(current, width, 50, reference, instrument) : [], [current, width, reference, instrument]);
   const scale = current ? sparklineScale(current, 50, reference, instrument) : undefined;
   const referenceY = scale?.referenceY;
@@ -194,7 +193,7 @@ function Spark({
         preserveAspectRatio="none"
         aria-label={
           current.session?.previous
-            ? `${current.session.date} 历史走势${cached ? " · 缓存" : ""}${scale?.referenceOutside ? " · 开盘参考价在曲线显示范围外" : ""}`
+            ? `${current.session.date} 历史走势${cached ? " · 缓存" : ""}${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
             : cached
               ? `离线或刷新失败，显示缓存走势${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
               : `${current.display_state === "closed" ? "常规交易时段已结束" : current.display_state === "unknown" ? "日内走势 · 交易时段未确认" : current.reason || "当前窗口日内走势"}${scale?.referenceOutside ? " · 昨收参考价在曲线显示范围外" : ""}`
@@ -208,9 +207,9 @@ function Spark({
           </linearGradient>
         </defs>
         {referenceY !== undefined && (
-          <line className={`${previousSession ? "mobile-spark-session-open" : "mobile-spark-previous-close"}${scale?.referenceOutside ? " mobile-spark-reference-outside" : ""}`} x1="0" x2={width}
+          <line className={`mobile-spark-previous-close${scale?.referenceOutside ? " mobile-spark-reference-outside" : ""}`} x1="0" x2={width}
             y1={referenceY} y2={referenceY} vectorEffect="non-scaling-stroke">
-            <title>{previousSession ? `${current.session!.date} 开盘价 ${sessionOpen}` : `昨收 ${previousClose} · 与报价涨跌幅同基准`}{scale?.referenceOutside ? " · 参考价在曲线显示范围外" : ""}</title>
+            <title>{`${current.session?.date || "展示日"} 的昨收 ${reference}`}{scale?.referenceOutside ? " · 参考价在曲线显示范围外" : ""}</title>
           </line>
         )}
         {current.reference_times?.map((at) => (
@@ -308,6 +307,16 @@ export default function WatchPage({
     if (version === pullVersion.current) setRefreshing(false);
   };
   const [groupForm, setGroupForm] = useState<"new" | "rename">();
+  const [renameId, setRenameId] = useState("");
+  const [formOrigin, setFormOrigin] = useState<"groups" | "manage">("groups");
+  function startGroupForm(mode: "new" | "rename", id = "") {
+    setRenameId(id);
+    setFormOrigin(sheet === "manage" ? "manage" : "groups");
+    setName(mode === "rename" ? (draft || content.lists).find(row => row.id === id)?.title || "" : "");
+    setNameError("");
+    afterSheetClose.current = () => setGroupForm(mode);
+    setSheet(null);
+  }
   const [nameError, setNameError] = useState("");
   const [quotes, setQuotes] = useState<Record<string, Quote>>({}),
     [sparks, setSparks] = useState<Record<string, Sparkline>>({});
@@ -951,8 +960,6 @@ export default function WatchPage({
                 instrument={displayCode}
                 online={online}
                 quote={!stale && foreground ? quote : undefined}
-                previousClose={quote?.s === "ok" && item && !item.session?.previous && value?.read_at >= item.window_start &&
-                  value.read_at < sparklineExpires(item) ? value.prev_close_price : undefined}
                 state={sparkStates[ticker]}
                 item={
                   item?.status !== "unavailable" && revision && item?.revision?.composite_revision_id !== revision
@@ -1005,6 +1012,14 @@ export default function WatchPage({
         </MobileSheet>
       <MobileSheet
           open={Boolean(sheet)}
+          onClosed={finishSheetClose}
+          headerActions={<>
+            <Button variant="ghost" size="icon" aria-label="新建分组" disabled={!online || busy} onClick={() => startGroupForm("new")}><FolderPlus aria-hidden="true" /></Button>
+            {sheet === "groups" && <Button variant="ghost" size="icon" aria-label="管理自选" onClick={() => {
+              afterSheetClose.current = () => { setManageTab("symbols"); setSheet("manage"); };
+              setSheet(null);
+            }}><SlidersHorizontal aria-hidden="true" /></Button>}
+          </>}
           dismissible={!busy}
           fullHeight={sheet === "manage"}
           title={sheet === "groups" ? "自选分组" : "管理自选"}
@@ -1026,28 +1041,17 @@ export default function WatchPage({
                   void writeSnapshot(profile, "watch-group", id).catch(() => report("分组选择未记住"));
                 }}>
                 {[{ id: "", title: "全部自选" }, ...content.lists].map(row => (
-                  <RadioGroupItem key={row.id} value={row.id} variant="row" aria-label={row.title}
-                    onClick={() => { if (group === row.id) setSheet(null); }}>
-                    <span className="watch-group-icon" aria-hidden="true">{row.id ? <Folder /> : <Layers3 />}</span>
-                    <span className="mobile-group-label">{row.title}</span>
-                    <span className="mobile-group-count" aria-hidden="true">{row.id ? content.lists.find(item => item.id === row.id)?.symbols.length : allSymbols(content).length}</span>
-                  </RadioGroupItem>
+                  <div className="watch-group-choice" key={row.id}>
+                    <RadioGroupItem value={row.id} variant="row" aria-label={row.title}
+                      onClick={() => { if (group === row.id) setSheet(null); }}>
+                      <span className="watch-group-icon" aria-hidden="true">{row.id ? <Folder /> : <Layers3 />}</span>
+                      <span className="mobile-group-label">{row.title}</span>
+                      <span className="mobile-group-count" aria-hidden="true">{row.id ? content.lists.find(item => item.id === row.id)?.symbols.length : allSymbols(content).length}</span>
+                    </RadioGroupItem>
+                    {row.id && <Button variant="ghost" size="icon" aria-label={`重命名 ${row.title}`} disabled={!online || busy} onClick={() => startGroupForm("rename", row.id)}><Pencil aria-hidden="true" /></Button>}
+                  </div>
                 ))}
               </RadioGroup>
-              <div className="mobile-sheet-actions watch-group-footer">
-                <div className="watch-group-shortcuts">
-                  <Button variant="outline" onClick={() => { setName(""); setNameError(""); setGroupForm("new"); }}>
-                    <FolderPlus data-icon="inline-start" aria-hidden="true" />新建分组
-                  </Button>
-                  {group && <Button variant="outline" onClick={() => {
-                    setName(content.lists.find(row => row.id === group)?.title || "");
-                    setNameError(""); setGroupForm("rename");
-                  }}><Pencil data-icon="inline-start" aria-hidden="true" />重命名当前分组</Button>}
-                </div>
-                <Button variant="ghost" onClick={() => { setName(""); setDraft(undefined); setManageTab("symbols"); setSheet("manage"); }}>
-                  管理自选<ChevronRight data-icon="inline-end" aria-hidden="true" />
-                </Button>
-              </div>
             </>
           ) : (
             <>
@@ -1063,67 +1067,12 @@ export default function WatchPage({
                   <TabsTrigger value="groups" aria-label="分组">分组<span>{editing.length}</span></TabsTrigger>
                 </TabsList>
                 <TabsContent value="groups" className="mobile-form-detail">
-                <FieldGroup>
-                <Field data-invalid={Boolean(nameError) || undefined}>
-                  <FieldLabel htmlFor={groupNameId + "-create"}>新分组名称</FieldLabel>
-                  <InputGroup className="watch-create-input">
-                  <InputGroupInput id={groupNameId + "-create"}
-                    value={name}
-                    placeholder="例如：重点关注"
-                    maxLength={20}
-                    aria-invalid={Boolean(nameError)}
-                    aria-describedby={nameError ? groupNameId + "-create-error" : undefined}
-                    onChange={(event) => { setName(event.target.value); setNameError(""); }}
-                  />
-                  <InputGroupAddon align="inline-end">
-                <InputGroupButton variant="secondary" size="icon-sm" aria-label="添加分组"
-                  disabled={!online || busy || !name.trim()}
-                  onClick={() => {
-                    if (name.trim() === "全部" || editing.some(row => row.title.trim() === name.trim())) {
-                      setNameError("请输入不重复的分组名称。");
-                      return;
-                    }
-                    const lists = [
-                      ...editing,
-                      {
-                        id: crypto.randomUUID(),
-                        title: name.trim(),
-                        symbols: [],
-                      },
-                    ];
-                    setDraft(lists);
-                    setName("");
-                  }}
-                >
-                  <Plus aria-hidden="true" />
-                </InputGroupButton>
-                  </InputGroupAddon>
-                  </InputGroup>
-                  {nameError && <FieldError id={groupNameId + "-create-error"}>{nameError}</FieldError>}
-                </Field>
-                </FieldGroup>
                 <WatchReorderList order={editing.map(row => row.id)}>
                 {editing.map((row, index) => (
                   <div key={row.id} data-order-id={row.id} className="mobile-manage-group">
-                    <FieldGroup>
-                    <Field>
-                      <FieldLabel className="sr-only" htmlFor={groupNameId + row.id}>分组名称</FieldLabel>
-                      <Input id={groupNameId + row.id}
-                        value={row.title}
-                        maxLength={20}
-                        onChange={(event) =>
-                          setDraft(
-                            editing.map((item) =>
-                              item.id === row.id
-                                ? { ...item, title: event.target.value }
-                                : item,
-                            ),
-                          )
-                        }
-                      />
-                    </Field>
-                    </FieldGroup>
+                    <strong className="mobile-manage-group-name">{row.title}</strong>
                     <div className="mobile-inline-actions">
+                      <Button variant="ghost" size="icon" aria-label={`重命名 ${row.title}`} disabled={!online || busy} onClick={() => startGroupForm("rename", row.id)}><Pencil aria-hidden="true" /></Button>
                       <Button variant="outline" size="icon"
                         aria-label={`上移分组 ${row.title}`}
                         disabled={!index}
@@ -1245,6 +1194,15 @@ export default function WatchPage({
                     </small>
                   </span>
                   <div className="mobile-watch-list-actions">
+                    {content.lists.length > 1 && <MobileSelect label={`移动 ${code(ticker, quotes[ticker])}`} value=""
+                      disabled={!online || busy || !!draft}
+                      items={[{ value: "", label: "移动到…" }, ...content.lists.filter(item => item.id !== group).map(item => ({ value: item.id, label: item.title }))]}
+                      onChange={destination => {
+                        if (!destination) return;
+                        const lists = removeSymbol(content, ticker, group).map(item => item.id === destination
+                          ? { ...item, symbols: [...new Set([...item.symbols, ticker])] } : item);
+                        void save(lists);
+                      }} />}
                     {group &&
                       [-1, 1].map((direction) => (
                         <Button variant="outline" size="icon"
@@ -1333,13 +1291,14 @@ export default function WatchPage({
         </MobileSheet>
       <MobileSheet
           open={Boolean(groupForm)}
+          onClosed={() => setSheet(formOrigin)}
           dismissible={!busy}
           title={groupForm === "new" ? "新建分组" : "重命名分组"}
           dirty={
             groupForm === "new"
               ? Boolean(name)
               : name !==
-                (content.lists.find((row) => row.id === group)?.title || "")
+                ((formOrigin === "manage" ? editing : content.lists).find((row) => row.id === renameId)?.title || "")
           }
           close={() => {
             setGroupForm(undefined);
@@ -1350,28 +1309,23 @@ export default function WatchPage({
             onSubmit={async (event) => {
               event.preventDefault();
               const title = name.trim();
-              if (
-                !title ||
-                title === "全部" ||
-                content.lists.some(
-                  (row) =>
-                    row.title === title &&
-                    (groupForm === "new" || row.id !== group),
-                )
-              ) {
+              const source = formOrigin === "manage" ? editing : content.lists;
+              if (!title || title.length > 20 || title === "全部" || source.some(row => row.title === title && (groupForm === "new" || row.id !== renameId))) {
                 setNameError("请输入不重复的分组名称（1–20 字）。");
                 return;
               }
-              const lists =
-                groupForm === "new"
-                  ? [
-                      ...content.lists,
-                      { id: crypto.randomUUID(), title, symbols: [] },
-                    ]
-                  : content.lists.map((row) =>
-                      row.id === group ? { ...row, title } : row,
-                    );
-              if (await save(lists)) {
+              const newId = crypto.randomUUID();
+              const lists = groupForm === "new" ? [...source, { id: newId, title, symbols: [] }]
+                : source.map(row => row.id === renameId ? { ...row, title } : row);
+              if (formOrigin === "manage") {
+                setDraft(lists);
+                setGroupForm(undefined);
+                setName("");
+              } else if (await save(lists)) {
+                if (groupForm === "new") {
+                  setGroup(newId);
+                  void writeSnapshot(profile, "watch-group", newId).catch(() => report("分组选择未记住"));
+                }
                 setGroupForm(undefined);
                 setName("");
                 report("分组已保存");

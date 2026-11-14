@@ -1043,3 +1043,11 @@
 .symbol-result-identity { display: flex; flex-direction: column; min-width: 0; }
 .mobile-controls button.symbol-search-body.data-catalog-row[data-variant] { flex-direction: row; align-items: center; justify-content: space-between; }
 .symbol-search-body.data-catalog-row .symbol-result-identity { gap: 0; }
+
+.mobile-data .data-title .data-title-count { display: inline; margin-top: 0; margin-left: 8px; color: var(--muted); font-size: .8rem; font-weight: 400; }
+.mobile-data .data-list-filter { justify-content: flex-end; }
+.mobile-data .data-managed-row { display: grid; grid-template-columns: minmax(0, 1fr) minmax(64px, auto); align-items: center; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--quiet-line); }
+.mobile-data .data-managed-open[data-slot="button"] { justify-content: flex-start; text-align: left; height: auto; min-height: 64px; min-width: 0; padding: 4px 0; white-space: normal; background: transparent; border-color: transparent; border-radius: 0; }
+.mobile-data .data-managed-row .data-managed-status { max-width: 110px; gap: 0; }
+.mobile-data .data-live-switch-target { display: flex; min-height: 44px; min-width: 48px; align-items: center; justify-content: flex-end; padding-right: 6px; }
+.mobile-data .data-managed-status small { font-size: .72rem; line-height: 1.45; }

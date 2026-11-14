@@ -96,7 +96,7 @@ export type Dataset = {
     mode?: string;
     adjustment?: string;
   };
-  continuation?: { enabled: boolean; configured: boolean; status: string; composite_ids?: string[] };
+  continuation?: { enabled: boolean; configured: boolean; status: string; composite_ids?: string[]; can_enable?: boolean; can_disable?: boolean; disabled_reason?: string | null; default_mapping_id?: string | null };
   maintenance: Plan;
   available_start?: number;
   available_end?: number;

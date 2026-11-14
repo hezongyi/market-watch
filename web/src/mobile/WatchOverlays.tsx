@@ -49,7 +49,7 @@ export function WatchDrawer(props: MobileSheetProps) {
   // Keep the last open view during exit; don't flash another panel or empty its form.
   const lastOpen = useRef(props);
   if (open) lastOpen.current = props;
-  const { title, description, children, dirty, close, onClosed, fullHeight, dismissible = true } = lastOpen.current;
+  const { title, description, headerActions, children, dirty, close, onClosed, fullHeight, dismissible = true } = lastOpen.current;
   const host = useWatchOverlays();
   const popup = useRef<HTMLDivElement>(null);
   const opened = useRef(false);
@@ -93,9 +93,12 @@ export function WatchDrawer(props: MobileSheetProps) {
             <DrawerTitle>{title}</DrawerTitle>
             {description && <DrawerDescription>{description}</DrawerDescription>}
           </div>
+          <div className="mobile-drawer-actions">
+          {headerActions}
           <Button variant="ghost" size="icon" aria-label="关闭" disabled={!dismissible} onClick={leave}>
             <X aria-hidden="true" />
           </Button>
+          </div>
         </header>
         <div className="mobile-sheet-body mobile-drawer-scroll" key={title}>
           <OverlayActive.Provider value={open}>{children}</OverlayActive.Provider>

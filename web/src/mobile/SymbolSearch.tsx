@@ -104,7 +104,7 @@ export function SymbolSearchPanel({
         <InputGroupInput
           type="search"
           aria-label={label}
-          placeholder="代码或中文名称"
+          placeholder="代码、中文名、来源或类别"
           value={query}
           maxLength={100}
           onChange={(e) => onQuery(e.target.value)}

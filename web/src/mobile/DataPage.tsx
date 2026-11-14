@@ -196,15 +196,12 @@ function DataContent({
   );
   const result = useSymbolSearch<Row>({
     profile,
-    queryKey: JSON.stringify(["watch-unified", query]),
+    queryKey: JSON.stringify(["watch-unified-v2", query]),
     active: visible && !detailsOpen,
     online,
     identity: rowKey,
     fetchPage: (cursor, signal) => watchSymbolPage(query, cursor, signal),
   });
-  const destination =
-    groups.find((item) => item.id === targetGroup) || groups[0];
-  const groupSymbols = destination?.symbols || [];
   useEffect(() => {
     if (!visible || !online) return;
     const controller = new AbortController();
@@ -315,12 +312,11 @@ function DataContent({
       if (!profileActive(profile)) return;
       const content = watchContent(baseline);
       if (
-        (
-          content.lists.find((list) => list.id === targetGroup) ||
-          content.lists[0]
-        )?.symbols.includes(row.ticker)
+        allSymbols(content).includes(row.ticker)
       ) {
         setAdded(true);
+        result.remove(item => rowKey(item) === rowKey(row));
+        result.refresh();
         return;
       }
       const saved = await saveWatchlists(
@@ -332,6 +328,8 @@ function DataContent({
       setFavorites(allSymbols(watchContent(saved)));
       setGroups(watchContent(saved).lists);
       setAdded(true);
+      result.remove(item => rowKey(item) === rowKey(row));
+      result.refresh();
       await writeSnapshot(profile, "watchlists", saved).catch(() =>
         report("自选已保存，本机快照未更新"),
       );
@@ -353,7 +351,7 @@ function DataContent({
         ? ""
         : selected?.ticker;
   useEffect(() => {
-    setAdded(!!detailTicker && groupSymbols.includes(detailTicker));
+    setAdded(!!detailTicker && favorites.includes(detailTicker));
   }, [detailTicker, targetGroup, groups, favorites]);
   async function openRow(row: Row, fromDetails = false) {
     if (adding.current) return;
@@ -538,7 +536,7 @@ function DataContent({
       )}
       <div className="symbol-search-results">
         {result.items.map((row) => {
-          const present = !!row.ticker && groupSymbols.includes(row.ticker);
+          const present = !!row.ticker && favorites.includes(row.ticker);
           return (
             <SymbolSearchRow
               key={rowKey(row)}

@@ -59,7 +59,7 @@ export function useSymbolSearch<T>({
   latest.current = { fetchPage, identity };
   current.current = state;
   const load = useCallback(
-    async (cursor?: string) => {
+    async (cursor?: string, preserve = false) => {
       if (!active || !online || request.current || !profileActive(profile))
         return;
       const controller = new AbortController();
@@ -70,10 +70,14 @@ export function useSymbolSearch<T>({
         error: "",
       }));
       try {
-        const result = await latest.current.fetchPage(
-          cursor,
-          controller.signal,
-        );
+        let result = await latest.current.fetchPage(cursor, controller.signal);
+        // Requalify the already loaded span after a write. Offsets have shifted
+        // when excluded members disappear; reusing the old cursor would skip rows.
+        const count = preserve && current.current.scope === scope ? current.current.items.length : 0;
+        while (preserve && result.next && result.items.length < count && !controller.signal.aborted) {
+          const next = await latest.current.fetchPage(result.next, controller.signal);
+          result = { ...next, items: [...result.items, ...next.items] };
+        }
         if (controller.signal.aborted || !profileActive(profile)) return;
         setState((old) => {
           const rows =
@@ -157,7 +161,12 @@ export function useSymbolSearch<T>({
       if (data.next && !data.error) void load(data.next);
     },
     retry: () => void load(data.loaded ? data.next : undefined),
-    refresh: () => void load(),
+    refresh: () => {
+      request.current?.abort();
+      request.current = undefined;
+      void load(undefined, true);
+    },
+    remove: (match: (item: T) => boolean) => setState(old => ({ ...old, items: old.items.filter(item => !match(item)) })),
     update: (fn: (item: T) => T) =>
       setState((old) => ({ ...old, items: old.items.map(fn) })),
   };

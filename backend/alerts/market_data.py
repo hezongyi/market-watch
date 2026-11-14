@@ -574,10 +574,10 @@ def router(authenticated):
     @r.get("/series/page")
     def series_page(query: str = "", kind: str = "history", page_size: int = 25,
                     offset: int = 0, source: str | None = None, calendar: str | None = None,
-                    symbol_type: str = "", cursor: str | None = None, include_total: bool = True):
+                    symbol_type: str = "", cursor: str | None = None, include_total: bool = True, mobile: bool = False, exclude_watch: bool = False):
         return search_series_page(query, kind=kind, page_size=page_size, offset=offset,
                                   source=source or None, calendar=calendar or None, symbol_type=symbol_type, cursor=cursor,
-                                  include_total=include_total)
+                                  include_total=include_total, mobile=mobile, exclude_watch=exclude_watch)
 
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
@@ -830,12 +830,12 @@ def router(authenticated):
 
 
 def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None,
-                       symbol_type="", cursor=None, include_total=True):
+                       symbol_type="", cursor=None, include_total=True, mobile=False, exclude_watch=False):
     """Compatibility adapter over the canonical series-directory seam."""
     from .series_directory import page
     return page(query, kind=kind, page_size=page_size, offset=offset, source=source,
                 calendar=calendar, symbol_type=symbol_type, cursor=cursor,
-                include_total=include_total, provider_page=_provider_series_page)
+                include_total=include_total, provider_page=_provider_series_page, mobile=mobile, exclude_watch=exclude_watch)
 
 
 def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor):
@@ -845,7 +845,7 @@ def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor)
                 symbol_type=symbol_type, cursor=cursor, provider_page=_provider_series_page)
 
 
-def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25, include_total=True):
+def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25, include_total=True, mobile=False, exclude_watch=False):
     from .chart_series import encode
     from .instrument_directory import search
     from .platform_catalog import _entry
@@ -854,7 +854,7 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
     asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
     with transaction() as db:
         page = search(db, query=query, source=source, asset=asset, offset=offset, limit=page_size,
-                      include_total=include_total)
+                      include_total=include_total, mobile=mobile, exclude_watch=exclude_watch)
     items = []
     for row in page["items"]:
         item = _entry(row)

@@ -9,11 +9,11 @@ export async function watchSymbolPage(query: string, cursor: string | undefined,
   const position: Position = cursor ? JSON.parse(cursor) : { native: { offset: 0 }, managed: 1 };
   const [native, managed] = await Promise.all([
     position.native ? api<{ items: MarketRow[]; has_more?: boolean; next_offset?: number | null; next_cursor?: string | null }>(
-      "/market-data/series/page?" + new URLSearchParams({ query, kind: "provider", include_total: "false", page_size: "25",
+      "/market-data/series/page?" + new URLSearchParams({ query, mobile: "true", exclude_watch: "true", kind: "provider", include_total: "false", page_size: "25",
         offset: String(position.native.offset), ...(position.native.cursor ? { cursor: position.native.cursor } : {}) }), undefined, signal,
     ) : undefined,
     position.managed ? api<{ items: Dataset[]; total: number }>(
-      "/market-data/center/dataset-summaries?" + new URLSearchParams({ query, page_size: "25", page: String(position.managed) }), undefined, signal,
+      "/market-data/center/dataset-summaries?" + new URLSearchParams({ query, mobile: "true", exclude_watch: "true", page_size: "25", page: String(position.managed) }), undefined, signal,
     ) : undefined,
   ]);
   const next: Position = {

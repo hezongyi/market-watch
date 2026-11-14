@@ -1,4 +1,7 @@
 import SymbolInfo from "./SymbolInfo";
+import DataSourceTools from "./DataSourceTools";
+import { Switch } from "./components/ui/switch";
+import { errorMessage } from "../api";
 import { SymbolSearchButton } from "./SymbolSearch";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -78,6 +81,11 @@ export default function DataManagedPage(props: Props) {
     [catalog, setCatalog] = useState(false),
     [catalogMounted, setCatalogMounted] = useState(false);
   const [notice, setNotice] = useState("");
+  const [find, setFind] = useState(false);
+  const [confirmedRows, setConfirmedRows] = useState<Record<string, { value: Continuation; revision: number }>>({});
+  const [pendingRows, setPendingRows] = useState<Record<string, boolean>>({});
+  const [rowErrors, setRowErrors] = useState<Record<string, string>>({});
+  const changing = useRef(new Set<string>());
   useEffect(() => {
     if (!notice) return;
     const timer = setTimeout(() => setNotice(""), 6000);
@@ -99,6 +107,7 @@ export default function DataManagedPage(props: Props) {
   const active = visible && onlineView;
   const params = new URLSearchParams({
     query,
+    mobile: "true",
     source: source === "all" ? "" : source,
     status,
     page: String(page),
@@ -112,6 +121,14 @@ export default function DataManagedPage(props: Props) {
     online,
     refreshRate,
   );
+  useEffect(() => {
+    // Only a server read started after the command can replace its response.
+    // Offline snapshots and older in-flight reads must not revert the Switch.
+    const freshRevision = result.freshRevision;
+    if (freshRevision === undefined) return;
+    setConfirmedRows(old => Object.fromEntries(Object.entries(old).filter(([, row]) =>
+      row.revision > freshRevision)));
+  }, [result.freshRevision]);
   useEffect(() => {
     setRefreshRate(
       result.data?.items.some((item) => item.maintenance.active_version_id)
@@ -154,13 +171,40 @@ export default function DataManagedPage(props: Props) {
     setCatalog(false);
   }
   function changed() {
-    result.refresh();
+    const revision = result.refresh();
     dispatchEvent(new Event("mw-mobile-data-changed"));
+    return revision;
+  }
+  async function toggleRow(dataset: Dataset, enabled: boolean) {
+    if (!online || result.readAt || changing.current.has(dataset.id)) return;
+    changing.current.add(dataset.id);
+    setPendingRows(old => ({ ...old, [dataset.id]: true }));
+    setRowErrors(old => ({ ...old, [dataset.id]: "" }));
+    const path = `/market-data/datasets/${dataset.id}/continuation`;
+    try {
+      let actual: Continuation;
+      try {
+        actual = await dataRequest<Continuation>(profile, path, { enabled, ...(enabled ? { mapping_id: dataset.continuation?.default_mapping_id } : {}) });
+      } catch (error) {
+        actual = await dataRequest<Continuation>(profile, path);
+        if (actual.enabled !== enabled) throw error;
+      }
+      if (!profileActive(profile)) return;
+      const revision = changed();
+      setConfirmedRows(old => ({ ...old, [dataset.id]: { value: actual, revision } }));
+      setNotice(enabled ? "实时已开启，正在接续行情" : "实时已关闭，历史保留");
+    } catch (error) {
+      if (profileActive(profile)) setRowErrors(old => ({ ...old, [dataset.id]: errorMessage(error) }));
+      result.refresh();
+    } finally {
+      changing.current.delete(dataset.id);
+      setPendingRows(old => ({ ...old, [dataset.id]: false }));
+    }
   }
   return (
     <div className="mobile-data-body mobile-data-surface data-managed">
       <header className="mobile-title data-title">
-        <h1>数据</h1>
+        <h1>数据{result.data && <small className="data-title-count" aria-label={`自建行情 ${result.data.total} 项`}>{result.data.total}</small>}</h1>
         <SymbolSearchButton
           label="搜索并添加行情"
           expanded={catalog}
@@ -171,7 +215,9 @@ export default function DataManagedPage(props: Props) {
         />
       </header>
       <div className="data-list-filter">
-        <InputGroup className="data-search-input">
+        <Button variant="ghost" size="icon" aria-label="查找已有自建" aria-expanded={find}
+          onClick={() => setFind(value => !value)}><Search aria-hidden="true" /></Button>
+        {find && <InputGroup className="data-search-input">
           <InputGroupAddon>
             <Search aria-hidden="true" />
           </InputGroupAddon>
@@ -185,7 +231,7 @@ export default function DataManagedPage(props: Props) {
               setPage(1);
             }}
           />
-        </InputGroup>
+        </InputGroup>}
         <Button
           variant="ghost"
           size="icon"
@@ -195,11 +241,8 @@ export default function DataManagedPage(props: Props) {
           <SlidersHorizontal aria-hidden="true" />
         </Button>
       </div>
-      <div className="data-list-caption">
-        <span>
-          {status === "archived" ? "已归档" : "自建行情"}
-          {result.data ? ` · ${result.data.total}` : ""}
-        </span>
+      {(source !== "all" || status !== "all") && <div className="data-list-caption">
+        <span>{status === "archived" ? "已归档" : "已筛选"}</span>
         {(source !== "all" || status !== "all") && (
           <Button
             variant="ghost"
@@ -212,7 +255,7 @@ export default function DataManagedPage(props: Props) {
             清除筛选
           </Button>
         )}
-      </div>
+      </div>}
       <DataFeedback
         error={result.error}
         notice={
@@ -280,6 +323,10 @@ export default function DataManagedPage(props: Props) {
       <div className="data-series-list">
         {result.data?.items.map((dataset) => {
           const plan = dataset.maintenance;
+          const confirmed = confirmedRows[dataset.id]?.value;
+          const continuation = confirmed ? { ...dataset.continuation, enabled: confirmed.enabled,
+            status: confirmed.status, can_disable: confirmed.enabled, can_enable: confirmed.ready_to_enable,
+            default_mapping_id: confirmed.default_mapping_id } : dataset.continuation;
           const label = plan.task_error
             ? "更新需处理"
             : plan.task_status &&
@@ -287,19 +334,18 @@ export default function DataManagedPage(props: Props) {
               ? taskName(plan.task_status)
               : plan.paused
                 ? "维护已暂停"
-                : dataset.continuation?.enabled
-                  ? `实时${continuationLabel(dataset.continuation.status)}`
+                : continuation?.enabled
+                  ? `实时${continuationLabel(continuation.status)}`
                   : dataset.availability === "available"
                     ? "历史可用"
                     : "待准备";
           return (
-            <Button
-              variant="plain"
+            <div
               className="data-managed-row"
               id={"managed-" + dataset.id}
               key={dataset.id}
-              onClick={() => pick(dataset.id)}
             >
+              <Button variant="plain" className="data-managed-open" aria-label={`查看 ${managedCode(dataset)}`} onClick={() => pick(dataset.id)}>
               <span className="data-managed-identity">
                 <SymbolInfo
                   code={managedCode(dataset)}
@@ -330,16 +376,24 @@ export default function DataManagedPage(props: Props) {
                   </small>
                 )}
               </span>
-              <span className="data-managed-status">
-                <Badge variant="secondary">{label}</Badge>
-                <small>
-                  {dataset.available_end
-                    ? `数据至 ${dataTime(dataset.available_end)}`
-                    : "尚无已发布历史"}
+              </Button>
+              <div className="data-managed-status">
+                <div className="data-live-switch-target">
+                  <Switch checked={!!continuation?.enabled}
+                    aria-label={`${managedCode(dataset)} 实时`}
+                    aria-describedby={`live-reason-${dataset.id}`}
+                    disabled={!online || !!result.readAt || !!pendingRows[dataset.id] ||
+                      (continuation?.enabled ? !continuation.can_disable : !continuation?.can_enable)}
+                    onCheckedChange={enabled => void toggleRow(dataset, enabled)} />
+                </div>
+                <small id={`live-reason-${dataset.id}`} role={rowErrors[dataset.id] ? "alert" : undefined}>
+                  {rowErrors[dataset.id] || (pendingRows[dataset.id] ? "正在更新…" :
+                    !continuation?.enabled && !continuation?.can_enable ?
+                      continuation?.disabled_reason || "待配置" : label)}
                 </small>
-              </span>
-              <ChevronRight aria-hidden="true" />
-            </Button>
+                {!!plan.task_error && <small>{label}</small>}
+              </div>
+            </div>
           );
         })}
       </div>
@@ -1123,10 +1177,12 @@ function DataTools({
             </Button>
           </div>
         )}
+        <DataSourceTools profile={profile} online={online} changed={() => { directory.refresh(); sources.refresh(); }} />
         <DataMore title="来源能力与目录">
           {sources.data?.map((source) => (
             <div className="data-task-card" key={source.source}>
               <strong>{sourceName(source.source)}</strong>
+              <p>{source.enabled === false ? "未启用" : source.configured === false ? "已启用 · 缺配置" : "已启用"}</p>
               <p>
                 {(
                   {

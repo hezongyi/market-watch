@@ -1,6 +1,6 @@
 # 手机自选 sparkline 跨日回显与收盘状态实施方案
 
-状态：新增“统一展示日昨收参考线”需求已确认、待实现（见参考线一节）；首轮已实施并收到真机反馈；原生开盘参考线补取已修复并实测 OANDA，Dukascopy USDCAD 因 TLS EOF 仍未通过，不能标全部完成。最新见 [反馈修复记录](../../verification/mobile-feedback-20261114/README.md)。用户后续已授权将待实现实施并验证；本任务验收实例已更新，详见 [实施与验收记录](../../verification/mobile-pending-20261114/README.md)。未进行生产发布。
+状态：2026-11-14 本轮展示日昨收参考线已实施；跨日回显与闭市状态保持。OANDA 黄金/白银及 Dukascopy USDCAD 真实响应已通过，原 USDCAD TLS 问题本轮未复现。Android 真机待复核。 见 [本轮验收记录](../../verification/mobile-completion-20261114/README.md)。下文保留原方案及历史实施边界，当前状态以本段和验收记录为准。
 
 ## 项目与基线
 
@@ -28,7 +28,7 @@
 - 时间窗口按本系列的聚合日界线/明确来源交易时段确定。NY17不等于开闭市证明；股票时区遵循交易所及DST，其他市场不得套美股时段。
 - 不新增常驻“上一交易日”文字；实际日期、回显/缓存原因通过可访问描述及既有详情/提示提供。超过常规近期范围不能静默装作上一交易日。
 
-### 参考线（2026-11-14 最新确认，待实现）
+### 参考线（2026-11-14 最新确认，已实施）
 
 本节替代此前“回显旧日时使用该日开盘价”的决定。当前部署 `f017e39c` 仍是旧规则，历史验收记录中的开盘线通过不代表本项已完成。
 
@@ -42,7 +42,7 @@
 
 实施入口与次序：先在 `backend/tests/test_sparkline_rollover.py`、`test_sparklines.py` 和 `web/tests/mobile-sparkline-session.browser.cjs` 复现 XAUUSD/XAGUSD 缺线、旧日不能套今天昨收；再调整 `backend/alerts/sparklines.py` 的参考价证据/prepare、`web/src/mobile/sparklines.ts` 响应字段及 `WatchPage.tsx` 的参考选择、class/title/无障碍说明。不能只将前端开盘字段重命名为昨收。
 
-验收：XAUUSD、XAGUSD（OANDA、Dukascopy）及外汇/股票/crypto、自建固定/接续；当日、收盘同日、旧日回显、周末/节假日、DST/NY17与UTC0不一致、缺昨收、来源故障、修订轮换。验证线值和实际日期证据，不只断言 DOM 有 line；来源故障须单独标未通过。沿用本文验证命令，覆盖新回归后做 Ubuntu 本任务真实响应及截图验证。用户本轮仅要求记录，实施待后续授权。
+验收：XAUUSD、XAGUSD（OANDA、Dukascopy）及外汇/股票/crypto、自建固定/接续；当日、收盘同日、旧日回显、周末/节假日、DST/NY17与UTC0不一致、缺昨收、来源故障、修订轮换。验证线值和实际日期证据，不只断言 DOM 有 line；来源故障须单独标未通过。沿用本文验证命令，覆盖新回归后做 Ubuntu 本任务真实响应及截图验证。用户已授权实施，本轮已验证代码与 Ubuntu 真实响应。
 
 ### 各类型身份边界
 

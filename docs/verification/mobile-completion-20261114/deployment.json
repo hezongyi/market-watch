@@ -1,0 +1,14 @@
+{
+  "host": "quant-server Ubuntu Docker",
+  "url": "https://192.168.7.232:18447",
+  "project": "mw-managed-live-rollover-20261113",
+  "branch": "feat/managed-live-rollover-20261113",
+  "shell_version": "38e7f78476c7aefd",
+  "shell_matches_local_build": true,
+  "images": {
+    "api": "sha256:a65c934d18527cdd638a615f5bdfcdb59903fbe6bfff8516ba37843fafaac0c7",
+    "web": "sha256:ac98c422a30d52f37930fd4f82ea8871b797fb33a2dc3bd3e235d143b2e9302a",
+    "data-worker": "sha256:a65c934d18527cdd638a615f5bdfcdb59903fbe6bfff8516ba37843fafaac0c7",
+    "market-runtime": "sha256:a65c934d18527cdd638a615f5bdfcdb59903fbe6bfff8516ba37843fafaac0c7"
+  }
+}

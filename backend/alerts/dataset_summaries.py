@@ -23,7 +23,9 @@ from .storage import (
 
 
 def summaries(db, *, ids=None, view=None, anchor=None, **filters):
-    base = _dataset_query(include_continuations=True, **filters)
+    from .mobile_symbol_search import watched
+    excluded = watched(db)["dataset"] if filters.get("exclude_watch") else ()
+    base = _dataset_query(include_continuations=True, excluded_watch_ids=excluded, **filters)
     if view == "continuation":
         base = base.where(select(RealtimeMapping.id).where(
             RealtimeMapping.dataset_id == MarketDataset.id,

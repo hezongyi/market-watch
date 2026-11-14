@@ -17,7 +17,7 @@ const prefs = { kind: 'setting', name: 'mw.watchlists.v1', tool: '', revision: 1
 function item(ticker) {
   const base = { ticker, revision: null, timeframe: 'M1', status: 'partial', reason: null,
     reference_times: [], valid_until: now + 14 * day, next_check_at: now + minute,
-    identity_key: ticker + ':fixture', session_open_price: '100' };
+    identity_key: ticker + ':fixture', session_open_price: '104', previous_close_price: '100' };
   if (ticker === ids[0]) {
     const date = new Date(now).toISOString().slice(0, 10), left = Date.parse(date + 'T14:30:00Z');
     return { ...base, stock_session: true, display_state: !calendarReady ? 'unknown' : now >= close ? 'closed' : 'current',
@@ -32,7 +32,7 @@ function item(ticker) {
     const left = currentFX ? fxLeft : fxLeft - day;
     const value = { ...base, window_start: left, window_end: left + day,
       target_window_start: fxLeft, target_window_end: fxLeft + day,
-      display_state: currentFX ? 'current' : 'previous', session_open_price: currentFX ? null : '1.1',
+      display_state: currentFX ? 'current' : 'previous', session_open_price: '1.2', previous_close_price: currentFX ? null : '1.1',
       session: { date: new Date(left).toISOString().slice(0, 10), previous: !currentFX },
       points: currentFX ? [{ time: left + minute, price: '1.12', gap_before: false }] :
         [{ time: left, price: '1.1', gap_before: false }, { time: left + minute, price: '1.11', gap_before: false },
@@ -117,7 +117,7 @@ const server = http.createServer(async (req, res) => {
     const reference = await row(0).locator('.mobile-spark-previous-close').getAttribute('y1');
     const oldFX = await spark(1).locator('svg').innerHTML();
     await expect(spark(1)).toHaveAttribute('data-previous-session', 'true');
-    await expect(row(1).locator('.mobile-spark-session-open')).toHaveCount(1);
+    await expect(row(1).locator('.mobile-spark-previous-close')).toHaveCount(1);
     await expect(row(2).locator('.mobile-spark-history-date')).toContainText('历史 ·');
     await expect(row(2).locator('.mobile-spark-session-open')).toHaveCount(0);
     await expect(spark(3)).toContainText('暂无日内数据');
@@ -139,7 +139,7 @@ const server = http.createServer(async (req, res) => {
       type: 'quotes', quotes: [{ s: 'ok', v: { short_name: 'EURUSD', lp: 1.12, chp: 1, fetch_status: 'ok', quote_time: now, read_at: now } }] }) + '\n\n');
     await expect(spark(1)).not.toHaveAttribute('data-previous-session');
     await expect(spark(1).locator('path[stroke]')).toHaveCount(2); // First real minute plus the much later quote, with a real gap.
-    await expect(row(1).locator('.mobile-spark-session-open')).toHaveCount(0);
+    await expect(row(1).locator('.mobile-spark-previous-close')).toHaveCount(0);
     await page.screenshot({ path: output + '/first-current-point.png' });
     failed = true; await refresh();
     await expect(spark(1)).toHaveAttribute('data-cached', 'true');

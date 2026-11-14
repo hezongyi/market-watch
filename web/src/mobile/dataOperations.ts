@@ -97,9 +97,15 @@ export function useDataRead<T>(
     loading: boolean;
     error: string;
     readAt?: number;
+    freshRevision?: number;
   }>({ loading: false, error: "" });
   const [revision, setRevision] = useState(0);
-  const refresh = useCallback(() => setRevision((n) => n + 1), []);
+  const refreshRevision = useRef(0);
+  const refresh = useCallback(() => {
+    const next = ++refreshRevision.current;
+    setRevision(next);
+    return next;
+  }, []);
   useEffect(() => {
     if (!active || !path) return;
     const controller = new AbortController();
@@ -136,7 +142,7 @@ export function useDataRead<T>(
           controller.signal,
         );
         if (!valid()) return;
-        setState({ data, scope, loading: false, error: "" });
+        setState({ data, scope, loading: false, error: "", freshRevision: revision });
         await writeSnapshot(profile, key, data).catch(() => {});
       } catch (error) {
         if (valid())

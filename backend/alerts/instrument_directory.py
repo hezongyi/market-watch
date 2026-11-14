@@ -31,11 +31,11 @@ def logical_symbol(source, symbol):
 def _asset(kind, symbol):
     return case(
         (or_(kind == "METAL", symbol.in_(("XAU_USD", "XAG_USD", "XAU/USD", "XAG/USD"))), "metal"),
-        (kind.in_(("CURRENCY", "FOREX")), "forex"),
-        (kind.in_(("CRYPTO", "CRYPTOCURRENCY")), "crypto"),
-        (kind == "INDEX", "index"),
+        (or_(kind.in_(("CURRENCY", "FOREX")), kind.startswith("INSTRUMENT_FX_", autoescape=True)), "forex"),
+        (or_(kind.in_(("CRYPTO", "CRYPTOCURRENCY")), kind.startswith("INSTRUMENT_VCCY_", autoescape=True)), "crypto"),
+        (or_(kind == "INDEX", kind.startswith("INSTRUMENT_IDX_", autoescape=True)), "index"),
         (kind.in_(("EQUITY", "STOCK")), "equity"),
-        (kind.in_(("ETF", "FUND", "MUTUALFUND")), "etf"),
+        (or_(kind.in_(("ETF", "FUND", "MUTUALFUND")), kind.startswith("INSTRUMENT_ETF_CFD_", autoescape=True)), "etf"),
         (kind.in_(("FUTURE", "FUTURES")), "future"),
         else_="other")
 
@@ -59,7 +59,7 @@ def _variant(ident):
                 (ident.startswith("TENCENT-NATIVE:"), 3), else_=0)
 
 
-def _statement(db, *, source=None, managed=False, query="", asset=None):
+def _statement(db, *, source=None, managed=False, query="", asset=None, mobile=False, exclude_watch=False, exclude_existing=False):
     from .config import settings
     from .fxcm_history import account_scope as fxcm_scope
     from .fxcm_history import configured
@@ -111,9 +111,33 @@ def _statement(db, *, source=None, managed=False, query="", asset=None):
                 i.id.not_in(select(MarketDataset.instrument_id))))
     candidates = union_all(*branches).subquery()
     filtered = select(candidates)
-    if query.strip():
+    if mobile:
+        from .mobile_symbol_search import predicate
+        filtered = filtered.where(predicate(query, candidates.c.source, candidates.c.symbol,
+            _asset(candidates.c.asset_type, candidates.c.symbol), _search_text(candidates.c),
+            exchange=func.coalesce(candidates.c.metadata_json["exchange_code"].as_string(), candidates.c.metadata_json["exchange"].as_string())))
+    elif query.strip():
         filtered = filtered.where(or_(alias_search(query, candidates.c.source, candidates.c.symbol),
             code_search(query, _search_text(candidates.c))))
+    if exclude_watch:
+        from .mobile_symbol_search import watched
+        excluded = watched(db)["provider"]
+        filtered = filtered.where(candidates.c.id.not_in(excluded),
+            ~and_(candidates.c.source == "oanda", (literal("OANDA:") + candidates.c.symbol).in_(excluded)),
+            ~and_(candidates.c.source == "binance", candidates.c.symbol.in_(excluded)))
+    if exclude_existing:
+        # Exact product/account, regardless of mode/calendar or archive status.
+        from .storage import DatasetMaintenance, RealtimeMapping
+        owned = select(MarketDataset.id).outerjoin(DatasetMaintenance).where(
+            MarketDataset.identity["source"].as_string() == candidates.c.source,
+            MarketDataset.identity["provider_symbol"].as_string() == candidates.c.symbol,
+            or_(DatasetMaintenance.dataset_id.is_not(None), select(RealtimeMapping.id).where(
+                RealtimeMapping.dataset_id == MarketDataset.id).exists()))
+        # Account-scoped catalogs have already been qualified above; only the
+        # current account's identities exclude a current account product.
+        account = candidates.c.metadata_json["history_account_scope"].as_string()
+        owned = owned.where(or_(account.is_(None), MarketDataset.identity["account_scope"].as_string() == account))
+        filtered = filtered.where(~owned.exists())
     if asset:
         filtered = filtered.where(_asset(candidates.c.asset_type, candidates.c.symbol) == asset)
     qualified = filtered.subquery()
@@ -164,10 +188,10 @@ def _present(row):
     return item
 
 
-def search(db, *, query="", source=None, asset=None, managed=False, offset=0, limit=25, include_total=True):
+def search(db, *, query="", source=None, asset=None, managed=False, offset=0, limit=25, include_total=True, mobile=False, exclude_watch=False, exclude_existing=False):
     if source not in (None, *SOURCES) or asset not in (None, *ASSETS) or offset < 0 or limit < 1:
         raise ValueError("无效品种目录查询")
-    statement, rows = _statement(db, source=source, managed=managed, query=query, asset=asset)
+    statement, rows = _statement(db, source=source, managed=managed, query=query, asset=asset, mobile=mobile, exclude_watch=exclude_watch, exclude_existing=exclude_existing)
     # Counting identities does not need window ordering or supplier metadata.
     if include_total:
         variant = _variant(rows.c.id)
@@ -177,12 +201,27 @@ def search(db, *, query="", source=None, asset=None, managed=False, offset=0, li
     # Until the first runtime sync, keep the pinned SDK directory discoverable.
     # It is explicitly marked unverified and never performs network I/O.
     fallback = []
+    from .mobile_symbol_search import watched
+    watched_provider_ids = watched(db)["provider"] if exclude_watch else set()
     if source in (None, "dukascopy") and not db.scalar(select(MarketCatalog.id).where(
             MarketCatalog.source == "dukascopy").limit(1)):
         from .provider_dukascopy import catalog
 
+        existing = set()
+        if exclude_existing:
+            from .storage import DatasetMaintenance
+            existing = set(db.scalars(select(MarketDataset.identity["provider_symbol"].as_string()).join(DatasetMaintenance)
+                .where(MarketDataset.identity["source"].as_string() == "dukascopy")))
         for row in catalog():
-            if asset and row["asset_class"] != asset or not matches_code(query,
+            if row["symbol"] in existing:
+                continue
+            if exclude_watch and row["id"] in watched_provider_ids:
+                continue
+            if mobile:
+                from .mobile_symbol_search import matches
+                if asset and row["asset_class"] != asset or not matches(query, {**row, "source": "dukascopy"}):
+                    continue
+            elif asset and row["asset_class"] != asset or not matches_code(query,
                     row["symbol"], "dukascopy", row["asset_type"], row["label"], chinese_name("dukascopy", row["symbol"]) or ""):
                 continue
             fallback.append(_present({"id": row["id"], "source": "dukascopy", "symbol": row["symbol"],

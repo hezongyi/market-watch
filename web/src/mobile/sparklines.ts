@@ -17,6 +17,8 @@ export type Sparkline = {
   display_state?: "current" | "closed" | "previous" | "historical" | "unknown" | "empty" | "unsupported";
   session?: { date: string; previous: boolean };
   session_open_price?: string | null;
+  previous_close_price?: string | null;
+  previous_close_at?: number | null;
   preparation_error?: string | null;
   timeframe: string | null;
   reference_times?: number[];
@@ -134,7 +136,7 @@ export function sparklineLoader(
           receive(response.items.filter(row => sparklineExpires(row) > response.as_of));
           for (const row of response.items) {
             const key = preparationKey(row);
-            if (response.preparation === "unsupported") history.prepared.set(key, Math.max(response.as_of + 900000, row.target_window_end ?? row.window_end));
+            if (response.preparation === "unsupported") history.prepared.set(key, row.previous_close_price == null ? response.as_of + 900000 : Math.max(response.as_of + 900000, row.target_window_end ?? row.window_end));
             else if (response.preparation === "ready" && row.points.length && !row.session?.previous && row.display_state !== "unknown") {
               retryAttempts.delete(key);
               history.prepared.set(key, Math.max(response.as_of + 900000, row.target_window_end ?? row.window_end));
@@ -197,7 +199,7 @@ export function sparklineLoader(
                 for (const [key, end] of history.prepared)
                   if (end <= response.as_of) history.prepared.delete(key);
                 pendingHistory.push(...current.filter(item => item.ticker.startsWith("MWP:") &&
-                  (item.status === "partial" || item.status === "empty" || item.stock_session && item.display_state === "unknown") &&
+                  (item.status === "partial" || item.status === "empty" || item.points.length > 0 && item.previous_close_price == null || item.stock_session && item.display_state === "unknown") &&
                   !history.prepared.has(preparationKey(item))));
               }
             } catch (error) {

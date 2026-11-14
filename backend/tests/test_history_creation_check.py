@@ -185,3 +185,33 @@ def test_preflight_race_cannot_overwrite_plan_and_idempotency_still_works(databa
                 assert db.scalar(select(MarketDemand)) is None
     finally:
         api.app.dependency_overrides.clear()
+
+
+def test_mobile_product_guard_covers_other_calendar_and_archived_without_changing_legacy(database):
+    api.app.dependency_overrides[api.authenticated] = lambda: "test"
+    payload = {"request_id": "mobile-product-first", "create_only": True, "mobile_unique": True,
+        "dataset": CreationCheckRequest(**draft()).model_dump(exclude={"start_date"}),
+        "maintenance": {"target_start": 0, "timeframes": ["M1"]}}
+    try:
+        with TestClient(api.app) as client:
+            first = client.post("/api/market-data/center/datasets", json=payload)
+            assert first.status_code == 201
+            ident = first.json()["dataset"]["id"]
+            with database.begin() as db:
+                db.get(DatasetMaintenance, ident).archived = True
+            check = client.post("/api/market-data/center/datasets/check?mobile_unique=true",
+                json=draft(aggregation_calendar="utc0"))
+            assert check.status_code == 200 and check.json()["existing"]["id"] == ident
+            second = client.post("/api/market-data/center/datasets", json={**payload,
+                "request_id": "mobile-product-second", "dataset": {**payload["dataset"], "aggregation_calendar": "utc0"}})
+            assert second.status_code == 409 and second.json()["detail"]["dataset_id"] == ident
+            again = client.post("/api/market-data/center/datasets", json=payload)
+            assert again.status_code == 201 and again.json()["task"]["id"] == first.json()["task"]["id"]
+            assert client.post("/api/market-data/center/datasets/check",
+                json=draft(aggregation_calendar="utc0")).json()["status"] == "ready"
+            with database.begin() as db:
+                assert db.scalar(select(func.count()).select_from(MarketDataset)) == 1
+                assert db.scalar(select(func.count()).select_from(HistoryRun)) == 1
+                assert db.scalar(select(MarketDemand)) is None
+    finally:
+        api.app.dependency_overrides.clear()

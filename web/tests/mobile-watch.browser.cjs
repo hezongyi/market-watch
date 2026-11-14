@@ -230,7 +230,10 @@ const server=http.createServer(async(req,res)=>{
   await expect(page.locator('.mobile-watch-row')).toHaveCount(1);assert.equal(writes.length,0,'phone group selection never writes desktop active');
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
   await page.getByRole('tab',{name:'分组',exact:true}).click();
-  await page.getByLabel('分组名称',{exact:true}).first().fill('手机修改组名');
+  await page.getByRole('button',{name:'重命名 第一组',exact:true}).click();
+  await page.getByLabel('分组名称',{exact:true}).fill('手机修改组名');
+  await page.getByRole('button',{name:'保存分组',exact:true}).click();
+  await expect(topDialog()).toHaveAccessibleName('管理自选');
   remote.content.value.active='b';remote.revision++;
   holdSave=true;
   await page.getByRole('button',{name:'保存分组',exact:true}).click();
@@ -245,10 +248,13 @@ const server=http.createServer(async(req,res)=>{
   assert.equal(writes[0].content.value.unknown,'keep');assert.equal(writes[0].content.envelope,'keep');
   assert.equal(writes[0].content.value.lists[0].unknown,'keep-list');
   conflict=true;
-  await page.getByLabel('分组名称',{exact:true}).first().fill('冲突输入保留');
+  await page.getByRole('button',{name:'重命名 手机修改组名',exact:true}).click();
+  await page.getByLabel('分组名称',{exact:true}).fill('冲突输入保留');
+  await page.getByRole('button',{name:'保存分组',exact:true}).click();
+  await expect(topDialog()).toHaveAccessibleName('管理自选');
   await page.getByRole('button',{name:'保存分组',exact:true}).click();
   await expect(page.getByRole('status').filter({hasText:'尚未保存'})).toBeVisible();
-  await expect(page.getByLabel('分组名称',{exact:true}).first()).toHaveValue('冲突输入保留');
+  await expect(page.locator('.mobile-manage-group-name').first()).toHaveText('冲突输入保留');
   await page.getByRole('button',{name:'关闭通知',exact:true}).click();
   await page.getByRole('button',{name:'关闭',exact:true}).click();
   await expect(page.getByRole('alertdialog',{name:'放弃本次修改？',exact:true})).toBeVisible();

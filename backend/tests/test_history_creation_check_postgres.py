@@ -53,3 +53,35 @@ def test_parallel_create_only_keeps_one_plan_and_exact_replay(provider_pg):
         assert db.get(DatasetMaintenance, winner["dataset"]["id"]).timeframes == ["M1", "H4"]
         assert db.scalar(select(func.count()).select_from(HistoryRun)) == 1
         assert db.scalar(select(MarketDemand)) is None
+
+
+def test_parallel_mobile_creation_across_calendars_keeps_one_product(provider_pg):
+    factory, _ = provider_pg
+
+    def submit(calendar):
+        body = ManagedRequest.model_validate({
+            "request_id": "mobile-calendar-" + calendar, "create_only": True, "mobile_unique": True,
+            "dataset": {key: value for key, value in contracts.draft(aggregation_calendar=calendar).items()
+                if key != "start_date"},
+            "maintenance": {"target_start": 0, "timeframes": ["M1"], "frequency": "once"}})
+        try:
+            with factory.begin() as db:
+                result = create_managed(db, body)
+            return result["dataset"]["id"]
+        except CreationConflict:
+            return None
+
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        results = list(pool.map(submit, ("ny17", "utc0")))
+    assert len([result for result in results if result]) == 1
+    with factory.begin() as db:
+        assert db.scalar(select(func.count()).select_from(DatasetMaintenance)) == 1
+        assert db.scalar(select(func.count()).select_from(HistoryRun)) == 1
+        assert db.scalar(select(MarketDemand)) is None
+
+
+def test_mobile_list_switch_eligibility_on_postgres(provider_pg, monkeypatch):
+    from test_dataset_summaries import (
+        test_list_switch_eligibility_matches_write_rules_without_creating_demand,
+    )
+    test_list_switch_eligibility_matches_write_rules_without_creating_demand(provider_pg[0], monkeypatch)
