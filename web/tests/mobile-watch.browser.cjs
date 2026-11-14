@@ -146,8 +146,8 @@ const server=http.createServer(async(req,res)=>{
   };
   for(const theme of ['light','dark']){
     await page.evaluate(theme=>document.querySelector('.mobile-app').dataset.theme=theme,theme);
-    await page.getByRole('button',{name:'自选操作',exact:true}).click();
-    await expect(topDialog()).toHaveAccessibleName('自选操作');
+    await page.getByRole('button',{name:'添加自选',exact:true}).click();
+    await expect(topDialog()).toHaveAccessibleName('添加自选');
     await captureControl('actions-'+theme);
     const duration=await topDialog().evaluate(el=>getComputedStyle(el).transitionDuration);
     assert.notEqual(duration,'0s','drawer has an actual enter transition');controlsProof.timings.push({theme,duration});
@@ -180,12 +180,12 @@ const server=http.createServer(async(req,res)=>{
   await expect(topDialog()).toHaveAccessibleName('自选分组');await closeControl();
   assert.equal(writes.length,0,'gesture, cancel and discard never persist draft changes');
   await page.emulateMedia({reducedMotion:'reduce'});
-  await page.getByRole('button',{name:'自选操作',exact:true}).click();await settle();
+  await page.getByRole('button',{name:'添加自选',exact:true}).click();await settle();
   assert.equal(await topDialog().evaluate(el=>getComputedStyle(el).transitionDuration),'0s','reduced motion removes drawer animation');
   await closeControl();controlsProof.reducedMotion=true;await page.emulateMedia({reducedMotion:'no-preference'});
   // Rapid open/close must never leave an invisible modal blocking Watch.
   for(let i=0;i<3;i++){
-    await page.getByRole('button',{name:'自选操作',exact:true}).click();
+    await page.getByRole('button',{name:'添加自选',exact:true}).click();
     await closeControl();
     await expect(page.locator('[data-slot=drawer-overlay]')).toHaveCount(0);
   }
@@ -199,7 +199,7 @@ const server=http.createServer(async(req,res)=>{
   assert(submitBounds.y>=0&&submitBounds.y+submitBounds.height<=420,'submit remains reachable in reduced viewport');
   await captureControl('compact-form');await closeControl();await closeControl();
   await page.setViewportSize({width:412,height:915});
-  await page.getByRole('button',{name:'自选操作',exact:true}).click();
+  await page.getByRole('button',{name:'选择自选分组',exact:true}).click();
   await page.getByRole('button',{name:'管理自选',exact:true}).click();
   await page.getByRole('tab',{name:'分组',exact:true}).click();
   await settle();
@@ -227,7 +227,7 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();
   await page.getByRole('radio',{name:'第一组',exact:true}).click();
   await expect(page.locator('.mobile-watch-row')).toHaveCount(1);assert.equal(writes.length,0,'phone group selection never writes desktop active');
-  await page.getByRole('button',{name:'自选操作',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
+  await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
   await page.getByRole('tab',{name:'分组',exact:true}).click();
   await page.getByLabel('分组名称',{exact:true}).first().fill('手机修改组名');
   remote.content.value.active='b';remote.revision++;
@@ -253,24 +253,23 @@ const server=http.createServer(async(req,res)=>{
   await expect(page.getByRole('alertdialog',{name:'放弃本次修改？',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'放弃修改',exact:true}).click();
   conflict=false;
-  await page.getByRole('button',{name:'自选操作',exact:true}).click();await page.getByRole('button',{name:'搜索并添加品种',exact:true}).click();
-  await expect(page.getByRole('dialog',{name:'搜索品种',exact:true}).getByLabel('搜索代码或中文')).toBeVisible();
-  const sourceFilters=page.getByRole('group',{name:'搜索来源',exact:true});
-  await sourceFilters.getByRole('button',{name:'Yahoo',exact:true}).click();
-  await expect(sourceFilters.getByRole('button',{name:'Yahoo',exact:true})).toHaveAttribute('aria-pressed','true');
-  await expect(sourceFilters.getByRole('button',{name:'全部',exact:true})).toHaveAttribute('aria-pressed','false');
-  await sourceFilters.getByRole('button',{name:'全部',exact:true}).click();
-  await expect(sourceFilters.getByRole('button',{name:'全部',exact:true})).toHaveAttribute('aria-pressed','true');
+  await page.getByRole('button',{name:'添加自选',exact:true}).click();
+  await expect(page.getByRole('dialog',{name:'添加自选',exact:true}).getByLabel('搜索代码或中文')).toBeVisible();
+  const sourceFilters=page.getByRole('dialog',{name:'添加自选',exact:true}).getByRole('combobox',{name:'来源',exact:true});
+  await sourceFilters.click(); await page.getByRole('option',{name:'Yahoo',exact:true}).click();
+  await expect(sourceFilters).toContainText('Yahoo');
+  await sourceFilters.click(); await page.getByRole('option',{name:'全部来源',exact:true}).click();
+  await expect(sourceFilters).toContainText('全部来源');
   await captureControl('search-controls');
-  await page.getByRole('dialog',{name:'搜索品种',exact:true}).getByLabel('搜索代码或中文').fill('old');await page.waitForTimeout(300);
-  await page.getByRole('dialog',{name:'搜索品种',exact:true}).getByLabel('搜索代码或中文').fill('new');
-  await expect(page.locator('.mobile-search-info').filter({hasText:'NEW-RESULT'})).toBeVisible();await page.waitForTimeout(800);
-  await expect(page.locator('.mobile-search-info').filter({hasText:'OLD-RESULT'})).toHaveCount(0);
-  await page.locator('.mobile-search-row').filter({hasText:'NEW-RESULT'}).getByRole('button',{name:'详情',exact:true}).click();
+  await page.getByRole('dialog',{name:'添加自选',exact:true}).getByLabel('搜索代码或中文').fill('old');await page.waitForTimeout(300);
+  await page.getByRole('dialog',{name:'添加自选',exact:true}).getByLabel('搜索代码或中文').fill('new');
+  await expect(page.locator('.symbol-search-body').filter({hasText:'NEW-RESULT'})).toBeVisible();await page.waitForTimeout(800);
+  await expect(page.locator('.symbol-search-body').filter({hasText:'OLD-RESULT'})).toHaveCount(0);
+  await page.locator('.symbol-search-row').filter({hasText:'NEW-RESULT'}).locator('.symbol-search-body').click();
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).locator('.mobile-chip-list')).toContainText('M1');
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).locator('.mobile-chip-list')).toContainText('M5');
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).locator('.mobile-chip-list')).toContainText('H1');
-  const targetSelect=page.getByRole('combobox',{name:'添加到分组',exact:true});
+  const targetSelect=page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('combobox',{name:'添加到分组',exact:true});
   await expect(targetSelect).toContainText('手机修改组名');
   await targetSelect.click();
   await expect(page.getByRole('option',{name:'默认自选列表',exact:true})).toBeVisible();
@@ -291,8 +290,8 @@ const server=http.createServer(async(req,res)=>{
   await expect(page.getByRole('alert').filter({hasText:'已加入自选'})).toBeVisible();
   await page.getByRole('button',{name:'关闭通知',exact:true}).click();
   await page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
-  await page.getByRole('dialog',{name:'搜索品种',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
-  await page.getByRole('button',{name:'自选操作',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
+  await page.getByRole('dialog',{name:'添加自选',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
+  await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();
   await page.getByRole('button',{name:'下移TEST',exact:true}).click();
   await expect.poll(()=>remote.content.value.lists[0].symbols.join(',')).toBe([third,first].join(','));
   await page.getByRole('button',{name:'完成',exact:true}).click();

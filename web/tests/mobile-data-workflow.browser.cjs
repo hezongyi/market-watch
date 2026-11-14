@@ -715,21 +715,21 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();
     await expect(
-      dialog("添加行情").getByRole("button").filter({ hasText: "EURUSD" }),
+      dialog("添加自建").getByRole("button").filter({ hasText: "EURUSD" }),
     ).toBeVisible();
     await shot("02-catalog");
-    await dialog("添加行情")
+    await dialog("添加自建")
       .getByRole("button")
       .filter({ hasText: "EURUSD" })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "创建并准备历史",
         exact: true,
       }),
     ).toBeEnabled();
     await shot("03-create");
-    const creationDay = dialog("创建自建行情").getByLabel("历史起点", {
+    const creationDay = dialog("添加自建").getByLabel("历史起点", {
         exact: true,
       }),
       originalDay = await creationDay.inputValue();
@@ -747,7 +747,7 @@ const server = http.createServer(async (req, res) => {
     proof.checks.push(
       "creation Android back asks once and retains the edited date",
     );
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
     await expect(page.locator(".data-managed-row")).toHaveCount(1);
@@ -913,17 +913,17 @@ const server = http.createServer(async (req, res) => {
     await page
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();
-    await dialog("添加行情")
+    await dialog("添加自建")
       .getByRole("button")
       .filter({ hasText: "XAUUSD" })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "创建并准备历史",
         exact: true,
       }),
     ).toBeEnabled();
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
     await expect(page.locator(".data-managed-row")).toHaveCount(2);
@@ -978,19 +978,19 @@ const server = http.createServer(async (req, res) => {
     await page
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();
-    await dialog("添加行情")
+    await dialog("添加自建")
       .getByRole("button")
       .filter({ hasText: "AAPL" })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "创建并准备历史",
         exact: true,
       }),
     ).toBeEnabled();
     assert.equal(probeCount, 1);
     await shot("11-yahoo-create");
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
     await expect(page.locator(".data-managed-row")).toHaveCount(3);
@@ -1025,17 +1025,17 @@ const server = http.createServer(async (req, res) => {
     await page
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();
-    await dialog("添加行情")
+    await dialog("添加自建")
       .getByRole("button")
       .filter({ hasText: "EURUSD" })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "查看已有自建",
         exact: true,
       }),
     ).toBeVisible();
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "查看已有自建", exact: true })
       .click();
     await expect(
@@ -1048,28 +1048,28 @@ const server = http.createServer(async (req, res) => {
     await page
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();
-    await dialog("添加行情")
+    await dialog("添加自建")
       .getByRole("button")
       .filter({ hasText: "EURUSD" })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "创建并准备历史",
         exact: true,
       }),
     ).toBeEnabled();
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "查看已有自建",
         exact: true,
       }),
     ).toBeVisible();
     assert.equal(createCount, countBefore);
     assert.equal(JSON.stringify(datasets.get(eid).maintenance), eurPlan);
-    await close("创建自建行情");
+    await close("添加自建");
     proof.checks.push(
       "duplicate pre-check and concurrent 409 lead to existing dataset without overwriting settings",
     );
@@ -1078,49 +1078,49 @@ const server = http.createServer(async (req, res) => {
     await page
       .getByRole("button", { name: "搜索并添加行情", exact: true })
       .click();
-    await dialog("添加行情")
+    await dialog("添加自建")
       .getByRole("button")
       .filter({ hasText: "AAPL" })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "重试验证",
         exact: true,
       }),
     ).toBeVisible();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "创建并准备历史",
         exact: true,
       }),
     ).toBeDisabled();
     failProbe = false;
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "重试验证", exact: true })
       .click();
     await expect(
-      dialog("创建自建行情").getByRole("button", {
+      dialog("添加自建").getByRole("button", {
         name: "查看已有自建",
         exact: true,
       }),
     ).toBeVisible();
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "更多设置", exact: true })
       .click();
     const beforeNativeProbe = probeCount;
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("combobox", { name: "历史模式", exact: true })
       .click();
     await page.getByRole("option", { name: "原生多周期", exact: true }).click();
     await expect.poll(() => probeCount).toBe(beforeNativeProbe + 1);
     await expect(
-      dialog("创建自建行情").getByRole("button", { name: "H1", exact: true }),
+      dialog("添加自建").getByRole("button", { name: "H1", exact: true }),
     ).toBeVisible();
     await expect(
-      dialog("创建自建行情").getByRole("button", { name: "H1", exact: true }),
+      dialog("添加自建").getByRole("button", { name: "H1", exact: true }),
     ).toHaveAttribute("aria-pressed", "true");
     await shot("18-native-periods");
-    await dialog("创建自建行情")
+    await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
     await expect(page.locator(".data-managed-row")).toHaveCount(4);
@@ -1293,12 +1293,12 @@ const server = http.createServer(async (req, res) => {
             .getByRole("button", { name: "搜索并添加行情", exact: true })
             .click();
           await shot(`matrix-catalog-${color}-${width}-${font}`);
-          await dialog("添加行情")
+          await dialog("添加自建")
             .getByRole("button")
             .filter({ hasText: "XAUUSD" })
             .click();
           await shot(`matrix-create-${color}-${width}-${font}`);
-          await close("创建自建行情");
+          await close("添加自建");
         }
     await page.evaluate(
       () => (document.documentElement.style.fontSize = "14px"),

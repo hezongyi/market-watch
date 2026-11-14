@@ -33,7 +33,8 @@ import {
 import { type MobileMarket, seriesIdentity } from "./market";
 import { sparklineExpires, sparklineLoader, sparklinePaths, sparklineScale, sparklineWithQuote, type Sparkline } from "./sparklines";
 import FitText from "./FitText";
-import { watchDescription } from "./watchIdentity";
+import SymbolInfo from "./SymbolInfo";
+import { SymbolSearchButton } from "./SymbolSearch";
 import { PULL_THRESHOLD, usePullRefresh } from "./usePullRefresh";
 import { formatWatchPrice, watchPriceParts } from "./quoteFormat";
 import {
@@ -286,17 +287,12 @@ export default function WatchPage({
     [hydrated, setHydrated] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [searching, setSearching] = useState(false);
-  const [actionsOpen, setActionsOpen] = useState(false);
   const [manageTab, setManageTab] = useState("symbols");
   const afterSheetClose = useRef<(() => void) | undefined>(undefined);
   const finishSheetClose = () => {
     const next = afterSheetClose.current;
     afterSheetClose.current = undefined;
     next?.();
-  };
-  const leaveActions = (next: () => void) => {
-    afterSheetClose.current = next;
-    setActionsOpen(false);
   };
   const groupNameId = useId();
   const [confirmation, setConfirmation] = useState<
@@ -377,7 +373,7 @@ export default function WatchPage({
       setRefreshing(false); report(String(error));
     });
   };
-  const pullDistance = usePullRefresh(list, visible && online && foreground && !sheet && !searching && !actionsOpen, refreshing, requestRefresh);
+  const pullDistance = usePullRefresh(list, visible && online && foreground && !sheet && !searching, refreshing, requestRefresh);
   useEffect(() => {
     if (!visible || !online || !foreground) {
       ++pullVersion.current; setRefreshing(false);
@@ -820,14 +816,7 @@ export default function WatchPage({
           <small>{last ? "最近通信 " + stamp(last) : "等待首次通信"}</small>
         </div>
         <div className="mobile-header-actions">
-          <Button variant="plain"
-            aria-label="自选操作"
-            aria-haspopup="dialog"
-            aria-expanded={actionsOpen}
-            onClick={() => setActionsOpen(true)}
-          >
-            <WatchIcon name="/more" />
-          </Button>
+          <SymbolSearchButton label="添加自选" expanded={searching} onClick={() => setSearching(true)} />
         </div>
       </header>
       {cacheStatus && (
@@ -925,8 +914,6 @@ export default function WatchPage({
             revision = quote?.snapshot?.revision_id;
           const identity = compactIdentity(ticker, quote);
           const displayCode = code(ticker, quote);
-          const description = watchDescription(displayCode, identity.name) ||
-            (identity.custom ? identity.name || "名称待确认" : "");
           const displayPrice = formatWatchPrice(price, value?.display_precision, displayCode);
           const priceParts = watchPriceParts(displayPrice);
           const displayChange = typeof change === "number" ? `${change >= 0 ? "+" : ""}${change.toFixed(2)}%` : "—";
@@ -939,16 +926,7 @@ export default function WatchPage({
               className={`mobile-watch-row ${stale ? "stale" : ""} ${typeof change === "number" ? (change >= 0 ? "positive" : "negative") : ""}`}
               onClick={() => open(ticker)}
             >
-              <span className="mobile-watch-symbol">
-                <strong title={displayCode}><FitText text={displayCode} /></strong>
-                {description && <span className="mobile-watch-description" title={identity.name}>{description}</span>}
-                {identity.provider && (
-                  <span className={`mobile-watch-origin${identity.custom ? " mobile-watch-origin-custom" : ""}`} title={identity.series}>
-                    {identity.custom && <span className="mobile-watch-kind">自建</span>}
-                    <span className="mobile-watch-provider">{identity.provider}</span>
-                  </span>
-                )}
-              </span>
+              <SymbolInfo compact code={displayCode} name={identity.name} source={identity.provider} sourceDescription={identity.series} custom={identity.custom} />
               <Spark
                 instrument={displayCode}
                 online={online}
@@ -991,25 +969,11 @@ export default function WatchPage({
           );
         })}
       </div>
-      <MobileSheet open={actionsOpen} title="自选操作" description="添加品种，整理你的关注列表"
-        close={() => setActionsOpen(false)} onClosed={finishSheetClose}>
-        <div className="mobile-watch-action-list">
-          <Button variant="ghost" aria-label="搜索并添加品种" onClick={() => leaveActions(() => setSearching(true))}>
-            <span className="watch-action-icon"><Plus aria-hidden="true" /></span><span><strong>添加自选</strong><small>搜索代码或名称</small></span><ChevronRight aria-hidden="true" />
-          </Button>
-          <Button variant="ghost" aria-label="管理自选" onClick={() => leaveActions(() => { setDraft(undefined); setManageTab("symbols"); setSheet("manage"); })}>
-            <span className="watch-action-icon"><WatchIcon name="manage" /></span><span><strong>管理自选</strong><small>分组、排序与移除</small></span><ChevronRight aria-hidden="true" />
-          </Button>
-          <Button variant="ghost" onClick={() => leaveActions(requestRefresh)} disabled={!online || refreshing}>
-            <span className="watch-action-icon"><RefreshCw aria-hidden="true" /></span><span><strong>刷新行情</strong><small>重新读取当前自选与走势</small></span><ChevronRight aria-hidden="true" />
-          </Button>
-        </div>
-      </MobileSheet>
-      <MobileSheet open={searching} fullHeight title="搜索品种" close={() => setSearching(false)} onClosed={finishSheetClose}>
+      <MobileSheet open={searching} fullHeight title="添加自选" close={() => setSearching(false)} onClosed={finishSheetClose}>
           <DataPage
             profile={profile}
             online={online}
-            visible
+            visible={searching && visible}
             searchMode
             initialGroup={group}
             report={report}
@@ -1060,8 +1024,8 @@ export default function WatchPage({
                     setNameError(""); setGroupForm("rename");
                   }}><Pencil data-icon="inline-start" aria-hidden="true" />重命名当前分组</Button>}
                 </div>
-                <Button variant="ghost" onClick={() => { setName(""); setManageTab("groups"); setSheet("manage"); }}>
-                  管理分组与排序<ChevronRight data-icon="inline-end" aria-hidden="true" />
+                <Button variant="ghost" onClick={() => { setName(""); setDraft(undefined); setManageTab("symbols"); setSheet("manage"); }}>
+                  管理自选<ChevronRight data-icon="inline-end" aria-hidden="true" />
                 </Button>
               </div>
             </>

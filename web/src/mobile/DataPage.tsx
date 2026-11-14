@@ -1,3 +1,6 @@
+import SymbolInfo from "./SymbolInfo";
+import { SymbolSearchPanel, SymbolSearchRow } from "./SymbolSearch";
+import { useSymbolSearch } from "./useSymbolSearch";
 import { useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../api";
 import {
@@ -167,15 +170,6 @@ function DataContent({
   const [kind, setKind] = useState("native"),
     [query, setQuery] = useState(""),
     [source, setSource] = useState("");
-  const [pages, setPages] = useState<{ offset: number; cursor?: string }[]>([
-    { offset: 0 },
-  ]);
-  const [page, setPage] = useState<Page>(),
-    [loaded, setLoaded] = useState(false),
-    [loading, setLoading] = useState(false);
-  const [readAt, setReadAt] = useState<number>(),
-    [retry, setRetry] = useState(0),
-    [error, setError] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [detailRetry, setDetailRetry] = useState(0);
   const [selected, setSelected] = useState<Row>(),
@@ -213,90 +207,62 @@ function DataContent({
     },
     [],
   );
-  const generation = useRef(0);
-  const position = pages.at(-1)!;
-  const cacheName =
-    "data-page:two-kinds:" + JSON.stringify([kind, query, source, position]);
-  useEffect(() => {
-    if (!visible) return;
-    const token = ++generation.current,
-      controller = new AbortController();
-    setLoading(true);
-    setError("");
-    setLoaded(false);
-    setPage(undefined);
-    setReadAt(undefined);
-    const timer = setTimeout(async () => {
-      try {
-        const cached = await readSnapshot<Page>(profile, cacheName);
-        if (token !== generation.current || controller.signal.aborted) return;
-        if (cached) {
-          setPage(cached.value);
-          setReadAt(cached.readAt);
-          setLoaded(true);
-        }
-        if (!online) return;
-        const params = new URLSearchParams({
-          query,
-          source,
-          page_size: "25",
-          ...(kind === "native"
-            ? {
-                kind: "provider",
-                include_total: "false",
-                offset: String(position.offset),
-              }
-            : { page: String(pages.length) }),
-        });
-        if (position.cursor) params.set("cursor", position.cursor);
-        let value: Page;
-        if (kind === "managed") {
-          const result = await api<{ items: Dataset[]; total: number }>(
-            "/market-data/center/dataset-summaries?" + params,
-            undefined,
-            controller.signal,
-          );
-          value = {
-            items: result.items.map(datasetRow),
-            next_offset:
-              pages.length * 25 < result.total ? pages.length * 25 : null,
-          };
-        } else {
-          value = await api<Page>(
-            "/market-data/series/page?" + params,
-            undefined,
-            controller.signal,
-          );
-        }
-        if (token !== generation.current || controller.signal.aborted) return;
-        setPage(value);
-        setLoaded(true);
-        setReadAt(undefined);
-        await writeSnapshot(profile, cacheName, value).catch(() =>
-          report("目录快照未能写入本机"),
-        );
-      } catch (error) {
-        if (!controller.signal.aborted && token === generation.current) {
-          setError(errorMessage(error));
-        }
-      } finally {
-        if (token === generation.current) setLoading(false);
-      }
-    }, 250);
-    return () => {
-      ++generation.current;
-      clearTimeout(timer);
-      controller.abort();
-    };
-  }, [
+  const result = useSymbolSearch<Row>({
+    profile,
+    queryKey: JSON.stringify(["watch", kind, query, source]),
+    active: visible && !detailsOpen,
     online,
-    visible,
-    cacheName,
-    retry,
-    profile.origin,
-    profile.subject,
-    report,
-  ]);
+    identity: rowKey,
+    fetchPage: async (cursor, signal) => {
+      const position = cursor ? JSON.parse(cursor) : { offset: 0, page: 1 };
+      const params = new URLSearchParams({
+        query,
+        source,
+        page_size: "25",
+        ...(kind === "native"
+          ? {
+              kind: "provider",
+              include_total: "false",
+              offset: String(position.offset),
+            }
+          : { page: String(position.page) }),
+      });
+      if (position.cursor) params.set("cursor", position.cursor);
+      if (kind === "managed") {
+        const value = await api<{ items: Dataset[]; total: number }>(
+          "/market-data/center/dataset-summaries?" + params,
+          undefined,
+          signal,
+        );
+        return {
+          items: value.items.map(datasetRow),
+          next:
+            position.page * 25 < value.total
+              ? JSON.stringify({ page: position.page + 1 })
+              : undefined,
+        };
+      }
+      const value = await api<Page>(
+        "/market-data/series/page?" + params,
+        undefined,
+        signal,
+      );
+      return {
+        items: value.items,
+        next:
+          value.has_more !== false &&
+          (value.next_cursor || value.next_offset != null)
+            ? JSON.stringify({
+                offset: value.next_offset ?? position.offset + 25,
+                cursor: value.next_cursor,
+              })
+            : undefined,
+      };
+    },
+  });
+  const destination =
+    groups.find((item) => item.id === targetGroup) || groups[0];
+  const groupSymbols = destination?.symbols || [];
   useEffect(() => {
     if (!visible || !online) return;
     const controller = new AbortController();
@@ -313,7 +279,8 @@ function DataContent({
         }
       })
       .catch((error) => {
-        if (!controller.signal.aborted) report(String(error));
+        if (!controller.signal.aborted && navigator.onLine)
+          report(String(error));
       });
     return () => controller.abort();
   }, [visible, online, report]);
@@ -399,25 +366,17 @@ function DataContent({
     try {
       row = await actionableRow(row);
       if (!profileActive(profile)) return;
-      setPage(
-        (current) =>
-          current && {
-            ...current,
-            items: current.items.map((item) =>
-              rowKey(item) === rowKey(row) ? row : item,
-            ),
-          },
-      );
+      result.update((item) => (rowKey(item) === rowKey(row) ? row : item));
       const baseline = watchPreference(
         await api<WatchPreference[]>("/advanced-charts/preferences"),
       );
       if (!profileActive(profile)) return;
       const content = watchContent(baseline);
       if (
-        (targetGroup
-          ? content.lists.find((list) => list.id === targetGroup)?.symbols || []
-          : allSymbols(content)
-        ).includes(row.ticker)
+        (
+          content.lists.find((list) => list.id === targetGroup) ||
+          content.lists[0]
+        )?.symbols.includes(row.ticker)
       ) {
         setAdded(true);
         return;
@@ -450,13 +409,7 @@ function DataContent({
         ? ""
         : selected?.ticker;
   useEffect(() => {
-    setAdded(
-      !!detailTicker &&
-        (targetGroup
-          ? groups.find((list) => list.id === targetGroup)?.symbols || []
-          : favorites
-        ).includes(detailTicker),
-    );
+    setAdded(!!detailTicker && groupSymbols.includes(detailTicker));
   }, [detailTicker, targetGroup, groups, favorites]);
   async function openRow(row: Row, fromDetails = false) {
     if (adding.current) return;
@@ -614,259 +567,113 @@ function DataContent({
     </Alert>
   );
   const listing = (
-    <>
-      <InputGroup className="watch-search-input data-search-input">
-        <InputGroupAddon>
-          <Search aria-hidden="true" />
-        </InputGroupAddon>
-        <InputGroupInput
-          type="search"
-          aria-label="搜索代码或中文"
-          placeholder="搜索代码或中文名称"
-          value={query}
-          maxLength={100}
-          onChange={(event) => {
-            setQuery(event.target.value);
-            setPages([{ offset: 0 }]);
-          }}
-        />
-      </InputGroup>
-      {searchMode ? (
-        <ToggleGroup
-          className="mobile-source-filters"
-          aria-label="搜索来源"
-          value={[source || "all"]}
-          onValueChange={(values) => {
-            if (values.length) {
-              setSource(values[0] === "all" ? "" : String(values[0]));
-              setPages([{ offset: 0 }]);
-            }
-          }}
-        >
-          {sources.map(([value, title]) => (
-            <ToggleGroupItem key={value} value={value || "all"}>
-              {value ? title : "全部"}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-      ) : (
-        <div className="mobile-source-bar data-source-bar">
+    <SymbolSearchPanel
+      query={query}
+      resetKey={JSON.stringify([kind, query, source])}
+      onQuery={setQuery}
+      label="搜索代码或中文"
+      active={visible && !detailsOpen}
+      online={online}
+      loading={result.loading}
+      loaded={result.loaded}
+      error={result.error}
+      retry={result.retry}
+      hasNext={!!result.next}
+      loadNext={result.loadNext}
+      filters={
+        <div className="symbol-search-filters">
           <MobileSelect
             label="来源"
             value={source || "all"}
-            onChange={(value) => {
-              setSource(value === "all" ? "" : value);
-              setPages([{ offset: 0 }]);
-            }}
+            onChange={(value) => setSource(value === "all" ? "" : value)}
             items={sources.map(([value, label]) => ({
               value: value || "all",
               label,
             }))}
           />
-          <span className="data-catalog-note">
-            {kind === "native" ? "原生目录" : "历史与实时接续"}
-          </span>
+          <div className="symbol-target-group">
+            <span>添加到</span>
+            <WatchGroupSelect
+              value={destination?.id || ""}
+              onChange={setTargetGroup}
+              groups={groups}
+              disabled={busy}
+            />
+          </div>
         </div>
-      )}
-      {readAt && (
-        <Alert className="data-feedback" role="status">
-          <Info aria-hidden="true" />
-          <AlertTitle>当前显示上次读取</AlertTitle>
-          <AlertDescription>
-            {dateTime(readAt)} · 连接恢复后核验最新状态
-          </AlertDescription>
-        </Alert>
-      )}
-      {loading && !loaded && <MobileLoading label="正在读取目录…" />}
-      {loading && loaded && (
-        <p className="mobile-rows-note" role="status">
-          正在更新目录…
-        </p>
-      )}
-      {error &&
-        loaded &&
-        panelError(error, () => setRetry((value) => value + 1))}
-      {!loading && !loaded && (
-        <MobileEmpty
-          offline={!online}
-          title={online ? "目录暂时无法读取" : "暂无本地数据"}
-          action={
-            <MobileButton
-              variant="outline"
-              disabled={!online}
-              onClick={() => setRetry((value) => value + 1)}
-            >
-              重新读取
-            </MobileButton>
-          }
-        >
-          {online ? error || "请稍后重试。" : "连接恢复后自动读取。"}
-        </MobileEmpty>
-      )}
-      {loaded && !page?.items.length && (
+      }
+      note={
+        result.readAt && (
+          <p className="data-caption">
+            上次读取 {dateTime(result.readAt)} · 联网后核验
+          </p>
+        )
+      }
+    >
+      {result.loaded && !result.items.length && (
         <MobileEmpty title="没有符合条件的行情">
           尝试其他代码、中文名称或来源。
         </MobileEmpty>
       )}
-      <div className="data-series-list">
-        {page?.items.map((row) =>
-          searchMode ? (
-            <div className="mobile-search-row" key={rowKey(row)}>
-              <div className="mobile-search-info">
-                <strong>
-                  {row.display_symbol || row.symbol || row.ticker}
-                </strong>
-                {(row.instrument_name || row.description) && (
-                  <span className="mobile-search-name">
-                    {row.instrument_name || row.description}
-                  </span>
-                )}
-                <small>
-                  {typeName(row)} · {displaySource(row)}
-                  {row.continuation?.enabled &&
-                    ` · 实时接续${continuationLabel(row.continuation.status)}`}
-                  <span className="watch-search-frames">
-                    {row.frames?.join(" / ") || "周期见详情"}
-                  </span>
-                </small>
-              </div>
-              <div className="watch-search-actions">
-                <MobileButton
-                  variant="secondary"
-                  className="mobile-search-add"
-                  disabled={
-                    !online ||
-                    busy ||
-                    (targetGroup
-                      ? groups.find((group) => group.id === targetGroup)
-                          ?.symbols || []
-                      : favorites
-                    ).includes(row.ticker)
-                  }
-                  onClick={() => void add(row)}
-                >
-                  {(targetGroup
-                    ? groups.find((group) => group.id === targetGroup)
-                        ?.symbols || []
-                    : favorites
-                  ).includes(row.ticker) ? (
-                    <>
-                      <Check data-icon="inline-start" aria-hidden="true" />
-                      已添加
-                    </>
-                  ) : (
-                    <>
-                      <Plus data-icon="inline-start" aria-hidden="true" />
-                      {targetGroup ? "分组" : "自选"}
-                    </>
-                  )}
-                </MobileButton>
-                <MobileButton
-                  variant="ghost"
-                  className="mobile-link-button"
-                  onClick={() => {
-                    setSelected(row);
-                    setDetailsOpen(true);
-                  }}
-                >
-                  详情
-                </MobileButton>
-                <MobileButton
-                  variant="ghost"
-                  className="mobile-link-button"
-                  disabled={!online || busy}
-                  onClick={() => void openRow(row)}
-                >
-                  开图
-                </MobileButton>
-              </div>
-            </div>
-          ) : (
-            <MobileButton
-              variant="plain"
-              className="mobile-series data-series"
+      <div className="symbol-search-results">
+        {result.items.map((row) => {
+          const present = !!row.ticker && groupSymbols.includes(row.ticker);
+          return (
+            <SymbolSearchRow
               key={rowKey(row)}
-              onClick={() => {
+              onSelect={() => {
                 setSelected(row);
                 setDetailsOpen(true);
               }}
-            >
-              <span className="data-series-top">
-                <strong>
-                  {row.display_symbol || row.symbol || row.ticker}
-                </strong>
-                {!row.continuation?.enabled &&
-                  favorites.includes(row.ticker) && (
-                    <Badge variant="secondary">
-                      <Check aria-hidden="true" />
-                      已关注
-                    </Badge>
+              action={
+                <MobileButton
+                  variant="ghost"
+                  size="icon"
+                  className="symbol-search-add"
+                  aria-label={
+                    present
+                      ? "已添加 " + (row.display_symbol || row.symbol)
+                      : "添加 " + (row.display_symbol || row.symbol)
+                  }
+                  disabled={!online || busy || present}
+                  onClick={() => void add(row)}
+                >
+                  {present ? (
+                    <Check aria-hidden="true" />
+                  ) : (
+                    <Plus aria-hidden="true" />
                   )}
-                <ChevronRight aria-hidden="true" />
-              </span>
-              {(row.instrument_name || row.description) && (
-                <span className="data-series-name">
-                  {row.instrument_name || row.description}
-                </span>
-              )}
-              <span className="data-series-meta">
-                <span>{displaySource(row) || typeName(row)}</span>
-                <span>
-                  {row.frames?.length ? row.frames.join(" · ") : "周期见详情"}
-                </span>
-              </span>
-              {row.continuation && (
-                <span className="data-series-range">
-                  实时接续 · {continuationLabel(row.continuation.status)}
-                </span>
-              )}
-              {kind === "managed" && row.latest_at && (
-                <span className="data-series-range">
-                  数据至 {dateTime(row.latest_at)}
-                </span>
-              )}
-            </MobileButton>
-          ),
-        )}
+                </MobileButton>
+              }
+            >
+              <SymbolInfo
+                code={row.display_symbol || row.symbol || row.ticker}
+                name={row.instrument_name || row.description || ""}
+                source={displaySource(row)}
+                custom={kind === "managed"}
+              />
+              {kind === "managed" &&
+                result.items.filter(
+                  (other) =>
+                    other.display_symbol === row.display_symbol &&
+                    other.source === row.source,
+                ).length > 1 && (
+                  <small className="symbol-configuration">
+                    {[
+                      row.identity?.mode,
+                      row.aggregation_calendar,
+                      row.identity?.basis,
+                      row.identity?.adjustment,
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </small>
+                )}
+            </SymbolSearchRow>
+          );
+        })}
       </div>
-      <nav
-        className="mobile-inline-actions data-pagination"
-        aria-label="行情分页"
-      >
-        <MobileButton
-          variant="outline"
-          disabled={loading || pages.length < 2}
-          onClick={() => setPages((value) => value.slice(0, -1))}
-        >
-          上一页
-        </MobileButton>
-        <span>第 {pages.length} 页</span>
-        <MobileButton
-          variant="outline"
-          disabled={
-            loading || !page || (!page.next_cursor && page.next_offset == null)
-          }
-          onClick={() =>
-            setPages((value) => [
-              ...value,
-              {
-                offset: page?.next_offset || position.offset + 25,
-                ...(page?.next_cursor ? { cursor: page.next_cursor } : {}),
-              },
-            ])
-          }
-        >
-          下一页
-        </MobileButton>
-      </nav>
-      {!searchMode && (
-        <p className="data-footnote">
-          {kind === "native"
-            ? "目录可查询，不代表历史行情已全部下载。"
-            : "创建、维护和实时接续配置请在桌面完成。"}
-        </p>
-      )}
-    </>
+    </SymbolSearchPanel>
   );
   return (
     <section
@@ -900,7 +707,6 @@ function DataContent({
         className="data-kind-tabs"
         onValueChange={(value) => {
           setKind(String(value));
-          setPages([{ offset: 0 }]);
         }}
       >
         <TabsList aria-label="行情类型">

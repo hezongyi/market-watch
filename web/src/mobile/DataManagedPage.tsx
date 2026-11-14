@@ -1,3 +1,5 @@
+import SymbolInfo from "./SymbolInfo";
+import { SymbolSearchButton } from "./SymbolSearch";
 import { useEffect, useRef, useState } from "react";
 import {
   ChevronRight,
@@ -11,7 +13,12 @@ import { api } from "../api";
 import type { Dataset, Task } from "../market-data/types";
 import type { Continuation } from "../market-data/DatasetContinuation";
 import { profileActive, writeSnapshot, type Profile } from "./cache";
-import { actionableRow, continuationLabel, datasetRow, managedCode } from "./dataMarkets";
+import {
+  actionableRow,
+  continuationLabel,
+  datasetRow,
+  managedCode,
+} from "./dataMarkets";
 import {
   addSymbol,
   allSymbols,
@@ -154,17 +161,14 @@ export default function DataManagedPage(props: Props) {
     <div className="mobile-data-body mobile-data-surface data-managed">
       <header className="mobile-title data-title">
         <h1>数据</h1>
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="搜索并添加行情"
+        <SymbolSearchButton
+          label="搜索并添加行情"
+          expanded={catalog}
           onClick={() => {
             setCatalogMounted(true);
             setCatalog(true);
           }}
-        >
-          <Search aria-hidden="true" />
-        </Button>
+        />
       </header>
       <div className="data-list-filter">
         <InputGroup className="data-search-input">
@@ -296,32 +300,35 @@ export default function DataManagedPage(props: Props) {
               key={dataset.id}
               onClick={() => pick(dataset.id)}
             >
-              <span className="data-managed-symbol">
-                <strong>
-                  {managedCode(dataset)}
-                </strong>
-                <span>
-                  {dataset.instrument_name ||
-                    dataset.provider_display_symbol ||
-                    dataset.identity.provider_symbol}
-                </span>
-                <small>
-                  {dataset.source_display ||
-                    sourceName(dataset.identity.source)}{" "}
-                  ·{" "}
-                  {dataset.identity.mode === "base_d1"
-                    ? "D1 派生"
-                    : dataset.identity.mode === "native_periods"
-                      ? "原生多周期"
-                      : dataset.aggregation_calendar === "ny17"
-                        ? "NY17"
-                        : dataset.aggregation_calendar === "source_date"
-                          ? "来源交易日"
-                          : "UTC0"}
-                  {dataset.identity.adjustment &&
-                    dataset.identity.adjustment !== "none" &&
-                    ` · ${{ qfq: "前复权", hfq: "后复权", supplier: "来源价格" }[dataset.identity.adjustment] || dataset.identity.adjustment}`}
-                </small>
+              <span className="data-managed-identity">
+                <SymbolInfo
+                  code={managedCode(dataset)}
+                  name={dataset.instrument_name || ""}
+                  source={dataset.source_display || dataset.identity.source}
+                  custom
+                />
+                {result.data!.items.filter(
+                  (other) =>
+                    managedCode(other) === managedCode(dataset) &&
+                    other.identity.source === dataset.identity.source,
+                ).length > 1 && (
+                  <small className="symbol-configuration">
+                    {[
+                      dataset.identity.mode === "base_d1"
+                        ? "D1派生"
+                        : dataset.identity.mode === "native_periods"
+                          ? "原生多周期"
+                          : "M1派生",
+                      dataset.aggregation_calendar,
+                      dataset.identity.basis,
+                      dataset.identity.adjustment !== "none"
+                        ? dataset.identity.adjustment
+                        : "",
+                    ]
+                      .filter(Boolean)
+                      .join(" · ")}
+                  </small>
+                )}
               </span>
               <span className="data-managed-status">
                 <Badge variant="secondary">{label}</Badge>
@@ -695,9 +702,7 @@ function ManagedDetails({
           {dataset && (
             <>
               <div className="data-selection">
-                <strong>
-                  {managedCode(dataset)}
-                </strong>
+                <strong>{managedCode(dataset)}</strong>
                 <span>
                   {dataset.instrument_name} ·{" "}
                   {dataset.source_display ||
@@ -785,16 +790,31 @@ function ManagedDetails({
                   <p className="data-caption">{live.data.reason}</p>
                 )}
                 {live.data?.baseline_seam != null && (
-                  <p className="data-caption">基线至 {dataTime(live.data.baseline_seam)}</p>
-                )}
-                {live.data?.rollover && ["preparing", "ready", "deferred", "updated"].includes(live.data.rollover.status) && (
-                  <p className="data-caption" role="status">
-                    {{ preparing: "新基线准备中", ready: "新基线即将接管", deferred: "基线轮换暂缓", updated: "基线已更新" }[live.data.rollover.status]}
-                    {live.data.rollover.reason && `：${live.data.rollover.reason}`}
+                  <p className="data-caption">
+                    基线至 {dataTime(live.data.baseline_seam)}
                   </p>
                 )}
+                {live.data?.rollover &&
+                  ["preparing", "ready", "deferred", "updated"].includes(
+                    live.data.rollover.status,
+                  ) && (
+                    <p className="data-caption" role="status">
+                      {
+                        {
+                          preparing: "新基线准备中",
+                          ready: "新基线即将接管",
+                          deferred: "基线轮换暂缓",
+                          updated: "基线已更新",
+                        }[live.data.rollover.status]
+                      }
+                      {live.data.rollover.reason &&
+                        `：${live.data.rollover.reason}`}
+                    </p>
+                  )}
                 {live.data?.rollover?.warning && (
-                  <p className="data-caption" role="status">{live.data.rollover.warning}</p>
+                  <p className="data-caption" role="status">
+                    {live.data.rollover.warning}
+                  </p>
                 )}
                 {live.data && (
                   <Button
@@ -1075,9 +1095,7 @@ function DataTools({
             onClick={() => pick(task.dataset.id)}
           >
             <span>
-              <strong>
-                {managedCode(task.dataset)}
-              </strong>
+              <strong>{managedCode(task.dataset)}</strong>
               <small>
                 {taskName(task.status)} · {dataTime(task.updated_at)}
               </small>

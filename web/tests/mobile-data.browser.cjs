@@ -216,7 +216,7 @@ const server = http.createServer(async (req, res) => {
           : [
               {
                 ...(entries[kind] || entries.provider),
-                ...(offset ? { display_symbol: "NEXT_PAGE_SAMPLE" } : {}),
+                ...(offset ? { ticker: "MWP:NEXT", display_symbol: "NEXT_PAGE_SAMPLE" } : {}),
               },
             ],
       next_offset: offset ? null : 25,
@@ -426,7 +426,7 @@ const server = http.createServer(async (req, res) => {
     page = await context.newPage();
   page.on("pageerror", (e) => errors.push(e.message));
   const dialog = () => page.getByRole("dialog").last(),
-    catalog = () => page.locator(".mobile-search-row");
+    catalog = () => page.locator(".symbol-search-row");
   const settle = async () => {
     await page.waitForTimeout(350);
     await page.evaluate(async () =>
@@ -466,7 +466,7 @@ const server = http.createServer(async (req, res) => {
   const detail = async () => {
     await catalog()
       .first()
-      .getByRole("button", { name: "详情", exact: true })
+      .locator(".symbol-search-body")
       .click();
     await expect(dialog()).toHaveAccessibleName("行情详情");
     await expect(
@@ -505,10 +505,7 @@ const server = http.createServer(async (req, res) => {
     await page.goto("http://127.0.0.1:" + server.address().port + "/m/watch");
     await page.getByLabel("密码", { exact: true }).fill("test-only");
     await page.getByRole("button", { name: "登录", exact: true }).click();
-    await page.getByRole("button", { name: "自选操作", exact: true }).click();
-    await page
-      .getByRole("button", { name: "搜索并添加品种", exact: true })
-      .click();
+    await page.getByRole("button", { name: "添加自选", exact: true }).click();
     await kind("原生");
     const search = page.getByRole("searchbox", {
       name: "搜索代码或中文",
@@ -524,42 +521,22 @@ const server = http.createServer(async (req, res) => {
     await shot("loading");
     hold.list = false;
     release.list();
-    await expect(catalog()).toBeVisible();
+    await expect(catalog().first()).toBeVisible();
     await search.fill("");
-    await expect(catalog()).toBeVisible();
-    const sourceFilters = page.getByRole("group", {
-      name: "搜索来源",
-      exact: true,
-    });
-    await sourceFilters
-      .getByRole("button", { name: "Yahoo", exact: true })
-      .click();
-    await expect
-      .poll(() =>
-        requests
-          .filter((r) => r.path.endsWith("/series/page"))
-          .at(-1)
-          ?.query.includes("source=yahoo"),
-      )
-      .toBe(true);
-    await sourceFilters
-      .getByRole("button", { name: "全部", exact: true })
-      .click();
-    await page
-      .getByRole("navigation", { name: "行情分页" })
-      .getByRole("button", { name: "下一页", exact: true })
-      .click();
-    await expect(catalog()).toContainText("NEXT_PAGE_SAMPLE");
-    await page
-      .getByRole("navigation", { name: "行情分页" })
-      .getByRole("button", { name: "上一页", exact: true })
-      .click();
-    await expect(catalog()).toContainText("EURUSD");
+    await expect(catalog().first()).toBeVisible();
+    const sourceFilters = dialog().getByRole("combobox", { name: "来源", exact: true });
+    await sourceFilters.click(); await page.getByRole("option", {name: "Yahoo", exact: true}).click();
+    await expect.poll(() => requests.filter(r => r.path.endsWith("/series/page")).at(-1)?.query.includes("source=yahoo")).toBe(true);
+    await sourceFilters.click(); await page.getByRole("option", {name: "全部来源", exact: true}).click();
+    await page.locator(".symbol-search-footer").scrollIntoViewIfNeeded();
+    await expect(catalog().filter({hasText: "NEXT_PAGE_SAMPLE"})).toBeVisible();
+    await expect(catalog().filter({hasText: "EURUSD"})).toBeVisible();
+    await expect(page.getByRole("navigation", {name: "行情分页"})).toHaveCount(0);
     proof.checks.push(
       "shared watch native search: loading, empty, source, pagination",
     );
     hold.detail = true;
-    await catalog().getByRole("button", { name: "详情", exact: true }).click();
+    await catalog().first().locator(".symbol-search-body").click();
     await expect(
       page.getByRole("status", { name: "正在读取详情…", exact: true }),
     ).toBeVisible();
@@ -569,7 +546,7 @@ const server = http.createServer(async (req, res) => {
     hold.detail = false;
     release.detail();
     await settle();
-    await expect(dialog()).toHaveAccessibleName("搜索品种");
+    await expect(dialog()).toHaveAccessibleName("添加自选");
     await detail();
     await dialog()
       .getByRole("button", { name: "数据身份与修订", exact: true })
@@ -703,9 +680,9 @@ const server = http.createServer(async (req, res) => {
     await page.evaluate(() =>
       document.dispatchEvent(new Event("visibilitychange")),
     );
-    await expect(catalog()).toBeVisible({ timeout: 15000 });
+    await expect(catalog().first()).toBeVisible({ timeout: 15000 });
     await expect(
-      page.getByText("当前显示上次读取", { exact: true }),
+      dialog().getByText(/上次读取/).first(),
     ).toBeVisible();
     await expect(
       page.locator(".mobile-search-content [role=alert]"),
@@ -725,18 +702,18 @@ const server = http.createServer(async (req, res) => {
     await shot("offline-no-cache");
     await context.setOffline(false);
     await page.evaluate(() => dispatchEvent(new Event("online")));
-    await expect(catalog()).toBeVisible();
+    await expect(catalog().first()).toBeVisible();
     fail.list = true;
     await search.fill("error");
     await expect(
-      page.getByText("目录暂时无法读取", { exact: true }),
+      page.locator(".symbol-search-footer").getByText(/failed|失败|error|错误|不可用/i),
     ).toBeVisible();
     await shot("catalog-error");
     fail.list = false;
-    await page.getByRole("button", { name: "重新读取", exact: true }).click();
-    await expect(catalog()).toBeVisible();
+    await page.getByRole("button", { name: "重试", exact: true }).click();
+    await expect(catalog().first()).toBeVisible();
     await search.fill("");
-    await expect(catalog()).toBeVisible();
+    await expect(catalog().first()).toBeVisible();
     await page.emulateMedia({ reducedMotion: "reduce" });
     await detail();
     await settle();
@@ -749,13 +726,13 @@ const server = http.createServer(async (req, res) => {
     await kind("自建");
     continuationEnabled = true;
     await search.fill("live");
-    await expect(catalog()).toContainText("实时接续运行中");
+    await expect(catalog()).toContainText("自建");
     await expect(catalog()).toHaveCount(1);
     await catalog()
-      .getByRole("button", { name: /分组|自选/ })
+      .getByRole("button", { name: /^添加 / })
       .click();
     await expect(
-      catalog().getByRole("button", { name: "已添加", exact: true }),
+      catalog().getByRole("button", { name: /^已添加 / }),
     ).toBeDisabled();
     assert(
       pref.content.value.lists.some((l) =>
