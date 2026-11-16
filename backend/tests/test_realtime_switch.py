@@ -266,17 +266,24 @@ def test_running_rule_pauses_once_off_and_reenable_needs_explicit_resume(databas
     with database.begin() as db:
         assert evaluate(db, ident, now=stamp) == []
         row = db.get(ChartAlert, ident)
-        before = (row.version, row.run, row.count, copy.deepcopy(row.state), copy.deepcopy(row.runtime))
+        before = (row.version, row.run, row.count, copy.deepcopy(row.state))
+        before_runtime = copy.deepcopy(row.runtime)
         control = row.control_revision
         sid = source_id(db, revision)
         set_enabled(db, sid, False, now=stamp)
         assert evaluate(db, ident, now=stamp + 1) == []
         assert row.status == 'paused' and row.control_revision == control + 1
         assert '实时流已关闭' in row.health_reason
+        # The final active inspection records why the rule paused. It must not
+        # advance the judgment baseline, and paused passes stop that clock.
+        paused_runtime = {**before_runtime, 'last_checked_at': stamp + 1}
+        assert row.runtime == paused_runtime
         assert evaluate(db, ident, now=stamp + 2) == [] and row.control_revision == control + 1
+        assert row.runtime == paused_runtime
         set_enabled(db, sid, True, now=stamp + 3)
         assert row.status == 'paused' and evaluate(db, ident, now=stamp + 3) == []
-        assert (row.version, row.run, row.count, row.state, row.runtime) == before
+        assert (row.version, row.run, row.count, row.state) == before
+        assert row.runtime == paused_runtime
         assert db.scalar(select(SignalRow)) is None
         expected = row.control_revision
         lifecycle(db, ident, row.version, 'resume', expected_revision=expected, request_id='explicit', at=stamp + 3)
