@@ -72,16 +72,33 @@ function canonical(value: any): string {
 export const sameConfig = (a: AlertConfig, b: AlertConfig) =>
   canonical(a) === canonical(b);
 export const uncertainError = (error: unknown) =>
-  !(error instanceof ApiError) || error.status >= 500 || error.status === 408;
+  !(error instanceof ApiError) ||
+  error.status >= 500 ||
+  error.status === 408 ||
+  (error.status >= 200 && error.status < 300 && error.code === "INVALID_RESPONSE");
 /** A lost edit response is resolved against the complete submitted config and version. */
 export async function savePriceRule(
   config: AlertConfig,
   requestId: string,
   editing?: AlertRow,
   request = api,
+  resolving = false,
 ) {
   if (editing && !editableRule(editing))
     throw Error("此规则仅支持查看、暂停或归档");
+  // Resolve an uncertain edit before resubmitting its old version. A second
+  // POST would return 409 even when the first write was saved successfully.
+  if (editing && resolving) {
+    const latest = await request<AlertRow>(
+      `/chart-alerts/${editing.id}`,
+      undefined,
+      AbortSignal.timeout(10000),
+    );
+    if (latest.version > editing.version && sameConfig(latest.config, config))
+      return latest;
+    if (latest.version !== editing.version)
+      throw new ApiError("规则已改变，当前输入已保留。", 409, "ALERT_CONFLICT");
+  }
   try {
     return await request<AlertRow>(
       editing ? `/chart-alerts/${editing.id}/edit` : "/chart-alerts",
@@ -94,6 +111,8 @@ export async function savePriceRule(
     if (editing && uncertainError(error)) {
       const latest = await request<AlertRow>(
         `/chart-alerts/${editing.id}`,
+        undefined,
+        AbortSignal.timeout(10000),
       ).catch(() => undefined);
       if (
         latest &&

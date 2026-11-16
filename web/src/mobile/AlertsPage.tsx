@@ -130,6 +130,9 @@ export default function AlertsPage({
     mounted = useRef(true),
     flight = useRef(false);
   const healthGeneration = useRef(0);
+  const rulesRequest = useRef<AbortController | undefined>(undefined);
+  const [rulesAt, setRulesAt] = useState(0);
+  const editorNext = useRef<(() => void) | undefined>(undefined);
   const rulePages = useRef(1);
   const [archivePages, setArchivePages] = useState(1);
   const [rulesMore, setRulesMore] = useState(false),
@@ -144,26 +147,38 @@ export default function AlertsPage({
     mounted.current = true;
     return () => {
       mounted.current = false;
+      rulesRequest.current?.abort();
     };
   }, []);
   const request = useCallback(
     (async (path: string, body?: unknown, signal?: AbortSignal) => {
       if (!live.current) throw Error("离线，只读；联网后可读取告警");
       if (path === "/chart-alerts" && body === undefined) {
+        const controller = new AbortController();
+        rulesRequest.current = controller;
         setRulesLoading(true);
         try {
           const value = await readRuleSpan(
             rulePages.current,
-            signal || AbortSignal.timeout(15000),
+            AbortSignal.any([
+              controller.signal,
+              ...(signal ? [signal] : []),
+              AbortSignal.timeout(15000),
+            ]),
           );
+          if (controller.signal.aborted || !live.current)
+            throw new DOMException("读取已取消", "AbortError");
           if (mounted.current) {
             setLoaded(true);
             setReadAt(undefined);
             setRulesMore(value.hasMore);
+            setRulesAt(Date.now());
           }
           return value.items;
         } finally {
           if (mounted.current) setRulesLoading(false);
+          if (rulesRequest.current === controller)
+            rulesRequest.current = undefined;
         }
       }
       return api(path, body, signal);
@@ -184,6 +199,8 @@ export default function AlertsPage({
     if (!online) {
       ++healthGeneration.current;
       setHealthAt(0);
+      setRulesAt(0);
+      rulesRequest.current?.abort();
     }
   }, [online]);
   useEffect(() => {
@@ -335,12 +352,13 @@ export default function AlertsPage({
     health,
     online,
     healthAt,
-    loaded && !readAt && !data.error,
+    loaded && !readAt && !data.error && !!rulesAt && clockNow - rulesAt < 45000,
     clockNow,
   );
   const ntfy =
     online &&
     !!healthAt &&
+    clockNow - healthAt < 45000 &&
     Boolean(health?.ntfy_configured && health?.delivery_enabled);
   const status = selected && ruleState(selected, monitor, clockNow);
   const progress = selected && ruleProgress(selected);
@@ -514,7 +532,11 @@ export default function AlertsPage({
     if (!selected || busy || !online) return;
     setBusy(true);
     try {
-      const row = await api<AlertRow>(`/chart-alerts/${selected.id}`);
+      const row = await api<AlertRow>(
+        `/chart-alerts/${selected.id}`,
+        undefined,
+        AbortSignal.timeout(10000),
+      );
       data.commit(row);
       setSelected(row);
       setActionError("");
@@ -529,10 +551,13 @@ export default function AlertsPage({
     return (
       (filter === "all" ||
         filter === "archived" ||
-        (filter === "current" && ["active", "paused"].includes(row.status)) ||
+        (filter === "current" &&
+          (["active", "paused"].includes(row.status) ||
+            row.execution?.settlement_pending)) ||
         (filter === "attention" && state.attention) ||
         (filter === "ended" &&
-          ["completed", "expired"].includes(row.status))) &&
+          ["completed", "expired"].includes(row.status) &&
+          !row.execution?.settlement_pending)) &&
       query
         .toLocaleLowerCase()
         .split(/\s+/)
@@ -635,7 +660,7 @@ export default function AlertsPage({
                         {actionError}
                       </p>
                     )}
-                    {(data.error || archiveError) && (
+                    {(filter === "archived" ? archiveError : data.error) && (
                       <div className="alert-read-error">
                         <p role="alert">
                           {filter === "archived" ? archiveError : data.error}
@@ -643,7 +668,11 @@ export default function AlertsPage({
                         <Button
                           variant="ghost"
                           disabled={!online}
-                          onClick={() => void refresh()}
+                          onClick={() =>
+                            void (filter === "archived"
+                              ? refreshArchives()
+                              : refresh())
+                          }
                         >
                           重试
                         </Button>
@@ -986,51 +1015,55 @@ export default function AlertsPage({
                     </Button>
                   </>
                 )}
-                {expiredRule(selected) && selected.status !== "archived" && (
-                  <p className="alert-muted">
-                    先编辑并更新到期时间，保存后再恢复。
-                  </p>
-                )}
-                {!unknownAction && selected.status !== "archived" && (
-                  <div className="alert-detail-actions">
-                    {selected.status === "active" ? (
-                      <Button
-                        variant="outline"
-                        disabled={!online || busy}
-                        onClick={() => void lifecycle(selected, "pause")}
-                      >
-                        暂停
-                      </Button>
-                    ) : (
-                      selected.config.series_kind === "composite" && (
+                {expiredRule(selected) &&
+                  selected.status !== "archived" &&
+                  !selected.execution?.settlement_pending && (
+                    <p className="alert-muted">
+                      先编辑并更新到期时间，保存后再恢复。
+                    </p>
+                  )}
+                {!unknownAction &&
+                  selected.status !== "archived" &&
+                  !selected.execution?.settlement_pending && (
+                    <div className="alert-detail-actions">
+                      {selected.status === "active" ? (
                         <Button
                           variant="outline"
-                          disabled={!online || busy || expiredRule(selected)}
-                          onClick={() =>
-                            selected.count >= selected.max_triggers
-                              ? setConfirmation({
-                                  row: selected,
-                                  action: "restart",
-                                })
-                              : void lifecycle(selected, "resume")
-                          }
+                          disabled={!online || busy}
+                          onClick={() => void lifecycle(selected, "pause")}
                         >
-                          {selected.count >= selected.max_triggers
-                            ? "再次启用"
-                            : "恢复"}
+                          暂停
                         </Button>
-                      )
-                    )}
-                    {editableRule(selected) && (
-                      <Button
-                        disabled={!online || busy}
-                        onClick={() => void edit(selected).catch(() => {})}
-                      >
-                        编辑条件
-                      </Button>
-                    )}
-                  </div>
-                )}
+                      ) : (
+                        selected.config.series_kind === "composite" && (
+                          <Button
+                            variant="outline"
+                            disabled={!online || busy || expiredRule(selected)}
+                            onClick={() =>
+                              selected.count >= selected.max_triggers
+                                ? setConfirmation({
+                                    row: selected,
+                                    action: "restart",
+                                  })
+                                : void lifecycle(selected, "resume")
+                            }
+                          >
+                            {selected.count >= selected.max_triggers
+                              ? "再次启用"
+                              : "恢复"}
+                          </Button>
+                        )
+                      )}
+                      {editableRule(selected) && (
+                        <Button
+                          disabled={!online || busy}
+                          onClick={() => void edit(selected).catch(() => {})}
+                        >
+                          编辑条件
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 <div className="alert-entry-list">
                   <Button
                     variant="plain"
@@ -1178,7 +1211,12 @@ export default function AlertsPage({
               ntfy={ntfy}
               open={editorOpen}
               close={() => setEditorOpen(false)}
-              onClosed={() => setEditor(undefined)}
+              onClosed={() => {
+                setEditor(undefined);
+                const action = editorNext.current;
+                editorNext.current = undefined;
+                action?.();
+              }}
               report={report}
               notifications={() => setNotifications(true)}
               maintain={
@@ -1186,9 +1224,11 @@ export default function AlertsPage({
               }
               saved={(row) => {
                 data.commit(row);
-                setSelected(row);
+                editorNext.current = () => {
+                  setSelected(row);
+                  setDetailOpen(true);
+                };
                 setEditorOpen(false);
-                setDetailOpen(true);
                 void refresh();
               }}
             />

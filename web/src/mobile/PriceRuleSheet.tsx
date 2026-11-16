@@ -78,6 +78,8 @@ export default function PriceRuleSheet({
     dateTimeInput(initial.expires_at, "UTC"),
   );
   const [moreOpen, setMoreOpen] = useState(false);
+  const [capabilityRetry, setCapabilityRetry] = useState(0),
+    [capabilityError, setCapabilityError] = useState("");
   const requestId = useRef(crypto.randomUUID()),
     flight = useRef(false),
     mounted = useRef(true);
@@ -92,6 +94,7 @@ export default function PriceRuleSheet({
   useEffect(() => {
     const controller = new AbortController();
     setCaps(undefined);
+    setCapabilityError("");
     if (online && open)
       void api<Capabilities>(
         "/chart-alerts/capabilities",
@@ -100,7 +103,7 @@ export default function PriceRuleSheet({
           series_kind: draft.series_kind,
           timeframe: draft.timeframe,
         },
-        controller.signal,
+        AbortSignal.any([controller.signal, AbortSignal.timeout(15000)]),
       )
         .then((value) => {
           if (!controller.signal.aborted) setCaps(value);
@@ -108,11 +111,18 @@ export default function PriceRuleSheet({
         .catch((error) => {
           if (!controller.signal.aborted) {
             logFailure("告警", "读取告警能力", error, label);
-            setError(errorMessage(error));
+            setCapabilityError(errorMessage(error));
           }
         });
     return () => controller.abort();
-  }, [draft.instrument, draft.timeframe, online, open, recheck]);
+  }, [
+    draft.instrument,
+    draft.timeframe,
+    online,
+    open,
+    recheck,
+    capabilityRetry,
+  ]);
   const indicator = draft.condition.left.indicator;
   const available = indicator
     ? caps?.sources.find(
@@ -201,7 +211,13 @@ export default function PriceRuleSheet({
     setFields([]);
     try {
       pending.current = config;
-      const row = await savePriceRule(config, requestId.current, editing);
+      const row = await savePriceRule(
+        config,
+        requestId.current,
+        editing,
+        api,
+        unknown,
+      );
       if (mounted.current) {
         setDirty(false);
         setUnknown(false);
@@ -666,11 +682,21 @@ export default function PriceRuleSheet({
             {!online
               ? "离线，只读；联网后可提交"
               : !caps
-                ? "正在核验实时能力…"
+                ? capabilityError || "正在核验实时能力…"
                 : !available?.available
                   ? available?.reason || "此条件暂不可用"
                   : "首次观察建立基准，不计为已发生穿越"}
           </p>
+        )}
+        {!unknown && capabilityError && (
+          <Button
+            type="button"
+            variant="outline"
+            disabled={!online || busy}
+            onClick={() => setCapabilityRetry((value) => value + 1)}
+          >
+            重新核验能力
+          </Button>
         )}
         {caps && !available?.available && maintain && (
           <Button type="button" variant="outline" onClick={maintain}>

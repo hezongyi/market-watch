@@ -26,6 +26,7 @@ from .storage import (
     ChartAlert,
     ChartAlertVersion,
     CompositeJudgment,
+    DeviceReceipt,
     Instrument,
     NoticeEvent,
     Notification,
@@ -172,8 +173,29 @@ def display_label(db, config, identity):
         value["code"], kind, value["basis"], value["timeframe"], value["source"].upper()) if part)
 
 
-def alert_dict(db, alert, *, last_triggered_at=None):
+def latest_trigger_notifications(db, alert_ids):
+    """Batch the latest trigger separately from rule execution incidents."""
+    if not alert_ids:
+        return {}
+    ordered = select(SignalRow.id.label("id"), func.row_number().over(
+        partition_by=SignalRow.chart_alert_id,
+        order_by=(SignalRow.occurred_at.desc(), SignalRow.created_at.desc(), SignalRow.id.desc()),
+    ).label("position")).where(SignalRow.chart_alert_id.in_(alert_ids)).subquery()
+    rows = db.execute(select(SignalRow, Notification, Outbox).join(
+        ordered, (ordered.c.id == SignalRow.id) & (ordered.c.position == 1)
+    ).join(Notification, Notification.signal_id == SignalRow.id).outerjoin(
+        Outbox, Outbox.notification_id == Notification.id)).all()
+    return {signal.chart_alert_id: {
+        "occurred_at": signal.occurred_at, "event_id": signal.id,
+        "notification_id": note.id, "status": note.status,
+        "outbox_status": task.status if task else "web_only", "ack_at": note.ack_at,
+    } for signal, note, task in rows}
+
+
+def alert_dict(db, alert, *, latest=None):
     version = current_version(db, alert)
+    if latest is None:
+        latest = latest_trigger_notifications(db, [alert.id]).get(alert.id, {})
     return {"id": alert.id, "name": alert.name, "version": alert.version,
             "run": alert.run, "control_revision": alert.control_revision,
             "status": alert.status, "health": alert.health,
@@ -183,7 +205,8 @@ def alert_dict(db, alert, *, last_triggered_at=None):
             "updated_at": alert.updated_at, "config": version.config,
             "market_identity": version.market_identity,
             "display_identity": display_identity(db, version.config, version.market_identity),
-            "last_triggered_at": last_triggered_at,
+            "last_triggered_at": latest.get("occurred_at"),
+            "last_notification": latest or None,
             "display_label": display_label(db, version.config, version.market_identity),
             "condition_summary": condition_label(version.config["condition"]),
             "runtime": alert.runtime,
@@ -259,10 +282,8 @@ def listing(db, instrument: str | None = None, status: str | None = None, search
             raise ValueError("无效规则游标") from exc
         query = query.where(tuple_(ChartAlert.created_at, ChartAlert.id) < tuple(cursor))
     rows = list(db.scalars(query.order_by(ChartAlert.created_at.desc(), ChartAlert.id.desc()).limit(limit)))
-    last = dict(db.execute(select(SignalRow.chart_alert_id, func.max(SignalRow.occurred_at))
-        .where(SignalRow.chart_alert_id.in_([row.id for row in rows]))
-        .group_by(SignalRow.chart_alert_id)).all()) if rows else {}
-    result = [alert_dict(db, row, last_triggered_at=last.get(row.id)) for row in rows]
+    latest = latest_trigger_notifications(db, [row.id for row in rows])
+    result = [alert_dict(db, row, latest=latest.get(row.id, {})) for row in rows]
     return result
 
 def rules_page(db, status: str | None = None, limit: int = 50, before: str | None = None):
@@ -306,6 +327,9 @@ def events(db, alert_id: str | None = None, limit: int = 100, *, before: str | N
         NoticeEvent.subject == SUBJECT, NoticeEvent.source_domain == "pro_chart",
         NoticeEvent.source_kind == "chart_alert",
         NoticeEvent.source_id.in_([record.id for record, _, _ in records])))} if records else {}
+    received = dict(db.execute(select(DeviceReceipt.notification_id, func.min(DeviceReceipt.received_at))
+        .where(DeviceReceipt.notification_id.in_([note.id for _, note, _ in records]))
+        .group_by(DeviceReceipt.notification_id)).all()) if records else {}
     return [{"id": record.id, "alert_id": record.chart_alert_id,
              "display_identity": display_identity(db, record.evidence["config"], record.evidence.get("market_identity")),
              "display_label": display_label(db, record.evidence["config"], record.evidence.get("market_identity")),
@@ -317,6 +341,9 @@ def events(db, alert_id: str | None = None, limit: int = 100, *, before: str | N
              "threshold": record.evidence.get("threshold", str(record.threshold)), "evidence": record.evidence,
              "message": signal_message(record), "notification_id": notification.id,
              "notification_status": notification.status, "ack_at": notification.ack_at,
+             "device_received_at": received.get(notification.id),
+             "delivery_attempts": task.attempts if task else 0,
+             "next_delivery_at": task.next_at if task and task.status == "pending" and not notification.ack_at else None,
              "delivery_status": task.status if task else "web_only"}
             for record, notification, task in records]
 

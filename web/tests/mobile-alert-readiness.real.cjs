@@ -1,7 +1,8 @@
-// Actual task-owned API + deployed UI. Business mutations and notification tests are denied.
+// Actual persistent development API + deployed UI. Business writes are denied.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const {chromium,expect}=require('@playwright/test');
-const task='mw-managed-live-rollover-20261113',origin='https://192.168.7.232:18447';
+const credentials=JSON.parse(fs.readFileSync(process.env.MW_ALERT_CREDENTIALS||path.join(process.env.HOME,'.local/share/market-watch-dev/credentials.json')));
+const origin=credentials.base_url;
 const out=process.env.MW_ALERT_UI_OUTPUT||'/tmp/mw-alert-readiness-20261116/deployed-ui';
 (async()=>{
   fs.mkdirSync(out,{recursive:true});
@@ -10,9 +11,10 @@ const out=process.env.MW_ALERT_UI_OUTPUT||'/tmp/mw-alert-readiness-20261116/depl
   const proof={host:'Ubuntu local Docker',origin,errors:[],blockedWrites:[],screenshots:[],checks:[]};
   const page=await context.newPage();page.on('pageerror',e=>proof.errors.push(e.message));
   try{
-    const login=await context.request.post(origin+'/api/login',{data:{password:JSON.parse(fs.readFileSync(path.join(process.env.HOME,'.local/share/market-watch-docker/previews',task,'credentials.json'))).login_password}});assert(login.ok());
+    const login=await context.request.post(origin+'/api/login',{data:{password:credentials.login_password}});assert(login.ok());
     const rr=await context.request.get(origin+'/api/chart-alerts');assert(rr.ok());const rows=await rr.json();
-    const selected=rows.find(r=>r.status==='active');assert(selected,'existing enabled rule for read-only observation');
+    const selected=rows.find(r=>r.status==='active')||rows[0];assert(selected,'existing rule for read-only observation');
+    proof.rule={id:selected.id,status:selected.status,version:selected.version,run:selected.run,count:selected.count};
     await context.route('**/api/**',route=>{
       const r=route.request();
       if(['GET','HEAD','OPTIONS'].includes(r.method()))return route.continue();
@@ -40,19 +42,33 @@ const out=process.env.MW_ALERT_UI_OUTPUT||'/tmp/mw-alert-readiness-20261116/depl
       await expect(page.locator('.mobile-app')).toHaveAttribute('data-theme',theme);
       await page.setViewportSize({width,height:880});await page.evaluate(font=>document.documentElement.style.fontSize=font+'px',font);
       await page.locator('a[href="/m/alerts"]').click();
+      if(!['active','paused'].includes(selected.status)&&!selected.execution?.settlement_pending){
+        await page.getByRole('button',{name:'搜索规则',exact:true}).click();
+        const filters=page.getByRole('dialog',{name:'搜索规则',exact:true});
+        await filters.getByRole('combobox',{name:'规则范围',exact:true}).click();
+        await page.getByRole('option',{name:'全部未归档',exact:true}).click();
+        await filters.getByRole('button',{name:'查看规则',exact:true}).click();
+        await expect(filters).toHaveCount(0);
+      }
       const row=page.locator('.alert-rule').filter({has:page.getByRole('button',{name:'查看'+selected.name,exact:true})});
-      await expect(row).toBeVisible();await expect(row.getByRole('switch')).toBeChecked();
-      await expect(row).toContainText(/监控中|休市|等待数据|需处理/);
-      await expect(row).not.toContainText(/服务未开启|尚未接管|状态待确认/);
+      await expect(row).toBeVisible();
+      if(selected.status==='active'){
+        await expect(row.getByRole('switch')).toBeChecked();
+        await expect(row).toContainText(/监控中|休市|等待数据|需处理|准备中|结算中|恢复中/);
+        await expect(row).not.toContainText(/服务未开启|尚未接管|状态待确认/);
+      }else{
+        await expect(row).toContainText({paused:'已暂停',completed:'次数已用完',expired:'已到期'}[selected.status]);
+        await expect(row).not.toContainText('监控中');
+      }
       await expect(page.locator('.mobile-app')).toHaveCSS('background-color',theme==='dark'?'rgb(16, 19, 23)':'rgb(248, 249, 252)');
       await shot(`list-${theme}-${width}`);
       await row.locator('.alert-rule-open').click();const detail=page.getByRole('dialog',{name:'规则详情',exact:true});
-      await expect(detail.getByText('最近检查',{exact:true}).first()).toBeVisible();
+      await expect(detail.getByText(/^(最近|上次)检查$/).first()).toBeVisible();
       await expect(detail.getByText('最近判定',{exact:true}).first()).toBeVisible();
       await expect(detail.getByRole('button',{name:'排查信息',exact:true})).toHaveAttribute('aria-expanded','false');
       await shot(`detail-${theme}-${width}`);
       await detail.getByRole('button',{name:'关闭',exact:true}).click();await expect(detail).toHaveCount(0);
-      proof.checks.push(`${width}px ${theme} ${font}px: 原规则开启、实际执行状态、检查/判定首屏、排查默认收起`);
+      proof.checks.push(`${width}px ${theme} ${font}px: 保留原规则${selected.status}、真实生命周期、检查/判定首屏、排查默认收起`);
     }
     assert.deepEqual(proof.errors,[]);assert.deepEqual(proof.blockedWrites,[]);proof.passed=true;
     fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify(proof,null,2));console.log(JSON.stringify(proof));

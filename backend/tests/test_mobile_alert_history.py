@@ -54,6 +54,71 @@ def test_trigger_history_stable_cursor_detail_and_legacy_array(database, monkeyp
         assert client.get("/api/chart-alerts/events/page?limit=101").status_code == 422
 
 
+def test_latest_trigger_and_delivery_survive_end_and_detail_reads(database, monkeypatch):
+    from alerts.chart_alert_application import read
+    from alerts.storage import ChartAlert, Outbox
+
+    with database.begin() as db:
+        row = create(db, "ended-delivery", config(), at=0)
+        row.status, row.count = "completed", 2
+        ident = row.id
+        for stamp in (100, 200):
+            signal = SignalRow(chart_alert_id=ident, instrument_id="EURUSD", occurred_at=stamp,
+                created_at=stamp + 1, direction="up", price=1.12, threshold=1.11,
+                reason="cross_up", evidence={"config": config().model_dump(mode="json")})
+            db.add(signal)
+            db.flush()
+            note = Notification(signal_id=signal.id, status="delivery_error")
+            db.add(note)
+            db.flush()
+            db.add(Outbox(notification_id=note.id, status="blocked", attempts=1))
+        notification_id = note.id
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        listed = client.get("/api/chart-alerts").json()[0]
+        detailed = client.get(f"/api/chart-alerts/{ident}").json()
+        for value in (listed, detailed):
+            assert value["status"] == "completed"
+            assert value["last_triggered_at"] == 200
+            assert value["last_notification"]["notification_id"] == notification_id
+            assert value["last_notification"]["outbox_status"] == "blocked"
+        # Acknowledging the actual trigger remains visible even on an ended rule.
+        assert client.post(f"/api/notifications/{notification_id}/ack", json={}).status_code == 200
+        with database() as db:
+            assert read(db, ident)["last_notification"]["ack_at"]
+            assert db.get(ChartAlert, ident).count == 2
+
+
+def test_event_delivery_evidence_belongs_to_its_own_notification(database, monkeypatch):
+    from alerts.storage import Device, DeviceReceipt, Outbox
+
+    with database.begin() as db:
+        rule = create(db, "receipt-identity", config(), at=0)
+        device = Device(name="isolated-test", token_hash="isolated-test-device")
+        db.add(device)
+        db.flush()
+        ids = []
+        for stamp in (100, 200):
+            signal = SignalRow(chart_alert_id=rule.id, instrument_id="EURUSD", occurred_at=stamp,
+                created_at=stamp + 1, direction="up", price=1.12, threshold=1.11,
+                reason="cross_up", evidence={"config": config().model_dump(mode="json")})
+            db.add(signal)
+            db.flush()
+            note = Notification(signal_id=signal.id, status="server_accepted")
+            db.add(note)
+            db.flush()
+            db.add(Outbox(notification_id=note.id, status="accepted", attempts=2))
+            ids.append(signal.id)
+        db.add(DeviceReceipt(device_id=device.id, notification_id=note.id, received_at=300))
+    with TestClient(api_module.app) as client:
+        login(client, monkeypatch)
+        own = client.get(f"/api/chart-alerts/events/{ids[1]}").json()
+        other = client.get(f"/api/chart-alerts/events/{ids[0]}").json()
+        assert own["device_received_at"] == 300 and own["delivery_attempts"] == 2
+        assert other["device_received_at"] is None
+        assert own["next_delivery_at"] is None
+
+
 def test_rules_page_distinguishes_archives_and_keeps_legacy_list(database, monkeypatch):
     from alerts.storage import ChartAlert
 
