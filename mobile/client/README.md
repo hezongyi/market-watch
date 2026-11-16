@@ -2,7 +2,7 @@
 
 当前应用基线 v2.0.6 / A06（最初从 v2.0.5 实施，2026-11-11 按用户要求变基）；本目录是新建工程，不恢复归档 Android 工程。
 
-- applicationId：`com.kookvv.marketwatch`，versionCode：`4`，versionName：`0.1.3`。
+- applicationId：`com.kookvv.marketwatch`，versionCode：`5`，versionName：`0.1.4`。
 - 工具链：JDK 17、Gradle 8.11.1（wrapper 固定 distribution SHA-256）、AGP 8.9.2、Kotlin 2.1.20、compile/target SDK 35、min SDK 26。
 - AndroidX Activity 1.10.1、WebKit 1.13.0。本机 SDK 35 assembleDebug/lintDebug 已通过；Find X8 待用户验收。
 - 首次输入可信 HTTPS origin，打开同源 `/m/`。禁止明文、混合内容、文件和 content 访问；主框架网络/HTTP/TLS 失败提供重试与连接设置，证书错误取消；release 禁用 WebView 调试。
@@ -10,6 +10,7 @@
 - 主框架、来源限定的 WebMessageListener 协议 v1 用于返回/退出/连接配置/清会话、壳版本及手动应用更新；没有原生业务数据桥。
 - 系统栏、刘海与键盘空间由原生容器统一处理并消费 insets；网页使用已避让的 WebView 视口。启动图标复用网站浅色主题的绿色 Waves 图形，白底 adaptive icon。
 - 0.1.3 通过 `appearance-v1` 将网页深浅主题同步到原生安全区和系统图标；浅色背景为 `#f8f9fc`，深色为 `#101317`，保持现有安全区尺寸。
+- 0.1.4 将离线可用的原生服务器设置统一为手机端表单风格，支持深浅主题、清空地址、就地校验、键盘连接与返回原服务器；首次配置及更换服务器不自动弹键盘。原有 HTTPS 与切源清会话流程不变。
 
 在已安装 SDK 35、JDK 17 且磁盘预算充足的环境执行：
 
@@ -37,5 +38,9 @@ python3 mobile/client/package_update.py --notes '本版更新说明'
 ```
 
 脚本将 APK 和清单放入 gitignored `web/vendor/downloads/`；随后按仓库规则构建并部署 Web 镜像，安装包与清单一起更新。不要手工填写未构建的版本或摘要。清单响应 `Cache-Control: no-store`，不存在的下载路径返回 404。
+
+切换 worktree 或仅更新网页时，Git 不会恢复这个下载目录。部署前须保留已发布的 APK 与配套清单，校验清单大小、SHA-256、包名、版本和签名；没有原生改动时不要为填补目录重做 APK。Ubuntu 隔离实例可将本任务私有持久目录只读挂载到 `/usr/share/nginx/html/downloads`，并同时写入实际启动与保存的 Compose 配置，避免网页镜像替换后丢失。不能从其他任务推断签名一致，也不能用伪造清单表示“已是最新”。
+
+部署后使用 APK 信任的 CA 验证同源 `/downloads/android-update.json` 返回真实 JSON（200、`Cache-Control: no-store`），清单所指 APK 返回 200 且字节数和 SHA-256 一致，不存在的 APK 返回 404；不能只验证网页 `/m/` 可以打开。生产下载目录的修复仍须按仓库生产授权边界执行。
 
 更新清单边界与网页桥接测试已通过；原生下载、权限跳转、系统安装器及覆盖安装保留数据仍需真机验收，不能以 JVM/Chromium 检查代替。

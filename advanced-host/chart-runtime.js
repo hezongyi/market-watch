@@ -3313,7 +3313,10 @@ async function update(m) {
       if (m.action === "indicators") await indicatorPicker.open();
       else if (m.action === "settings") widget.activeChart().executeActionById("chartProperties");
       else if (m.action === "resolution") await widget.activeChart().setResolution(m.resolution);
-      else if (m.action === "symbol") await widget.activeChart().setSymbol(m.symbol);
+      else if (m.action === "symbol") {
+        await widget.activeChart().setSymbol(m.symbol);
+        if (m.resolution) await widget.activeChart().setResolution(m.resolution);
+      }
       else if (m.action === "crosshair") {
         await mobileHeaderEntry.setEnabled(m.enabled);
         mobileCrosshair = m.enabled;

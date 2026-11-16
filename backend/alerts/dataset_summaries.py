@@ -21,11 +21,44 @@ from .storage import (
     RealtimeMapping,
 )
 
+# Navigation groups reuse the same verified metadata as the row badges.
+MOBILE_CATEGORIES = {
+    "forex": ("外汇", ("外汇",)), "metal": ("贵金属", ("贵金属",)),
+    "a-stock": ("A股", ("深A", "沪A", "北A")), "us-stock": ("美股", ("美股",)),
+    "hk-stock": ("港股", ("港股",)), "crypto": ("加密", ("加密",)),
+    "index": ("指数", ("股指", "指数")), "future": ("期货", ("期货",)),
+    "etf": ("ETF", ("ETF",)), "fund": ("基金", ("基金",)),
+    "stock": ("其他股票", ("股票", "日股", "英股", "德股")),
+    "commodity": ("商品", ("商品",)), "bond": ("债券", ("债券",)),
+    "option": ("期权", ("期权",)), "other": ("其他", ("待分类",)),
+}
 
-def summaries(db, *, ids=None, view=None, anchor=None, **filters):
+
+def mobile_category_ids(db, *, archived=False):
+    from .mobile_identity import dataset_display_metadata, mobile_identity
+    base = _dataset_query(include_continuations=True, status="archived" if archived else "all")
+    datasets = list(db.scalars(select(MarketDataset).where(MarketDataset.id.in_(base))))
+    metadata = dataset_display_metadata(db, datasets)
+    groups = {key: [] for key in MOBILE_CATEGORIES}
+    by_label = {label: key for key, (_, labels) in MOBILE_CATEGORIES.items() for label in labels}
+    for row in datasets:
+        label = mobile_identity({"asset_class": row.asset_class, "metadata_json": metadata.get(row.id, {})}, row.identity)["category"]
+        groups[by_label.get(label, "other")].append(row.id)
+    return groups
+
+
+def summaries(db, *, ids=None, view=None, anchor=None, retain_watch=(), category=None, include_categories=False, **filters):
     from .mobile_symbol_search import watched
-    excluded = watched(db)["dataset"] if filters.get("exclude_watch") else ()
+    excluded = watched(db, retain_watch)["dataset"] if filters.get("exclude_watch") else ()
     base = _dataset_query(include_continuations=True, excluded_watch_ids=excluded, **filters)
+    categories = None
+    if category or include_categories:
+        if category and category not in MOBILE_CATEGORIES:
+            raise ValueError("无效的品种分类")
+        groups = mobile_category_ids(db, archived=filters.get("status") == "archived")
+        categories = [{"value": key, "label": MOBILE_CATEGORIES[key][0]} for key, members in groups.items() if members]
+        if category:
+            base = base.where(MarketDataset.id.in_(groups[category]))
     if view == "continuation":
         base = base.where(select(RealtimeMapping.id).where(
             RealtimeMapping.dataset_id == MarketDataset.id,
@@ -58,7 +91,8 @@ def summaries(db, *, ids=None, view=None, anchor=None, **filters):
     selected = db.execute(query.order_by(ranked.c.position)).all()
     items = _rows(db, selected)
     return {"items": items, "total": total, "page": filters.get("page", 1),
-            "page_size": filters.get("page_size", 25), "anchor_position": anchor_position}
+            "page_size": filters.get("page_size", 25), "anchor_position": anchor_position,
+            **({"categories": categories} if include_categories else {})}
 
 
 def _rows(db, selected):
@@ -106,6 +140,8 @@ def _rows(db, selected):
     from .continuation_summaries import summaries as continuation_summaries
 
     continuations = continuation_summaries(db, [dataset for dataset, *_ in selected], switches)
+    from .mobile_identity import dataset_display_metadata
+    display_metadata = dataset_display_metadata(db, [dataset for dataset, *_ in selected])
     output = []
     for dataset, inst, plan, position in selected:
         parent = versions.get(plan.latest_version_id) if plan and plan.latest_version_id else latest.get(dataset.id)
@@ -118,7 +154,7 @@ def _rows(db, selected):
             task_status=task_state(active, runs.get(active.id), active.id in unavailable) if active else
             task_state(parent, runs.get(parent.id), parent.id in unavailable) if parent else None,
             next_at=plan.next_at if plan and plan.frequency == "daily" and not plan.paused and not plan.archived else None)
-        output.append({**dataset_report(dataset, inst), "position": position, "maintenance": maintenance,
+        output.append({**dataset_report(dataset, inst, display_metadata.get(dataset.id)), "position": position, "maintenance": maintenance,
             "latest_version_id": parent.id if parent else None, "available_start": parent.start if parent else None,
             "available_end": parent.end if parent else None,
             "unknown_minutes": parent.manifest.get("unknown_minutes") if parent else None,

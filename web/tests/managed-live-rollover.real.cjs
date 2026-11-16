@@ -162,7 +162,7 @@ const mount=MWChartAdapter.mount;MWChartAdapter.mount=(...args)=>{const adapter=
     await page.getByLabel("密码", { exact: true }).fill(password);
     await page.getByRole("button", { name: "登录", exact: true }).click();
     await expect(
-      page.getByRole("button", { name: "搜索并添加行情", exact: true }),
+      page.getByRole("button", { name: "添加自建", exact: true }),
     ).toBeVisible();
     const rows = (
       await request("/market-data/center/dataset-summaries?page_size=25")

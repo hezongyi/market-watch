@@ -3,8 +3,31 @@ const exportsObject={};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/sparklines.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,{exports:exportsObject,Map,Set,Promise,AbortController,Number,Math,JSON});
-const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,sparklineDisplayPoints,sparklineWithQuote,mergeSparkline,sparklineNeedsRecheck}=exportsObject;
+const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,sparklineDisplayPoints,sparklineWithQuote,mergeSparkline,sparklineNeedsRecheck,sparklinePosition}=exportsObject;
 (async()=>{
+  const ashareMinute=60000, ashareTime=time=>Date.parse('2026-11-13T'+time+':00+08:00');
+  const ashare={ticker:'MWP:ASHARE',timeframe:'M1',window_start:ashareTime('00:00'),window_end:ashareTime('23:59'),
+    display_segments:[{start:ashareTime('09:30'),end:ashareTime('11:30')},{start:ashareTime('13:00'),end:ashareTime('15:00')}],
+    points:['09:30','11:30','13:00','15:00'].map((time,i)=>({time:ashareTime(time)-ashareMinute,display_time:ashareTime(time),price:String(100+i),gap_before:i===2}))};
+  const asharePaths=sparklinePaths(ashare,200);
+  assert.equal(asharePaths[0].line.split(' ')[0].split(',')[0],'M0.00','opening close stays at the left edge');
+  assert.equal(asharePaths[0].end[0],100,'morning occupies half of the width');
+  assert.equal(asharePaths[1].line.split(' ')[0].split(',')[0],'M100.00','afternoon begins at the same middle coordinate');
+  assert.equal(asharePaths[1].end[0],200,'actual session close reaches the right edge');
+  assert.equal(asharePaths.length,2,'compressing lunch must not join the data gap');
+  const morningOnly={...ashare,points:ashare.points.slice(0,2)};
+  assert.equal(sparklinePaths(morningOnly,200)[0].end[0],100,'morning does not stretch into the future afternoon');
+  assert.equal(sparklinePosition(ashare,ashareTime('14:00')),0.75);
+  assert.equal(sparklinePosition(ashare,ashareTime('12:00')),undefined,'lunch is outside the display axis');
+  const offSession={...ashare,points:[...ashare.points.slice(0,2),{time:ashareTime('12:00'),price:'9999',gap_before:false},...ashare.points.slice(2)]};
+  assert.equal(sparklineDisplayPoints(offSession).length,4,'off-session observations do not affect the curve or vertical scale');
+  assert.equal(sparklineScale(offSession).y(101),sparklineScale(ashare).y(101));
+  const morningQuote={s:'ok',v:{fetch_status:'ok',lp:105,quote_time:ashareTime('12:00')}};
+  assert.equal(sparklineWithQuote(morningOnly,morningQuote,ashareTime('12:01')),morningOnly,'lunch quotes cannot paint a false live tail');
+  const sourceClose={s:'ok',v:{fetch_status:'ok',lp:105,time_type:'source_m1',data_start:ashareTime('12:59'),data_end:ashareTime('13:00')}};
+  const afternoon=sparklineWithQuote(morningOnly,sourceClose,ashareTime('13:01'));
+  assert.equal(afternoon.points.at(-1).display_time,ashareTime('13:00'),'source minute closes align with the afternoon open');
+  assert.equal(sparklinePaths(afternoon,200).at(-1).end[0],100);
   const requests=[],received=[],failed=[];let active=0,maxActive=0;
   const loader=sparklineLoader((items,signal)=>new Promise(resolve=>{
     active++;maxActive=Math.max(maxActive,active);

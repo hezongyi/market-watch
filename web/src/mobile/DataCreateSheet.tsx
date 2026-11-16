@@ -1,3 +1,4 @@
+import SymbolIdentityRow from "./SymbolIdentityRow";
 import { useEffect, useRef, useState } from "react";
 import type { CatalogItem } from "../market-data/CreationCatalog";
 import {
@@ -22,7 +23,6 @@ import { FrameSettings } from "./DataMaintenanceSheet";
 import {
   dataRequest,
   recentDate,
-  sourceName,
   useDataCommand,
 } from "./dataOperations";
 
@@ -311,11 +311,8 @@ export default function DataCreateSheet({
   const edit = () => setDirty(true);
   return (
     <div className="data-workflow-form">
-      <div className="data-selection">
-        <strong>{item.display_symbol || item.provider_symbol}</strong>
-        <span>
-          {item.label} · {sourceName(item.source)}
-        </span>
+      <div className="data-create-symbol">
+        <SymbolIdentityRow row={item} code={item.display_symbol || item.provider_symbol} name={item.label} />
       </div>
       <form
         onSubmit={(event) => {

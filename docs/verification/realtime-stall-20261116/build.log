@@ -1,0 +1,79 @@
+#0 building with "market-watch-ubuntu" instance using docker-container driver
+
+#1 [internal] load build definition from Dockerfile.stream-recovery
+#1 transferring dockerfile: 498B 0.0s done
+#1 DONE 0.0s
+
+#2 [context market-watch-api:mobile-data-categories-20261115-r1] load metadata for docker.io/library/market-watch-api:mobile-data-categories-20261115-r1@sha256:b7f1ac5df2bb71e6555ee5eeb78f050b53227c108f87ab3c178a1d706a9cb655
+#2 DONE 0.0s
+
+#3 [internal] load .dockerignore
+#3 transferring context: 336B done
+#3 DONE 0.0s
+
+#4 [context market-watch-api:mobile-data-categories-20261115-r1] OCI load from client
+#4 resolve docker.io/library/market-watch-api:mobile-data-categories-20261115-r1@sha256:b7f1ac5df2bb71e6555ee5eeb78f050b53227c108f87ab3c178a1d706a9cb655 0.0s done
+#4 DONE 0.3s
+
+#5 [1/9] RUN rm -rf /app/backend /app/migrations
+#5 ...
+
+#6 [internal] load build context
+#6 transferring context: 5.79MB 0.4s done
+#6 DONE 0.5s
+
+#5 [1/9] RUN rm -rf /app/backend /app/migrations
+#5 DONE 1.5s
+
+#7 [2/9] COPY backend /app/backend
+#7 DONE 0.2s
+
+#8 [3/9] COPY migrations /app/migrations
+#8 DONE 0.2s
+
+#9 [4/9] COPY pyproject.toml requirements.lock alembic.ini /app/
+#9 DONE 0.1s
+
+#10 [5/9] COPY scripts/volume_backfill.py /app/scripts/volume_backfill.py
+#10 DONE 0.1s
+
+#11 [6/9] COPY scripts/oanda_live_sessions.py /app/scripts/oanda_live_sessions.py
+#11 DONE 0.1s
+
+#12 [7/9] WORKDIR /app
+#12 DONE 0.1s
+
+#13 [8/9] RUN pip install --no-cache-dir --no-deps --no-build-isolation .
+#13 1.135 Processing /app
+#13 1.138   Preparing metadata (pyproject.toml): started
+#13 1.583   Preparing metadata (pyproject.toml): finished with status 'done'
+#13 1.587 Building wheels for collected packages: market-watch
+#13 1.588   Building wheel for market-watch (pyproject.toml): started
+#13 2.498   Building wheel for market-watch (pyproject.toml): finished with status 'done'
+#13 2.505   Created wheel for market-watch: filename=market_watch-1.27.0-py3-none-any.whl size=1663768 sha256=16204d0d52d3411a329f948e65a1b18efdca479d61fe19a0da1f157876640c7c
+#13 2.506   Stored in directory: /tmp/pip-ephem-wheel-cache-n9mnnc1e/wheels/57/0f/98/bb57b2b57b95807699b822a35c022f139d38a02c27922f27ce
+#13 2.513 Successfully built market-watch
+#13 2.518 Installing collected packages: market-watch
+#13 2.519   Attempting uninstall: market-watch
+#13 2.523     Found existing installation: market-watch 1.27.0
+#13 2.589     Uninstalling market-watch-1.27.0:
+#13 3.321       Successfully uninstalled market-watch-1.27.0
+#13 4.834 Successfully installed market-watch-1.27.0
+#13 4.835 WARNING: Running pip as the 'root' user can result in broken permissions and conflicting behaviour with the system package manager. It is recommended to use a virtual environment instead: https://pip.pypa.io/warnings/venv
+#13 DONE 10.0s
+
+#14 exporting to oci image format
+#14 exporting layers
+#14 exporting layers 1.5s done
+#14 exporting manifest sha256:b3a8dc6b5189685e61670716856e3ec9ef38a0767122c42911c2b9f8670f6f18 0.0s done
+#14 exporting config sha256:32ad081ef85c90e6f93f3e9221d5b052c1020b2b80669d9aa8e0e723c92de6ef 0.0s done
+#14 sending tarball
+#14 ...
+
+#15 importing to docker
+#15 DONE 0.0s
+
+#14 exporting to oci image format
+#14 sending tarball 10.3s done
+#14 DONE 11.8s
+{"task": "mw-managed-live-rollover-20261113", "tag": "market-watch-api:stream-recovery-20261116", "builder": "market-watch-ubuntu"}

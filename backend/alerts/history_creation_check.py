@@ -13,7 +13,7 @@ class CreationCheckError(ValueError):
         self.field = field
 
 
-def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=50, mobile=False, exclude_existing=False):
+def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=50, mobile=False, exclude_existing=False, include_total=True):
     from .fxcm_history import configured as fxcm_configured
     from .history_catalog import creation_entry
     from .instrument_directory import SOURCES, has_entries, search
@@ -23,7 +23,7 @@ def search_catalog(db, *, source="", query="", symbol_type="", offset=0, limit=5
         raise ValueError("请选择支持自建历史的来源")
     asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
     result = search(db, source=source or None, query=query, asset=asset, managed=True,
-                    offset=offset, limit=limit, mobile=mobile, exclude_existing=exclude_existing)
+                    offset=offset, limit=limit, mobile=mobile, exclude_existing=exclude_existing, include_total=include_total)
     sources = []
     for name in [source] if source else SOURCES:
         sources.append({"source": name,

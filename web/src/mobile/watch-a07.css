@@ -59,26 +59,6 @@
   width: 16px;
   height: 16px;
 }
-.mobile-watch .mobile-header-actions button {
-  width: 44px;
-  height: 44px;
-  padding: 10px;
-  border-radius: 12px;
-  color: var(--muted);
-  flex-shrink: 0;
-  border: 1px solid transparent;
-  background: transparent;
-}
-.mobile-watch .mobile-header-actions svg {
-  width: 22px;
-  height: 22px;
-  stroke-width: 1.65;
-}
-.mobile-watch .mobile-header-actions .mobile-watch-add {
-  background: var(--selected);
-  color: var(--accent);
-}
-.mobile-watch .mobile-header-actions { gap: 4px; }
 .mobile-watch .mobile-sse small { font-variant-numeric: tabular-nums; white-space: nowrap; }
 .mobile-watch .mobile-sse {
   font-size: 0.857143rem;
@@ -650,11 +630,7 @@
     margin-top: 2px;
     justify-self: center;
   }
-  .mobile-watch .mobile-header-actions {
-    grid-column: 2;
-    grid-row: 1;
-  }
-  .mobile-app .mobile-watch-row {
+    .mobile-app .mobile-watch-row {
     grid-template-columns: minmax(0, 1fr) auto;
     row-gap: 8px;
   }

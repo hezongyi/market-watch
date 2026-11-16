@@ -1,0 +1,45 @@
+{
+  "host": "Ubuntu local Docker",
+  "checked_at": "2026-11-16T02:04:04.527640+00:00",
+  "samples": [],
+  "existing_configuration_preserved": true,
+  "usdjpy_supported_not_automatically_enabled": true,
+  "containers": [
+    {
+      "name": "mw-managed-live-rollover-20261113-data-worker-1",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-api-1",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running",
+      "health": "healthy"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-market-runtime-1",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-web-1",
+      "image": "sha256:6c6c453337d454b44ce17708edb653a5930d03043a2d6c6f5bf712136d93934d",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-tls-1",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running",
+      "health": null
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-postgres-1",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running",
+      "health": "healthy"
+    }
+  ]
+}

@@ -1,7 +1,8 @@
 import { useOverlayActive } from "./WatchOverlays";
 import { useEffect, useRef, type ReactNode } from "react";
-import { ChevronRight, Search, X } from "lucide-react";
+import { ChevronRight, Plus, Search, X } from "lucide-react";
 import { Button } from "./components/ui/button";
+import { HeaderIconButton } from "./components/HeaderIconButton";
 import {
   InputGroup,
   InputGroupAddon,
@@ -10,7 +11,7 @@ import {
 } from "./components/ui/input-group";
 import { DataEmpty, DataLoading } from "./DataStates";
 
-export function SymbolSearchButton({
+export function SymbolAddButton({
   label,
   onClick,
   expanded,
@@ -20,17 +21,13 @@ export function SymbolSearchButton({
   expanded?: boolean;
 }) {
   return (
-    <Button
-      variant="plain"
-      size="icon"
-      className="symbol-search-entry"
-      aria-label={label}
+    <HeaderIconButton
+      icon={Plus}
+      label={label}
       aria-haspopup="dialog"
       aria-expanded={expanded}
       onClick={onClick}
-    >
-      <Search aria-hidden="true" />
-    </Button>
+    />
   );
 }
 
@@ -39,7 +36,10 @@ export function SymbolSearchPanel({
   resetKey = query,
   onQuery,
   label,
+  placeholder = "代码、中文名、来源或类别",
+  maxLength = 100,
   filters,
+  enhancedFilters,
   children,
   loading,
   loaded,
@@ -55,7 +55,10 @@ export function SymbolSearchPanel({
   resetKey?: string;
   onQuery(value: string): void;
   label: string;
+  placeholder?: string;
+  maxLength?: number;
   filters?: ReactNode;
+  enhancedFilters?: ReactNode;
   children: ReactNode;
   loading: boolean;
   loaded: boolean;
@@ -97,26 +100,32 @@ export function SymbolSearchPanel({
   }, [active, online, hasNext, loading, error]);
   return (
     <div className="symbol-search-panel">
-      <InputGroup className="data-search-input">
-        <InputGroupAddon>
-          <Search aria-hidden="true" />
-        </InputGroupAddon>
-        <InputGroupInput
-          type="search"
-          aria-label={label}
-          placeholder="代码、中文名、来源或类别"
-          value={query}
-          maxLength={100}
-          onChange={(e) => onQuery(e.target.value)}
-        />
-        {query && (
-          <InputGroupAddon align="inline-end">
-            <InputGroupButton aria-label="清空搜索" onClick={() => onQuery("")}>
-              <X aria-hidden="true" />
-            </InputGroupButton>
+      <div className="symbol-search-controls">
+        <InputGroup className="data-search-input">
+          <InputGroupAddon>
+            <Search aria-hidden="true" />
           </InputGroupAddon>
-        )}
-      </InputGroup>
+          <InputGroupInput
+            type="search"
+            aria-label={label}
+            placeholder={placeholder}
+            value={query}
+            maxLength={maxLength}
+            onChange={(e) => onQuery(e.target.value)}
+          />
+          {query && (
+            <InputGroupAddon align="inline-end">
+              <InputGroupButton
+                aria-label="清空搜索"
+                onClick={() => onQuery("")}
+              >
+                <X aria-hidden="true" />
+              </InputGroupButton>
+            </InputGroupAddon>
+          )}
+        </InputGroup>
+        {enhancedFilters}
+      </div>
       {filters}
       {note}
       {loading && !loaded && <DataLoading label="正在读取品种…" />}

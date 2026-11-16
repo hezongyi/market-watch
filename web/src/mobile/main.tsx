@@ -11,6 +11,8 @@ import "./records-controls.css";
 import "./data-controls.css";
 import "./login-controls.css";
 import "./chart-controls.css";
+import "./logs.css";
+import "./alerts-controls.css";
 
 createRoot(document.getElementById("root")!).render(
   <React.StrictMode>

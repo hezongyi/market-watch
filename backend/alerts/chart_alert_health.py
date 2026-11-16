@@ -41,6 +41,7 @@ class Heartbeat:
 
 
 def summary(db, *, at=None):
+    from .config import settings
     from .runtime_health import key
     from .runtime_health import summary as runtime_summary
 
@@ -77,7 +78,8 @@ def summary(db, *, at=None):
         ChartAlert.runtime["demand_hold"].as_string() == "stale_input"))
     settling = db.scalar(select(func.count()).select_from(ChartAlert).where(ChartAlert.status == "expired",
         ChartAlert.runtime["settlement_pending"].as_boolean()))
-    return {"loop": loop, "rules": {"active": sum(groups.values()),
+    return {"enabled": settings.market_runtime_chart_alert_enabled,
+        "loop": loop, "rules": {"active": sum(groups.values()),
         "blocked": groups.get("blocked", 0), "stale": groups.get("stale", 0),
         "error": groups.get("error", 0), "waiting": groups.get("warming", 0) + groups.get("coverage_pending", 0),
         "ready": groups.get("ready", 0)}, "delivery": delivery,

@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { ChartNoAxesCombined, WifiOff } from "lucide-react";
+import { CandlestickChart, WifiOff } from "lucide-react";
 import {
   Empty,
   EmptyHeader,
@@ -20,19 +20,21 @@ export function ChartEmpty({
   offline?: boolean;
   action?: ReactNode;
 }) {
-  const Icon = offline ? WifiOff : ChartNoAxesCombined;
+  const Icon = offline ? WifiOff : CandlestickChart;
   return (
     <section
       className="mobile-chart mobile-controls chart-idle"
       aria-label="图表"
     >
-      <h1>图表</h1>
-      <Empty role="status" className="chart-empty">
+      <header className="chart-idle-header">
+        <h1>图表</h1>
+      </header>
+      <Empty className="chart-empty">
         <EmptyHeader>
           <EmptyMedia variant="icon">
             <Icon aria-hidden="true" />
           </EmptyMedia>
-          <EmptyTitle>{title}</EmptyTitle>
+          <EmptyTitle><h2>{title}</h2></EmptyTitle>
           <EmptyDescription>{children}</EmptyDescription>
         </EmptyHeader>
         {action && <EmptyContent>{action}</EmptyContent>}

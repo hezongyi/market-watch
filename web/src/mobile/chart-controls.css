@@ -72,10 +72,19 @@
 .mobile-chart .chart-failure button {
   background: var(--surface);
 }
-.mobile-chart .chart-empty button {
+.mobile-chart .chart-empty button[data-variant="default"] {
   background: var(--button);
   color: white;
   border-color: transparent;
+}
+.mobile-chart .chart-empty button[data-variant="ghost"] {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+}
+.mobile-chart .chart-empty button[data-variant="ghost"]:hover {
+  background: var(--surface2);
+  color: var(--text);
 }
 .chart-loading {
   flex-direction: column;
@@ -119,9 +128,78 @@
   }
 }
 
-.mobile-chart .chart-empty {
+.chart-idle {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+.chart-idle-header {
+  display: flex;
+  align-items: center;
+  flex: none;
+  min-height: 64px;
+  padding: 12px 18px;
+}
+.chart-idle-header h1 {
+  margin: 0;
+  font-size: 1.571429rem;
+  font-weight: 650;
+  line-height: 1.4;
+}
+.chart-idle .chart-empty {
+  flex: 1 0 auto;
+  gap: 28px;
+  padding: 32px 24px 80px;
   border: 0;
   border-radius: 0;
+}
+.chart-idle .chart-empty [data-slot="empty-header"] {
+  gap: 10px;
+  max-width: 24rem;
+}
+.chart-idle .chart-empty [data-slot="empty-icon"] {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 10px;
+  border-radius: 20px;
+  background: var(--surface2);
+  color: var(--accent);
+}
+.chart-idle .chart-empty [data-slot="empty-icon"] svg {
+  width: 30px;
+  height: 30px;
+  stroke-width: 1.5;
+}
+.chart-idle .chart-empty h2 {
+  margin: 0;
+  color: var(--text);
+  font-size: 1.428571rem;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: -0.02em;
+}
+.chart-idle .chart-empty [data-slot="empty-description"] {
+  max-width: 20em;
+  font-size: 1rem;
+  line-height: 1.7;
+  color: var(--muted);
+}
+.chart-idle .chart-empty [data-slot="empty-content"] {
+  max-width: 20rem;
+  gap: 8px;
+}
+.chart-idle .chart-empty [data-slot="empty-content"] button {
+  width: 100%;
+}
+@media (max-height: 600px) {
+  .chart-idle .chart-empty {
+    gap: 16px;
+    padding: 16px 24px 24px;
+  }
+  .chart-idle .chart-empty [data-slot="empty-icon"] {
+    width: 56px;
+    height: 56px;
+    margin-bottom: 8px;
+  }
 }
 .mobile-chart .mobile-search-info strong {
   display: block;
@@ -199,4 +277,11 @@
   .chart-history-progress [data-slot="spinner"] {
     animation: none;
   }
+}
+/* Long operation errors must stay within the chart and preserve navigation. */
+.mobile-chart .chart-history-progress.mobile-inline-error {
+  width: max-content;
+  max-width: calc(100% - 24px);
+  white-space: normal;
+  overflow-wrap: anywhere;
 }

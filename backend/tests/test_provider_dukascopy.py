@@ -253,7 +253,8 @@ def test_stock_and_fund_catalogue_preserves_source_product_identity():
 
 def test_native_recovers_failed_managed_pool_once_with_same_absolute_deadline(monkeypatch):
     import time
-    from alerts import provider_transport, provider_deadline
+
+    from alerts import provider_deadline, provider_transport
     first_calls, second_calls, discarded = [], [], []
     deadline = time.monotonic() + 20
     def failed(request):
@@ -273,6 +274,7 @@ def test_native_recovers_failed_managed_pool_once_with_same_absolute_deadline(mo
 
 def test_native_transport_failure_never_retries_without_budget(monkeypatch):
     import time
+
     from alerts import provider_transport
     calls = []
     def failed(request):

@@ -131,7 +131,7 @@ const server = http.createServer(async (req, res) => {
     await page.screenshot({ path: output + '/ordinary-close.png' });
     emptyFX = true; await refresh();
     await expect(spark(1).locator('svg')).toHaveCount(1);
-    assert.equal(await spark(1).locator('svg').innerHTML(), oldFX, 'empty success retains the original axis and gaps');
+    await expect.poll(() => spark(1).locator('svg').innerHTML(), { message: 'empty success retains the original axis and gaps after visible width settles' }).toBe(oldFX);
     emptyFX = false; currentFX = true;
     const sub = [...subscriptions.values()].find(value => value.query.instrument === 'EURUSD');
     assert(sub, 'EURUSD has a live quote listener');

@@ -846,6 +846,7 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     runtime.update(processed_input_revision=value, confirmed_end=bar["end"] if config.mode == "close" else
         max(runtime.get("confirmed_end", 0), previous["end"] if previous and previous["source_confirmed"] else 0),
         epoch=live.epoch, recovering=False, last_start=bar["start"],
+        last_evaluated_at=now, last_input_at=sequence, last_outcome=outcome,
         readiness={"ready": True, "status": "ready", "dependencies": dependencies, "last_outcome": outcome})
     alert.runtime = runtime
     alert.health, alert.health_reason = "ready", "恢复/接缝后已建立新基准，等待新事件" if baseline else None

@@ -574,10 +574,11 @@ def router(authenticated):
     @r.get("/series/page")
     def series_page(query: str = "", kind: str = "history", page_size: int = 25,
                     offset: int = 0, source: str | None = None, calendar: str | None = None,
-                    symbol_type: str = "", cursor: str | None = None, include_total: bool = True, mobile: bool = False, exclude_watch: bool = False):
+                    symbol_type: str = "", cursor: str | None = None, include_total: bool = True, mobile: bool = False, exclude_watch: bool = False, retain_watch: str = ""):
         return search_series_page(query, kind=kind, page_size=page_size, offset=offset,
                                   source=source or None, calendar=calendar or None, symbol_type=symbol_type, cursor=cursor,
-                                  include_total=include_total, mobile=mobile, exclude_watch=exclude_watch)
+                                  include_total=include_total, mobile=mobile, exclude_watch=exclude_watch,
+                                  retain_watch=retain_watch.split(",") if retain_watch else ())
 
     @r.post("/quotes")
     def quotes(body: QuoteQuery):
@@ -830,12 +831,12 @@ def router(authenticated):
 
 
 def search_series_page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None,
-                       symbol_type="", cursor=None, include_total=True, mobile=False, exclude_watch=False):
+                       symbol_type="", cursor=None, include_total=True, mobile=False, exclude_watch=False, retain_watch=()):
     """Compatibility adapter over the canonical series-directory seam."""
     from .series_directory import page
     return page(query, kind=kind, page_size=page_size, offset=offset, source=source,
                 calendar=calendar, symbol_type=symbol_type, cursor=cursor,
-                include_total=include_total, provider_page=_provider_series_page, mobile=mobile, exclude_watch=exclude_watch)
+                include_total=include_total, provider_page=_provider_series_page, mobile=mobile, exclude_watch=exclude_watch, retain_watch=retain_watch)
 
 
 def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor):
@@ -845,7 +846,7 @@ def _all_series_page(query, *, page_size, source, calendar, symbol_type, cursor)
                 symbol_type=symbol_type, cursor=cursor, provider_page=_provider_series_page)
 
 
-def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25, include_total=True, mobile=False, exclude_watch=False):
+def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_size=25, include_total=True, mobile=False, exclude_watch=False, retain_watch=()):
     from .chart_series import encode
     from .instrument_directory import search
     from .platform_catalog import _entry
@@ -854,7 +855,7 @@ def _provider_series_page(query, *, source=None, symbol_type="", offset=0, page_
     asset = {"stock": "equity", "fund": "etf", "futures": "future", "commodity": "metal"}.get(symbol_type, symbol_type) or None
     with transaction() as db:
         page = search(db, query=query, source=source, asset=asset, offset=offset, limit=page_size,
-                      include_total=include_total, mobile=mobile, exclude_watch=exclude_watch)
+                      include_total=include_total, mobile=mobile, exclude_watch=exclude_watch, retain_watch=retain_watch)
     items = []
     for row in page["items"]:
         item = _entry(row)
@@ -1108,6 +1109,23 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                            "resolution": quote_frame})
         except Exception as error:
             from .market_notices import error_evidence
+            identity_meta = meta
+            if identity_meta is None and ident.startswith("YAHOO:"):
+                # Identity is maintained locally, even before chart metadata is
+                # ready. A failed remote refresh must not erase code/name/source.
+                from .market_presentation import present
+                from .yahoo_catalog import local_entry
+                try:
+                    entry = local_entry(ident)
+                    identity_meta = present({**entry["details"], "symbol": entry["symbol"],
+                                             "name": entry["name"], "source": "yahoo"})
+                except Exception:
+                    pass  # Unknown/disabled sources remain unavailable.
+            identity_values = ({
+                "short_name": identity_meta.get("display_symbol") or display_code(identity_meta["symbol"], identity_meta["source"]),
+                "exchange": identity_meta["source"].upper(),
+                "description_base": identity_meta.get("presentation_description", identity_meta["name"]),
+            } if identity_meta else {})
             observed_now = now_ms()
             session = session_status(meta["source"], meta["symbol"], observed_now, metadata=meta) if meta else {
                 "market_session": "unknown", "session_reason": None, "calendar_verified": False, "calendar_version": None}
@@ -1117,8 +1135,7 @@ def quote_snapshot(body: QuoteQuery, *, previous_close=None, provider_page=None)
                                  "fetch_status": "fetch_failed",
                                  "error_evidence": error_evidence(
                                      error, provider=meta.get('source', '') if meta else '', operation='quote_snapshot'),
-                                 **({"short_name": meta.get("display_symbol") or display_code(meta["symbol"], meta["source"]),
-                                     "exchange": meta["source"].upper()} if meta else {})}})
+                                 **identity_values}})
     with transaction() as db:
         for ident in managed:
             if len(ident) > 80:

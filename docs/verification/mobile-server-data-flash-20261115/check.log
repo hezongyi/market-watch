@@ -1,0 +1,13 @@
+[{"port":18446,"shellVersion":"27903fd4fb0f376f","pendingY":261.296875,"freshY":172,"movement":-89.296875,"hints":["操作状态上次读取 2026/11/15 15:39 · 当前状态待核实"]},{"port":18447,"shellVersion":"466ea0a9f2222971","pendingY":127,"freshY":127,"movement":0,"hints":[]}]
+AssertionError [ERR_ASSERTION]: switching servers must not insert transient cache notices
+    at /home/quant/repos/market-watch-managed-live-rollover-20261113/docs/verification/mobile-server-data-flash-20261115/check.cjs:27:2
+    at runNextTicks (node:internal/process/task_queues:64:5)
+    at process.processImmediate (node:internal/timers:452:9)
+    at process.callbackTrampoline (node:internal/async_hooks:130:17) {
+  generatedMessage: false,
+  code: 'ERR_ASSERTION',
+  actual: false,
+  expected: true,
+  operator: '==',
+  diff: 'simple'
+}

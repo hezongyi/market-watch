@@ -1,0 +1,30 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-dev",
+  "origin": "https://192.168.7.232:18443",
+  "images": {
+    "api": "sha256:672267b1e96347e76fbebdd0e644e5ca39682c16922af7395271780171c82b43",
+    "web": "sha256:ca0fcc9ccf9293d1ab786cdd9dbde3ffcbf0f2f0b0dc82a9b8e0afbbab1e432f"
+  },
+  "source_worktree": "/home/quant/repos/market-watch-managed-live-rollover-20261113",
+  "schema": "bd57_notice_source_poll_index",
+  "APK": "0.1.4",
+  "cleaned_projects": [
+    "mw-health-pg-20261111"
+  ],
+  "cleanup_incomplete": [
+    "mw-cpu-20261111",
+    "mw-managed-live-rollover-20261113-test",
+    "mw-managed-live-rollover-20261113"
+  ],
+  "private_records": "/home/quant/.local/share/market-watch-dev/updates/mobile-latest-20261116",
+  "unraid_touched": false,
+  "data_migration": {
+    "source": "18447 / rollover",
+    "target": "18443 / dev_mobile_20261116",
+    "original_dev_retained": true,
+    "integrity_verified": true,
+    "realtime_acceptance": "pending OANDA HTTP 401",
+    "source_retirement": "not executed; source PG retained, source writers stopped"
+  }
+}

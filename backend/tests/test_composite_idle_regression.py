@@ -36,6 +36,7 @@ def test_empty_indicator_workers_do_not_write_fairness_turns(database):
 
 
 def test_pricing_without_demand_does_not_claim_every_idle_round(monkeypatch):
+    monkeypatch.setattr(oanda_worker, 'registered_stream_identities', lambda *_: {})
     from types import SimpleNamespace
     claims = []
     monkeypatch.setattr(oanda_worker, 'claim', lambda *a, **kw: claims.append(1) or {'id': 'owner'})
@@ -93,6 +94,7 @@ def test_replayed_batch_only_aggregates_changed_price_minutes(database, monkeypa
 
 
 def test_cached_pricing_catalog_preserves_auth_probe_without_demand(monkeypatch):
+    monkeypatch.setattr(oanda_worker, 'registered_stream_identities', lambda *_: {})
     from types import SimpleNamespace
     probes = []
     monkeypatch.setattr(oanda_worker, 'claim', lambda *a, **kw: ('account', 'token'))

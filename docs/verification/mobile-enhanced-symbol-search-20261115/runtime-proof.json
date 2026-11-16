@@ -1,0 +1,296 @@
+{
+  "passed": true,
+  "host": "Ubuntu local Docker",
+  "url": "https://192.168.7.232:18447",
+  "readOnly": true,
+  "queries": [
+    {
+      "flow": "watch",
+      "source": "dukascopy",
+      "type": "stock",
+      "sample": [
+        "0005.HK/HKD",
+        "0027.HK/HKD",
+        "0175.HK/HKD"
+      ]
+    },
+    {
+      "flow": "watch",
+      "source": "新浪财经",
+      "samples": 25,
+      "providers": [
+        "新浪财经"
+      ]
+    },
+    {
+      "flow": "watch",
+      "source": "腾讯财经",
+      "samples": 25,
+      "providers": [
+        "腾讯财经"
+      ]
+    },
+    {
+      "flow": "catalog",
+      "source": "dukascopy",
+      "type": "stock",
+      "sample": [
+        "0005.HK/HKD",
+        "0027.HK/HKD",
+        "0175.HK/HKD"
+      ]
+    },
+    {
+      "flow": "catalog",
+      "source": "新浪财经",
+      "samples": 25,
+      "providers": [
+        "新浪财经"
+      ]
+    },
+    {
+      "flow": "catalog",
+      "source": "腾讯财经",
+      "samples": 0,
+      "providers": []
+    }
+  ],
+  "screenshots": [
+    "watch-default",
+    "watch-selected",
+    "watch-collapsed",
+    "watch-375-light-14",
+    "watch-375-light-21",
+    "watch-375-dark-14",
+    "watch-375-dark-21",
+    "watch-412-light-14",
+    "watch-412-light-21",
+    "watch-412-dark-14",
+    "watch-412-dark-21",
+    "watch-short",
+    "catalog-default",
+    "catalog-selected",
+    "catalog-collapsed",
+    "catalog-375-light-14",
+    "catalog-375-light-21",
+    "catalog-375-dark-14",
+    "catalog-375-dark-21",
+    "catalog-412-light-14",
+    "catalog-412-light-21",
+    "catalog-412-dark-14",
+    "catalog-412-dark-21",
+    "catalog-short"
+  ],
+  "errors": [],
+  "writes": [],
+  "blockedBackgroundReads": [
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/sparklines",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/sparklines",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/sparklines",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    }
+  ]
+}

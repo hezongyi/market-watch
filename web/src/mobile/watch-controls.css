@@ -85,17 +85,6 @@
   line-height: 1.5;
   color: var(--muted);
 }
-.mobile-controls .mobile-drawer-header button {
-  width: 44px;
-  height: 44px;
-  min-height: 44px;
-  flex: none;
-  border: 0;
-  border-radius: 50%;
-  padding: 12px;
-  color: var(--muted);
-  background: var(--surface2);
-}
 .mobile-controls .mobile-drawer-scroll {
   min-height: 0;
   overflow: auto;
@@ -123,7 +112,7 @@
   font-size: .857143rem;
   color: var(--down);
 }
-.mobile-controls .mobile-control-drawer button[data-variant],
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon),
 .mobile-controls .mobile-confirm button[data-variant] {
   min-height: 48px;
   height: auto;
@@ -135,35 +124,35 @@
   box-shadow: none;
   transition: background-color 140ms ease, border-color 140ms ease, transform 120ms ease, opacity 120ms ease;
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-variant="default"],
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-variant="default"],
 .mobile-controls .mobile-confirm button[data-variant][data-variant="default"] {
   background: var(--button);
   color: white;
   border-color: transparent;
   font-weight: 600;
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-variant="outline"],
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-variant="outline"],
 .mobile-controls .mobile-confirm button[data-variant][data-variant="outline"] {
   background: var(--surface);
   border-color: var(--line);
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-variant="secondary"] {
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-variant="secondary"] {
   background: var(--selected);
   border-color: transparent;
   color: var(--accent);
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-variant="ghost"] {
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-variant="ghost"] {
   background: transparent;
   border-color: transparent;
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-variant="destructive"],
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-variant="destructive"],
 .mobile-controls .mobile-confirm button[data-variant][data-variant="destructive"] {
   background: color-mix(in srgb, var(--down) 10%, var(--surface));
   border-color: transparent;
   color: var(--down);
   font-weight: 600;
 }
-.mobile-controls .mobile-control-drawer button:not(:disabled):active,
+.mobile-controls .mobile-control-drawer button:not(.mobile-header-icon):not(:disabled):active,
 .mobile-controls .mobile-confirm button:not(:disabled):active {
   transform: scale(.98);
   opacity: 1;
@@ -173,18 +162,6 @@
 .mobile-controls .mobile-control-drawer [data-variant="default"]:active {
   background: var(--button);
   opacity: .88;
-}
-.mobile-controls .mobile-drawer-header button[data-variant] {
-  min-height: 44px;
-  width: 44px;
-  height: 44px;
-  padding: 12px;
-  border-radius: 50%;
-  background: var(--surface2);
-}
-.mobile-controls .mobile-drawer-header button[data-variant] svg {
-  width: 18px;
-  height: 18px;
 }
 .mobile-controls .mobile-watch-action-list { gap: 4px; }
 .mobile-controls .mobile-watch-action-list button[data-variant] {
@@ -279,7 +256,7 @@
   border: 0;
   min-height: 64px;
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-size="icon"] {
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-size="icon"] {
   width: 44px;
   height: 44px;
   min-width: 44px;
@@ -287,7 +264,7 @@
   padding: 12px;
   border-radius: 12px;
 }
-.mobile-controls .mobile-control-drawer button[data-variant][data-size="icon"] svg { width: 18px; height: 18px; }
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon)[data-size="icon"] svg { width: 18px; height: 18px; }
 .mobile-controls .mobile-manage-group [data-slot="field-label"],
 .mobile-controls .watch-collapse-panel > [data-slot="field-group"] [data-slot="field-label"] {
   color: var(--muted);
@@ -295,7 +272,7 @@
 }
 .mobile-controls .watch-collapse-panel > [data-slot="field-group"] { margin: 6px 0 10px; }
 .mobile-controls .mobile-manage-group > [data-slot="field-group"] { margin-bottom: 10px; }
-.mobile-controls .mobile-control-drawer button[data-variant].mobile-watch-remove {
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon).mobile-watch-remove {
   color: var(--down);
   background: color-mix(in srgb, var(--down) 7%, var(--bg));
   min-width: 48px;
@@ -350,7 +327,7 @@
   padding: 12px 0 calc(16px + env(safe-area-inset-bottom));
   margin: 16px 0 calc(-16px - env(safe-area-inset-bottom));
 }
-.mobile-controls .mobile-control-drawer button[data-variant] { padding: 10px 12px; border-radius: 10px; }
+.mobile-controls .mobile-control-drawer button[data-variant]:not(.mobile-header-icon) { padding: 10px 12px; border-radius: 10px; }
 .mobile-controls .mobile-watch-action-list { gap: 2px; }
 .mobile-controls .mobile-watch-action-list button[data-variant] { min-height: 64px; padding: 10px 4px; gap: 12px; border-radius: 12px; }
 .mobile-controls .watch-action-icon { width: 36px; height: 36px; border-radius: 11px; }
@@ -378,7 +355,7 @@
 }
 .mobile-controls .watch-manage-tabs [data-slot="tabs-trigger"][data-active] { background: var(--surface); color: var(--text); box-shadow: 0 1px 4px #0001; }
 .mobile-controls .watch-manage-tabs [data-slot="tabs-trigger"] span { font-size: .857143rem; font-variant-numeric: tabular-nums; color: var(--muted); }
-.mobile-controls .watch-manage-tabs > .mobile-form-detail { padding: 0; margin: 0; border: 0; border-radius: 0; background: none; }
+.mobile-controls .watch-manage-tabs .mobile-tabs-slide > .mobile-form-detail { padding-block: 0; margin: 0; border: 0; border-radius: 0; background: none; }
 .mobile-controls .watch-manage-tabs [data-slot="tabs-content"] { min-width: 0; }
 .mobile-controls .watch-manage-tabs .mobile-manage-context { margin-top: 0; }
 .mobile-controls .watch-manage-tabs .mobile-manage-help { margin: 6px 0 12px; }
@@ -403,7 +380,7 @@
 .mobile-controls .mobile-group-order .watch-disclosure small { margin-top: 1px; font-size: .857143rem; }
 .mobile-controls .mobile-group-save-actions { padding-top: 4px; margin: 0; border: 0; }
 .mobile-controls .mobile-group-save-actions button[data-variant] { color: var(--muted); background: transparent; border: 0; }
-.mobile-controls .mobile-control-drawer button[data-size="icon"] { border-radius: 10px; }
+.mobile-controls .mobile-control-drawer button[data-size="icon"]:not(.mobile-header-icon) { border-radius: 10px; }
 .mobile-controls .mobile-control-drawer button[data-variant="destructive"] { background: transparent; }
 .mobile-controls .mobile-watch-manage-row { padding: 10px 0; gap: 12px; min-height: 64px; }
 .mobile-controls .mobile-watch-list-actions { gap: 4px; }
@@ -459,9 +436,7 @@
 .mobile-controls .watch-detail-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .mobile-controls .mobile-group-button[data-variant="plain"], .mobile-controls .mobile-watch-row[data-variant="plain"] { box-shadow: none; }
 
-.mobile-controls .mobile-drawer-actions { display: flex; align-items: center; gap: 2px; flex: none; }
 .mobile-controls .watch-group-choice { display: flex; align-items: center; gap: 2px; }
 .mobile-controls .watch-group-choice > [data-slot="radio-group-item"] { flex: 1; min-width: 0; }
 .mobile-controls .watch-group-choice > button[data-slot="button"] { flex: none; min-width: 44px; min-height: 44px; }
 .mobile-manage-group-name { grid-column: 1; grid-row: 1; align-self: center; min-width: 0; overflow-wrap: anywhere; font-size: 1rem; }
-.mobile-controls .mobile-drawer-actions button[data-variant]:not([aria-label="关闭"]) { background: transparent; }

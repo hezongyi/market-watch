@@ -1,6 +1,5 @@
 import { useId, type ReactNode } from "react";
-import { ChevronDown, Info } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "./components/ui/alert";
+import { ChevronDown } from "lucide-react";
 import { Field, FieldLabel } from "./components/ui/field";
 import { Button } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -20,15 +19,16 @@ export function DataFeedback({
   notice?: string;
 }) {
   return error || notice ? (
-    <Alert
-      variant={error ? "destructive" : "default"}
-      className="data-feedback"
+    <p
+      className={
+        error
+          ? "data-inline-feedback data-inline-error"
+          : "data-inline-feedback"
+      }
       role={error ? "alert" : "status"}
     >
-      <Info aria-hidden="true" />
-      <AlertTitle>{error ? "需要处理" : "操作状态"}</AlertTitle>
-      <AlertDescription>{error || notice}</AlertDescription>
-    </Alert>
+      {error || notice}
+    </p>
   ) : null;
 }
 export function DataInput({
@@ -102,12 +102,16 @@ export function DataFrames({
 export function DataMore({
   title = "更多设置",
   children,
+  open,
+  onOpenChange,
 }: {
   title?: string;
   children: ReactNode;
+  open?: boolean;
+  onOpenChange?(open: boolean): void;
 }) {
   return (
-    <Collapsible className="data-more">
+    <Collapsible className="data-more" open={open} onOpenChange={onOpenChange}>
       <CollapsibleTrigger render={<Button variant="ghost" />}>
         {title}
         <ChevronDown data-icon="inline-end" aria-hidden="true" />

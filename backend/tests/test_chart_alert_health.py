@@ -6,6 +6,21 @@ from alerts.storage import Preference
 from test_chart_alert_service import config
 
 
+def test_disabled_monitor_is_explicit_but_does_not_hide_a_live_owner(database, monkeypatch):
+    from alerts.config import settings
+
+    monkeypatch.setattr(settings, "market_runtime_chart_alert_enabled", False)
+    with database() as db:
+        report = health.summary(db, at=100000)
+        assert report["enabled"] is False
+        assert report["loop"]["state"] == "unknown"
+    monkeypatch.setattr(health, "now_ms", lambda: 100000)
+    health.Heartbeat().record()
+    with database() as db:
+        report = health.summary(db, at=100000)
+        assert report["loop"]["state"] == "running"
+
+
 def test_empty_loop_is_healthy_and_heartbeat_writes_are_bounded(database, monkeypatch):
     clock = [100000]
     monkeypatch.setattr(health, "now_ms", lambda: clock[0])

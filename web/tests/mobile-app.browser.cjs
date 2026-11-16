@@ -123,12 +123,16 @@ const server=http.createServer(async(req,res)=>{
    await expect(page.getByLabel('密码',{exact:true})).toBeVisible();assert.equal(await page.locator('.mobile-chart-canvas iframe').count(),0);checks.push('explicit session expiry disposes widget and prompts login');
    await page.getByLabel('密码',{exact:true}).fill('unsent-input');shellRevision=1;
    await page.evaluate(async()=>{const registration=await navigator.serviceWorker.getRegistration('/m/');await registration.update();});
-   await expect(page.getByRole('button',{name:'更新页面',exact:true})).toBeVisible();
-   await page.getByRole('button',{name:'更新页面',exact:true}).click();
-   await expect(page.getByLabel('密码',{exact:true})).toHaveValue('unsent-input');
-   await expect(page.getByRole('alert')).toContainText('请先完成或放弃');
-   await page.getByRole('button',{name:'关闭通知',exact:true}).click();await page.getByLabel('密码',{exact:true}).fill('');
-   await page.getByRole('button',{name:'更新页面',exact:true}).click();
+   await expect.poll(()=>page.evaluate(async()=>Boolean((await navigator.serviceWorker.getRegistration('/m/')).waiting))).toBe(true);
+   await expect(page.locator('.mobile-update')).toHaveCount(0);
+   // Controller activation must not reload a login form with unsubmitted input.
+   await page.evaluate(async()=>{(await navigator.serviceWorker.getRegistration('/m/')).waiting.postMessage({type:'activate'});});
+   await expect.poll(()=>page.evaluate(async()=>navigator.serviceWorker.controller?.state)).toBe('activated');
+   await page.waitForTimeout(250);await expect(page.getByLabel('密码',{exact:true})).toHaveValue('unsent-input');
+   await expect(page.locator('.mobile-toast')).toHaveCount(0);
+   await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
+   await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('button',{name:/检查更新/}).click();
+   await page.getByRole('button',{name:'应用网页更新',exact:true}).click();
    await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
    await expect.poll(()=>page.evaluate(async()=>(await caches.keys()).some(key=>key.endsWith('-test-1')))).toBe(true);
    shellRevision=2;brokenInstall=true;

@@ -1,3 +1,4 @@
+import { logEvent, logFailure } from "./logs";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { NoticeRuntime } from "../notifications/runtime";
 import { NoticeStore } from "../notifications/store";
@@ -22,7 +23,6 @@ export function useMobileNotices(
     runtime.snapshot,
   );
   const [foreground, setForeground] = useState(!document.hidden);
-  const [popup, setPopup] = useState("");
   const queue = useRef(Promise.resolve());
   const activeProfile = useRef("");
   activeProfile.current =
@@ -42,14 +42,11 @@ export function useMobileNotices(
   }, [runtime, profile?.origin, profile?.subject, online, foreground]);
   useEffect(() => () => runtime.dispose(), [runtime]);
   useEffect(() => {
-    if (!profile) setPopup("");
-  }, [profile]);
-  useEffect(() => {
     if (!profile || !online || !foreground || !state.events.length) return;
     const identity = JSON.stringify(profile),
       events = state.events;
-    // A cursor refresh may publish the same rows while the receipt transaction
-    // commits. Serialize presentation claims; never mark seen then drop the popup.
+    // Local logging deduplication is independent of runtime receipts/handling.
+    // A cursor refresh can publish the same rows while the local write commits.
     queue.current = queue.current
       .then(async () => {
         if (activeProfile.current !== identity) return;
@@ -68,14 +65,12 @@ export function useMobileNotices(
         candidates.forEach((row) => seen.add(row.id));
         await writeSnapshot(profile, "notice-popups", [...seen].slice(-500));
         if (activeProfile.current === identity)
-          setPopup(
-            `${candidates.length} 条未处理事件，请到告警或更多的记录中查看。关闭提示不代表已处理。`,
-          );
+          logEvent({module:"告警",action:"收到服务器事件",message:`${candidates.length} 条未处理事件，详见告警记录`,level:"warning",object:candidates.map(row=>row.title).join(" · ")});
       })
       .catch(() => {
         if (activeProfile.current === identity)
-          setPopup("事件提示去重未能记住，请到记录查看");
+          logFailure("告警","事件去重","事件日志去重未能记住，请到记录查看");
       });
   }, [state.events, profile?.origin, profile?.subject, online, foreground]);
-  return { runtime, state, popup, closePopup: () => setPopup("") };
+  return { runtime, state };
 }

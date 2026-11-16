@@ -1,10 +1,8 @@
-import { useEffect, useState } from "react";
+import { logEvent } from "./logs";
+import { useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../api";
-import {
-  deliveryNames,
-  eventPresentation,
-  type AlertEvent,
-} from "../advanced/chartAlerts";
+import type { AlertEvent } from "../advanced/chartAlerts";
+import AlertRecords from "./AlertRecords";
 import {
   noticeInstrument,
   severityLabels,
@@ -16,7 +14,13 @@ import { readSnapshot, writeSnapshot, type Profile } from "./cache";
 import MobileSheet from "./MobileSheet";
 import { MobileOverlaysProvider } from "./WatchOverlays";
 import { Button } from "./components/ui/button";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "./components/ui/tabs";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  TabsPanels,
+} from "./components/ui/tabs";
 export const stamp = (value: unknown) =>
   typeof value === "number" && value
     ? new Date(value).toLocaleString()
@@ -30,8 +34,10 @@ export default function RecordsSheet({
   runtime,
   close,
   report,
+  initialTab = "triggers",
 }: {
   open?: boolean;
+  initialTab?: string;
   profile: Profile;
   online: boolean;
   events: AlertEvent[];
@@ -39,53 +45,20 @@ export default function RecordsSheet({
   close(): void;
   report(message: string): void;
 }) {
-  const [tab, setTab] = useState("triggers"),
-    [history, setHistory] = useState<HistoryPage>(),
-    [readAt, setReadAt] = useState<number>();
-  const [before, setBefore] = useState<string>(),
-    [selected, setSelected] = useState<Notice>(),
+  const [tab, setTab] = useState(initialTab);
+  const [selected, setSelected] = useState<Notice>(),
     [timeline, setTimeline] = useState<any[]>([]);
   const [busy, setBusy] = useState(false),
     [retry, setRetry] = useState(0),
     [error, setError] = useState("");
   useEffect(() => {
-    if (!open || tab === "triggers") return;
-    const controller = new AbortController();
-    setHistory(undefined);
-    setError("");
-    const key = `records:${tab}:${before || ""}`;
-    void (async () => {
-      try {
-        const cached = await readSnapshot<HistoryPage>(profile, key);
-        if (controller.signal.aborted) return;
-        if (cached) {
-          setHistory(cached.value);
-          setReadAt(cached.readAt);
-        }
-        if (!online) return;
-        const params = new URLSearchParams({
-          audience: tab === "system" ? "system" : "alerts",
-        });
-        if (before) params.set("before", before);
-        const page = await api<HistoryPage>(
-          "/notification-center/events?" + params,
-          undefined,
-          controller.signal,
-        );
-        if (controller.signal.aborted) return;
-        setHistory(page);
-        setReadAt(undefined);
-        await writeSnapshot(profile, key, page);
-      } catch (error) {
-        if (!controller.signal.aborted) setError(errorMessage(error));
-      }
-    })();
-    return () => controller.abort();
-  }, [open, tab, before, online, retry]);
+    if (open) setTab(initialTab);
+  }, [open, initialTab]);
   useEffect(() => {
     if (!open || !selected || !online) return;
     const controller = new AbortController();
     setTimeline([]);
+    setError("");
     void api<any>(
       `/notification-center/events/${encodeURIComponent(selected.id)}/timeline`,
       undefined,
@@ -95,7 +68,10 @@ export default function RecordsSheet({
         if (!controller.signal.aborted) setTimeline(value.observations || []);
       })
       .catch((error) => {
-        if (!controller.signal.aborted) report(errorMessage(error));
+        if (!controller.signal.aborted) {
+          setError(errorMessage(error));
+          report(errorMessage(error));
+        }
       });
     return () => controller.abort();
   }, [open, selected?.id, online]);
@@ -111,8 +87,15 @@ export default function RecordsSheet({
       });
       setRetry((value) => value + 1);
       setSelected(undefined);
-      report("服务器已记录已处理；手机实收仍需在设备核验");
+      logEvent({
+        module: "告警",
+        action: "标记已处理",
+        object: notice.id,
+        message: "服务器已记录已处理；手机实收仍需在设备核验",
+        result: "success",
+      });
     } catch (error) {
+      setError(errorMessage(error));
       report(errorMessage(error));
     } finally {
       setBusy(false);
@@ -124,24 +107,23 @@ export default function RecordsSheet({
         <MobileSheet
           open={open}
           title="事件记录"
+          // Keep the tab bar in place across loading, empty and populated lists.
+          fullHeight
           close={close}
           dismissible={!busy}
           onClosed={() => {
             setTab("triggers");
-            setBefore(undefined);
             setSelected(undefined);
-            setHistory(undefined);
-            setReadAt(undefined);
             setError("");
             setTimeline([]);
           }}
         >
           <Tabs
+            swipe
             className="mobile-record-tabs"
             value={tab}
             onValueChange={(value) => {
               setTab(String(value));
-              setBefore(undefined);
             }}
           >
             <TabsList aria-label="记录类型">
@@ -151,131 +133,30 @@ export default function RecordsSheet({
               </TabsTrigger>
               <TabsTrigger value="system">系统</TabsTrigger>
             </TabsList>
-            <TabsContent key={tab} value={tab}>
-              {readAt && tab !== "triggers" && <p>上次读取 {stamp(readAt)}</p>}
-              {error && (
-                <>
-                  <p role="alert">{error}</p>
-                  <Button
-                    variant="outline"
-                    onClick={() => setRetry((value) => value + 1)}
-                  >
-                    重试读取
-                  </Button>
-                </>
-              )}
-              {tab === "triggers" ? (
-                <>
-                  {!events.length && <p>暂无已读取的触发记录。</p>}
-                  {events.map((event) => (
-                    <article key={event.id} className="mobile-status-card">
-                      <strong>
-                        {eventPresentation(event).name || event.display_label}
-                      </strong>
-                      <p>{eventPresentation(event).summary}</p>
-                      <p>
-                        触发价格 {event.price} · 目标 {event.threshold}
-                      </p>
-                      <p>
-                        触发 {stamp(event.occurred_at)}
-                        <br />
-                        检测 {stamp(event.detected_at)}
-                      </p>
-                      <p>
-                        {deliveryNames[event.delivery_status] ||
-                          event.delivery_status}{" "}
-                        ·{" "}
-                        {deliveryNames[event.notification_status] ||
-                          event.notification_status}
-                      </p>
-                      <p>
-                        {event.ack_at
-                          ? "用户已确认 " + stamp(event.ack_at)
-                          : "用户尚未确认"}{" "}
-                        · 手机送达未知
-                      </p>
-                      {event.message && <p>{event.message}</p>}
-                      {event.notice && (
-                        <Button
-                          variant="outline"
-                          disabled={
-                            !online || busy || Boolean(event.notice.handled_at)
-                          }
-                          onClick={() =>
-                            void confirmNotice({
-                              id: event.notice!.id,
-                            } as Notice)
-                          }
-                        >
-                          标记已处理
-                        </Button>
-                      )}
-                      {!event.ack_at && event.notification_id && (
-                        <Button
-                          variant="outline"
-                          disabled={!online || busy}
-                          onClick={async () => {
-                            setBusy(true);
-                            try {
-                              await api(
-                                `/notifications/${encodeURIComponent(event.notification_id)}/ack`,
-                                {},
-                              );
-                              report("用户确认已提交；下次读取后更新记录");
-                            } catch (error) {
-                              report(errorMessage(error));
-                            } finally {
-                              setBusy(false);
-                            }
-                          }}
-                        >
-                          确认并停止本次提醒
-                        </Button>
-                      )}
-                    </article>
-                  ))}
-                </>
-              ) : (
-                <>
-                  {!history && !error && (
-                    <p>{online ? "正在读取记录…" : "暂无本页缓存"}</p>
-                  )}
-                  {history && !history.events.length && <p>本页暂无记录。</p>}
-                  {history?.events.map((notice) => (
-                    <Button
-                      variant="outline"
-                      key={notice.id}
-                      className="mobile-series mobile-record-row"
-                      onClick={() => setSelected(notice)}
-                    >
-                      <strong>{notice.title}</strong>
-                      <span>
-                        {noticeInstrument(notice)} ·{" "}
-                        {notice.handled_at ? "已处理" : "未处理"} ·{" "}
-                        {severityLabels[notice.severity] || notice.severity}
-                      </span>
-                      <span>{notice.message}</span>
-                      <span>{stamp(notice.occurred_at)}</span>
-                    </Button>
-                  ))}
-                  <Button
-                    variant="outline"
-                    disabled={!history?.before}
-                    onClick={() => setBefore(history!.before!)}
-                  >
-                    更早记录
-                  </Button>
-                  {before && (
-                    <Button
-                      variant="outline"
-                      onClick={() => setBefore(undefined)}
-                    >
-                      最新记录
-                    </Button>
-                  )}
-                </>
-              )}
-            </TabsContent>
+            <TabsPanels>
+              <TabsContent value="triggers">
+                <AlertRecords
+                  profile={profile}
+                  online={online}
+                  active={open && tab === "triggers"}
+                  runtime={runtime}
+                  fallback={events}
+                />
+              </TabsContent>
+              {["alerts", "system"].map((kind) => (
+                <TabsContent key={kind} value={kind}>
+                  <HistoryRecords
+                    key={JSON.stringify([kind, profile])}
+                    tab={kind}
+                    profile={profile}
+                    online={online}
+                    active={open && tab === kind}
+                    retry={retry}
+                    select={setSelected}
+                  />
+                </TabsContent>
+              ))}
+            </TabsPanels>
           </Tabs>
           <MobileSheet
             open={Boolean(selected)}
@@ -283,6 +164,7 @@ export default function RecordsSheet({
             title={selected?.title || "记录详情"}
             close={() => setSelected(undefined)}
           >
+            {error && <p role="alert">{error}</p>}
             {selected && (
               <>
                 <p>{noticeInstrument(selected)}</p>
@@ -336,5 +218,118 @@ export default function RecordsSheet({
         </MobileSheet>
       </MobileOverlaysProvider>
     </div>
+  );
+}
+
+function HistoryRecords({
+  tab,
+  profile,
+  online,
+  active,
+  retry: externalRetry,
+  select,
+}: {
+  tab: string;
+  profile: Profile;
+  online: boolean;
+  active: boolean;
+  retry: number;
+  select(notice: Notice): void;
+}) {
+  const [history, setHistory] = useState<HistoryPage>(),
+    [readAt, setReadAt] = useState<number>();
+  const [before, setBefore] = useState<string>(),
+    [error, setError] = useState("");
+  const [localRetry, setRetry] = useState(0);
+  const retry = externalRetry + localRetry;
+  const cursor = useRef(before);
+  useEffect(() => {
+    if (!active) return;
+    const controller = new AbortController();
+    if (cursor.current !== before) {
+      setHistory(undefined);
+      cursor.current = before;
+    }
+    setError("");
+    const key = `records:${tab}:${before || ""}`;
+    void (async () => {
+      try {
+        const cached = await readSnapshot<HistoryPage>(profile, key);
+        if (controller.signal.aborted) return;
+        if (cached) {
+          setHistory(cached.value);
+          setReadAt(cached.readAt);
+        }
+        if (!online) return;
+        const params = new URLSearchParams({
+          audience: tab === "system" ? "system" : "alerts",
+        });
+        if (before) params.set("before", before);
+        const page = await api<HistoryPage>(
+          "/notification-center/events?" + params,
+          undefined,
+          controller.signal,
+        );
+        if (controller.signal.aborted) return;
+        setHistory(page);
+        setReadAt(undefined);
+        await writeSnapshot(profile, key, page);
+      } catch (error) {
+        if (!controller.signal.aborted) setError(errorMessage(error));
+      }
+    })();
+    return () => controller.abort();
+  }, [active, tab, before, online, retry, profile]);
+
+  return (
+    <>
+      {!online && readAt && <p>当前离线</p>}
+      {error && (
+        <>
+          <p role="alert">{error}</p>
+          <Button
+            variant="outline"
+            onClick={() => setRetry((value) => value + 1)}
+          >
+            重试读取
+          </Button>
+        </>
+      )}
+      <>
+        {!history && !error && (
+          <p>{online ? "正在读取记录…" : "暂无本页缓存"}</p>
+        )}
+        {history && !history.events.length && <p>本页暂无记录。</p>}
+        {history?.events.map((notice) => (
+          <Button
+            variant="outline"
+            key={notice.id}
+            className="mobile-series mobile-record-row"
+            onClick={() => select(notice)}
+          >
+            <strong>{notice.title}</strong>
+            <span>
+              {noticeInstrument(notice)} ·{" "}
+              {notice.handled_at ? "已处理" : "未处理"} ·{" "}
+              {severityLabels[notice.severity] || notice.severity}
+            </span>
+            <span>{notice.message}</span>
+            <span>{stamp(notice.occurred_at)}</span>
+          </Button>
+        ))}
+        <Button
+          variant="outline"
+          disabled={!history?.before}
+          onClick={() => setBefore(history!.before!)}
+        >
+          更早记录
+        </Button>
+        {before && (
+          <Button variant="outline" onClick={() => setBefore(undefined)}>
+            最新记录
+          </Button>
+        )}
+      </>
+    </>
   );
 }

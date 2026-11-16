@@ -6,6 +6,7 @@ const dist=path.resolve('dist'),id='a'.repeat(64),ticker='MWC:'+id;
 const out=process.env.MOBILE_CHART_OUTPUT || '/tmp/mw-chart-round1';fs.mkdirSync(out,{recursive:true});
 const requests=[],errors=[],checks=[],consoleErrors=[],layouts=[];let catalogMode='hold',releaseCatalog,holdHistory=false,failHistory=false;const heldHistory=[];
 const provider=process.env.MOBILE_CHART_IDENTITY_ONLY ? 'MWP:DUKA:'+'A1'.repeat(16) : 'MWP:YAHOO:AAPL';
+const alertRule={id:'fixture-rule',name:'EURUSD H1',status:'paused',health:'ready',version:1,control_revision:1,run:1,count:0,max_triggers:1,created_at:Date.now(),updated_at:Date.now(),display_identity:{code:'EURUSD',source:'composite'},condition_summary:'价格 上穿 101',runtime:{},config:{name:'EURUSD H1',instrument:id,series_kind:'composite',source:'composite',timeframe:'H1',mode:'close',condition:{relation:'cross_up',left:{kind:'price'},right:{kind:'constant',value:'101'}},max_triggers:1,expires_at:null,message:'',notify_web:true,notify_ntfy:false,late_delivery:'log_only',association:null,calculation_version:'chart-python-v1'}};
 let logged=false,shellRevision=0,brokenInstall=false,delayLogin=false,pendingLogin;
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
@@ -22,6 +23,9 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/advanced-charts/catalog'){if(catalogMode==='hold')await new Promise(resolve=>releaseCatalog=resolve);if(catalogMode==='fail')return json({detail:'图表目录读取失败'},500);return json({SMA:{label:"SMA 简单均线",pane:"main",aliases:["SMA","均线"],params:{period:20},series:[{key:"value",type:"line"}]}});}
    if(url.pathname==='/api/charts/history-capabilities')return json({protocol:1,version:'test',mode:'continuous',max_bars:20000,workspace_bars:100000,default_bars:1000,task_seconds:30});
    if(url.pathname==='/api/market-data/resolve')return json({symbol:query.series_kind==='provider'?'AAPL':'EURUSD · 日内观察组合',source:query.series_kind==='provider'?'yahoo':'composite',price_description:'收盘价',name:query.series_kind==='provider'?'苹果':'受控组合',precision:2,calendar:'utc0',asset_type:'CRYPTO',frames:['M1','M5','H1','D1'],created:true,stream:false});
+   if(url.pathname==='/api/chart-alerts/page')return json({items:[alertRule],next_cursor:null});
+   if(url.pathname==='/api/chart-alerts/fixture-rule')return json(alertRule);
+   if(url.pathname==='/api/chart-alerts/events/page')return json({items:[],next_cursor:null});
    if(url.pathname==='/api/health')return json({version:'fixture'});
    if(url.pathname==='/api/notification-center/snapshot')return json({events:[],cursor:'test'});
    if(url.pathname==='/api/notification-center/events')return json({events:[],before:null});
@@ -95,7 +99,7 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await page.evaluate(id=>window.MW_TEST_WIDGET.activeChart().removeEntity(id),study);
   await expect(page.locator('.mobile-toast')).toContainText('本次图表设置未记住');await shot('autosave-real-write-failure');
   await page.evaluate(()=>IDBObjectStore.prototype.put=window.MW_TEST_STORAGE_PUT);
-  await page.getByRole('button',{name:'关闭通知',exact:true}).click();await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();await page.reload();await widgetReady();
+  await expect(page.locator('.mobile-toast')).toHaveCount(0);await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();await page.reload();await widgetReady();
   assert.equal(await page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().getAllStudies().length),baseline,'retry flush persists latest settings after local storage recovers');await shot('autosave-reloaded');
   checks.push('normal pending autosave is silent; study settings restored on reload; actual local write failure is reported; flush retries and persists after storage recovery');
  };
@@ -131,7 +135,7 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   }
   holdHistory=true;await page.reload();
   await expect(page.locator('.chart-preview')).toBeVisible({timeout:10000});
-  await expect(page.locator('.chart-preview')).toContainText('上次数据');
+  await expect(page.locator('.chart-preview img')).toBeVisible();await expect(page.locator('.chart-preview span')).toHaveCount(0);
   assert.equal(await page.locator('.chart-loading [data-slot="spinner"]').count(),0);await shot('previous-view-reload');
   holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();await expect(page.locator('.chart-preview')).toHaveCount(0);
   holdHistory=true;await page.evaluate(()=>{void window.MW_TEST_WIDGET.activeChart().setResolution('60');});
@@ -164,7 +168,8 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
  try{
   await page.goto(base+'/m/');await page.getByLabel('密码',{exact:true}).fill('fixture-only');await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
   await page.getByRole('link',{name:'图表',exact:true}).click();await expect(page.getByText('选择要查看的品种',{exact:true})).toBeVisible();await shot('empty-dark-412');
-  await page.getByRole('button',{name:'选择品种',exact:true}).click();await page.getByRole('button',{name:/EURUSD · 日内观察组合/}).click();await page.getByRole('button',{name:'打开图表',exact:true}).click();
+  // Seed only the saved choice: chart regression does not depend on DataPage layout.
+  await page.evaluate(ticker=>new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile',2);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,tx=db.transaction('records','readwrite');tx.objectStore('records').put({value:ticker,readAt:Date.now()},[location.origin,'admin',1,'chart-selection']);tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};}),ticker);await page.reload();
   await expect(page.getByRole('status',{name:'准备图表'})).toBeVisible();await shot('loading-dark-412');
   catalogMode='ok';releaseCatalog();await widgetReady();await expect(page.locator('.mobile-chart-canvas iframe')).toHaveAttribute('src',/\/charting_library_[a-f0-9]+\/sameorigin\.html$/);await shot('chart-dark-412');
   const nativeTouch=await page.locator('.mobile-chart-canvas iframe').evaluate(async node=>{
@@ -184,6 +189,19 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await native().getByRole('radio',{name:'1 分钟',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('1');
   await native().getByRole('radio',{name:'5 分钟',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('5');await widgetReady();await shot('favorite-shortcuts-dark-412');
   checks.push('native header replaces outer toolbar; period menu only supported intervals; native star adds direct shortcut; Android back closes period popup; one-tap M1/M5');
+  if(process.env.MOBILE_CHART_ALERT_ONLY){
+   await page.getByRole('link',{name:'告警',exact:true}).click();
+   await page.locator('.alert-rule-open').first().click();
+   await page.getByRole('button',{name:'查看品种图表',exact:true}).click();
+   await expect(page).toHaveURL(/\/chart$/);await widgetReady();await symbolIs(ticker.toUpperCase());
+   await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('60');
+   await shot('alert-opens-native-h1');
+   checks.push('alert detail opens actual native widget at rule symbol and H1, replacing existing M5');
+   await continuity();await failedHistoryStartup();
+   const forbidden=requests.filter(r=>r.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)|\/alerts|\/tasks/.test(r.path));
+   assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
+   fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({evidence:'HTTP fixtures + actual licensed native widget; browser only',checks,errors,forbidden},null,2));console.log(JSON.stringify({checks,errors}));return;
+  }
   if(process.env.MOBILE_CHART_STARTUP_ONLY){await failedHistoryStartup();return;}
   if(process.env.MOBILE_CHART_SAVE_ONLY){await silentLocalSave();return;}
   if(process.env.MOBILE_CHART_CONTINUITY_ONLY){await continuity();assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));return;}

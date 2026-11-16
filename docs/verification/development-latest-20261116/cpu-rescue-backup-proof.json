@@ -1,0 +1,12 @@
+{
+  "sha256": "87b66694b74c63dfb3f6d13f4044ba6812332e007727cd3902630aac0e49ff56",
+  "restored_from_prior_snapshots": true,
+  "original_cold_archive_failed_tmpfs": true,
+  "full_original_restore_verified": false,
+  "limitations": [
+    "one rehearsal preference row not recovered",
+    "two empty rehearsal tables not restored",
+    "three existing invalid FK constraints omitted by restore"
+  ],
+  "original_container_volume_retained": true
+}

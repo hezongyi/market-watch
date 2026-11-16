@@ -1,17 +1,79 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { api, ApiError, errorMessage } from "../api";
-import { History, Plus, ShieldCheck, SlidersHorizontal } from "lucide-react";
+import {
+  Plus,
+  Search,
+  ChevronRight,
+  RefreshCw,
+  Archive,
+  Activity,
+  X,
+} from "lucide-react";
 import { useAlertData } from "../advanced/useAlertData";
-import { alertCode, alertState } from "../advanced/alertPresentation";
+import { alertCode } from "../advanced/alertPresentation";
 import type { AlertConfig, AlertRow } from "../advanced/chartAlerts";
 import type { NoticeRuntime } from "../notifications/runtime";
-import { editablePrice, newPriceConfig, uncertainError } from "./alerts";
+import { editableRule, newPriceConfig, uncertainError } from "./alerts";
+import {
+  monitorState,
+  ruleState,
+  ruleProgress,
+  ruleIdentity,
+  expiredRule,
+} from "./alertView";
+import { readRuleSpan } from "./alertRules";
 import { seriesIdentity } from "./market";
 import { readSnapshot, writeSnapshot, type Profile } from "./cache";
+import { logEvent, logFailure } from "./logs";
+import { ManagedDetails } from "./DataManagedPage";
+import type { MarketRow } from "./dataMarkets";
 import MobileSheet from "./MobileSheet";
+import { MobileOverlaysProvider, MobileConfirm } from "./WatchOverlays";
 import PriceRuleSheet from "./PriceRuleSheet";
-import RecordsSheet, { stamp } from "./RecordsSheet";
+import RecordsSheet from "./RecordsSheet";
+import AlertRecords from "./AlertRecords";
+import AlertListRefresh from "./AlertListRefresh";
+import AlertSymbolPicker from "./AlertSymbolPicker";
+import DataCatalogSheet from "./DataCatalogSheet";
+import SymbolInfo from "./SymbolInfo";
+import { stamp } from "./alertTime";
+import { Button } from "./components/ui/button";
+import { HeaderIconButton } from "./components/HeaderIconButton";
+import { Badge } from "./components/ui/badge";
+import { Switch } from "./components/ui/switch";
+import {
+  Tabs,
+  TabsList,
+  TabsTrigger,
+  TabsContent,
+  TabsPanels,
+} from "./components/ui/tabs";
+import { FieldGroup } from "./components/ui/field";
+import { DataInput, DataSelect, DataMore } from "./DataFormParts";
+import { DataEmpty, DataLoading } from "./DataStates";
 
+type Props = {
+  profile: Profile;
+  online: boolean;
+  visible: boolean;
+  symbol: string;
+  createToken: number;
+  runtime: NoticeRuntime;
+  records: boolean;
+  closeRecords(): void;
+  showRecords(): void;
+  report(message: string): void;
+  openChart?(ticker: string, timeframe?: string): void;
+};
+type Editor = {
+  config: AlertConfig;
+  row?: AlertRow;
+  frames: string[];
+  label: string;
+  source?: string;
+  name?: string;
+  dataset?: string;
+};
 export default function AlertsPage({
   profile,
   online,
@@ -23,66 +85,88 @@ export default function AlertsPage({
   closeRecords,
   showRecords,
   report,
-}: {
-  profile: Profile;
-  online: boolean;
-  visible: boolean;
-  symbol: string;
-  createToken: number;
-  runtime: NoticeRuntime;
-  records: boolean;
-  closeRecords(): void;
-  showRecords(): void;
-  report(message: string): void;
-}) {
-  const [cachedEvents, setCachedEvents] = useState<
-    import("../advanced/chartAlerts").AlertEvent[]
-  >([]);
+  openChart,
+}: Props) {
   const [cached, setCached] = useState<AlertRow[]>([]),
     [readAt, setReadAt] = useState<number>(),
     [loaded, setLoaded] = useState(false);
   const [health, setHealth] = useState<any>(),
-    [healthAt, setHealthAt] = useState(0),
-    [filter, setFilter] = useState("all"),
+    [healthAt, setHealthAt] = useState(0);
+  const [clockNow, setClockNow] = useState(Date.now);
+  const [tab, setTab] = useState("rules"),
+    [filter, setFilter] = useState("current"),
     [query, setQuery] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(false),
+    [archived, setArchived] = useState<AlertRow[]>([]),
+    [archiveError, setArchiveError] = useState("");
   const [selection, setSelected] = useState<AlertRow>(),
+    [detailOpen, setDetailOpen] = useState(false),
     [judgments, setJudgments] = useState<any[]>([]);
-  const [editor, setEditor] = useState<{
-    config: AlertConfig;
-    row?: AlertRow;
-    frames: string[];
-    label: string;
-  }>();
+  const [editor, setEditor] = useState<Editor>(),
+    [editorOpen, setEditorOpen] = useState(false);
+  const [pickerMounted, setPickerMounted] = useState(false),
+    [pickerOpen, setPickerOpen] = useState(false);
+  const [maintenance, setMaintenance] = useState(""),
+    [maintenanceOpen, setMaintenanceOpen] = useState(false);
+  const [ruleRecords, setRuleRecords] = useState(""),
+    [ruleRecordsOpen, setRuleRecordsOpen] = useState(false);
+  const [catalogMounted, setCatalogMounted] = useState(false),
+    [catalogOpen, setCatalogOpen] = useState(false);
+  const catalogNext = useRef<(() => void) | undefined>(undefined);
+  const [recheck, setRecheck] = useState(0);
+  const [notifications, setNotifications] = useState(false);
   const [busy, setBusy] = useState(false),
-    [unknownAction, setUnknownAction] = useState<{
-      row: AlertRow;
-      action: string;
-      requestId: string;
-    }>();
-  const [actionError, setActionError] = useState("");
-  const [filtersOpen, setFiltersOpen] = useState(false);
+    [actionError, setActionError] = useState("");
+  const [unknownAction, setUnknownAction] = useState<{
+    row: AlertRow;
+    action: string;
+    requestId: string;
+  }>();
+  const [confirmation, setConfirmation] = useState<{
+    row: AlertRow;
+    action: string;
+  }>();
   const live = useRef(online),
-    current = useRef(true);
+    mounted = useRef(true),
+    flight = useRef(false);
+  const healthGeneration = useRef(0);
+  const rulePages = useRef(1);
+  const [archivePages, setArchivePages] = useState(1);
+  const [rulesMore, setRulesMore] = useState(false),
+    [archivesMore, setArchivesMore] = useState(false);
+  const [rulesLoading, setRulesLoading] = useState(false),
+    [archivesLoading, setArchivesLoading] = useState(false);
+  const ruleSentinel = useRef<HTMLDivElement>(null);
+  const archiveRequest = useRef<AbortController | undefined>(undefined);
+  const next = useRef<(() => void) | undefined>(undefined);
   live.current = online;
-  useEffect(
-    () => () => {
-      current.current = false;
-    },
-    [],
-  );
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
   const request = useCallback(
     (async (path: string, body?: unknown, signal?: AbortSignal) => {
-      if (!live.current) throw Error("连接核验后可读取告警");
-      const value = await api(path, body, signal);
-      if (path === "/chart-alerts" && body === undefined && current.current) {
-        setLoaded(true);
-        setReadAt(undefined);
+      if (!live.current) throw Error("离线，只读；联网后可读取告警");
+      if (path === "/chart-alerts" && body === undefined) {
+        setRulesLoading(true);
+        try {
+          const value = await readRuleSpan(
+            rulePages.current,
+            signal || AbortSignal.timeout(15000),
+          );
+          if (mounted.current) {
+            setLoaded(true);
+            setReadAt(undefined);
+            setRulesMore(value.hasMore);
+          }
+          return value.items;
+        } finally {
+          if (mounted.current) setRulesLoading(false);
+        }
       }
-      if (path === "/chart-alerts/events" && current.current) {
-        setCachedEvents(value);
-        void writeSnapshot(profile, "alert-events", value).catch(() => {});
-      }
-      return value;
+      return api(path, body, signal);
     }) as typeof api,
     [profile.origin, profile.subject],
   );
@@ -95,7 +179,13 @@ export default function AlertsPage({
     },
     [profile.origin, profile.subject, report],
   );
-  const data = useAlertData(request, onRows);
+  const data = useAlertData(request, onRows, false);
+  useEffect(() => {
+    if (!online) {
+      ++healthGeneration.current;
+      setHealthAt(0);
+    }
+  }, [online]);
   useEffect(() => {
     let active = true;
     void readSnapshot<AlertRow[]>(profile, "alert-rules")
@@ -105,35 +195,33 @@ export default function AlertsPage({
           setReadAt(value.readAt);
         }
       })
-      .catch(() => report("上次告警读取失败"));
-    void readSnapshot<import("../advanced/chartAlerts").AlertEvent[]>(
-      profile,
-      "alert-events",
-    )
-      .then((value) => {
-        if (active && value) setCachedEvents(value.value);
-      })
       .catch(() => {});
     return () => {
       active = false;
     };
-  }, [profile.origin, profile.subject, report]);
+  }, [profile.origin, profile.subject]);
   const refresh = useCallback(async () => {
     if (!live.current || document.hidden) return;
-    void data.refresh();
+    const generation = ++healthGeneration.current;
+    const rules = data.refresh();
     try {
-      const value = await api("/health");
-      if (current.current && live.current) {
+      const value = await api("/health", undefined, AbortSignal.timeout(10000));
+      if (
+        mounted.current &&
+        live.current &&
+        generation === healthGeneration.current
+      ) {
         setHealth(value);
         setHealthAt(Date.now());
       }
     } catch (error) {
-      if (current.current) {
+      if (mounted.current && generation === healthGeneration.current) {
         setHealthAt(0);
-        report(errorMessage(error));
+        logFailure("告警", "核验执行服务", error);
       }
     }
-  }, [data.refresh, report]);
+    await rules;
+  }, [data.refresh]);
   useEffect(() => {
     if ((!visible && !records) || !online) return;
     let timer: ReturnType<typeof setInterval>;
@@ -151,18 +239,118 @@ export default function AlertsPage({
       document.removeEventListener("visibilitychange", visibility);
     };
   }, [visible, records, online, refresh]);
+  useEffect(() => {
+    if (!visible && !records) return;
+    const timer = setInterval(() => setClockNow(Date.now()), 5000);
+    return () => clearInterval(timer);
+  }, [visible, records]);
+  const refreshArchives = useCallback(async () => {
+    archiveRequest.current?.abort();
+    const controller = new AbortController();
+    archiveRequest.current = controller;
+    setArchiveError("");
+    setArchivesLoading(true);
+    await readRuleSpan(archivePages, controller.signal, "archived")
+      .then((value) => {
+        const rows = value.items;
+        if (controller.signal.aborted) return;
+        setArchivesMore(value.hasMore);
+        setArchived(rows);
+        void writeSnapshot(profile, "alert-rules:archived", rows).catch(
+          () => {},
+        );
+      })
+      .catch((error) => {
+        if (!controller.signal.aborted) setArchiveError(errorMessage(error));
+      })
+      .finally(() => {
+        if (!controller.signal.aborted) setArchivesLoading(false);
+      });
+  }, [archivePages, profile.origin, profile.subject]);
+  useEffect(() => {
+    if (filter !== "archived" || !online || !visible) return;
+    void refreshArchives();
+    return () => archiveRequest.current?.abort();
+  }, [filter, online, visible, data.rows, refreshArchives]);
+  useEffect(() => {
+    if (filter !== "archived" || online) return;
+    let active = true;
+    void readSnapshot<AlertRow[]>(profile, "alert-rules:archived").then(
+      (value) => {
+        if (active) setArchived(value?.value || []);
+      },
+    );
+    return () => {
+      active = false;
+    };
+  }, [filter, online]);
+  useEffect(() => {
+    const node = ruleSentinel.current;
+    const more = filter === "archived" ? archivesMore : rulesMore;
+    if (
+      !node ||
+      !visible ||
+      tab !== "rules" ||
+      !online ||
+      !more ||
+      rulesLoading ||
+      archivesLoading ||
+      data.error ||
+      archiveError
+    )
+      return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return;
+        observer.disconnect();
+        if (filter === "archived") setArchivePages((value) => value + 1);
+        else {
+          rulePages.current++;
+          void data.refresh();
+        }
+      },
+      { rootMargin: "0px 0px 160px 0px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [
+    visible,
+    tab,
+    online,
+    filter,
+    rulesMore,
+    archivesMore,
+    rulesLoading,
+    archivesLoading,
+    data.error,
+    archiveError,
+    data.refresh,
+  ]);
   const rows = loaded ? data.rows : cached;
   const selected =
-    selection && (rows.find((row) => row.id === selection.id) || selection);
-  const selectionMissing = Boolean(
-    selection && loaded && !rows.some((row) => row.id === selection.id),
+    selection &&
+    ([...rows, ...archived].find((row) => row.id === selection.id) ||
+      selection);
+  const monitor = monitorState(
+    health,
+    online,
+    healthAt,
+    loaded && !readAt && !data.error,
+    clockNow,
   );
+  const ntfy =
+    online &&
+    !!healthAt &&
+    Boolean(health?.ntfy_configured && health?.delivery_enabled);
+  const status = selected && ruleState(selected, monitor, clockNow);
+  const progress = selected && ruleProgress(selected);
+  const activity = selected && (selected.execution || selected.activity);
   useEffect(() => {
-    if (!selected || !online) return;
+    if (!selected || !detailOpen || !online) return;
     const controller = new AbortController();
     setJudgments([]);
     void api<any>(
-      `/chart-alerts/${selected.id}/judgments`,
+      `/chart-alerts/${selected.id}/judgments?limit=10`,
       undefined,
       controller.signal,
     )
@@ -170,67 +358,101 @@ export default function AlertsPage({
         if (!controller.signal.aborted) setJudgments(value.items || value);
       })
       .catch((error) => {
-        if (!controller.signal.aborted) report(errorMessage(error));
+        if (!controller.signal.aborted)
+          logFailure("告警", "读取判定记录", error);
       });
     return () => controller.abort();
-  }, [selected?.id, online, report]);
-  const loop = health?.chart_alerts?.loop;
-  const verified = online && Boolean(healthAt) && Date.now() - healthAt < 45000;
-  const workerKnown =
-    verified &&
-    ["running", "ready", "idle", "waiting_input"].includes(loop?.state);
-  const ntfy = Boolean(
-    verified && health?.ntfy_configured && health?.delivery_enabled,
-  );
-  const bucket = (row: AlertRow) => {
-    if (row.execution?.state === "blocked") return "attention";
-    if (row.execution?.state === "settling") return "settling";
-    if (row.status !== "active") return row.status;
-    return row.execution?.state || row.status;
-  };
-  async function edit(row?: AlertRow) {
-    if (!online || busy) return;
-    const ticker = row ? "MWC:" + row.config.instrument : symbol;
+  }, [
+    selected?.id,
+    selected?.version,
+    selected?.run,
+    activity?.last_evaluated_at,
+    detailOpen,
+    online,
+  ]);
+  function create() {
+    setActionError("");
+    setPickerMounted(true);
+    setPickerOpen(true);
+  }
+  function maintain(id: string) {
+    setMaintenance(id);
+    setMaintenanceOpen(true);
+  }
+  async function edit(row?: AlertRow, picked?: MarketRow) {
+    if (!online || flight.current) return;
+    const ticker = row
+      ? "MWC:" + row.config.instrument
+      : picked?.ticker || symbol;
     const identity = seriesIdentity(ticker);
     if (identity.series_kind !== "composite") {
-      report("请选择已开启实时接续的自建行情；原生行情和固定历史不支持新建实时告警");
+      create();
       return;
     }
+    flight.current = true;
     setBusy(true);
+    setActionError("");
     try {
-      const detail = await api<any>(
-        `/market-data/composites/${encodeURIComponent(identity.instrument)}`,
-      );
-      const meta = await api<any>("/market-data/resolve", {
-        ...identity,
-        timeframe: row?.config.timeframe || "M1",
-      });
-      if (!current.current || !live.current) return;
-      setEditor({
+      const [detail, meta] = await Promise.all([
+        api<any>(
+          `/market-data/composites/${encodeURIComponent(identity.instrument)}`,
+        ),
+        api<any>("/market-data/resolve", {
+          ...identity,
+          timeframe: row?.config.timeframe || "M1",
+        }),
+      ]);
+      if (!mounted.current || !live.current) return;
+      const value: Editor = {
         config: row
           ? structuredClone(row.config)
           : newPriceConfig(identity.instrument, detail.active_revision_id),
         row,
         frames: meta.frames || [],
         label: row
-          ? alertCode(row, row.name)
-          : detail.display_symbol || detail.logical_symbol || ticker,
-      });
+          ? alertCode(row, "品种")
+          : picked?.display_symbol ||
+            detail.display_symbol ||
+            detail.logical_symbol ||
+            "自建行情",
+        source:
+          picked?.source_display ||
+          picked?.source ||
+          String(row?.market_identity?.source || detail.source || ""),
+        name: picked?.description || "",
+        dataset:
+          picked?.dataset_id ||
+          String(row?.market_identity?.dataset_id || detail.dataset_id || ""),
+      };
+      if (pickerOpen) {
+        next.current = () => {
+          setEditor(value);
+          setEditorOpen(true);
+        };
+        setPickerOpen(false);
+      } else {
+        setEditor(value);
+        setEditorOpen(true);
+      }
     } catch (error) {
-      report(errorMessage(error));
+      setActionError(errorMessage(error));
+      logFailure("告警", "打开条件编辑", error);
+      throw error;
     } finally {
-      if (current.current) setBusy(false);
+      flight.current = false;
+      if (mounted.current) setBusy(false);
     }
   }
   useEffect(() => {
-    if (createToken && online) void edit();
+    if (createToken && online) void edit().catch(() => {});
   }, [createToken]);
   async function lifecycle(
     row: AlertRow,
     action: string,
     requestId: string = crypto.randomUUID(),
   ) {
-    if (!online || busy) return;
+    if (!online || flight.current) return;
+    flight.current = true;
     setBusy(true);
     setActionError("");
     try {
@@ -244,452 +466,868 @@ export default function AlertsPage({
         },
         AbortSignal.timeout(20000),
       );
-      if (!current.current || !live.current) return;
+      if (!mounted.current) return;
       data.commit(saved);
-      setSelected(saved.status === "archived" ? undefined : saved);
+      setSelected(saved);
       setUnknownAction(undefined);
+      if (saved.status === "archived") {
+        setArchived((old) => [
+          saved,
+          ...old.filter((item) => item.id !== saved.id),
+        ]);
+        setDetailOpen(false);
+      }
+      logEvent({
+        module: "告警",
+        action: (
+          {
+            pause: "暂停规则",
+            resume: "恢复规则",
+            restart: "再次启用",
+            archive: "归档规则",
+          } as Record<string, string>
+        )[action],
+        object: saved.name,
+        message: "服务器已保存",
+        result: "success",
+      });
       void refresh();
     } catch (error) {
-      if (!current.current) return;
+      if (!mounted.current) return;
       setActionError(errorMessage(error));
-      if (uncertainError(error)) setUnknownAction({ row, action, requestId });
-      else {
+      logFailure("告警", "修改规则状态", error, row.name);
+      if (uncertainError(error)) {
+        setSelected(row);
+        setDetailOpen(true);
+        setUnknownAction({ row, action, requestId });
+      } else {
         setUnknownAction(undefined);
         if (error instanceof ApiError && error.status === 409)
-          report("规则已改变；当前操作未自动覆盖，请查看最新");
+          setActionError("规则已改变，请读取最新状态后重试。");
       }
     } finally {
-      if (current.current) setBusy(false);
+      flight.current = false;
+      if (mounted.current) setBusy(false);
     }
   }
+  async function latest() {
+    if (!selected || busy || !online) return;
+    setBusy(true);
+    try {
+      const row = await api<AlertRow>(`/chart-alerts/${selected.id}`);
+      data.commit(row);
+      setSelected(row);
+      setActionError("");
+    } catch (error) {
+      setActionError(errorMessage(error));
+    } finally {
+      setBusy(false);
+    }
+  }
+  const matches = (row: AlertRow) => {
+    const state = ruleState(row, monitor, clockNow);
+    return (
+      (filter === "all" ||
+        filter === "archived" ||
+        (filter === "current" && ["active", "paused"].includes(row.status)) ||
+        (filter === "attention" && state.attention) ||
+        (filter === "ended" &&
+          ["completed", "expired"].includes(row.status))) &&
+      query
+        .toLocaleLowerCase()
+        .split(/\s+/)
+        .filter(Boolean)
+        .every((token) =>
+          [
+            row.name,
+            row.display_label,
+            row.condition_summary,
+            ...Object.values(ruleIdentity(row)),
+          ]
+            .join(" ")
+            .toLocaleLowerCase()
+            .includes(token),
+        )
+    );
+  };
+  const filtered = (filter === "archived" ? archived : rows).filter(matches);
+  const stateLabel = (
+    {
+      current: "当前规则",
+      attention: "需处理",
+      ended: "已结束",
+      archived: "已归档",
+      all: "全部规则",
+    } as Record<string, string>
+  )[filter];
   return (
     <>
-      <section hidden={!visible} className="mobile-content mobile-alerts">
-        <header className="mobile-title">
-          <div>
-            <h1>告警</h1>
-            <small>
-              {readAt
-                ? `上次读取 ${stamp(readAt)}`
-                : workerKnown
-                  ? "执行服务状态已核验"
-                  : "执行服务待确认"}
-            </small>
-          </div>
-          <button
-            className="mobile-icon-button"
-            aria-label="创建告警"
-            disabled={!online || busy || !symbol.startsWith("MWC:")}
-            onClick={() => void edit()}
+      <div className="mobile-controls mobile-alerts" hidden={!visible}>
+        <MobileOverlaysProvider>
+          <section className="mobile-content alert-page">
+            <header className="mobile-title alert-title">
+              <h1>告警</h1>
+              <div className="alert-header-actions">
+                {tab === "rules" && (
+                  <HeaderIconButton
+                    icon={Search}
+                    active={filter !== "current" || !!query.trim()}
+                    label="搜索规则"
+                    aria-haspopup="dialog"
+                    aria-expanded={filtersOpen}
+                    onClick={() => setFiltersOpen(true)}
+                  />
+                )}
+                <HeaderIconButton
+                  icon={Plus}
+                  label="创建告警"
+                  disabled={!online || busy}
+                  onClick={create}
+                />
+              </div>
+            </header>
+            {!online && (
+              <p className="alert-offline">离线，只读 · 运行状态待联网核验</p>
+            )}
+            <Tabs
+              swipe
+              value={tab}
+              onValueChange={(value) => setTab(String(value))}
+              className="alert-main-tabs"
+            >
+              <div className="alert-tabbar mobile-page-tabs-nav">
+                <TabsList variant="line" aria-label="告警视图">
+                  <TabsTrigger value="rules">规则</TabsTrigger>
+                  <TabsTrigger value="records" aria-label="事件记录">
+                    记录
+                  </TabsTrigger>
+                </TabsList>
+                {tab === "records" && (
+                  <Button
+                    variant="plain"
+                    className="alert-filter-entry"
+                    onClick={showRecords}
+                  >
+                    异常/恢复
+                    <ChevronRight data-icon="inline-end" aria-hidden="true" />
+                  </Button>
+                )}
+              </div>
+              <TabsPanels>
+                <TabsContent value="rules" className="alert-list-panel">
+                  <AlertListRefresh
+                    active={
+                      visible &&
+                      tab === "rules" &&
+                      !filtersOpen &&
+                      !detailOpen &&
+                      !editorOpen &&
+                      !pickerOpen &&
+                      !records
+                    }
+                    online={online}
+                    loading={rulesLoading || archivesLoading}
+                    resetKey={filter + ":" + query}
+                    refresh={filter === "archived" ? refreshArchives : refresh}
+                  >
+                    {actionError && !detailOpen && !editorOpen && (
+                      <p role="alert" className="mobile-inline-error">
+                        {actionError}
+                      </p>
+                    )}
+                    {(data.error || archiveError) && (
+                      <div className="alert-read-error">
+                        <p role="alert">
+                          {filter === "archived" ? archiveError : data.error}
+                        </p>
+                        <Button
+                          variant="ghost"
+                          disabled={!online}
+                          onClick={() => void refresh()}
+                        >
+                          重试
+                        </Button>
+                      </div>
+                    )}
+                    {(query || filter !== "current") && (
+                      <div className="alert-query">
+                        <span>
+                          {query ? `${stateLabel} · ${query}` : stateLabel}
+                        </span>
+                        <Button
+                          variant="plain"
+                          size="icon"
+                          aria-label="清除规则筛选"
+                          onClick={() => {
+                            setQuery("");
+                            setFilter("current");
+                          }}
+                        >
+                          <X aria-hidden="true" />
+                        </Button>
+                      </div>
+                    )}
+                    {!loaded && !readAt && online ? (
+                      <DataLoading label="正在读取规则…" />
+                    ) : !filtered.length ? (
+                      <DataEmpty
+                        title={
+                          rows.length || filter === "archived"
+                            ? "没有匹配的规则"
+                            : "还没有告警"
+                        }
+                        action={
+                          !rows.length && filter !== "archived" ? (
+                            <Button disabled={!online} onClick={create}>
+                              创建告警
+                            </Button>
+                          ) : undefined
+                        }
+                      >
+                        {rows.length || filter === "archived"
+                          ? "试试其他筛选，或创建新的规则。"
+                          : "选一个自建品种，设置价格或指标条件。"}
+                      </DataEmpty>
+                    ) : (
+                      <div className="alert-rule-list">
+                        {filtered.map((row) => {
+                          const identity = ruleIdentity(row);
+                          const checked = (row.execution || row.activity)
+                            ?.last_checked_at;
+                          const state = ruleState(row, monitor, clockNow);
+                          return (
+                            <article className="alert-rule" key={row.id}>
+                              <Button
+                                variant="plain"
+                                className="alert-rule-open"
+                                aria-label={`查看${row.name}`}
+                                onClick={() => {
+                                  setSelected(row);
+                                  setDetailOpen(true);
+                                  setActionError("");
+                                }}
+                              >
+                                <div
+                                  className="alert-rule-heading"
+                                  data-long-code={
+                                    identity.code.length > 12 || undefined
+                                  }
+                                >
+                                  <SymbolInfo {...identity} />
+                                  <div className="alert-rule-condition">
+                                    <strong>{row.condition_summary}</strong>
+                                    <small>
+                                      {row.config.mode === "close"
+                                        ? `${row.config.timeframe} 收盘`
+                                        : "触价"}{" "}
+                                      · {row.count}/{row.max_triggers} 次
+                                    </small>
+                                  </div>
+                                </div>
+                              </Button>
+                              <div className="alert-rule-status">
+                                <span
+                                  data-attention={state.attention || undefined}
+                                >
+                                  <i data-state={state.key} />
+                                  {state.label}
+                                </span>
+                                {state.attention && state.message && (
+                                  <small>{state.message}</small>
+                                )}
+                                {checked && !state.attention && (
+                                  <small>
+                                    {monitor.verified ? "最近检查" : "上次检查"}{" "}
+                                    {stamp(checked)}
+                                  </small>
+                                )}
+                                {row.execution?.last_gap?.unrecoverable && (
+                                  <small>曾中断，部分时段无法补判</small>
+                                )}
+                              </div>
+                              <Switch
+                                size="lg"
+                                aria-label={`启用${row.name}`}
+                                checked={row.status === "active"}
+                                disabled={
+                                  !online ||
+                                  busy ||
+                                  !!unknownAction ||
+                                  !["active", "paused"].includes(row.status) ||
+                                  (row.status === "paused" &&
+                                    (row.config.series_kind !== "composite" ||
+                                      expiredRule(row) ||
+                                      row.count >= row.max_triggers))
+                                }
+                                onCheckedChange={(checked) =>
+                                  void lifecycle(
+                                    row,
+                                    checked ? "resume" : "pause",
+                                  )
+                                }
+                              />
+                            </article>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <div ref={ruleSentinel} className="alert-list-end">
+                      {(filter === "archived" ? archivesMore : rulesMore) && (
+                        <Button
+                          variant="ghost"
+                          disabled={!online || rulesLoading || archivesLoading}
+                          onClick={() => {
+                            if (filter === "archived")
+                              setArchivePages((value) => value + 1);
+                            else {
+                              rulePages.current++;
+                              void data.refresh();
+                            }
+                          }}
+                        >
+                          {rulesLoading || archivesLoading
+                            ? "正在加载…"
+                            : "加载更多规则"}
+                        </Button>
+                      )}
+                    </div>
+                  </AlertListRefresh>
+                </TabsContent>
+                <TabsContent value="records" className="alert-list-panel">
+                  <AlertRecords
+                    profile={profile}
+                    online={online}
+                    active={visible && tab === "records"}
+                    runtime={runtime}
+                    pullToRefresh
+                  />
+                </TabsContent>
+              </TabsPanels>
+            </Tabs>
+          </section>
+          <MobileSheet
+            title="搜索规则"
+            open={filtersOpen}
+            close={() => setFiltersOpen(false)}
           >
-            <Plus aria-hidden="true" />
-          </button>
-        </header>
-        <div className="mobile-health-card">
-          <div className="mobile-health-title">
-            <ShieldCheck aria-hidden="true" />
-            {readAt || !online ? "上次读取的监控概况" : "由服务器检测价格"}
-          </div>
-          <div className="mobile-health-stats">
-            <div>
-              <strong>
-                {loaded || readAt
-                  ? rows.filter((row) => bucket(row) === "monitoring").length
-                  : "—"}
-              </strong>
-              <span>{readAt || !workerKnown ? "上次监控" : "监控中"}</span>
-            </div>
-            <div>
-              <strong>
-                {loaded || readAt
-                  ? rows.filter((row) => bucket(row) === "attention").length
-                  : "—"}
-              </strong>
-              <span>需要处理</span>
-            </div>
-            <div>
-              <strong>
-                {loaded || readAt
-                  ? rows.filter((row) => bucket(row) === "paused").length
-                  : "—"}
-              </strong>
-              <span>已暂停</span>
-            </div>
-          </div>
-        </div>
-        {!online && <p>上次内容，只读；服务器继续检测。</p>}
-        {data.error && <p role="status">{data.error}</p>}
-        <div className="mobile-compact-filter">
-          <div className="mobile-tabs" role="group" aria-label="告警状态">
-            {[
-              ["all", "全部"],
-              ["monitoring", "监控中"],
-              ["attention", "需处理"],
-              ["paused", "已暂停"],
-            ].map(([value, label]) => (
-              <button
-                key={value}
-                aria-pressed={filter === value}
-                onClick={() => setFilter(value)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-          <button
-            className="mobile-icon-button"
-            aria-label="更多告警筛选"
-            onClick={() => setFiltersOpen(true)}
-          >
-            <SlidersHorizontal aria-hidden="true" />
-          </button>
-        </div>
-        {!["all", "monitoring", "attention", "paused"].includes(filter) && (
-          <p className="mobile-muted">当前筛选：{filter}</p>
-        )}
-        {filtersOpen && (
-          <MobileSheet title="告警筛选" close={() => setFiltersOpen(false)}>
-            <label>
-              搜索告警
-              <input
+            <FieldGroup>
+              <DataInput
+                label="搜索规则"
                 type="search"
                 value={query}
                 onChange={(event) => setQuery(event.target.value)}
+                placeholder="品种、名称或条件"
               />
-            </label>
-            <label>
-              规则状态
-              <select
+              <DataSelect
+                label="规则范围"
                 value={filter}
-                onChange={(event) => setFilter(event.target.value)}
+                onChange={setFilter}
+                items={[
+                  { value: "current", label: "当前规则" },
+                  { value: "attention", label: "需处理" },
+                  { value: "ended", label: "已结束" },
+                  { value: "archived", label: "已归档" },
+                  { value: "all", label: "全部未归档" },
+                ]}
+              />
+              <Button
+                variant="outline"
+                disabled={!online || busy}
+                onClick={() => void refresh()}
               >
-                <option value="all">全部</option>
-                <option value="monitoring">监控中</option>
-                <option value="attention">需处理</option>
-                <option value="preparing">准备中</option>
-                <option value="recovering">恢复中</option>
-                <option value="closed">休市</option>
-                <option value="settling">到期结算</option>
-                <option value="paused">暂停</option>
-                <option value="completed">完成</option>
-                <option value="expired">到期</option>
-                <option value="archived">归档</option>
-              </select>
-            </label>
-            {!symbol.startsWith("MWC:") && (
-              <p>从自选或数据选择已开启实时接续的自建行情，创建价格告警。</p>
-            )}
-            <button
-              aria-label="刷新"
-              disabled={!online || busy}
-              onClick={() => void refresh()}
-            >
-              刷新告警
-            </button>
-            <button className="primary" onClick={() => setFiltersOpen(false)}>
-              应用筛选
-            </button>
+                <RefreshCw data-icon="inline-start" />
+                刷新规则
+              </Button>
+              <Button onClick={() => setFiltersOpen(false)}>查看规则</Button>
+            </FieldGroup>
           </MobileSheet>
-        )}
-        {!loaded && !readAt ? (
-          <p>
-            {data.error
-              ? "读取失败，暂无缓存"
-              : online
-                ? "正在读取告警…"
-                : "暂无告警缓存"}
-          </p>
-        ) : (
-          !rows.length && <p>尚无规则。</p>
-        )}
-        {rows
-          .filter(
-            (row) =>
-              (filter === "all" || bucket(row) === filter) &&
-              [row.name, row.display_label, row.condition_summary]
-                .join(" ")
-                .toLocaleLowerCase()
-                .includes(query.toLocaleLowerCase()),
-          )
-          .map((row) => (
-            <article key={row.id} className="mobile-rule-card">
-              <button
-                className="mobile-rule-open"
-                onClick={() => {
-                  setActionError("");
-                  setSelected(row);
-                }}
-              >
-                <span>
-                  <strong>{alertCode(row, row.config.instrument)}</strong>
-                  <span
-                    className={`mobile-rule-state ${bucket(row) === "attention" ? "warning" : ""}`}
-                  >
-                    {row.execution
-                      ? alertState(row)
-                      : row.status === "active"
-                        ? "执行状态待确认"
-                        : alertState(row)}
-                    {(readAt || !workerKnown) && " · 待确认"}
-                  </span>
-                </span>
-                <small>
-                  {row.name} ·{" "}
-                  {row.config.series_kind === "composite" ? "自建 · 实时接续" : row.config.series_kind === "provider" ? "原生" : "自建"} ·{" "}
-                  {row.display_identity?.source || row.config.source}
-                </small>
-                <strong className="mobile-rule-condition">
-                  {row.condition_summary}
-                </strong>
-                <small>
-                  {row.config.mode === "close"
-                    ? `${row.config.timeframe} 收盘确认`
-                    : "触价检测"}{" "}
-                  · {row.count}/{row.max_triggers} 次<br />
-                  {row.config.notify_ntfy
-                    ? "ntfy 通知 + 站内记录"
-                    : "站内记录"}{" "}
-                  ·{" "}
-                  {row.config.expires_at
-                    ? stamp(row.config.expires_at) + " 到期"
-                    : "不限到期时间"}
-                </small>
-              </button>
-              <div className="mobile-rule-footer">
-                <small>
-                  最近检测{" "}
-                  {row.execution?.last_evaluated_at
-                    ? new Date(
-                        row.execution.last_evaluated_at,
-                      ).toLocaleTimeString()
-                    : "尚无记录"}
-                </small>
-                <div>
-                  <button
-                    className="mobile-link-button"
-                    onClick={() => {
-                      setActionError("");
-                      setSelected(row);
-                    }}
-                  >
-                    详情
-                  </button>
-                  {(row.status === "active" ||
-                    (row.status === "paused" &&
-                      row.config.series_kind === "composite")) && (
-                    <button
-                      className="mobile-link-button"
-                      aria-label={`${row.status === "active" ? "暂停" : "恢复"}${row.name}`}
-                      disabled={!online || busy || Boolean(unknownAction)}
-                      onClick={() => {
-                        setSelected(row);
-                        void lifecycle(
-                          row,
-                          row.status === "active" ? "pause" : "resume",
-                        );
-                      }}
-                    >
-                      {row.status === "active" ? "暂停" : "恢复"}
-                    </button>
-                  )}
-                </div>
-              </div>
-            </article>
-          ))}
-        <button
-          className="mobile-records-button"
-          aria-label="事件记录"
-          onClick={showRecords}
-        >
-          <History aria-hidden="true" />
-          触发与异常记录
-        </button>
-        {selected && (
           <MobileSheet
-            title={selected.name}
-            close={() => {
+            title="规则详情"
+            open={detailOpen}
+            close={() => setDetailOpen(false)}
+            dismissible={!busy && !unknownAction}
+            onClosed={() => {
               setSelected(undefined);
-              setUnknownAction(undefined);
+              setActionError("");
+              const action = next.current;
+              next.current = undefined;
+              action?.();
             }}
-            dirty={Boolean(unknownAction)}
           >
-            <p>{alertCode(selected, selected.config.instrument)}</p>
-            <p className="mobile-identity">
-              {selected.config.series_kind} · {selected.config.source} ·{" "}
-              {selected.config.instrument}
-            </p>
-            <p>
-              {selected.condition_summary} ·{" "}
-              {selected.config.mode === "close" ? "完成柱收盘" : "当前抽样触价"}{" "}
-              · {selected.config.timeframe}
-            </p>
-            <p>
-              {selected.execution ? selected.execution.label : "执行状态待确认"}
-              {(!workerKnown || readAt || selectionMissing) && " · 状态待确认"}
-            </p>
-            <p>{selected.execution?.message || selected.health_reason}</p>
-            <dl className="mobile-facts">
-              {Object.entries({
-                已触发: `${selected.count}/${selected.max_triggers} 次`,
-                到期: stamp(selected.config.expires_at),
-                接管: stamp((selected.execution as any)?.taken_over_at),
-                最近检查: stamp((selected.execution as any)?.last_checked_at),
-                最近判定: stamp(selected.execution?.last_evaluated_at),
-                最近输入: stamp(selected.execution?.last_input_at),
-                预期输入: stamp((selected.execution as any)?.expected_input_at),
-                位置: String((selected.execution as any)?.position ?? "待确认"),
-                ntfy:
-                  selected.execution?.notification?.message ||
-                  selected.execution?.notification?.status ||
-                  "未确认",
-                手机配置:
-                  selected.execution?.phone_configuration?.message ||
-                  "未核验手机实收",
-              }).map(([label, value]) => (
-                <div key={label}>
-                  <dt>{label}</dt>
-                  <dd>{value}</dd>
-                </div>
-              ))}
-            </dl>
-            {selected.execution?.last_gap && (
-              <p>
-                判定缺口 {stamp(selected.execution.last_gap.start)} —{" "}
-                {stamp(selected.execution.last_gap.end)} ·{" "}
-                {selected.execution.last_gap.bounds}
-                {selected.execution.last_gap.unrecoverable ? " · 无法补判" : ""}
-              </p>
-            )}
-            {(selected.execution as any)?.incident?.message && (
-              <p>{(selected.execution as any).incident.message}</p>
-            )}
-            {actionError && <p role="alert">{actionError}</p>}
-            {unknownAction ? (
-              <>
-                <p>操作结果未知；核查沿用同一请求，不能继续其他状态操作。</p>
-                <button
-                  disabled={busy || !online}
-                  onClick={() =>
-                    void lifecycle(
-                      unknownAction.row,
-                      unknownAction.action,
-                      unknownAction.requestId,
-                    )
+            {selected && status && (
+              <div className="alert-detail">
+                <div
+                  className="alert-detail-identity"
+                  data-long-code={
+                    ruleIdentity(selected).code.length > 12 || undefined
                   }
                 >
-                  核查同一次操作
-                </button>
-              </>
-            ) : (
-              <>
-                <button
-                  disabled={!online || busy || !editablePrice(selected)}
-                  onClick={() => void edit(selected)}
-                >
-                  编辑价格告警
-                </button>
-                {selected.status === "active" && (
-                  <button
-                    disabled={!online || busy}
-                    onClick={() => void lifecycle(selected, "pause")}
-                  >
-                    暂停
-                  </button>
-                )}
-                {selected.status === "paused" &&
-                  selected.config.series_kind === "composite" && (
-                    <button
-                      disabled={!online || busy}
-                      onClick={() => void lifecycle(selected, "resume")}
+                  <SymbolInfo {...ruleIdentity(selected)} />
+                  <div className="alert-state-line">
+                    <Badge
+                      variant={status.attention ? "destructive" : "secondary"}
                     >
-                      恢复
-                    </button>
+                      {status.label}
+                    </Badge>
+                    {!online && <span>离线，只读</span>}
+                  </div>
+                </div>
+                <h3 className="alert-condition-title">
+                  {selected.condition_summary}
+                </h3>
+                {status.message && (
+                  <div className="alert-issue">
+                    <p>{status.message || "等待服务器建立观察基准"}</p>
+                    {(status.issue === "input" ||
+                      status.key === "recovering") &&
+                      !!selected.market_identity?.dataset_id && (
+                        <Button
+                          variant="outline"
+                          onClick={() =>
+                            maintain(
+                              String(selected.market_identity!.dataset_id),
+                            )
+                          }
+                        >
+                          去数据详情
+                        </Button>
+                      )}
+                    {status.issue === "delivery" &&
+                      selected.config.notify_ntfy && (
+                        <Button
+                          variant="ghost"
+                          onClick={() => setNotifications(true)}
+                        >
+                          检查通知设置
+                        </Button>
+                      )}
+                  </div>
+                )}
+                <dl className="alert-facts">
+                  <div>
+                    <dt>{monitor.verified ? "最近检查" : "上次检查"}</dt>
+                    <dd>{stamp(activity?.last_checked_at)}</dd>
+                  </div>
+                  <div>
+                    <dt>最近判定</dt>
+                    <dd>
+                      {progress?.label}
+                      {progress?.at
+                        ? ` · ${stamp(progress.at)}`
+                        : selected.config.mode === "close" &&
+                            !status.attention &&
+                            monitor.verified
+                          ? ` · 等待 ${selected.config.timeframe} 收盘数据`
+                          : ""}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>判定方式</dt>
+                    <dd>
+                      {selected.config.mode === "close"
+                        ? `${selected.config.timeframe} 收盘确认`
+                        : "实时抽样触价"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>已触发</dt>
+                    <dd>
+                      {selected.count}/{selected.max_triggers} 次
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>到期</dt>
+                    <dd>
+                      {selected.config.expires_at
+                        ? stamp(selected.config.expires_at)
+                        : "不限到期"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>提醒</dt>
+                    <dd>
+                      {selected.config.notify_ntfy ? "手机推送 · " : ""}
+                      {selected.config.notify_web ? "应用内" : "仅记录"}
+                    </dd>
+                  </div>
+                  <div>
+                    <dt>最近触发</dt>
+                    <dd>{stamp(selected.last_triggered_at)}</dd>
+                  </div>
+                </dl>
+                {selected.execution?.last_gap && (
+                  <p className="alert-gap">
+                    {selected.execution.last_gap.unrecoverable
+                      ? "曾中断，部分时段无法补判"
+                      : "曾有数据缺口"}{" "}
+                    · {stamp(selected.execution.last_gap.start)} —{" "}
+                    {stamp(selected.execution.last_gap.end)}
+                  </p>
+                )}
+                {actionError && (
+                  <p role="alert" className="mobile-inline-error">
+                    {actionError}
+                  </p>
+                )}
+                {unknownAction && (
+                  <>
+                    <p className="alert-muted">结果未知，请核查同一次操作。</p>
+                    <Button
+                      disabled={!online || busy}
+                      onClick={() =>
+                        void lifecycle(
+                          unknownAction.row,
+                          unknownAction.action,
+                          unknownAction.requestId,
+                        )
+                      }
+                    >
+                      核查同一次操作
+                    </Button>
+                  </>
+                )}
+                {expiredRule(selected) && selected.status !== "archived" && (
+                  <p className="alert-muted">
+                    先编辑并更新到期时间，保存后再恢复。
+                  </p>
+                )}
+                {!unknownAction && selected.status !== "archived" && (
+                  <div className="alert-detail-actions">
+                    {selected.status === "active" ? (
+                      <Button
+                        variant="outline"
+                        disabled={!online || busy}
+                        onClick={() => void lifecycle(selected, "pause")}
+                      >
+                        暂停
+                      </Button>
+                    ) : (
+                      selected.config.series_kind === "composite" && (
+                        <Button
+                          variant="outline"
+                          disabled={!online || busy || expiredRule(selected)}
+                          onClick={() =>
+                            selected.count >= selected.max_triggers
+                              ? setConfirmation({
+                                  row: selected,
+                                  action: "restart",
+                                })
+                              : void lifecycle(selected, "resume")
+                          }
+                        >
+                          {selected.count >= selected.max_triggers
+                            ? "再次启用"
+                            : "恢复"}
+                        </Button>
+                      )
+                    )}
+                    {editableRule(selected) && (
+                      <Button
+                        disabled={!online || busy}
+                        onClick={() => void edit(selected).catch(() => {})}
+                      >
+                        编辑条件
+                      </Button>
+                    )}
+                  </div>
+                )}
+                <div className="alert-entry-list">
+                  <Button
+                    variant="plain"
+                    onClick={() => {
+                      setRuleRecords(selected.id);
+                      setRuleRecordsOpen(true);
+                    }}
+                  >
+                    此规则触发记录
+                    <ChevronRight data-icon="inline-end" />
+                  </Button>
+                  {openChart && (
+                    <Button
+                      variant="plain"
+                      disabled={!online}
+                      onClick={() => {
+                        const row = selected;
+                        next.current = () =>
+                          openChart(
+                            (row.config.series_kind === "composite"
+                              ? "MWC:"
+                              : row.config.series_kind === "managed"
+                                ? "MWH:"
+                                : "MWP:") + row.config.instrument,
+                            row.config.timeframe,
+                          );
+                        setDetailOpen(false);
+                      }}
+                    >
+                      查看品种图表
+                      <ChevronRight data-icon="inline-end" />
+                    </Button>
                   )}
-                <button
-                  disabled={!online || busy || selected.status === "archived"}
-                  onClick={() => {
-                    if (confirm("归档此规则？服务器将停止此规则执行。"))
-                      void lifecycle(selected, "archive");
-                  }}
-                >
-                  归档
-                </button>
-                <button
-                  disabled={!online || busy}
-                  onClick={async () => {
-                    try {
-                      const row = await api<AlertRow>(
-                        `/chart-alerts/${selected.id}`,
-                      );
-                      data.commit(row);
-                      setSelected(row);
-                    } catch (error) {
-                      report(errorMessage(error));
-                    }
-                  }}
-                >
-                  查看最新
-                </button>
-              </>
-            )}
-            {!editablePrice(selected) && (
-              <p>
-                此规则的来源、状态或条件不支持手机编辑。旧来源仅可查看、暂停或归档；复杂条件请在桌面查看。
-              </p>
-            )}
-            <h3>判定结果</h3>
-            {!judgments.length && <p>暂无已读取的判定记录。</p>}
-            {judgments.map((row, index) => (
-              <article className="mobile-status-card" key={row.id || index}>
-                <p>
-                  {row.summary ||
-                    row.reason ||
-                    row.result ||
-                    row.outcome ||
-                    row.state ||
-                    row.status}
-                </p>
-                <p>
-                  {stamp(
-                    row.evaluated_at ||
-                      row.event_time ||
-                      row.created_at ||
-                      row.occurred_at ||
-                      row.at,
+                </div>
+                <DataMore title="排查信息">
+                  <dl className="alert-facts">
+                    {Object.entries({
+                      名称: selected.name,
+                      接管: stamp(activity?.taken_over_at),
+                      最近检查: stamp(activity?.last_checked_at),
+                      最近判定: stamp(activity?.last_evaluated_at),
+                      最近输入: stamp(activity?.last_input_at),
+                      预期输入: stamp(
+                        (selected.execution as any)?.expected_input_at,
+                      ),
+                      修订: selected.config.composite_revision_id || "历史来源",
+                      推送状态:
+                        selected.execution?.notification?.message ||
+                        selected.execution?.notification?.status ||
+                        "尚无投递证据",
+                    }).map(([label, value]) => (
+                      <div key={label}>
+                        <dt>{label}</dt>
+                        <dd>{value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                  {selected.health_reason && (
+                    <p className="alert-muted">{selected.health_reason}</p>
                   )}
-                </p>
-              </article>
-            ))}
+                  {judgments.length > 0 && (
+                    <>
+                      <h4>最近判定</h4>
+                      {judgments.slice(0, 10).map((item, index) => (
+                        <p className="alert-muted" key={item.id || index}>
+                          {(
+                            {
+                              unknown: "无法判定",
+                              triggered: "已触发",
+                              no_trigger: "未触发",
+                              initial_baseline: "初始基准已建立",
+                              recovery_baseline: "恢复基准已建立",
+                            } as Record<string, string>
+                          )[item.outcome] ||
+                            item.summary ||
+                            item.outcome}{" "}
+                          · {stamp(item.event_time || item.created_at)}
+                        </p>
+                      ))}
+                    </>
+                  )}
+                  <Button
+                    variant="outline"
+                    disabled={!online || busy || !!unknownAction}
+                    onClick={() => void latest()}
+                  >
+                    读取最新状态
+                  </Button>
+                </DataMore>
+                {!unknownAction && selected.status !== "archived" && (
+                  <>
+                    {!editableRule(selected) && (
+                      <p className="alert-muted">
+                        此条件仅支持查看与状态维护；画线关联请在网页端编辑。
+                      </p>
+                    )}
+                    <Button
+                      variant="ghost"
+                      className="alert-archive"
+                      disabled={!online || busy}
+                      onClick={() =>
+                        setConfirmation({ row: selected, action: "archive" })
+                      }
+                    >
+                      <Archive data-icon="inline-start" />
+                      归档规则
+                    </Button>
+                  </>
+                )}
+              </div>
+            )}
           </MobileSheet>
-        )}
-        {editor && (
-          <PriceRuleSheet
-            key={editor.row?.id || "new"}
-            initial={editor.config}
-            editing={editor.row}
-            frames={editor.frames}
-            label={editor.label}
-            online={online}
-            ntfy={ntfy}
-            close={() => setEditor(undefined)}
-            report={report}
-            saved={(row) => {
-              data.commit(row);
-              setEditor(undefined);
-              setSelected(undefined);
-              void refresh();
-            }}
-          />
-        )}
-      </section>
+          {pickerMounted && (
+            <AlertSymbolPicker
+              profile={profile}
+              online={online}
+              open={pickerOpen}
+              close={() => setPickerOpen(false)}
+              pick={(row) => edit(undefined, row)}
+              maintain={maintain}
+              recheck={recheck}
+              add={() => {
+                setCatalogMounted(true);
+                setCatalogOpen(true);
+              }}
+              onClosed={() => {
+                setPickerMounted(false);
+                const action = next.current;
+                next.current = undefined;
+                action?.();
+              }}
+            />
+          )}
+          {editor && (
+            <PriceRuleSheet
+              key={editor.row?.id || editor.config.instrument}
+              initial={editor.config}
+              recheck={recheck}
+              editing={editor.row}
+              label={editor.label}
+              source={editor.source}
+              name={editor.name}
+              frames={editor.frames}
+              online={online}
+              ntfy={ntfy}
+              open={editorOpen}
+              close={() => setEditorOpen(false)}
+              onClosed={() => setEditor(undefined)}
+              report={report}
+              notifications={() => setNotifications(true)}
+              maintain={
+                editor.dataset ? () => maintain(editor.dataset!) : undefined
+              }
+              saved={(row) => {
+                data.commit(row);
+                setSelected(row);
+                setEditorOpen(false);
+                setDetailOpen(true);
+                void refresh();
+              }}
+            />
+          )}
+          {catalogMounted && (
+            <DataCatalogSheet
+              profile={profile}
+              online={online}
+              active={catalogOpen}
+              open={catalogOpen}
+              close={() => setCatalogOpen(false)}
+              done={(id) => {
+                catalogNext.current = () => maintain(id);
+                setCatalogOpen(false);
+              }}
+              onClosed={() => {
+                setCatalogMounted(false);
+                setRecheck((value) => value + 1);
+                const action = catalogNext.current;
+                catalogNext.current = undefined;
+                action?.();
+              }}
+            />
+          )}
+          {maintenance && (
+            <ManagedDetails
+              profile={profile}
+              online={online}
+              visible={visible}
+              active={visible}
+              id={maintenance}
+              opened={maintenanceOpen}
+              close={() => setMaintenanceOpen(false)}
+              onClosed={() => {
+                setMaintenance("");
+                setRecheck((value) => value + 1);
+                void refresh();
+              }}
+              changed={() => void refresh()}
+              report={report}
+              open={(ticker) => openChart?.(ticker)}
+            />
+          )}
+          <MobileSheet
+            title="规则触发记录"
+            open={ruleRecordsOpen}
+            close={() => setRuleRecordsOpen(false)}
+            onClosed={() => setRuleRecords("")}
+            fullHeight
+          >
+            {ruleRecords && (
+              <AlertRecords
+                key={ruleRecords}
+                profile={profile}
+                online={online}
+                active={ruleRecordsOpen}
+                runtime={runtime}
+                alertId={ruleRecords}
+              />
+            )}
+          </MobileSheet>
+          <MobileSheet
+            title="后台通知"
+            open={notifications}
+            close={() => setNotifications(false)}
+          >
+            <dl className="alert-facts">
+              <div>
+                <dt>推送配置</dt>
+                <dd>
+                  {healthAt
+                    ? health?.ntfy_configured
+                      ? "ntfy 已配置"
+                      : "ntfy 尚未配置"
+                    : "待核验"}
+                </dd>
+              </div>
+              <div>
+                <dt>服务器投递</dt>
+                <dd>
+                  {healthAt
+                    ? health?.delivery_enabled
+                      ? "已开启"
+                      : "未开启"
+                    : "待核验"}
+                </dd>
+              </div>
+            </dl>
+            <p className="alert-muted">
+              手机后台通知由 ntfy
+              提供。请允许通知与后台运行；锁屏实收需要在手机检查。
+            </p>
+            <p className="alert-muted">
+              服务器通知配置可在网页端设置，暂未配置也能创建站内记录。
+            </p>
+            <Button
+              variant="outline"
+              disabled={!online}
+              onClick={() => void refresh()}
+            >
+              <Activity data-icon="inline-start" />
+              重新核验
+            </Button>
+          </MobileSheet>
+          {confirmation && (
+            <MobileConfirm
+              title={
+                confirmation.action === "archive"
+                  ? "归档这条规则？"
+                  : "再次启用？"
+              }
+              description={
+                confirmation.action === "archive"
+                  ? "停止检测并保留历史记录。归档后不能恢复。"
+                  : "触发次数归零，保留历史，从新的观察重新建立基准。"
+              }
+              actionLabel={
+                confirmation.action === "archive" ? "确认归档" : "再次启用"
+              }
+              destructive={confirmation.action === "archive"}
+              onClose={() => setConfirmation(undefined)}
+              onAccept={() => {
+                const value = confirmation;
+                setConfirmation(undefined);
+                void lifecycle(value.row, value.action);
+              }}
+            />
+          )}
+        </MobileOverlaysProvider>
+      </div>
       <RecordsSheet
         open={records}
         profile={profile}
         online={online}
-        events={data.events.length ? data.events : cachedEvents}
+        events={[]}
         runtime={runtime}
         close={closeRecords}
         report={report}
+        initialTab={visible ? "alerts" : "triggers"}
       />
     </>
   );

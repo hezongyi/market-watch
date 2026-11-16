@@ -1,0 +1,422 @@
+{
+  "checked_at": "2026-11-14T14:39:58.889Z",
+  "host": "Ubuntu quant-server local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "origin": "https://192.168.7.232:18447",
+  "matrices": [
+    {
+      "theme": "light",
+      "width": 375,
+      "font": 14,
+      "screenshot": "detail-light-375-14.png",
+      "metrics": [
+        {
+          "width": 56.46875,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 51,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 46.765625,
+          "height": 22,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 375,
+      "font": 21,
+      "screenshot": "detail-light-375-21.png",
+      "metrics": [
+        {
+          "width": 74.71875,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 66,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 61.171875,
+          "height": 29.09375,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 412,
+      "font": 14,
+      "screenshot": "detail-light-412-14.png",
+      "metrics": [
+        {
+          "width": 56.46875,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 51,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 46.765625,
+          "height": 22,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "light",
+      "width": 412,
+      "font": 21,
+      "screenshot": "detail-light-412-21.png",
+      "metrics": [
+        {
+          "width": 74.71875,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 66,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 61.171875,
+          "height": 29.09375,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "font": 14,
+      "screenshot": "detail-dark-375-14.png",
+      "metrics": [
+        {
+          "width": 56.46875,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 51,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 46.765625,
+          "height": 22,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 375,
+      "font": 21,
+      "screenshot": "detail-dark-375-21.png",
+      "metrics": [
+        {
+          "width": 74.71875,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 66,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 61.171875,
+          "height": 29.09375,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 412,
+      "font": 14,
+      "screenshot": "detail-dark-412-14.png",
+      "metrics": [
+        {
+          "width": 56.46875,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 51,
+          "height": 22,
+          "within": true
+        },
+        {
+          "width": 46.765625,
+          "height": 22,
+          "within": true
+        }
+      ]
+    },
+    {
+      "theme": "dark",
+      "width": 412,
+      "font": 21,
+      "screenshot": "detail-dark-412-21.png",
+      "metrics": [
+        {
+          "width": 74.71875,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 66,
+          "height": 29.09375,
+          "within": true
+        },
+        {
+          "width": 61.171875,
+          "height": 29.09375,
+          "within": true
+        }
+      ]
+    }
+  ],
+  "details": [
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "EURUSD",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767305040000,
+        "end": 1794607200000,
+        "timeframe": "M1",
+        "version_id": "13f01a3b-7210-4e86-8809-25b48cef4795"
+      },
+      "tags": [
+        "M1派生",
+        "bid",
+        "NY17"
+      ]
+    },
+    {
+      "symbol": "01810",
+      "mode": "base_d1",
+      "history_range": {
+        "start": 1609718400000,
+        "end": 1794557400000,
+        "timeframe": "D1",
+        "version_id": "de353c52-e2e3-48d7-92a1-a58a5b2a4354"
+      },
+      "tags": [
+        "D1派生",
+        "原始价格",
+        "不复权",
+        "来源交易日"
+      ]
+    },
+    {
+      "symbol": "600900",
+      "mode": "base_d1",
+      "history_range": {
+        "start": 1069113600000,
+        "end": 1794553800000,
+        "timeframe": "D1",
+        "version_id": "8ceb9872-d54c-4355-9b52-1ad93362d8de"
+      },
+      "tags": [
+        "D1派生",
+        "原始价格",
+        "不复权",
+        "来源交易日"
+      ]
+    },
+    {
+      "symbol": "USDCAD",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1790802000000,
+        "end": 1794607200000,
+        "timeframe": "M1",
+        "version_id": "a8c99b11-4fe2-4a08-9e13-8705eb34e628"
+      },
+      "tags": [
+        "M1派生",
+        "bid",
+        "NY17"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    },
+    {
+      "symbol": "BTCUSDT",
+      "mode": "base_m1",
+      "history_range": {
+        "start": 1767225600000,
+        "end": 1794664320000,
+        "timeframe": "M1",
+        "version_id": "bab3a63c-2b93-4122-a91b-d50e8117c5a0"
+      },
+      "tags": [
+        "M1派生",
+        "成交价",
+        "UTC0"
+      ]
+    }
+  ],
+  "shell": "a57f2d8f76d26e15",
+  "assets": [
+    {
+      "path": "/assets/mobile-D66hgLdv.css",
+      "sha256": "3e55572e673065989847e414d759f78891aa989f42bccfbe2793b1a300bbba8d"
+    },
+    {
+      "path": "/assets/mobile-DWib0HZF.js",
+      "sha256": "0ba9fc84c6565c7491f9523b9b51bcb81f6acf712f0857bbef0c2e9967df979b"
+    }
+  ],
+  "backend_sha256": "9061caf203f3705fe6269497199fe2bc79b4838aad5b955b2e54534c4f66dff9",
+  "apk_update": {
+    "status": 200,
+    "version": "0.1.3",
+    "hash_matches": true
+  },
+  "images": {
+    "api": "sha256:ef51751b121e3ca22699aec250953c8070ce0873c328c9379d43f27c1058b529",
+    "web": "sha256:156693d60d11af3f506d39233ce86917c295d177c9b5128d8718389a4de2ebe0"
+  },
+  "errors": [],
+  "user_writes": [],
+  "automatic_read_and_cache_requests": [
+    "POST /api/market-data/quotes",
+    "POST /api/market-data/sparklines",
+    "POST /api/market-data/resolve",
+    "POST /api/charts/stream/subscribe",
+    "POST /api/market-data/sparklines/prepare"
+  ],
+  "passed": true
+}

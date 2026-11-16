@@ -1,7 +1,10 @@
-import SymbolInfo from "./SymbolInfo";
+import { logEvent } from "./logs";
+import SymbolIdentityRow from "./SymbolIdentityRow";
+import { sourceLabel, configurationDifference } from "./marketIdentity";
 import { SymbolSearchPanel, SymbolSearchRow } from "./SymbolSearch";
 import { useSymbolSearch } from "./useSymbolSearch";
 import { watchSymbolPage } from "./watchSymbolSearch";
+import { SymbolSearchFilters, type SymbolSearchFilterState } from "./SymbolSearchFilters";
 import { useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../api";
 import {
@@ -124,6 +127,7 @@ type DataPageProps = {
   report(message: string): void;
   searchMode?: boolean;
   initialGroup?: string;
+  searchFilters?: SymbolSearchFilterState;
 };
 
 export default function DataPage(props: DataPageProps) {
@@ -155,6 +159,7 @@ function DataContent({
   report,
   searchMode = false,
   initialGroup = "",
+  searchFilters,
 }: DataPageProps) {
   const [query, setQuery] = useState("");
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -187,6 +192,7 @@ function DataContent({
     afterDetails = useRef<(() => void) | undefined>(undefined),
     afterVersions = useRef<(() => void) | undefined>(undefined);
   const adding = useRef(false);
+  const retained = useRef(new Map<string, string>());
   useEffect(
     () => () => {
       supportRequest.current?.abort();
@@ -196,11 +202,11 @@ function DataContent({
   );
   const result = useSymbolSearch<Row>({
     profile,
-    queryKey: JSON.stringify(["watch-unified-v2", query]),
+    queryKey: JSON.stringify(["watch-unified-v3", query, searchFilters?.value]),
     active: visible && !detailsOpen,
     online,
     identity: rowKey,
-    fetchPage: (cursor, signal) => watchSymbolPage(query, cursor, signal),
+    fetchPage: (cursor, signal) => watchSymbolPage(query, cursor, signal, [...retained.current.values()], searchFilters?.value),
   });
   useEffect(() => {
     if (!visible || !online) return;
@@ -299,6 +305,7 @@ function DataContent({
     report,
   ]);
   async function add(row: Row) {
+    setDetailError("");
     if (!online || adding.current) return;
     adding.current = true;
     setBusy(true);
@@ -314,9 +321,10 @@ function DataContent({
       if (
         allSymbols(content).includes(row.ticker)
       ) {
+        retained.current.set(rowKey(row), row.ticker);
+        setFavorites(allSymbols(content));
+        setGroups(content.lists);
         setAdded(true);
-        result.remove(item => rowKey(item) === rowKey(row));
-        result.refresh();
         return;
       }
       const saved = await saveWatchlists(
@@ -325,19 +333,19 @@ function DataContent({
         addSymbol(content, row.ticker, targetGroup),
       );
       if (!profileActive(profile)) return;
+      retained.current.set(rowKey(row), row.ticker);
       setFavorites(allSymbols(watchContent(saved)));
       setGroups(watchContent(saved).lists);
       setAdded(true);
-      result.remove(item => rowKey(item) === rowKey(row));
-      result.refresh();
       await writeSnapshot(profile, "watchlists", saved).catch(() =>
         report("自选已保存，本机快照未更新"),
       );
       dispatchEvent(new Event("mw-mobile-watchlists-changed"));
       const savedLists = watchContent(saved).lists;
       const savedGroup = savedLists.find((list) => list.id === targetGroup) || savedLists[0];
-      report("已加入自选 · " + (savedGroup?.title || "自选列表"));
+      logEvent({module:"自选",action:"添加自选",object:row.code || row.ticker,message:"已加入 · " + (savedGroup?.title || "自选列表"),result:"success"});
     } catch (error) {
+      setDetailError(errorMessage(error));
       report(String(error));
     } finally {
       adding.current = false;
@@ -354,6 +362,7 @@ function DataContent({
     setAdded(!!detailTicker && favorites.includes(detailTicker));
   }, [detailTicker, targetGroup, groups, favorites]);
   async function openRow(row: Row, fromDetails = false) {
+    setDetailError("");
     if (adding.current) return;
     adding.current = true;
     setBusy(true);
@@ -363,6 +372,7 @@ function DataContent({
       if (fromDetails) showChart(current.ticker);
       else open(current.ticker);
     } catch (error) {
+      setDetailError(errorMessage(error));
       report(errorMessage(error));
     } finally {
       adding.current = false;
@@ -492,11 +502,13 @@ function DataContent({
     afterDetails.current = () => open(ticker);
     setDetailsOpen(false);
   }
+  // Cached results may belong to a previous opening. Only this opening's
+  // additions remain visible; pre-existing membership stays excluded.
+  const searchItems = result.items.filter(row => retained.current.has(rowKey(row)) ||
+    !row.ticker || !favorites.includes(row.ticker));
   const typeName = marketType;
   const displaySource = (row: Row) =>
-    row.source_display ||
-    sources.find(([value]) => value === row.source)?.[1] ||
-    row.source;
+    sourceLabel(row.source_display || sources.find(([value]) => value === row.source)?.[1] || row.source);
   const panelError = (message: string, retry: () => void) => (
     <Alert variant="destructive" className="data-feedback">
       <Info aria-hidden="true" />
@@ -510,9 +522,11 @@ function DataContent({
   const listing = (
     <SymbolSearchPanel
       query={query}
-      resetKey={query}
+      resetKey={JSON.stringify([query, searchFilters?.value])}
+      maxLength={90}
       onQuery={setQuery}
       label="搜索代码或中文"
+      enhancedFilters={searchFilters && <SymbolSearchFilters state={searchFilters} />}
       active={visible && !detailsOpen}
       online={online}
       loading={result.loading}
@@ -521,22 +535,16 @@ function DataContent({
       retry={result.retry}
       hasNext={!!result.next}
       loadNext={result.loadNext}
-      note={
-        result.readAt && (
-          <p className="data-caption">
-            上次读取 {dateTime(result.readAt)} · 联网后核验
-          </p>
-        )
-      }
     >
-      {result.loaded && !result.items.length && (
+      {detailError && !detailsOpen && <p className="mobile-inline-error" role="alert">{detailError}</p>}
+      {result.loaded && !searchItems.length && (
         <MobileEmpty title="没有符合条件的行情">
           尝试其他代码或中文名称。
         </MobileEmpty>
       )}
       <div className="symbol-search-results">
-        {result.items.map((row) => {
-          const present = !!row.ticker && favorites.includes(row.ticker);
+        {searchItems.map((row) => {
+          const present = retained.current.has(rowKey(row)) || (!!row.ticker && favorites.includes(row.ticker));
           return (
             <SymbolSearchRow
               key={rowKey(row)}
@@ -565,29 +573,9 @@ function DataContent({
                 </MobileButton>
               }
             >
-              <SymbolInfo
-                code={row.display_symbol || row.symbol || row.ticker}
-                name={row.instrument_name || row.description || ""}
-                source={displaySource(row)}
-                custom={!!row.managed}
-              />
-              {row.managed &&
-                result.items.filter(
-                  (other) =>
-                    other.managed && other.display_symbol === row.display_symbol &&
-                    other.source === row.source,
-                ).length > 1 && (
-                  <small className="symbol-configuration">
-                    {[
-                      row.identity?.mode,
-                      row.aggregation_calendar,
-                      row.identity?.basis,
-                      row.identity?.adjustment,
-                    ]
-                      .filter(Boolean)
-                      .join(" · ")}
-                  </small>
-                )}
+              <SymbolIdentityRow row={row} code={row.display_symbol || row.symbol || row.ticker}
+                name={row.instrument_name || row.description || ""} custom={!!row.managed}
+                configuration={row.managed ? configurationDifference(row, searchItems.filter(other=>other.managed && other.display_symbol===row.display_symbol && other.source===row.source)) : ""}/>
             </SymbolSearchRow>
           );
         })}
@@ -696,7 +684,7 @@ function DataContent({
                 selected.description ||
                 displaySource(selected)}
             </p>
-            {detail?.cachedAt && (
+            {detail?.cachedAt && (!online || detailError) && (
               <Alert className="data-feedback" role="status">
                 <AlertTitle>上次读取的详情</AlertTitle>
                 <AlertDescription>
@@ -722,17 +710,20 @@ function DataContent({
                 <dl className="mobile-facts data-facts">
                   {[
                     [
-                      "来源",
+                      "行情来源",
                       displaySource({
                         ticker: selected.ticker,
                         source_display: detail.source_display,
                         source: detail.historical_source || detail.source,
                       }) || displaySource(selected),
                     ],
+                    ["采集通道", detail.mobile_identity?.channel || (detail.source === "akshare" ? "AKShare" : undefined)],
+                    ["完整代码", detail.mobile_identity?.provider_symbol],
+                    ["类别", detail.mobile_identity?.category],
                     [
                       "数据状态",
                       detail.cachedAt
-                        ? "上次读取 · 当前待确认"
+                        ? !online ? "离线" : detailError ? "核验失败" : "核验中"
                         : selected.ticker.startsWith("MWP:")
                           ? "目录可查询"
                           : statusLabel(
@@ -771,8 +762,7 @@ function DataContent({
                     ],
                     [
                       "接续来源",
-                      detail.live_source_display ||
-                        detail.mapping?.source_display,
+                      sourceLabel(detail.live_source_display || detail.mapping?.source_display),
                     ],
                     [
                       "拼接点",

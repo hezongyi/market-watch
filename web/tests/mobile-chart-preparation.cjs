@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
 const {indexedDB}=require('fake-indexeddb');
 const compile=file=>ts.transpileModule(fs.readFileSync(file,'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText;
-const cache={};vm.runInNewContext(compile('src/mobile/cache.ts'),{exports:cache,indexedDB,Promise,Error,Date,Array,Object,window:{location:{origin:'https://phone.test'}}});
+const cache={};vm.runInNewContext(compile('src/mobile/cache.ts'),{exports:cache,indexedDB,Event,dispatchEvent:()=>{},Promise,Error,Date,Array,Object,window:{location:{origin:'https://phone.test'}}});
 const identity={};vm.runInNewContext(compile('src/mobile/chartIdentity.ts'),{exports:identity});
 const preview={};vm.runInNewContext(compile('src/mobile/chartPreview.ts'),{exports:preview,require:name=>name==='./chartIdentity'?identity:cache,Promise,Error,Date,Array,Object,JSON});
 const pending=[],timers=new Map();let nextTimer=0,configReads=0,resources=0;

@@ -4,12 +4,13 @@ from sqlalchemy import func, select
 
 from .composite_center import SCOPE, runtime_status
 from .composite_definitions import definition
-from .composite_matching import saved_mapping_valid
+from .composite_matching import continuation_blocker, saved_mapping_valid
 from .composite_quotes import snapshot_values
 from .config import settings
 from .history_catalog import account_scope
 from .live_pricing import account_key
 from .managed_continuation import default_key
+from .market_contracts import DatasetIdentity
 from .storage import (
     CompositePreparation,
     CompositeRevision,
@@ -39,11 +40,13 @@ def summaries(db, datasets, switches):
         "configured": False, "status": "disabled", "can_enable": False,
         "can_disable": bool(switches.get("managed_realtime:" + item.instrument_id, {}).get("enabled", False)),
         "disabled_reason": "待配置", "default_mapping_id": None} for item in datasets}
+    entries = list(db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+        MarketCatalog.available.is_(True))))
+    blockers = {item.id: continuation_blocker(DatasetIdentity.model_validate(item.identity), entries)
+        for item in datasets}
     for item in datasets:
-        if item.identity.get("mode", "base_m1") != "base_m1" or item.identity.get("basis") != "bid":
-            result[item.id]["disabled_reason"] = "不支持"
-        elif not settings.oanda_account_id or not settings.oanda_token:
-            result[item.id]["disabled_reason"] = "待配置"
+        if blockers[item.id]:
+            result[item.id]["disabled_reason"] = blockers[item.id][0]
     if not mapped:
         for row in result.values():
             row["status"] = "attention" if row["enabled"] else "disabled"
@@ -70,9 +73,6 @@ def summaries(db, datasets, switches):
             MarketDataset, MarketDataset.id == RealtimeMapping.target_dataset_id).join(
             Instrument, Instrument.id == MarketDataset.instrument_id).where(RealtimeMapping.id.in_(missing))))
     targets = {target.id: (target, inst) for _, target, inst in mapped}
-    entries = list(db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
-        MarketCatalog.symbol.in_([target.identity["provider_symbol"] for target, _ in targets.values()]),
-        MarketCatalog.available.is_(True))))
     catalogs = {entry.symbol: entry for entry in entries
                 if entry.metadata_json.get("history_account_scope") == account_scope()}
     states = {state.dataset_id: state for state in db.scalars(select(LiveState).where(LiveState.dataset_id.in_(targets)))}
@@ -113,13 +113,12 @@ def summaries(db, datasets, switches):
         row["default_mapping_id"] = mapping.id if mapping else None
         row["status"] = "attention" if row["enabled"] else "disabled"
         if mapping is None:
-            if row["disabled_reason"] != "不支持":
+            if blockers[dataset.id] is None:
                 row["disabled_reason"] = "账户变更" if row["configured"] else "待配置"
             continue
         *_, ident = definition(db, dataset.id, mapping.id)
         current = configurations.get(ident)
-        supported = (dataset.identity.get("mode", "base_m1") == "base_m1" and dataset.identity.get("basis") == "bid"
-            and bool(settings.oanda_account_id and settings.oanda_token))
+        supported = blockers[dataset.id] is None
         ready = current is not None
         if not ready and dataset.id in baselines:
             from .domain import session_bounds

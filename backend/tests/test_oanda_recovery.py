@@ -26,6 +26,7 @@ def assert_maintenance_fence(factory, ownership, epoch, identities, monkeypatch)
     from legacy_records import archived_watch
 
     monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+    monkeypatch.setattr(settings, 'oanda_acquisition_mode', 'rest_batch')
     first, other = identities['EUR_USD'], identities['XAU_USD']
     for identity in identities.values():
         live.commit_confirmation(ownership, epoch, candles(identity), now=125000)
@@ -67,7 +68,8 @@ def test_maintenance_confirmation_fences_crossing_and_other_symbol_before_stream
 
 
 @pytest.mark.parametrize('stage', ['confirmation', 'startup', 'disconnect', 'intentional_disconnect'])
-def test_new_unauthorized_upgrades_maintenance_without_losing_auth_hold(running, stage):
+def test_new_unauthorized_upgrades_maintenance_without_losing_auth_hold(running, monkeypatch, stage):
+    monkeypatch.setattr(settings, 'oanda_acquisition_mode', 'rest_batch')
     factory, ownership, epoch, identities = running
     identity = identities['EUR_USD']
     live.commit_confirmation(ownership, epoch, candles(identity, rows=(), checkpoint=0,
@@ -121,7 +123,8 @@ def test_stream_unauthorized_wins_over_concurrent_rest_maintenance(running, monk
     (('unauthorized', 'provider_maintenance'), 'unauthorized'),
     (('provider_maintenance', 'data'), 'provider_maintenance'),
 ])
-def test_already_issued_confirmation_pair_preserves_strongest_fault(running, statuses, expected):
+def test_already_issued_confirmation_pair_preserves_strongest_fault(running, monkeypatch, statuses, expected):
+    monkeypatch.setattr(settings, 'oanda_acquisition_mode', 'rest_batch')
     factory, ownership, epoch, identities = running
     calls = []
     results = dict(zip(identities, statuses))

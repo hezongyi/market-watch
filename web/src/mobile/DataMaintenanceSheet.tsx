@@ -1,3 +1,4 @@
+import { sourceLabel } from "./marketIdentity";
 import { useRef, useState } from "react";
 import { ApiError } from "../api";
 import { editableFramePlan } from "../market-data/FrameSchedules";
@@ -344,7 +345,7 @@ export default function DataMaintenanceSheet({
       <div className="data-workflow-form">
         <div className="data-selection">
           <strong>{managedCode(dataset)}</strong>
-          <span>{dataset.source_display || dataset.identity.source}</span>
+          <span>{sourceLabel(dataset.source_display) || dataset.identity.source}</span>
         </div>
         {view === "settings" && (
           <form
@@ -458,7 +459,7 @@ export default function DataMaintenanceSheet({
                 !!conflict
               }
             >
-              {command.busy ? "正在保存…" : "保存维护设置"}
+              {command.busy ? "正在保存…" : command.notice ? "已保存" : "保存维护设置"}
             </Button>
             <p className="data-caption">
               保存设置不另行提交更新，当前任务保持原范围。
@@ -513,7 +514,7 @@ export default function DataMaintenanceSheet({
               type="submit"
               disabled={mutationLocked}
             >
-              提交{kind === "backfill" ? "补数" : "复查"}
+              {command.busy ? "正在提交…" : command.notice ? "已提交" : `提交${kind === "backfill" ? "补数" : "复查"}`}
             </Button>
           </form>
         )}
@@ -655,7 +656,6 @@ export default function DataMaintenanceSheet({
         <DataFeedback
           error={command.error || result.error}
           notice={
-            command.notice ||
             (!online ? "当前为离线快照，联网后可操作" : undefined)
           }
         />

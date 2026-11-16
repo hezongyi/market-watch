@@ -46,9 +46,21 @@ def router(authenticated):
     def listing(instrument: str | None = None, status: str | None = None, search: str = ""):
         return read_operation(application.listing, instrument=instrument, status=status, search=search)
 
+    @api.get("/page")
+    def rule_page(status: str | None = None, limit: int = 50, before: str | None = None):
+        return read_operation(application.rules_page, status=status, limit=limit, before=before)
+
     @api.get("/events")
     def events(alert_id: str | None = None, limit: int = 100):
         return read_operation(application.events, alert_id=alert_id, limit=limit)
+
+    @api.get("/events/page")
+    def event_page(alert_id: str | None = None, limit: int = 50, before: str | None = None):
+        return read_operation(application.events_page, alert_id=alert_id, limit=limit, before=before)
+
+    @api.get("/events/{event_id}")
+    def event_detail(event_id: str):
+        return read_operation(application.read_event, event_id)
 
     @api.get("/{alert_id}")
     def read(alert_id: str):

@@ -1,0 +1,9 @@
+{"at": "2026-11-16T03:45:08.775549+00:00", "mode": "stream", "proxy_configured": true, "probe_interval_seconds": 300}
+{"route": "configured", "operation": "account_summary", "http_status": 200, "seconds": 0.98, "json_valid": true}
+{"route": "configured", "operation": "minute_candles", "http_status": 200, "seconds": 0.29, "json_valid": true}
+{"route": "configured", "operation": "pricing_stream", "symbols": ["EUR_USD", "USD_CAD", "XAU_USD", "USD_JPY"], "prices": ["EUR_USD", "USD_CAD", "USD_JPY", "XAU_USD"], "http_status": 200, "seconds": 1.37}
+{"route": "configured", "operation": "pricing_stream", "symbols": ["EUR_USD", "USD_CAD", "XAU_USD"], "prices": ["EUR_USD", "USD_CAD", "XAU_USD"], "http_status": 200, "seconds": 1.68}
+{"route": "configured", "operation": "pricing_stream", "symbols": ["USD_JPY"], "prices": ["USD_JPY"], "http_status": 200, "seconds": 1.42}
+{"route": "direct", "operation": "account_summary", "http_status": 200, "seconds": 0.9, "json_valid": true}
+{"route": "direct", "operation": "minute_candles", "http_status": 200, "seconds": 0.27, "json_valid": true}
+{"route": "direct", "operation": "pricing_stream", "symbols": ["EUR_USD", "USD_CAD", "XAU_USD", "USD_JPY"], "prices": ["EUR_USD", "USD_CAD", "USD_JPY", "XAU_USD"], "http_status": 200, "seconds": 1.31}

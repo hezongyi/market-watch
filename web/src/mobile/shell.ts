@@ -1,3 +1,4 @@
+import { logEvent, logFailure, setLogVersions } from "./logs";
 import { useEffect, useRef, useState } from "react";
 
 declare global {
@@ -19,6 +20,7 @@ export function useMobileShell(
   hasInput: () => boolean,
   theme: "light" | "dark",
 ) {
+  const [error,setError] = useState("");
   const [info, setInfo] = useState<{
     appVersion?: string;
     webViewVersion?: string;
@@ -36,11 +38,17 @@ export function useMobileShell(
   useEffect(() => {
     if (window.MWMobileHost) {
       window.MWMobileHost.onmessage = (event) => {
-        const result = JSON.parse(event.data);
-        if (result.version !== protocol || result.error)
-          alert(result.error || "请更新 APK：页面协议不兼容");
-        else if (result.appUpdate) setAppUpdate(result.appUpdate);
-        else setInfo(result);
+        try {
+          const result = JSON.parse(event.data);
+          if (result.version !== protocol || result.error) {
+            const message=result.error || "请更新 APK：页面协议不兼容";
+            setError(message);logFailure("应用","APK 桥接",message);
+          } else if (result.appUpdate) {
+            setAppUpdate(result.appUpdate);
+            logEvent({module:"应用",action:"APK 更新",message:result.appUpdate.label,level:result.appUpdate.status==="error" ? "error" : "info"});
+          } else {setInfo(result);setLogVersions(undefined,result.appVersion);}
+        } catch {setError("APK 返回内容无法读取");logFailure("应用","APK 桥接","APK 返回内容无法读取");}
+
       };
       host("hello");
     }
@@ -85,11 +93,13 @@ export function useMobileShell(
       navigator.serviceWorker.removeEventListener("controllerchange", reload);
     };
   }, []);
+  useEffect(() => { if(update)logEvent({module:"应用",action:"发现网页更新",message:"可在更多的检查更新中应用"}); },[update]);
   useEffect(() => {
     if (info?.capabilities?.includes("appearance-v1")) host("appearance", { theme });
   }, [theme, info]);
   return {
     update,
+    error,
     info,
     appUpdate,
     checkUpdates: async () => {
@@ -123,7 +133,7 @@ export function useMobileShell(
     },
     configure: () => {
       if (window.MWMobileHost) host("configure");
-      else alert("请在浏览器打开新的可信 HTTPS 服务器地址 /m/。");
+      else {const message="请在浏览器打开新的可信 HTTPS 服务器地址 /m/。";setError(message);logFailure("应用","切换服务器",message);}
     },
     clearCookies: () => host("clear-session"),
     exit: () => host("exit"),

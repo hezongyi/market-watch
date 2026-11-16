@@ -1,0 +1,14 @@
+AssertionError [ERR_ASSERTION]: Expected values to be strictly equal:
+
+'FX000外汇' !== 'FX000'
+
+    at module.exports (/home/quant/repos/market-watch-managed-live-rollover-20261113/web/tests/mobile-data-categories.scenario.cjs:26:69)
+    at async /home/quant/repos/market-watch-managed-live-rollover-20261113/web/tests/mobile-data-workflow.browser.cjs:724:7 {
+  generatedMessage: true,
+  code: 'ERR_ASSERTION',
+  actual: 'FX000外汇',
+  expected: 'FX000',
+  operator: 'strictEqual',
+  diff: 'simple'
+}
+[{"path":"/api/login"}]

@@ -1,3 +1,4 @@
+import { sourceLabel } from "./marketIdentity";
 import { useEffect, useRef, useState } from "react";
 import { ApiError } from "../api";
 import type { CatalogItem } from "../market-data/CreationCatalog";
@@ -242,7 +243,7 @@ export default function DataContinuationSheet({
       <div className="data-workflow-form">
         <div className="data-selection">
           <strong>{managedCode(dataset)}</strong>
-          <span>{sourceName(dataset.identity.source)} → OANDA Practice</span>
+          <span>{sourceLabel(dataset.source_display) || sourceName(dataset.identity.source)} → OANDA Practice</span>
         </div>
         <DataFeedback
           error={current.error || command.error || checkError}

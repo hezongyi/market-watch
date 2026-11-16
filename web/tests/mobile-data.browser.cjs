@@ -579,7 +579,7 @@ const server = http.createServer(async (req, res) => {
       [entries.provider.ticker],
     );
     assert.equal(pref.content.value.active, "desktop");
-    await page.getByRole("button", { name: "关闭通知", exact: true }).click();
+    await expect(page.locator('.mobile-toast')).toHaveCount(0);
     await close();
     await detail();
     // Another window removed the member; a failed re-add must keep the detail.
@@ -599,7 +599,15 @@ const server = http.createServer(async (req, res) => {
       [],
     );
     fail.save = false;
-    await page.getByRole("button", { name: "关闭通知", exact: true }).click();
+    await expect(page.locator('.mobile-toast')).toHaveCount(0);
+    await close();
+    hold.detail = true;
+    await detail();
+    await expect(dialog().getByText('核验中', {exact:true})).toBeVisible();
+    await expect(dialog().getByText('上次读取的详情', {exact:true})).toHaveCount(0);
+    await shot('detail-cache-revalidation-pending');
+    hold.detail = false; release.detail();
+    await expect(dialog().getByText('核验中', {exact:true})).toHaveCount(0);
     await close();
     fail.detail = true;
     await detail();
@@ -661,9 +669,8 @@ const server = http.createServer(async (req, res) => {
       document.dispatchEvent(new Event("visibilitychange")),
     );
     await expect(catalog().first()).toBeVisible({ timeout: 15000 });
-    await expect(
-      dialog().getByText(/上次读取/).first(),
-    ).toBeVisible();
+    await expect(dialog().getByText(/上次读取.*联网后核验/)).toHaveCount(0);
+    await expect(dialog().locator('.symbol-search-footer')).toContainText('离线');
     await expect(
       page.locator(".mobile-search-content [role=alert]"),
     ).toHaveCount(0);
@@ -712,7 +719,8 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: /^添加 / })
       .click();
     await expect.poll(() => pref.content.value.lists.some(l => l.symbols.includes(entries.composite.ticker))).toBe(true);
-    await expect(catalog()).toHaveCount(0);
+    await expect(catalog()).toHaveCount(1);
+    await expect(catalog().getByRole("button", { name: /^已添加 / })).toBeDisabled();
     assert(
       pref.content.value.lists.some((l) =>
         l.symbols.includes(entries.composite.ticker),
@@ -723,7 +731,7 @@ const server = http.createServer(async (req, res) => {
         l.symbols.includes(entries.history.ticker),
       ),
     );
-    await page.getByRole("button", { name: "关闭通知", exact: true }).click();
+    await expect(page.locator('.mobile-toast')).toHaveCount(0);
     // A different client removes the watched identity before eligibility checks.
     pref.content.value.lists.forEach(l => l.symbols = []);
     continuationReady = false;
@@ -764,7 +772,7 @@ const server = http.createServer(async (req, res) => {
         l.symbols.includes(entries.history.ticker),
       ),
     );
-    await page.getByRole("button", { name: "关闭通知", exact: true }).click();
+    await expect(page.locator('.mobile-toast')).toHaveCount(0);
     await close();
     proof.checks.push(
       "shared MWC/MWH selection; preparing/unpublished guards; no fallback identity; offline recovery and reduced motion",

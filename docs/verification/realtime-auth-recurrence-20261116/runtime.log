@@ -1,0 +1,13 @@
+2026-11-16 03:19:10,401 INFO pricing_connection_stopping reason=subscription_change epoch=124
+2026-11-16 03:19:19,396 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=125 http_status=401 body_kind=json elapsed_ms=6320 since_record_ms=- records=0
+2026-11-16 03:19:19,397 WARNING pricing_stream_ended status=unauthorized stage=stream type=HTTPStatusError sqlstate=- epoch=125
+2026-11-16 03:24:25,365 WARNING pricing_transport_failed phase=tls route=proxy_tls type=ConnectError epoch=1 http_status=- body_kind=other elapsed_ms=5064 since_record_ms=- records=0
+2026-11-16 03:24:25,366 WARNING pricing_auth_probe_failed status=unavailable stage=auth_probe type=ConnectError sqlstate=- epoch=None
+2026-11-16 03:29:34,734 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=126 http_status=401 body_kind=json elapsed_ms=6257 since_record_ms=- records=0
+2026-11-16 03:29:34,734 WARNING pricing_stream_ended status=unauthorized stage=stream type=HTTPStatusError sqlstate=- epoch=126
+2026-11-16 03:34:43,412 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=1 http_status=401 body_kind=json elapsed_ms=7840 since_record_ms=- records=0
+2026-11-16 03:34:43,412 WARNING pricing_auth_probe_failed status=unauthorized stage=auth_probe type=HTTPStatusError sqlstate=- epoch=None
+2026-11-16 03:39:52,022 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=127 http_status=401 body_kind=json elapsed_ms=6094 since_record_ms=- records=0
+2026-11-16 03:39:52,023 WARNING pricing_stream_ended status=unauthorized stage=stream type=HTTPStatusError sqlstate=- epoch=127
+2026-11-16 03:44:59,178 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=1 http_status=401 body_kind=json elapsed_ms=6068 since_record_ms=- records=0
+2026-11-16 03:44:59,178 WARNING pricing_auth_probe_failed status=unauthorized stage=auth_probe type=HTTPStatusError sqlstate=- epoch=None

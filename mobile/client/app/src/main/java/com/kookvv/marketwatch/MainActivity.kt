@@ -21,10 +21,7 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.WebStorage
-import android.widget.Button
-import android.widget.EditText
 import android.widget.LinearLayout
-import android.widget.TextView
 import androidx.activity.ComponentActivity
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.SystemBarStyle
@@ -43,6 +40,7 @@ class MainActivity : ComponentActivity() {
     private var connectionDialog: AlertDialog? = null
     private var updater: AppUpdater? = null
     private var safeContainer: View? = null
+    private var serverSettings: ServerSettingsView? = null
     private val lightAppearance get() = preferences.getString("appearance", "dark") == "light"
     private val surfaceColor get() = Color.parseColor(if (lightAppearance) "#f8f9fc" else "#101317")
     private val installPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -56,6 +54,12 @@ class MainActivity : ComponentActivity() {
         WebView.setWebContentsDebuggingEnabled(BuildConfig.DEBUG)
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
+                serverSettings?.let { settings ->
+                    if (ViewCompat.getRootWindowInsets(settings)?.isVisible(WindowInsetsCompat.Type.ime()) == true)
+                        WindowInsetsControllerCompat(window, settings).hide(WindowInsetsCompat.Type.ime())
+                    else settings.goBack()
+                    return
+                }
                 val view = web
                 if (view == null) { finish(); return }
                 if (ViewCompat.getRootWindowInsets(view)?.isVisible(WindowInsetsCompat.Type.ime()) == true) {
@@ -84,35 +88,18 @@ class MainActivity : ComponentActivity() {
         origin = null
         connectionDialog?.dismiss(); connectionDialog = null
         web?.destroy(); web = null
-        val layout = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(32, 48, 32, 24) }
-        val title = TextView(this).apply { text = "连接守望\n输入可信 HTTPS 服务器地址"; textSize = 20f }
-        val address = EditText(this).apply {
-            inputType = android.text.InputType.TYPE_CLASS_TEXT or android.text.InputType.TYPE_TEXT_VARIATION_URI
-            hint = "https://服务器地址"; setText(preferences.getString("origin", "")); minHeight = 96
-        }
-        val error = TextView(this)
-        val foreground = Color.parseColor(if (lightAppearance) "#17202a" else "#f0f2f5")
-        title.setTextColor(foreground)
-        address.setTextColor(foreground)
-        address.setHintTextColor(Color.parseColor(if (lightAppearance) "#596574" else "#aab3bf"))
-        address.backgroundTintList = android.content.res.ColorStateList.valueOf(foreground)
-        error.setTextColor(foreground)
-        val connect = Button(this).apply {
-            text = "连接"
-            setOnClickListener {
-                val value = trustedOrigin(address.text.toString())
-                if (value == null) error.text = "请输入有效的 HTTPS 地址，不包含用户名、查询参数或其他页面路径"
-                else {
-                    val previous = preferences.getString("origin", null)
-                    preferences.edit().putString("origin", value).apply()
-                    if (previous != null && previous != value) {
-                        WebStorage.getInstance().deleteAllData()
-                        CookieManager.getInstance().removeAllCookies { open(value) }
-                    } else open(value)
-                }
-            }
-        }
-        layout.addView(title); layout.addView(address); layout.addView(error); layout.addView(connect)
+        val previous = preferences.getString("origin", null)
+        val layout = ServerSettingsView(this, lightAppearance, previous, ::trustedOrigin,
+            onConnect = { value ->
+                preferences.edit().putString("origin", value).apply()
+                if (previous != null && previous != value) {
+                    WebStorage.getInstance().deleteAllData()
+                    CookieManager.getInstance().removeAllCookies { open(value) }
+                } else open(value)
+            },
+            onBack = { if (previous != null) open(previous) else finish() },
+        )
+        serverSettings = layout
         setSafeContent(layout)
     }
 
@@ -128,6 +115,7 @@ class MainActivity : ComponentActivity() {
     @SuppressLint("SetJavaScriptEnabled")
     private fun open(value: String) {
         if (trustedOrigin(value) != value) { configure(); return }
+        serverSettings = null
         origin = value
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             AlertDialog.Builder(this).setMessage("请更新 Android System WebView 后重新打开守望")

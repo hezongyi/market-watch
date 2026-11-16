@@ -1,0 +1,19 @@
+{
+  "origin": "https://192.168.7.232:18447",
+  "staticSource": "deployed",
+  "checks": [
+    "真实配置保持开启，列表稳定呈现维护设置；运行详情默认收起、展开及关闭通过",
+    "375px浅色及412px深色150%字号截图无横向溢出"
+  ],
+  "errors": [],
+  "blockedWrites": [],
+  "screenshots": [
+    "list-light-375-14.png",
+    "detail-light-375-14.png",
+    "runtime-light-375-14.png",
+    "list-dark-412-21.png",
+    "detail-dark-412-21.png",
+    "runtime-dark-412-21.png"
+  ],
+  "passed": true
+}

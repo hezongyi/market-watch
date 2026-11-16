@@ -14,6 +14,41 @@ from test_market_contracts import identity
 from test_market_datasets import register
 
 
+@pytest.mark.parametrize("mode,frame,bounds", [
+    ("base_m1", "M1", (60000, 180000)),
+    ("base_d1", "D1", (0, 86400000)),
+    ("native_periods", "M1", (60000, 180000)),
+])
+def test_product_history_range_uses_one_materialized_base(database, mode, frame, bounds):
+    from types import SimpleNamespace
+
+    from alerts.data_center import _history_range
+    from alerts.storage import HistoryArtifact, HistoryArtifactBlock
+
+    with database.begin() as db:
+        register(db)
+        version = HistoryVersion(dataset_id=identity().key, start=-86400000,
+            end=172800000, cursor=172800000, status="published")
+        db.add(version)
+        db.flush()
+        available = {}
+        for period, start, end in [("M1", 60000, 180000), ("D1", 0, 86400000)]:
+            artifact = HistoryArtifact(id=period, version_id=version.id, timeframe=period,
+                rule_version="fixture", cursor=end, count=1, complete_count=1, status="published")
+            db.add(artifact)
+            db.flush()
+            db.add(HistoryArtifactBlock(artifact_id=artifact.id, start=start, end=end,
+                count=1, checksum="fixture", content=b"fixture"))
+            available[period] = artifact
+        db.flush()
+        dataset = SimpleNamespace(identity={"mode": mode})
+        assert _history_range(db, dataset, available) == {
+            "start": bounds[0], "end": bounds[1], "timeframe": frame, "version_id": version.id}
+        assert _history_range(db, dataset, {}) is None
+        db.query(HistoryArtifactBlock).filter_by(artifact_id=available[frame].id).delete()
+        assert _history_range(db, dataset, available) is None, "missing payload cannot use task bounds"
+
+
 def test_dataset_available_only_after_period_publication_and_pause_keeps_it(database):
     with database.begin() as db:
         register(db)
@@ -23,11 +58,14 @@ def test_dataset_available_only_after_period_publication_and_pause_keeps_it(data
     with database.begin() as db:
         detail = dataset_detail(db, identity().key)
         assert detail["usable_timeframes"] == []
+        assert detail["history_range"] is None
         assert dataset_list(db, status="available")["total"] == 0
     while artifact_tick(ident):
         pass
     with database.begin() as db:
         assert dataset_detail(db, identity().key)["usable_timeframes"] == ["H4", "M1"]
+        assert dataset_detail(db, identity().key)["history_range"] == {
+            "start": 0, "end": 120000, "timeframe": "M1", "version_id": ident}
         assert dataset_list(db, status="available")["total"] == 1
         db.get(DatasetMaintenance, identity().key).paused = True
         db.flush()
@@ -151,6 +189,8 @@ def test_new_m1_publication_preserves_previous_period_usability(database):
         assert detail["latest_version_id"] == child
         assert detail["usable_timeframes"] == ["H4", "M1"]
         assert all(p["available_version_id"] == parent for p in detail["periods"])
+        assert detail["history_range"]["version_id"] == parent
+        assert detail["history_range"]["end"] == 120000
         assert dataset_list(db, status="available")["total"] == 1
 
 

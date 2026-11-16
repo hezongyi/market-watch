@@ -42,7 +42,7 @@ const check = (message) => { if (!proof.checks.includes(message)) proof.checks.p
     await page.goto(origin + '/m/data');
     await page.getByLabel('密码', { exact: true }).fill(password);
     await page.getByRole('button', { name: '登录', exact: true }).click();
-    await expect(page.getByRole('button', { name: '搜索并添加行情', exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: '添加自建', exact: true })).toBeVisible();
     check('Isolated Docker mobile UI login and managed-only data home');
     if (phase === 'create') {
       for (const [code, supplier] of [['EURUSD', 'Dukascopy'], ['XAUUSD', 'Dukascopy'], ['AAPL', 'Yahoo Finance']]) {
@@ -51,7 +51,7 @@ const check = (message) => { if (!proof.checks.includes(message)) proof.checks.p
           check(code + ': existing real dataset displays supplier code on managed home');
           continue;
         }
-        await page.getByRole('button', { name: '搜索并添加行情', exact: true }).click();
+        await page.getByRole('button', { name: '添加自建', exact: true }).click();
         await select('来源', supplier);
         await dialog('添加行情').getByLabel('搜索原生行情', { exact: true }).fill(code);
         let result = dialog('添加行情').locator('.data-catalog-row').filter({ hasText: code });
@@ -213,7 +213,7 @@ const check = (message) => { if (!proof.checks.includes(message)) proof.checks.p
       check('Mobile managed live chart opens licensed native widget and receives real nonempty candles');
       await shot('real-mobile-chart');
       await page.getByRole('link', { name: '数据', exact: true }).click();
-      await expect(page.getByRole('button', { name: '搜索并添加行情', exact: true })).toBeVisible();
+      await expect(page.getByRole('button', { name: '添加自建', exact: true })).toBeVisible();
     } else if (phase === 'inspect') {
       for (const row of await list()) {
         await details(row.provider_display_symbol || row.display_symbol);

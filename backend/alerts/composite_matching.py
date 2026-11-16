@@ -4,12 +4,14 @@ Rules describe price products, never equivalence of broker trading contracts.
 Unknown products stay blocked; supplied URLs or a checkbox cannot create a rule.
 """
 
+import re
+from functools import lru_cache
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, HttpUrl, model_validator
 
 from .config import settings
-from .history_catalog import account_scope
+from .history_catalog import account_scope, asset_class
 from .market_contracts import DatasetIdentity
 from .storage import Instrument, MarketCatalog, MarketDataset
 
@@ -76,8 +78,18 @@ def selection(db, dataset_id, catalog_id):
     return dataset, historical, entry, snapshot
 
 
+@lru_cache(maxsize=1)
+def dukascopy_forex_symbols():
+    """Use the pinned SDK's FX family, not a six-letter symbol guess."""
+    from dukascopy_python import instruments
+
+    return frozenset(symbol for name, symbol in vars(instruments).items()
+        if name.startswith("INSTRUMENT_FX_") and isinstance(symbol, str)
+        and asset_class(name, symbol) == "forex")
+
+
 def product_rule(historical, entry):
-    """Explicit source + exact-symbol + provider-type allowlist, not fuzzy matching.
+    """Source-verified FX families + exact pairs; other products stay explicit.
 
     2026-10-22 source review: OANDA CURRENCY/METAL are API price categories.
     METAL does not establish the account's legal CFD/spot contract. Gold is
@@ -86,14 +98,17 @@ def product_rule(historical, entry):
     sources = [{"url": OA_TYPES, "scope": "v20 InstrumentType: CURRENCY / METAL / CFD"},
         {"url": OA_ACCOUNT, "scope": "当前 Practice 账户可交易目录、准确代码及精度"}]
     defaults, difference = {}, None
+    if historical.mode != "base_m1" or historical.basis != "bid":
+        return defaults, sources, difference
     if (historical.source == "dukascopy" and historical.channel == "python" and
             historical.environment == "historical" and historical.account_scope == "public"):
         sources += [{"url": DK_HISTORY, "scope": "Dukascopy 历史报价来源"}]
-        fx = {"EUR/USD": ("EUR_USD", "EUR", "USD"), "USD/CAD": ("USD_CAD", "USD", "CAD")}
-        if historical.provider_symbol in fx and entry.asset_type == "CURRENCY":
-            code, base, quote = fx[historical.provider_symbol]
-            if code == entry.symbol:
-                sources += [{"url": DK_FX, "scope": "JForex 外汇报价；仅 EUR/USD、USD/CAD"}]
+        pair = re.fullmatch(r"([A-Z]{3})/([A-Z]{3})", historical.provider_symbol)
+        if (pair and historical.provider_symbol in dukascopy_forex_symbols()
+                and entry.asset_type == "CURRENCY"):
+            base, quote = pair.groups()
+            if base != quote and f"{base}_{quote}" == entry.symbol:
+                sources += [{"url": DK_FX, "scope": "JForex 外汇报价；SDK 外汇分类与当前账户 CURRENCY 准确货币对一致"}]
                 defaults = dict(underlying=base, quote_currency=quote, historical_product="spot_fx",
                     live_product="spot_fx", relationship="same_product")
         elif historical.provider_symbol == "XAU/USD" and entry.symbol == "XAU_USD" and entry.asset_type == "METAL":
@@ -101,17 +116,32 @@ def product_rule(historical, entry):
             defaults = dict(underlying="XAU", quote_currency="USD", historical_product="cfd",
                 live_product="metal_quote", relationship="same_underlying_different_product")
             difference = "历史为 Dukascopy 滚动黄金 CFD 报价；实时为 OANDA METAL 报价。二者同为 XAU/USD，但不是同一产品或经纪商合约，保留原价差异。"
-    elif (historical.source == "oanda" and historical.environment == "practice" and
+    elif (historical.source == "oanda" and historical.channel == "v20" and historical.environment == "practice" and
             historical.account_scope == account_scope() and historical.provider_symbol == entry.symbol):
-        known = {"EUR_USD": ("EUR", "USD", "CURRENCY", "spot_fx"),
-            "USD_CAD": ("USD", "CAD", "CURRENCY", "spot_fx"),
-            "XAU_USD": ("XAU", "USD", "METAL", "metal_quote")}
-        if entry.symbol in known:
-            base, quote, kind, product = known[entry.symbol]
-            if kind == entry.asset_type:
-                defaults = dict(underlying=base, quote_currency=quote, historical_product=product,
-                    live_product=product, relationship="same_product")
+        pair = re.fullmatch(r"([A-Z]{3})_([A-Z]{3})", entry.symbol)
+        if pair and pair[1] != pair[2] and entry.asset_type == "CURRENCY":
+            defaults = dict(underlying=pair[1], quote_currency=pair[2], historical_product="spot_fx",
+                live_product="spot_fx", relationship="same_product")
+        elif entry.symbol == "XAU_USD" and entry.asset_type == "METAL":
+            defaults = dict(underlying="XAU", quote_currency="USD", historical_product="metal_quote",
+                live_product="metal_quote", relationship="same_product")
     return defaults, sources, difference
+
+
+def continuation_blocker(historical, entries):
+    """Shared short list label and detailed reason; None means configurable."""
+    if historical.mode != "base_m1" or historical.basis != "bid":
+        return "不支持", "实时接续目前只支持已核实品种的 M1 基础 Bid 行情"
+    if not settings.oanda_account_id or not settings.oanda_token:
+        return "未配来源", "OANDA Practice 连接尚未配置"
+    current = [entry for entry in entries if entry.available
+        and entry.metadata_json.get("history_account_scope") == account_scope()]
+    if any(product_rule(historical, entry)[0] for entry in current):
+        return None
+    symbol = historical.provider_symbol.replace("/", "_")
+    if not any(entry.symbol == symbol for entry in current):
+        return "目录无品种", "当前 OANDA Practice 账户目录没有可用的对应品种，请检查来源目录"
+    return "规则未支持", "当前历史来源与实时品种尚无可用的接续规则，请核对来源与产品类型"
 
 
 def check_match(db, dataset_id, catalog_id, draft=None):

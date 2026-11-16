@@ -64,6 +64,11 @@ def test_watched_native_hidden_globally_before_paging_and_after_removal(database
         result = search(db, source="yahoo", mobile=True, exclude_watch=True, limit=2)
         assert result["total"] == 4 and len(result["items"]) == 2
         assert result["items"][0]["symbol"] == "S26"
+        retained = search(db, source="yahoo", mobile=True, exclude_watch=True,
+                          retain_watch=["MWP:YAHOO:25"], limit=2)
+        assert retained["total"] == 5
+        assert [row["symbol"] for row in retained["items"]] == ["S25", "S26"]
+        assert search(db, source="yahoo", mobile=True, exclude_watch=True)["total"] == 4
         pref.content = {"value": {"lists": []}}
         db.flush()
         assert search(db, source="yahoo", mobile=True, exclude_watch=True)["total"] == 30
@@ -81,6 +86,8 @@ def test_stable_history_membership_hides_new_version_but_not_native(database):
         old_ticker = "MWH:" + version.id
         preference(db, [old_ticker])
         assert identities(db, [old_ticker])[old_ticker] == ("dataset", dataset.id)
+        assert summaries(db, mobile=True, exclude_watch=True)["total"] == 0
+        assert summaries(db, mobile=True, exclude_watch=True, retain_watch=[old_ticker])["total"] == 1
         assert summaries(db, mobile=True, exclude_watch=True)["total"] == 0
         assert summaries(db, mobile=True, query="欧元美元 duka")["total"] == 1
         assert search(db, query="eurusd duka", mobile=True, exclude_watch=True)["total"] == 1
@@ -116,6 +123,9 @@ def test_mobile_search_api_mode_and_write_guard(database):
         with TestClient(api.app) as client:
             rows = client.get("/api/market-data/series/page", params={"kind": "provider", "query": "比特币 bin", "mobile": True, "exclude_watch": True})
             assert rows.status_code == 200 and rows.json()["total"] == 0
+            retained = client.get("/api/market-data/series/page", params={"kind": "provider",
+                "query": "比特币 bin", "mobile": True, "exclude_watch": True, "retain_watch": "MWP:BTCUSDT"})
+            assert retained.status_code == 200 and retained.json()["total"] == 1
             prefs = client.get("/api/advanced-charts/preferences").json()[0]
             prefs["content"]["value"]["lists"].append({"id": "new", "symbols": ["MWP:BTCUSDT"]})
             result = client.post("/api/advanced-charts/preferences/save", json={**prefs, "mobile_unique": True})
@@ -138,3 +148,30 @@ def test_legacy_provider_alias_cannot_reappear_or_be_added_twice(database):
         with pytest.raises(ValueError, match="已在自选"):
             validate_additions(db, {"value": {"lists": [{"id": "a", "symbols": ["MWP:EURUSD"]}]}},
                 {"value": {"lists": [{"id": "a", "symbols": ["MWP:EURUSD", "MWP:OANDA:EUR_USD"]}]}})
+
+
+def test_mobile_creation_can_skip_count_without_changing_default(database, monkeypatch):
+    from alerts.config import settings
+    monkeypatch.setattr(settings, "yahoo_enabled", True)
+    with database.begin() as db:
+        for index in range(28):
+            db.add(MarketCatalog(id=f"YAHOO:PAGE{index:02}", source="yahoo", symbol=f"PAGE{index:02}",
+                label="Page stock", asset_type="EQUITY", precision=2))
+        db.flush()
+        default = search_catalog(db, source="yahoo", query="PAGE", mobile=True, limit=25)
+        first = search_catalog(db, source="yahoo", query="PAGE", mobile=True, limit=25, include_total=False)
+        last = search_catalog(db, source="yahoo", query="PAGE", mobile=True, offset=25, limit=25, include_total=False)
+        assert default["total"] == 28 and "has_more" not in default
+        assert "total" not in first and first["has_more"] is True
+        assert [row["catalog_id"] for row in first["items"]] == [row["catalog_id"] for row in default["items"]]
+        assert len(last["items"]) == 3 and last["has_more"] is False
+        assert not {row["catalog_id"] for row in first["items"]} & {row["catalog_id"] for row in last["items"]}
+
+
+def test_provider_substring_is_not_an_exclusive_source_filter(database):
+    with database.begin() as db:
+        db.add(MarketCatalog(id="YAHOO:BOAT", source="yahoo", symbol="BOAT", label="Boat company",
+            asset_type="EQUITY", precision=2))
+        db.flush()
+        assert "BOAT" in [row["symbol"] for row in search(db, query="oa", source="yahoo", mobile=True)["items"]]
+        assert "BOAT" in [row["symbol"] for row in search(db, query="oa yahoo", mobile=True)["items"]]

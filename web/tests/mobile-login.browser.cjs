@@ -55,7 +55,7 @@ const server = http.createServer(async (req, res) => {
   };
   const shot = async name => { await settle(); await audit(); await page.screenshot({ path: path.join(out, name + '.png'), fullPage: true }); proof.screenshots.push(name + '.png'); };
   const signIn = async () => { mode = 'success'; await input().fill('fixture-only'); await login().click(); await expect(page.getByRole('navigation', { name: '主导航' })).toBeVisible(); };
-  const signOut = async () => { await page.getByRole('link', { name: '更多', exact: true }).click(); await page.getByRole('button', { name: '退出登录', exact: true }).click(); await expect(login()).toBeEnabled(); if (await page.getByRole('button', { name: '关闭通知', exact: true }).count()) await page.getByRole('button', { name: '关闭通知', exact: true }).click(); };
+  const signOut = async () => { await page.getByRole('link', { name: '更多', exact: true }).click(); await page.getByRole('button', { name: '退出登录', exact: true }).click(); await expect(login()).toBeEnabled(); if (await page.getByRole('button', { name: '关闭通知', exact: true }).count()) await expect(page.locator('.mobile-toast')).toHaveCount(0); };
   try {
     await page.goto('http://127.0.0.1:' + server.address().port + '/m/');
     await expect(page.getByRole('button', { name: '正在核验连接…', exact: true })).toBeDisabled();

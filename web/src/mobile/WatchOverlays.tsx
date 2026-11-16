@@ -9,7 +9,7 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "./components/ui/alert-dialog";
-import { Button } from "./components/ui/button";
+import { HeaderIconButton } from "./components/HeaderIconButton";
 import type { MobileSheetProps } from "./MobileSheet";
 
 // Opt-in page providers keep portals inside the current theme and mobile control scope.
@@ -95,9 +95,7 @@ export function WatchDrawer(props: MobileSheetProps) {
           </div>
           <div className="mobile-drawer-actions">
           {headerActions}
-          <Button variant="ghost" size="icon" aria-label="关闭" disabled={!dismissible} onClick={leave}>
-            <X aria-hidden="true" />
-          </Button>
+          <HeaderIconButton icon={X} label="关闭" disabled={!dismissible} onClick={leave} />
           </div>
         </header>
         <div className="mobile-sheet-body mobile-drawer-scroll" key={title}>

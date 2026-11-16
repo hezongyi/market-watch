@@ -1,0 +1,58 @@
+{
+  "at": "2026-11-16T08:13:27.311313+08:00",
+  "provider": {
+    "authentication_hold": true,
+    "error": "unauthorized",
+    "configured": true
+  },
+  "datasets": [
+    {
+      "symbol": "XAUUSD",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "revision": 5593,
+      "received_at": "2026-11-16T07:31:21.294000+08:00",
+      "age_minutes": 42.1
+    },
+    {
+      "symbol": "USDCAD",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "revision": 11795,
+      "received_at": "2026-11-16T07:31:20.772000+08:00",
+      "age_minutes": 42.1
+    },
+    {
+      "symbol": "EURUSD",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "revision": 16516,
+      "received_at": "2026-11-16T07:31:20.500000+08:00",
+      "age_minutes": 42.1
+    }
+  ],
+  "investigation": {
+    "instance": "Ubuntu local Docker / mw-managed-live-rollover-20261113",
+    "origin": "https://192.168.7.232:18447",
+    "service_config_consistent": true,
+    "upstream_read_only_probes": {
+      "accounts_direct": 401,
+      "accounts_proxy": 504,
+      "account_instruments_proxy": 401,
+      "account_pricing_proxy": 401,
+      "instrument_candles_direct": 200,
+      "instrument_candles_proxy": 200,
+      "pricing_stream_direct": 200,
+      "pricing_stream_proxy": 200,
+      "stream_prices_observed": [
+        "EUR_USD",
+        "USD_CAD",
+        "XAU_USD"
+      ],
+      "latest_observed_source_time": "2026-11-16T00:14:52.661830248Z"
+    },
+    "application_hold_released": false,
+    "business_configuration_modified": false,
+    "services_restarted": false
+  }
+}

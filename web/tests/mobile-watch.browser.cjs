@@ -1,3 +1,4 @@
+const { auditHeaderIcons } = require('./mobile-header-icons.helper.cjs');
 // Real built mobile UI, explicit API doubles; no supplier or Android-device claim.
 const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path'),http=require('node:http');
 const {chromium,expect}=require('@playwright/test');
@@ -6,7 +7,7 @@ let remote={kind:'setting',name:'mw.watchlists.v1',tool:'',revision:3,content:{e
   {id:'a',title:'第一组',symbols:[first],unknown:'keep-list'}, {id:'b',title:'第二组',symbols:[second]}
 ]}}},logged=false,conflict=false;
 const writes=[],clients=new Set(),streams=new Set(),errors=[],subscriptions=new Map();let holdSave=false,pendingSave;let maxStreams=0,holdQuotes=false,quoteReads=0,sparkReads=0,unsubscribes=0,quotePrice=123.45;const pendingQuotes=[];
-const dist=path.resolve('dist'),controlsOutput='/tmp/mw-watch-controls-regression';
+const dist=path.resolve('dist'),controlsOutput=process.env.MOBILE_WATCH_OUTPUT||'/tmp/mw-watch-controls-regression';
 fs.mkdirSync(controlsOutput,{recursive:true});
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');let raw='';for await(const chunk of req)raw+=chunk;
@@ -121,7 +122,7 @@ const server=http.createServer(async(req,res)=>{
    assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'large watch text overflow');
   }
   await page.evaluate(()=>document.documentElement.style.fontSize='100%');
-  await page.screenshot({path:'/tmp/mw-android-personal-v205-watch.png'});
+  await auditHeaderIcons(page);await page.screenshot({path:'/tmp/mw-android-personal-v205-watch.png'});
   // Product controls: measure real transitions and touch gestures against the built UI.
   const controlsProof={timings:[],gestures:[],screenshots:[],reducedMotion:false};
   const settle=async()=>page.evaluate(async()=>{
@@ -133,7 +134,7 @@ const server=http.createServer(async(req,res)=>{
     const missed=await page.locator('.mobile-watch').evaluate(root=>[...root.querySelectorAll('button,input,select,textarea')].filter(el=>el.getClientRects().length&&!el.closest('[hidden],[aria-hidden="true"]')&&!el.dataset.slot).map(el=>({tag:el.tagName,text:el.getAttribute('aria-label')||el.textContent.slice(0,40)})));
     assert.deepEqual(missed,[],'all visible Watch controls use shadcn components');
   };
-  const captureControl=async name=>{await settle();await auditControls();await page.screenshot({path:controlsOutput+'/'+name+'.png'});controlsProof.screenshots.push(name);};
+  const captureControl=async name=>{await settle();await auditControls();await auditHeaderIcons(page);await page.screenshot({path:controlsOutput+'/'+name+'.png'});controlsProof.screenshots.push(name);};
   const topDialog=()=>page.getByRole('dialog').last();
   const closeControl=async()=>{const element=await topDialog().elementHandle();await topDialog().getByRole('button',{name:'关闭',exact:true}).click();await expect.poll(()=>element.evaluate(el=>el.isConnected)).toBe(false);};
   const touch=await context.newCDPSession(page);
@@ -202,6 +203,12 @@ const server=http.createServer(async(req,res)=>{
   await page.setViewportSize({width:412,height:915});
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();
   await page.getByRole('button',{name:'管理自选',exact:true}).click();
+  if(process.env.MOBILE_TAB_SWIPE==='1') {
+    await settle();
+    await require('./mobile-tab-swipe.helper.cjs').verifySwipeTabs({page,context,root:page.locator('.watch-manage-tabs'),full:true});
+    assert.equal(writes.length,0,'swiping management tabs does not save or remove symbols');
+    await expect(topDialog()).toHaveAccessibleName('管理自选');
+  }
   await page.getByRole('tab',{name:'分组',exact:true}).click();
   await settle();
   await page.getByRole('button',{name:'下移分组 第一组',exact:true}).click();
@@ -255,7 +262,7 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('button',{name:'保存分组',exact:true}).click();
   await expect(page.getByRole('status').filter({hasText:'尚未保存'})).toBeVisible();
   await expect(page.locator('.mobile-manage-group-name').first()).toHaveText('冲突输入保留');
-  await page.getByRole('button',{name:'关闭通知',exact:true}).click();
+  await expect(page.locator('.mobile-toast')).toHaveCount(0);
   await page.getByRole('button',{name:'关闭',exact:true}).click();
   await expect(page.getByRole('alertdialog',{name:'放弃本次修改？',exact:true})).toBeVisible();
   await page.getByRole('button',{name:'放弃修改',exact:true}).click();
@@ -278,8 +285,8 @@ const server=http.createServer(async(req,res)=>{
   await page.getByRole('button',{name:'加入自选',exact:true}).click();
   await expect(page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('button',{name:'已添加',exact:true})).toBeVisible();
   assert.equal(remote.content.value.active,'b');
-  await expect(page.getByRole('alert').filter({hasText:'已加入自选'})).toBeVisible();
-  await page.getByRole('button',{name:'关闭通知',exact:true}).click();
+  await expect(page.locator('.mobile-toast')).toHaveCount(0);
+  await expect(page.locator('.mobile-toast')).toHaveCount(0);
   await page.getByRole('dialog',{name:'行情详情',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
   await page.getByRole('dialog',{name:'添加自选',exact:true}).getByRole('button',{name:'关闭',exact:true}).click();
   await page.getByRole('button',{name:'选择自选分组',exact:true}).click();await page.getByRole('button',{name:'管理自选',exact:true}).click();

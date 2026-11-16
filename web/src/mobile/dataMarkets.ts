@@ -3,6 +3,7 @@ import type { Dataset } from "../market-data/types";
 import type { Continuation } from "../market-data/DatasetContinuation";
 
 export type MarketRow = {
+  mobile_identity?: import("./marketIdentity").MobileIdentity;
   ticker: string;
   id?: string;
   symbol?: string;

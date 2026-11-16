@@ -1,0 +1,159 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "url": "https://192.168.7.232:18447/m/data",
+  "stamp": "2026-11-16T04:47:25.280329+00:00",
+  "updatedServices": [
+    "web"
+  ],
+  "image": "sha256:3b2a88f62f4d58736c2edba4fe9a42a18fc3590d8c9bd003e8b6d034fa98c3bf",
+  "tag": "market-watch-web:mobile-data-settings-20261116",
+  "previous": {
+    "run.json": "sha256:55c98ae32b1b53f8e7aae9a30065f433dec0edc4906e3a047fdf5bf18fb0ddf7",
+    "compose.json": "sha256:55c98ae32b1b53f8e7aae9a30065f433dec0edc4906e3a047fdf5bf18fb0ddf7"
+  },
+  "beforeContainers": [
+    {
+      "name": "mw-managed-live-rollover-20261113-web-1",
+      "id": "3a511d1b155597f59e8d37b2fb4b6efa7d1468063e2416b271f6a55babfa2111",
+      "image": "sha256:55c98ae32b1b53f8e7aae9a30065f433dec0edc4906e3a047fdf5bf18fb0ddf7",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-data-worker-1",
+      "id": "51a85d72730632a3b5e8e560145cf120246e2da32e1e6b8a162c19b257fe1d52",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-api-1",
+      "id": "0ed95048c8ba22304c0c1c952d3ce9675603b4c35fbd33526ab0eb43d387e50e",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-market-runtime-1",
+      "id": "4d980f3dbf7961806146c644c65fe2cc996728af48abf182e64be930b1917317",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-migrate-1",
+      "id": "52372375e5cc01bb0b05c7c20f6ab4b6fb31c9be346adcf5fc18f9fdfc799b73",
+      "image": "sha256:fb950b983eb764a96033a7ae8fefc9bac728d89bd6cb1b8552665207be3480fa",
+      "status": "exited"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-tls-1",
+      "id": "d5e1cc2d595253f8a82a818d61d54ef54f2c866e622881e062432f859cf54cd8",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-postgres-1",
+      "id": "19cd00546145216e6b74edf45fcae0346665160261d5d4f9b2768b124ad4fe38",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running"
+    }
+  ],
+  "afterContainers": [
+    {
+      "name": "mw-managed-live-rollover-20261113-web-1",
+      "id": "36fb4b475f54cf3a0301bc2c0422b4620ed0c69a379e0c7f8cb4b58450df55b3",
+      "image": "sha256:3b2a88f62f4d58736c2edba4fe9a42a18fc3590d8c9bd003e8b6d034fa98c3bf",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-data-worker-1",
+      "id": "51a85d72730632a3b5e8e560145cf120246e2da32e1e6b8a162c19b257fe1d52",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-api-1",
+      "id": "0ed95048c8ba22304c0c1c952d3ce9675603b4c35fbd33526ab0eb43d387e50e",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-market-runtime-1",
+      "id": "4d980f3dbf7961806146c644c65fe2cc996728af48abf182e64be930b1917317",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-migrate-1",
+      "id": "52372375e5cc01bb0b05c7c20f6ab4b6fb31c9be346adcf5fc18f9fdfc799b73",
+      "image": "sha256:fb950b983eb764a96033a7ae8fefc9bac728d89bd6cb1b8552665207be3480fa",
+      "status": "exited"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-tls-1",
+      "id": "d5e1cc2d595253f8a82a818d61d54ef54f2c866e622881e062432f859cf54cd8",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-postgres-1",
+      "id": "19cd00546145216e6b74edf45fcae0346665160261d5d4f9b2768b124ad4fe38",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running"
+    }
+  ],
+  "checks": {
+    "readyz": "passed",
+    "APK_trusted_CA": "passed",
+    "all_shell_resources_match_build": true,
+    "shell_version": "b11387dfc82e7536",
+    "APK_download_preserved": "0.1.4",
+    "only_web_recreated": true
+  },
+  "originalPrevious": {
+    "run.json": "sha256:7250a89736f54d131642c7a842a106213d6a41c50be27b1c6b6034a9883f1f53",
+    "compose.json": "sha256:7250a89736f54d131642c7a842a106213d6a41c50be27b1c6b6034a9883f1f53"
+  },
+  "originalBeforeContainers": [
+    {
+      "name": "mw-managed-live-rollover-20261113-web-1",
+      "id": "f771971b9d95b62bb1d0e2a0982989261e6e59caf69dbd7ff4bef1a7634bbf14",
+      "image": "sha256:7250a89736f54d131642c7a842a106213d6a41c50be27b1c6b6034a9883f1f53",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-data-worker-1",
+      "id": "51a85d72730632a3b5e8e560145cf120246e2da32e1e6b8a162c19b257fe1d52",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-api-1",
+      "id": "0ed95048c8ba22304c0c1c952d3ce9675603b4c35fbd33526ab0eb43d387e50e",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-market-runtime-1",
+      "id": "4d980f3dbf7961806146c644c65fe2cc996728af48abf182e64be930b1917317",
+      "image": "sha256:e7a524c358b02a553aee91fa82c218699763ff3ddbb34248903d1d26a4d8ae40",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-migrate-1",
+      "id": "52372375e5cc01bb0b05c7c20f6ab4b6fb31c9be346adcf5fc18f9fdfc799b73",
+      "image": "sha256:fb950b983eb764a96033a7ae8fefc9bac728d89bd6cb1b8552665207be3480fa",
+      "status": "exited"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-tls-1",
+      "id": "d5e1cc2d595253f8a82a818d61d54ef54f2c866e622881e062432f859cf54cd8",
+      "image": "sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592",
+      "status": "running"
+    },
+    {
+      "name": "mw-managed-live-rollover-20261113-postgres-1",
+      "id": "19cd00546145216e6b74edf45fcae0346665160261d5d4f9b2768b124ad4fe38",
+      "image": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+      "status": "running"
+    }
+  ]
+}

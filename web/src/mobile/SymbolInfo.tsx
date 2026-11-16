@@ -1,30 +1,8 @@
 import FitText from "./FitText";
 import { watchDescription } from "./watchIdentity";
 
-export function symbolProvider(source?: string) {
-  const value = (source || "来源待确认")
-    .replace(/^历史[：:]\s*/, "")
-    .split(/\s*→\s*实时[：:]/)[0]
-    .trim();
-  return (
-    (
-      {
-        DUKASCOPY: "Dukas",
-        "YAHOO FINANCE": "Yahoo",
-        YAHOO: "Yahoo",
-        "BINANCE SPOT": "Binance",
-        BINANCE: "Binance",
-        OANDA: "OANDA",
-        "OANDA PRACTICE": "OANDA",
-        "OANDA LIVE": "OANDA",
-        FXCM: "FXCM",
-        "FXCM DEMO": "FXCM",
-        "FXCM REAL": "FXCM",
-        AKSHARE: "AKShare",
-      } as Record<string, string>
-    )[value.toUpperCase()] || value
-  );
-}
+export { compactProvider as symbolProvider } from "./marketIdentity";
+import { compactProvider as symbolProvider } from "./marketIdentity";
 
 /** Shared information hierarchy; Watch alone owns its fixed-column geometry. */
 export default function SymbolInfo({

@@ -1,0 +1,45 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const out={};vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/ManagedDataFacts.tsx','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022,jsx:ts.JsxEmit.ReactJSX}}).outputText,{exports:out,require:n=>n.includes('/types')?{frames:['M1','M5','H1','H4','D1','W1','MN'],names:{running:'下载中'},time:v=>v==null?'—':v+' UTC'}:n.includes('dataMarkets')?{continuationLabel:s=>({receiving:'运行中',market_closed:'闭市',preparing:'准备中',unauthorized:'认证异常'})[s]||s}:{}});
+const dataset={identity:{mode:'base_m1',basis:'bid',adjustment:'none'},aggregation_calendar:'ny17',asset_class:'forex',maintenance:{configured:true,timeframes:['M1','H4'],frequency:'daily',daily_minute:90,timezone:'America/New_York'},periods:[{timeframe:'M1',status:'published',available_version_id:'v1',available_start:0,available_end:100}]};
+assert.deepEqual(Array.from(out.historyTags(dataset)),['M1派生','bid','NY17']);
+assert.deepEqual(Array.from(out.historyTags({...dataset,identity:{mode:'base_d1',basis:'trade',adjustment:'qfq'},asset_class:'equity',aggregation_calendar:'source_date'})),['D1派生','trade','前复权','来源交易日']);
+assert.deepEqual(Array.from(out.historyTags({...dataset,identity:{mode:'native_periods',basis:'ask',adjustment:'supplier'},aggregation_calendar:'utc0'})),['原生周期','ask','来源价格','UTC0']);
+assert.deepEqual(Array.from(out.historyTags({...dataset,identity:{basis:'unknown'},aggregation_calendar:''})),[], 'unknown mode, basis and boundary are not guessed');
+const range={start:Date.UTC(2020,0,1),end:Date.UTC(2026,10,14),timeframe:'M1',version_id:'v1'};
+assert.equal(out.coverageConclusion({...dataset,history_range:range}),'2020/01/01 → 2026/11/14');
+assert.equal(out.coverageConclusion({...dataset,periods:[]}), '尚无历史');
+assert.equal(out.coverageConclusion({...dataset,available_start:0,available_end:100000000}), '范围待核实', 'task window is never a fallback for actual history');
+assert.equal(out.coverageConclusion({...dataset,history_range:range,periods:[...dataset.periods,{...dataset.periods[0],timeframe:'H4',available_start:-999999999,available_end:999999999}]}),'2020/01/01 → 2026/11/14', 'derived bounds do not change product history');
+assert.equal(out.periodRows(dataset)[1].frame,'H4');assert.equal(out.periodRows(dataset)[1].period,undefined,'configured pending period retained');
+assert.equal(out.periodState({...dataset.periods[0],status:'failed'}),'更新失败，已有历史可用');
+assert.equal(out.periodState({...dataset.periods[0],freshness:'inherited'}),'沿用上次数据');
+assert.equal(out.periodState({status:'running'}),'下载中');
+assert.equal(out.periodState(out.currentPeriod({...dataset,frames:{M1:{status:'failed'}}},'M1')),'更新失败，已有历史可用');
+assert.equal(out.periodState(out.currentPeriod({...dataset,latest_version_id:'new',frames:{M1:{status:'available'}}},'M1')),'可用','independent frame version does not imply stale');
+assert.equal(out.maintenanceSummary(dataset),'每日 01:30（America/New_York）');
+for(const [extra,label] of [[{configured:false},'未配置'],[{paused:true},'已暂停'],[{archived:true},'已归档'],[{frame_plan:{M1:{}}},'按周期更新']])assert.equal(out.maintenanceSummary({...dataset,maintenance:{...dataset.maintenance,...extra}}),label);
+assert.equal(out.liveSummary(), '读取中');assert.equal(out.liveSummary(undefined,'fail'), '读取失败 · 状态待核实');
+assert.equal(out.liveSummary({supported:true,enabled:false}), '未开启');
+assert.equal(out.liveSummary({supported:false,enabled:false}), '暂不支持');
+assert.equal(out.liveSummary({supported:true,enabled:true,status:'market_closed'}), '已开启');
+assert.equal(out.liveSummary({supported:true,enabled:true,status:'unauthorized'},'fail'), '已开启 · 上次状态，待核实');
+assert.equal(out.liveSummary({supported:true,enabled:true,status:'receiving'},undefined,123), '已开启 · 上次状态，待核实');
+console.log('managed facts: separate attribute labels, product-level materialized range, configured missing periods, old usable history, schedule and unknown/stale realtime states passed');
+
+for (const status of ['preparing','receiving','recovering','unauthorized','market_closed','provider_maintenance','inactive']) {
+  assert.equal(out.liveSettingLabel({enabled:true,status}), '实时已开启', status+' must not rewrite saved intent');
+  assert.equal(out.liveSummary({supported:true,enabled:true,status}), '已开启');
+}
+assert.equal(out.liveSettingLabel({enabled:false,status:'unauthorized'}), '实时未开启');
+for (const status of ['attention','account_changed']) assert.equal(out.liveSettingLabel({enabled:true,status}), '实时需处理');
+assert.equal(out.liveSettingLabel({enabled:true,status:'receiving',rollover:{requires_attention:true}}), '实时需处理');
+assert.equal(out.maintenanceState({...dataset,maintenance:{...dataset.maintenance,active_version_id:'v',task_status:'deriving'}}), '维护已配置');
+assert.equal(out.maintenanceState({...dataset,maintenance:{...dataset.maintenance,task_status:'partial'}}), '维护需处理');
+assert.equal(out.maintenanceState({...dataset,maintenance:{...dataset.maintenance,task_error:'failed'}}), '维护需处理');
+assert.equal(out.maintenanceState({...dataset,maintenance:{...dataset.maintenance,paused:true}}), '维护已暂停');
+assert.equal(out.maintenanceState({...dataset,maintenance:{configured:false}}), '维护待配置');
+assert.equal(out.liveRuntimeSummary({enabled:true,status:'recovering',composite:{health:{quote_ready:true}}}), '报价已恢复，分钟线补齐中');
+assert.equal(out.liveRuntimeSummary({enabled:true,status:'receiving',composite:{health:{sample_ready:false}}}), '分钟线已接续，当前报价暂不可用');
+assert.equal(out.liveRuntimeSummary({enabled:true,status:'unauthorized'}), '连接认证失败，系统自动重试');
+console.log('managed settings: saved intent stays stable across runtime transitions; actionable settings/history failures remain visible; runtime readiness remains distinct');
+assert.equal(out.maintenanceState({...dataset,maintenance:{...dataset.maintenance,active_version_id:'v',task_status:'retrying',task_error:'timeout'}}), '维护已配置','automatic retry does not mean configuration needs manual repair');

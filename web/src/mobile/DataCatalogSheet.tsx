@@ -1,6 +1,12 @@
 import { useLayoutEffect, useRef } from "react";
-import SymbolInfo from "./SymbolInfo";
+import SymbolIdentityRow from "./SymbolIdentityRow";
 import { SymbolSearchPanel, SymbolSearchRow } from "./SymbolSearch";
+import {
+  SymbolSearchFilterButton,
+  SymbolSearchFilters,
+  symbolSearchRequest,
+  useSymbolSearchFilters,
+} from "./SymbolSearchFilters";
 import { useSymbolSearch } from "./useSymbolSearch";
 import { dataRequest } from "./dataOperations";
 import { useCallback, useState } from "react";
@@ -32,6 +38,7 @@ export default function DataCatalogSheet({
   onClosed(): void;
 }) {
   const [query, setQuery] = useState("");
+  const filters = useSymbolSearchFilters();
   const [selected, setSelected] = useState<CatalogItem>();
   const scrollTop = useRef(0),
     searchHost = useRef<HTMLDivElement>(null);
@@ -50,22 +57,27 @@ export default function DataCatalogSheet({
   }, []);
   const result = useSymbolSearch<CatalogItem>({
     profile,
-    queryKey: JSON.stringify(["catalog-v2", query]),
+    queryKey: JSON.stringify(["catalog-v3", query, filters.value]),
     active: active && open && !selected,
     online,
     identity: (item) => item.catalog_id,
     fetchPage: async (cursor, signal) => {
       const offset = Number(cursor || 0);
+      const request = symbolSearchRequest(query, filters.value);
       const params = new URLSearchParams({
-        query,
+        query: request.query,
+        ...(request.source ? { source: request.source } : {}),
+        ...(request.symbol_type ? { symbol_type: request.symbol_type } : {}),
         mobile: "true",
         exclude_existing: "true",
+        include_total: "false",
         offset: String(offset),
         limit: "25",
       });
       const value = await dataRequest<{
         items: CatalogItem[];
-        total: number;
+        total?: number;
+        has_more?: boolean;
         sources: { source: string; requires_refresh: boolean }[];
       }>(
         profile,
@@ -75,10 +87,11 @@ export default function DataCatalogSheet({
       );
       return {
         items: value.items,
-        next: offset + 25 < value.total ? String(offset + 25) : undefined,
-        note: value.sources.some(
-          (item) => item.requires_refresh,
-        )
+        next:
+          (value.has_more ?? offset + 25 < (value.total || 0))
+            ? String(offset + 25)
+            : undefined,
+        note: value.sources.some((item) => item.requires_refresh)
           ? "部分目录尚未同步，可在数据页的任务与来源中更新。"
           : undefined,
       };
@@ -91,6 +104,7 @@ export default function DataCatalogSheet({
   return (
     <MobileSheet
       title="添加自建"
+      headerActions={!selected && <SymbolSearchFilterButton state={filters} />}
       open={open}
       onClosed={onClosed}
       fullHeight
@@ -117,7 +131,9 @@ export default function DataCatalogSheet({
         <div ref={searchHost}>
           <SymbolSearchPanel
             query={query}
-            resetKey={query}
+            resetKey={JSON.stringify([query, filters.value])}
+            maxLength={90}
+            enhancedFilters={<SymbolSearchFilters state={filters} />}
             onQuery={setQuery}
             label="搜索原生行情"
             active={active && open}
@@ -128,14 +144,7 @@ export default function DataCatalogSheet({
             retry={result.retry}
             hasNext={!!result.next}
             loadNext={result.loadNext}
-            note={
-              <DataFeedback
-                notice={
-                  result.note ||
-                  (result.readAt ? "离线显示上次目录，联网后核验" : undefined)
-                }
-              />
-            }
+            note={<DataFeedback notice={result.note} />}
           >
             {result.loaded && !result.items.length && (
               <DataEmpty title="没有找到品种">
@@ -156,10 +165,10 @@ export default function DataCatalogSheet({
                     setSelected(item);
                   }}
                 >
-                  <SymbolInfo
+                  <SymbolIdentityRow
+                    row={item}
                     code={item.display_symbol || item.provider_symbol}
                     name={item.label}
-                    source={item.source}
                   />
                 </SymbolSearchRow>
               ))}

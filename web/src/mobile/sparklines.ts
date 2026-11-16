@@ -14,6 +14,7 @@ export type Sparkline = {
   next_check_at?: number;
   identity_key?: string;
   stock_session?: boolean;
+  display_segments?: { start: number; end: number }[];
   display_state?: "current" | "closed" | "previous" | "historical" | "unknown" | "empty" | "unsupported";
   session?: { date: string; previous: boolean };
   session_open_price?: string | null;
@@ -22,7 +23,7 @@ export type Sparkline = {
   preparation_error?: string | null;
   timeframe: string | null;
   reference_times?: number[];
-  points: { time: number; price: string; gap_before: boolean }[];
+  points: { time: number; display_time?: number; price: string; gap_before: boolean }[];
   status: "ready" | "partial" | "empty" | "unavailable";
   reason: string | null;
   last_data_at: number | null;
@@ -33,6 +34,20 @@ export function sparklineExpires(item: Sparkline) {
 }
 
 type SparkQuote = { s: string; v: Record<string, any>; snapshot?: { revision_id?: string } };
+/** Exchange trading time occupies the whole axis; scheduled lunch has no width. */
+export function sparklinePosition(item: Sparkline, time: number): number | undefined {
+  if (!item.display_segments?.length)
+    return (time - item.window_start) / (item.window_end - item.window_start);
+  const total = item.display_segments.reduce((sum, segment) => sum + segment.end - segment.start, 0);
+  let elapsed = 0;
+  for (const segment of item.display_segments) {
+    if (time >= segment.start && time <= segment.end)
+      return (elapsed + time - segment.start) / total;
+    elapsed += segment.end - segment.start;
+  }
+  return undefined;
+}
+
 /** A display-only quote overlay. Source clocks, never HTTP receipt time, place
  * the tail; the original history and cached observations remain untouched. */
 export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Date.now()): Sparkline {
@@ -51,10 +66,16 @@ export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Da
   const last = item.points.at(-1);
   if (last && time < last.time) return item;
   if (last && time === last.time && Number(last.price) === price) return item;
+  const displayTime = item.display_segments?.length
+    ? sourceMinute && Number.isFinite(value.data_end) ? Math.min(value.data_end, now) : time
+    : undefined;
+  if (displayTime !== undefined && (sparklinePosition(item, displayTime) === undefined ||
+      last && displayTime < (last.display_time ?? last.time))) return item;
   const step = ({ M1: 60_000, M5: 300_000, M15: 900_000, M30: 1_800_000, H1: 3_600_000 } as Record<string, number>)[item.timeframe || ""] || 60_000;
   const same = last?.time === time;
   const gap = last ? Math.floor((time - item.window_start) / step) - Math.floor((last.time - item.window_start) / step) > 1 : false;
-  const point = { time, price: String(price), gap_before: same ? last!.gap_before : gap };
+  const point = { time, price: String(price), gap_before: same ? last!.gap_before : gap,
+    ...(displayTime !== undefined ? { display_time: displayTime } : {}) };
   return { ...item, points: [...(same ? item.points.slice(0, -1) : item.points), point], last_data_at: time };
 }
 
@@ -288,7 +309,17 @@ export function sparklineScale(item: Sparkline, height = 48, previousClose?: num
 /** Reduce M1 observations only for display, retaining the latest point in each
  * five-minute bucket and keeping each gap-separated segment independent. */
 export function sparklineDisplayPoints(item: Sparkline) {
-  if (item.timeframe !== "M1" || item.points.length < 2) return item.points;
+  let points = item.points;
+  if (item.display_segments?.length) {
+    let gap = false;
+    points = [];
+    for (const point of item.points) {
+      if (sparklinePosition(item, point.display_time ?? point.time) === undefined) { gap = true; continue; }
+      points.push(gap ? { ...point, gap_before: true } : point);
+      gap = false;
+    }
+  }
+  if (item.timeframe !== "M1" || points.length < 2) return points;
   const interval = 5 * 60_000;
   const sampled: Sparkline["points"] = [];
   let bucket: number | undefined;
@@ -298,7 +329,7 @@ export function sparklineDisplayPoints(item: Sparkline) {
     latest = undefined;
     bucket = undefined;
   };
-  for (const point of item.points) {
+  for (const point of points) {
     if (point.gap_before) flush();
     const nextBucket = Math.floor((point.time - item.window_start) / interval);
     if (bucket !== undefined && nextBucket !== bucket) flush();
@@ -339,10 +370,7 @@ export function sparklinePaths(item: Sparkline, width = 200, height = 48, previo
   };
   pointsToDraw.forEach((point, index) => {
     if (point.gap_before) finish();
-    const x =
-      ((point.time - item.window_start) /
-        (item.window_end - item.window_start)) *
-      width;
+    const x = sparklinePosition(item, point.display_time ?? point.time)! * width;
     const y = scale.y(prices[index]);
     points.push([x, y]);
   });

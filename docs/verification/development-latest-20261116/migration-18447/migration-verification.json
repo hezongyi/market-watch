@@ -1,0 +1,57 @@
+{
+  "migration_integrity_passed": true,
+  "strict_TLS_login_and_resources_passed": true,
+  "deployed_browser_passed": true,
+  "rule_identity_lifecycle_unchanged": true,
+  "active_rule_count": 0,
+  "chart_alert_worker_heartbeat_advances": true,
+  "chart_alert_first": {
+    "deployment": "mw-dev",
+    "state": "idle",
+    "checked_at": 1794813614806,
+    "heartbeat_at": 1794813614806,
+    "error_type": null
+  },
+  "chart_alert_second": {
+    "deployment": "mw-dev",
+    "state": "idle",
+    "checked_at": 1794813626660,
+    "heartbeat_at": 1794813626660,
+    "error_type": null
+  },
+  "backup_launcher_active_database_verified": true,
+  "live": [
+    {
+      "logical_symbol": "XAUUSD",
+      "connection": "disconnected",
+      "quote_ready": false,
+      "candle_ready": false,
+      "confirmation_error": "unauthorized"
+    },
+    {
+      "logical_symbol": "USDJPY",
+      "connection": "disconnected",
+      "quote_ready": false,
+      "candle_ready": false,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "EURUSD",
+      "connection": "disconnected",
+      "quote_ready": false,
+      "candle_ready": false,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "USDCAD",
+      "connection": "disconnected",
+      "quote_ready": false,
+      "candle_ready": false,
+      "confirmation_error": null
+    }
+  ],
+  "realtime_acceptance_passed": false,
+  "source_retirement_executed": false,
+  "reason": "OANDA HTTP 401 after automatic authentication retry; source DB and original dev DB retained",
+  "passed": true
+}

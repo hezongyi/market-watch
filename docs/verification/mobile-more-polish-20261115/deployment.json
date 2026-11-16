@@ -1,0 +1,24 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "updatedServices": [
+    "web"
+  ],
+  "stamp": "20261115T142614Z",
+  "image": "sha256:157ea64e80c0b10dacda516fc93a9a3829d56e00ec1c5b6911b5c85e975837b7",
+  "tag": "market-watch-web:mobile-more-polish-20261115-r3",
+  "previous": {
+    "run.json": "sha256:92aeffd34fb44584cae60da2974a119c6d671b54ea90c8172a4c3c48fa5bc8d0",
+    "compose.json": "sha256:92aeffd34fb44584cae60da2974a119c6d671b54ea90c8172a4c3c48fa5bc8d0"
+  },
+  "url": "https://192.168.7.232:18447/m/more",
+  "unchangedServices": [
+    "postgres",
+    "migrate",
+    "api",
+    "data-worker",
+    "market-runtime",
+    "tls"
+  ],
+  "downloadsReadOnlyMount": true
+}

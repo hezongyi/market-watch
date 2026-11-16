@@ -1,0 +1,239 @@
+{
+  "host": "Ubuntu local Docker",
+  "evidence": "browser, not Android device",
+  "errors": [],
+  "network": [
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"provider\",\"instrument\":\"YAHOO:426219f2bc19829619cd8e71b51d7b93\",\"timeframe\":null,\"indicators\":[],\"dataset_id\":\"20d800145c178b4e54a3f58520a4bcc0fd2aff7cc84c9afb5c1660de61faf347\",\"metadata\":{\"symbol\":\"NVDA\",\"english_name\":\"NVIDIA Corporation\",\"asset_type\":\"EQUITY\",\"quote_type\":\"EQUITY\",\"exchange\":\"NasdaqGS\",\"exchange_code\":\"NMS\",\"currency\":\"USD\",\"price_hint\":2,\"regular_market_price\":162.85,\"timezone\":\"America/New_York\",\"session\":\"0930-1600:23456\",\"session_status\":\"configured\",\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"D1\",\"W1\",\"MN\"],\"adjustment\":\"auto\",\"price_description\":\"Yahoo 自动复权\",\"delay_seconds\":900,\"reported_delay_seconds\":900,\"declared_delay_seconds\":null,\"first_trade_ms\":917015400000,\"event_revision\":\"382c836c27b56f9dcda6bcc528f339709f143592ce55b051629367fbe19fbcfb\",\"updated_at\":1794753623813,\"volume_kind\":\"shares\",\"volume_unit\":\"股\",\"metadata_observed_at\":1794753623813,\"sparkline_sessions\":{\"2026-11-09\":{\"start\":1794234600000,\"end\":1794258000000},\"2026-11-10\":{\"start\":1794321000000,\"end\":1794344400000},\"2026-11-11\":{\"start\":1794407400000,\"end\":1794430800000},\"2026-11-12\":{\"start\":1794493800000,\"end\":1794517200000},\"2026-11-13\":{\"start\":1794580200000,\"end\":1794603600000}},\"sparkline_calendar_retry_at\":1794790689602,\"archive_verified_frames\":{\"none\":[\"D1\"]},\"archive_probes\":{\"none\":{\"D1\":{\"status\":\"verified\",\"observed_at\":1794733371458,\"rows\":6758,\"first\":946857600000,\"last\":1794603600000}}},\"id\":\"YAHOO:426219f2bc19829619cd8e71b51d7b93\",\"name\":\"英伟达\",\"source\":\"yahoo\",\"display_symbol\":\"NVDA\",\"basis\":\"adjusted\",\"calendar\":\"yahoo\",\"precision\":8,\"display_precision\":2,\"series_kind\":\"provider\",\"series_kinds\":[\"provider\"],\"mobile_identity\":{\"category\":\"美股\",\"provider\":\"Yahoo\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"NVDA\"},\"instrument_name\":\"英伟达\",\"series_kind_display\":\"原生\",\"source_display\":\"Yahoo Finance\",\"price_basis_display\":\"来源复权\",\"presentation_description\":\"NVDA · 英伟达 · 原生 · Yahoo Finance · 来源复权\"},\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":4,\"task_id\":\"23b89d752a7456d7de8e66914183cf80c6437729a79c232872631d0d8d58c910\",\"result_epoch\":\"b5cec525-c031-4605-ad76-175c78f46e2a\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"provider\",\"instrument\":\"YAHOO:6493341e6b5636b2080fa9a1961f4fd3\",\"timeframe\":null,\"indicators\":[],\"dataset_id\":\"e4a399142c17ba9fc37bf6ef75e5a9c0047cea3afb6a41030712214b87752954\",\"metadata\":{\"symbol\":\"SPY\",\"english_name\":\"State Street SPDR S&P 500 ETF Trust\",\"asset_type\":\"ETF\",\"quote_type\":\"ETF\",\"exchange\":\"NYSEArca\",\"exchange_code\":\"PCX\",\"currency\":\"USD\",\"price_hint\":2,\"regular_market_price\":754.37,\"timezone\":\"America/New_York\",\"session\":\"0930-1600:23456\",\"session_status\":\"configured\",\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"D1\",\"W1\",\"MN\"],\"adjustment\":\"auto\",\"price_description\":\"Yahoo 自动复权\",\"delay_seconds\":0,\"reported_delay_seconds\":0,\"declared_delay_seconds\":null,\"first_trade_ms\":728317800000,\"event_revision\":null,\"updated_at\":1794786320763,\"volume_kind\":\"shares\",\"volume_unit\":\"股\",\"metadata_observed_at\":1794786320763,\"sparkline_sessions\":{\"2026-11-09\":{\"start\":1794234600000,\"end\":1794258000000},\"2026-11-10\":{\"start\":1794321000000,\"end\":1794344400000},\"2026-11-11\":{\"start\":1794407400000,\"end\":1794430800000},\"2026-11-12\":{\"start\":1794493800000,\"end\":1794517200000},\"2026-11-13\":{\"start\":1794580200000,\"end\":1794603600000}},\"sparkline_calendar_retry_at\":1794790689665,\"id\":\"YAHOO:6493341e6b5636b2080fa9a1961f4fd3\",\"name\":\"SPDR 标普 500 ETF\",\"source\":\"yahoo\",\"display_symbol\":\"SPY\",\"basis\":\"adjusted\",\"calendar\":\"yahoo\",\"precision\":8,\"display_precision\":2,\"series_kind\":\"provider\",\"series_kinds\":[\"provider\"],\"mobile_identity\":{\"category\":\"ETF\",\"provider\":\"Yahoo\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"SPY\"},\"instrument_name\":\"SPDR 标普 500 ETF\",\"series_kind_display\":\"原生\",\"source_display\":\"Yahoo Finance\",\"price_basis_display\":\"来源复权\",\"presentation_description\":\"SPY · SPDR 标普 500 ETF · 原生 · Yahoo Finance · 来源复权\"},\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":4,\"task_id\":\"65148e428f3c04cc0fd72e2c51bc7e86c7c775a650ee38980ac6e9fcad8dfa50\",\"result_epoch\":\"69cf9c8e-d081-40b4-add6-35d1fdcb2587\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"composite\",\"instrument\":\"54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982\",\"timeframe\":null,\"indicators\":[],\"metadata\":{\"id\":\"54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982\",\"symbol\":\"USDCAD\",\"name\":\"USDCAD\",\"display_symbol\":\"USDCAD\",\"series_kind\":\"composite\",\"source\":\"composite\",\"historical_source\":\"dukascopy\",\"basis\":\"bid\",\"calendar\":\"ny17\",\"precision\":5,\"calendar_profile\":{},\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"H4\",\"D1\",\"W1\",\"MN\"],\"volume_kind\":\"unavailable\",\"volume_unit\":null,\"composite_id\":\"54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982\",\"dataset_id\":\"b6b959a98b619ba5f8b56c0cacaffb19d208545fcb24a4445c6f1ebec2bcda20\",\"mapping_id\":\"a6e8ed4580064242d814cd3365746d41e3bd4d3429c3631944606fbc02c74214\",\"history_version_id\":\"850ae70a-f6bc-4f4a-bd66-f58cfefc05aa\",\"seam\":1794780000000,\"created\":true,\"realtime_enabled\":true,\"mobile_identity\":{\"category\":\"待分类\",\"provider\":\"Dukas\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"USD/CAD\"},\"instrument_name\":\"USDCAD\",\"series_kind_display\":\"自建 · 实时接续\",\"source_display\":\"历史：Dukascopy → 实时：OANDA Practice\",\"price_basis_display\":\"买价\",\"presentation_description\":\"USDCAD · 自建 · 实时接续 · 历史：Dukascopy → 实时：OANDA Practice · 买价\",\"historical_source_display\":\"Dukascopy\",\"live_source_display\":\"OANDA Practice\"},\"revision_id\":null,\"follow_active\":true,\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":0,\"task_id\":\"57f0f18253f5a6bcb04d83e8ae4366d57ccc7bfcfce9c5f47362c5954fd2aa62\",\"result_epoch\":\"3fc58596-bf92-4485-9b10-8068cac15cdb\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"composite\",\"instrument\":\"8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb\",\"timeframe\":null,\"indicators\":[],\"metadata\":{\"id\":\"8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb\",\"symbol\":\"EURUSD\",\"name\":\"EURUSD\",\"display_symbol\":\"EURUSD\",\"series_kind\":\"composite\",\"source\":\"composite\",\"historical_source\":\"dukascopy\",\"basis\":\"bid\",\"calendar\":\"ny17\",\"precision\":5,\"calendar_profile\":{},\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"H4\",\"D1\",\"W1\",\"MN\"],\"volume_kind\":\"unavailable\",\"volume_unit\":null,\"composite_id\":\"8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb\",\"dataset_id\":\"e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3\",\"mapping_id\":\"5817041c6bd7806dbbca2d1cccf3d2cc8fdd1dfdaf4f5af0f54b57e4ac7e9331\",\"history_version_id\":\"c79b5f9e-7278-4a1f-b13c-cfdab491c746\",\"seam\":1794607200000,\"created\":true,\"realtime_enabled\":true,\"mobile_identity\":{\"category\":\"待分类\",\"provider\":\"Dukas\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"EUR/USD\"},\"instrument_name\":\"EURUSD\",\"series_kind_display\":\"自建 · 实时接续\",\"source_display\":\"历史：Dukascopy → 实时：OANDA Practice\",\"price_basis_display\":\"买价\",\"presentation_description\":\"EURUSD · 自建 · 实时接续 · 历史：Dukascopy → 实时：OANDA Practice · 买价\",\"historical_source_display\":\"Dukascopy\",\"live_source_display\":\"OANDA Practice\"},\"revision_id\":null,\"follow_active\":true,\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":0,\"task_id\":\"99958999139ad12b7f91672a8a0c623c422e0238f9c80ff632a5dd4dd1adf4e5\",\"result_epoch\":\"f7d7183b-1bf1-4ad2-a465-393bcb797d28\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"composite\",\"instrument\":\"4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6\",\"timeframe\":null,\"indicators\":[],\"metadata\":{\"id\":\"4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6\",\"symbol\":\"XAUUSD\",\"name\":\"XAUUSD\",\"display_symbol\":\"XAUUSD\",\"series_kind\":\"composite\",\"source\":\"composite\",\"historical_source\":\"dukascopy\",\"basis\":\"bid\",\"calendar\":\"ny17\",\"precision\":3,\"calendar_profile\":{},\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"H4\",\"D1\",\"W1\",\"MN\"],\"volume_kind\":\"unavailable\",\"volume_unit\":null,\"composite_id\":\"4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6\",\"dataset_id\":\"a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2\",\"mapping_id\":\"a0ecebffb9ed825c5f9b96e4afc2591308457ef0994fabc2491eb42fe5c14e90\",\"history_version_id\":\"8fb4ad77-f498-4339-a16f-90667f2d109c\",\"seam\":1794780000000,\"created\":true,\"realtime_enabled\":true,\"mobile_identity\":{\"category\":\"待分类\",\"provider\":\"Dukas\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"XAU/USD\"},\"instrument_name\":\"XAUUSD\",\"series_kind_display\":\"自建 · 实时接续\",\"source_display\":\"历史：Dukascopy → 实时：OANDA Practice\",\"price_basis_display\":\"买价\",\"presentation_description\":\"XAUUSD · 自建 · 实时接续 · 历史：Dukascopy → 实时：OANDA Practice · 买价\",\"historical_source_display\":\"Dukascopy\",\"live_source_display\":\"OANDA Practice\"},\"revision_id\":null,\"follow_active\":true,\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":0,\"task_id\":\"297d4732c5439a65de63c087b1e720610023c7f06be758d6eb884fa745e7fef9\",\"result_epoch\":\"d99c0298-1522-4227-8381-d2a1cb4bd83c\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"provider\",\"instrument\":\"YAHOO:426219f2bc19829619cd8e71b51d7b93\",\"timeframe\":null,\"indicators\":[],\"dataset_id\":\"20d800145c178b4e54a3f58520a4bcc0fd2aff7cc84c9afb5c1660de61faf347\",\"metadata\":{\"symbol\":\"NVDA\",\"english_name\":\"NVIDIA Corporation\",\"asset_type\":\"EQUITY\",\"quote_type\":\"EQUITY\",\"exchange\":\"NasdaqGS\",\"exchange_code\":\"NMS\",\"currency\":\"USD\",\"price_hint\":2,\"regular_market_price\":162.85,\"timezone\":\"America/New_York\",\"session\":\"0930-1600:23456\",\"session_status\":\"configured\",\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"D1\",\"W1\",\"MN\"],\"adjustment\":\"auto\",\"price_description\":\"Yahoo 自动复权\",\"delay_seconds\":900,\"reported_delay_seconds\":900,\"declared_delay_seconds\":null,\"first_trade_ms\":917015400000,\"event_revision\":\"382c836c27b56f9dcda6bcc528f339709f143592ce55b051629367fbe19fbcfb\",\"updated_at\":1794753623813,\"volume_kind\":\"shares\",\"volume_unit\":\"股\",\"metadata_observed_at\":1794753623813,\"sparkline_sessions\":{\"2026-11-09\":{\"start\":1794234600000,\"end\":1794258000000},\"2026-11-10\":{\"start\":1794321000000,\"end\":1794344400000},\"2026-11-11\":{\"start\":1794407400000,\"end\":1794430800000},\"2026-11-12\":{\"start\":1794493800000,\"end\":1794517200000},\"2026-11-13\":{\"start\":1794580200000,\"end\":1794603600000}},\"sparkline_calendar_retry_at\":1794790689602,\"archive_verified_frames\":{\"none\":[\"D1\"]},\"archive_probes\":{\"none\":{\"D1\":{\"status\":\"verified\",\"observed_at\":1794733371458,\"rows\":6758,\"first\":946857600000,\"last\":1794603600000}}},\"id\":\"YAHOO:426219f2bc19829619cd8e71b51d7b93\",\"name\":\"英伟达\",\"source\":\"yahoo\",\"display_symbol\":\"NVDA\",\"basis\":\"adjusted\",\"calendar\":\"yahoo\",\"precision\":8,\"display_precision\":2,\"series_kind\":\"provider\",\"series_kinds\":[\"provider\"],\"mobile_identity\":{\"category\":\"美股\",\"provider\":\"Yahoo\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"NVDA\"},\"instrument_name\":\"英伟达\",\"series_kind_display\":\"原生\",\"source_display\":\"Yahoo Finance\",\"price_basis_display\":\"来源复权\",\"presentation_description\":\"NVDA · 英伟达 · 原生 · Yahoo Finance · 来源复权\"},\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":4,\"task_id\":\"23b89d752a7456d7de8e66914183cf80c6437729a79c232872631d0d8d58c910\",\"result_epoch\":\"b5cec525-c031-4605-ad76-175c78f46e2a\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"provider\",\"instrument\":\"YAHOO:6493341e6b5636b2080fa9a1961f4fd3\",\"timeframe\":null,\"indicators\":[],\"dataset_id\":\"e4a399142c17ba9fc37bf6ef75e5a9c0047cea3afb6a41030712214b87752954\",\"metadata\":{\"symbol\":\"SPY\",\"english_name\":\"State Street SPDR S&P 500 ETF Trust\",\"asset_type\":\"ETF\",\"quote_type\":\"ETF\",\"exchange\":\"NYSEArca\",\"exchange_code\":\"PCX\",\"currency\":\"USD\",\"price_hint\":2,\"regular_market_price\":754.37,\"timezone\":\"America/New_York\",\"session\":\"0930-1600:23456\",\"session_status\":\"configured\",\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"D1\",\"W1\",\"MN\"],\"adjustment\":\"auto\",\"price_description\":\"Yahoo 自动复权\",\"delay_seconds\":0,\"reported_delay_seconds\":0,\"declared_delay_seconds\":null,\"first_trade_ms\":728317800000,\"event_revision\":null,\"updated_at\":1794786320763,\"volume_kind\":\"shares\",\"volume_unit\":\"股\",\"metadata_observed_at\":1794786320763,\"sparkline_sessions\":{\"2026-11-09\":{\"start\":1794234600000,\"end\":1794258000000},\"2026-11-10\":{\"start\":1794321000000,\"end\":1794344400000},\"2026-11-11\":{\"start\":1794407400000,\"end\":1794430800000},\"2026-11-12\":{\"start\":1794493800000,\"end\":1794517200000},\"2026-11-13\":{\"start\":1794580200000,\"end\":1794603600000}},\"sparkline_calendar_retry_at\":1794790689665,\"id\":\"YAHOO:6493341e6b5636b2080fa9a1961f4fd3\",\"name\":\"SPDR 标普 500 ETF\",\"source\":\"yahoo\",\"display_symbol\":\"SPY\",\"basis\":\"adjusted\",\"calendar\":\"yahoo\",\"precision\":8,\"display_precision\":2,\"series_kind\":\"provider\",\"series_kinds\":[\"provider\"],\"mobile_identity\":{\"category\":\"ETF\",\"provider\":\"Yahoo\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"SPY\"},\"instrument_name\":\"SPDR 标普 500 ETF\",\"series_kind_display\":\"原生\",\"source_display\":\"Yahoo Finance\",\"price_basis_display\":\"来源复权\",\"presentation_description\":\"SPY · SPDR 标普 500 ETF · 原生 · Yahoo Finance · 来源复权\"},\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":4,\"task_id\":\"65148e428f3c04cc0fd72e2c51bc7e86c7c775a650ee38980ac6e9fcad8dfa50\",\"result_epoch\":\"69cf9c8e-d081-40b4-add6-35d1fdcb2587\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"composite\",\"instrument\":\"54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982\",\"timeframe\":null,\"indicators\":[],\"metadata\":{\"id\":\"54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982\",\"symbol\":\"USDCAD\",\"name\":\"USDCAD\",\"display_symbol\":\"USDCAD\",\"series_kind\":\"composite\",\"source\":\"composite\",\"historical_source\":\"dukascopy\",\"basis\":\"bid\",\"calendar\":\"ny17\",\"precision\":5,\"calendar_profile\":{},\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"H4\",\"D1\",\"W1\",\"MN\"],\"volume_kind\":\"unavailable\",\"volume_unit\":null,\"composite_id\":\"54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982\",\"dataset_id\":\"b6b959a98b619ba5f8b56c0cacaffb19d208545fcb24a4445c6f1ebec2bcda20\",\"mapping_id\":\"a6e8ed4580064242d814cd3365746d41e3bd4d3429c3631944606fbc02c74214\",\"history_version_id\":\"850ae70a-f6bc-4f4a-bd66-f58cfefc05aa\",\"seam\":1794780000000,\"created\":true,\"realtime_enabled\":true,\"mobile_identity\":{\"category\":\"待分类\",\"provider\":\"Dukas\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"USD/CAD\"},\"instrument_name\":\"USDCAD\",\"series_kind_display\":\"自建 · 实时接续\",\"source_display\":\"历史：Dukascopy → 实时：OANDA Practice\",\"price_basis_display\":\"买价\",\"presentation_description\":\"USDCAD · 自建 · 实时接续 · 历史：Dukascopy → 实时：OANDA Practice · 买价\",\"historical_source_display\":\"Dukascopy\",\"live_source_display\":\"OANDA Practice\"},\"revision_id\":null,\"follow_active\":true,\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":0,\"task_id\":\"57f0f18253f5a6bcb04d83e8ae4366d57ccc7bfcfce9c5f47362c5954fd2aa62\",\"result_epoch\":\"3fc58596-bf92-4485-9b10-8068cac15cdb\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"composite\",\"instrument\":\"4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6\",\"timeframe\":null,\"indicators\":[],\"metadata\":{\"id\":\"4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6\",\"symbol\":\"XAUUSD\",\"name\":\"XAUUSD\",\"display_symbol\":\"XAUUSD\",\"series_kind\":\"composite\",\"source\":\"composite\",\"historical_source\":\"dukascopy\",\"basis\":\"bid\",\"calendar\":\"ny17\",\"precision\":3,\"calendar_profile\":{},\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"H4\",\"D1\",\"W1\",\"MN\"],\"volume_kind\":\"unavailable\",\"volume_unit\":null,\"composite_id\":\"4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6\",\"dataset_id\":\"a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2\",\"mapping_id\":\"a0ecebffb9ed825c5f9b96e4afc2591308457ef0994fabc2491eb42fe5c14e90\",\"history_version_id\":\"8fb4ad77-f498-4339-a16f-90667f2d109c\",\"seam\":1794780000000,\"created\":true,\"realtime_enabled\":true,\"mobile_identity\":{\"category\":\"待分类\",\"provider\":\"Dukas\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"XAU/USD\"},\"instrument_name\":\"XAUUSD\",\"series_kind_display\":\"自建 · 实时接续\",\"source_display\":\"历史：Dukascopy → 实时：OANDA Practice\",\"price_basis_display\":\"买价\",\"presentation_description\":\"XAUUSD · 自建 · 实时接续 · 历史：Dukascopy → 实时：OANDA Practice · 买价\",\"historical_source_display\":\"Dukascopy\",\"live_source_display\":\"OANDA Practice\"},\"revision_id\":null,\"follow_active\":true,\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":0,\"task_id\":\"297d4732c5439a65de63c087b1e720610023c7f06be758d6eb884fa745e7fef9\",\"result_epoch\":\"d99c0298-1522-4227-8381-d2a1cb4bd83c\"}"
+    },
+    {
+      "url": "/api/charts/stream/subscribe",
+      "status": 200,
+      "body": "{\"generation\":1,\"identity\":{\"kind\":\"quotes\",\"series_kind\":\"composite\",\"instrument\":\"8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb\",\"timeframe\":null,\"indicators\":[],\"metadata\":{\"id\":\"8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb\",\"symbol\":\"EURUSD\",\"name\":\"EURUSD\",\"display_symbol\":\"EURUSD\",\"series_kind\":\"composite\",\"source\":\"composite\",\"historical_source\":\"dukascopy\",\"basis\":\"bid\",\"calendar\":\"ny17\",\"precision\":5,\"calendar_profile\":{},\"frames\":[\"M1\",\"M5\",\"M15\",\"M30\",\"H1\",\"H4\",\"D1\",\"W1\",\"MN\"],\"volume_kind\":\"unavailable\",\"volume_unit\":null,\"composite_id\":\"8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb\",\"dataset_id\":\"e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3\",\"mapping_id\":\"5817041c6bd7806dbbca2d1cccf3d2cc8fdd1dfdaf4f5af0f54b57e4ac7e9331\",\"history_version_id\":\"c79b5f9e-7278-4a1f-b13c-cfdab491c746\",\"seam\":1794607200000,\"created\":true,\"realtime_enabled\":true,\"mobile_identity\":{\"category\":\"待分类\",\"provider\":\"Dukas\",\"channel\":\"\",\"product\":\"\",\"environment\":\"\",\"provider_symbol\":\"EUR/USD\"},\"instrument_name\":\"EURUSD\",\"series_kind_display\":\"自建 · 实时接续\",\"source_display\":\"历史：Dukascopy → 实时：OANDA Practice\",\"price_basis_display\":\"买价\",\"presentation_description\":\"EURUSD · 自建 · 实时接续 · 历史：Dukascopy → 实时：OANDA Practice · 买价\",\"historical_source_display\":\"Dukascopy\",\"live_source_display\":\"OANDA Practice\"},\"revision_id\":null,\"follow_active\":true,\"input_revision\":null,\"calculation_origin\":null,\"provisional\":true},\"sequence\":0,\"task_id\":\"99958999139ad12b7f91672a8a0c623c422e0238f9c80ff632a5dd4dd1adf4e5\",\"result_epoch\":\"f7d7183b-1bf1-4ad2-a465-393bcb797d28\"}"
+    }
+  ],
+  "screenshots": [
+    "watch-0.png",
+    "watch-4.png"
+  ],
+  "samples": [
+    {
+      "at": "2026-11-16T00:52:21.204Z",
+      "visible": "visible",
+      "rows": [
+        {
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "text": "EURUSD\n欧元美元\n自建\nDukas\n-0.01%\n1.10209"
+        },
+        {
+          "ticker": "MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "text": "USDCAD\n美元加元\n自建\nDukas\n+0.05%\n1.42732"
+        },
+        {
+          "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+          "text": "NVDA\n英伟达\nYahoo\n-2.01%\n162.85\n延迟15分"
+        },
+        {
+          "ticker": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3",
+          "text": "SPY\nSPDR 标普 500 ETF\nYahoo\n-0.36%\n754.37"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:000725",
+          "text": "000725\n京东方Ａ\n腾讯财经\n暂无日内数据\n-2.49%\n4.3000"
+        },
+        {
+          "ticker": "MWP:AKSHARE:03e17c7afd7a5bb095e732b85bc6d346",
+          "text": "09618\n京东集团－ＳＷ\n新浪财经\n暂无日内数据\n-0.65%\n107.00000"
+        },
+        {
+          "ticker": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+          "text": "XAUUSD\n黄金\n自建\nDukas\n+0.22%\n3,891.735"
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T00:52:31.277Z",
+      "visible": "visible",
+      "rows": [
+        {
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "text": "EURUSD\n欧元美元\n自建\nDukas\n-0.01%\n1.10215"
+        },
+        {
+          "ticker": "MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "text": "USDCAD\n美元加元\n自建\nDukas\n+0.05%\n1.42724"
+        },
+        {
+          "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+          "text": "NVDA\n英伟达\nYahoo\n-2.01%\n162.85\n延迟15分"
+        },
+        {
+          "ticker": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3",
+          "text": "SPY\nSPDR 标普 500 ETF\nYahoo\n-0.36%\n754.37"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:000725",
+          "text": "000725\n京东方Ａ\n腾讯财经\n暂无日内数据\n-2.49%\n4.3000"
+        },
+        {
+          "ticker": "MWP:AKSHARE:03e17c7afd7a5bb095e732b85bc6d346",
+          "text": "09618\n京东集团－ＳＷ\n新浪财经\n暂无日内数据\n-0.65%\n107.00000"
+        },
+        {
+          "ticker": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+          "text": "XAUUSD\n黄金\n自建\nDukas\n+0.21%\n3,891.345"
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T00:52:41.286Z",
+      "visible": "visible",
+      "rows": [
+        {
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "text": "EURUSD\n欧元美元\n自建\nDukas\n-0.00%\n1.10217"
+        },
+        {
+          "ticker": "MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "text": "USDCAD\n美元加元\n自建\nDukas\n+0.05%\n1.42724"
+        },
+        {
+          "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+          "text": "NVDA\n英伟达\nYahoo\n-2.01%\n162.85\n延迟15分"
+        },
+        {
+          "ticker": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3",
+          "text": "SPY\nSPDR 标普 500 ETF\nYahoo\n-0.36%\n754.37"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:000725",
+          "text": "000725\n京东方Ａ\n腾讯财经\n暂无日内数据\n-2.49%\n4.3000"
+        },
+        {
+          "ticker": "MWP:AKSHARE:03e17c7afd7a5bb095e732b85bc6d346",
+          "text": "09618\n京东集团－ＳＷ\n新浪财经\n暂无日内数据\n-0.65%\n107.00000"
+        },
+        {
+          "ticker": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+          "text": "XAUUSD\n黄金\n自建\nDukas\n+0.22%\n3,891.745"
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T00:52:51.293Z",
+      "visible": "visible",
+      "rows": [
+        {
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "text": "EURUSD\n欧元美元\n自建\nDukas\n-0.00%\n1.10218"
+        },
+        {
+          "ticker": "MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "text": "USDCAD\n美元加元\n自建\nDukas\n+0.05%\n1.42723"
+        },
+        {
+          "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+          "text": "NVDA\n英伟达\nYahoo\n-2.01%\n162.85\n延迟15分"
+        },
+        {
+          "ticker": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3",
+          "text": "SPY\nSPDR 标普 500 ETF\nYahoo\n-0.36%\n754.37"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:000725",
+          "text": "000725\n京东方Ａ\n腾讯财经\n暂无日内数据\n-2.49%\n4.3000"
+        },
+        {
+          "ticker": "MWP:AKSHARE:03e17c7afd7a5bb095e732b85bc6d346",
+          "text": "09618\n京东集团－ＳＷ\n新浪财经\n暂无日内数据\n-0.65%\n107.00000"
+        },
+        {
+          "ticker": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+          "text": "XAUUSD\n黄金\n自建\nDukas\n+0.21%\n3,891.475"
+        }
+      ]
+    },
+    {
+      "at": "2026-11-16T00:53:01.298Z",
+      "visible": "visible",
+      "rows": [
+        {
+          "ticker": "MWC:8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+          "text": "EURUSD\n欧元美元\n自建\nDukas\n-0.00%\n1.10217"
+        },
+        {
+          "ticker": "MWC:54ef74f0522cfce9b29f2ad14743bf51c345c6e46208119402c18dab2b3b0982",
+          "text": "USDCAD\n美元加元\n自建\nDukas\n+0.05%\n1.42723"
+        },
+        {
+          "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+          "text": "NVDA\n英伟达\nYahoo\n-2.01%\n162.85\n延迟15分"
+        },
+        {
+          "ticker": "MWP:YAHOO:6493341e6b5636b2080fa9a1961f4fd3",
+          "text": "SPY\nSPDR 标普 500 ETF\nYahoo\n-0.36%\n754.37"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:000725",
+          "text": "000725\n京东方Ａ\n腾讯财经\n暂无日内数据\n-2.49%\n4.3000"
+        },
+        {
+          "ticker": "MWP:AKSHARE:03e17c7afd7a5bb095e732b85bc6d346",
+          "text": "09618\n京东集团－ＳＷ\n新浪财经\n暂无日内数据\n-0.65%\n107.00000"
+        },
+        {
+          "ticker": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+          "text": "XAUUSD\n黄金\n自建\nDukas\n+0.22%\n3,891.855"
+        }
+      ]
+    }
+  ],
+  "passed": true,
+  "checks": [
+    "All three managed quote rows update visibly",
+    "No browser page errors",
+    "Read-only subscription/resolve requests allowed; business mutations blocked"
+  ]
+}

@@ -1,3 +1,4 @@
+const { auditHeaderIcons } = require('./mobile-header-icons.helper.cjs');
 // Real production build + explicit HTTP fixture; never presented as a supplier/device test.
 const assert = require("node:assert/strict"),
   fs = require("node:fs"),
@@ -62,6 +63,7 @@ let logged = false,
   mappingLost = false,
   enableLost = false,
   failEnable = false,
+  failPreferenceSave = false,
   commandPreparing = false,
   summaryGate = null,
   conflict = false,
@@ -131,6 +133,7 @@ function make(entry, id, ready = false) {
     availability: ready ? "available" : "preparing",
     available_start: ready ? start : null,
     available_end: ready ? now : null,
+    history_range: ready ? {start, end:now, timeframe:entry.source === "yahoo" ? "D1" : "M1",version_id:vid} : null,
     usable_timeframes: ready
       ? entry.source === "yahoo"
         ? ["D1", "W1", "MN"]
@@ -153,6 +156,7 @@ function publish(id) {
     availability: "available",
     available_start: start,
     available_end: now,
+    history_range: {start,end:now,timeframe:d.identity.mode === "base_d1" ? "D1" : "M1",version_id:vid},
     usable_timeframes: d.maintenance.timeframes,
     periods: d.maintenance.timeframes.map((timeframe) => ({
       timeframe,
@@ -185,10 +189,13 @@ function continuation(id) {
       (id === eid ? defaultOverride : "") || maps[0]?.id || null,
     mappings: maps,
     configurations: [],
-    status: enabled ? "receiving" : "disabled",
+    status: enabled ? d.runtime_status || "receiving" : "disabled",
     composite: enabled
       ? {
           id: cid,
+          health: d.runtime_health,
+          live_source:"oanda",live_source_display:"OANDA",mapping:{target_identity:{provider_symbol:"EUR_USD"}},
+          revision:{history_version_id:vid,seam:Date.UTC(2026,10,13),activated_at:Date.UTC(2026,10,13)},
           preparation: { status: livePrepared ? "queried" : "preparing" },
         }
       : null,
@@ -227,6 +234,7 @@ const server = http.createServer(async (req, res) => {
     }
     if (p === "/api/advanced-charts/preferences") return json([remote]);
     if (p === "/api/advanced-charts/preferences/save") {
+      if (failPreferenceSave) { failPreferenceSave = false; return json({detail:"自选已在其他窗口修改，请重试"},409); }
       remote = { ...body, revision: remote.revision + 1 };
       return json(remote);
     }
@@ -254,6 +262,12 @@ const server = http.createServer(async (req, res) => {
           ? d.maintenance.archived
           : !d.maintenance.archived,
       );
+      const categoryLabel = d => d.mobile_identity?.category || ({forex:"外汇",metal:"贵金属",equity:"股票",crypto:"加密",etf:"ETF"})[d.asset_class] || "待分类";
+      const groups = {forex:["外汇"],metal:["贵金属"],"a-stock":["深A","沪A","北A"],"us-stock":["美股"],"hk-stock":["港股"],crypto:["加密"],index:["指数","股指"],future:["期货"],etf:["ETF"],fund:["基金"],stock:["股票"],other:["待分类"]};
+      const labels = {forex:"外汇",metal:"贵金属","a-stock":"A股","us-stock":"美股","hk-stock":"港股",crypto:"加密",index:"指数",future:"期货",etf:"ETF",fund:"基金",stock:"其他股票",other:"其他"};
+      const categories = Object.entries(groups).filter(([,values])=>rows.some(d=>values.includes(categoryLabel(d)))).map(([value])=>({value,label:labels[value]}));
+      const category = url.searchParams.get("category");
+      if(category) rows=rows.filter(d=>groups[category]?.includes(categoryLabel(d)));
       const q = url.searchParams.get("query"),
         s = url.searchParams.get("source");
       if (q)
@@ -264,9 +278,10 @@ const server = http.createServer(async (req, res) => {
       const anchor = url.searchParams.get("anchor")?.slice(8),
         pos = rows.findIndex((d) => d.id === anchor) + 1;
       return json({
-        items: rows.map(d => { const c=continuation(d.id); return {...d,continuation:{...c,configured:c.mappings.length>0,can_enable:c.supported&&c.ready_to_enable,can_disable:c.enabled,disabled_reason:!c.supported?'不支持':!c.mappings.length?'待配置':'待历史'}}; }),
+        items: rows.slice((Number(url.searchParams.get("page") || 1)-1)*Number(url.searchParams.get("page_size") || 25),Number(url.searchParams.get("page") || 1)*Number(url.searchParams.get("page_size") || 25)).map(d => { const c=continuation(d.id); return {...d,continuation:{...c,configured:c.mappings.length>0,can_enable:c.supported&&c.ready_to_enable,can_disable:c.enabled,disabled_reason:!c.supported?'不支持':!c.mappings.length?'待配置':'待历史'}}; }),
         total: rows.length,
         anchor_position: pos || null,
+        categories,
       });
     }
     if (p === "/api/market-data/history-catalog/search") {
@@ -680,6 +695,7 @@ const server = http.createServer(async (req, res) => {
         [],
         name + " shared control inventory",
       );
+    await auditHeaderIcons(page);
     await page.screenshot({ path: path.join(out, name + ".png") });
     proof.screenshots.push(name);
   }
@@ -696,7 +712,7 @@ const server = http.createServer(async (req, res) => {
     await settle();
   }
   async function details(code = "EURUSD") {
-    await page.locator(".data-managed-row").filter({ hasText: code }).locator(".data-managed-open").click();
+    await page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row').filter({ hasText: code }).locator(".data-managed-open").click();
     await expect(
       dialog("自建行情").getByRole("button", { name: "维护设置", exact: true }),
     ).toBeVisible();
@@ -707,6 +723,14 @@ const server = http.createServer(async (req, res) => {
       .click();
   }
   try {
+    if(process.env.MOBILE_DATA_SETTINGS) {
+      await require("./mobile-data-settings.scenario.cjs")({page,context,server,datasets,mappings,make,entries,errors,proof,shot,close,out,writes});
+      return;
+    }
+    if(process.env.MOBILE_DATA_CATEGORIES) {
+      await require("./mobile-data-categories.scenario.cjs")({page,context,server,datasets,make,entries,errors,proof,shot,close,out});
+      return;
+    }
     await page.goto(`http://127.0.0.1:${server.address().port}/m/data`);
     await page.getByLabel("密码", { exact: true }).fill("fixture");
     await page.getByRole("button", { name: "登录", exact: true }).click();
@@ -719,7 +743,7 @@ const server = http.createServer(async (req, res) => {
     );
     await shot("01-empty");
     await page
-      .getByRole("button", { name: "搜索并添加行情", exact: true })
+      .getByRole("button", { name: "添加自建", exact: true })
       .click();
     await expect(
       dialog("添加自建").getByRole("button").filter({ hasText: "EURUSD" }),
@@ -757,7 +781,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
-    await expect(page.locator(".data-managed-row")).toHaveCount(1);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(1);
     assert.equal(createCount, 1);
     proof.checks.push(
       "lost creation response reconciles exact request; no duplicate creation",
@@ -785,6 +809,11 @@ const server = http.createServer(async (req, res) => {
     await expect(
       dialog("自建行情").getByRole("button", { name: "立即更新", exact: true }),
     ).toBeVisible();
+    await expect(dialog("自建行情").getByText("历史范围",{exact:true})).toBeVisible();
+    await expect(dialog("自建行情").locator('.data-history-range')).toContainText('→');
+    await expect(dialog("自建行情").locator('.data-history-tags [data-slot="badge"]')).toHaveText(['M1派生','bid','NY17']);
+    await expect(dialog("自建行情").getByRole('button',{name:'数据明细',exact:true})).toHaveCount(0);
+    await expect(dialog("自建行情").getByRole('combobox')).toHaveCount(0);
     await shot("05-detail-ready");
     await dialog("自建行情")
       .getByRole("button", { name: "维护设置", exact: true })
@@ -821,7 +850,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("维护设置")
       .getByRole("button", { name: "保存维护设置", exact: true })
       .click();
-    await expect(dialog("维护设置").getByText(/维护设置已保存/)).toBeVisible();
+    await expect(dialog("维护设置").getByRole("button",{name:"已保存",exact:true})).toBeVisible();
     assert.equal(datasets.get(eid).maintenance.daily_minute, 150);
     await close("维护设置");
     proof.checks.push(
@@ -860,7 +889,7 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "核查配置并开启", exact: true })
       .click();
     await expect(
-      dialog("自建行情").getByText("已开启 · 运行中", { exact: true }),
+      dialog("自建行情").getByText("已开启", { exact: true }),
     ).toBeVisible();
     assert.equal(writes.filter((w) => w.path.endsWith("/mappings")).length, 1);
     await shot("08-live-running");
@@ -885,7 +914,7 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "开启实时", exact: true })
       .click();
     await expect(
-      dialog("自建行情").getByText("已开启 · 运行中", { exact: true }),
+      dialog("自建行情").getByText("已开启", { exact: true }),
     ).toBeVisible();
     assert.equal(writes.filter((w) => w.path.endsWith("/mappings")).length, 1);
     await dialog("自建行情")
@@ -913,7 +942,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("区间维护")
       .getByRole("button", { name: "提交补数", exact: true })
       .click();
-    await expect(dialog("区间维护").getByText(/区间维护已提交/)).toBeVisible();
+    await expect(dialog("区间维护").getByRole("button",{name:"已提交",exact:true})).toBeVisible();
     await shot("09-range");
     await close("区间维护");
     await close("自建行情");
@@ -927,6 +956,7 @@ const server = http.createServer(async (req, res) => {
     await rowSwitch().click();
     await expect(rowSwitch()).not.toBeChecked();
     await expect(rowSwitch()).toBeEnabled();
+    await expect(page.getByText(/当前状态待核实/)).toHaveCount(0);
     failEnable=false;
     // Command response protects against the old disk snapshot, then yields to
     // a fresh summary even when runtime has already advanced to receiving.
@@ -942,12 +972,12 @@ const server = http.createServer(async (req, res) => {
     await expect(rowSwitch()).toBeChecked();
     summaryGate = null;
     releaseSummary();
-    const liveRow = page.locator('.data-managed-row').filter({ has: rowSwitch() });
-    await expect(liveRow.getByText('实时运行中', { exact: true })).toBeVisible();
+    const liveRow = page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row').filter({ has: rowSwitch() });
+    await expect(liveRow.getByText('实时已开启', { exact: true })).toBeVisible();
     // A change by another client must replace the command response on polling.
     datasets.get(eid).continuation.enabled = false;
     await expect(rowSwitch()).not.toBeChecked({ timeout: 20000 });
-    await expect(liveRow.getByText('历史可用', { exact: true })).toBeVisible();
+    await expect(liveRow.getByText('实时未开启', { exact: true })).toBeVisible();
     proof.checks.push('preparing command survives stale snapshot, yields to fresh receiving summary and later external disable');
     enableLost=true;
     await rowSwitch().click();
@@ -956,7 +986,7 @@ const server = http.createServer(async (req, res) => {
     await shot('09a-row-live-switch');
     proof.checks.push('list Switch directly stops, failure rolls back, lost enable response reads back; no confirmation or detail navigation');
     await page
-      .getByRole("button", { name: "搜索并添加行情", exact: true })
+      .getByRole("button", { name: "添加自建", exact: true })
       .click();
     await dialog("添加自建")
       .getByRole("button")
@@ -971,7 +1001,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
-    await expect(page.locator(".data-managed-row")).toHaveCount(2);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(2);
     publish(gid);
     await details("XAUUSD");
     await dialog("自建行情")
@@ -1014,14 +1044,14 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "重试开启实时", exact: true })
       .click();
     await expect(
-      dialog("自建行情").getByText("已开启 · 运行中", { exact: true }),
+      dialog("自建行情").getByText("已开启", { exact: true }),
     ).toBeVisible();
     await close("自建行情");
     proof.checks.push(
       "gold difference cannot be skipped; saved mapping survives enable failure",
     );
     await page
-      .getByRole("button", { name: "搜索并添加行情", exact: true })
+      .getByRole("button", { name: "添加自建", exact: true })
       .click();
     await dialog("添加自建")
       .getByRole("button")
@@ -1038,7 +1068,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
-    await expect(page.locator(".data-managed-row")).toHaveCount(3);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(3);
     publish(yid);
     datasets.get(yid).maintenance.frame_plan.D1.overlap_bars = 7;
     await details("AAPL");
@@ -1057,7 +1087,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("维护设置")
       .getByRole("button", { name: "保存维护设置", exact: true })
       .click();
-    await expect(dialog("维护设置").getByText(/维护设置已保存/)).toBeVisible();
+    await expect(dialog("维护设置").getByRole("button",{name:"已保存",exact:true})).toBeVisible();
     assert.equal(datasets.get(yid).maintenance.frame_plan.D1.overlap_bars, 7);
     await close("维护设置");
     await close("自建行情");
@@ -1068,7 +1098,7 @@ const server = http.createServer(async (req, res) => {
     const eurPlan = JSON.stringify(datasets.get(eid).maintenance),
       countBefore = createCount;
     await page
-      .getByRole("button", { name: "搜索并添加行情", exact: true })
+      .getByRole("button", { name: "添加自建", exact: true })
       .click();
     await dialog("添加自建")
       .getByRole("button")
@@ -1083,15 +1113,14 @@ const server = http.createServer(async (req, res) => {
     await dialog("添加自建")
       .getByRole("button", { name: "查看已有自建", exact: true })
       .click();
-    await expect(
-      page.getByRole("status").filter({ hasText: "已定位已有自建行情" }),
-    ).toBeVisible();
+    await expect(page.getByRole("dialog", {name:"添加自建",exact:true})).toHaveCount(0);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row').filter({hasText:"EURUSD"})).toBeVisible();
     assert.equal(createCount, countBefore);
     assert.equal(JSON.stringify(datasets.get(eid).maintenance), eurPlan);
     // A concurrent creator can win between check and POST; re-check before proceeding.
     hideExisting = true;
     await page
-      .getByRole("button", { name: "搜索并添加行情", exact: true })
+      .getByRole("button", { name: "添加自建", exact: true })
       .click();
     await dialog("添加自建")
       .getByRole("button")
@@ -1121,7 +1150,7 @@ const server = http.createServer(async (req, res) => {
     // A failed source validation never permits creation; explicit retry recovers.
     failProbe = true;
     await page
-      .getByRole("button", { name: "搜索并添加行情", exact: true })
+      .getByRole("button", { name: "添加自建", exact: true })
       .click();
     await dialog("添加自建")
       .getByRole("button")
@@ -1168,7 +1197,7 @@ const server = http.createServer(async (req, res) => {
     await dialog("添加自建")
       .getByRole("button", { name: "创建并准备历史", exact: true })
       .click();
-    await expect(page.locator(".data-managed-row")).toHaveCount(4);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(4);
     publish(nativeId);
     assert.deepEqual(datasets.get(nativeId).maintenance.timeframes, [
       "H1",
@@ -1199,7 +1228,7 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "确认并开启", exact: true })
       .click();
     await expect(
-      dialog("自建行情").getByText("已开启 · 运行中", { exact: true }),
+      dialog("自建行情").getByText("已开启", { exact: true }),
     ).toBeVisible();
     assert.equal(defaultOverride, second.id);
     assert.equal(
@@ -1218,6 +1247,7 @@ const server = http.createServer(async (req, res) => {
       window_remaining_ms: 86400000,
     };
     await details();
+    await expect(dialog("自建行情").getByText("已开启 · 需处理", {exact:true})).toBeVisible();
     await expect(dialog("自建行情").getByText(rolloverOverride.warning, { exact: true })).toBeVisible();
     await shot("18b-rollover-window-warning");
     await close("自建行情");
@@ -1236,16 +1266,16 @@ const server = http.createServer(async (req, res) => {
     await expect.poll(() => datasets.get(eid).maintenance.archived).toBe(true);
     assert(datasets.get(eid).continuation.enabled);
     await close("自建行情");
-    await expect(page.locator(".data-managed-row")).toHaveCount(3);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(3);
     await page
-      .getByRole("button", { name: "筛选与数据工具", exact: true })
+      .getByRole("button", { name: "搜索自建行情", exact: true })
       .click();
-    await dialog("筛选与工具")
+    await dialog("搜索自建行情")
       .getByRole("combobox", { name: "显示范围", exact: true })
       .click();
     await page.getByRole("option", { name: "已归档", exact: true }).click();
-    await close("筛选与工具");
-    await expect(page.locator(".data-managed-row")).toHaveCount(1);
+    await close("搜索自建行情");
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(1);
     await details();
     await more();
     await dialog("自建行情")
@@ -1261,7 +1291,7 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "清除筛选", exact: true })
       .first()
       .click();
-    await expect(page.locator(".data-managed-row")).toHaveCount(4);
+    await expect(page.locator('[data-slot="tabs-content"]:not([hidden]) .data-managed-row')).toHaveCount(4);
     // Missing baseline is explained by the server and never silently enables.
     datasets.get(eid).continuation.enabled = false;
     missingBaseline = true;
@@ -1276,7 +1306,7 @@ const server = http.createServer(async (req, res) => {
       .getByRole("button", { name: "开启实时", exact: true })
       .click();
     await expect(
-      dialog("自建行情").getByText("已开启 · 运行中", { exact: true }),
+      dialog("自建行情").getByText("已开启", { exact: true }),
     ).toBeVisible();
     await close("自建行情");
     livePrepared = false;
@@ -1285,7 +1315,7 @@ const server = http.createServer(async (req, res) => {
       dialog("自建行情").getByRole("button", { name: "打开图表", exact: true }),
     ).toBeDisabled();
     await expect(
-      dialog("自建行情").getByRole("button", { name: "加入自选", exact: true }),
+      dialog("自建行情").getByRole("button", { name: /^(已加入自选|加入自选)$/ }),
     ).toBeDisabled();
     await close("自建行情");
     livePrepared = true;
@@ -1294,9 +1324,9 @@ const server = http.createServer(async (req, res) => {
     );
     // Source tools remain discoverable without occupying the home header.
     await page
-      .getByRole("button", { name: "筛选与数据工具", exact: true })
+      .getByRole("button", { name: "搜索自建行情", exact: true })
       .click();
-    await dialog("筛选与工具")
+    await dialog("搜索自建行情")
       .getByRole("button", { name: "任务与来源", exact: true })
       .click();
     await expect(
@@ -1335,7 +1365,7 @@ const server = http.createServer(async (req, res) => {
           await close("维护设置");
           await close("自建行情");
           await page
-            .getByRole("button", { name: "搜索并添加行情", exact: true })
+            .getByRole("button", { name: "添加自建", exact: true })
             .click();
           await shot(`matrix-catalog-${color}-${width}-${font}`);
           await dialog("添加自建")
@@ -1387,7 +1417,7 @@ const server = http.createServer(async (req, res) => {
       document.dispatchEvent(new Event("visibilitychange")),
     );
     await expect(
-      page.getByRole("status").filter({ hasText: "上次读取" }),
+      page.getByRole("status").filter({ hasText: "当前离线" }),
     ).toBeVisible();
     await details();
     await expect(
@@ -1422,6 +1452,44 @@ const server = http.createServer(async (req, res) => {
     proof.checks.push(
       "light/dark 375/412px 150% typography for home/detail/catalog/create/settings; tools; offline write guards and recovery; reduced motion",
     );
+    // Current group belongs to this origin/account, not desktop active or the first list.
+    const savedRemote = structuredClone(remote);
+    const watchedTicker = continuation(eid).enabled ? "MWC:"+cid : "MWH:"+vid;
+    const setSelection = async value => page.evaluate(value => new Promise((resolve,reject)=>{
+      const request=indexedDB.open('mw-mobile',2);
+      request.onsuccess=()=>{const db=request.result,tx=db.transaction('records','readwrite');
+        tx.objectStore('records').put({value,readAt:Date.now()},[location.origin,'admin',1,'watch-group']);
+        tx.oncomplete=()=>{db.close();resolve()};tx.onerror=()=>reject(tx.error)};
+      request.onerror=()=>reject(request.error);
+    }),value);
+    for (const group of ['second','','deleted']) {
+      remote={...savedRemote,revision:remote.revision+1,content:{...savedRemote.content,value:{...savedRemote.content.value,lists:[{id:'first',title:'第一组',symbols:[]},{id:'second',title:'第二组',symbols:[]}]}}};
+      await setSelection(group);await details();
+      await expect(dialog('自建行情').getByRole('combobox')).toHaveCount(0);
+      await dialog('自建行情').getByRole('button',{name:'加入自选',exact:true}).click();
+      await expect(dialog('自建行情').getByRole('button',{name:'已加入自选',exact:true})).toBeDisabled();
+      const target=group==='second'?1:0;
+      assert.deepEqual(remote.content.value.lists[target].symbols,[watchedTicker]);
+      assert.deepEqual(remote.content.value.lists[1-target].symbols,[]);
+      assert.equal(remote.content.value.active,'desktop');
+      await close('自建行情');
+      const saves=writes.filter(w=>w.path.endsWith('/preferences/save')).length;
+      await details();
+      await expect(dialog('自建行情').getByRole('button',{name:'已加入自选',exact:true})).toBeDisabled();
+      assert.equal(writes.filter(w=>w.path.endsWith('/preferences/save')).length,saves);
+      await close('自建行情');
+    }
+    remote={...savedRemote,revision:remote.revision+1,content:{...savedRemote.content,value:{...savedRemote.content.value,lists:[]}}};
+    await setSelection('deleted');await details();failPreferenceSave=true;
+    await dialog('自建行情').getByRole('button',{name:'加入自选',exact:true}).click();
+    await expect(dialog('自建行情').getByRole('alert')).toContainText('其他窗口');
+    assert.deepEqual(remote.content.value.lists,[]);
+    await dialog('自建行情').getByRole('button',{name:'加入自选',exact:true}).click();
+    await expect(dialog('自建行情').getByRole('button',{name:'已加入自选',exact:true})).toBeDisabled();
+    assert.equal(remote.content.value.lists.length,1);
+    assert.deepEqual(remote.content.value.lists[0].symbols,[watchedTicker]);
+    await close('自建行情');await setSelection('');remote=savedRemote;
+    proof.checks.push('detail has product range and separate tags without technical expansion or group picker; current/all/deleted/no group, reopen duplicate and conflict retry verified');
     await page.emulateMedia({ reducedMotion: "no-preference" });
     await details();
     await dialog("自建行情")
@@ -1440,8 +1508,8 @@ const server = http.createServer(async (req, res) => {
     await page.getByRole("link", { name: "数据", exact: true }).click();
     await details("XAUUSD");
     await expect(
-      dialog("自建行情").getByRole("button", { name: "加入自选", exact: true }),
-    ).toBeEnabled();
+      dialog("自建行情").getByRole("button", { name: "已加入自选", exact: true }),
+    ).toBeDisabled();
     await close("自建行情");
     proof.checks.push(
       "managed chart handoff selects exact MWC identity and releases detail state before returning to another dataset",
@@ -1462,6 +1530,7 @@ const server = http.createServer(async (req, res) => {
       }),
     );
   } catch (error) {
+    await auditHeaderIcons(page);
     await page.screenshot({ path: path.join(out, "failure.png") });
     console.error(error);
     console.error(

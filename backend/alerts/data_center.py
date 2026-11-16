@@ -17,6 +17,31 @@ from .storage import (
 )
 
 
+def _history_range(db, dataset, available):
+    """One product range from materialized base history, never task targets.
+
+    Native periods have no derived base: the finest available input is the
+    product's history reference. Coarser bucket boundaries do not widen it.
+    All bounds remain the stored half-open interval, not a last-bar timestamp.
+    """
+    from .chart_data import FRAMES
+
+    mode = dataset.identity.get("mode", "base_m1")
+    frame = {"base_m1": "M1", "base_d1": "D1"}.get(mode)
+    if mode == "native_periods":
+        frame = next((f for f in FRAMES if f in available), None)
+    artifact = available.get(frame)
+    if artifact is None:
+        return None
+    start, end = db.execute(select(func.min(HistoryArtifactBlock.start),
+        func.max(HistoryArtifactBlock.end)).where(
+            HistoryArtifactBlock.artifact_id == artifact.id)).one()
+    if start is None or end is None:
+        return None
+    return {"start": start, "end": end, "timeframe": frame,
+            "version_id": artifact.version_id}
+
+
 def dataset_detail(db, dataset_id):
     from .history_api import dataset_report
     from .history_artifacts import artifact_report
@@ -75,9 +100,12 @@ def dataset_detail(db, dataset_id):
             selectable = list(dict.fromkeys([*inputs, *available_frames(info, dataset.identity["adjustment"])]))
         except ValueError:
             pass  # Saved inputs remain editable while a source is disabled.
-    return {**dataset_report(dataset, db.get(Instrument, dataset.instrument_id)), "maintenance": maintenance,
+    from .mobile_identity import dataset_display_metadata
+    display_metadata = dataset_display_metadata(db, [dataset]).get(dataset.id)
+    return {**dataset_report(dataset, db.get(Instrument, dataset.instrument_id), display_metadata), "maintenance": maintenance,
         "latest_version_id": published, "available_start": version.start if version else None,
         "available_end": version.end if version else None,
+        "history_range": _history_range(db, dataset, available),
         "unknown_minutes": version.manifest.get("unknown_minutes") if version else None,
         "mode": dataset.identity.get("mode", "base_m1"),
         "input_timeframes": inputs, "selectable_timeframes": selectable,
@@ -110,6 +138,10 @@ def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, st
         base = base.where(predicate(query, Instrument.source,
             MarketDataset.identity["provider_symbol"].as_string(), MarketDataset.asset_class,
             MarketDataset.logical_symbol, Instrument.label,
+            family=MarketDataset.identity["source_family"].as_string(),
+            adjustment=MarketDataset.identity["adjustment"].as_string(), basis=MarketDataset.identity["basis"].as_string(),
+            index_type=MarketDataset.identity["parameters"]["index_type"].as_string(),
+            product=MarketDataset.identity["parameters"]["contract_type"].as_string(),
             exchange=func.coalesce(MarketDataset.identity["parameters"]["exchange_code"].as_string(), MarketDataset.identity["parameters"]["exchange"].as_string())))
     elif query:
         # Literal substring search: user wildcards must not expand the query.

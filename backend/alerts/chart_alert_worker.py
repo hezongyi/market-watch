@@ -250,6 +250,10 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
             return result
         from .composite_alerts import evaluate as evaluate_composite
 
+        # Inspection evidence must also cover indicator/drawing rules. It is
+        # independent of whether this pass has new judgeable input.
+        alert.runtime = {**alert.runtime, "taken_over_at": alert.runtime.get("taken_over_at", now),
+                         "last_checked_at": now}
         return evaluate_composite(db, alert, version, config, now, clock=clock)
     try:
         rows, meta = stored_rows(db, version, config, now,

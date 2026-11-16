@@ -1,0 +1,31 @@
+{
+  "build": "assembleDebug passed",
+  "lint": {
+    "errors": 0,
+    "warnings": 16
+  },
+  "tests": [
+    {
+      "suite": "com.kookvv.marketwatch.ServerSettingsRenderTest",
+      "tests": 2,
+      "failures": 0,
+      "errors": 0
+    },
+    {
+      "suite": "com.kookvv.marketwatch.UpdateManifestTest",
+      "tests": 4,
+      "failures": 0,
+      "errors": 0
+    }
+  ],
+  "renderer": "Robolectric 4.14.1 / Android API 35 native graphics, not emulator or physical device",
+  "screenshots": 14,
+  "sourceSha256": {
+    "mobile/client/app/build.gradle.kts": "05c9dde5a594c34f745afd065ffc5b33aff51973851ca12af72d1a26b2ae22fc",
+    "mobile/client/app/src/main/java/com/kookvv/marketwatch/MainActivity.kt": "0b5123b51eee5ee4aa00475ba3e8813240af07b427a4bb281a8f144fb0b9a6f7",
+    "mobile/client/app/src/main/java/com/kookvv/marketwatch/ServerSettingsView.kt": "0aee9a182b60ed1cffa7ae6a84a7cb6732777a5e878b70dc10dd057bce514f51",
+    "mobile/client/app/src/main/res/values/strings.xml": "d742c2fe8704f9cbb0cb639afe1965ddf8af90cce4069e3d19925b332cdd6e99",
+    "mobile/client/app/src/main/res/drawable/ic_server_back.xml": "a56e2d09f1744b3ade278bc1a1b64bd4c6900a33af609bc2f07a5c82ae2ae872",
+    "mobile/client/app/src/main/res/drawable/ic_server_clear.xml": "b339e5e5c57e79aa0b9aa7a407e5cd04b5c0b6d139a7e90260e7cb37882d9377"
+  }
+}

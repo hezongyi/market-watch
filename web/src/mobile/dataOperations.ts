@@ -1,5 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { api, errorMessage } from "../api";
+import { logEvent } from "./logs";
+import {
+  api,
+  errorMessage,
+  apiErrorDetails,
+  apiRequestDiagnostics,
+} from "../api";
 import {
   profileActive,
   readSnapshot,
@@ -101,6 +107,9 @@ export function useDataRead<T>(
   }>({ loading: false, error: "" });
   const [revision, setRevision] = useState(0);
   const refreshRevision = useRef(0);
+  const failedRead = useRef("");
+  const hydratedScope = useRef("");
+  const fetchedAt = useRef({scope:"",at:0});
   const refresh = useCallback(() => {
     const next = ++refreshRevision.current;
     setRevision(next);
@@ -122,9 +131,10 @@ export function useDataRead<T>(
         error: "",
       }));
       try {
-        if (first) {
+        if (first && hydratedScope.current !== scope) {
           const snapshot = await readSnapshot<T>(profile, key);
           if (!valid()) return;
+          hydratedScope.current = scope;
           if (snapshot)
             setState({
               data: snapshot.value,
@@ -134,7 +144,11 @@ export function useDataRead<T>(
               readAt: snapshot.readAt,
             });
         }
-        if (!online) return;
+        if (!online) {
+          setState(old => old.scope === scope && !old.readAt && fetchedAt.current.scope === scope
+            ? {...old,readAt:fetchedAt.current.at} : old);
+          return;
+        }
         const data = await dataRequest<T>(
           profile,
           path,
@@ -142,11 +156,39 @@ export function useDataRead<T>(
           controller.signal,
         );
         if (!valid()) return;
-        setState({ data, scope, loading: false, error: "", freshRevision: revision });
+        if (failedRead.current === scope)
+          logEvent({
+            module: "数据",
+            action: "读取行情数据",
+            path,
+            message: "连接读取已恢复",
+            result: "recovery",
+          });
+        failedRead.current = "";
+        fetchedAt.current = {scope,at:Date.now()};
+        setState({
+          data,
+          scope,
+          loading: false,
+          error: "",
+          freshRevision: revision,
+        });
         await writeSnapshot(profile, key, data).catch(() => {});
       } catch (error) {
-        if (valid())
+        if (valid()) {
+          if (failedRead.current !== scope)
+            logEvent({
+              module: "数据",
+              action: "读取行情数据",
+              path,
+              message: errorMessage(error),
+              level: "error",
+              result: "failure",
+              code: apiErrorDetails(error).code,
+            });
+          failedRead.current = scope;
           setState((old) => ({ ...old, error: errorMessage(error) }));
+        }
       } finally {
         if (valid()) {
           setState((old) => ({ ...old, loading: false }));
@@ -181,13 +223,30 @@ export function useDataRead<T>(
 export function useDataCommand(profile: Profile, online: boolean) {
   const [busy, setBusy] = useState(false),
     [error, setError] = useState(""),
-    [notice, setNotice] = useState("");
+    [notice, setNoticeValue] = useState("");
+  const noticeTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const context = useRef({ action: "数据操作", path: "" });
+  function setNotice(message: string) {
+    clearTimeout(noticeTimer.current);
+    setNoticeValue(message);
+    if (message) {
+      logEvent({
+        module: "数据",
+        action: context.current.action,
+        path: context.current.path,
+        message,
+        result: "success",
+      });
+      noticeTimer.current = setTimeout(() => setNoticeValue(""), 2500);
+    }
+  }
   const locked = useRef(false),
     alive = useRef(true);
   useEffect(() => {
     alive.current = true;
     return () => {
       alive.current = false;
+      clearTimeout(noticeTimer.current);
     };
   }, []);
   const run = async (
@@ -199,10 +258,45 @@ export function useDataCommand(profile: Profile, online: boolean) {
     setError("");
     setNotice("");
     try {
-      await action(dataRequest);
+      const request: typeof dataRequest = async (p, path, body, signal) => {
+        context.current = {
+          path,
+          action: /\/maintenance\/control/.test(path)
+            ? "控制历史维护"
+            : /\/maintenance/.test(path)
+              ? "保存维护设置"
+              : /\/tasks/.test(path)
+                ? "提交历史任务"
+                : /\/continuation/.test(path)
+                  ? "设置实时行情"
+                  : /\/history-catalog\/refresh/.test(path)
+                    ? "更新目录"
+                    : /\/catalog\/discover/.test(path)
+                      ? "补录品种"
+                      : /\/datasets$/.test(path)
+                        ? "创建自建"
+                        : "数据操作",
+        };
+        return dataRequest(p, path, body, signal);
+      };
+      await action(request);
     } catch (error) {
-      if (alive.current && profileActive(profile))
+      if (alive.current && profileActive(profile)) {
+        const diagnostic = apiRequestDiagnostics()
+          .filter((row) => row.path === context.current.path.split("?")[0])
+          .at(-1);
+        logEvent({
+          module: "数据",
+          action: context.current.action,
+          path: context.current.path,
+          message: errorMessage(error),
+          level: "error",
+          result: "failure",
+          code: apiErrorDetails(error).code,
+          elapsedMs: diagnostic?.elapsedMs,
+        });
         setError(errorMessage(error));
+      }
     } finally {
       locked.current = false;
       if (alive.current) setBusy(false);

@@ -1,0 +1,22 @@
+F                                                                        [100%]
+=================================== FAILURES ===================================
+________ test_non_price_rule_check_is_not_confused_with_new_evaluation _________
+
+provider_pg = (sessionmaker(class_='Session', bind=Engine(postgresql+psycopg://[REDACTED]@127.0.0.1:25476/rollover_test), autoflush=True, expire_on_commit=False), Engine(postgresql+psycopg://[REDACTED]@127.0.0.1:25476/rollover_test))
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f6fbbb46310>
+
+    def test_non_price_rule_check_is_not_confused_with_new_evaluation(provider_pg, monkeypatch):
+        database, _ = provider_pg
+        ident, _, _, _, stamp = armed(database, monkeypatch, condition=ray_condition())
+        with database.begin() as db:
+            chart_alert_worker.evaluate(db, ident, now=stamp)
+            first = read(db, ident)
+            assert first["execution"] is None
+>           assert first["activity"]["taken_over_at"] == stamp
+                   ^^^^^^^^^^^^^^^^^
+E           KeyError: 'activity'
+
+backend/tests/test_mobile_alert_runtime_postgres.py:163: KeyError
+=========================== short test summary info ============================
+FAILED backend/tests/test_mobile_alert_runtime_postgres.py::test_non_price_rule_check_is_not_confused_with_new_evaluation
+1 failed, 1 deselected in 2.42s

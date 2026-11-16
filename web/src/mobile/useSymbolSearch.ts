@@ -164,7 +164,7 @@ export function useSymbolSearch<T>({
     refresh: () => {
       request.current?.abort();
       request.current = undefined;
-      void load(undefined, true);
+      return load(undefined, true);
     },
     remove: (match: (item: T) => boolean) => setState(old => ({ ...old, items: old.items.filter(item => !match(item)) })),
     update: (fn: (item: T) => T) =>

@@ -1,0 +1,14 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "image": "sha256:78cf03e0419188c8b8eba0f316068785c1a08d1260c4c9b95b42cb7911cb0837",
+  "tag": "market-watch-web:mobile-alert-polish-20261115-r3",
+  "previous": {
+    "run.json": "sha256:20848de50dba89561480e266a602b10cd2047d1ce9a2597c912849c58db15a63",
+    "compose.json": "sha256:20848de50dba89561480e266a602b10cd2047d1ce9a2597c912849c58db15a63"
+  },
+  "stamp": "20261115T103905Z",
+  "updatedServices": [
+    "web"
+  ]
+}

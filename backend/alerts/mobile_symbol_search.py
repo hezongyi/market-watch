@@ -5,9 +5,9 @@ Searches remain local, and all qualification happens before pagination.
 
 import re
 
-from sqlalchemy import and_, case, false, func, literal, or_, select
+from sqlalchemy import and_, false, func, literal, or_, select
 
-from .market_names import alias_search, code_search, matches_code
+from .market_names import alias_search, code_search, matches_code, pair_query
 from .storage import AdvancedPreference, HistoryVersion, Instrument, MarketComposite, MarketDataset
 
 PROVIDERS = {"oanda": "OANDA Practice", "dukascopy": "Dukascopy Dukas",
@@ -21,15 +21,84 @@ def tokens(query):
     return query[:100].strip().casefold().split()
 
 
-def predicate(query, source, symbol, asset, *labels, exchange=None):
-    provider = case(PROVIDERS, value=source, else_=source)
-    category = case(CATEGORIES, value=asset, else_=asset)
+PRICE_ALIASES = {"none": "不复权", "qfq": "前复权", "hfq": "后复权", "auto": "来源复权"}
+
+UPSTREAMS = {"sina-": "新浪 新浪财经 sina", "tencent-": "腾讯 腾讯财经 tencent", "eastmoney-a": "东方财富 eastmoney"}
+
+
+def upstream_terms(query):
+    return [term for term in tokens(query) if any(term in label.casefold() for label in UPSTREAMS.values())]
+
+
+def series_terms(query):
+    return [term for term in tokens(query) if term in upstream_terms(query) or any(term in label for label in PRICE_ALIASES.values())]
+
+
+def predicate(query, source, symbol, asset, *labels, exchange=None, indexed_text=None, family=None, variants=False, kind=None, product=None, adjustment=None, basis=None, index_type=None):
+    # Fold fixed vocabulary in Python instead of running CASE/string transforms
+    # for every catalog row. A term still matches ANY field, never a forced source.
     compact = func.replace(func.replace(func.replace(symbol, "_", ""), "/", ""), "-", "")
     us_market = or_(symbol.endswith(".US/USD", autoescape=True), and_(source == "yahoo",
         (exchange if exchange is not None else literal("")).in_(("NMS", "NYQ", "NCM", "NGM", "PCX", "ASE", "BTS", "NASDAQ", "NYSE", "US", "NYS", "NAS"))))
-    market = case((and_(asset.in_(("equity", "etf")), us_market), "美股 美国股票 US stocks"), else_="")
-    return and_(*(or_(code_search(term, symbol, compact, source, provider, category, market, *labels),
-        alias_search(term, source, symbol, compact=True)) for term in tokens(query))) if tokens(query) else ~false()
+    conditions = []
+    for term in tokens(query):
+        providers = [key for key, value in PROVIDERS.items() if term in value.casefold()]
+        categories = [key for key, value in CATEGORIES.items() if term in value.casefold()]
+        if indexed_text is not None:
+            # The normalized directory index is a superset for compact SYMBOL
+            # matching. Recheck the symbol to avoid inventing compact-name matches.
+            def contains(column, value):
+                pattern = "%" + value.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+                return column.like(pattern, escape="\\") if value.upper() == value.lower() else column.ilike(pattern, escape="\\")
+            compact_text = func.replace(func.replace(func.replace(indexed_text, "_", ""), "/", ""), "-", "")
+            # Trigrams cannot accelerate one/two-character tokens. Avoid
+            # normalizing the entire long metadata text for every short match.
+            text_match = or_(contains(indexed_text, term), contains(compact, term)) if len(term) < 3 else or_(
+                contains(indexed_text, term), and_(contains(compact_text, term), contains(compact, term)))
+            pair = pair_query(term)
+            if pair:
+                text_match = or_(text_match, contains(compact_text, pair))
+        else:
+            text_match = code_search(term, symbol, compact, source, *labels)
+        fields = [text_match, alias_search(term, source, symbol, compact=True)]
+        prices = [key for key, label in PRICE_ALIASES.items() if term in label]
+        if prices:
+            fields.append(and_(source == "akshare", literal(True)) if variants else adjustment.in_(prices) if adjustment is not None else false())
+        if basis is not None and term in ("bid", "ask", "mid", "买价", "卖价", "中间价"):
+            fields.append(basis == {"买价": "bid", "卖价": "ask", "中间价": "mid"}.get(term, term))
+        if index_type is not None and term in "股指 股票指数":
+            fields.append(and_(asset == "index", index_type == "stock"))
+        upstream = [key for key, label in UPSTREAMS.items() if term in label.casefold()]
+        if upstream:
+            exact = or_(*(family.startswith(key, autoescape=True) if key.endswith("-") else family == key for key in upstream)) if family is not None else false()
+            fields.append(and_(source == "akshare", literal(True) if variants else exact))
+        if kind is not None:
+            if term in ("基金", "fund"):
+                fields.append(kind.in_(("ETF", "FUND", "MUTUALFUND")))
+            elif term == "etf":
+                fields.append(kind == "ETF")
+            for code, names in (("BOND", "债券 bond"), ("OPTION", "期权 option")):
+                if term in names:
+                    fields.append(kind == code)
+        if product is not None:
+            for code, names in (("PERPETUAL", "永续 perpetual"), ("SPOT", "现货 spot"), ("DELIVERY", "交割 delivery")):
+                if term in names:
+                    fields.append(or_(product == code, and_(source == "binance", asset == "crypto") if code == "SPOT" else false()))
+        if term in "主力连续":
+            fields.append(and_(source == "akshare", asset == "future"))
+        for name, prefix in (("沪A 沪市", "SSE:"), ("深A 深市", "SZSE:"), ("港股", "HKEX:")):
+            if term in name:
+                fields.append(and_(asset == "equity", symbol.startswith(prefix)))
+        if providers:
+            fields.append(source.in_(providers))
+        if categories:
+            if term == "etf" and kind is not None:
+                categories = [value for value in categories if value != "etf"]
+            fields.append(asset.in_(categories))
+        if term in "美股 美国股票 us stocks":
+            fields.append(and_(asset.in_(("equity", "etf")), us_market))
+        conditions.append(or_(*fields))
+    return and_(*conditions) if conditions else ~false()
 
 
 def matches(query, row):
@@ -79,8 +148,12 @@ def identities(db, tickers):
         ("dataset", datasets.get(ident, ident)) for ticker, (ident, kind) in decoded.items()}
 
 
-def watched(db):
-    values = identities(db, watch_symbols(db)).values()
+def watched(db, retain=()):
+    # A search drawer may retain its own successful additions until it closes.
+    # Resolve the same stable identities used by write-time deduplication.
+    values = set(identities(db, watch_symbols(db)).values())
+    if retain:
+        values -= set(identities(db, retain).values())
     return {kind: {ident for category, ident in values if category == kind} for kind in ("provider", "dataset")}
 
 

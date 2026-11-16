@@ -123,7 +123,7 @@ def _native_page(meta, frame, before, count, *, client=None, deadline=None, opti
     from .provider_cache import check_cancelled
     from .provider_chart import record_timing
     from .provider_deadline import request_deadline
-    from .provider_transport import activity, pooled_client, discard_client, retryable_network_error
+    from .provider_transport import activity, discard_client, pooled_client, retryable_network_error
 
     deadline = deadline or time.monotonic() + 20
     managed_client = client is None

@@ -62,17 +62,42 @@ def stock_clock(meta, stamp):
     return None
 
 
+def a_share(identity):
+    symbol = identity.get("provider_symbol") or identity.get("symbol", "")
+    return identity.get("source") == "akshare" and symbol.split(":")[0] in {"SSE", "SZSE", "BSE"}
+
+
+def display_axis(output, identity):
+    """A-share display clock; never change source bars or acquisition calendars."""
+    if not a_share(identity) or not output[3]:
+        return output
+    local = datetime.fromtimestamp(output[3][0]["start"] / 1000, ZoneInfo("Asia/Shanghai"))
+    output[5]["display_segments"] = [
+        {"start": int(local.replace(hour=hour, minute=minute, second=0, microsecond=0).timestamp() * 1000),
+         "end": int(local.replace(hour=end_hour, minute=end_minute, second=0, microsecond=0).timestamp() * 1000)}
+        for hour, minute, end_hour, end_minute in ((9, 30, 11, 30), (13, 0, 15, 0))]
+    return output
+
+
 LOOKBACK = 14 * 86400000
 
 
-def closing_reference(candidates, left, bounds):
+def closing_reference(candidates, left, bounds, identity=None):
     """Only a finished bar at the prior actual session's end proves its close."""
-    previous = [row for _, rows, _ in candidates for row in rows
+    previous = [(frame, row) for frame, rows, _ in candidates for row in rows
         if row["start"] < left and row.get("complete") and row.get("close") is not None
         and row["start"] >= left - LOOKBACK]
-    latest = max((bounds(row["start"])[0] for row in previous), default=None)
-    evidence = [row for row in previous if bounds(row["start"])[0] == latest
-        and row.get("end") == bounds(row["start"])[1]]
+    latest = max((bounds(row["start"])[0] for _, row in previous), default=None)
+    def finished(frame, row):
+        if not a_share(identity or {}):
+            return row.get("end") == bounds(row["start"])[1]
+        # Native D1 uses a UTC date label and a 15:10 Shanghai confirmation
+        # boundary. Intraday closes prove the close only at exactly 15:00.
+        local = datetime.fromtimestamp(row["start"] / 1000, ZoneInfo("Asia/Shanghai"))
+        end = int(local.replace(hour=15, minute=10 if frame == "D1" else 0,
+            second=0, microsecond=0).timestamp() * 1000)
+        return row.get("end") == end and end <= left
+    evidence = [row for frame, row in previous if bounds(row["start"])[0] == latest and finished(frame, row)]
     row = max(evidence, key=lambda row: row["start"], default=None)
     return {"previous_close_price": str(row["close"]) if row else None,
         "previous_close_at": row["end"] if row else None}
@@ -192,7 +217,7 @@ def provider(db, symbol, stamp, meta):
                 ProviderBar.complete.is_(True)).order_by(ProviderBar.start.desc()).limit(1))
             if prior:
                 reference_candidates.append((frame, [{**prior.payload, "start": prior.start, "complete": True}], None))
-        output[5].update(closing_reference(reference_candidates, output[0], bounds))
+        output[5].update(closing_reference(reference_candidates, output[0], bounds, meta))
     if output[3]:
         # A sparse first M1 is not the open. The native daily candle can prove
         # it, but only when its *source* interval exactly matches this axis.
@@ -211,7 +236,7 @@ def provider(db, symbol, stamp, meta):
     # Yahoo price revalidation revokes old adjusted values without changing the
     # source's stable dataset key. Empty replies must not resurrect those prices.
     output[5]["identity_key"] = json.dumps([key, (dataset.metadata_json or {}).get("revalidation_generation", 0) if dataset else 0])
-    return output
+    return display_axis(output, meta)
 
 
 def managed(db, symbol, stamp):
@@ -227,7 +252,11 @@ def managed(db, symbol, stamp):
             rows = chart_rows(db, instrument, frame, stamp + 1, MAX_POINTS, stamp, after=stamp - LOOKBACK)
             rows, _ = usable_cached_rows(db, instrument, rows, stamp)
             candidates.append((frame, rows, None))
-    return selection(candidates, stamp, bounds)
+    output = selection(candidates, stamp, bounds)
+    identity = dataset.identity if dataset else {}
+    if a_share(identity):
+        output[5].update(closing_reference(candidates, output[0], bounds, identity))
+    return display_axis(output, identity)
 
 
 def latest_history_at(db, version, cutoff):
@@ -284,8 +313,8 @@ def history(db, symbol, stamp):
                     end=min(output[0], version.end)), MAX_POINTS)]
         else:
             previous = read_artifact(db, symbol, frame, end=output[0], limit=1, newest_first=True)
-        output[5].update(closing_reference([(frame, previous, revision)], output[0], bounds))
-    return (*output[:4], revision, output[5])
+        output[5].update(closing_reference([(frame, previous, revision)], output[0], bounds, dataset.identity))
+    return display_axis((*output[:4], revision, output[5]), dataset.identity)
 
 
 def composite(db, symbol, revision_id, stamp):
@@ -354,8 +383,8 @@ def composite(db, symbol, revision_id, stamp):
             prior_left, prior_right = bounds(at)
             prior_result = read_window(db, symbol, "M1", prior_left, prior_right,
                 revision_id=revision.id, provisional=False, now=stamp)
-            output[5].update(closing_reference([("M1", prior_result["bars"], marker)], output[0], bounds))
-    return (*output[:4], marker, output[5])
+            output[5].update(closing_reference([("M1", prior_result["bars"], marker)], output[0], bounds, dataset.identity))
+    return display_axis((*output[:4], marker, output[5]), dataset.identity)
 
 
 def result(ticker, left, right, frame, rows, revision, stamp, session=None):
@@ -365,13 +394,16 @@ def result(ticker, left, right, frame, rows, revision, stamp, session=None):
     previous_end = None
     for row in rows[:MAX_POINTS]:
         gap = previous_end is not None and row["start"] != previous_end
-        points.append({"time": row["start"], "price": str(row["close"]), "gap_before": gap})
+        points.append({"time": row["start"], "price": str(row["close"]), "gap_before": gap,
+                       # Minute prices are closes. Keep their source start for
+                       # identity/deduplication, place them at the observed end.
+                       **({"display_time": min(row["end"], stamp)} if (session or {}).get("display_segments") else {})})
         partial |= gap or not row.get("complete", False) or row.get("coverage_complete") is False
         previous_end = row["end"]
     partial |= bool(points and (points[0]["time"] > left or previous_end <= stamp - step))
     status = "partial" if points and partial else "ready" if points else "empty"
     references = []
-    if left % 86400000 and not (session or {}).get("stock_session"):  # NY17 from explicit asset metadata.
+    if left % 86400000 and not (session or {}).get("stock_session") and not (session or {}).get("display_segments"):
         for zone in (ZoneInfo("Europe/London"), ZoneInfo("America/New_York")):
             local = datetime.fromtimestamp(left / 1000, zone).replace(hour=8, minute=0, second=0, microsecond=0)
             if local.timestamp() * 1000 < left:
@@ -484,7 +516,7 @@ def prepare(item):
                     # Friday curve needs Thursday's close, not Friday's open.
                     from .provider_chart import label
                     reference_frame = "D1" if ("D1" in meta.get("frames", ()) and
-                        (meta["source"] == "oanda" or meta["source"] == "binance" and
+                        (a_share(meta) or meta["source"] == "oanda" or meta["source"] == "binance" and
                          observed["window_start"] % 86400000 == 0)) else frame
                     provider_cache.fetch_page(provider_cache.ensure(meta, reference_frame), meta, reference_frame,
                         label(observed["window_start"], reference_frame, meta["calendar"]), 3,
