@@ -9,10 +9,13 @@ import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle,
 } from "./components/ui/alert-dialog";
-import { Button } from "./components/ui/button";
+import { HeaderIconButton } from "./components/HeaderIconButton";
 import type { MobileSheetProps } from "./MobileSheet";
 
 // Opt-in page providers keep portals inside the current theme and mobile control scope.
+const OverlayActive = createContext(true);
+export const useOverlayActive = () => useContext(OverlayActive);
+
 const WatchOverlays = createContext<{ container: HTMLDivElement | null } | null>(null);
 export const useWatchOverlays = () => useContext(WatchOverlays);
 export const MOBILE_OVERLAYS = 'dialog.mobile-sheet[open], [data-mobile-overlay="true"]';
@@ -46,7 +49,7 @@ export function WatchDrawer(props: MobileSheetProps) {
   // Keep the last open view during exit; don't flash another panel or empty its form.
   const lastOpen = useRef(props);
   if (open) lastOpen.current = props;
-  const { title, description, children, dirty, close, onClosed, fullHeight, dismissible = true } = lastOpen.current;
+  const { title, description, headerActions, children, dirty, close, onClosed, fullHeight, dismissible = true } = lastOpen.current;
   const host = useWatchOverlays();
   const popup = useRef<HTMLDivElement>(null);
   const opened = useRef(false);
@@ -90,12 +93,13 @@ export function WatchDrawer(props: MobileSheetProps) {
             <DrawerTitle>{title}</DrawerTitle>
             {description && <DrawerDescription>{description}</DrawerDescription>}
           </div>
-          <Button variant="ghost" size="icon" aria-label="关闭" disabled={!dismissible} onClick={leave}>
-            <X aria-hidden="true" />
-          </Button>
+          <div className="mobile-drawer-actions">
+          {headerActions}
+          <HeaderIconButton icon={X} label="关闭" disabled={!dismissible} onClick={leave} />
+          </div>
         </header>
         <div className="mobile-sheet-body mobile-drawer-scroll" key={title}>
-          {children}
+          <OverlayActive.Provider value={open}>{children}</OverlayActive.Provider>
         </div>
         {discard && <WatchConfirm
           title="放弃本次修改？"

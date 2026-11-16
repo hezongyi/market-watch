@@ -1,3 +1,4 @@
+import type { MobileIdentity } from "../mobile/marketIdentity";
 import { DirectoryTools } from "./DirectoryTools";
 import { useCallback, useContext, useEffect, useRef, useState } from "react";
 import {
@@ -11,6 +12,7 @@ import { api } from "./api";
 import { names } from "./types";
 
 export type CatalogItem = {
+  mobile_identity?: MobileIdentity;
   source_display?: string;
   catalog_id: string;
   source: string;

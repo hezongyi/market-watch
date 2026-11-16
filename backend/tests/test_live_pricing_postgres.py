@@ -80,6 +80,7 @@ def test_snapshot_reads_shared_cooldown_and_expiration_from_postgres(provider_pg
 def test_controlled_rest_fault_uses_real_commit_fence_and_shared_budget(provider_pg, monkeypatch, status):
     """Inject transport outcomes, never supplier prices, into isolated PG paths."""
     factory, _ = provider_pg
+    monkeypatch.setattr(live.settings, "oanda_acquisition_mode", "rest_batch")
     monkeypatch.setattr(live, "now_ms", lambda: 125000)
     monkeypatch.setattr(market_resources, "now_ms", lambda: 125000)
     monkeypatch.setattr(live.settings, "oanda_recovery_minutes", 2)

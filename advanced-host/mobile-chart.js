@@ -35,14 +35,16 @@ function mobileChartCrosshairEntry(widget, report) {
   `;
   doc.head.append(style);
   const tracking = () => widget.activeChart()._chartWidget.paneWidgets().some(pane => pane.trackingModeEnabled());
+  // Match the native drawing toolbar's cursor glyph, including its open center.
+  // Render directly because the native palette may not have mounted yet.
+  const crosshairIcon = '<svg viewBox="0 0 28 28" fill="currentColor" aria-hidden="true"><path d="M18 15h8v-1h-8zM14 18v8h1v-8zM14 3v8h1v-8zM3 15h8v-1h-8z"/></svg>';
   const decorate = () => {
     for (const intervals of doc.querySelectorAll('#header-toolbar-intervals'))
       intervals.parentElement.parentElement.classList.add('mw-mobile-header-row');
     for (const button of doc.querySelectorAll('button[data-name="custom-tradingview-styled-button"][aria-label="十字线"]')) {
       if (!button.classList.contains('mw-mobile-crosshair-entry')) {
         button.classList.add('mw-mobile-crosshair-entry');
-        (button.querySelector('.js-button-text') || button).insertAdjacentHTML('afterbegin',
-          '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2v5m0 10v5M2 12h5m10 0h5"/><circle cx="12" cy="12" r="5"/></svg>');
+        (button.querySelector('.js-button-text') || button).innerHTML = crosshairIcon;
       }
       button.setAttribute('aria-pressed', String(tracking()));
     }

@@ -8,7 +8,7 @@ import {
   type FormEvent,
 } from "react";
 import { NavLink, useLocation, useNavigate } from "react-router-dom";
-import { Bell, CandlestickChart, Database, Ellipsis, List } from "lucide-react";
+import { Bell, CandlestickChart, ChevronRight, Database, Ellipsis, List } from "lucide-react";
 import { api, ApiError, errorMessage, setCsrf } from "../api";
 import MobileChart, { type MobileChartHandle } from "./MobileChart";
 import {
@@ -28,7 +28,7 @@ import { useMobileShell } from "./shell";
 import { mobileMarket, type MobileMarket } from "./market";
 import WatchPage from "./WatchPage";
 import DataPage from "./DataPage";
-import MobileToast from "./MobileToast";
+import { logEvent, logFailure, setLogProfile } from "./logs";
 import AlertsPage from "./AlertsPage";
 import MorePage from "./MorePage";
 import LoginPage, { type LoginError, type LoginIntent } from "./LoginPage";
@@ -61,13 +61,13 @@ export default function MobileApp() {
     [state, setState] = useState<"loading" | "login" | "online" | "offline">(
       "loading",
     );
-  const [message, setMessage] = useState(""),
-    [password, setPassword] = useState(""),
+  const [password, setPassword] = useState(""),
     [busy, setBusy] = useState(false);
   const [loginError, setLoginError] = useState<LoginError>();
   const [loginIntent, setLoginIntent] = useState<LoginIntent>();
   const [checking, setChecking] = useState(false);
   const [symbol, setSymbol] = useState("");
+  const [chartTarget, setChartTarget] = useState<{ symbol: string; resolution: string; token: number }>();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [chartOpened, setChartOpened] = useState(false);
   const [firstWatchSymbol, setFirstWatchSymbol] = useState("");
@@ -80,7 +80,12 @@ export default function MobileApp() {
     session = useRef<AbortController | undefined>(undefined),
     sessionAllowed = useRef(false),
     signingOut = useRef(false);
-  const report = useCallback((value: string) => setMessage(value), []);
+  useLayoutEffect(() => setLogProfile(profile), [profile?.origin, profile?.subject, profile?.generation]);
+  const report = useCallback((value: string) => logEvent({module:"应用",action:"运行反馈",message:value,level:"warning"}), []);
+  const scopedReports = useMemo(() => {
+    const target = profile || profileFor(window.location.origin, "anonymous");
+    return Object.fromEntries(["图表", "自选", "数据", "告警", "更多", "行情"].map(module => [module, (value: string) => logFailure(module, "运行反馈", value, undefined, target)]));
+  }, [profile?.origin, profile?.subject, profile?.generation]);
   const preparation = useMemo(() => profile && state === "online"
     ? mobileChartPreparation(profile) : undefined,
     [profile?.origin, profile?.subject, profile?.generation, state === "online"]);
@@ -117,12 +122,12 @@ export default function MobileApp() {
       setConnection(undefined);
       return;
     }
-    const value = mobileMarket(report);
+    const value = mobileMarket(scopedReports["行情"]);
     setConnection(value);
     return () => {
       void value.dispose().catch(() => {});
     };
-  }, [profile?.origin, profile?.subject, state, report]);
+  }, [profile?.origin, profile?.subject, state, scopedReports]);
   const flush = useCallback(async () => {
     await chart.current?.flush();
   }, []);
@@ -238,8 +243,18 @@ export default function MobileApp() {
     const foreground = () => {
       if (!document.hidden) void refresh();
     };
+    const offline = () => {
+      if (loginVisible.current || signingOut.current) return;
+      // Invalidate an in-flight session response so it cannot restore a false
+      // online state after the OS has reported loss of connectivity.
+      ++generation.current;
+      session.current?.abort();
+      setState((current) => current === "online" ? "offline" : current);
+      setChecking(false);
+    };
     addEventListener("mw-session-expired", expire);
     addEventListener("online", refresh);
+    addEventListener("offline", offline);
     document.addEventListener("visibilitychange", foreground);
     return () => {
       active = false;
@@ -247,6 +262,7 @@ export default function MobileApp() {
       session.current?.abort();
       removeEventListener("mw-session-expired", expire);
       removeEventListener("online", refresh);
+      removeEventListener("offline", offline);
       document.removeEventListener("visibilitychange", foreground);
     };
   }, [refresh, report]);
@@ -327,7 +343,6 @@ export default function MobileApp() {
     if (busy || checking) return;
     setBusy(true);
     setLoginError(undefined);
-    setMessage("");
     const token = ++generation.current,
       controller = new AbortController();
     session.current?.abort();
@@ -362,9 +377,11 @@ export default function MobileApp() {
         setBusy(false);
     }
   }
-  async function select(row: Series) {
+  async function select(row: Series, timeframe?: string) {
     if (!profile || !row.ticker) return;
     await flush();
+    const resolution = timeframe && ({ M1: "1", M5: "5", M15: "15", M30: "30", H1: "60", H4: "240", D1: "1D", W1: "1W", MN: "1M" } as Record<string, string>)[timeframe];
+    setChartTarget(resolution ? { symbol: row.ticker, resolution, token: Date.now() } : undefined);
     setSymbol(row.ticker);
     navigate("/chart");
     await writeSnapshot(profile, "chart-selection", row.ticker).catch(() =>
@@ -380,22 +397,6 @@ export default function MobileApp() {
       <a className="sr-only" href="#mobile-main">
         跳至主要内容
       </a>
-      <MobileToast message={message} close={() => setMessage("")} />
-      {shell.update && (
-        <aside className="mobile-update" role="status">
-          页面有更新
-          <Button
-            onClick={() =>
-              void shell.apply().catch((error) => report(String(error)))
-            }
-          >
-            更新页面
-          </Button>
-        </aside>
-      )}
-      {notices.popup && !message && (location.pathname !== "/" || !profile) && (
-        <MobileToast message={notices.popup} close={notices.closePopup} />
-      )}
       <main id="mobile-main">
         {state === "login" || !profile ? (
           <LoginPage
@@ -406,7 +407,7 @@ export default function MobileApp() {
             }}
             busy={busy}
             checking={checking || state === "loading"}
-            error={loginError}
+            error={loginError || (shell.error ? {message:shell.error} : undefined)}
             intent={loginIntent}
             setIntent={setLoginIntent}
             submit={login}
@@ -416,8 +417,7 @@ export default function MobileApp() {
             }}
             configure={async () => {
               await logout();
-              setMessage("");
-              if (window.MWMobileHost) shell.configure();
+                        if (window.MWMobileHost) shell.configure();
             }}
           />
         ) : (
@@ -433,6 +433,7 @@ export default function MobileApp() {
                   connection={connection}
                   preparation={preparation!}
                   symbol={symbol}
+                  target={chartTarget}
                   theme={theme}
                   rememberSymbol={(ticker) => {
                     setSymbol(ticker);
@@ -443,7 +444,7 @@ export default function MobileApp() {
                     ).catch(() => report("本次品种选择未记住"));
                   }}
                   visible={location.pathname === "/chart"}
-                  report={report}
+                  report={scopedReports["图表"]}
                 />
               )}
             {location.pathname === "/chart" && state !== "online" && (
@@ -465,27 +466,26 @@ export default function MobileApp() {
                 <ChartEmpty
                   title="选择要查看的品种"
                   action={
-                    <Button onClick={() => navigate("/data")}>选择品种</Button>
+                    <>
+                      <Button onClick={() => navigate("/")}>前往自选</Button>
+                      <Button variant="ghost" onClick={() => navigate("/data")}>
+                        查看自建行情
+                        <ChevronRight data-icon="inline-end" aria-hidden="true" />
+                      </Button>
+                    </>
                   }
                 >
-                  从自选或数据页选择真实系列打开图表。
+                  从自选或自建行情中选择。
                 </ChartEmpty>
               )}
             {profile && (
               <WatchPage
                 firstSymbol={setFirstWatchSymbol}
-                notice={!message ? notices.popup : undefined}
-                closeNotice={notices.closePopup}
-                showNotices={() => {
-                  notices.closePopup();
-                  setRecords(true);
-                  navigate("/alerts");
-                }}
                 profile={profile}
                 online={state === "online"}
                 connection={connection}
                 visible={location.pathname === "/"}
-                report={report}
+                report={scopedReports["自选"]}
                 open={(ticker) =>
                   void select({ ticker }).catch((error) =>
                     report(String(error)),
@@ -498,7 +498,7 @@ export default function MobileApp() {
                 profile={profile}
                 online={state === "online"}
                 visible={location.pathname === "/data"}
-                report={report}
+                report={scopedReports["数据"]}
                 open={(ticker) =>
                   void select({ ticker }).catch((error) =>
                     report(String(error)),
@@ -513,12 +513,13 @@ export default function MobileApp() {
                 online={state === "online"}
                 visible={location.pathname === "/alerts"}
                 symbol={symbol}
+                openChart={(ticker, frame) => void select({ ticker }, frame).catch(error => report(String(error)))}
                 createToken={createAlert}
                 runtime={notices.runtime}
                 records={records}
                 showRecords={() => setRecords(true)}
                 closeRecords={() => setRecords(false)}
-                report={report}
+                report={scopedReports["告警"]}
               />
             )}
             {location.pathname === "/more" && (
@@ -529,7 +530,7 @@ export default function MobileApp() {
                 shell={shell}
                 records={() => setRecords(true)}
                 logout={logout}
-                report={report}
+                report={scopedReports["更多"]}
                 setTheme={() => {
                   const value = theme === "dark" ? "light" : "dark";
                   setTheme(value);

@@ -1,0 +1,37 @@
+[
+  {
+    "id": "675a0f754e4cce65af269e7bc143a8495c1e6b62143e9f8f68c6b85d66c0f1de",
+    "symbol": "USDJPY",
+    "identity": {
+      "source": "dukascopy",
+      "channel": "python",
+      "environment": "historical",
+      "account_scope": "public",
+      "provider_symbol": "USD/JPY",
+      "basis": "bid",
+      "calendar_version": "user-forex-ny17-v1"
+    },
+    "maintenance": {
+      "timeframes": null,
+      "archived": false,
+      "task_status": "published"
+    },
+    "summary": {
+      "enabled": false,
+      "configured": false,
+      "status": "disabled",
+      "can_enable": false,
+      "can_disable": false,
+      "disabled_reason": "待配置",
+      "default_mapping_id": null
+    },
+    "report": {
+      "supported": true,
+      "reason": "请先配置并核对实时来源",
+      "enabled": false,
+      "default_mapping_id": null,
+      "mappings": [],
+      "blockers": null
+    }
+  }
+]

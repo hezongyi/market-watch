@@ -1,0 +1,21 @@
+{
+  "passed": true,
+  "checks": [
+    "shared entries",
+    "no tabs or filters or group picker",
+    "both directory page chains exhaust independently",
+    "current/default group and global duplicate exclusion before paging",
+    "current opening retains native/managed additions as disabled checks without requery or row jump; next opening excludes them; pagination has no skipped identities",
+    "auto append",
+    "identity dedup",
+    "end stop",
+    "late query rejected",
+    "next-page failure retains rows and waits for retry",
+    "detail and creation return keep rows and scroll",
+    "375/412 light/dark 150% typography",
+    "both cached searches refresh without cache banners or input jump; offline guard remains"
+  ],
+  "calls": 27,
+  "writes": 3,
+  "out": "/tmp/mw-mobile-feedback-20261114"
+}

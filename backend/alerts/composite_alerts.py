@@ -184,6 +184,8 @@ def require_live_eligibility(db, revision, *, now, timeframe, lock=True):
         list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(
             {history.dataset_id, mapping.target_dataset_id})).order_by(MarketDataset.id).with_for_update()))
         lock_plan_instrument(db, instrument_id)
+    if frozen(db.get(CompositePreparation, revision.id)):
+        raise ValueError("组合修订已冻结，请刷新后重新绑定")
     if not enabled(db, instrument_id):
         raise ValueError("该自建品种实时流已关闭，不能启动可执行告警")
     if not live_snapshot(db, revision, now=now)["sample_ready"]:
@@ -279,6 +281,39 @@ def relocatable(db, previous, target, config, bound, *, input_revision, source=N
     if not task or task.applied_input_revision < input_revision:
         return False, f"目标修订 {config.timeframe} 聚合水位未覆盖激活输入"
     return True, None
+
+
+def automatic_blockers(db, composite, target, progress):
+    """Read/lock current rules; an automatic rotation must keep them running."""
+    from .baseline_shadow import _paused_rules
+    from .chart_alert_service import AlertConfig
+    from .price_alert_inputs import is_price_rule
+
+    rules = bound_rules(db, composite.id, lock=True)
+    blocked = []
+    compared = {item["alert_id"]: item for item in _paused_rules(db, composite.id,
+        target, progress, db.get(HistoryVersion, target.history_version_id))}
+    for version, alert in rules:
+        current = version.market_identity.get("composite_revision_id")
+        if current == target.id:
+            continue
+        config = AlertConfig.model_validate(version.config)
+        if is_price_rule(config):
+            reason = "固定价格告警“" + alert.name + "”绑定当前基线"
+        else:
+            bound = db.get(CompositeRevision, current) if current else None
+            if bound is None or bound.composite_id != composite.id:
+                blocked.append({"alert_id": alert.id, "reason": "告警绑定的修订不可用"})
+                continue
+            ready, reason = relocatable(db, bound, target, config,
+                version.market_identity, input_revision=progress["input_revision"])
+            shadow = compared.get(alert.id, {})
+            if shadow.get("will_pause"):
+                reason = "；".join(item["detail"] for item in shadow["reasons"])
+            elif ready:
+                continue
+        blocked.append({"alert_id": alert.id, "reason": reason})
+    return blocked
 
 
 def rebind_active(db, composite, *, previous, target, boundary, run_id, now, input_revision,
@@ -811,6 +846,7 @@ def evaluate(db, alert, version, config, now, *, clock=None):
     runtime.update(processed_input_revision=value, confirmed_end=bar["end"] if config.mode == "close" else
         max(runtime.get("confirmed_end", 0), previous["end"] if previous and previous["source_confirmed"] else 0),
         epoch=live.epoch, recovering=False, last_start=bar["start"],
+        last_evaluated_at=now, last_input_at=sequence, last_outcome=outcome,
         readiness={"ready": True, "status": "ready", "dependencies": dependencies, "last_outcome": outcome})
     alert.runtime = runtime
     alert.health, alert.health_reason = "ready", "恢复/接缝后已建立新基准，等待新事件" if baseline else None

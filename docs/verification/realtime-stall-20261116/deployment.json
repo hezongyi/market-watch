@@ -1,0 +1,29 @@
+{
+  "stamp": "2026-11-16T00:40:22.060314+00:00",
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "image": "sha256:b3a8dc6b5189685e61670716856e3ec9ef38a0767122c42911c2b9f8670f6f18",
+  "tag": "market-watch-api:stream-recovery-20261116",
+  "services": [
+    "api",
+    "market-runtime",
+    "data-worker"
+  ],
+  "url": "https://192.168.7.232:18447/m/",
+  "previous": {
+    "compose.json": {
+      "api": "sha256:b7f1ac5df2bb71e6555ee5eeb78f050b53227c108f87ab3c178a1d706a9cb655",
+      "market-runtime": "sha256:92cd24d49aef909b1584cdaadb85434e297f1df6d6321ef1a80a3af9be287eae",
+      "data-worker": "sha256:25e2db4b3ba1a60ad5547b5649395d82a53e803d619cca875bc100436a54975d"
+    },
+    "run.json": {
+      "api": "sha256:b7f1ac5df2bb71e6555ee5eeb78f050b53227c108f87ab3c178a1d706a9cb655",
+      "market-runtime": "sha256:92cd24d49aef909b1584cdaadb85434e297f1df6d6321ef1a80a3af9be287eae",
+      "data-worker": "sha256:25e2db4b3ba1a60ad5547b5649395d82a53e803d619cca875bc100436a54975d"
+    }
+  },
+  "verified_at": "2026-11-16T00:53:33.327782+00:00",
+  "verified_services_healthy": true,
+  "quote_recovery_passed": true,
+  "mobile_visible_updates_passed": true
+}

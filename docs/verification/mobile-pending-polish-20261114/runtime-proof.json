@@ -1,0 +1,46 @@
+{
+  "checked_at": "2026-11-14T13:37:45.281Z",
+  "host": "Ubuntu quant-server local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "base_url": "https://192.168.7.232:18447",
+  "readyz": 200,
+  "shell": "7024b02e926fbfb2",
+  "images": {
+    "api": "sha256:25e2db4b3ba1a60ad5547b5649395d82a53e803d619cca875bc100436a54975d",
+    "data-worker": "sha256:25e2db4b3ba1a60ad5547b5649395d82a53e803d619cca875bc100436a54975d",
+    "market-runtime": "sha256:25e2db4b3ba1a60ad5547b5649395d82a53e803d619cca875bc100436a54975d",
+    "web": "sha256:89fd8eb1160485e171a9eb1cd867341aac24c3f1668698189eb39a1c7eb72e95"
+  },
+  "assets": [
+    {
+      "path": "/assets/mobile-2LovJaoG.css",
+      "sha256": "365cd95b067c3542ab2e559c6b4c3c1183ebc3a283be3d03d12ebd8e95e5a0de"
+    },
+    {
+      "path": "/assets/mobile-CKZL26Bl.js",
+      "sha256": "762d7ab147556b6fb2f48786d9fd67c526437f175ca1639ff76080aa39030078"
+    }
+  ],
+  "backend_sha256": {
+    "history_api": "99aeaff24ecd2d5aa2b115935a3a9c64f5898a4cfbb228acc212aec9bc4766a4",
+    "history_creation_check": "8943b9a6d5458a6f09a09f1e3e83a3d563c55d01519df8f94cc34309e7eee7e0",
+    "instrument_directory": "f82105e0dfec545c3d692f8dcb126bf73addeca6edafbabe9682c26e0452cfef",
+    "mobile_symbol_search": "a68a21558ebbdbd2d9eb1b557d4a03024872e77065f42fbb8bfc113109d3044c"
+  },
+  "errors": [],
+  "forbidden_user_writes": [],
+  "checks": [
+    "runtime source and asset hashes match",
+    "no-total mobile search real HTTP",
+    "watch and both search entries",
+    "data header icons no border/background",
+    "managed history and expanded details",
+    "More and logs light/dark",
+    "no top toast",
+    "no actual group/create/live writes"
+  ],
+  "limitations": [
+    "Android keyboard/back/clipboard/export require device acceptance",
+    "existing realtime authentication faults are displayed; no account credentials or live switches changed"
+  ]
+}

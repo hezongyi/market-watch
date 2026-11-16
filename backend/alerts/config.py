@@ -18,6 +18,8 @@ class Settings(BaseSettings):
     # the shadow report marked ready, without a per-switch approval.
     # ALERTS_SWITCH_AUTO_ACTIVATE_ENABLED (default: true).
     switch_auto_activate_enabled: bool = True
+    # Maintenance-driven rotation is opt-in; activation also obeys the global switch.
+    managed_rollover_enabled: bool = False
     # Cleanup mode: off does nothing, dry_run (default) reports and never
     # deletes, execute deletes but retention_window still requires the
     # restore-drill marker. ALERTS_RETENTION_MODE (default: dry_run).

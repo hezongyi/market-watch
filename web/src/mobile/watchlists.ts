@@ -57,6 +57,7 @@ export async function saveWatchlists(
     name: WATCHLIST_NAME,
     tool: "",
     revision: latest?.revision || 0,
+    mobile_unique: true,
     content: { ...latest?.content, value: { ...watchContent(latest), lists } },
   });
 }
@@ -66,6 +67,7 @@ export function addSymbol(
   group: string,
 ): WatchList[] {
   const lists = structuredClone(content.lists);
+  if (allSymbols(content).includes(ticker)) return lists;
   let target = lists.find((list) => list.id === group) || lists[0];
   if (!target) {
     target = { id: crypto.randomUUID(), title: "自选列表", symbols: [] };

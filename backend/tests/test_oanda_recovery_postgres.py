@@ -78,23 +78,29 @@ class ControlledStop:
         return self.is_set()
 
 
-def test_worker_startup401_maintenance_then_pricing_access_recovers_without_manual_reset(provider_pg, monkeypatch):
+def test_worker_stream401_maintenance_then_stream_recovers_without_manual_reset(provider_pg, monkeypatch):
     factory, _ = provider_pg
-    catalog()
+    identities = catalog()
     clock, calls, collections = [125000], [], []
     monkeypatch.setattr(live, 'now_ms', lambda: clock[0])
     monkeypatch.setattr(oanda_worker, 'now_ms', lambda: clock[0])
     monkeypatch.setattr(settings, 'oanda_account_id', 'test-account')
+    monkeypatch.setattr(settings, 'oanda_acquisition_mode', 'stream')
     interval = settings.oanda_auth_probe_seconds * 1000
-    good_client, _ = client_for()
+    ownership = live.claim('test-account')
+    epoch = live.begin_connection(ownership, identities)
+    live.disconnected(ownership, epoch, identities, RequestResult(status='unauthorized'))
 
     def respond(request):
+        import json
+
         calls.append((clock[0], request.url.path))
-        if clock[0] < 125000 + interval:
-            return httpx.Response(401)
-        if clock[0] < 125000 + 2 * interval and request.url.path.endswith('/pricing'):
+        assert request.url.host == 'stream-fxpractice.oanda.com'
+        if clock[0] < 125000 + 2 * interval:
             return httpx.Response(503, json={'errorMessage': 'Service maintenance'})
-        return good_client.send(request)
+        return httpx.Response(200, content=''.join(json.dumps({
+            'type': 'PRICE', 'instrument': symbol, 'time': '124.0', 'tradeable': False,
+            'bids': [], 'asks': []}) + '\n' for symbol in identities))
 
     stopped = ControlledStop(clock, 125000 + 2*interval + 3000)
 
@@ -106,15 +112,16 @@ def test_worker_startup401_maintenance_then_pricing_access_recovers_without_manu
         live.disconnected(ownership, epoch, identities, RequestResult(status='unavailable'), intentional=True)
 
     monkeypatch.setattr(oanda_worker, 'collect', collect)
-    with good_client, httpx.Client(transport=httpx.MockTransport(respond)) as client:
-        adapter = OandaPractice(token='test', account_id='test-account', rest_client=client, clock=lambda: clock[0])
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        adapter = OandaPractice(token='test', account_id='test-account', rest_client=client,
+            stream_client=client, clock=lambda: clock[0])
         oanda_worker.run(adapter, stopped)
     assert len(collections) == 1
-    assert len(calls) == 9  # Startup 401, failed 4-endpoint probe, successful 4-endpoint probe.
-    assert {at for at, _ in calls} == {125000, 125000 + interval, 125000 + 2*interval}
+    assert len(calls) == 2  # Failed stream probe, then successful stream probe.
+    assert {at for at, _ in calls} == {125000 + interval, 125000 + 2*interval}
     with factory.begin() as db:
         owner = db.get(PricingOwner, live.account_key('test-account'))
-        assert owner.error is None and owner.epoch == 1
+        assert owner.error is None and owner.epoch == 2
 
 
 def test_worker_verified_closure_has_no_stream_or_rest_poll_storm(provider_pg, monkeypatch):
@@ -141,7 +148,7 @@ def test_worker_verified_closure_has_no_stream_or_rest_poll_storm(provider_pg, m
     with client, httpx.Client(transport=httpx.MockTransport(respond)) as rest:
         adapter = OandaPractice(token='test', account_id='test-account', rest_client=rest)
         oanda_worker.run(adapter, ControlledStop(clock, stamp + 2*settings.oanda_closed_probe_seconds*1000 + 1000))
-    assert len(calls) == 2 and calls[0] == '/v3/accounts' and calls[1].endswith('/instruments')
+    assert not calls  # Registered identities also avoid bootstrap REST while closed.
     rows = live.snapshots(now=stamp)
     assert rows and all(row['quality'] == 'market_closed' for row in rows)
     assert all(not row['quote_ready'] and not row['candle_ready'] for row in rows)

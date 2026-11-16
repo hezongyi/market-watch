@@ -89,6 +89,9 @@ def creation_entry(row):
             observed_start = evidence.get("requested_start")
             result["default_start_date"] = (datetime.fromtimestamp(observed_start / 1000, UTC).date().isoformat()
                 if evidence.get("status") == "verified" and type(observed_start) is int else None)
+    from .mobile_identity import mobile_identity
+    result["mobile_identity"] = mobile_identity({**row, "source_family": family}, {**info, "source": source, "source_family": family,
+        "environment": "practice" if source == "oanda" else "demo" if source == "fxcm" else "public"})
     return result
 
 

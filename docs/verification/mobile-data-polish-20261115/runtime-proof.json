@@ -1,0 +1,405 @@
+{
+  "passed": true,
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "readOnly": true,
+  "checks": [
+    "375/412 light/dark 100%/150% text",
+    "full/detail action reachability",
+    "named filter/clear/reset",
+    "empty filter single clear action",
+    "real creation catalog",
+    "no backend writes/page errors/5xx"
+  ],
+  "screenshots": 35,
+  "geometry": [
+    {
+      "name": "runtime-list-light-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 343
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-light-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-light-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-light-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-light-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 343
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-light-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-light-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-light-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-light-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 380
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-light-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-light-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-light-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-light-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 380
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-light-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-light-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-light-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-dark-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 343
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-dark-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-dark-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-dark-375-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-dark-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 343
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-dark-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-dark-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-dark-375-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-dark-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 380
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-dark-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-dark-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-dark-412-14",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-list-dark-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 380
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-dark-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-detail-actions-dark-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filters-dark-412-21",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 412
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filter-yahoo",
+      "pageOverflow": false,
+      "surfaceOverflow": true,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 343
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-filter-empty",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 16,
+        "width": 343
+      },
+      "badText": []
+    },
+    {
+      "name": "runtime-catalog",
+      "pageOverflow": false,
+      "surfaceOverflow": false,
+      "surfaceOverflowX": "visible",
+      "bounds": {
+        "x": 0,
+        "width": 375
+      },
+      "badText": []
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "writes": []
+}

@@ -15,6 +15,7 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/login'){logged=true;if(delayLogin){pendingLogin=()=>json({csrf:'test-csrf',subject:'admin'});return;}return json({csrf:'test-csrf',subject:'admin'});}
    if(url.pathname==='/api/logout'){logged=false;return json({ok:true});}
    if(url.pathname==='/api/advanced-charts/preferences')return json([]);
+   if(url.pathname==='/api/market-data/center/dataset-summaries')return json({items:[],total:0});
    if(url.pathname==='/api/market-data/composites/'+id)return json({id,source:'composite',frames:['M1','M5','H1','D1'],status:'ready'});
    if(url.pathname==='/api/market-data/series/page')return json({items:[{ticker,symbol:'TEST-COMPOSITE',description:'受控浏览器测试组合',series_kind:'composite'}]});
    if(url.pathname==='/api/advanced-charts/catalog')return json({});
@@ -59,8 +60,8 @@ const server=http.createServer(async(req,res)=>{
    await page.getByLabel('密码',{exact:true}).fill('test-only');await page.getByRole('button',{name:'登录',exact:true}).click();
    await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
    assert.equal(await page.getByRole('navigation',{name:'主导航'}).getByRole('link').count(),5);checks.push('login and five mobile navigation entries');
-   await page.getByRole('link',{name:'数据',exact:true}).click();
-   await page.getByRole('button',{name:/TEST-COMPOSITE/}).click();
+   await page.getByRole('button',{name:'添加自选',exact:true}).click();
+   await page.locator('.symbol-search-body').first().click();
    await page.getByRole('button',{name:'打开图表',exact:true}).click();
    await expect(page.locator('.chart-workspace')).toHaveAttribute('aria-busy','false',{timeout:30000});
    await expect.poll(()=>page.evaluate(()=>Boolean(window.MW_TEST_WIDGET?.activeChart().dataReady())),{timeout:30000}).toBe(true);
@@ -113,21 +114,25 @@ const server=http.createServer(async(req,res)=>{
    await page.evaluate(()=>navigator.serviceWorker.ready);
    await page.getByRole('link',{name:'数据',exact:true}).click();
    await expect(page).toHaveURL(/\/m\/data$/);
-   await expect(page.getByRole('button',{name:/TEST-COMPOSITE/})).toBeVisible();
+   await expect(page.getByText('还没有自建行情',{exact:true})).toBeVisible();
    await context.setOffline(true);await page.reload();
-   await expect(page.getByRole('button',{name:/TEST-COMPOSITE/})).toBeVisible({timeout:15000});checks.push('SW offline cold navigation displays last IDB series snapshot');
+   await expect(page.getByText('还没有自建行情',{exact:true})).toBeVisible({timeout:15000});checks.push('SW offline cold navigation displays last IDB managed-list snapshot');
    await context.setOffline(false);await page.reload();
-   await expect(page.getByRole('button',{name:/TEST-COMPOSITE/})).toBeVisible();
+   await expect(page.getByText('还没有自建行情',{exact:true})).toBeVisible();
    await page.evaluate(()=>window.dispatchEvent(new Event('mw-session-expired')));
    await expect(page.getByLabel('密码',{exact:true})).toBeVisible();assert.equal(await page.locator('.mobile-chart-canvas iframe').count(),0);checks.push('explicit session expiry disposes widget and prompts login');
    await page.getByLabel('密码',{exact:true}).fill('unsent-input');shellRevision=1;
    await page.evaluate(async()=>{const registration=await navigator.serviceWorker.getRegistration('/m/');await registration.update();});
-   await expect(page.getByRole('button',{name:'更新页面',exact:true})).toBeVisible();
-   await page.getByRole('button',{name:'更新页面',exact:true}).click();
-   await expect(page.getByLabel('密码',{exact:true})).toHaveValue('unsent-input');
-   await expect(page.getByRole('alert')).toContainText('请先完成或放弃');
-   await page.getByRole('button',{name:'关闭通知',exact:true}).click();await page.getByLabel('密码',{exact:true}).fill('');
-   await page.getByRole('button',{name:'更新页面',exact:true}).click();
+   await expect.poll(()=>page.evaluate(async()=>Boolean((await navigator.serviceWorker.getRegistration('/m/')).waiting))).toBe(true);
+   await expect(page.locator('.mobile-update')).toHaveCount(0);
+   // Controller activation must not reload a login form with unsubmitted input.
+   await page.evaluate(async()=>{(await navigator.serviceWorker.getRegistration('/m/')).waiting.postMessage({type:'activate'});});
+   await expect.poll(()=>page.evaluate(async()=>navigator.serviceWorker.controller?.state)).toBe('activated');
+   await page.waitForTimeout(250);await expect(page.getByLabel('密码',{exact:true})).toHaveValue('unsent-input');
+   await expect(page.locator('.mobile-toast')).toHaveCount(0);
+   await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
+   await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('button',{name:/检查更新/}).click();
+   await page.getByRole('button',{name:'应用网页更新',exact:true}).click();
    await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
    await expect.poll(()=>page.evaluate(async()=>(await caches.keys()).some(key=>key.endsWith('-test-1')))).toBe(true);
    shellRevision=2;brokenInstall=true;

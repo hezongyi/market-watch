@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type RefObject } from "react";
 
 export const PULL_THRESHOLD = 56;
-export function usePullRefresh(target: RefObject<HTMLDivElement | null>, enabled: boolean, refreshing: boolean, refresh: () => void) {
+export function usePullRefresh(target: RefObject<HTMLDivElement | null>, enabled: boolean, refreshing: boolean, refresh: () => void, scope?: string) {
   const [distance, setDistance] = useState(0);
   const current = useRef({ refreshing, refresh });
   current.current = { refreshing, refresh };
@@ -35,6 +35,6 @@ export function usePullRefresh(target: RefObject<HTMLDivElement | null>, enabled
       node.removeEventListener("touchstart", begin); node.removeEventListener("touchmove", move);
       node.removeEventListener("touchend", end); node.removeEventListener("touchcancel", reset);
     };
-  }, [target, enabled]);
+  }, [target, enabled, scope]);
   return distance;
 }

@@ -83,6 +83,7 @@ export type AlertContext = {
   composite_revision_id?: string | null;
 };
 export type AlertRow = {
+  market_identity?: Record<string, unknown>;
   display_identity?: DisplayIdentity;
   last_triggered_at?: number | null;
   display_label?: string;
@@ -102,15 +103,26 @@ export type AlertRow = {
   config: AlertConfig;
   condition_summary: string;
   runtime: Record<string, unknown>;
+  activity?: {
+    taken_over_at?: number | null;
+    last_checked_at?: number | null;
+    last_evaluated_at?: number | null;
+    last_input_at?: number | null;
+    last_outcome?: string | null;
+  };
   execution?: {
     state: string;
     label: string;
     message?: string | null;
+    reason_code?: string | null;
+    taken_over_at?: number | null;
+    last_checked_at?: number | null;
     last_evaluated_at?: number | null;
+    last_outcome?: string | null;
     last_input_at?: number | null;
     last_gap?: { start?: number | null; end?: number | null; bounds: string; unrecoverable?: boolean; resolved_at?: number };
     notification?: { status: string; outbox_status?: string; message?: string; device_received?: boolean };
-    phone_configuration?: { message?: string | null };
+    phone_configuration?: { reason_code?: string | null; message?: string | null };
   } | null;
 };
 export function isFixedPrice(config: AlertConfig) {

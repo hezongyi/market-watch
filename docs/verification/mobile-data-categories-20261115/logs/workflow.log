@@ -1,0 +1,128 @@
+locator.click: Timeout 30000ms exceeded.
+Call log:
+[2m  - waiting for getByRole('dialog', { name: '维护设置', exact: true }).getByRole('button', { name: '关闭', exact: true })[22m
+[2m    - locator resolved to <button tabindex="0" type="button" aria-label="关闭" data-size="icon" data-slot="button" data-variant="ghost" class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive a…>…</button>[22m
+[2m  - attempting click action[22m
+[2m    2 × waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <header class="mobile-drawer-header">…</header> intercepts pointer events[22m
+[2m    - retrying click action[22m
+[2m    - waiting 20ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+[2m    - <header class="mobile-drawer-header">…</header> intercepts pointer events[22m
+[2m  2 × retrying click action[22m
+[2m      - waiting 100ms[22m
+[2m      - waiting for element to be visible, enabled and stable[22m
+[2m      - element is visible, enabled and stable[22m
+[2m      - scrolling into view if needed[22m
+[2m      - done scrolling[22m
+[2m      - <div data-open="" data-modal="true" role="presentation" data-slot="drawer-viewport" class="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">…</div> intercepts pointer events[22m
+[2m  14 × retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <header class="mobile-drawer-header">…</header> intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <header class="mobile-drawer-header">…</header> intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div data-open="" data-modal="true" role="presentation" data-slot="drawer-viewport" class="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">…</div> intercepts pointer events[22m
+[2m     - retrying click action[22m
+[2m       - waiting 500ms[22m
+[2m       - waiting for element to be visible, enabled and stable[22m
+[2m       - element is visible, enabled and stable[22m
+[2m       - scrolling into view if needed[22m
+[2m       - done scrolling[22m
+[2m       - <div data-open="" data-modal="true" role="presentation" data-slot="drawer-viewport" class="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">…</div> intercepts pointer events[22m
+[2m  - retrying click action[22m
+[2m    - waiting 500ms[22m
+[2m    - waiting for element to be visible, enabled and stable[22m
+[2m    - element is visible, enabled and stable[22m
+[2m    - scrolling into view if needed[22m
+[2m    - done scrolling[22m
+[2m    - <header class="mobile-drawer-header">…</header> intercepts pointer events[22m
+[2m  - retrying click action[22m
+[2m    - waiting 500ms[22m
+
+    at close (/home/quant/repos/market-watch-managed-live-rollover-20261113/web/tests/mobile-data-workflow.browser.cjs:702:8)
+    at /home/quant/repos/market-watch-managed-live-rollover-20261113/web/tests/mobile-data-workflow.browser.cjs:1357:17 {
+  log: [
+    "  - waiting for getByRole('dialog', { name: '维护设置', exact: true }).getByRole('button', { name: '关闭', exact: true })",
+    '    - locator resolved to <button tabindex="0" type="button" aria-label="关闭" data-size="icon" data-slot="button" data-variant="ghost" class="group/button inline-flex shrink-0 items-center justify-center rounded-lg border border-transparent bg-clip-padding text-sm font-medium whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive a…>…</button>',
+    '  - attempting click action',
+    '    2 × waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <header class="mobile-drawer-header">…</header> intercepts pointer events',
+    '    - retrying click action',
+    '    - waiting 20ms',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed',
+    '    - done scrolling',
+    '    - <header class="mobile-drawer-header">…</header> intercepts pointer events',
+    '  2 × retrying click action',
+    '      - waiting 100ms',
+    '      - waiting for element to be visible, enabled and stable',
+    '      - element is visible, enabled and stable',
+    '      - scrolling into view if needed',
+    '      - done scrolling',
+    '      - <div data-open="" data-modal="true" role="presentation" data-slot="drawer-viewport" class="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">…</div> intercepts pointer events',
+    '  14 × retrying click action',
+    '       - waiting 500ms',
+    '       - waiting for element to be visible, enabled and stable',
+    '       - element is visible, enabled and stable',
+    '       - scrolling into view if needed',
+    '       - done scrolling',
+    '       - <header class="mobile-drawer-header">…</header> intercepts pointer events',
+    '     - retrying click action',
+    '       - waiting 500ms',
+    '       - waiting for element to be visible, enabled and stable',
+    '       - element is visible, enabled and stable',
+    '       - scrolling into view if needed',
+    '       - done scrolling',
+    '       - <header class="mobile-drawer-header">…</header> intercepts pointer events',
+    '     - retrying click action',
+    '       - waiting 500ms',
+    '       - waiting for element to be visible, enabled and stable',
+    '       - element is visible, enabled and stable',
+    '       - scrolling into view if needed',
+    '       - done scrolling',
+    '       - <div data-open="" data-modal="true" role="presentation" data-slot="drawer-viewport" class="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">…</div> intercepts pointer events',
+    '     - retrying click action',
+    '       - waiting 500ms',
+    '       - waiting for element to be visible, enabled and stable',
+    '       - element is visible, enabled and stable',
+    '       - scrolling into view if needed',
+    '       - done scrolling',
+    '       - <div data-open="" data-modal="true" role="presentation" data-slot="drawer-viewport" class="pointer-events-none fixed inset-0 z-50 select-none data-[modal=true]:pointer-events-auto">…</div> intercepts pointer events',
+    '  - retrying click action',
+    '    - waiting 500ms',
+    '    - waiting for element to be visible, enabled and stable',
+    '    - element is visible, enabled and stable',
+    '    - scrolling into view if needed',
+    '    - done scrolling',
+    '    - <header class="mobile-drawer-header">…</header> intercepts pointer events',
+    '  - retrying click action',
+    '    - waiting 500ms'
+  ],
+  name: 'TimeoutError'
+}
+[{"path":"/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance/control"},{"path":"/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance/control"},{"path":"/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"},{"path":"/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"},{"path":"/api/market-data/center/datasets/check"}]

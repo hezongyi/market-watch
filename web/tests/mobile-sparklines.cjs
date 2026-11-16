@@ -3,8 +3,31 @@ const exportsObject={};
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/sparklines.ts','utf8'),{
   compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}
 }).outputText,{exports:exportsObject,Map,Set,Promise,AbortController,Number,Math,JSON});
-const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,sparklineDisplayPoints,sparklineWithQuote}=exportsObject;
+const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,sparklineDisplayPoints,sparklineWithQuote,mergeSparkline,sparklineNeedsRecheck,sparklinePosition}=exportsObject;
 (async()=>{
+  const ashareMinute=60000, ashareTime=time=>Date.parse('2026-11-13T'+time+':00+08:00');
+  const ashare={ticker:'MWP:ASHARE',timeframe:'M1',window_start:ashareTime('00:00'),window_end:ashareTime('23:59'),
+    display_segments:[{start:ashareTime('09:30'),end:ashareTime('11:30')},{start:ashareTime('13:00'),end:ashareTime('15:00')}],
+    points:['09:30','11:30','13:00','15:00'].map((time,i)=>({time:ashareTime(time)-ashareMinute,display_time:ashareTime(time),price:String(100+i),gap_before:i===2}))};
+  const asharePaths=sparklinePaths(ashare,200);
+  assert.equal(asharePaths[0].line.split(' ')[0].split(',')[0],'M0.00','opening close stays at the left edge');
+  assert.equal(asharePaths[0].end[0],100,'morning occupies half of the width');
+  assert.equal(asharePaths[1].line.split(' ')[0].split(',')[0],'M100.00','afternoon begins at the same middle coordinate');
+  assert.equal(asharePaths[1].end[0],200,'actual session close reaches the right edge');
+  assert.equal(asharePaths.length,2,'compressing lunch must not join the data gap');
+  const morningOnly={...ashare,points:ashare.points.slice(0,2)};
+  assert.equal(sparklinePaths(morningOnly,200)[0].end[0],100,'morning does not stretch into the future afternoon');
+  assert.equal(sparklinePosition(ashare,ashareTime('14:00')),0.75);
+  assert.equal(sparklinePosition(ashare,ashareTime('12:00')),undefined,'lunch is outside the display axis');
+  const offSession={...ashare,points:[...ashare.points.slice(0,2),{time:ashareTime('12:00'),price:'9999',gap_before:false},...ashare.points.slice(2)]};
+  assert.equal(sparklineDisplayPoints(offSession).length,4,'off-session observations do not affect the curve or vertical scale');
+  assert.equal(sparklineScale(offSession).y(101),sparklineScale(ashare).y(101));
+  const morningQuote={s:'ok',v:{fetch_status:'ok',lp:105,quote_time:ashareTime('12:00')}};
+  assert.equal(sparklineWithQuote(morningOnly,morningQuote,ashareTime('12:01')),morningOnly,'lunch quotes cannot paint a false live tail');
+  const sourceClose={s:'ok',v:{fetch_status:'ok',lp:105,time_type:'source_m1',data_start:ashareTime('12:59'),data_end:ashareTime('13:00')}};
+  const afternoon=sparklineWithQuote(morningOnly,sourceClose,ashareTime('13:01'));
+  assert.equal(afternoon.points.at(-1).display_time,ashareTime('13:00'),'source minute closes align with the afternoon open');
+  assert.equal(sparklinePaths(afternoon,200).at(-1).end[0],100);
   const requests=[],received=[],failed=[];let active=0,maxActive=0;
   const loader=sparklineLoader((items,signal)=>new Promise(resolve=>{
     active++;maxActive=Math.max(maxActive,active);
@@ -164,15 +187,58 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,spark
   historyCalls.slice(3).forEach(call=>call.resolve());await cancelled;
   assert.equal(historyReceived.length,delivered,'late preparation cannot overwrite a new visible generation');
   // Previous plot bounds are in the past but the snapshot remains valid today.
-  const prior={ticker:'MWP:NVDA',window_start:0,window_end:10,valid_until:200,
+  let sessionNow=100;
+  const prior={ticker:'MWP:NVDA',window_start:0,window_end:10,valid_until:1000000,target_window_start:20,target_window_end:1000000,
     session:{date:'2026-11-06',previous:true},status:'partial',points:[{time:1,price:'100'}]};
   const sessionReceived=[],sessionPrepared=new Map();let sessionCalls=0;
-  const sessionLoader=sparklineLoader(async()=>({as_of:100,items:[prior]}),rows=>sessionReceived.push(...rows),error=>{throw error},{
-    prepared:sessionPrepared,request:async()=>{sessionCalls++;return {as_of:100,items:[prior],preparation:'ready'}}
+  const sessionLoader=sparklineLoader(async()=>({as_of:sessionNow,items:[prior]}),rows=>sessionReceived.push(...rows),error=>{throw error},{
+    prepared:sessionPrepared,request:async()=>{sessionCalls++;return {as_of:sessionNow,items:[prior],preparation:'ready'}}
   });
   await sessionLoader.load([{ticker:prior.ticker}]);await sessionLoader.load([{ticker:prior.ticker}]);
-  assert(sessionReceived.length===4,'valid previous-session curve survives batch and preparation');
-  assert.equal(sessionCalls,2,'previous session must not suppress next refresh after open');
-  assert.equal(sessionPrepared.size,0);
+  assert.equal(sessionReceived.length,3,'previous curve survives while preparation waits for its retry boundary');
+  assert.equal(sessionCalls,1,'previous data does not trigger unbounded repeat preparation');
+  sessionNow=60100;await sessionLoader.load([{ticker:prior.ticker}]);
+  assert.equal(sessionCalls,2,'previous session preparation becomes retryable at its backoff boundary');
+  assert.equal(sessionPrepared.size,1);
+  const empty={...prior,points:[],status:'empty'};
+  assert.equal(mergeSparkline(prior,empty,100).points.length,1,'empty success retains valid fallback');
+  const failedEmpty={...empty,preparation_error:'历史补取暂未成功，稍后重试'};
+  assert.equal(mergeSparkline(failedEmpty,empty,100).preparation_error,failedEmpty.preparation_error,'an empty observation cannot hide a failed preparation');
+  assert.equal(mergeSparkline(failedEmpty,{...empty,preparation_error:null},100).preparation_error,null,'successful preparation clears its error');
+  assert.equal(mergeSparkline(failedEmpty,{...empty,identity_key:'other'},100).preparation_error,undefined,'a changed identity never inherits preparation errors');
+
+  assert.equal(mergeSparkline(prior,{...empty,status:'unavailable'},100).points.length,0,'explicit failure never masked');
+  assert.equal(mergeSparkline({...prior,identity_key:'old'},{...empty,identity_key:'new'},100).points.length,0,'changed account/source cache cannot reuse another identity');
+  assert(sparklineNeedsRecheck(prior,{s:'ok',v:{fetch_status:'ok',quote_time:30}},100),'current quote triggers recheck without painting onto yesterday');
+  assert(!sparklineNeedsRecheck(prior,{s:'ok',v:{fetch_status:'ok',quote_time:10}},100),'prior quote cannot trigger a fake current day');
+  assert.equal(mergeSparkline({...prior,revision:{composite_revision_id:'a',input_revision:1}},
+    {...empty,revision:{composite_revision_id:'a',input_revision:2}},100).points.length,0,'changed confirmed input cannot reuse an empty old curve');
+  assert.equal(mergeSparkline(prior,{...empty,display_state:'unsupported'},100).points.length,0,'unsupported does not hide behind old data');
+  let unsupportedCalls=0;
+  const unsupported={...prior,target_window_end:10};
+  const unsupportedLoader=sparklineLoader(async()=>({as_of:sessionNow,items:[unsupported]}),()=>{},error=>{throw error},{
+    prepared:new Map(),request:async()=>{unsupportedCalls++;return {as_of:sessionNow,items:[unsupported],preparation:'unsupported'}}
+  });
+  await unsupportedLoader.load([{ticker:prior.ticker}]);
+  sessionNow+=60000;await unsupportedLoader.load([{ticker:prior.ticker}]);
+  assert.equal(unsupportedCalls,1,'past stock close does not expire unsupported preparation every minute');
+  let calendarCalls=0;
+  const unknown={...prior,status:'ready',stock_session:true,display_state:'unknown',session:{date:'2026-11-13',previous:false}};
+  const calendarLoader=sparklineLoader(async()=>({as_of:sessionNow,items:[unknown]}),()=>{},error=>{throw error},{
+    prepared:new Map(),request:async()=>{calendarCalls++;return {as_of:sessionNow,items:[unknown],preparation:'ready'}}
+  });
+  await calendarLoader.load([{ticker:prior.ticker}]);
+  assert.equal(calendarCalls,1,'complete stock prices must still prepare missing dated session evidence');
+  let closedCalls=0;
+  const completed={...unsupported,display_state:'closed',session:{date:'2026-11-13',previous:false}};
+  const closedLoader=sparklineLoader(async()=>({as_of:sessionNow,items:[completed]}),()=>{},error=>{throw error},{
+    prepared:new Map(),request:async()=>{closedCalls++;return {as_of:sessionNow,items:[completed],preparation:'ready'}}
+  });
+  await closedLoader.load([{ticker:prior.ticker}]);sessionNow+=60000;
+  await closedLoader.load([{ticker:prior.ticker}]);
+  assert.equal(closedCalls,1,'past close does not expire completed preparation every minute');
+  const closed={...liveItem,display_state:'closed'};
+  assert.strictEqual(sparklineWithQuote(closed,{s:'ok',v:{fetch_status:'ok',quote_time:100,lp:5}},200),closed,'closed display stays blue and does not accept quote tails');
+
   console.log('PASS mobile sparklines: bounded batches/concurrency, deduplication, abort/late replies, window expiry and gaps');
 })().catch(error=>{console.error(error);process.exitCode=1;});

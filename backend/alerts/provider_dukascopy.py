@@ -12,6 +12,8 @@ from decimal import Decimal, InvalidOperation
 from functools import lru_cache
 from types import SimpleNamespace
 
+import httpx
+
 from .chart_data import FRAMES
 from .dukascopy_history import DukascopyHistory
 from .market_names import display_code, matches_code
@@ -120,9 +122,11 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
 def _native_page(meta, frame, before, count, *, client=None, deadline=None, optional=0):
     from .provider_cache import check_cancelled
     from .provider_chart import record_timing
-    from .provider_transport import activity, pooled_client
+    from .provider_deadline import request_deadline
+    from .provider_transport import activity, discard_client, pooled_client, retryable_network_error
 
     deadline = deadline or time.monotonic() + 20
+    managed_client = client is None
     client = client or pooled_client("dukascopy")
     adapter = DukascopyHistory(client=client)
     # Native SDK decoding can preserve arbitrary JSON decimals, just like M1.
@@ -130,15 +134,26 @@ def _native_page(meta, frame, before, count, *, client=None, deadline=None, opti
     requested = min(4000, count + optional)
 
     def get(url, **kwargs):
+        nonlocal client
         check_cancelled()
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise TimeoutError("Dukascopy原生请求超过时间预算")
         kwargs["params"] = {**kwargs["params"], "time_direction": "P"}
         started = time.monotonic()
-        with request_slot("dukascopy", deadline=deadline, cancelled=lambda: time.monotonic() >= deadline):
-            with activity(client) as transport:
-                response = transport.get(url, **kwargs, timeout=max(.001, min(7, deadline - time.monotonic())))
+        for attempt in range(2):
+            transport = client
+            try:
+                with request_slot("dukascopy", deadline=deadline, cancelled=lambda: time.monotonic() >= deadline):
+                    with activity(client) as transport, request_deadline(deadline):
+                        response = transport.get(url, **kwargs, timeout=max(.001, min(7, deadline - time.monotonic())))
+                break
+            except httpx.TransportError as error:
+                if managed_client and retryable_network_error(error):
+                    discard_client(transport)
+                if attempt or not managed_client or not retryable_network_error(error) or deadline - time.monotonic() <= .25:
+                    raise
+                client = pooled_client("dukascopy")
         record_timing("dukascopy_native_http", started)
         if response.status_code == 429:
             value = response.headers.get("Retry-After", "")

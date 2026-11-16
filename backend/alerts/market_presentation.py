@@ -59,6 +59,7 @@ def present(meta, *, identity=None, realtime_identity=None):
             price = '成交价' if source == 'binance' else '原始价格'
     kind_display = KIND_NAMES.get(kind, kind)
     label = ' · '.join(part for part in (shown, name if name != shown else '', kind_display, source_display, price) if part)
-    return {**meta, 'display_symbol': shown, 'instrument_name': name, 'series_kind_display': kind_display,
+    from .mobile_identity import mobile_identity
+    return {**meta, 'mobile_identity': mobile_identity(meta, origin), 'display_symbol': shown, 'instrument_name': name, 'series_kind_display': kind_display,
             'source_display': source_display, 'price_basis_display': price,
             'presentation_description': label, **extra}

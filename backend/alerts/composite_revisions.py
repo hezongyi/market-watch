@@ -76,7 +76,7 @@ def affected_rules(db, composite_id):
     ).where(ChartAlert.status == "active")) if version.market_identity.get("composite_id") == composite_id]
 
 
-def create(db, composite_id, body):
+def create(db, composite_id, body, *, managed=False):
     from .composite_series import period
 
     body = RevisionRequest.model_validate(body)
@@ -149,7 +149,8 @@ def create(db, composite_id, body):
     db.add(CompositeRevisionChange(revision_id=revision.id, request_hash=request_hash, reason=body.reason,
         manifest={"request": body.model_dump(), "cutoff": cutoff, "history_checksum": version.manifest["checksum"],
             "warmups": list(warmups.values()), "affected_rules": impacted, "indicator_algorithm": ALGORITHM,
-            "policy": "no_implicit_rule_migration"}))
+            "policy": "no_implicit_rule_migration",
+            **({"managed_rollover": True} if managed else {})}))
     db.add(CompositePreparation(revision_id=revision.id, cursor=body.seam, cutoff=cutoff,
         state={"stage": "confirm_recent_m1", "target_identity": target.identity,
             "historical_input": {"version_id": version.id, "checksum": version.manifest["checksum"],
@@ -163,6 +164,7 @@ def create(db, composite_id, body):
 
 
 def readiness(db, revision, *, enqueue=False):
+    from .composite_preparation import query_cutoff
     from .fixed_indicators import request
 
     prep = db.get(CompositePreparation, revision.id)
@@ -184,9 +186,19 @@ def readiness(db, revision, *, enqueue=False):
     periods_ready = set(FRAMES) <= {item.timeframe for item in periods if item.status == "published"} and (
         value is not None and all(frame in tasks and tasks[frame].applied_input_revision >= value for frame in FRAMES))
     indicators, complete = [], True
+    warmups = list(change.manifest["warmups"]) if change else []
+    if change and change.manifest.get("managed_rollover"):
+        from .chart_alert_service import AlertConfig
+        current_warmups = {key(item): item for item in warmups}
+        for saved, _ in affected_rules(db, revision.composite_id):
+            config = AlertConfig.model_validate(saved.config)
+            for indicator in config.indicators():
+                item = {"timeframe": config.timeframe, "spec": indicator.model_dump(exclude={"output"})}
+                current_warmups[key(item)] = item
+        warmups = list(current_warmups.values())
     if prep.status == "queried" and not prep.error and periods_ready:
         status = "initializing_indicators"
-        for warmup in change.manifest["warmups"] if change else []:
+        for warmup in warmups:
             page = {"revision_id": revision.id, "history_version_id": revision.history_version_id,
                 "input_revision": value, "timeframe": warmup["timeframe"]}
             # Progress reads must never queue work. The asynchronous worker owns
@@ -194,7 +206,7 @@ def readiness(db, revision, *, enqueue=False):
             stored = prep.state.get("activation_indicators", {}).get(key(warmup))
             from .storage import FixedIndicatorRun
 
-            run = request(db, page, warmup["spec"], stamp=prep.cutoff) if enqueue else db.get(FixedIndicatorRun, stored) if stored else None
+            run = request(db, page, warmup["spec"], stamp=query_cutoff(prep)) if enqueue else db.get(FixedIndicatorRun, stored) if stored else None
             if run and enqueue:
                 prep.state = {**prep.state, "activation_indicators": {
                     **prep.state.get("activation_indicators", {}), key(warmup): run.id}}
@@ -266,6 +278,12 @@ def options(db, composite_id):
 
 def activate(db, composite_id, revision_id, body):
     body = ActivationRequest.model_validate(body)
+    candidate = db.get(CompositeRevision, revision_id)
+    change = db.get(CompositeRevisionChange, revision_id)
+    managed = bool(change and change.manifest.get("managed_rollover") and body.request_id.startswith("auto:"))
+    from .managed_rollover import lock_scope
+
+    lock_scope(db, owned(db, composite_id), candidate)
     composite = owned(db, composite_id, lock=True)
     revision = db.get(CompositeRevision, revision_id)
     if not revision or revision.composite_id != composite.id or not db.get(CompositeRevisionChange, revision.id):
@@ -287,6 +305,9 @@ def activate(db, composite_id, revision_id, body):
     mapping = db.get(RealtimeMapping, revision.mapping_id)
     if db.get(MarketDataset, mapping.target_dataset_id).identity["account_scope"] != account_scope():
         raise ValueError("实时账户已改变，不能启用旧映射")
+    if managed:
+        from .managed_rollover import activation_gate
+        activation_gate(db, composite, candidate, progress)
     from .switch_activation import publish
 
     return publish(db, composite=composite, revision=revision, body=body, progress=progress,

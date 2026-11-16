@@ -1,0 +1,97 @@
+{
+  "at": "2026-11-16T03:50:30.023492+00:00",
+  "provider_keys": [
+    "source",
+    "environment",
+    "authentication_hold",
+    "error",
+    "next_probe_at",
+    "configured",
+    "collection_recorded",
+    "connection_started_at",
+    "authentication_probe_at",
+    "error_observed_at"
+  ],
+  "provider": {
+    "status": null,
+    "error": null,
+    "authentication_hold": false,
+    "next_probe_at": null,
+    "authentication_probe_at": 1794801002019,
+    "error_observed_at": null,
+    "connection_started_at": 1794801003101,
+    "configured": true
+  },
+  "live_datasets": [
+    {
+      "logical_symbol": "USDJPY",
+      "connection": "recovering",
+      "quality": "recovering",
+      "quote_ready": true,
+      "candle_ready": false,
+      "quote_age_ms": 1000,
+      "revision": 168,
+      "received_at": 1794801029124,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "USDCAD",
+      "connection": "recovering",
+      "quality": "recovering",
+      "quote_ready": true,
+      "candle_ready": false,
+      "quote_age_ms": 4898,
+      "revision": 19387,
+      "received_at": 1794801025147,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "EURUSD",
+      "connection": "recovering",
+      "quality": "recovering",
+      "quote_ready": true,
+      "candle_ready": false,
+      "quote_age_ms": 1678,
+      "revision": 24276,
+      "received_at": 1794801028281,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "XAUUSD",
+      "connection": "recovering",
+      "quality": "recovering",
+      "quote_ready": true,
+      "candle_ready": false,
+      "quote_age_ms": 914,
+      "revision": 31442,
+      "received_at": 1794801029170,
+      "confirmation_error": null
+    }
+  ],
+  "managed_datasets": [
+    {
+      "symbol": "EURUSD",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "recovering"
+    },
+    {
+      "symbol": "USDCAD",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "recovering"
+    },
+    {
+      "symbol": "USDJPY",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "recovering"
+    },
+    {
+      "symbol": "XAUUSD",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "recovering"
+    }
+  ]
+}

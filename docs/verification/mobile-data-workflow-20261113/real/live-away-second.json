@@ -1,0 +1,91 @@
+{
+  "observedAt": 1794588993028,
+  "composites": [
+    {
+      "symbol": "EURUSD",
+      "datasetId": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "enabled": true,
+      "durableTarget": true,
+      "status": "receiving",
+      "connection": "connected",
+      "receivedAt": 1794588992746,
+      "confirmedEnd": 1794588960000,
+      "epoch": 2,
+      "sequence": 277,
+      "observations": 1,
+      "usage": {
+        "charts": 0,
+        "strategies": 0,
+        "chart_alerts": 0,
+        "total": 0
+      },
+      "revision": {
+        "id": "589a416a-5c8b-40e9-bf43-e98d07630ac0",
+        "history_version_id": "15bb31c3-be97-4f61-a74a-eae0ca9e6ba8",
+        "history_start": 1794348000000,
+        "history_end": 1794588480000,
+        "history_checksum": "cbe9b2402cd1ea5ec94b588dc47cefd05f03c073c84889ef5283877d9b5da3b9",
+        "seam": 1794520800000,
+        "rules": {
+          "aggregation": "configured-phase-m1-v1",
+          "seam": "latest-day-boundary-v1",
+          "selection": "history-before-T-target-from-T-v1",
+          "tail_revisions": "source-confirmed-replace-audit-v1",
+          "aggregation_calendar": "ny17",
+          "historical_calendar_version": "user-forex-ny17-v1"
+        },
+        "activated_at": null
+      },
+      "preparationStatus": "queried",
+      "health": {
+        "quote_ready": true,
+        "confirmed_tail_ready": true,
+        "quote_age_ms": 284,
+        "connection": "connected"
+      }
+    },
+    {
+      "symbol": "XAUUSD",
+      "datasetId": "a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2",
+      "enabled": true,
+      "durableTarget": true,
+      "status": "receiving",
+      "connection": "connected",
+      "receivedAt": 1794588992768,
+      "confirmedEnd": 1794588960000,
+      "epoch": 2,
+      "sequence": 717,
+      "observations": 1,
+      "usage": {
+        "charts": 0,
+        "strategies": 0,
+        "chart_alerts": 0,
+        "total": 0
+      },
+      "revision": {
+        "id": "8eacfac4-2d39-4137-85ca-0d6ea64a5402",
+        "history_version_id": "15d1638d-156e-4330-be24-6fc15575ba0c",
+        "history_start": 1794348000000,
+        "history_end": 1794588480000,
+        "history_checksum": "88058abd57203af3bf42d700d5156f84197f1effcf9731244bae71155fa0dd83",
+        "seam": 1794520800000,
+        "rules": {
+          "aggregation": "configured-phase-m1-v1",
+          "seam": "latest-day-boundary-v1",
+          "selection": "history-before-T-target-from-T-v1",
+          "tail_revisions": "source-confirmed-replace-audit-v1",
+          "aggregation_calendar": "ny17",
+          "historical_calendar_version": "user-metal-ny17-v1"
+        },
+        "activated_at": null
+      },
+      "preparationStatus": "queried",
+      "health": {
+        "quote_ready": true,
+        "confirmed_tail_ready": true,
+        "quote_age_ms": 396,
+        "connection": "connected"
+      }
+    }
+  ]
+}

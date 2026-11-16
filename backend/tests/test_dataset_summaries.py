@@ -17,6 +17,37 @@ def seed(db, code):
     configure(db, identity(provider_symbol=code).key, target_start=0, timeframes=["M1", "H4"])
 
 
+def test_list_switch_eligibility_matches_write_rules_without_creating_demand(database, monkeypatch):
+    from alerts.composite_definitions import save_mapping
+    from alerts.managed_continuation import configure as toggle
+    from alerts.storage import MarketCatalog, MarketComposite, MarketDemand
+    from sqlalchemy import func, select
+    from test_composite_definitions import PROOF, prepare, publish
+
+    catalog = prepare(database, monkeypatch)
+    with database.begin() as db:
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        row = summaries(db)["items"][0]["continuation"]
+        assert not row["can_enable"] and row["disabled_reason"] == "待配置"
+        mapping = save_mapping(db, identity().key, catalog, PROOF)
+        row = summaries(db)["items"][0]["continuation"]
+        assert not row["can_enable"] and row["disabled_reason"] == "待历史"
+        assert not row["can_disable"] and row["default_mapping_id"] == mapping.id
+    publish(database)
+    with database.begin() as db:
+        row = summaries(db)["items"][0]["continuation"]
+        assert row["can_enable"] and not row["can_disable"] and not row["enabled"]
+        assert db.scalar(select(func.count()).select_from(MarketComposite)) == 0
+        assert db.scalar(select(func.count()).select_from(MarketDemand)) == 0
+        toggle(db, identity().key, value=True)
+        db.get(MarketCatalog, catalog).available = False
+        db.flush()
+        broken = summaries(db)["items"][0]["continuation"]
+        assert broken["enabled"] and broken["can_disable"] and not broken["can_enable"]
+        toggle(db, identity().key, value=False)
+        assert not summaries(db)["items"][0]["continuation"]["enabled"]
+
+
 def test_rows_batch_without_per_item_detail_and_preserve_period_versions(database):
     with database.begin() as db:
         register(db)
@@ -198,3 +229,39 @@ def test_legacy_continuation_without_maintenance_is_listed_without_creating_plan
         assert summaries(db, status="archived")["total"] == 0
         assert summaries(db, status="paused")["total"] == 0
         assert db.scalar(select(func.count()).select_from(DatasetMaintenance)) == 0
+
+
+def test_summary_task_state_matches_detail_during_download_derivation_and_partial(database):
+    """A published base is still deriving until its requested frames finish."""
+    from alerts.history_maintenance import task_status
+    from alerts.storage import HistoryArtifact, HistoryVersion
+    from sqlalchemy import select
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=["M1", "H4"])
+        ident = create_run(db, identity().key, end=120000, request_id="summary-state").id
+        version = db.get(HistoryVersion, ident)
+        for state in ("pending", "running", "retrying", "configuration_error", "paused", "failed"):
+            version.status = state
+            db.flush()
+            assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == state
+        version.status = "pending"
+    import_page(Adapter(), version_id=ident)
+    from alerts.history_maintenance import task_control
+
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == "deriving"
+        task_control(db, ident, "pause")
+        db.flush()
+        assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == "paused"
+        task_control(db, ident, "resume")
+        artifact = db.scalar(select(HistoryArtifact).where(HistoryArtifact.version_id == ident, HistoryArtifact.timeframe == "H4"))
+        artifact.status = "unavailable"
+        db.flush()
+    while artifact_tick(ident):
+        pass
+    with database.begin() as db:
+        version = db.get(HistoryVersion, ident)
+        assert summaries(db)["items"][0]["maintenance"]["task_status"] == task_status(db, version) == "partial"

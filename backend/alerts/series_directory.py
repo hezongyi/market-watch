@@ -11,7 +11,7 @@ from .storage import transaction
 
 
 def page(query="", *, kind="history", page_size=25, offset=0, source=None, calendar=None,
-          symbol_type="", cursor=None, include_total=True, provider_page=None):
+          symbol_type="", cursor=None, include_total=True, provider_page=None, mobile=False, exclude_watch=False, retain_watch=()):
     from .search_types import TYPES
     if (kind not in ("all", "provider", "history", "composite") or symbol_type not in TYPES
             or not 1 <= page_size <= 250 or not 0 <= offset <= 1000000
@@ -31,7 +31,8 @@ def page(query="", *, kind="history", page_size=25, offset=0, source=None, calen
         if provider_page is None:
             from .market_data import _provider_series_page as provider_page
         return provider_page(query, source=source, symbol_type=symbol_type,
-                             offset=offset, page_size=page_size, include_total=include_total)
+                             offset=offset, page_size=page_size, include_total=include_total, **({"mobile": mobile, "exclude_watch": exclude_watch} if mobile or exclude_watch else {}),
+                             **({"retain_watch": retain_watch} if retain_watch else {}))
     from .series_access import search_page
     try:
         with transaction() as db:

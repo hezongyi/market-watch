@@ -280,13 +280,29 @@ def finish_run(db, version_id):
         if not unavailable:
             plan.last_success = run.completed_at
         plan.updated_at = now_ms()
+    from .config import settings
+    if settings.managed_rollover_enabled and not unavailable:
+        from .publication_wakeup import COMPOSITE_CHANNEL, notify
+        # Delivered after commit; polling HistoryRun also recovers a lost hint.
+        db.flush()
+        try:
+            with db.begin_nested():
+                notify(db, COMPOSITE_CHANNEL)
+        except Exception:
+            pass  # The hint must never roll back successful maintenance.
     return True
 
 
 def task_status(db, version):
     run = db.get(HistoryRun, version.id)
-    if version.status == "published" and db.scalar(select(HistoryArtifact.id).where(
-            HistoryArtifact.version_id == version.id, HistoryArtifact.status == "unavailable").limit(1)):
+    unavailable = version.status == "published" and db.scalar(select(HistoryArtifact.id).where(
+            HistoryArtifact.version_id == version.id, HistoryArtifact.status == "unavailable").limit(1))
+    return task_state(version, run, bool(unavailable))
+
+
+def task_state(version, run, unavailable=False):
+    """Same task state for individual detail and bounded summary readers."""
+    if version.status == "published" and unavailable:
         return "partial"
     if version.status != "published" or not run or run.completed_at is not None:
         return "partial" if version.status == "published" and version.manifest.get("result") == "partial" else version.status

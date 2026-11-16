@@ -1,0 +1,69 @@
+{
+  "timestamp": "20261115T064130Z",
+  "project": "mw-managed-live-rollover-20261113",
+  "old": {
+    "run.json": {
+      "api": "sha256:1c50e1756fe7fa5ccb0142dbd8f9aecf56f8f8246f9981a996c235a8e9f42940",
+      "web": "sha256:953992d066371405b077fcbbbe02465332f85aee8319419be4b5552d79dd93f9"
+    },
+    "compose.json": {
+      "api": "sha256:1c50e1756fe7fa5ccb0142dbd8f9aecf56f8f8246f9981a996c235a8e9f42940",
+      "web": "sha256:953992d066371405b077fcbbbe02465332f85aee8319419be4b5552d79dd93f9"
+    }
+  },
+  "images": {
+    "api": "sha256:dc0b05352c7bb2df84a44ab3d0fa91397db7bcb3ad15c59f3848a012fbec3b7a",
+    "web": "sha256:e15f0c348181ade2f2dabd70414a9b2b46fa383f1890842e4c8141b838a5193e"
+  },
+  "changes": [
+    "api",
+    "web"
+  ],
+  "noDatabaseMigration": true,
+  "searchOptimizationDeployment": {
+    "timestamp": "20261115T064906Z",
+    "changed": [
+      "api"
+    ],
+    "backups": [
+      "run.json.before-mobile-identity-search-20261115T064906Z",
+      "compose.json.before-mobile-identity-search-20261115T064906Z"
+    ]
+  },
+  "indexOptimizationDeployment": {
+    "timestamp": "20261115T065357Z",
+    "changed": [
+      "api"
+    ],
+    "backups": [
+      "run.json.before-mobile-identity-index-20261115T065357Z",
+      "compose.json.before-mobile-identity-index-20261115T065357Z"
+    ]
+  },
+  "sourceSamplingFixDeployment": {
+    "timestamp": "20261115T070521Z",
+    "changed": [
+      "api"
+    ],
+    "backups": [
+      "run.json.before-source-sampling-20261115T070521Z",
+      "compose.json.before-source-sampling-20261115T070521Z"
+    ],
+    "fixes": [
+      "COMMODITY display",
+      "HK/GB/DE stock display",
+      "explicit CFD display"
+    ]
+  },
+  "etfFormFixDeployment": {
+    "timestamp": "20261115T071118Z",
+    "changed": [
+      "api"
+    ],
+    "backups": [
+      "run.json.before-source-etf-20261115T071118Z",
+      "compose.json.before-source-etf-20261115T071118Z"
+    ],
+    "fix": "Dukas normalized ETF retains verified ETF_CFD group"
+  }
+}

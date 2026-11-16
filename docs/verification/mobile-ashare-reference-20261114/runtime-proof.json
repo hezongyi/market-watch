@@ -1,0 +1,49 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "base": "https://192.168.7.232:18447",
+  "checks": [
+    "API source and built mobile assets match",
+    "Real 688256 fills trading width; NVDA identity remains correct; 8 layout screenshots",
+    "APK update download preserved"
+  ],
+  "errors": [],
+  "user_writes": [],
+  "screenshots": [
+    "watch-375-light-14.png",
+    "watch-375-light-21.png",
+    "watch-375-dark-14.png",
+    "watch-375-dark-21.png",
+    "watch-412-light-14.png",
+    "watch-412-light-21.png",
+    "watch-412-dark-14.png",
+    "watch-412-dark-21.png"
+  ],
+  "real_a_share": {
+    "ticker": "MWP:TENCENT-NATIVE:SSE:688256",
+    "point_count": 240,
+    "date": "2026-11-13",
+    "previous_close": "973.00",
+    "previous_close_at": 1794466800000,
+    "display_segments": [
+      {
+        "start": 1794533400000,
+        "end": 1794540600000
+      },
+      {
+        "start": 1794546000000,
+        "end": 1794553200000
+      }
+    ],
+    "before_end_ratio": 0.2902777777777778,
+    "after_end_ratio": 0.9958333333333332
+  },
+  "source_sha256": "01108b64621ea7ebe362443be16f817e278f2d5c2623e7769c47c7c5b04e10d3",
+  "shell": "c3b5bb975dbf9299",
+  "images": {
+    "api": "sha256:1f40d2a2341316837dae255f10e5a0dba58010c39a62c169bd45e85f70cf7094",
+    "web": "sha256:fcc379e1ea0b59221679fd1e7db2a4b9c26f80a6bf5a2ea323e172ba601dc9a1",
+    "market-runtime": "sha256:92cd24d49aef909b1584cdaadb85434e297f1df6d6321ef1a80a3af9be287eae"
+  },
+  "passed": true
+}

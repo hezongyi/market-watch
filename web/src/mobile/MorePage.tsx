@@ -1,6 +1,9 @@
+import LogsSheet from "./LogsSheet";
+import { setLogVersions } from "./logs";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Bell,
+  ChevronDown,
   ChevronRight,
   History,
   Info,
@@ -9,14 +12,19 @@ import {
   Sun,
   Wifi,
   Download,
+  ScrollText,
 } from "lucide-react";
 import { api, errorMessage } from "../api";
 import type { MobileMarket } from "./market";
 import type { MarketTransportState } from "../advanced/providerSubscriptions";
-import { stamp } from "./RecordsSheet";
 import MobileSheet from "./MobileSheet";
 import { MobileOverlaysProvider, MobileConfirm } from "./WatchOverlays";
 import { Button } from "./components/ui/button";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "./components/ui/collapsible";
 import type { useMobileShell } from "./shell";
 
 type Panel = "connection" | "notifications" | "about" | "update";
@@ -27,25 +35,54 @@ const titles: Record<Panel, string> = {
   update: "检查更新",
 };
 
+function MoreTime({ value }: { value: unknown }) {
+  if (typeof value !== "number" || !value) return <>尚无记录</>;
+  const date = new Date(value);
+  return (
+    <time className="more-time" dateTime={date.toISOString()}>
+      <span>
+        {date.toLocaleDateString("zh-CN", {
+          year: "numeric",
+          month: "2-digit",
+          day: "2-digit",
+        })}
+      </span>
+      <span>{date.toLocaleTimeString("zh-CN", { hour12: false })}</span>
+    </time>
+  );
+}
+
 function Setting({
   icon,
   label,
   value,
+  toggle,
   onClick,
 }: {
   icon: ReactNode;
   label: string;
   value?: string;
+  toggle?: boolean;
   onClick(): void;
 }) {
   return (
-    <Button variant="ghost" className="mobile-setting-row" onClick={onClick}>
+    <Button
+      variant="ghost"
+      className="mobile-setting-row"
+      aria-pressed={toggle}
+      aria-haspopup={toggle === undefined ? "dialog" : undefined}
+      onClick={onClick}
+    >
       <span className="more-setting-icon" aria-hidden="true">
         {icon}
       </span>
       <span className="more-setting-label">{label}</span>
       {value && <small>{value}</small>}
-      <ChevronRight data-icon="inline-end" aria-hidden="true" />
+      {toggle === undefined ? (
+        <ChevronRight data-icon="inline-end" aria-hidden="true" />
+      ) : (
+        <span className="more-setting-tail" aria-hidden="true" />
+      )}
     </Button>
   );
 }
@@ -69,6 +106,10 @@ export default function MorePage({
   logout(): Promise<void>;
   report(message: string): void;
 }) {
+  const [logsOpen, setLogsOpen] = useState(false);
+  const [connectionError, setConnectionError] = useState("");
+  const [updateError, setUpdateError] = useState("");
+  const pendingLogRecords = useRef(false);
   const [health, setHealth] = useState<any>();
   const [transport, setTransport] = useState<MarketTransportState>();
   const [readAt, setReadAt] = useState<number>();
@@ -86,10 +127,12 @@ export default function MorePage({
     }
     if (refreshing) return;
     setRefreshing(true);
+    setConnectionError("");
     try {
       setHealth(await api("/health"));
       setReadAt(Date.now());
     } catch (error) {
+      setConnectionError(errorMessage(error));
       report(errorMessage(error));
     } finally {
       setRefreshing(false);
@@ -103,7 +146,10 @@ export default function MorePage({
     void fetch("/m/shell-manifest.json", { signal: controller.signal })
       .then((response) => response.json())
       .then((value) => {
-        if (!controller.signal.aborted) setVersion(value.version || "");
+        if (!controller.signal.aborted) {
+          setVersion(value.version || "");
+          setLogVersions(value.version, shell.info?.appVersion);
+        }
       })
       .catch(() => {});
     return () => controller.abort();
@@ -118,26 +164,37 @@ export default function MorePage({
   const updateBusy =
     shell.appUpdate?.status === "checking" ||
     shell.appUpdate?.status === "downloading";
+  const notificationState = !health
+    ? "待核验"
+    : !health.ntfy_configured
+      ? "未配置"
+      : health.delivery_enabled
+        ? "已启用"
+        : "未启用";
+  const notificationTest = health?.last_notification_test;
+  const notificationTestLabel =
+    (
+      {
+        notification_test_requested: "已请求 · 待确认",
+        notification_test_accepted: "推送服务已接受",
+        notification_test_failed_or_unknown: "失败或结果未知",
+        notification_test_acknowledged: "手机已确认",
+      } as Record<string, string>
+    )[notificationTest?.status] || "结果待确认";
   return (
     <section
       className="mobile-content mobile-more mobile-controls"
       aria-label="更多设置"
     >
       <MobileOverlaysProvider>
-        <header className="mobile-profile">
+        <header className="mobile-profile more-title">
           <span className="mobile-profile-mark" aria-hidden="true">
             <img src="/favicon.svg" alt="" />
           </span>
-          <div>
-            <h1>我的守望</h1>
-            <small>个人工作区</small>
-          </div>
-          <span className="more-device">
-            {shell.info ? "Android" : "手机浏览器"}
-          </span>
+          <h1>我的守望</h1>
         </header>
         <section className="mobile-setting-group" aria-labelledby="more-market">
-          <h2 id="more-market">行情与数据</h2>
+          <h2 id="more-market">服务与通知</h2>
           <div>
             <Setting
               icon={<Wifi />}
@@ -145,24 +202,10 @@ export default function MorePage({
               value={sse}
               onClick={() => setPanel("connection")}
             />
-          </div>
-        </section>
-        <section
-          className="mobile-setting-group"
-          aria-labelledby="more-notifications"
-        >
-          <h2 id="more-notifications">通知与显示</h2>
-          <div>
             <Setting
               icon={<Bell />}
               label="后台通知"
-              value={
-                health?.ntfy_configured
-                  ? "ntfy 已配置"
-                  : health
-                    ? "待配置"
-                    : "待确认"
-              }
+              value={notificationState}
               onClick={() => setPanel("notifications")}
             />
             <Setting
@@ -171,22 +214,40 @@ export default function MorePage({
               value="触发与异常"
               onClick={records}
             />
-            <Setting
-              icon={theme === "dark" ? <Moon /> : <Sun />}
-              label="显示主题"
-              value={theme === "dark" ? "深色" : "浅色"}
-              onClick={setTheme}
-            />
           </div>
         </section>
         <section className="mobile-setting-group" aria-labelledby="more-app">
           <h2 id="more-app">应用</h2>
           <div>
             <Setting
+              icon={theme === "dark" ? <Moon /> : <Sun />}
+              label="显示主题"
+              value={theme === "dark" ? "深色" : "浅色"}
+              toggle={theme === "dark"}
+              onClick={setTheme}
+            />
+            <Setting
+              icon={<ScrollText />}
+              label="日志"
+              value="操作与异常"
+              onClick={() => setLogsOpen(true)}
+            />
+            <Setting
               icon={<Download />}
               label="检查更新"
-              value={shell.info?.appVersion || "网页与应用"}
-              onClick={() => setPanel("update")}
+              value={
+                shell.update
+                  ? "有网页更新"
+                  : updateBusy
+                    ? shell.appUpdate?.status === "downloading"
+                      ? "下载中"
+                      : "检查中"
+                    : shell.info?.appVersion || "网页与应用"
+              }
+              onClick={() => {
+                setUpdateError("");
+                setPanel("update");
+              }}
             />
             <Setting
               icon={<Info />}
@@ -211,6 +272,20 @@ export default function MorePage({
           <LogOut data-icon="inline-start" aria-hidden="true" />
           {leaving ? "正在退出…" : "退出登录"}
         </Button>
+        <LogsSheet
+          open={logsOpen}
+          close={() => setLogsOpen(false)}
+          records={() => {
+            pendingLogRecords.current = true;
+            setLogsOpen(false);
+          }}
+          onClosed={() => {
+            if (pendingLogRecords.current) {
+              pendingLogRecords.current = false;
+              records();
+            }
+          }}
+        />
         <MobileSheet
           open={Boolean(panel)}
           title={panel ? titles[panel] : "设置"}
@@ -231,21 +306,28 @@ export default function MorePage({
                 </div>
                 <div>
                   <dt>网页构建</dt>
-                  <dd>{version || "正在读取…"}</dd>
+                  <dd className="more-version">{version || "正在读取…"}</dd>
                 </div>
               </dl>
               <p className="more-description" role="status">
                 {shell.appUpdate?.label ||
                   "检查应用和网页更新，保留服务器设置与本机数据。"}
               </p>
+              {(updateError || shell.error) && (
+                <p className="mobile-inline-error" role="alert">
+                  {updateError || shell.error}
+                </p>
+              )}
               <div className="mobile-sheet-actions more-panel-actions">
                 <Button
                   disabled={updateBusy}
-                  onClick={() =>
-                    void shell
-                      .checkUpdates()
-                      .catch((error) => report(errorMessage(error)))
-                  }
+                  onClick={() => {
+                    setUpdateError("");
+                    void shell.checkUpdates().catch((error) => {
+                      setUpdateError(errorMessage(error));
+                      report(errorMessage(error));
+                    });
+                  }}
                 >
                   <Download data-icon="inline-start" aria-hidden="true" />
                   {shell.appUpdate?.status === "checking"
@@ -257,11 +339,13 @@ export default function MorePage({
                 {shell.update && (
                   <Button
                     variant="outline"
-                    onClick={() =>
-                      void shell
-                        .apply()
-                        .catch((error) => report(errorMessage(error)))
-                    }
+                    onClick={() => {
+                      setUpdateError("");
+                      void shell.apply().catch((error) => {
+                        setUpdateError(errorMessage(error));
+                        report(errorMessage(error));
+                      });
+                    }}
                   >
                     应用网页更新
                   </Button>
@@ -277,8 +361,23 @@ export default function MorePage({
           )}
           {panel === "connection" && (
             <div className="more-panel">
+              <div className="more-connection-state" role="status">
+                <span
+                  data-connected={
+                    (online && transport?.state === "open") || undefined
+                  }
+                  aria-hidden="true"
+                />
+                <strong>{sse}</strong>
+                <small>行情连接</small>
+              </div>
+              {connectionError && (
+                <p className="mobile-inline-error" role="alert">
+                  {connectionError}
+                </p>
+              )}
               <dl className="mobile-facts more-facts">
-                <div>
+                <div className="more-fact-wide">
                   <dt>服务器</dt>
                   <dd>{window.location.origin}</dd>
                 </div>
@@ -287,12 +386,14 @@ export default function MorePage({
                   <dd>{online ? "已核验" : "连接尚未核验"}</dd>
                 </div>
                 <div>
-                  <dt>行情连接</dt>
-                  <dd>{sse}</dd>
-                </div>
-                <div>
                   <dt>最近心跳</dt>
-                  <dd>{online ? stamp(transport?.heartbeatAt) : "待确认"}</dd>
+                  <dd>
+                    {online ? (
+                      <MoreTime value={transport?.heartbeatAt} />
+                    ) : (
+                      "待确认"
+                    )}
+                  </dd>
                 </div>
               </dl>
               <div className="mobile-sheet-actions more-panel-actions">
@@ -311,9 +412,6 @@ export default function MorePage({
           )}
           {panel === "notifications" && (
             <div className="more-panel">
-              <p className="more-description">
-                服务器持续检测，退出 App 不停止规则。手机后台提醒由 ntfy 提供。
-              </p>
               <dl className="mobile-facts more-facts">
                 <div>
                   <dt>推送配置</dt>
@@ -332,24 +430,30 @@ export default function MorePage({
                 {readAt && (
                   <div>
                     <dt>最近核验</dt>
-                    <dd>{stamp(readAt)}</dd>
+                    <dd>
+                      <MoreTime value={readAt} />
+                    </dd>
                   </div>
                 )}
                 {health?.last_notification_test && (
                   <div>
                     <dt>最近测试</dt>
                     <dd>
-                      {health.last_notification_test.status}
-                      <br />
-                      {stamp(health.last_notification_test.at)}
+                      {notificationTestLabel}
+                      <MoreTime value={notificationTest.at} />
                     </dd>
                   </div>
                 )}
               </dl>
-              <p className="more-description">
-                请在 ntfy 开启即时投递，并在 ColorOS
-                允许通知和后台运行。推送服务接受不代表手机送达，锁屏实收需实际检查。
-              </p>
+              <div className="more-notification-help">
+                <p className="more-description">
+                  服务器持续检测，退出 App 不停止规则。后台提醒由 ntfy 提供。
+                </p>
+                <p className="more-description">
+                  请允许 ntfy
+                  即时投递、系统通知和后台运行。推送服务接受后，仍需检查手机锁屏实收。
+                </p>
+              </div>
               <div className="mobile-sheet-actions more-panel-actions">
                 <Button
                   variant="outline"
@@ -364,24 +468,49 @@ export default function MorePage({
             </div>
           )}
           {panel === "about" && (
-            <dl className="mobile-facts more-facts">
-              <div>
-                <dt>App</dt>
-                <dd>{shell.info?.appVersion || "手机浏览器"}</dd>
-              </div>
-              <div>
-                <dt>网页构建</dt>
-                <dd>{version || "版本待读取"}</dd>
-              </div>
-              <div>
-                <dt>服务器版本</dt>
-                <dd>{health?.version || "服务器未提供版本标识"}</dd>
-              </div>
-              <div>
-                <dt>WebView</dt>
-                <dd>{shell.info?.webViewVersion || navigator.userAgent}</dd>
-              </div>
-            </dl>
+            <div className="more-panel">
+              <dl className="mobile-facts more-facts">
+                <div>
+                  <dt>App</dt>
+                  <dd>{shell.info?.appVersion || "手机浏览器"}</dd>
+                </div>
+                <div>
+                  <dt>网页构建</dt>
+                  <dd className="more-version">{version || "版本待读取"}</dd>
+                </div>
+                <div>
+                  <dt>服务器版本</dt>
+                  <dd>{health?.version || "服务器未提供版本标识"}</dd>
+                </div>
+              </dl>
+              <Collapsible className="more-environment">
+                <CollapsibleTrigger
+                  render={
+                    <Button
+                      variant="ghost"
+                      className="more-environment-trigger"
+                    />
+                  }
+                >
+                  运行环境
+                  <ChevronDown data-icon="inline-end" aria-hidden="true" />
+                </CollapsibleTrigger>
+                <CollapsibleContent>
+                  <dl className="mobile-facts more-facts">
+                    <div>
+                      <dt>客户端</dt>
+                      <dd>{shell.info ? "Android" : "手机浏览器"}</dd>
+                    </div>
+                    <div className="more-fact-wide">
+                      <dt>{shell.info ? "WebView" : "浏览器"}</dt>
+                      <dd>
+                        {shell.info?.webViewVersion || navigator.userAgent}
+                      </dd>
+                    </div>
+                  </dl>
+                </CollapsibleContent>
+              </Collapsible>
+            </div>
           )}
         </MobileSheet>
         {switchServer && (
@@ -395,7 +524,10 @@ export default function MorePage({
               setSwitchServer(false);
               void logout()
                 .then(() => shell.configure())
-                .catch((error) => report(errorMessage(error)));
+                .catch((error) => {
+                  setConnectionError(errorMessage(error));
+                  report(errorMessage(error));
+                });
             }}
           />
         )}

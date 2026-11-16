@@ -1,6 +1,7 @@
 export type Sparkline = {
   ticker: string;
   revision: {
+    history_version_id?: string;
     composite_revision_id?: string;
     input_revision?: number;
     cache_revision?: number;
@@ -8,11 +9,21 @@ export type Sparkline = {
   window_start: number;
   window_end: number;
   valid_until?: number;
+  target_window_start?: number;
+  target_window_end?: number;
+  next_check_at?: number;
+  identity_key?: string;
+  stock_session?: boolean;
+  display_segments?: { start: number; end: number }[];
+  display_state?: "current" | "closed" | "previous" | "historical" | "unknown" | "empty" | "unsupported";
   session?: { date: string; previous: boolean };
   session_open_price?: string | null;
+  previous_close_price?: string | null;
+  previous_close_at?: number | null;
+  preparation_error?: string | null;
   timeframe: string | null;
   reference_times?: number[];
-  points: { time: number; price: string; gap_before: boolean }[];
+  points: { time: number; display_time?: number; price: string; gap_before: boolean }[];
   status: "ready" | "partial" | "empty" | "unavailable";
   reason: string | null;
   last_data_at: number | null;
@@ -23,12 +34,26 @@ export function sparklineExpires(item: Sparkline) {
 }
 
 type SparkQuote = { s: string; v: Record<string, any>; snapshot?: { revision_id?: string } };
+/** Exchange trading time occupies the whole axis; scheduled lunch has no width. */
+export function sparklinePosition(item: Sparkline, time: number): number | undefined {
+  if (!item.display_segments?.length)
+    return (time - item.window_start) / (item.window_end - item.window_start);
+  const total = item.display_segments.reduce((sum, segment) => sum + segment.end - segment.start, 0);
+  let elapsed = 0;
+  for (const segment of item.display_segments) {
+    if (time >= segment.start && time <= segment.end)
+      return (elapsed + time - segment.start) / total;
+    elapsed += segment.end - segment.start;
+  }
+  return undefined;
+}
+
 /** A display-only quote overlay. Source clocks, never HTTP receipt time, place
  * the tail; the original history and cached observations remain untouched. */
 export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Date.now()): Sparkline {
   const value = quote?.v;
   if (quote?.s !== "ok" || !value || value.fetch_status !== "ok" || value.session_conflict ||
-      !item.points.length || item.ticker.startsWith("MWH:") || item.session?.previous ||
+      !item.points.length || item.ticker.startsWith("MWH:") || item.session?.previous || item.display_state === "closed" ||
       now < item.window_start || now >= item.window_end ||
       value.time_type === "fixed_history" || value.time_type === "source_d1" ||
       (quote.snapshot?.revision_id && quote.snapshot.revision_id !== item.revision?.composite_revision_id)) return item;
@@ -41,12 +66,47 @@ export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Da
   const last = item.points.at(-1);
   if (last && time < last.time) return item;
   if (last && time === last.time && Number(last.price) === price) return item;
+  const displayTime = item.display_segments?.length
+    ? sourceMinute && Number.isFinite(value.data_end) ? Math.min(value.data_end, now) : time
+    : undefined;
+  if (displayTime !== undefined && (sparklinePosition(item, displayTime) === undefined ||
+      last && displayTime < (last.display_time ?? last.time))) return item;
   const step = ({ M1: 60_000, M5: 300_000, M15: 900_000, M30: 1_800_000, H1: 3_600_000 } as Record<string, number>)[item.timeframe || ""] || 60_000;
   const same = last?.time === time;
   const gap = last ? Math.floor((time - item.window_start) / step) - Math.floor((last.time - item.window_start) / step) > 1 : false;
-  const point = { time, price: String(price), gap_before: same ? last!.gap_before : gap };
+  const point = { time, price: String(price), gap_before: same ? last!.gap_before : gap,
+    ...(displayTime !== undefined ? { display_time: displayTime } : {}) };
   return { ...item, points: [...(same ? item.points.slice(0, -1) : item.points), point], last_data_at: time };
 }
+
+/** Empty refreshes do not erase a still-valid, identity-matched curve. */
+export function mergeSparkline(old: Sparkline | undefined, next: Sparkline, now = Date.now()): Sparkline {
+  if (!next.points.length && next.status !== "unavailable" && next.display_state !== "unsupported" && next.preparation_error === undefined &&
+      old?.preparation_error && old.ticker === next.ticker && old.identity_key === next.identity_key &&
+      old.revision?.input_revision === next.revision?.input_revision &&
+      old.revision?.composite_revision_id === next.revision?.composite_revision_id && sparklineExpires(old) > now)
+    next = { ...next, preparation_error: old.preparation_error };
+  if (!old?.points.length || next.points.length || next.status === "unavailable" || next.display_state === "unsupported" ||
+      sparklineExpires(old) <= now || old.ticker !== next.ticker ||
+      old.identity_key !== next.identity_key ||
+      old.revision?.composite_revision_id !== next.revision?.composite_revision_id ||
+      old.revision?.input_revision !== next.revision?.input_revision) return next;
+  const previous = old.window_start !== (next.target_window_start ?? next.window_start);
+  return { ...old, target_window_start: next.target_window_start, target_window_end: next.target_window_end,
+    next_check_at: next.next_check_at, session: {date: old.session?.date || new Date(old.window_start).toISOString().slice(0,10), previous},
+    display_state: previous ? old.display_state === "historical" ? "historical" : "previous" : old.display_state,
+    reason: "本次读取为空，显示同一来源的有效缓存" };
+}
+
+export function sparklineNeedsRecheck(item: Sparkline | undefined, quote: SparkQuote, now = Date.now()) {
+  if (!item || item.display_state === "unsupported" || item.ticker.startsWith("MWH:") ||
+      (!item.session?.previous && item.points.length) || quote.s !== "ok" || quote.v?.fetch_status !== "ok") return false;
+  const at = quote.v.quote_time ?? quote.v.data_start;
+  return Number.isFinite(at) && at <= now && at >= (item.target_window_start ?? item.window_start) &&
+    at < (item.target_window_end ?? item.window_end);
+}
+
+const preparationKey = (item: Sparkline) => JSON.stringify([item.ticker, item.identity_key, item.target_window_start ?? item.window_start]);
 
 type Request = (
   items: { ticker: string; composite_revision_id?: string }[],
@@ -70,6 +130,7 @@ export function sparklineLoader(
   const preparations = new Map<string, Promise<void>>();
   const historyQueue: { item: Sparkline; lifetime: number; resolve(): void; promise: Promise<void> }[] = [];
   let lifetime = 0, activeHistory = 0;
+  const retryAttempts = new Map<string, number>();
   function cancelObservations() {
     ++epoch;
     for (const controller of controllers) controller.abort();
@@ -85,7 +146,7 @@ export function sparklineLoader(
   }
   function drainHistory() {
     while (history && activeHistory < 2 && historyQueue.length) {
-      const task = historyQueue.shift()!, key = task.item.ticker + ":" + task.item.window_start;
+      const task = historyQueue.shift()!, key = preparationKey(task.item);
       const controller = new AbortController();
       historyControllers.add(controller);
       ++activeHistory;
@@ -94,12 +155,22 @@ export function sparklineLoader(
           const response = await history.request(task.item.ticker, controller.signal);
           if (task.lifetime !== lifetime || controller.signal.aborted) return;
           receive(response.items.filter(row => sparklineExpires(row) > response.as_of));
-          if (response.preparation !== "retry")
-            for (const row of response.items)
-              if (!row.session || (!row.session.previous && row.points.length))
-                history.prepared.set(row.ticker + ":" + row.window_start, sparklineExpires(row));
+          for (const row of response.items) {
+            const key = preparationKey(row);
+            if (response.preparation === "unsupported") history.prepared.set(key, row.previous_close_price == null ? response.as_of + 900000 : Math.max(response.as_of + 900000, row.target_window_end ?? row.window_end));
+            else if (response.preparation === "ready" && row.points.length && !row.session?.previous && row.display_state !== "unknown") {
+              retryAttempts.delete(key);
+              history.prepared.set(key, Math.max(response.as_of + 900000, row.target_window_end ?? row.window_end));
+            } else {
+              const attempt = (retryAttempts.get(key) || 0) + 1;
+              retryAttempts.set(key, attempt);
+              history.prepared.set(key, response.as_of + Math.min(900000, 60000 * 2 ** Math.min(attempt - 1, 4)));
+            }
+          }
         } catch (error) {
-          if (task.lifetime === lifetime && !controller.signal.aborted) failure(error);
+          if (task.lifetime === lifetime && !controller.signal.aborted) {
+            history.prepared.set(key, Date.now() + 60000); failure(error);
+          }
         } finally {
           historyControllers.delete(controller);
           if (preparations.get(key) === task.promise) preparations.delete(key);
@@ -111,7 +182,7 @@ export function sparklineLoader(
     }
   }
   function prepare(item: Sparkline) {
-    const key = item.ticker + ":" + item.window_start;
+    const key = preparationKey(item);
     const pending = preparations.get(key);
     if (pending) return pending;
     let resolve!: () => void;
@@ -149,8 +220,8 @@ export function sparklineLoader(
                 for (const [key, end] of history.prepared)
                   if (end <= response.as_of) history.prepared.delete(key);
                 pendingHistory.push(...current.filter(item => item.ticker.startsWith("MWP:") &&
-                  (item.status === "partial" || item.status === "empty") &&
-                  !history.prepared.has(item.ticker + ":" + item.window_start)));
+                  (item.status === "partial" || item.status === "empty" || item.points.length > 0 && item.previous_close_price == null || item.stock_session && item.display_state === "unknown") &&
+                  !history.prepared.has(preparationKey(item))));
               }
             } catch (error) {
               if (generation === epoch && !controller.signal.aborted)
@@ -238,7 +309,17 @@ export function sparklineScale(item: Sparkline, height = 48, previousClose?: num
 /** Reduce M1 observations only for display, retaining the latest point in each
  * five-minute bucket and keeping each gap-separated segment independent. */
 export function sparklineDisplayPoints(item: Sparkline) {
-  if (item.timeframe !== "M1" || item.points.length < 2) return item.points;
+  let points = item.points;
+  if (item.display_segments?.length) {
+    let gap = false;
+    points = [];
+    for (const point of item.points) {
+      if (sparklinePosition(item, point.display_time ?? point.time) === undefined) { gap = true; continue; }
+      points.push(gap ? { ...point, gap_before: true } : point);
+      gap = false;
+    }
+  }
+  if (item.timeframe !== "M1" || points.length < 2) return points;
   const interval = 5 * 60_000;
   const sampled: Sparkline["points"] = [];
   let bucket: number | undefined;
@@ -248,7 +329,7 @@ export function sparklineDisplayPoints(item: Sparkline) {
     latest = undefined;
     bucket = undefined;
   };
-  for (const point of item.points) {
+  for (const point of points) {
     if (point.gap_before) flush();
     const nextBucket = Math.floor((point.time - item.window_start) / interval);
     if (bucket !== undefined && nextBucket !== bucket) flush();
@@ -289,10 +370,7 @@ export function sparklinePaths(item: Sparkline, width = 200, height = 48, previo
   };
   pointsToDraw.forEach((point, index) => {
     if (point.gap_before) finish();
-    const x =
-      ((point.time - item.window_start) /
-        (item.window_end - item.window_start)) *
-      width;
+    const x = sparklinePosition(item, point.display_time ?? point.time)! * width;
     const y = scale.y(prices[index]);
     points.push([x, y]);
   });

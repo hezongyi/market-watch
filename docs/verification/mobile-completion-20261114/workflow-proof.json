@@ -1,0 +1,294 @@
+{
+  "checks": [
+    "creation Android back asks once and retains the edited date",
+    "lost creation response reconciles exact request; no duplicate creation",
+    "maintenance conflict retains edits; explicit reload; schedule save does not queue task",
+    "mapping lost-response reconciliation and continuation lost-response readback; paused schedule does not block real-time",
+    "preparing command survives stale snapshot, yields to fresh receiving summary and later external disable",
+    "list Switch directly stops, failure rolls back, lost enable response reads back; no confirmation or detail navigation",
+    "gold difference cannot be skipped; saved mapping survives enable failure",
+    "Yahoo probes once, creates native archive, preserves hidden frame settings, unsupported live stays unavailable",
+    "duplicate pre-check and concurrent 409 lead to existing dataset without overwriting settings",
+    "failed probe blocks creation; retry recovers; native-mode change probes its required timeframes",
+    "invalid default among multiple mappings requires explicit selection and reuses the selected mapping",
+    "deferred baseline rotation shows actionable retention-window warning in managed details",
+    "archive/unarchive preserves live/history; missing baseline blocks live; preparing live blocks use without fallback",
+    "small viewport focused form keeps submit reachable; Android back/discard retains or drops input explicitly",
+    "light/dark 375/412px 150% typography for home/detail/catalog/create/settings; tools; offline write guards and recovery; reduced motion",
+    "managed chart handoff selects exact MWC identity and releases detail state before returning to another dataset"
+  ],
+  "screenshots": [
+    "01-empty",
+    "02-catalog",
+    "03-create",
+    "04-tasks",
+    "05-detail-ready",
+    "06-maintenance",
+    "07-live-confirm",
+    "08-live-running",
+    "09-range",
+    "09a-row-live-switch",
+    "10-gold-difference",
+    "11-yahoo-create",
+    "18-native-periods",
+    "18b-rollover-window-warning",
+    "19-tools",
+    "matrix-home-light-375-14",
+    "matrix-detail-light-375-14",
+    "matrix-settings-light-375-14",
+    "matrix-catalog-light-375-14",
+    "matrix-create-light-375-14",
+    "matrix-home-light-375-21",
+    "matrix-detail-light-375-21",
+    "matrix-settings-light-375-21",
+    "matrix-catalog-light-375-21",
+    "matrix-create-light-375-21",
+    "matrix-home-light-412-14",
+    "matrix-detail-light-412-14",
+    "matrix-settings-light-412-14",
+    "matrix-catalog-light-412-14",
+    "matrix-create-light-412-14",
+    "matrix-home-light-412-21",
+    "matrix-detail-light-412-21",
+    "matrix-settings-light-412-21",
+    "matrix-catalog-light-412-21",
+    "matrix-create-light-412-21",
+    "matrix-home-dark-375-14",
+    "matrix-detail-dark-375-14",
+    "matrix-settings-dark-375-14",
+    "matrix-catalog-dark-375-14",
+    "matrix-create-dark-375-14",
+    "matrix-home-dark-375-21",
+    "matrix-detail-dark-375-21",
+    "matrix-settings-dark-375-21",
+    "matrix-catalog-dark-375-21",
+    "matrix-create-dark-375-21",
+    "matrix-home-dark-412-14",
+    "matrix-detail-dark-412-14",
+    "matrix-settings-dark-412-14",
+    "matrix-catalog-dark-412-14",
+    "matrix-create-dark-412-14",
+    "matrix-home-dark-412-21",
+    "matrix-detail-dark-412-21",
+    "matrix-settings-dark-412-21",
+    "matrix-catalog-dark-412-21",
+    "matrix-create-dark-412-21",
+    "20-form-small-viewport"
+  ],
+  "passed": true,
+  "writes": [
+    {
+      "path": "/api/login"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets"
+    },
+    {
+      "path": "/api/market-data/tasks/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/control"
+    },
+    {
+      "path": "/api/market-data/tasks/aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa/control"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance/control"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/mapping-check"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/mapping-check"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/mappings"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/advanced-charts/preferences/save"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/tasks"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets"
+    },
+    {
+      "path": "/api/market-data/datasets/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/mapping-check"
+    },
+    {
+      "path": "/api/market-data/datasets/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/mapping-check"
+    },
+    {
+      "path": "/api/market-data/datasets/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/mapping-check"
+    },
+    {
+      "path": "/api/market-data/datasets/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/mappings"
+    },
+    {
+      "path": "/api/market-data/datasets/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd/continuation"
+    },
+    {
+      "path": "/api/market-data/history-catalog/probe"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets"
+    },
+    {
+      "path": "/api/market-data/datasets/eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee/maintenance"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/history-catalog/probe"
+    },
+    {
+      "path": "/api/market-data/history-catalog/probe"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/history-catalog/probe"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance/control"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/maintenance/control"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/datasets/cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc/continuation"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/center/datasets/check"
+    },
+    {
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "path": "/api/market-data/quotes"
+    },
+    {
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "path": "/api/market-data/quotes"
+    },
+    {
+      "path": "/api/charts/data"
+    },
+    {
+      "path": "/api/market-data/quotes"
+    },
+    {
+      "path": "/api/market-data/quotes"
+    },
+    {
+      "path": "/api/market-data/quotes"
+    },
+    {
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe"
+    },
+    {
+      "path": "/api/market-data/resolve"
+    }
+  ]
+}

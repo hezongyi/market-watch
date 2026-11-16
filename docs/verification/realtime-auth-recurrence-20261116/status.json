@@ -1,0 +1,97 @@
+{
+  "at": "2026-11-16T03:45:29.986619+00:00",
+  "provider_keys": [
+    "source",
+    "environment",
+    "authentication_hold",
+    "error",
+    "next_probe_at",
+    "configured",
+    "collection_recorded",
+    "connection_started_at",
+    "authentication_probe_at",
+    "error_observed_at"
+  ],
+  "provider": {
+    "status": null,
+    "error": "unauthorized",
+    "authentication_hold": true,
+    "next_probe_at": 1794800999179,
+    "authentication_probe_at": 1794800699179,
+    "error_observed_at": 1794800699179,
+    "connection_started_at": 1794800385715,
+    "configured": true
+  },
+  "live_datasets": [
+    {
+      "logical_symbol": "USDJPY",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "quote_ready": false,
+      "candle_ready": false,
+      "quote_age_ms": null,
+      "revision": 135,
+      "received_at": 0,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "USDCAD",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "quote_ready": false,
+      "candle_ready": false,
+      "quote_age_ms": 1580009,
+      "revision": 19363,
+      "received_at": 1794799149999,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "EURUSD",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "quote_ready": false,
+      "candle_ready": false,
+      "quote_age_ms": 1581502,
+      "revision": 24249,
+      "received_at": 1794799148651,
+      "confirmation_error": null
+    },
+    {
+      "logical_symbol": "XAUUSD",
+      "connection": "disconnected",
+      "quality": "unauthorized",
+      "quote_ready": false,
+      "candle_ready": false,
+      "quote_age_ms": 1579966,
+      "revision": 31381,
+      "received_at": 1794799150274,
+      "confirmation_error": "unauthorized"
+    }
+  ],
+  "managed_datasets": [
+    {
+      "symbol": "EURUSD",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "unauthorized"
+    },
+    {
+      "symbol": "USDCAD",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "unauthorized"
+    },
+    {
+      "symbol": "USDJPY",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "unauthorized"
+    },
+    {
+      "symbol": "XAUUSD",
+      "source": "dukascopy",
+      "enabled": true,
+      "status": "unauthorized"
+    }
+  ]
+}

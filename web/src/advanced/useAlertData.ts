@@ -18,6 +18,7 @@ function older(a: AlertRow, b: AlertRow) {
 export function useAlertData(
   request: AlertApi,
   onRows: (rows: AlertRow[]) => void,
+  includeEvents = true,
 ) {
   const [rows, setRows] = useState<AlertRow[]>([]),
     [events, setEvents] = useState<AlertEvent[]>([]);
@@ -131,7 +132,7 @@ export function useAlertData(
         flight.running = false;
       }
     }
-    await Promise.all([read("lists"), read("events")]);
-  }, [publish]);
+    await Promise.all([read("lists"), ...(includeEvents ? [read("events")] : [])]);
+  }, [publish, includeEvents]);
   return { rows, events, error, setError, refresh, commit };
 }

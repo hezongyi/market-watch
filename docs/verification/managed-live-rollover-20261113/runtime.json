@@ -1,0 +1,22 @@
+{
+  "host": "Ubuntu quant-server",
+  "compose_project": "mw-managed-live-rollover-20261113",
+  "images": {
+    "postgres": "sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872",
+    "api": "sha256:fb950b983eb764a96033a7ae8fefc9bac728d89bd6cb1b8552665207be3480fa",
+    "web": "sha256:1f1f0eb3db1c9b5a0194c81cd1b2ebf8087820fa4acca228fb88abed5656012c"
+  },
+  "api_source_sha256": {
+    "managed_rollover.py": "74d013f8eac75ff52f53a93607048c14db15339793f18c6ebab1103e76d17aff",
+    "managed_rollover_coverage.py": "1f3ed2b613f413b5187bdd1f817e631ea0c27e8f3137bf0af287481e2d8ba63d",
+    "retention_window.py": "d9e032bd77abb49edbfb41bfa1b909722e475a8b6f5230b6bd74d27c7184ee59",
+    "history_retention.py": "e871afadd9a2f138cb124a1ca7d498b1ac02ce8d035719bcccadb50b4394b2bf",
+    "chart_alert_service.py": "b31e5b9e9ba8ffa86d761238da5c511538933a46f8c1bb23c14bdc1607bdab75"
+  },
+  "web_fingerprint": "db0e3cdc6c2e0bd3",
+  "retention_mode": "dry_run",
+  "source_providers": [
+    "dukascopy",
+    "oanda"
+  ]
+}

@@ -19,7 +19,7 @@ const names = [
   "纳指 100 ETF",
   "贵州茅台",
 ];
-const sources = ["OANDA", "OANDA", "Binance", "FXCM", "Yahoo", "AKShare"];
+const sources = ["OANDA", "Dukascopy", "Binance", "FXCM", "Yahoo", "AKShare"];
 const prices = [2684.52, 1.08420, 76428.30, 147.250, 512.84, 9876543.21];
 let preferenceReads = 0, slowPreferences = 0, stockSessionPhase = "normal";
 let holdPreferences = false,
@@ -109,14 +109,11 @@ const server = http.createServer(async (req, res) => {
           s: "ok",
           v: {
             short_name: codes[i],
-            description_base:
-              codes[i] +
-              " · " +
-              names[i] +
-              " · " +
-              (i < 2 ? "自建 · 实时接续" : "原生") +
-              " · " +
-              sources[i],
+            description_base: [
+              codes[i], i === 1 ? "" : names[i],
+              i < 2 ? "自建 · 实时接续" : "原生",
+              i < 2 ? `历史：${sources[i]} → 实时：OANDA Practice` : sources[i],
+            ].filter(Boolean).join(" · "),
             description: names[i],
             exchange: sources[i],
             lp: prices[i],
@@ -143,13 +140,14 @@ const server = http.createServer(async (req, res) => {
         window_end: stockSessionPhase === "current" ? left+23400000 : left-63000000,
         valid_until: left+86400000,
         session: {date: new Date(stockSessionPhase === "current" ? left : left-86400000).toISOString().slice(0,10), previous: stockSessionPhase !== "current"},
-        timeframe:"M1", status:"partial", reference_times:[], session_open_price:"99.75",
+        timeframe:"M1", status:"partial", reference_times:[], session_open_price:"99.75", previous_close_price:"99.75",
         points: (stockSessionPhase === "current" ? [left,left+60000,left+120000] : [left-86400000,left-75000000,left-63060000]).map((time,i)=>({time,price:String(100+[0,0.4,0.2][i])})),
       } : ({
         ticker: item.ticker,
         window_start: left,
         window_end: left + 86400000,
         timeframe: "M1",
+        previous_close_price: item.ticker === symbols[5] ? null : "100",
         reference_times: [left+28800000,left+46800000],
         points: [
           { time: left, price: "100" },
@@ -265,7 +263,8 @@ const server = http.createServer(async (req, res) => {
     await page.goto(url);
     await expect(page.locator(".mobile-watch-row")).toHaveCount(6);
     await expect(page.locator(".mobile-watch-row.stale")).toHaveCount(0);
-    await expect(page.locator('.mobile-watch-origin')).toHaveText(['Binance', 'FXCM', 'Yahoo', 'AKShare']);
+    await expect(page.locator('.mobile-watch-origin')).toHaveText(['自建OANDA', '自建Dukas', 'Binance', 'FXCM', 'Yahoo', 'AKShare']);
+    await expect(page.locator('.mobile-watch-origin-custom').nth(1)).toHaveAttribute('title', '自建 · 历史：Dukascopy → 实时：OANDA Practice');
     await expect(page.locator('.mobile-watch-description')).toHaveText(['黄金','欧元美元','比特币','美元日元','纳指 100 ETF','贵州茅台']);
     for (const theme of ["dark", "light"])
       for (const [width, height, font] of [
@@ -318,6 +317,14 @@ const server = http.createServer(async (req, res) => {
             const separated = await page.locator('.mobile-watch-row').first().evaluate(row =>
               row.querySelector('.mobile-watch-symbol').getBoundingClientRect().bottom <= row.querySelector('.mobile-spark').getBoundingClientRect().top);
             assert(separated,'large text keeps chart on a separate unobstructed row');
+            const contained = await page.locator('.mobile-watch-row').evaluateAll(rows => rows.every(row => {
+              const bounds = row.getBoundingClientRect();
+              return [...row.children].every(child => {
+                const rect = child.getBoundingClientRect();
+                return rect.top >= bounds.top && rect.bottom <= bounds.bottom;
+              });
+            }));
+            assert(contained, 'large text and third identity line stay within their own watch row');
           }
           assert(Math.abs(parseFloat(actual.price.fontSize) - font * 15/14) < 0.01);
           await expect(page.locator('.mobile-watch-price strong').first()).toHaveText('+0.69%');
@@ -383,16 +390,22 @@ const server = http.createServer(async (req, res) => {
         });
       }
     await page.setViewportSize({ width: 412, height: 852 });
+    if (process.env.MOBILE_VISUAL_SCOPE === "identity") {
+      assert.deepEqual(errors, []);
+      fs.writeFileSync(path.join(output, "proof.json"), JSON.stringify({ measurements, errors }, null, 2));
+      console.log(JSON.stringify({ checks: "8 watch identity/geometry layouts", errors, output }));
+      return;
+    }
     await page.evaluate(() => {
       document.documentElement.style.fontSize = "14px";
       document.querySelector(".mobile-app").dataset.theme = "dark";
     });
     for (const [button, name] of [
-      ["搜索并添加品种", "search"],
+      ["添加自选", "search"],
       ["选择自选分组", "groups"],
       ["管理自选", "manage"],
     ]) {
-      if (button !== "选择自选分组") await page.getByRole("button", {name:"自选操作",exact:true}).click();
+      if (button === "管理自选") await page.getByRole("button", {name:"选择自选分组",exact:true}).click();
       await page.getByRole("button", { name: button, exact: true }).click();
       await page.screenshot({animations: "disabled", path: path.join(output, name + ".png") });
       await page
@@ -420,17 +433,16 @@ const server = http.createServer(async (req, res) => {
         // Dirty forms open confirmation; clean drawers finish their exit first.
         if (!await page.getByRole("alertdialog").count()) await expect.poll(() => element.evaluate(el => el.isConnected)).toBe(false);
       };
-      await page.getByRole("button", {name:"自选操作",exact:true}).click();
-      await page.getByRole("button", {name:"搜索并添加品种",exact:true}).click();
-      await expect(page.locator(".mobile-search-row").first()).toBeVisible();
+      await page.getByRole("button", {name:"添加自选",exact:true}).click();
+      await expect(page.locator(".symbol-search-row").first()).toBeVisible();
       await capture("search"); await close();
-      await page.getByRole("button", {name:"自选操作",exact:true}).click();
+      await page.getByRole("button", {name:"选择自选分组",exact:true}).click();
       await capture("watch-actions"); await close();
       await page.getByRole("button", {name:"选择自选分组",exact:true}).click();
       await capture("groups");
       await page.getByRole("button", {name:"新建分组",exact:true}).click();
       await capture("new-group"); await close(); await close();
-      await page.getByRole("button", {name:"自选操作",exact:true}).click();
+      await page.getByRole("button", {name:"选择自选分组",exact:true}).click();
       await page.getByRole("button", {name:"管理自选",exact:true}).click();
       await page.getByRole("tab",{name:"分组",exact:true}).click();
       const layout=await page.locator('.watch-manage-tabs').evaluate(el=>({width:el.clientWidth,panels:[...el.querySelectorAll(':scope > [data-slot="tabs-list"],:scope > [data-slot="tabs-content"]')].filter(n=>n.getClientRects().length).map(n=>n.getBoundingClientRect().width)}));
@@ -439,10 +451,14 @@ const server = http.createServer(async (req, res) => {
       await page.locator(".mobile-group-order > [data-slot=collapsible-trigger]").first().click();
       await page.locator(".mobile-group-order > [data-slot=collapsible-trigger]").first().scrollIntoViewIfNeeded();
       await capture("group-order");
+      await page.getByRole("button", {name:/^重命名 /}).first().click();
+      await expect(page.getByRole("dialog").last()).toHaveAccessibleName("重命名分组");
       await page.getByLabel("分组名称", {exact:true}).first().fill("重点关注 · 编辑示例");
       await expect(page.getByRole("button", {name:"保存分组",exact:true})).toBeInViewport();
       await capture("group-save"); await close();
       await page.getByRole("button", {name:"放弃修改",exact:true}).click();
+      await expect(page.getByRole("dialog").last()).toHaveAccessibleName("管理自选");
+      await close();
     }
     await page.setViewportSize({width:412,height:852});
     await page.evaluate(() => { document.documentElement.style.fontSize="14px"; });
@@ -513,10 +529,10 @@ const server = http.createServer(async (req, res) => {
       } else {
         await expect(stockRow.locator('.mobile-spark[data-previous-session]')).toHaveCount(1);
         await expect(stockRow.locator('.mobile-spark-caption')).toHaveCount(0);
-        await expect(stockRow.locator('.mobile-spark-session-open')).toHaveCount(1);
-        await expect(stockRow.locator('.mobile-spark-session-open title')).toContainText('开盘价 99.75');
-        assert(await stockRow.locator('.mobile-spark-session-open').evaluate(el=>{const y=Number(el.getAttribute('y1'));return y>=4&&y<=46;}),'historical open reference follows the adaptive vertical domain');
-        await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(0);
+        await expect(stockRow.locator('.mobile-spark-previous-close')).toHaveCount(1);
+        await expect(stockRow.locator('.mobile-spark-previous-close title')).toContainText('昨收 99.75');
+        assert(await stockRow.locator('.mobile-spark-previous-close').evaluate(el=>{const y=Number(el.getAttribute('y1'));return y>=4&&y<=46;}),'historical previous-close reference follows the adaptive vertical domain');
+        await expect(stockRow.locator('.mobile-spark-session-open')).toHaveCount(0);
       }
       for (const theme of ['light','dark']) {
         await page.locator('.mobile-app').evaluate((el,theme)=>el.dataset.theme=theme,theme);
@@ -531,7 +547,7 @@ const server = http.createServer(async (req, res) => {
           assert.equal(colors.fill,colors.line,'previous-session area retains its existing blue');
           assert.equal(colors.stroke,theme==='light' ? 'rgb(76, 115, 165)' : 'rgb(117, 153, 200)');
           assert.equal(colors.strokeOpacity,'0.92');
-          const reference=await stockRow.locator('.mobile-spark-session-open').evaluate(el=>({color:getComputedStyle(el).stroke,opacity:getComputedStyle(el).opacity}));
+          const reference=await stockRow.locator('.mobile-spark-previous-close').evaluate(el=>({color:getComputedStyle(el).stroke,opacity:getComputedStyle(el).opacity}));
           assert.equal(reference.color,theme==='light'?'rgb(120, 145, 173)':'rgb(145, 168, 196)');
           assert.equal(reference.opacity,'0.5');
         }
@@ -548,8 +564,8 @@ const server = http.createServer(async (req, res) => {
     });
     await page.getByRole('link', { name: '更多', exact: true }).click();
     await page.getByRole('link', { name: '自选', exact: true }).click();
-    await expect(page.locator('.mobile-spark-empty').first()).toHaveText('暂无日内数据');
-    await page.screenshot({animations: "disabled", path: path.join(output, 'spark-empty.png') });
+    await expect(page.locator('.mobile-spark svg[aria-label*="本次读取为空"]')).toHaveCount(6);
+    await page.screenshot({animations: "disabled", path: path.join(output, 'spark-empty-cached.png') });
     await page.unroute('**/api/market-data/sparklines');
     await page.route('**/api/market-data/sparklines', route => route.abort());
     await page.getByRole('link', { name: '更多', exact: true }).click();

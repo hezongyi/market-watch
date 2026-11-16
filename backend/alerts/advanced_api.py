@@ -37,6 +37,7 @@ class PreferenceWrite(BaseModel):
     name: str = Field(min_length=1, max_length=250)
     tool: str = Field(default="", max_length=100)
     content: dict
+    mobile_unique: bool = False
     revision: int = Field(default=0, ge=0)
 
 
@@ -180,6 +181,12 @@ def router(authenticated):
 
                 db.execute(text("SELECT pg_advisory_xact_lock(8675318)"))
             row = db.get(AdvancedPreference, ident)
+            if body.mobile_unique and body.kind == "setting" and body.name == "mw.watchlists.v1" and not body.tool:
+                from .mobile_symbol_search import validate_additions
+                try:
+                    validate_additions(db, row.content if row else {}, body.content)
+                except ValueError as error:
+                    raise HTTPException(409, str(error)) from None
             if row is None:
                 if body.revision != 0:
                     raise HTTPException(409, {"code": "PREFERENCE_REVISION_CONFLICT", "message": "模板已删除，请重新加载"})

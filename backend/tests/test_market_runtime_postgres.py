@@ -704,7 +704,13 @@ def test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order(
                     while time.monotonic() < deadline:
                         if judging.done():
                             judging.result()
-                            pytest.fail("judgment completed while the chart held its dataset lock")
+                            if counterparty == "judgment":
+                                # The monitor deliberately skips busy dataset
+                                # fences rather than blocking every other rule.
+                                # Progress after releasing the chart is checked
+                                # below, so a permanent no-op cannot pass.
+                                break
+                            pytest.fail("confirmation completed while the chart held its dataset lock")
                         waiting = connection.scalar(text(
                             "SELECT wait_event_type = 'Lock' AND wait_event IN ('transactionid', 'tuple') "
                             "FROM pg_stat_activity WHERE pid = :pid"), {"pid": judgment_pids[0]})
@@ -718,6 +724,10 @@ def test_first_legacy_chart_read_and_judgment_lock_both_datasets_in_order(
                 page = browsing.result(timeout=5)
                 assert any(bar["start"] < seam for bar in page["bars"])
                 assert judging.result(timeout=5) == ([] if counterparty == "judgment" else None)
+                if counterparty == "judgment":
+                    with factory.begin() as db:
+                        assert composite_contracts.evaluate(db, ident, now=stamp + 1) == []
+                        assert db.get(ChartAlert, ident).runtime["last_checked_at"] == stamp + 1
             finally:
                 release_browser.set()
         with factory() as db:

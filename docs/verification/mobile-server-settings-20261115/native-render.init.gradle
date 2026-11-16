@@ -1,0 +1,24 @@
+// Acceptance-only renderer; no additional dependency enters the APK.
+// Google-hosted Maven Central mirror avoids this host's intermittent Central TLS failures.
+settingsEvaluated { settings ->
+    settings.dependencyResolutionManagement.repositories.withType(MavenArtifactRepository).configureEach { repository ->
+        if (repository.url.toString().contains('repo.maven.apache.org')) {
+            repository.setUrl('https://maven-central.storage-download.googleapis.com/maven2')
+        }
+    }
+}
+allprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin('com.android.application')) {
+            project.android.testOptions.unitTests.includeAndroidResources = true
+            project.android.sourceSets.test.java.srcDir(new File(rootDir, '../../docs/verification/mobile-server-settings-20261115/native-render'))
+            project.dependencies.add('testImplementation', 'org.robolectric:robolectric:4.14.1')
+            project.tasks.withType(Test).configureEach { testTask ->
+                testTask.maxHeapSize = '1024m'
+                testTask.maxParallelForks = 1
+                testTask.systemProperty 'mw.render.output', new File(project.rootDir, '../../docs/verification/mobile-server-settings-20261115/screenshots').absolutePath
+                testTask.systemProperty 'robolectric.dependency.repo.url', 'https://maven-central.storage-download.googleapis.com/maven2'
+            }
+        }
+    }
+}

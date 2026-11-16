@@ -138,7 +138,7 @@ def test_retention_requires_a_succeeded_run(database):
     row = run()
     with pytest.raises(ValueError, match="succeeded"):
         switch_runs.claim_retention(row["id"], dry_run=True)
-    with pytest.raises(ValueError, match="没有清理批次"):
+    with pytest.raises(ValueError, match="succeeded"):
         switch_runs.release_retention(row["id"], outcome="completed", stats={})
     with pytest.raises(ValueError, match="未知的清理结果"):
         switch_runs.release_retention(succeeded()["id"], outcome="aborted", stats={})

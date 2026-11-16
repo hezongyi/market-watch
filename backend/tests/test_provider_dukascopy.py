@@ -249,3 +249,40 @@ def test_stock_and_fund_catalogue_preserves_source_product_identity():
     fund = next(row for row in catalog("2822.HK") if row["symbol"] == "2822.HK/HKD")
     assert fund["asset_class"] == "etf"
     assert fund["product_type"] == "etf_cfd"
+
+
+def test_native_recovers_failed_managed_pool_once_with_same_absolute_deadline(monkeypatch):
+    import time
+
+    from alerts import provider_deadline, provider_transport
+    first_calls, second_calls, discarded = [], [], []
+    deadline = time.monotonic() + 20
+    def failed(request):
+        first_calls.append(request)
+        raise httpx.PoolTimeout('exhausted stale pool')
+    def healthy(request):
+        second_calls.append(request)
+        assert provider_deadline._DEADLINE.get() == deadline
+        return httpx.Response(200, text=request.url.params['jsonp'] + '([[60000,1,2,1,1.5,12]]);')
+    with httpx.Client(transport=httpx.MockTransport(failed)) as stale, httpx.Client(transport=httpx.MockTransport(healthy)) as fresh:
+        monkeypatch.setattr(provider_transport, 'pooled_client', lambda _: fresh if discarded else stale)
+        monkeypatch.setattr(provider_transport, 'discard_client', lambda client: discarded.append(client))
+        page = provider.native_page(provider.metadata(provider.stable_id('USD/CAD')), 'M1', 120000, 1, deadline=deadline)
+    assert len(page['bars']) == 1
+    assert len(first_calls) == len(second_calls) == len(discarded) == 1
+
+
+def test_native_transport_failure_never_retries_without_budget(monkeypatch):
+    import time
+
+    from alerts import provider_transport
+    calls = []
+    def failed(request):
+        calls.append(request)
+        raise httpx.PoolTimeout('busy')
+    with httpx.Client(transport=httpx.MockTransport(failed)) as client:
+        monkeypatch.setattr(provider_transport, 'pooled_client', lambda _: client)
+        monkeypatch.setattr(provider_transport, 'discard_client', lambda _: None)
+        with pytest.raises(httpx.PoolTimeout):
+            provider.native_page(provider.metadata(provider.stable_id('USD/CAD')), 'M1', 120000, 1, deadline=time.monotonic() + .1)
+    assert len(calls) == 1

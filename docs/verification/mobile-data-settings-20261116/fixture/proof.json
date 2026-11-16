@@ -1,0 +1,32 @@
+{
+  "checks": [
+    "401不改变已开启配置；暂停及失败与实时分开，已有历史仍保留",
+    "准备、重连、收盘、来源维护、历史派生及自动重试均不改写长期设置状态",
+    "新报价与分钟补齐分开说明；账户配置失效有明确处理提示且不伪造关闭",
+    "375/412px、深浅主题、100%/150%字号，列表及详情截图无溢出",
+    "连接变化静默进入更多日志；断网保留设置且禁止误操作，联网恢复"
+  ],
+  "screenshots": [
+    "01-stable-settings-auth-retry",
+    "02-runtime-on-demand",
+    "03-actionable-configuration",
+    "list-light-375-14",
+    "detail-light-375-14",
+    "list-light-375-21",
+    "detail-light-375-21",
+    "list-light-412-14",
+    "detail-light-412-14",
+    "list-light-412-21",
+    "detail-light-412-21",
+    "list-dark-375-14",
+    "detail-dark-375-14",
+    "list-dark-375-21",
+    "detail-dark-375-21",
+    "list-dark-412-14",
+    "detail-dark-412-14",
+    "list-dark-412-21",
+    "detail-dark-412-21",
+    "04-runtime-logged"
+  ],
+  "passed": true
+}

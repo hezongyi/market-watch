@@ -138,6 +138,7 @@ export function dropSnapshot(profile: Profile, name: string): Promise<void> {
 }
 export function clearOrigin(origin: string): Promise<void> {
   invalidateProfile(origin);
+  dispatchEvent(new Event("mw-mobile-local-cleared"));
   return transaction(
     ["records", "profiles", ...noticeStores],
     "readwrite",

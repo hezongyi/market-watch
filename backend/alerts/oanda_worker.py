@@ -29,6 +29,7 @@ from .live_pricing import (
     publish_event,
     publish_rest_batch,
     recovery_requirements,
+    registered_stream_identities,
     renew,
     session_states,
     startup_failed,
@@ -136,9 +137,18 @@ def probe_authentication(adapter, ownership):
                 specs = [CandleSpec(
                     account_scope=scope, provider_symbol=symbol) for symbol in sorted(symbols)]
                 catalog = adapter.validate_candle_access(specs)
+                ensure_catalog(catalog, adapter.account_id, ownership=ownership)
             else:
-                catalog = adapter.validate_access(symbols)
-        ensure_catalog(catalog, adapter.account_id, ownership=ownership)
+                registered = registered_stream_identities(adapter.account_id)
+                if not registered or not symbols <= registered.keys():
+                    catalog = adapter.catalog()
+                    ensure_catalog(catalog, adapter.account_id, ownership=ownership)
+                    registered = registered_stream_identities(adapter.account_id)
+                if not registered or not symbols <= registered.keys():
+                    raise ValueError('Stream probe requires registered symbols')
+                selected = symbols or {min(registered)}
+                adapter.validate_stream_access({s: registered[s] for s in selected})
+                catalog = registered
         result = RequestResult(status='data')
     except Exception as error:
         catalog = None
@@ -412,7 +422,6 @@ def collect(adapter, ownership, identities, stopped):
     epoch = begin_connection(ownership, identities)
     connection_stop = threading.Event()
     lost = threading.Event()
-    maintenance_error = []
     intentional_stop = threading.Event()
     closed_stop = threading.Event()
     health_lock = threading.Lock()
@@ -473,10 +482,8 @@ def collect(adapter, ownership, identities, stopped):
                     lambda: stopped.is_set() or connection_stop.is_set() or lost.is_set())
                 if error:
                     report_confirmation(error.status)
-                    maintenance_error.append(error)
-                    connection_stop.set()
-                    return
-                report_confirmation(confirmation_error(identities, epoch))
+                else:
+                    report_confirmation(confirmation_error(identities, epoch))
             except TimeoutError as error:
                 log_failure("pricing_ownership_lost", error, stage=stage, epoch=epoch)
                 lost.set()
@@ -526,8 +533,7 @@ def collect(adapter, ownership, identities, stopped):
         require_stopped((thread, guardian))
         if not lost.is_set():
             try:
-                failure = (result if result.status == 'unauthorized' else
-                           maintenance_error[-1] if maintenance_error else result)
+                failure = result
                 delay = (closed_delay(identities) if closed_stop.is_set() and failure.status not in (
                     'unauthorized', 'provider_maintenance') else None)
                 if delay is not None:
@@ -575,9 +581,12 @@ def run(adapter, stopped):
         try:
             # The shared account lease also serializes startup catalog calls.
             if catalog is None:
-                with lane('realtime'):
-                    catalog = adapter.catalog()
-                ensure_catalog(catalog, adapter.account_id, ownership=ownership)
+                if settings.oanda_acquisition_mode == 'stream':
+                    catalog = registered_stream_identities(adapter.account_id) or None
+                if catalog is None:
+                    with lane('realtime'):
+                        catalog = adapter.catalog()
+                    ensure_catalog(catalog, adapter.account_id, ownership=ownership)
             identities = desired_for_mode(adapter.account_id)
             native = native_specs(adapter.account_id) if settings.oanda_acquisition_mode == "rest_batch" else ()
             delay = closed_delay(identities)

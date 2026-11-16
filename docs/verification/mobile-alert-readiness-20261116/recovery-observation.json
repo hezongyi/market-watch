@@ -1,0 +1,124 @@
+{
+  "at": "2026-11-16T05:50:25.755Z",
+  "time": 1794808225708,
+  "loop": {
+    "group": "market",
+    "role": "chart_alert",
+    "deployment": "managed-live-rollover-20261113",
+    "boot_id": "6561589c-e38c-4a90-a59d-97506bc43004",
+    "started_at": 1794807809286,
+    "starts": [
+      1794807725603,
+      1794807809286
+    ],
+    "state": "idle",
+    "checked_at": 1794808225613,
+    "last_success_at": 1794808225613,
+    "error_type": null,
+    "stale_after_ms": 15000,
+    "owner": {
+      "role": "market-runtime",
+      "run_id": "6561589c-e38c-4a90-a59d-97506bc43004"
+    },
+    "heartbeat_at": 1794808225613,
+    "recent_error": null
+  },
+  "notifications": [
+    {
+      "group": "notifications",
+      "role": "notification_projection",
+      "deployment": "managed-live-rollover-20261113",
+      "boot_id": "d3c1bfd9-e232-4950-ab8e-3c9b17db3838",
+      "started_at": 1794807811585,
+      "starts": [
+        1794807726885,
+        1794807811585
+      ],
+      "state": "idle",
+      "checked_at": 1794808203075,
+      "last_success_at": 1794808203075,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "notifications",
+      "role": "notification_retention",
+      "deployment": "managed-live-rollover-20261113",
+      "boot_id": "d3c1bfd9-e232-4950-ab8e-3c9b17db3838",
+      "started_at": 1794807811676,
+      "starts": [
+        1794807726983,
+        1794807811676
+      ],
+      "state": "idle",
+      "checked_at": 1794808172278,
+      "last_success_at": 1794808172278,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "notifications",
+      "role": "notification_delivery",
+      "deployment": "managed-live-rollover-20261113",
+      "boot_id": "d3c1bfd9-e232-4950-ab8e-3c9b17db3838",
+      "started_at": 1794807811681,
+      "starts": [
+        1794807726989,
+        1794807811681
+      ],
+      "state": "idle",
+      "checked_at": 1794808202305,
+      "last_success_at": 1794808202305,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "notifications",
+      "role": "notification_ownership",
+      "deployment": "managed-live-rollover-20261113",
+      "boot_id": "d3c1bfd9-e232-4950-ab8e-3c9b17db3838",
+      "started_at": 1794807811687,
+      "starts": [
+        1794807727073,
+        1794807811687
+      ],
+      "state": "idle",
+      "checked_at": 1794808222700,
+      "last_success_at": 1794808222700,
+      "error_type": null,
+      "stale_after_ms": 60000
+    },
+    {
+      "group": "notifications",
+      "role": "notification_health",
+      "deployment": "managed-live-rollover-20261113",
+      "boot_id": "d3c1bfd9-e232-4950-ab8e-3c9b17db3838",
+      "started_at": 1794807811692,
+      "starts": [
+        1794807727081,
+        1794807811692
+      ],
+      "state": "idle",
+      "checked_at": 1794808219869,
+      "last_success_at": 1794808219869,
+      "error_type": null,
+      "stale_after_ms": 60000
+    }
+  ],
+  "rules": [
+    {
+      "id": "71583df9-5a82-4a4a-9b29-5aff9be88595",
+      "version": 1,
+      "run": 1,
+      "control_revision": 1,
+      "status": "active",
+      "configHash": "280e43a39489a6be50f4ff7757601872d1ce9b008719cd677ec72093eef2e414",
+      "checked": 1794808225580,
+      "evaluated": 1794806310430,
+      "execution": "recovering",
+      "reason": "confirmation_source_unavailable",
+      "message": "当前确认来源不可用；已取得的确认柱仍按序处理。",
+      "count": 0
+    }
+  ]
+}

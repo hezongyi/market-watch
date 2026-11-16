@@ -1,0 +1,143 @@
+{
+  "task": "mw-mobile-data-workflow-20261113",
+  "origin": "https://127.0.0.1:18446",
+  "checks": [
+    "Isolated Docker mobile UI login and managed-only data home",
+    "EURUSD: source matching saved and real continuation enabled via mobile UI",
+    "XAUUSD real product difference requires explicit acknowledgement",
+    "XAUUSD: source matching saved and real continuation enabled via mobile UI",
+    "Left data page after enabling live; persistent demand checked separately"
+  ],
+  "screenshots": [
+    "real-live-confirm-EURUSD",
+    "real-live-enabled-EURUSD",
+    "real-live-confirm-XAUUSD",
+    "real-live-enabled-XAUUSD",
+    "real-away-from-data"
+  ],
+  "EURUSD": {
+    "datasetId": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+    "compositeId": "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb",
+    "baselineVersion": "15bb31c3-be97-4f61-a74a-eae0ca9e6ba8",
+    "seam": 1794520800000
+  },
+  "XAUUSD": {
+    "datasetId": "a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2",
+    "compositeId": "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+    "baselineVersion": "15d1638d-156e-4330-be24-6fc15575ba0c",
+    "seam": 1794520800000
+  },
+  "datasets": [
+    {
+      "id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+      "symbol": "EURUSD",
+      "source": "dukascopy",
+      "availability": "available",
+      "availableStart": 1794348000000,
+      "availableEnd": 1794588480000,
+      "usableTimeframes": [
+        "D1",
+        "H1",
+        "H4",
+        "M1",
+        "M15",
+        "M30",
+        "M5",
+        "MN",
+        "W1"
+      ],
+      "maintenance": {
+        "frequency": "daily",
+        "paused": true,
+        "archived": false,
+        "last_attempt": 1794588539390,
+        "last_success": 1794588543778,
+        "active_version_id": null,
+        "configured": true,
+        "task_error": null,
+        "task_status": "published",
+        "next_at": null
+      },
+      "continuation": {
+        "enabled": true,
+        "configured": true,
+        "status": "recovering",
+        "composite_ids": [
+          "8c490df00408ed7102d9106e2ad6d3991d3e6488de0b0905d92a2ec052343cbb"
+        ]
+      }
+    },
+    {
+      "id": "a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2",
+      "symbol": "XAUUSD",
+      "source": "dukascopy",
+      "availability": "available",
+      "availableStart": 1794348000000,
+      "availableEnd": 1794588480000,
+      "usableTimeframes": [
+        "D1",
+        "H1",
+        "H4",
+        "M1",
+        "M15",
+        "M30",
+        "M5",
+        "MN",
+        "W1"
+      ],
+      "maintenance": {
+        "frequency": "daily",
+        "paused": false,
+        "archived": false,
+        "last_attempt": 1794588543311,
+        "last_success": 1794588549291,
+        "active_version_id": null,
+        "configured": true,
+        "task_error": null,
+        "task_status": "published",
+        "next_at": 1794615300000
+      },
+      "continuation": {
+        "enabled": true,
+        "configured": true,
+        "status": "recovering",
+        "composite_ids": [
+          "4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6"
+        ]
+      }
+    },
+    {
+      "id": "508fd4b4d44625bf0a935c9a5a46f480e688098a9e3ab78fffa1ddff4c479fde",
+      "symbol": "Y1EB44D625",
+      "source": "yahoo",
+      "availability": "available",
+      "availableStart": 1790812800000,
+      "availableEnd": 1794588720000,
+      "usableTimeframes": [
+        "D1",
+        "MN",
+        "W1"
+      ],
+      "maintenance": {
+        "frequency": "daily",
+        "paused": false,
+        "archived": false,
+        "last_attempt": 1794588741227,
+        "last_success": 1794588750991,
+        "active_version_id": null,
+        "configured": true,
+        "task_error": null,
+        "task_status": "published",
+        "next_at": 1794610800000
+      },
+      "continuation": {
+        "enabled": false,
+        "configured": false,
+        "status": "disabled"
+      }
+    }
+  ],
+  "runtimeErrors": [],
+  "lastSuccessfulPhase": "enable",
+  "evidenceNote": "Successful checks from task-owned real supplier acceptance; screenshot names enumerate temporary captures, only a curated subset is committed. Enable phase is a historical setup snapshot; final.json contains the corrected Yahoo display and final state."
+}

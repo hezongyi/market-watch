@@ -46,6 +46,7 @@ export default forwardRef<
     profile: Profile;
     connection: MobileMarket;
     symbol: string;
+    target?: { symbol: string; resolution: string; token: number };
     theme: "dark" | "light";
     rememberSymbol(ticker: string): void;
     visible: boolean;
@@ -57,6 +58,7 @@ export default forwardRef<
     profile,
     connection,
     symbol,
+    target,
     theme,
     rememberSymbol,
     visible,
@@ -115,6 +117,7 @@ export default forwardRef<
   const [preview, setPreview] = useState<ChartPreview>();
   const [shellReady, setShellReady] = useState(false);
   const displayTarget = useRef({symbol, resolution:"60", theme});
+  const [operationError, setOperationError] = useState("");
   const [failure, setFailure] = useState(""),
     [retry, setRetry] = useState(0);
   const flushes = useRef(
@@ -340,8 +343,10 @@ export default forwardRef<
                 );
               }
             }
-          } else if (message.type === "error")
+          } else if (message.type === "error") {
+            setOperationError(errorMessage(message.error));
             callbacks.current.report(message.error);
+          }
         };
         void handle().catch((error) => {
           if (!stopped) {
@@ -388,6 +393,7 @@ export default forwardRef<
       'meta[name="mw-chart-manifest"]',
     )?.content;
     setFailure("");
+    setOperationError("");
     setHistoryFailure(null);
     setReady(false);
     setShellReady(false);
@@ -428,16 +434,21 @@ export default forwardRef<
     };
     // Keep a single widget; subsequent symbol changes use the native API below.
   }, [profile.origin, profile.subject, connection, preparation, retry]);
+  const appliedTarget = useRef(0);
   const initial = useRef("");
   useEffect(() => {
-    if (sameChartSymbol(initial.current, symbol) || !ready) return;
+    if (!ready) return;
+    const requested = target?.symbol === symbol && appliedTarget.current !== target.token ? target : undefined;
+    if (sameChartSymbol(initial.current, symbol) && !requested) return;
     initial.current = symbol;
+    if (requested) appliedTarget.current = requested.token;
     void chart.current?.update({
       type: "mobile-command",
       action: "symbol",
       symbol,
+      ...(requested ? { resolution: requested.resolution } : {}),
     });
-  }, [symbol, ready]);
+  }, [symbol, ready, target]);
   useEffect(() => {
     if (!visible && ready)
       void chart.current?.update({ type: "mobile-command", action: "leave" });
@@ -465,9 +476,10 @@ export default forwardRef<
             <div className="chart-preview" style={{top:shellReady ? preview.top : 0,bottom:preview.bottom}}
               aria-label={`上次图表，${new Date(preview.at).toLocaleString()}`}>
               <img src={preview.image} alt="" />
-              <span>上次数据 {new Date(preview.at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})} · {failure || historyFailure ? "更新失败" : "更新中"}</span>
+              {(failure || historyFailure) && <span>图表更新失败</span>}
             </div>
           )}
+          {operationError && ready && <p className="chart-history-progress mobile-inline-error" role="alert">{operationError}</p>}
           {ready && !failure && historyFailure && (
             <Alert className="chart-history-failure">
               <CircleAlert aria-hidden="true" />

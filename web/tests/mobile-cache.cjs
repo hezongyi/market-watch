@@ -1,8 +1,11 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
 const {indexedDB}=require('fake-indexeddb');
 const exportsObject={};
+const events=new EventTarget();
+let localClearEvents=0;
+events.addEventListener('mw-mobile-local-cleared',()=>{localClearEvents++;});
 vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/cache.ts','utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,
-  {exports:exportsObject,indexedDB,Promise,Error,Date,Array,Object,window:{location:{origin:'https://one.example'}}});
+  {exports:exportsObject,indexedDB,Promise,Error,Date,Array,Object,Event,dispatchEvent:events.dispatchEvent.bind(events),window:{location:{origin:'https://one.example'}}});
 (async()=>{
   const cache=exportsObject;
   // Upgrade an actual v1 phone DB; preserve its last successful layout.
@@ -37,6 +40,7 @@ vm.runInNewContext(ts.transpileModule(fs.readFileSync('src/mobile/cache.ts','utf
   assert.equal(cache.validChartDocument({engine:'old',schemaVersion:1}),false);
   assert.equal((await cache.readSnapshot(a,'upgrade')).value,'v1-kept','IDB migration retains layout');
   await cache.clearOrigin(a.origin);
+  assert.equal(localClearEvents,1,'logout notifies local state consumers to clear memory');
   assert.equal(await notices.get('meta','admin:receipt'),undefined,'logout also clears notification receipts');notices.close();
   assert.equal(await cache.lastProfile(a.origin),undefined);
   assert.equal(await cache.locallySignedOut(a.origin),true,'offline logout blocks silent session reuse');

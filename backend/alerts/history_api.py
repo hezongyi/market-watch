@@ -102,6 +102,7 @@ class ManagedRequest(BaseModel):
     maintenance: MaintenanceRequest
     request_id: str = Field(min_length=1, max_length=100)
     create_only: bool = False
+    mobile_unique: bool = False
 
 
 class CreationCheckRequest(DatasetRequest):
@@ -118,14 +119,14 @@ class SourceProbeRequest(BaseModel):
     start: int = Field(default=1262304000000, ge=0)
 
 
-def dataset_report(row, inst):
+def dataset_report(row, inst, display_metadata=None):
     from .market_presentation import present
     return present({"name": inst.label, "series_kind": "managed", "id": row.id, "instrument_id": row.instrument_id,
             "logical_symbol": row.logical_symbol, "identity": row.identity,
             "display_symbol": display_code(row.logical_symbol, asset_type=row.asset_class),
             "provider_display_symbol": display_code(row.identity["provider_symbol"], row.identity["source"], row.asset_class),
             "volume_kind": row.volume_kind, "volume_unit": row.volume_unit,
-            "precision": inst.precision, "asset_class": row.asset_class,
+            "precision": inst.precision, "asset_class": row.asset_class, "metadata_json": display_metadata or {},
             "aggregation_calendar": inst.calendar}, identity=row.identity)
 
 
@@ -154,13 +155,15 @@ def router(authenticated):
     def dataset_summaries(query: str = "", source: str | None = None, calendar: str | None = None,
                           asset_class: str | None = None, status: str = "all", page: int = 1,
                           page_size: int = 25, ids: str | None = None, view: str | None = None,
-                          anchor: str | None = None):
+                          anchor: str | None = None, mobile: bool = False, exclude_watch: bool = False, retain_watch: str = "",
+                          category: str | None = None, include_categories: bool = False):
         from .dataset_summaries import summaries
 
         try:
             with transaction() as db:
                 return summaries(db, ids=ids, view=view, anchor=anchor, query=query, source=source, calendar=calendar,
-                    asset_class=asset_class, status=status, page=page, page_size=page_size)
+                    asset_class=asset_class, status=status, page=page, page_size=page_size, mobile=mobile, exclude_watch=exclude_watch,
+                    retain_watch=retain_watch.split(",") if retain_watch else (), category=category, include_categories=include_categories)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
@@ -282,12 +285,12 @@ def router(authenticated):
             raise HTTPException(422, str(error)) from None
 
     @routes.post("/center/datasets/check")
-    def check_creation(body: CreationCheckRequest):
+    def check_creation(body: CreationCheckRequest, mobile_unique: bool = False):
         from .history_creation_check import CreationCheckError, check_creation
 
         try:
             with transaction() as db:
-                return check_creation(db, body)
+                return check_creation(db, body, mobile_unique=mobile_unique)
         except CreationCheckError as error:
             return {"status": "invalid", "start": None, "existing": None,
                     "field": error.field, "message": str(error)}
@@ -296,21 +299,28 @@ def router(authenticated):
 
     @routes.get("/history-catalog/search")
     def search_creation_catalog(source: str = "", query: str = "", symbol_type: str = "",
-                                offset: int = Query(default=0, ge=0), limit: int = Query(default=50, ge=1, le=100)):
+                                offset: int = Query(default=0, ge=0), limit: int = Query(default=50, ge=1, le=100),
+                                mobile: bool = False, exclude_existing: bool = False, include_total: bool = True):
         from .history_creation_check import search_catalog
 
         try:
             with transaction() as db:
                 return search_catalog(db, source=source, query=query, symbol_type=symbol_type,
-                                      offset=offset, limit=limit)
+                                      offset=offset, limit=limit, mobile=mobile, exclude_existing=exclude_existing, include_total=include_total)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
     @routes.get("/sources")
     def sources():
+        from .config import settings
+        from .fxcm_history import configured
         from .source_registry import capabilities
 
-        return [capabilities(source) for source in ("dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")]
+        return [{**capabilities(source),
+            "enabled": getattr(settings, source + "_enabled", True),
+            "configured": configured() if source == "fxcm" else
+                bool(settings.oanda_account_id and settings.oanda_token) if source == "oanda" else True}
+            for source in ("dukascopy", "oanda", "binance", "yahoo", "akshare", "fxcm")]
 
     @routes.get("/catalog/directory-status")
     def directory_status(source: str | None = None):

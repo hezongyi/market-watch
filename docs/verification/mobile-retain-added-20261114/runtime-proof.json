@@ -1,0 +1,35 @@
+{
+  "host": "Ubuntu quant-server local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "base": "https://192.168.7.232:18447",
+  "checks": [],
+  "shell": "f23872eb477f808b",
+  "backend_sha256": {
+    "mobile_symbol_search": "afad6f57cc6969bb21d887fad2e2e4d0d8b4bf33002cef523952c6ff8d432883",
+    "instrument_directory": "0e03ad8c9fea7f16eb103a6f6cab587908d8dcde2631ae588f40205e6adf3703",
+    "dataset_summaries": "2e011eb632fd0fd669019fb27017ba26769888e208164c321fbd14aae3688db6",
+    "history_api": "3ce7c7103a0f4b7880ded5ba2d6eaa8ef9489ff51bc05930b499aa6d1ba19b43",
+    "market_data": "9491e2c929ee1ef98e08f10e0a1bb5a3ebf7697ad1e5cf7fcd465e92cd478a4a",
+    "series_directory": "a54f7619fb8c01b7492255fe63b79c0411b954d13baf859a69f827967d20b1a4"
+  },
+  "provider": {
+    "default_count": 3,
+    "retained_count": 4,
+    "retained_ticker": "MWP:TENCENT-NATIVE:SSE:688256"
+  },
+  "managed": {
+    "default_total": 4,
+    "retained_total": 6
+  },
+  "apk_update": {
+    "version": "0.1.3",
+    "hash_matches": true
+  },
+  "images": {
+    "api": "sha256:673c973a0500f4125fa9902eb22bf85b4ac436a538c6d33820604a8a424c82e8",
+    "web": "sha256:4a4f69806e0b273e58f3f90d0c44b8031a7dd0acfcf672ca8817c47c6f53e28a"
+  },
+  "errors": [],
+  "user_writes": [],
+  "passed": true
+}

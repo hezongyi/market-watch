@@ -4,9 +4,7 @@ from sqlalchemy import select
 
 from .composite_center import SCOPE, detail, mappings
 from .composite_definitions import baseline, definition, first_use
-from .composite_matching import product_rule
-from .config import settings
-from .history_catalog import account_scope
+from .composite_matching import continuation_blocker
 from .market_contracts import DatasetIdentity
 from .realtime_switch import enabled, set_enabled
 from .storage import Instrument, MarketCatalog, MarketComposite, MarketDataset, Preference, now_ms
@@ -22,19 +20,10 @@ def report(db, dataset_id):
         raise ValueError("自建行情不存在")
     source = db.get(Instrument, dataset.instrument_id)
     identity = DatasetIdentity.model_validate(dataset.identity)
-    reason = None
-    supported = identity.mode == "base_m1" and identity.basis == "bid"
-    if not supported:
-        reason = "实时接续目前只支持已核实品种的 M1 基础 Bid 行情"
-    elif not settings.oanda_account_id or not settings.oanda_token:
-        supported, reason = False, "OANDA Practice 连接尚未配置"
-    else:
-        entries = db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
-            MarketCatalog.available.is_(True)))
-        supported = any(entry.metadata_json.get("history_account_scope") == account_scope()
-            and bool(product_rule(identity, entry)[0]) for entry in entries)
-        if not supported:
-            reason = "当前账户目录中没有已核实可接续的品种，请检查来源目录与产品规则"
+    entries = db.scalars(select(MarketCatalog).where(MarketCatalog.source == "oanda",
+        MarketCatalog.available.is_(True)))
+    blocker = continuation_blocker(identity, entries)
+    supported, reason = blocker is None, blocker[1] if blocker else None
     options = mappings(db, dataset_id)["items"]
     valid = [item for item in options if item["current_account"] and item["valid_for_selection"]]
     saved = db.get(Preference, default_key(dataset_id))
@@ -62,10 +51,13 @@ def report(db, dataset_id):
         "created_at": item.created_at} for item in db.scalars(select(MarketComposite).where(
             MarketComposite.dataset_id == dataset_id, MarketComposite.permission_scope == SCOPE)
             .order_by(MarketComposite.created_at.desc(), MarketComposite.id))]
+    from .managed_rollover import status as rollover_status
+    rollover = rollover_status(db, composite.id) if composite else None
     return {"dataset_id": dataset_id, "supported": supported, "reason": reason,
         "enabled": active, "ready_to_enable": ready, "status": state,
         "default_mapping_id": selected, "mappings": options, "composite": current,
-        "configurations": configurations}
+        "configurations": configurations, "rollover": rollover,
+        "baseline_seam": current["revision"]["seam"] if current else None}
 
 
 def configure(db, dataset_id, *, value, mapping_id=None):

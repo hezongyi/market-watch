@@ -1,0 +1,240 @@
+{
+  "host": "Ubuntu local Docker",
+  "origin": "https://192.168.7.232:18447",
+  "device": "Chromium touch emulation; Android device still requires acceptance",
+  "errors": [],
+  "blockedWrites": [],
+  "blockedMetadataRequests": [
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/sparklines/prepare"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/sparklines/prepare"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    },
+    {
+      "method": "POST",
+      "path": "/api/market-data/resolve"
+    }
+  ],
+  "checks": [
+    {
+      "action": "all actual categories reachable by touch; no looping",
+      "categories": [
+        "全部",
+        "外汇",
+        "贵金属",
+        "A股",
+        "美股",
+        "港股",
+        "加密"
+      ]
+    },
+    "375/412px, light/dark, 100%/150% text; follow-finger frames, visible adjacent panels, short return, cancel/multi/edge/diagonal, rapid clicks, keyboard and reduced motion",
+    "alerts and event drawer swipes, drawer remains open; controls and nested dismissal preserved",
+    "watch management follows finger, short return and rapid switching; no dirty form"
+  ],
+  "screenshots": [
+    "data-light-375-14.png",
+    "data-light-375-21.png",
+    "data-light-412-14.png",
+    "data-light-412-21.png",
+    "data-dark-375-14.png",
+    "data-dark-375-21.png",
+    "data-dark-412-14.png",
+    "data-dark-412-21.png",
+    "alerts-records.png",
+    "records-drawer.png",
+    "watch-management.png"
+  ],
+  "passed": true
+}

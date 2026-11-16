@@ -687,3 +687,18 @@ def quote(meta, *, deadline=None):
             "status": "ok",
             "basis": "Yahoo 市场报价",
         }
+
+
+def regular_sessions(meta, stamp):
+    """Mobile-only calendar evidence; never feed this read into price caches."""
+    from .sparkline_calendar import source_sessions
+    deadline = time.monotonic() + max(20, settings.provider_request_seconds)
+    with _operation(deadline, stage="mobile_session") as session:
+        try:
+            _history(yf.Ticker(meta["symbol"], session=session), meta, "M5", stamp - 5 * 86400000, stamp + 1, deadline)
+        except YFPricesMissingError:
+            # Empty candles can still carry authoritative regular-session meta.
+            pass
+        response = getattr(session, "chart_response", None)
+        results = response[1].get("chart", {}).get("result", []) if response and response[0] == 200 else []
+        return source_sessions(meta, results[0].get("meta") or {}) if results else {}

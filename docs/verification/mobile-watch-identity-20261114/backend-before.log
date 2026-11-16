@@ -1,0 +1,97 @@
+FFF..                                                                    [100%]
+=================================== FAILURES ===================================
+___________ test_yahoo_failure_keeps_catalog_identity[cold_metadata] ___________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bd4b7f5d0>
+failure = 'cold_metadata'
+
+    @pytest.mark.parametrize("failure", ["cold_metadata", "expired_metadata", "quote"])
+    def test_yahoo_failure_keeps_catalog_identity(database, monkeypatch, failure):
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        details = provider_yahoo._metadata({"symbol": "NVDA", "quoteType": "EQUITY", "exchange": "NMS"})
+        if failure == "expired_metadata":
+            details.update(metadata_observed_at=1, updated_at=1)
+        ident = yahoo_catalog._store(details)
+        if failure == "cold_metadata":
+            with database.begin() as db:
+                row = db.get(MarketCatalog, ident)
+                row.metadata_json = {key: value for key, value in row.metadata_json.items() if key != "adjustment"}
+
+        def unavailable(*args, **kwargs):
+            raise TimeoutError("supplier unavailable")
+
+        monkeypatch.setattr(provider_yahoo, "metadata", unavailable)
+        monkeypatch.setattr(provider_service, "yahoo_quote", unavailable)
+        row = market_data.quote_snapshot(market_data.QuoteQuery(symbols=["MWP:" + ident]))[0]
+        assert row["s"] == "error"
+>       assert row["v"]["short_name"] == "NVDA"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'short_name'
+
+backend/tests/test_watch_quote_identity.py:28: KeyError
+_________ test_yahoo_failure_keeps_catalog_identity[expired_metadata] __________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bd4b75650>
+failure = 'expired_metadata'
+
+    @pytest.mark.parametrize("failure", ["cold_metadata", "expired_metadata", "quote"])
+    def test_yahoo_failure_keeps_catalog_identity(database, monkeypatch, failure):
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        details = provider_yahoo._metadata({"symbol": "NVDA", "quoteType": "EQUITY", "exchange": "NMS"})
+        if failure == "expired_metadata":
+            details.update(metadata_observed_at=1, updated_at=1)
+        ident = yahoo_catalog._store(details)
+        if failure == "cold_metadata":
+            with database.begin() as db:
+                row = db.get(MarketCatalog, ident)
+                row.metadata_json = {key: value for key, value in row.metadata_json.items() if key != "adjustment"}
+
+        def unavailable(*args, **kwargs):
+            raise TimeoutError("supplier unavailable")
+
+        monkeypatch.setattr(provider_yahoo, "metadata", unavailable)
+        monkeypatch.setattr(provider_service, "yahoo_quote", unavailable)
+        row = market_data.quote_snapshot(market_data.QuoteQuery(symbols=["MWP:" + ident]))[0]
+        assert row["s"] == "error"
+>       assert row["v"]["short_name"] == "NVDA"
+               ^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'short_name'
+
+backend/tests/test_watch_quote_identity.py:28: KeyError
+_______________ test_yahoo_failure_keeps_catalog_identity[quote] _______________
+
+database = sessionmaker(class_='Session', bind=Engine(sqlite://), autoflush=True, expire_on_commit=False)
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x7f1bd4b7e950>
+failure = 'quote'
+
+    @pytest.mark.parametrize("failure", ["cold_metadata", "expired_metadata", "quote"])
+    def test_yahoo_failure_keeps_catalog_identity(database, monkeypatch, failure):
+        monkeypatch.setattr(settings, "yahoo_enabled", True)
+        details = provider_yahoo._metadata({"symbol": "NVDA", "quoteType": "EQUITY", "exchange": "NMS"})
+        if failure == "expired_metadata":
+            details.update(metadata_observed_at=1, updated_at=1)
+        ident = yahoo_catalog._store(details)
+        if failure == "cold_metadata":
+            with database.begin() as db:
+                row = db.get(MarketCatalog, ident)
+                row.metadata_json = {key: value for key, value in row.metadata_json.items() if key != "adjustment"}
+
+        def unavailable(*args, **kwargs):
+            raise TimeoutError("supplier unavailable")
+
+        monkeypatch.setattr(provider_yahoo, "metadata", unavailable)
+        monkeypatch.setattr(provider_service, "yahoo_quote", unavailable)
+        row = market_data.quote_snapshot(market_data.QuoteQuery(symbols=["MWP:" + ident]))[0]
+        assert row["s"] == "error"
+        assert row["v"]["short_name"] == "NVDA"
+>       assert "英伟达" in row["v"]["description_base"]
+E       AssertionError: assert '英伟达' in '平台报价暂不可用，请重试'
+
+backend/tests/test_watch_quote_identity.py:29: AssertionError
+=========================== short test summary info ============================
+FAILED backend/tests/test_watch_quote_identity.py::test_yahoo_failure_keeps_catalog_identity[cold_metadata]
+FAILED backend/tests/test_watch_quote_identity.py::test_yahoo_failure_keeps_catalog_identity[expired_metadata]
+FAILED backend/tests/test_watch_quote_identity.py::test_yahoo_failure_keeps_catalog_identity[quote]
+3 failed, 2 passed in 0.89s

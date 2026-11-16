@@ -1,0 +1,53 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "updatedServices": [
+    "web"
+  ],
+  "stamp": "2026-11-16T02:52:30.869278+00:00",
+  "image": "sha256:86f8fa0c2f9d07ddbf4754c118047da01578dc1ba2570a016e8791d765b31e1e",
+  "tag": "market-watch-web:mobile-tab-motion-20261116",
+  "previous": {
+    "run.json": "sha256:6c6c453337d454b44ce17708edb653a5930d03043a2d6c6f5bf712136d93934d",
+    "compose.json": "sha256:6c6c453337d454b44ce17708edb653a5930d03043a2d6c6f5bf712136d93934d"
+  },
+  "url": "https://192.168.7.232:18447/m/data",
+  "beforeContainers": [
+    {
+      "ID": "51a85d727306",
+      "Names": "mw-managed-live-rollover-20261113-data-worker-1",
+      "Image": "e7a524c358b0",
+      "Status": "Up 51 minutes"
+    },
+    {
+      "ID": "0ed95048c8ba",
+      "Names": "mw-managed-live-rollover-20261113-api-1",
+      "Image": "e7a524c358b0",
+      "Status": "Up 51 minutes (healthy)"
+    },
+    {
+      "ID": "4d980f3dbf79",
+      "Names": "mw-managed-live-rollover-20261113-market-runtime-1",
+      "Image": "e7a524c358b0",
+      "Status": "Up 51 minutes"
+    },
+    {
+      "ID": "8d7ac824751e",
+      "Names": "mw-managed-live-rollover-20261113-web-1",
+      "Image": "6c6c453337d4",
+      "Status": "Up 2 hours"
+    },
+    {
+      "ID": "d5e1cc2d5952",
+      "Names": "mw-managed-live-rollover-20261113-tls-1",
+      "Image": "201aafcbd9cd",
+      "Status": "Up 2 days"
+    },
+    {
+      "ID": "19cd00546145",
+      "Names": "mw-managed-live-rollover-20261113-postgres-1",
+      "Image": "993166bee3ea",
+      "Status": "Up 2 days (healthy)"
+    }
+  ]
+}

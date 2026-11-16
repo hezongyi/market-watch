@@ -92,9 +92,15 @@ def next_weekly(now=None):
 def eligible():
     """Composites the runtime already serves: the managed-realtime revision scope."""
     with transaction() as db:
-        return tuple(db.scalars(select(MarketComposite.id).where(
+        ids = tuple(db.scalars(select(MarketComposite.id).where(
             MarketComposite.active_revision_id.in_(composite_aggregates.runtime_revisions()),
         ).order_by(MarketComposite.id)))
+        if not settings.managed_rollover_enabled:
+            return ids
+        from .storage import MarketDataset
+        # Managed maintenance and the weekly window must not race each other.
+        return tuple(ident for ident in ids if db.get(MarketDataset,
+            db.get(MarketComposite, ident).dataset_id).identity.get("mode", "base_m1") != "base_m1")
 
 
 def _shadow_one(composite_id, *, scheduled_for, kind, prepare, adapter, budget):
@@ -186,7 +192,7 @@ def activation_targets():
 
     with transaction() as db:
         rows = list(db.scalars(select(MarketSwitchRun).where(
-            MarketSwitchRun.kind == shadow_kind,
+            MarketSwitchRun.kind.in_((shadow_kind, "managed_rollover")),
             MarketSwitchRun.state == "shadow_ready",
             MarketSwitchRun.composite_id.is_not(None),
             MarketSwitchRun.previous_revision_id.is_not(None),
@@ -197,7 +203,18 @@ def activation_targets():
             window = {"run_id": row.id, "composite_id": row.composite_id,
                       "revision_id": row.target_revision_id,
                       "previous_revision_id": row.previous_revision_id,
-                      "scheduled_for": row.scheduled_for}
+                      "scheduled_for": row.scheduled_for, "kind": row.kind}
+            if row.kind == "managed_rollover" and not settings.managed_rollover_enabled:
+                skipped.append({**window, "reason": "managed_rollover_off"})
+                continue
+            # Old weekly windows must not take over a maintenance-owned baseline.
+            if row.kind == shadow_kind and settings.managed_rollover_enabled:
+                from .storage import MarketDataset
+                composite = db.get(MarketComposite, row.composite_id)
+                dataset = db.get(MarketDataset, composite.dataset_id) if composite else None
+                if dataset and dataset.identity.get("mode", "base_m1") == "base_m1":
+                    skipped.append({**window, "reason": "managed_rollover_owns_baseline"})
+                    continue
             reason = _deferral(db, row, activation_kind)
             if reason:
                 skipped.append({**window, "reason": reason})
@@ -222,6 +239,12 @@ def activation_cycle(*, activate=None):
                 })
             results.append({**item, "status": "activated"})
         except Exception as error:
+            from .managed_rollover import Deferred, _status
+            if isinstance(error, Deferred):
+                with transaction() as db:
+                    _status(db, item["composite_id"], "deferred", str(error))
+                skipped += ({**item, "reason": str(error)},)
+                continue
             log.warning("Activation cycle failed composite=%s run=%s error_type=%s",
                         item["composite_id"], item["run_id"], type(error).__name__)
             results.append({**item, "status": "failed", "error": type(error).__name__})
@@ -257,10 +280,19 @@ def run_shadow(stop, *, adapter=None, budget=None, idle_wait=SHADOW_IDLE_SECONDS
     """Poll the weekly window; a failing composite never stops the loop."""
     from .history_sources import HistorySources
 
-    work = shadow_cycle if cycle is None else cycle
+    def combined(**kwargs):
+        from .managed_rollover import cycle as managed_cycle
+        managed = managed_cycle(**kwargs)
+        weekly = shadow_cycle(**kwargs)
+        return {**weekly, "worked": managed["worked"] or weekly["worked"],
+                "composites": managed["composites"] + weekly["composites"]}
+    work = combined if cycle is None else cycle
     source = HistorySources() if adapter is None else adapter
+    from .publication_wakeup import COMPOSITE_CHANNEL, PublicationWakeup
+    wakeup = PublicationWakeup(channel=COMPOSITE_CHANNEL)
     try:
         while not stop.is_set():
+            wakeup.prepare()
             try:
                 result = work(adapter=source, budget=budget)
                 error, worked = _failure(result["composites"]), result["worked"]
@@ -272,8 +304,9 @@ def run_shadow(stop, *, adapter=None, budget=None, idle_wait=SHADOW_IDLE_SECONDS
                 continue
             progress(state="degraded" if error else "running" if worked else "idle",
                      error=error)
-            stop.wait(WORK_SECONDS if worked else idle_wait)
+            wakeup.wait(WORK_SECONDS if worked else idle_wait, stop)
     finally:
+        wakeup.close()
         if adapter is None:
             source.close()
 

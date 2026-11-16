@@ -27,7 +27,6 @@ from .storage import (
     DisplaySnapshot,
     FixedIndicatorBlock,
     FixedIndicatorRun,
-    HistoryReclamation,
     HistoryVersion,
     Instrument,
     MarketDataset,
@@ -123,6 +122,12 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
     version_id = page.get("history_version_id", page.get("version_id"))
     version = db.get(HistoryVersion, version_id)
     revision = db.get(CompositeRevision, revision_id) if revision_id else None
+    from .history_retention import lock_reference_values
+
+    # Core INSERT bypasses the ORM guard. Keep the artifact reader's shared
+    # fence (never upgrade concurrent readers), and recheck after any cleanup.
+    lock_reference_values(db, {"history_version_id": version_id,
+                              "composite_revision_id": revision_id}, shared=True)
     engine = (ObservedState(spec, source_start=version.start,
                            source_end=None if revision else version.end)
               if input_policy == OBSERVED else IndicatorState(spec))
@@ -163,12 +168,6 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
         return existing
     if db.scalar(select(func.count()).select_from(FixedIndicatorRun).where(FixedIndicatorRun.status=='pending'))>=MAX_PENDING_RUNS:
         raise DemandCapacity()
-    # Match the artifact reader's shared lock: upgrading two concurrent readers
-    # to exclusive locks would deadlock. Immutable inputs plus unique run IDs
-    # make concurrent selection safe; reclamation takes the exclusive lock.
-    db.scalar(select(MarketDataset.id).where(MarketDataset.id == version.dataset_id).with_for_update(read=True))
-    if db.get(HistoryReclamation, version.id):
-        raise ValueError("历史版本价格数据已回收，不能创建指标任务")
     parent, prefix, state = None, origin, engine.checkpoint()
     candidates = db.scalars(select(FixedIndicatorRun).where(FixedIndicatorRun.group_key == group,
         FixedIndicatorRun.input_revision <= value, FixedIndicatorRun.cursor > origin)

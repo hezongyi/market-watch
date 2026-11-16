@@ -1,0 +1,35 @@
+{
+  "passed": true,
+  "checks": [
+    "旧的慢健康响应不能覆盖较新的服务异常",
+    "375px light 14px：未开启、接管、正常、规则停滞、心跳过期、恢复、休市、推送错误、基准、离线及联网恢复",
+    "412px dark 21px：未开启、接管、正常、规则停滞、心跳过期、恢复、休市、推送错误、基准、离线及联网恢复"
+  ],
+  "screenshots": [
+    "baseline-dark.png",
+    "baseline-light.png",
+    "closed-dark.png",
+    "closed-light.png",
+    "disabled-dark.png",
+    "disabled-detail-dark.png",
+    "disabled-detail-light.png",
+    "disabled-light.png",
+    "monitoring-dark.png",
+    "monitoring-detail-dark.png",
+    "monitoring-detail-light.png",
+    "monitoring-light.png",
+    "not-taken-over-dark.png",
+    "not-taken-over-light.png",
+    "offline-dark.png",
+    "offline-light.png",
+    "phone-issue-dark.png",
+    "phone-issue-light.png",
+    "service-stale-dark.png",
+    "service-stale-light.png",
+    "stalled-rule-dark.png",
+    "stalled-rule-light.png",
+    "waiting-data-dark.png",
+    "waiting-data-light.png"
+  ],
+  "errors": []
+}

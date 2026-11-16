@@ -1,0 +1,42 @@
+{
+  "at": "2026-11-16T05:18:40.071Z",
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "loop": {
+    "state": "idle",
+    "heartbeat_at": 1794806315886,
+    "last_success_at": 1794806315886
+  },
+  "notifications": [
+    {
+      "role": "notification_projection",
+      "state": "idle"
+    },
+    {
+      "role": "notification_retention",
+      "state": "idle"
+    },
+    {
+      "role": "notification_delivery",
+      "state": "idle"
+    },
+    {
+      "role": "notification_ownership",
+      "state": "idle"
+    },
+    {
+      "role": "notification_health",
+      "state": "idle"
+    }
+  ],
+  "rules": [
+    {
+      "status": "active",
+      "state": "monitoring",
+      "reason": null,
+      "taken_over_at": 1794806310430,
+      "last_checked_at": 1794806319621,
+      "last_evaluated_at": 1794806310430
+    }
+  ]
+}

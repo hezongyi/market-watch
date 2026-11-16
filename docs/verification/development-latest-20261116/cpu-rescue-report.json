@@ -1,0 +1,36 @@
+{
+  "cpu_acceptance": {
+    "restored_tables": 0,
+    "missing_tables": [],
+    "different_counts": {},
+    "all_pre_stop_counts_match": true
+  },
+  "cpu_dev_deploy_check": {
+    "restored_tables": 104,
+    "missing_tables": [],
+    "different_counts": {},
+    "all_pre_stop_counts_match": true
+  },
+  "cpu_rehearsal": {
+    "restored_tables": 104,
+    "missing_tables": [
+      "\"public\".\"price_alert_inputs\"",
+      "\"public\".\"price_alert_streams\""
+    ],
+    "different_counts": {
+      "\"public\".\"preferences\"": {
+        "before": 1,
+        "restored": 0
+      },
+      "\"public\".\"price_alert_inputs\"": {
+        "before": 0,
+        "restored": null
+      },
+      "\"public\".\"price_alert_streams\"": {
+        "before": 0,
+        "restored": null
+      }
+    },
+    "all_pre_stop_counts_match": false
+  }
+}

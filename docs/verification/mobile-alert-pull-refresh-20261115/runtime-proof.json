@@ -1,0 +1,17 @@
+{
+  "passed": true,
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "readOnly": true,
+  "checks": [
+    "rules gesture/refetch/retract",
+    "records gesture/refetch/retract"
+  ],
+  "heldReads": [
+    "/api/chart-alerts/page",
+    "/api/chart-alerts/events/page"
+  ],
+  "screenshots": 20,
+  "errors": [],
+  "writes": []
+}

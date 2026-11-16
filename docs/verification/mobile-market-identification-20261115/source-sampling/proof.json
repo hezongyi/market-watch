@@ -1,0 +1,3090 @@
+{
+  "host": "Ubuntu local Docker",
+  "url": "https://192.168.7.232:18447/m/watch",
+  "readOnly": true,
+  "scope": "real catalog identity/search UI only; no live quote/bar or new creation claims",
+  "inventory": [
+    {
+      "source": "akshare",
+      "kind": "EQUITY",
+      "count": 8031
+    },
+    {
+      "source": "akshare",
+      "kind": "FUTURE",
+      "count": 1
+    },
+    {
+      "source": "binance",
+      "kind": "CRYPTO",
+      "count": 3742
+    },
+    {
+      "source": "dukascopy",
+      "kind": "BOND",
+      "count": 3
+    },
+    {
+      "source": "dukascopy",
+      "kind": "COMMODITY",
+      "count": 13
+    },
+    {
+      "source": "dukascopy",
+      "kind": "CRYPTO",
+      "count": 33
+    },
+    {
+      "source": "dukascopy",
+      "kind": "CURRENCY",
+      "count": 346
+    },
+    {
+      "source": "dukascopy",
+      "kind": "EQUITY",
+      "count": 987
+    },
+    {
+      "source": "dukascopy",
+      "kind": "ETF",
+      "count": 85
+    },
+    {
+      "source": "dukascopy",
+      "kind": "FUND",
+      "count": 9
+    },
+    {
+      "source": "dukascopy",
+      "kind": "INDEX",
+      "count": 21
+    },
+    {
+      "source": "dukascopy",
+      "kind": "METAL",
+      "count": 2
+    },
+    {
+      "source": "dukascopy",
+      "kind": "OTHER",
+      "count": 5
+    },
+    {
+      "source": "fxcm",
+      "kind": "CURRENCY",
+      "count": 48
+    },
+    {
+      "source": "fxcm",
+      "kind": "INDEX",
+      "count": 14
+    },
+    {
+      "source": "fxcm",
+      "kind": "METAL",
+      "count": 3
+    },
+    {
+      "source": "fxcm",
+      "kind": "OTHER",
+      "count": 452
+    },
+    {
+      "source": "oanda",
+      "kind": "CFD",
+      "count": 38
+    },
+    {
+      "source": "oanda",
+      "kind": "CURRENCY",
+      "count": 68
+    },
+    {
+      "source": "oanda",
+      "kind": "METAL",
+      "count": 21
+    },
+    {
+      "source": "yahoo",
+      "kind": "CRYPTOCURRENCY",
+      "count": 8094
+    },
+    {
+      "source": "yahoo",
+      "kind": "CURRENCY",
+      "count": 2
+    },
+    {
+      "source": "yahoo",
+      "kind": "EQUITY",
+      "count": 7
+    },
+    {
+      "source": "yahoo",
+      "kind": "ETF",
+      "count": 2
+    },
+    {
+      "source": "yahoo",
+      "kind": "FUTURE",
+      "count": 3
+    },
+    {
+      "source": "yahoo",
+      "kind": "INDEX",
+      "count": 3
+    }
+  ],
+  "samples": [
+    {
+      "sample": {
+        "group": "EQUITY",
+        "source": "akshare",
+        "symbol": "HKEX:00001",
+        "kind": "EQUITY",
+        "label": "长和",
+        "available": true,
+        "metadata": {
+          "exchange": "HKEX",
+          "source_family": "sina-hk"
+        }
+      },
+      "watch": [
+        {
+          "code": "00001",
+          "providerSymbol": "HKEX:00001",
+          "source": "akshare",
+          "identity": {
+            "category": "港股",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "HKEX:00001"
+          },
+          "price": "前复权",
+          "ticker": "MWP:AKSHARE:9ee912c70e7a8bb1a229a84ec32545e5",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "00001",
+          "providerSymbol": "HKEX:00001",
+          "source": "akshare",
+          "identity": {
+            "category": "港股",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "HKEX:00001"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:HKEX:00001",
+          "capabilities": [
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "00001",
+          "providerSymbol": "HKEX:00001",
+          "source": "akshare",
+          "identity": {
+            "category": "港股",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "HKEX:00001"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "FUTURE",
+        "source": "akshare",
+        "symbol": "SHFE:RB0",
+        "kind": "FUTURE",
+        "label": "螺纹钢主力连续",
+        "available": true,
+        "metadata": {
+          "exchange": "SHFE",
+          "source_family": "sina-futures"
+        }
+      },
+      "watch": [
+        {
+          "code": "RB0",
+          "providerSymbol": "SHFE:RB0",
+          "source": "akshare",
+          "identity": {
+            "category": "期货",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "主力连续",
+            "environment": "",
+            "provider_symbol": "SHFE:RB0"
+          },
+          "price": "原始价格",
+          "ticker": "MWP:AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "RB0",
+          "providerSymbol": "SHFE:RB0",
+          "source": "akshare",
+          "identity": {
+            "category": "期货",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "主力连续",
+            "environment": "",
+            "provider_symbol": "SHFE:RB0"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CRYPTO",
+        "source": "binance",
+        "symbol": "0GBNB",
+        "kind": "CRYPTO",
+        "label": "0G / BNB",
+        "available": true,
+        "metadata": {
+          "exchange": "Binance Spot"
+        }
+      },
+      "watch": [
+        {
+          "code": "0GBNB",
+          "providerSymbol": "0GBNB",
+          "source": "binance",
+          "identity": {
+            "category": "加密",
+            "provider": "Binance",
+            "channel": "",
+            "product": "现货",
+            "environment": "",
+            "provider_symbol": "0GBNB"
+          },
+          "price": "成交价",
+          "ticker": "MWP:BINANCE:0GBNB",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "0GBNB",
+          "providerSymbol": "0GBNB",
+          "source": "binance",
+          "identity": {
+            "category": "加密",
+            "provider": "Binance",
+            "channel": "",
+            "product": "现货",
+            "environment": "",
+            "provider_symbol": "0GBNB"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "BOND",
+        "source": "dukascopy",
+        "symbol": "BUND.TR/EUR",
+        "kind": "BOND",
+        "label": "Euro Bund",
+        "available": true,
+        "metadata": {
+          "exchange": "DE"
+        }
+      },
+      "watch": [
+        {
+          "code": "BUND.TR/EUR",
+          "providerSymbol": "BUND.TR/EUR",
+          "source": "dukascopy",
+          "identity": {
+            "category": "债券",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BUND.TR/EUR"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:75c4f0902d3bf7b81353f6d7c0b2ea77",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "BUND.TR/EUR",
+          "providerSymbol": "BUND.TR/EUR",
+          "source": "dukascopy",
+          "identity": {
+            "category": "债券",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BUND.TR/EUR"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "COMMODITY",
+        "source": "dukascopy",
+        "symbol": "BRENT.CMD/USD",
+        "kind": "COMMODITY",
+        "label": "Brent Crude Oil",
+        "available": true,
+        "metadata": {
+          "exchange": "US"
+        }
+      },
+      "watch": [
+        {
+          "code": "BRENT.CMD/USD",
+          "providerSymbol": "BRENT.CMD/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "商品",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BRENT.CMD/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:60a1c9d7826d8c8ffde6970ece4dbdb5",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "BRENT.CMD/USD",
+          "providerSymbol": "BRENT.CMD/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "商品",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BRENT.CMD/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CRYPTO",
+        "source": "dukascopy",
+        "symbol": "ADA/USD",
+        "kind": "CRYPTO",
+        "label": "Cardano vs US Dollar",
+        "available": true,
+        "metadata": {
+          "exchange": "US"
+        }
+      },
+      "watch": [
+        {
+          "code": "ADAUSD",
+          "providerSymbol": "ADA/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "加密",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "ADA/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:50cd6650c96bf3c016e7ce6acd4659cb",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "ADAUSD",
+          "providerSymbol": "ADA/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "加密",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "ADA/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CURRENCY",
+        "source": "dukascopy",
+        "symbol": "AED/CNH",
+        "kind": "CURRENCY",
+        "label": "UAE Dirham vs Chinese Yuan",
+        "available": true,
+        "metadata": {
+          "exchange": "AE"
+        }
+      },
+      "watch": [
+        {
+          "code": "AEDCNH",
+          "providerSymbol": "AED/CNH",
+          "source": "dukascopy",
+          "identity": {
+            "category": "外汇",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AED/CNH"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:4ca767a0b679b859b2ac926f7d04967e",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AEDCNH",
+          "providerSymbol": "AED/CNH",
+          "source": "dukascopy",
+          "identity": {
+            "category": "外汇",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AED/CNH"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "EQUITY",
+        "source": "dukascopy",
+        "symbol": "0005.HK/HKD",
+        "kind": "EQUITY",
+        "label": "HSBC Holdings Plc",
+        "available": true,
+        "metadata": {
+          "exchange": "HK"
+        }
+      },
+      "watch": [
+        {
+          "code": "0005.HK/HKD",
+          "providerSymbol": "0005.HK/HKD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "港股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "0005.HK/HKD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:01a57802521e21b4496ba167087bdb9c",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "0005.HK/HKD",
+          "providerSymbol": "0005.HK/HKD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "港股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "0005.HK/HKD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "ETF",
+        "source": "dukascopy",
+        "symbol": "2822.HK/HKD",
+        "kind": "ETF",
+        "label": "2822 CSOP FTSE China A50 ETF",
+        "available": true,
+        "metadata": {
+          "exchange": "HK"
+        }
+      },
+      "watch": [
+        {
+          "code": "2822.HK/HKD",
+          "providerSymbol": "2822.HK/HKD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "ETF",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "CFD",
+            "environment": "",
+            "provider_symbol": "2822.HK/HKD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:456d135f3f75e31508ba8b6f2be7944b",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "2822.HK/HKD",
+          "providerSymbol": "2822.HK/HKD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "ETF",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "CFD",
+            "environment": "",
+            "provider_symbol": "2822.HK/HKD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "FUND",
+        "source": "dukascopy",
+        "symbol": "IE0005023803.FN/EUR",
+        "kind": "FUND",
+        "label": "BlackRock ICS Euro Liquidity Fund vs Euro",
+        "available": true,
+        "metadata": {
+          "exchange": "US"
+        }
+      },
+      "watch": [
+        {
+          "code": "IE0005023803.FN/EUR",
+          "providerSymbol": "IE0005023803.FN/EUR",
+          "source": "dukascopy",
+          "identity": {
+            "category": "基金",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "IE0005023803.FN/EUR"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:25759ddd471775a437402643c8b03a61",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "IE0005023803.FN/EUR",
+          "providerSymbol": "IE0005023803.FN/EUR",
+          "source": "dukascopy",
+          "identity": {
+            "category": "基金",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "IE0005023803.FN/EUR"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "INDEX",
+        "source": "dukascopy",
+        "symbol": "AUS.IDX/AUD",
+        "kind": "INDEX",
+        "label": "Australia 200 Index",
+        "available": true,
+        "metadata": {
+          "exchange": "AU"
+        }
+      },
+      "watch": [
+        {
+          "code": "AUS.IDX/AUD",
+          "providerSymbol": "AUS.IDX/AUD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "指数",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AUS.IDX/AUD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:eea8d87ba168c784e3eee2e764614e98",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AUS.IDX/AUD",
+          "providerSymbol": "AUS.IDX/AUD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "指数",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AUS.IDX/AUD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "METAL",
+        "source": "dukascopy",
+        "symbol": "XAG/USD",
+        "kind": "METAL",
+        "label": "Silver vs US Dollar",
+        "available": true,
+        "metadata": {
+          "exchange": "US"
+        }
+      },
+      "watch": [
+        {
+          "code": "XAGUSD",
+          "providerSymbol": "XAG/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "贵金属",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "XAG/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:8a1727877cdea8e0a143fd2b5bf9d385",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "XAGUSD",
+          "providerSymbol": "XAG/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "贵金属",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "XAG/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "OTHER",
+        "source": "dukascopy",
+        "symbol": "BUGG.GB/USD",
+        "kind": "OTHER",
+        "label": "Global X Cybersecurity Ucits ETF",
+        "available": true,
+        "metadata": {
+          "exchange": "GB"
+        }
+      },
+      "watch": [
+        {
+          "code": "BUGG.GB/USD",
+          "providerSymbol": "BUGG.GB/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "待分类",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BUGG.GB/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:5ceb1f08fa39f1f8c3b0d9b1d8d86acc",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "BUGG.GB/USD",
+          "providerSymbol": "BUGG.GB/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "待分类",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BUGG.GB/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CURRENCY",
+        "source": "fxcm",
+        "symbol": "AUD/CAD",
+        "kind": "CURRENCY",
+        "label": "AUD/CAD",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "AUDCAD",
+          "providerSymbol": "AUD/CAD",
+          "source": "fxcm",
+          "identity": {
+            "category": "外汇",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "AUD/CAD"
+          },
+          "price": "买价",
+          "ticker": "MWP:FXCM:04ad017e6aa0c0690a41b99410037690",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AUDCAD",
+          "providerSymbol": "AUD/CAD",
+          "source": "fxcm",
+          "identity": {
+            "category": "外汇",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "AUD/CAD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "INDEX",
+        "source": "fxcm",
+        "symbol": "AUS200",
+        "kind": "INDEX",
+        "label": "AUS200",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "AUS200",
+          "providerSymbol": "AUS200",
+          "source": "fxcm",
+          "identity": {
+            "category": "指数",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "AUS200"
+          },
+          "price": "买价",
+          "ticker": "MWP:FXCM:b8d38107a307795e9c231e69626eb47a",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AUS200",
+          "providerSymbol": "AUS200",
+          "source": "fxcm",
+          "identity": {
+            "category": "指数",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "AUS200"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "METAL",
+        "source": "fxcm",
+        "symbol": "RKG/CNH",
+        "kind": "METAL",
+        "label": "RKG/CNH",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "RKG/CNH",
+          "providerSymbol": "RKG/CNH",
+          "source": "fxcm",
+          "identity": {
+            "category": "贵金属",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "RKG/CNH"
+          },
+          "price": "买价",
+          "ticker": "MWP:FXCM:289066452c38730a1b037d5504105842",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "RKG/CNH",
+          "providerSymbol": "RKG/CNH",
+          "source": "fxcm",
+          "identity": {
+            "category": "贵金属",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "RKG/CNH"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "OTHER",
+        "source": "fxcm",
+        "symbol": "10USNote",
+        "kind": "OTHER",
+        "label": "10USNote",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "10USNOTE",
+          "providerSymbol": "10USNote",
+          "source": "fxcm",
+          "identity": {
+            "category": "待分类",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "10USNote"
+          },
+          "price": "买价",
+          "ticker": "MWP:FXCM:c23b7348cc1825cd26b6995813c453bf",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "10USNOTE",
+          "providerSymbol": "10USNote",
+          "source": "fxcm",
+          "identity": {
+            "category": "待分类",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "10USNote"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CFD",
+        "source": "oanda",
+        "symbol": "AU200_AUD",
+        "kind": "CFD",
+        "label": "Australia 200",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "AU200AUD",
+          "providerSymbol": "AU200_AUD",
+          "source": "oanda",
+          "identity": {
+            "category": "待分类",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "CFD",
+            "environment": "模拟",
+            "provider_symbol": "AU200_AUD"
+          },
+          "price": "买价",
+          "ticker": "MWP:OANDA:AU200_AUD",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AU200AUD",
+          "providerSymbol": "AU200_AUD",
+          "source": "oanda",
+          "identity": {
+            "category": "待分类",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "CFD",
+            "environment": "模拟",
+            "provider_symbol": "AU200_AUD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CURRENCY",
+        "source": "oanda",
+        "symbol": "AUD_CAD",
+        "kind": "CURRENCY",
+        "label": "AUD/CAD",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "AUDCAD",
+          "providerSymbol": "AUD_CAD",
+          "source": "oanda",
+          "identity": {
+            "category": "外汇",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "AUD_CAD"
+          },
+          "price": "买价",
+          "ticker": "MWP:OANDA:AUD_CAD",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AUDCAD",
+          "providerSymbol": "AUD_CAD",
+          "source": "oanda",
+          "identity": {
+            "category": "外汇",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "AUD_CAD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "METAL",
+        "source": "oanda",
+        "symbol": "XAG_AUD",
+        "kind": "METAL",
+        "label": "Silver/AUD",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "XAGAUD",
+          "providerSymbol": "XAG_AUD",
+          "source": "oanda",
+          "identity": {
+            "category": "贵金属",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "XAG_AUD"
+          },
+          "price": "买价",
+          "ticker": "MWP:OANDA:XAG_AUD",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "XAGAUD",
+          "providerSymbol": "XAG_AUD",
+          "source": "oanda",
+          "identity": {
+            "category": "贵金属",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "XAG_AUD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CRYPTOCURRENCY",
+        "source": "yahoo",
+        "symbol": "000660-USD",
+        "kind": "CRYPTOCURRENCY",
+        "label": "SK hynix Inc (Derivatives) USD",
+        "available": true,
+        "metadata": {
+          "exchange": "CCC"
+        }
+      },
+      "watch": [
+        {
+          "code": "000660USD",
+          "providerSymbol": "000660-USD",
+          "source": "yahoo",
+          "identity": {
+            "category": "加密",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "000660-USD"
+          },
+          "price": "来源价格",
+          "ticker": "MWP:YAHOO:e3377336a155640f15fffe31e6b00e06",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "000660USD",
+          "providerSymbol": "000660-USD",
+          "source": "yahoo",
+          "identity": {
+            "category": "加密",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "000660-USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "CURRENCY",
+        "source": "yahoo",
+        "symbol": "EURUSD=X",
+        "kind": "CURRENCY",
+        "label": "欧元／美元",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "EURUSD",
+          "providerSymbol": "EURUSD=X",
+          "source": "yahoo",
+          "identity": {
+            "category": "外汇",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "EURUSD=X"
+          },
+          "price": "来源价格",
+          "ticker": "MWP:YAHOO:edb0c8f3d3a261a3a3497905f4873c34",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "EURUSD",
+          "providerSymbol": "EURUSD=X",
+          "source": "yahoo",
+          "identity": {
+            "category": "外汇",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "EURUSD=X"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "EQUITY",
+        "source": "yahoo",
+        "symbol": "AAPL",
+        "kind": "EQUITY",
+        "label": "苹果公司",
+        "available": true,
+        "metadata": {
+          "exchange": "NasdaqGS",
+          "exchange_code": "NMS"
+        }
+      },
+      "watch": [
+        {
+          "code": "AAPL",
+          "providerSymbol": "AAPL",
+          "source": "yahoo",
+          "identity": {
+            "category": "美股",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AAPL"
+          },
+          "price": "来源复权",
+          "ticker": "MWP:YAHOO:1eb44d625271a4eb75016f276d137836",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AAPL",
+          "providerSymbol": "AAPL",
+          "source": "yahoo",
+          "identity": {
+            "category": "美股",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AAPL"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "ETF",
+        "source": "yahoo",
+        "symbol": "QQQ",
+        "kind": "ETF",
+        "label": "Invesco 纳斯达克 100 ETF",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "QQQ",
+          "providerSymbol": "QQQ",
+          "source": "yahoo",
+          "identity": {
+            "category": "ETF",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "QQQ"
+          },
+          "price": "来源复权",
+          "ticker": "MWP:YAHOO:e9c5d7403d908b95343d66b100aef3bf",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "QQQ",
+          "providerSymbol": "QQQ",
+          "source": "yahoo",
+          "identity": {
+            "category": "ETF",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "QQQ"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "FUTURE",
+        "source": "yahoo",
+        "symbol": "CL=F",
+        "kind": "FUTURE",
+        "label": "WTI 原油期货 · NYMEX",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "CL=F",
+          "providerSymbol": "CL=F",
+          "source": "yahoo",
+          "identity": {
+            "category": "期货",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "CL=F"
+          },
+          "price": "来源价格",
+          "ticker": "MWP:YAHOO:bdee2875bb189e62de2ab68d352e5504",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "CL=F",
+          "providerSymbol": "CL=F",
+          "source": "yahoo",
+          "identity": {
+            "category": "期货",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "CL=F"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "INDEX",
+        "source": "yahoo",
+        "symbol": "^DJI",
+        "kind": "INDEX",
+        "label": "道琼斯工业平均指数",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "^DJI",
+          "providerSymbol": "^DJI",
+          "source": "yahoo",
+          "identity": {
+            "category": "指数",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "^DJI"
+          },
+          "price": "来源价格",
+          "ticker": "MWP:YAHOO:7c74a995e0ae1c1bb018e0c03fae84f9",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "^DJI",
+          "providerSymbol": "^DJI",
+          "source": "yahoo",
+          "identity": {
+            "category": "指数",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "^DJI"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "AAPL.US/USD",
+        "source": "dukascopy",
+        "symbol": "AAPL.US/USD",
+        "kind": "EQUITY",
+        "label": "APPLE INC",
+        "available": true,
+        "metadata": {
+          "exchange": "US"
+        }
+      },
+      "watch": [
+        {
+          "code": "AAPL.US/USD",
+          "providerSymbol": "AAPL.US/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "美股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AAPL.US/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:bb5abfac0fa5d2485eac940a7c32251b",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "AAPL.US/USD",
+          "providerSymbol": "AAPL.US/USD",
+          "source": "dukascopy",
+          "identity": {
+            "category": "美股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "AAPL.US/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "VOD.GB/GBX",
+        "source": "dukascopy",
+        "symbol": "VOD.GB/GBX",
+        "kind": "EQUITY",
+        "label": "Vodafone Group PLC",
+        "available": true,
+        "metadata": {
+          "exchange": "GB"
+        }
+      },
+      "watch": [
+        {
+          "code": "VOD.GB/GBX",
+          "providerSymbol": "VOD.GB/GBX",
+          "source": "dukascopy",
+          "identity": {
+            "category": "英股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "VOD.GB/GBX"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:da8edaf7958ddf5189ebaca55170ea2b",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "VOD.GB/GBX",
+          "providerSymbol": "VOD.GB/GBX",
+          "source": "dukascopy",
+          "identity": {
+            "category": "英股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "VOD.GB/GBX"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "7203.JP/JPY",
+        "source": "dukascopy",
+        "symbol": "7203.JP/JPY",
+        "kind": "EQUITY",
+        "label": "Toyota Motor Corp",
+        "available": true,
+        "metadata": {
+          "exchange": "JP"
+        }
+      },
+      "watch": [
+        {
+          "code": "7203.JP/JPY",
+          "providerSymbol": "7203.JP/JPY",
+          "source": "dukascopy",
+          "identity": {
+            "category": "日股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "7203.JP/JPY"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:71e47ef89fa8fcfa9dac61bc392fef2d",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "7203.JP/JPY",
+          "providerSymbol": "7203.JP/JPY",
+          "source": "dukascopy",
+          "identity": {
+            "category": "日股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "7203.JP/JPY"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "ADS.DE/EUR",
+        "source": "dukascopy",
+        "symbol": "ADS.DE/EUR",
+        "kind": "EQUITY",
+        "label": "Adidas AG",
+        "available": true,
+        "metadata": {
+          "exchange": "DE"
+        }
+      },
+      "watch": [
+        {
+          "code": "ADS.DE/EUR",
+          "providerSymbol": "ADS.DE/EUR",
+          "source": "dukascopy",
+          "identity": {
+            "category": "德股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "ADS.DE/EUR"
+          },
+          "price": "买价",
+          "ticker": "MWP:DUKA:923f794962fe8e379e0bbd65de0d0dcd",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "ADS.DE/EUR",
+          "providerSymbol": "ADS.DE/EUR",
+          "source": "dukascopy",
+          "identity": {
+            "category": "德股",
+            "provider": "Dukas",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "ADS.DE/EUR"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "SZSE:300750",
+        "source": "akshare",
+        "symbol": "SZSE:300750",
+        "kind": "EQUITY",
+        "label": "宁德时代",
+        "available": true,
+        "metadata": {
+          "exchange": "SZSE",
+          "source_family": "sina-a"
+        }
+      },
+      "watch": [
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "前复权",
+          "ticker": "MWP:AKSHARE:99000cdea79314675931de1860dc447b",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "不复权",
+          "ticker": "MWP:SINA-NATIVE:SZSE:300750",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:300750",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:300750",
+          "capabilities": [
+            "D1"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "SSE:688256",
+        "source": "akshare",
+        "symbol": "SSE:688256",
+        "kind": "EQUITY",
+        "label": "寒武纪",
+        "available": true,
+        "metadata": {
+          "exchange": "SSE",
+          "source_family": "sina-a"
+        }
+      },
+      "watch": [
+        {
+          "code": "688256",
+          "providerSymbol": "SSE:688256",
+          "source": "akshare",
+          "identity": {
+            "category": "沪A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SSE:688256"
+          },
+          "price": "前复权",
+          "ticker": "MWP:AKSHARE:6a9493f8ac30d543f9da9fcef798368b",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "688256",
+          "providerSymbol": "SSE:688256",
+          "source": "akshare",
+          "identity": {
+            "category": "沪A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SSE:688256"
+          },
+          "price": "不复权",
+          "ticker": "MWP:SINA-NATIVE:SSE:688256",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "688256",
+          "providerSymbol": "SSE:688256",
+          "source": "akshare",
+          "identity": {
+            "category": "沪A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SSE:688256"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SSE:688256",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "688256",
+          "providerSymbol": "SSE:688256",
+          "source": "akshare",
+          "identity": {
+            "category": "沪A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SSE:688256"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SSE:688256",
+          "capabilities": [
+            "D1"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "688256",
+          "providerSymbol": "SSE:688256",
+          "source": "akshare",
+          "identity": {
+            "category": "沪A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SSE:688256"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "NVDA",
+        "source": "yahoo",
+        "symbol": "NVDA",
+        "kind": "EQUITY",
+        "label": "英伟达",
+        "available": true,
+        "metadata": {
+          "exchange": "NasdaqGS",
+          "exchange_code": "NMS"
+        }
+      },
+      "watch": [
+        {
+          "code": "NVDA",
+          "providerSymbol": "NVDA",
+          "source": "yahoo",
+          "identity": {
+            "category": "美股",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "NVDA"
+          },
+          "price": "来源复权",
+          "ticker": "MWP:YAHOO:426219f2bc19829619cd8e71b51d7b93",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "NVDA",
+          "providerSymbol": "NVDA",
+          "source": "yahoo",
+          "identity": {
+            "category": "美股",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "NVDA"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "excluded/current scope",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "BTC-USD",
+        "source": "yahoo",
+        "symbol": "BTC-USD",
+        "kind": "CRYPTOCURRENCY",
+        "label": "Bitcoin USD",
+        "available": true,
+        "metadata": {
+          "exchange": "CCC"
+        }
+      },
+      "watch": [
+        {
+          "code": "BTCUSD",
+          "providerSymbol": "BTC-USD",
+          "source": "yahoo",
+          "identity": {
+            "category": "加密",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BTC-USD"
+          },
+          "price": "来源价格",
+          "ticker": "MWP:YAHOO:2fd1a09ed73e366561d195e4ae8fa215",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "BTCUSD",
+          "providerSymbol": "BTC-USD",
+          "source": "yahoo",
+          "identity": {
+            "category": "加密",
+            "provider": "Yahoo",
+            "channel": "",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "BTC-USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "EUR_USD",
+        "source": "oanda",
+        "symbol": "EUR_USD",
+        "kind": "CURRENCY",
+        "label": "EUR/USD",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "EURUSD",
+          "providerSymbol": "EUR_USD",
+          "source": "oanda",
+          "identity": {
+            "category": "外汇",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "EUR_USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:OANDA:EUR_USD",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "EURUSD",
+          "providerSymbol": "EUR_USD",
+          "source": "oanda",
+          "identity": {
+            "category": "外汇",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "EUR_USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "XAU_USD",
+        "source": "oanda",
+        "symbol": "XAU_USD",
+        "kind": "METAL",
+        "label": "Gold",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "XAUUSD",
+          "providerSymbol": "XAU_USD",
+          "source": "oanda",
+          "identity": {
+            "category": "贵金属",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "XAU_USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:OANDA:XAU_USD",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "XAUUSD",
+          "providerSymbol": "XAU_USD",
+          "source": "oanda",
+          "identity": {
+            "category": "贵金属",
+            "provider": "OANDA",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "XAU_USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "EUR/USD",
+        "source": "fxcm",
+        "symbol": "EUR/USD",
+        "kind": "CURRENCY",
+        "label": "EUR/USD",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "EURUSD",
+          "providerSymbol": "EUR/USD",
+          "source": "fxcm",
+          "identity": {
+            "category": "外汇",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "EUR/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:FXCM:941424ca250383292ab3a5b2d04e2623",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "EURUSD",
+          "providerSymbol": "EUR/USD",
+          "source": "fxcm",
+          "identity": {
+            "category": "外汇",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "EUR/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    },
+    {
+      "sample": {
+        "group": "XAU/USD",
+        "source": "fxcm",
+        "symbol": "XAU/USD",
+        "kind": "METAL",
+        "label": "XAU/USD",
+        "available": true,
+        "metadata": {}
+      },
+      "watch": [
+        {
+          "code": "XAUUSD",
+          "providerSymbol": "XAU/USD",
+          "source": "fxcm",
+          "identity": {
+            "category": "贵金属",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "XAU/USD"
+          },
+          "price": "买价",
+          "ticker": "MWP:FXCM:044d651dad2554fb2eeb040e1e7a43bb",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "H4",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ],
+      "create": [
+        {
+          "code": "XAUUSD",
+          "providerSymbol": "XAU/USD",
+          "source": "fxcm",
+          "identity": {
+            "category": "贵金属",
+            "provider": "FXCM",
+            "channel": "",
+            "product": "",
+            "environment": "模拟",
+            "provider_symbol": "XAU/USD"
+          }
+        }
+      ],
+      "checks": [
+        "native category/provider/product passed",
+        "creation identity passed"
+      ],
+      "watchUi": "passed",
+      "createUi": "passed"
+    }
+  ],
+  "upstreams": [
+    {
+      "query": "300750 新浪财经",
+      "rows": [
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "前复权",
+          "ticker": "MWP:AKSHARE:99000cdea79314675931de1860dc447b",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "不复权",
+          "ticker": "MWP:SINA-NATIVE:SZSE:300750",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "300750 腾讯财经",
+      "rows": [
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:300750",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "300750",
+          "providerSymbol": "SZSE:300750",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300750"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:300750",
+          "capabilities": [
+            "D1"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "00001 腾讯财经",
+      "rows": [
+        {
+          "code": "00001",
+          "providerSymbol": "HKEX:00001",
+          "source": "akshare",
+          "identity": {
+            "category": "港股",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "HKEX:00001"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:HKEX:00001",
+          "capabilities": [
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000001",
+          "providerSymbol": "SZSE:000001",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000001"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000001",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000001",
+          "providerSymbol": "SZSE:000001",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000001"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000001",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "000010",
+          "providerSymbol": "SZSE:000010",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000010"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000010",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000010",
+          "providerSymbol": "SZSE:000010",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000010"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000010",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "000011",
+          "providerSymbol": "SZSE:000011",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000011"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000011",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000011",
+          "providerSymbol": "SZSE:000011",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000011"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000011",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "000012",
+          "providerSymbol": "SZSE:000012",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000012"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000012",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000012",
+          "providerSymbol": "SZSE:000012",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000012"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000012",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "000014",
+          "providerSymbol": "SZSE:000014",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000014"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000014",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000014",
+          "providerSymbol": "SZSE:000014",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000014"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000014",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "000017",
+          "providerSymbol": "SZSE:000017",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000017"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000017",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000017",
+          "providerSymbol": "SZSE:000017",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000017"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000017",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "000019",
+          "providerSymbol": "SZSE:000019",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000019"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:000019",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "000019",
+          "providerSymbol": "SZSE:000019",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:000019"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:000019",
+          "capabilities": [
+            "D1"
+          ]
+        },
+        {
+          "code": "300001",
+          "providerSymbol": "SZSE:300001",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300001"
+          },
+          "price": "不复权",
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:300001",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1",
+            "W1",
+            "MN"
+          ]
+        },
+        {
+          "code": "300001",
+          "providerSymbol": "SZSE:300001",
+          "source": "akshare",
+          "identity": {
+            "category": "深A",
+            "provider": "腾讯财经",
+            "channel": "AKShare",
+            "product": "",
+            "environment": "",
+            "provider_symbol": "SZSE:300001"
+          },
+          "price": "前复权",
+          "ticker": "MWP:TENCENT:SZSE:300001",
+          "capabilities": [
+            "D1"
+          ]
+        }
+      ]
+    },
+    {
+      "query": "RB0 新浪财经",
+      "rows": [
+        {
+          "code": "RB0",
+          "providerSymbol": "SHFE:RB0",
+          "source": "akshare",
+          "identity": {
+            "category": "期货",
+            "provider": "新浪财经",
+            "channel": "AKShare",
+            "product": "主力连续",
+            "environment": "",
+            "provider_symbol": "SHFE:RB0"
+          },
+          "price": "原始价格",
+          "ticker": "MWP:AKSHARE:5f9ceaee63a57ebd822f453a9df7aa0f",
+          "capabilities": [
+            "M1",
+            "M5",
+            "M15",
+            "M30",
+            "H1",
+            "D1"
+          ]
+        }
+      ]
+    }
+  ],
+  "issues": [],
+  "pageErrors": []
+}

@@ -1,10 +1,17 @@
 """Actual PostgreSQL commit/publication/consumer acceptance at period handoff."""
+import os
+
 import pytest
 from alerts import market_stream as stream
 from alerts import provider_cache as cache
 from alerts.chart_query import DataQuery
 from test_market_stream import session
 from test_provider_cache import META, seed
+from test_provider_postgres import provider_pg as provider_pg
+
+pytestmark = pytest.mark.skipif(
+    not os.getenv("TEST_POSTGRES_URL"), reason="Requires isolated PostgreSQL"
+)
 
 
 def setup(provider_pg, monkeypatch, frame="M1"):

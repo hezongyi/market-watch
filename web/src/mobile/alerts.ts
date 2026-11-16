@@ -9,7 +9,15 @@ import {
 export const editablePrice = (row: AlertRow) =>
   isFixedPrice(row.config) &&
   !row.config.association?.object_kind &&
-  ["active", "paused"].includes(row.status);
+  ["active", "paused", "expired", "completed"].includes(row.status);
+export const editableRule = (row: AlertRow) =>
+  editablePrice(row) ||
+  (row.config.series_kind === "composite" &&
+    row.status !== "archived" &&
+    !row.config.association?.object_kind &&
+    !row.config.condition.offset &&
+    row.config.condition.left.kind === "indicator" &&
+    row.config.condition.right?.kind === "constant");
 export function admission(
   capabilities: Capabilities | undefined,
   config: AlertConfig,
@@ -72,7 +80,7 @@ export async function savePriceRule(
   editing?: AlertRow,
   request = api,
 ) {
-  if (editing && !editablePrice(editing))
+  if (editing && !editableRule(editing))
     throw Error("此规则仅支持查看、暂停或归档");
   try {
     return await request<AlertRow>(

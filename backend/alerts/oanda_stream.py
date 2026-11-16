@@ -257,6 +257,37 @@ class OandaPractice:
             raise ValueError('OANDA pricing probe is incomplete')
         return catalog
 
+    def validate_stream_access(self, identities):
+        """Prove pricing access using actual account-stream records, not REST.
+
+        Probe observations are discarded: they neither publish prices nor mark
+        historical minutes confirmed. Heartbeats alone cannot release a hold.
+        """
+        import hashlib
+
+        scope = 'sha256:' + hashlib.sha256(self.account_id.encode()).hexdigest()
+        if not identities or len(identities) > 200 or any(
+                (key, identity.source, identity.channel, identity.environment,
+                 identity.account_scope, identity.basis) !=
+                (identity.provider_symbol, 'oanda', 'v20', 'practice', scope, 'bid')
+                for key, identity in identities.items()):
+            raise ValueError('Stream probe requires registered account identities')
+        deadline = time.monotonic() + 15
+        seen = set()
+        events = self.stream(identities, epoch=1,
+                             stopped=lambda: time.monotonic() >= deadline)
+        try:
+            for event in events:
+                if time.monotonic() >= deadline:
+                    break
+                if isinstance(event, QuoteEvent):
+                    seen.add(event.identity.provider_symbol)
+                    if seen == set(identities):
+                        return
+        finally:
+            events.close()
+        raise TimeoutError('Account stream probe did not observe all requested symbols')
+
     def page(self, identity, start, end):
         if (identity.source, identity.environment, identity.channel, identity.basis) != (
                 "oanda", "practice", "v20", "bid"):

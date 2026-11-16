@@ -5,7 +5,7 @@ import { api, ApiError } from "./api";
 import { frames, time, type Dataset, type Plan, type FrameRule } from "./types";
 import { FrameSchedules, editableFramePlan } from "./FrameSchedules";
 
-function tradingDate(start: number, calendar: string) {
+export function tradingDate(start: number, calendar: string) {
   const date = new Intl.DateTimeFormat("en-CA", {
     timeZone: calendar === "ny17" ? "America/New_York" : "UTC",
     year: "numeric", month: "2-digit", day: "2-digit",

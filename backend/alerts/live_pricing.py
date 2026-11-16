@@ -64,6 +64,30 @@ def ensure_catalog(items, account, *, ownership=None):
     return resident
 
 
+def registered_stream_identities(account):
+    """Reuse registered metadata, never claim current upstream availability.
+
+    The account-scoped stream still authenticates every connection. New accounts
+    or calendars must bootstrap their catalog before they can use this path.
+    """
+    scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
+    identities = {}
+    with transaction() as db:
+        datasets = db.scalars(select(MarketDataset).join(
+            LiveState, LiveState.dataset_id == MarketDataset.id))
+        for dataset in datasets:
+            if not all(dataset.identity.get(key) == value for key, value in {
+                    "source": "oanda", "channel": "v20", "environment": "practice",
+                    "account_scope": scope, "basis": "bid",
+                    "calendar_version": settings.oanda_calendar_version}.items()):
+                continue
+            identity = DatasetIdentity.model_validate(dataset.identity)
+            if identity.key == dataset.id and identity.mode == "base_m1":
+                identities[identity.provider_symbol] = identity
+    residents = {s.strip() for s in settings.oanda_resident_symbols.split(",") if s.strip()}
+    return identities if residents <= identities.keys() else {}
+
+
 def _desired_dataset_identities(account):
     scope = "sha256:" + hashlib.sha256(account.encode()).hexdigest()
     with transaction() as db:
@@ -831,12 +855,15 @@ def commit_confirmation(ownership, epoch, batch, *, now=None, operation="candles
             state.next_confirm_at = max(stamp + min(60000, 1000 * 2 ** min(state.attempts, 6)),
                                          batch.result.retry_at or 0)
             if batch.result.status in ('unauthorized', 'provider_maintenance'):
-                # Fence every symbol immediately, before the stream thread
-                # observes the confirmation thread's connection-stop event.
-                owner.error = batch.result.status
-                db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
-                owner.next_at = _retry_at(batch.result, stamp, owner.failures)
+                retry_at = _retry_at(batch.result, stamp, state.attempts)
+                state.next_confirm_at = max(state.next_confirm_at, retry_at)
                 state.ready = False
+                if settings.oanda_acquisition_mode == 'rest_batch':
+                    # REST sampling shares this capability; stream sampling
+                    # has its own authenticated connection and must stay live.
+                    owner.error = batch.result.status
+                    db.merge(Preference(key='oanda_probe_status:' + owner.id, value={}))
+                    owner.next_at = retry_at
             return
         dataset = db.get(MarketDataset, batch.identity.key)
         inst = db.get(Instrument, dataset.instrument_id)

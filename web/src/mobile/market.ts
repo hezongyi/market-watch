@@ -1,3 +1,4 @@
+import { logEvent } from "./logs";
 import { api } from "../api";
 import {
   providerSubscriptions,
@@ -53,6 +54,8 @@ export function mobileMarket(report: (message: string) => void) {
       return meta.created === true;
     },
     (value) => {
+      if(state.state!==value.state && value.state==="error")logEvent({module:"行情",action:"行情连接",message:"连接中断，正在自动重连",level:"warning",result:"failure"});
+      if(state.state==="error" && value.state==="open")logEvent({module:"行情",action:"行情连接",message:"连接已恢复",result:"recovery"});
       state = value;
       observers.forEach((observer) => observer(value));
     },

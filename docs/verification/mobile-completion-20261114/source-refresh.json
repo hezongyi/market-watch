@@ -1,0 +1,99 @@
+[
+  {
+    "source": "oanda",
+    "error_type": "HTTPError",
+    "http_status": 502,
+    "retry": {
+      "status": "complete",
+      "count": 127,
+      "method": "existing catalog refresh; direct and HTTP retry confirmed"
+    }
+  },
+  {
+    "source": "dukascopy",
+    "elapsed": 3.8,
+    "result": {
+      "source": "dukascopy",
+      "partition": "all",
+      "status": "complete",
+      "count": 1504,
+      "advertised_total": 1504,
+      "last_success": 1794648031634,
+      "last_attempt": 1794648031634,
+      "origin": "https://jetta.dukascopy.com/v1/instruments"
+    }
+  },
+  {
+    "source": "binance",
+    "elapsed": 3.5,
+    "result": {
+      "source": "binance",
+      "partition": "all",
+      "status": "complete",
+      "count": 3742,
+      "advertised_total": 3742,
+      "last_success": 1794648034258,
+      "last_attempt": 1794648034258,
+      "origin": "https://data-api.binance.vision/api/v3/exchangeInfo"
+    }
+  },
+  {
+    "source": "fxcm",
+    "elapsed": 9.2,
+    "result": {
+      "source": "fxcm",
+      "partition": "all",
+      "status": "complete",
+      "count": 517,
+      "advertised_total": 517,
+      "last_success": 1794648044549,
+      "last_attempt": 1794648044549,
+      "origin": "FXCM Demo ForexConnect Offers",
+      "updated_at": 1794648044549
+    }
+  },
+  {
+    "source": "akshare",
+    "elapsed": 12.2,
+    "result": {
+      "source": "akshare",
+      "partition": "a",
+      "status": "complete",
+      "count": 5223,
+      "advertised_total": null,
+      "last_success": 1794648046377,
+      "last_attempt": 1794648046377,
+      "origin": "stock_info_a_code_name",
+      "market": "a"
+    }
+  },
+  {
+    "source": "yahoo",
+    "elapsed": 14.6,
+    "result": {
+      "source": "yahoo",
+      "partitions": [
+        {
+          "source": "yahoo",
+          "scope": "public",
+          "partition": "crypto-usd",
+          "status": "complete",
+          "count": 8094,
+          "advertised_total": 8094,
+          "last_success": 1794648055414,
+          "last_attempt": 1794648055414,
+          "origin": "Yahoo screener: ALL_CRYPTOCURRENCIES_US"
+        },
+        {
+          "source": "yahoo",
+          "scope": "public",
+          "partition": "equity-us",
+          "status": "failed",
+          "last_attempt": 1794648059507,
+          "error": "供应商分区总数变化或超过10000条分页上限；未发布，保留旧快照"
+        }
+      ],
+      "coverage_note": "已声明公开分区；不代表全球资产全集；排除沪深京及港股"
+    }
+  }
+]

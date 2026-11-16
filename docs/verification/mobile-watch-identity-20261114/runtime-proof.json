@@ -1,0 +1,19 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "base": "https://192.168.7.232:18447",
+  "checks": [
+    "API and realtime worker use the fixed quote_snapshot",
+    "Separate read-only process: failed metadata refresh preserves catalog identity without inventing price",
+    "Live NVDA row: NVDA / 英伟达 / Yahoo",
+    "APK update manifest and download digest preserved"
+  ],
+  "images": {
+    "api": "sha256:92cd24d49aef909b1584cdaadb85434e297f1df6d6321ef1a80a3af9be287eae",
+    "market-runtime": "sha256:92cd24d49aef909b1584cdaadb85434e297f1df6d6321ef1a80a3af9be287eae"
+  },
+  "errors": [],
+  "user_writes": [],
+  "source_sha256": "78234db4cfb5d4c9cb61934d9143e392f4d5a2a565f5050c6ec4eb68a1f98dcc",
+  "passed": true
+}

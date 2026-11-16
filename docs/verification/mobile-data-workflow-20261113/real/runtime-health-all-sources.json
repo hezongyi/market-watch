@@ -1,0 +1,289 @@
+{
+  "observedAt": 1794590193684,
+  "deployment": "mw-mobile-data-workflow-20261113",
+  "disabledMarketRoles": [
+    "chart_alert",
+    "switch_activation"
+  ],
+  "roles": [
+    {
+      "group": "market",
+      "role": "pricing",
+      "state": "running",
+      "checked_at": 1794590189233,
+      "last_success_at": 1794590189233,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "realtime",
+      "state": "idle",
+      "checked_at": 1794590183599,
+      "last_success_at": 1794590183599,
+      "error_type": null,
+      "stale_after_ms": 60000
+    },
+    {
+      "group": "market",
+      "role": "composite_aggregate",
+      "state": "idle",
+      "checked_at": 1794590189659,
+      "last_success_at": 1794590189659,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "alert_indicator",
+      "state": "idle",
+      "checked_at": 1794590189201,
+      "last_success_at": 1794590189201,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "market",
+      "role": "market_ownership",
+      "state": "idle",
+      "checked_at": 1794590193547,
+      "last_success_at": 1794590193547,
+      "error_type": null,
+      "stale_after_ms": 15000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_oanda",
+      "state": "idle",
+      "checked_at": 1794590172684,
+      "last_success_at": 1794590172684,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_oanda",
+      "state": "idle",
+      "checked_at": 1794590173339,
+      "last_success_at": 1794590173339,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_binance",
+      "state": "idle",
+      "checked_at": 1794590173382,
+      "last_success_at": 1794590173382,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_binance",
+      "state": "idle",
+      "checked_at": 1794590173387,
+      "last_success_at": 1794590173387,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_yahoo",
+      "state": "idle",
+      "checked_at": 1794590173460,
+      "last_success_at": 1794590173460,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_yahoo",
+      "state": "idle",
+      "checked_at": 1794590173298,
+      "last_success_at": 1794590173298,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_dukascopy",
+      "state": "idle",
+      "checked_at": 1794590173438,
+      "last_success_at": 1794590173438,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_dukascopy",
+      "state": "idle",
+      "checked_at": 1794590173403,
+      "last_success_at": 1794590173403,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_akshare",
+      "state": "idle",
+      "checked_at": 1794590173453,
+      "last_success_at": 1794590173453,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_akshare",
+      "state": "idle",
+      "checked_at": 1794590173385,
+      "last_success_at": 1794590173385,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_live_fxcm",
+      "state": "idle",
+      "checked_at": 1794590173413,
+      "last_success_at": 1794590173413,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_warm_fxcm",
+      "state": "idle",
+      "checked_at": 1794590173465,
+      "last_success_at": 1794590173465,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_oanda",
+      "state": "idle",
+      "checked_at": 1794590177506,
+      "last_success_at": 1794590177506,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_binance",
+      "state": "idle",
+      "checked_at": 1794590177079,
+      "last_success_at": 1794590177079,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_transport_dukascopy",
+      "state": "idle",
+      "checked_at": 1794590173346,
+      "last_success_at": 1794590173346,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "provider_janitor",
+      "state": "idle",
+      "checked_at": 1794590173357,
+      "last_success_at": 1794590173357,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "catalog_runtime",
+      "state": "idle",
+      "checked_at": 1794590173094,
+      "last_success_at": 1794590173094,
+      "error_type": null,
+      "stale_after_ms": 90000
+    },
+    {
+      "group": "data",
+      "role": "chart_history",
+      "state": "idle",
+      "checked_at": 1794590164461,
+      "last_success_at": 1794590164461,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "history_network",
+      "state": "idle",
+      "checked_at": 1794590174697,
+      "last_success_at": 1794590174697,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "history_compute",
+      "state": "idle",
+      "checked_at": 1794590174777,
+      "last_success_at": 1794590174777,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "native_history",
+      "state": "idle",
+      "checked_at": 1794590173538,
+      "last_success_at": 1794590173538,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "chart_aggregation",
+      "state": "idle",
+      "checked_at": 1794590164449,
+      "last_success_at": 1794590164449,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "market_stream",
+      "state": "idle",
+      "checked_at": 1794590173621,
+      "last_success_at": 1794590173621,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "switch_shadow",
+      "state": "idle",
+      "checked_at": 1794590173832,
+      "last_success_at": 1794590173832,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "retention",
+      "state": "idle",
+      "checked_at": 1794590173206,
+      "last_success_at": 1794590173206,
+      "error_type": null,
+      "stale_after_ms": 300000
+    },
+    {
+      "group": "data",
+      "role": "data_ownership",
+      "state": "idle",
+      "checked_at": 1794590193465,
+      "last_success_at": 1794590193465,
+      "error_type": null,
+      "stale_after_ms": 90000
+    }
+  ]
+}

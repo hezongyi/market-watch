@@ -4,11 +4,13 @@ Adapters own transactions; all writes use the existing lifecycle and event model
 Provider HTTP failures are translated at the provider boundary.
 """
 
+import base64
+import json
 from typing import Literal
 
 from fastapi import HTTPException as ProviderHTTPError
 from pydantic import Field
-from sqlalchemy import func, select
+from sqlalchemy import func, select, tuple_
 
 from .chart_alert_domain import Contract
 from .chart_alert_message import condition_label, signal_message
@@ -184,7 +186,10 @@ def alert_dict(db, alert, *, last_triggered_at=None):
             "last_triggered_at": last_triggered_at,
             "display_label": display_label(db, version.config, version.market_identity),
             "condition_summary": condition_label(version.config["condition"]),
-            "runtime": alert.runtime, "execution": execution_dict(alert, version)}
+            "runtime": alert.runtime,
+            "activity": {key: alert.runtime.get(key) for key in (
+                "taken_over_at", "last_checked_at", "last_evaluated_at", "last_input_at", "last_outcome")},
+            "execution": execution_dict(alert, version)}
 
 
 def execution_dict(alert, version, *, at=None):
@@ -221,13 +226,15 @@ def execution_dict(alert, version, *, at=None):
         "expired": expired, "settlement_pending": bool(runtime.get("settlement_pending")),
         "taken_over_at": runtime.get("taken_over_at"), "last_checked_at": runtime.get("last_checked_at"),
         "last_evaluated_at": runtime.get("last_evaluated_at"), "last_input_at": runtime.get("last_input_at"),
+        "last_outcome": runtime.get("last_outcome"),
         "position": runtime.get("cursor", runtime.get("close_cursor")), "expected_input_at": runtime.get("expected_input_at"),
         "last_gap": runtime.get("last_gap"), "incident": runtime.get("incident"),
         "notification": runtime.get("execution_notification"),
         "phone_configuration": {"available": phone_code is None, "reason_code": phone_code, "message": message(phone_code)}}
 
 
-def listing(db, instrument: str | None = None, status: str | None = None, search: str = ""):
+def listing(db, instrument: str | None = None, status: str | None = None, search: str = "",
+            *, before: str | None = None, limit: int = 500):
     if status and status not in ("active", "paused", "completed", "expired", "archived"):
         raise ValueError("未知告警状态")
     if len(search) > 100 or instrument and len(instrument) > 64:
@@ -242,14 +249,36 @@ def listing(db, instrument: str | None = None, status: str | None = None, search
         query = query.where(ChartAlert.name.contains(search, autoescape=True))
     if instrument:
         query = query.where(ChartAlertVersion.config["instrument"].as_string() == instrument)
-    rows = list(db.scalars(query.order_by(ChartAlert.created_at.desc()).limit(500)))
+    if before:
+        try:
+            cursor = json.loads(base64.urlsafe_b64decode(before + "=" * (-len(before) % 4)))
+            if (not isinstance(cursor, list) or len(cursor) != 2 or type(cursor[0]) is not int
+                    or cursor[0] < 0 or not isinstance(cursor[1], str) or not 1 <= len(cursor[1]) <= 36):
+                raise ValueError
+        except (ValueError, TypeError, UnicodeError) as exc:
+            raise ValueError("无效规则游标") from exc
+        query = query.where(tuple_(ChartAlert.created_at, ChartAlert.id) < tuple(cursor))
+    rows = list(db.scalars(query.order_by(ChartAlert.created_at.desc(), ChartAlert.id.desc()).limit(limit)))
     last = dict(db.execute(select(SignalRow.chart_alert_id, func.max(SignalRow.occurred_at))
         .where(SignalRow.chart_alert_id.in_([row.id for row in rows]))
         .group_by(SignalRow.chart_alert_id)).all()) if rows else {}
     result = [alert_dict(db, row, last_triggered_at=last.get(row.id)) for row in rows]
     return result
 
-def events(db, alert_id: str | None = None, limit: int = 100):
+def rules_page(db, status: str | None = None, limit: int = 50, before: str | None = None):
+    if not 1 <= limit <= 100 or before and len(before) > 256:
+        raise ValueError("规则请求超出范围")
+    items = listing(db, status=status, before=before, limit=limit + 1)
+    has_more = len(items) > limit
+    items = items[:limit]
+    tail = items[-1] if has_more else None
+    cursor = base64.urlsafe_b64encode(json.dumps(
+        [tail["created_at"], tail["id"]], separators=(",", ":")
+    ).encode()).decode().rstrip("=") if tail else None
+    return {"items": items, "has_more": has_more, "next_cursor": cursor}
+
+
+def events(db, alert_id: str | None = None, limit: int = 100, *, before: str | None = None, event_id: str | None = None):
     if not 1 <= limit <= 500 or alert_id and len(alert_id) > 36:
         raise ValueError("日志请求超出范围")
     query = select(SignalRow, Notification, Outbox).join(Notification, Notification.signal_id == SignalRow.id).outerjoin(
@@ -257,8 +286,20 @@ def events(db, alert_id: str | None = None, limit: int = 100):
     ).where(SignalRow.chart_alert_id.is_not(None))
     if alert_id:
         query = query.where(SignalRow.chart_alert_id == alert_id)
+    if event_id:
+        query = query.where(SignalRow.id == event_id)
+    if before:
+        try:
+            cursor = json.loads(base64.urlsafe_b64decode(before + "=" * (-len(before) % 4)))
+            if (not isinstance(cursor, list) or len(cursor) != 3
+                    or any(type(value) is not int or value < 0 for value in cursor[:2])
+                    or not isinstance(cursor[2], str) or not 1 <= len(cursor[2]) <= 36):
+                raise ValueError
+        except (ValueError, TypeError, UnicodeError) as exc:
+            raise ValueError("无效触发记录游标") from exc
+        query = query.where(tuple_(SignalRow.occurred_at, SignalRow.created_at, SignalRow.id) < tuple(cursor))
     records = list(db.execute(query.order_by(
-        SignalRow.occurred_at.desc(), SignalRow.created_at.desc()).limit(limit)))
+        SignalRow.occurred_at.desc(), SignalRow.created_at.desc(), SignalRow.id.desc()).limit(limit)))
     from .notification_center import SUBJECT
 
     notices = {notice.source_id: notice for notice in db.scalars(select(NoticeEvent).where(
@@ -278,6 +319,29 @@ def events(db, alert_id: str | None = None, limit: int = 100):
              "notification_status": notification.status, "ack_at": notification.ack_at,
              "delivery_status": task.status if task else "web_only"}
             for record, notification, task in records]
+
+def events_page(db, alert_id: str | None = None, limit: int = 50, before: str | None = None):
+    """Stable historical cursor; the legacy events endpoint keeps its array contract."""
+    if not 1 <= limit <= 100 or before and len(before) > 256:
+        raise ValueError("日志请求超出范围")
+    items = events(db, alert_id, limit + 1, before=before)
+    has_more = len(items) > limit
+    items = items[:limit]
+    tail = items[-1] if has_more else None
+    cursor = base64.urlsafe_b64encode(json.dumps(
+        [tail["occurred_at"], tail["detected_at"], tail["id"]], separators=(",", ":")
+    ).encode()).decode().rstrip("=") if tail else None
+    return {"items": items, "has_more": has_more, "next_cursor": cursor}
+
+
+def read_event(db, event_id: str):
+    if len(event_id) > 36:
+        raise ValueError("无效触发记录")
+    rows = events(db, limit=1, event_id=event_id)
+    if not rows:
+        raise LookupError("触发记录不存在")
+    return rows[0]
+
 
 def read(db, alert_id: str):
     alert = db.get(ChartAlert, alert_id)
@@ -321,7 +385,9 @@ def require_executable_source(config):
 
 
 def action(db, alert_id: str, body: Action):
-    alert = db.scalar(select(ChartAlert).where(ChartAlert.id == alert_id).with_for_update())
+    from .chart_alert_service import locked
+
+    alert = locked(db, alert_id)
     if alert:
         config = AlertConfig.model_validate(current_version(db, alert).config)
         if config.series_kind != "composite" and body.action not in ("pause", "archive"):

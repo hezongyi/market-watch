@@ -40,7 +40,8 @@ def test_current_coarse_bars_replace_old_fine_bars_and_use_exchange_date(databas
     assert item["timeframe"] == "M5" and item["points"][0]["price"] == "125"
     assert item["session"] == {"date": "2026-11-09", "previous": False}
     assert item["window_start"] == monday
-    assert item["valid_until"] == stamp("2026-11-10T05:00:00+00:00")
+    assert item["valid_until"] > stamp("2026-11-10T05:00:00+00:00"), "offline display survives midnight"
+    assert item["next_check_at"] <= storage.now_ms() + 60000
 
 
 @pytest.mark.parametrize("now,opening", [("2026-03-09T16:00:00+00:00", "2026-03-09T13:30:00+00:00"),
@@ -71,7 +72,7 @@ def test_cold_stock_preparation_requests_previous_actual_bars(database, monkeypa
     monkeypatch.setattr(provider_cache, "read", lambda meta, frame, before, count, **kw:
                         calls.append((frame, before, count)))
     response = sparklines.prepare(SparklineItem(ticker="MWP:NVDA"))
-    assert response["preparation"] == "ready"
+    assert response["preparation"] == "retry"
     assert calls[0][2] >= 390, "a cold pre-open watch needs actual prior bars, not minutes since midnight"
     assert calls[0][2] <= 1600
 
@@ -87,7 +88,7 @@ def test_cold_history_reader_crosses_weekend_and_reuses_cache(database, monkeypa
         calls.append((before, count))
         return {"bars": [{"start": at, "chart_time": at, "end": at + 60000,
             "open": "100", "high": "100", "low": "100", "close": "100", "complete": True}
-            for at in range(opening, opening + 390 * 60000, 60000) if at < before],
+            for at in [opening - 86400000 + 389 * 60000, *range(opening, opening + 390 * 60000, 60000)] if at < before],
             "history_boundary": True}
 
     monkeypatch.setattr(provider_chart, "native_page", fetch)

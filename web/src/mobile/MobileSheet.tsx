@@ -5,6 +5,7 @@ import { useWatchOverlays, WatchDrawer } from "./WatchOverlays";
 export type MobileSheetProps = {
   title: string;
   description?: string;
+  headerActions?: ReactNode;
   dirty?: boolean;
   open?: boolean;
   fullHeight?: boolean;

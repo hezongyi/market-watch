@@ -1,0 +1,295 @@
+{
+  "passed": true,
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "readOnly": true,
+  "total": 11,
+  "categories": [
+    {
+      "value": "forex",
+      "label": "外汇",
+      "total": 2,
+      "samples": [
+        {
+          "id": "e3aaae7f238e6a55ca937c1d01b1225c1ccf2b6c6225f18744d11fd73b5436d3",
+          "code": "EURUSD",
+          "asset_class": "forex",
+          "source": "dukascopy",
+          "badge": "外汇"
+        },
+        {
+          "id": "b6b959a98b619ba5f8b56c0cacaffb19d208545fcb24a4445c6f1ebec2bcda20",
+          "code": "USDCAD",
+          "asset_class": "forex",
+          "source": "dukascopy",
+          "badge": "外汇"
+        }
+      ]
+    },
+    {
+      "value": "metal",
+      "label": "贵金属",
+      "total": 1,
+      "samples": [
+        {
+          "id": "a16e8ef60a6b260b3e12be4454edf2572f47a01e494f3def514831b82f2c4bb2",
+          "code": "XAUUSD",
+          "asset_class": "metal",
+          "source": "dukascopy",
+          "badge": "贵金属"
+        }
+      ]
+    },
+    {
+      "value": "a-stock",
+      "label": "A股",
+      "total": 4,
+      "samples": [
+        {
+          "id": "f8196fa0bd950f4a76401241971654b4687c91634cde169e934b5d108b9a2bdb",
+          "code": "600016",
+          "asset_class": "equity",
+          "source": "akshare",
+          "badge": "沪A"
+        },
+        {
+          "id": "19f72421b6dfd6d24501cdd4fa12f473048c3f52d2dbbb774d2635ffe91a963b",
+          "code": "600900",
+          "asset_class": "equity",
+          "source": "akshare",
+          "badge": "沪A"
+        },
+        {
+          "id": "5552a64c47cd75af7bd483432f2ea38c51d46d3bd5e058dc0abaf2132f0004f8",
+          "code": "601166",
+          "asset_class": "equity",
+          "source": "akshare",
+          "badge": "沪A"
+        }
+      ]
+    },
+    {
+      "value": "us-stock",
+      "label": "美股",
+      "total": 1,
+      "samples": [
+        {
+          "id": "c7ff5832a6060c9e045be2244576509afd319adb821f2b527cd4d656170fb0dc",
+          "code": "Y426219F2B",
+          "asset_class": "equity",
+          "source": "yahoo",
+          "badge": "美股"
+        }
+      ]
+    },
+    {
+      "value": "hk-stock",
+      "label": "港股",
+      "total": 1,
+      "samples": [
+        {
+          "id": "691de86899fa220a3cee38f254606339776c9460ddcf9300762becb93a16e3ae",
+          "code": "01810",
+          "asset_class": "equity",
+          "source": "akshare",
+          "badge": "港股"
+        }
+      ]
+    },
+    {
+      "value": "crypto",
+      "label": "加密",
+      "total": 2,
+      "samples": [
+        {
+          "id": "3ec69e3af33d4375a4e03331702a499093213b536041211152d9ca17639be7a7",
+          "code": "BTCUSD",
+          "asset_class": "crypto",
+          "source": "dukascopy",
+          "badge": "加密"
+        },
+        {
+          "id": "d23667daf6bc77cc26bf066b887875dfeb4f817d49851c5dceb389aa68d96460",
+          "code": "BTCUSDT",
+          "asset_class": "crypto",
+          "source": "binance",
+          "badge": "加密"
+        }
+      ]
+    }
+  ],
+  "partitionComplete": true,
+  "screenshots": [
+    {
+      "name": "all-light-375-14",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "forex-light-375-14",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "all-light-375-21",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "forex-light-375-21",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "all-light-412-14",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "forex-light-412-14",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "all-light-412-21",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "forex-light-412-21",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "all-dark-375-14",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "forex-dark-375-14",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "all-dark-375-21",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "forex-dark-375-21",
+      "width": 367,
+      "scrollWidth": 367,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "all-dark-412-14",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "forex-dark-412-14",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "all-dark-412-21",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "forex-dark-412-21",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 685,
+      "top": 0
+    },
+    {
+      "name": "category-forex",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "category-metal",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "category-a-stock",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "category-us-stock",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "category-hk-stock",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "category-crypto",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "pull-refresh",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    },
+    {
+      "name": "pull-settled",
+      "width": 404,
+      "scrollWidth": 404,
+      "height": 689,
+      "top": 0
+    }
+  ],
+  "errors": [],
+  "failures": [],
+  "writes": []
+}

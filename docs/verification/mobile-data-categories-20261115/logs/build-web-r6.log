@@ -1,0 +1,107 @@
+#0 building with "market-watch-ubuntu" instance using docker-container driver
+
+#1 [internal] load build definition from Dockerfile
+#1 transferring dockerfile: 510B done
+#1 DONE 0.0s
+
+#2 [context node:22-bookworm-slim] load metadata for docker.io/library/node:22-bookworm-slim@sha256:89b30bf5b6a8d1d0c7f0b1b77e12794a81924120740a724cd73bb270d3528f6c
+#2 DONE 0.0s
+
+#3 [context nginx:1.28-alpine] load metadata for docker.io/library/nginx:1.28-alpine@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592
+#3 DONE 0.0s
+
+#4 [internal] load .dockerignore
+#4 transferring context: 336B done
+#4 DONE 0.0s
+
+#5 [internal] load build context
+#5 ...
+
+#6 [context node:22-bookworm-slim] OCI load from client
+#6 resolve docker.io/library/node:22-bookworm-slim@sha256:89b30bf5b6a8d1d0c7f0b1b77e12794a81924120740a724cd73bb270d3528f6c 0.0s done
+#6 DONE 0.0s
+
+#7 [context nginx:1.28-alpine] OCI load from client
+#7 resolve docker.io/library/nginx:1.28-alpine@sha256:201aafcbd9cdd5385d5aaf610b45389944d8c2269c4a6f10e6fdf39f76cab592 0.0s done
+#7 DONE 0.0s
+
+#5 [internal] load build context
+#5 transferring context: 388.81kB 0.2s done
+#5 DONE 0.2s
+
+#8 [build 1/7] WORKDIR /app/web
+#8 CACHED
+
+#9 [build 2/7] COPY web/package*.json ./
+#9 CACHED
+
+#10 [build 3/7] RUN npm ci
+#10 CACHED
+
+#11 [build 4/7] COPY web/ ./
+#11 DONE 0.1s
+
+#12 [build 5/7] COPY advanced-host/ /app/advanced-host/
+#12 DONE 1.0s
+
+#13 [build 6/7] RUN npm run build
+#13 0.219
+#13 0.219 > market-watch-web@1.27.0 build
+#13 0.219 > tsc -b && vite build && node scripts/build-single-frontend.mjs && node scripts/build-mobile-shell.mjs
+#13 0.219
+#13 11.37 vite v6.4.3 building for production...
+#13 11.44 transforming...
+#13 15.67 ✓ 2110 modules transformed.
+#13 15.95 rendering chunks...
+#13 16.13 computing gzip size...
+#13 16.16 dist/index.html                                  0.55 kB │ gzip:   0.37 kB
+#13 16.16 dist/m/index.html                                0.63 kB │ gzip:   0.38 kB
+#13 16.16 dist/.vite/manifest.json                         1.89 kB │ gzip:   0.42 kB
+#13 16.16 dist/assets/desktop-qKyMmEfo.css                35.84 kB │ gzip:   8.09 kB
+#13 16.16 dist/assets/mobile-DXephDxU.css                189.00 kB │ gzip:  30.08 kB
+#13 16.16 dist/assets/MaintenanceDialog-BesA29dn.js        1.86 kB │ gzip:   1.17 kB
+#13 16.16 dist/assets/ExportDialog-BHhlHdir.js             4.27 kB │ gzip:   2.35 kB
+#13 16.16 dist/assets/HistoryCapacityDialog-XH0_Q1rC.js    5.04 kB │ gzip:   2.47 kB
+#13 16.16 dist/assets/HistoryPlansDialog-CsGKrkKK.js       7.38 kB │ gzip:   3.07 kB
+#13 16.16 dist/assets/desktop-DD2NWP53.js                 80.77 kB │ gzip:  27.73 kB
+#13 16.16 dist/assets/chartAlerts-C2utiEdg.js            394.95 kB │ gzip: 127.24 kB
+#13 16.16 dist/assets/mobile-ChhNF6zC.js                 525.84 kB │ gzip: 174.84 kB
+#13 16.16
+#13 16.16 (!) Some chunks are larger than 500 kB after minification. Consider:
+#13 16.16 - Using dynamic import() to code-split the application
+#13 16.16 - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+#13 16.16 - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+#13 16.16 ✓ built in 4.76s
+#13 16.98 Verified existing continuous native hooks
+#13 17.03 Verified native toolbar lifetime
+#13 18.07 Mobile shell 766be16284bede79: 6 public resources; native library excluded
+#13 DONE 18.7s
+
+#7 [context nginx:1.28-alpine] OCI load from client
+#7 CACHED
+
+#14 [stage-1 1/4] COPY --from=build /app/web/dist /usr/share/nginx/html
+#14 DONE 0.6s
+
+#15 [stage-1 2/4] COPY --from=build /app/web/src/app/MAGIC_UI_LICENSE.md /usr/share/nginx/html/MAGIC_UI_LICENSE.md
+#15 DONE 0.0s
+
+#16 [stage-1 3/4] COPY web/nginx.conf /etc/nginx/conf.d/default.conf
+#16 DONE 0.0s
+
+#17 exporting to oci image format
+#17 exporting layers
+#17 exporting layers 2.8s done
+#17 exporting manifest sha256:1a4e8d0d7eb9b46152c4c8903efcb2a1fc253ec57d09e0348ad2f97e17c4a069
+#17 exporting manifest sha256:1a4e8d0d7eb9b46152c4c8903efcb2a1fc253ec57d09e0348ad2f97e17c4a069 0.0s done
+#17 exporting config sha256:e1595b31173f1e15c6da6f625f0a9835d7ae8fc17abfe3397613db66879f6843 0.0s done
+#17 sending tarball
+#17 ...
+
+#18 importing to docker
+#18 DONE 0.0s
+
+#17 exporting to oci image format
+#17 sending tarball 3.0s done
+#17 DONE 5.8s
+{"task": "mw-managed-live-rollover-20261113", "tag": "market-watch-web:mobile-data-categories-20261115-r6", "builder": "market-watch-ubuntu"}

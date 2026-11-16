@@ -1,0 +1,84 @@
+{
+  "host": "Ubuntu local Docker",
+  "project": "mw-managed-live-rollover-20261113",
+  "url": "https://192.168.7.232:18447/m/watch",
+  "readOnly": true,
+  "readyz": 200,
+  "searches": [
+    {
+      "query": "300750 新浪财经",
+      "rows": [
+        {
+          "ticker": "MWP:AKSHARE:99000cdea79314675931de1860dc447b",
+          "code": "300750",
+          "source": "新浪财经",
+          "category": "深A",
+          "price": "前复权"
+        },
+        {
+          "ticker": "MWP:SINA-NATIVE:SZSE:300750",
+          "code": "300750",
+          "source": "新浪财经",
+          "category": "深A",
+          "price": "不复权"
+        }
+      ]
+    },
+    {
+      "query": "300750 腾讯财经",
+      "rows": [
+        {
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:300750",
+          "code": "300750",
+          "source": "腾讯财经",
+          "category": "深A",
+          "price": "不复权"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:300750",
+          "code": "300750",
+          "source": "腾讯财经",
+          "category": "深A",
+          "price": "前复权"
+        }
+      ]
+    },
+    {
+      "query": "300750 akshare",
+      "rows": [
+        {
+          "ticker": "MWP:AKSHARE:99000cdea79314675931de1860dc447b",
+          "code": "300750",
+          "source": "新浪财经",
+          "category": "深A",
+          "price": "前复权"
+        },
+        {
+          "ticker": "MWP:SINA-NATIVE:SZSE:300750",
+          "code": "300750",
+          "source": "新浪财经",
+          "category": "深A",
+          "price": "不复权"
+        },
+        {
+          "ticker": "MWP:TENCENT-NATIVE:SZSE:300750",
+          "code": "300750",
+          "source": "腾讯财经",
+          "category": "深A",
+          "price": "不复权"
+        },
+        {
+          "ticker": "MWP:TENCENT:SZSE:300750",
+          "code": "300750",
+          "source": "腾讯财经",
+          "category": "深A",
+          "price": "前复权"
+        }
+      ]
+    }
+  ],
+  "downloadManifest": 200,
+  "apkVersion": "0.1.3",
+  "apkIntegrity": "passed",
+  "pageErrors": []
+}

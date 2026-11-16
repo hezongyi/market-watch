@@ -1,0 +1,67 @@
+{
+  "observedAt": "2026-11-13T17:15:54.383182+00:00",
+  "task": "mw-mobile-data-workflow-20261113",
+  "refresh": [
+    {
+      "source": "fxcm",
+      "partition": "all",
+      "status": "complete",
+      "count": 517,
+      "last_success": 1794590162105
+    },
+    {
+      "source": "akshare",
+      "partition": "a",
+      "status": "complete",
+      "count": 5223,
+      "last_success": 1794590163830
+    },
+    {
+      "source": "akshare",
+      "partition": "hk",
+      "status": "complete",
+      "count": 2808,
+      "last_success": 1794590173991
+    },
+    {
+      "source": "akshare",
+      "partition": "futures",
+      "status": "complete",
+      "count": 83,
+      "last_success": 1794590194621
+    }
+  ],
+  "catalogs": [
+    {
+      "source": "oanda",
+      "total": 127,
+      "configured": true
+    },
+    {
+      "source": "binance",
+      "total": 3742,
+      "configured": true
+    },
+    {
+      "source": "yahoo",
+      "total": 8108,
+      "configured": true
+    },
+    {
+      "source": "dukascopy",
+      "total": 1504,
+      "configured": true
+    },
+    {
+      "source": "akshare",
+      "total": 8114,
+      "configured": true
+    },
+    {
+      "source": "fxcm",
+      "total": 517,
+      "configured": true
+    }
+  ],
+  "ready": "ready"
+}
