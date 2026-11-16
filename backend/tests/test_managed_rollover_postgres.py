@@ -115,7 +115,8 @@ def test_fixed_reader_arriving_during_cleanup_is_fenced_and_rejects_trimmed_inpu
 
     def observed(_conn, _cursor, statement, _params, _context, _many):
         if (threading.current_thread().name.startswith("fixed-reader")
-                and "market_datasets" in statement and "FOR UPDATE" in statement):
+                and "market_datasets" in statement
+                and ("FOR UPDATE" in statement or "FOR SHARE" in statement)):
             reader_waiting.set()
 
     monkeypatch.setattr(window, "_plan", pause_after_reference_snapshot)
