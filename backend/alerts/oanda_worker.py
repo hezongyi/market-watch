@@ -385,6 +385,8 @@ def confirm_pages(adapter, ownership, epoch, identities, cancelled):
     """
     def fetch(identity, window):
         with lane("realtime"):
+            if isinstance(adapter, OandaPractice):
+                return adapter.page(identity, *window, cancelled=cancelled)
             return adapter.page(identity, *window)
 
     values = confirmation_candidates(identities)

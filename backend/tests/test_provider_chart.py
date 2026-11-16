@@ -768,7 +768,7 @@ def test_oanda_queued_current_cursor_recovers_only_explicit_future_to(monkeypatc
 
 @pytest.mark.parametrize('status,body,explicit,attempts', [
     (400, {'errorMessage': 'Invalid price'}, True, 1),
-    (401, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, True, 1),
+    (401, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, True, 3),
     (400, None, True, 1),
     (400, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, False, 1),
     (400, {'errorMessage': "Invalid value specified for 'to'. Time is in the future"}, True, 2),
@@ -788,6 +788,8 @@ def test_oanda_future_to_fallback_is_single_and_does_not_mask_other_errors(
         with pytest.raises(httpx.HTTPStatusError):
             provider.native_page(META, 'M1', observed - 100 if explicit else observed + 1, 5, client=client)
     assert len(calls) == attempts
+    if status == 401:
+        assert all(params == calls[0] for params in calls), "401 must not change the requested window"
     if attempts == 2:
         assert 'to' in calls[0] and 'to' not in calls[1]
 

@@ -200,5 +200,5 @@ def test_invalid_account_fails_before_catalog_and_logs_no_credentials(payload, s
             adapter.catalog()
         if isinstance(failure.value, MarketRequestError):
             assert failure.value.result.status == "unauthorized"
-    assert paths == ["/v3/accounts"]
+    assert paths == ["/v3/accounts"] * (3 if status == 401 else 1)
     assert not any(secret in caplog.text for secret in ("test-secret", "selected-account", "private upstream content"))

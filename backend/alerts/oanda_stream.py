@@ -4,6 +4,7 @@ import codecs
 import json
 import logging
 import time
+from contextlib import ExitStack
 from datetime import datetime
 from decimal import Decimal, InvalidOperation
 
@@ -18,6 +19,8 @@ from .market_contracts import (
     failed_request,
 )
 from .market_resources import cooldown, request_slot
+from .oanda_auth import AuthRetry
+from .provider_deadline import deadline_transport, effective_deadline, request_deadline
 from .provider_transport import (
     activity,
     client_for_key,
@@ -169,28 +172,41 @@ class OandaPractice:
     def headers(self):
         return {"Authorization": "Bearer " + self.token, "Accept-Datetime-Format": "UNIX"}
 
-    def rest_get(self, url, **kwargs):
+    def rest_get(self, url, *, operation="account", deadline=None, cancelled=None, **kwargs):
         # Each operation redirects old handles after failure; concurrent readers
         # finish their own generation before its pool is closed.
-        with activity(self.rest) as client:
-            try:
-                if self.owns_rest:
-                    kwargs['timeout'] = httpx.Timeout(15, connect=5)
-                return client.get(url, **kwargs)
-            except httpx.TransportError as error:
-                if self.owns_rest and retryable_network_error(error):
-                    discard_client(client)
-                raise
+        deadline = effective_deadline(deadline if deadline is not None else time.monotonic() + 15)
+        retry = AuthRetry(operation=operation, token=self.token, account=self.account_id,
+                          deadline=deadline, cancelled=cancelled)
+        while True:
+            retry.check()
+            with request_slot("oanda", deadline=deadline, cancelled=cancelled):
+                retry.check()
+                with activity(self.rest) as client, request_deadline(deadline):
+                    try:
+                        if self.owns_rest:
+                            remaining = deadline - time.monotonic()
+                            kwargs['timeout'] = httpx.Timeout(remaining, connect=min(5, remaining))
+                        response = client.get(url, **kwargs)
+                    except httpx.TransportError as error:
+                        if self.owns_rest and retryable_network_error(error):
+                            discard_client(client)
+                        raise
+            retry.observe(response)
+            if response.status_code != 401:
+                return response
+            response.close()
+            if not retry.wait():
+                return response
 
     def catalog(self):
         trace, response = TransportTrace(), None
         try:
             # A token can authorize several accounts. Validate the explicitly
             # configured account; never select the first account implicitly.
-            with request_slot("oanda"):
-                trace.phase, trace.route = "request", "upstream"
-                response = self.rest_get("https://api-fxpractice.oanda.com/v3/accounts",
-                    headers=self.headers, extensions={"trace": trace})
+            trace.phase, trace.route = "request", "upstream"
+            response = self.rest_get("https://api-fxpractice.oanda.com/v3/accounts",
+                operation="accounts", headers=self.headers, extensions={"trace": trace})
             response.raise_for_status()
             payload = response.json()
             accounts = payload.get("accounts") if isinstance(payload, dict) else None
@@ -200,11 +216,10 @@ class OandaPractice:
                 raise ValueError("Invalid OANDA account list")
             if self.account_id not in {row["id"] for row in accounts}:
                 raise MarketRequestError(RequestResult(status="unauthorized"))
-            with request_slot("oanda"):
-                trace.phase, trace.route = "request", "upstream"
-                response = self.rest_get(
-                    "https://api-fxpractice.oanda.com/v3/accounts/" + self.account_id + "/instruments",
-                    headers=self.headers, extensions={"trace": trace})
+            trace.phase, trace.route = "request", "upstream"
+            response = self.rest_get(
+                "https://api-fxpractice.oanda.com/v3/accounts/" + self.account_id + "/instruments",
+                operation="instruments", headers=self.headers, extensions={"trace": trace})
             response.raise_for_status()
             items = response.json()["instruments"]
             if not isinstance(items, list):
@@ -215,10 +230,9 @@ class OandaPractice:
             raise
 
     def _account_json(self, endpoint, *, params=None):
-        with request_slot('oanda'):
-            response = self.rest_get(
-                'https://api-fxpractice.oanda.com/v3/accounts/' + self.account_id + '/' + endpoint,
-                headers=self.headers, params=params)
+        response = self.rest_get(
+            'https://api-fxpractice.oanda.com/v3/accounts/' + self.account_id + '/' + endpoint,
+            operation=endpoint, headers=self.headers, params=params)
         response.raise_for_status()
         return response.json()
 
@@ -288,7 +302,7 @@ class OandaPractice:
             events.close()
         raise TimeoutError('Account stream probe did not observe all requested symbols')
 
-    def page(self, identity, start, end):
+    def page(self, identity, start, end, *, cancelled=None):
         if (identity.source, identity.environment, identity.channel, identity.basis) != (
                 "oanda", "practice", "v20", "bid"):
             raise ValueError("OANDA practice BID identity required")
@@ -300,14 +314,14 @@ class OandaPractice:
             raise ValueError("Use at most 4000 UTC M1 candles per request")
         trace, response = TransportTrace(), None
         try:
-            with request_slot("oanda"):
-                trace.phase, trace.route = "request", "upstream"
-                response = self.rest_get(
-                    f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
-                    f"/instruments/{identity.provider_symbol}/candles",
-                    headers=self.headers, params={"granularity": "M1", "price": "B",
-                        "smooth": "false", "from": str(Decimal(start) / 1000),
-                        "to": str(Decimal(end) / 1000)}, extensions={"trace": trace})
+            trace.phase, trace.route = "request", "upstream"
+            response = self.rest_get(
+                f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
+                f"/instruments/{identity.provider_symbol}/candles",
+                operation="candles", cancelled=cancelled,
+                headers=self.headers, params={"granularity": "M1", "price": "B",
+                    "smooth": "false", "from": str(Decimal(start) / 1000),
+                    "to": str(Decimal(end) / 1000)}, extensions={"trace": trace})
             response.raise_for_status()
             raw = response.json()
             if raw.get("instrument", identity.provider_symbol) != identity.provider_symbol:
@@ -364,12 +378,11 @@ class OandaPractice:
             raise ValueError("Native price confirmation alignment mismatch")
         if not 0 <= start < end <= self.clock():
             return None
-        with request_slot("oanda"):
-            response = self.rest_get(
-                f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
-                f"/instruments/{source.provider_symbol}/candles", headers=self.headers,
-                params={"granularity": "D", **native, "smooth": "false",
-                        "from": str(Decimal(start) / 1000), "to": str(Decimal(end) / 1000)})
+        response = self.rest_get(
+            f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
+            f"/instruments/{source.provider_symbol}/candles", operation="daily_candles", headers=self.headers,
+            params={"granularity": "D", **native, "smooth": "false",
+                    "from": str(Decimal(start) / 1000), "to": str(Decimal(end) / 1000)})
         response.raise_for_status()
         raw = response.json()
         if raw.get("instrument") != source.provider_symbol or raw.get("granularity") != "D":
@@ -395,6 +408,20 @@ class OandaPractice:
                 **row.model_dump(include={"open", "high", "low", "close"})}
 
     def stream(self, identities, *, epoch, stopped=None):
+        retry = AuthRetry(operation="pricing_stream", token=self.token, account=self.account_id,
+                          deadline=time.monotonic() + 15, cancelled=stopped)
+        while True:
+            if stopped and stopped():
+                return
+            retry.check()
+            try:
+                yield from self._stream_once(identities, epoch=epoch, stopped=stopped, retry=retry)
+                return
+            except httpx.HTTPStatusError as error:
+                if retry.accepted or error.response.status_code != 401 or not retry.wait():
+                    raise
+
+    def _stream_once(self, identities, *, epoch, stopped, retry):
         decoder = NDJSONDecoder()
         sequence = 0
         trace = TransportTrace()
@@ -406,16 +433,24 @@ class OandaPractice:
         # its own pool, closed on every exit, including partial iteration.
         client = self.stream_client
         if client is None:
-            client = httpx.Client(proxy=self.proxy, trust_env=False,
-                timeout=httpx.Timeout(15, connect=5), limits=httpx.Limits(max_connections=1))
+            remaining = max(0.001, retry.deadline - time.monotonic())
+            limits = httpx.Limits(max_connections=1)
+            client = httpx.Client(trust_env=False,
+                timeout=httpx.Timeout(15, connect=min(5, remaining)),
+                limits=limits, transport=deadline_transport(proxy=self.proxy, limits=limits))
             self.stream_client = client
 
         try:
-            with client.stream("GET",
-                    f"https://stream-fxpractice.oanda.com/v3/accounts/{self.account_id}/pricing/stream",
-                    headers=self.headers, params={"instruments": ",".join(sorted(identities)),
-                                                  "snapshot": "true"},
-                    extensions={"trace": trace}) as response:
+            with ExitStack() as opened:
+                with request_slot("oanda", deadline=retry.deadline, cancelled=stopped):
+                    retry.check()
+                    with request_deadline(retry.deadline):
+                        response = opened.enter_context(client.stream("GET",
+                            f"https://stream-fxpractice.oanda.com/v3/accounts/{self.account_id}/pricing/stream",
+                            headers=self.headers, params={"instruments": ",".join(sorted(identities)),
+                                                          "snapshot": "true"},
+                            extensions={"trace": trace}))
+                retry.observe(response)
                 response.raise_for_status()
                 for chunk in response.iter_bytes():
                     if stopped and stopped():

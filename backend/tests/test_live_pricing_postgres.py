@@ -82,7 +82,10 @@ def test_controlled_rest_fault_uses_real_commit_fence_and_shared_budget(provider
     factory, _ = provider_pg
     monkeypatch.setattr(live.settings, "oanda_acquisition_mode", "rest_batch")
     monkeypatch.setattr(live, "now_ms", lambda: 125000)
-    monkeypatch.setattr(market_resources, "now_ms", lambda: 125000)
+    # Authentication retries need a moving admission clock so slots expire.
+    # The single-request 429 case fixes it to assert its exact cooldown boundary.
+    if status == "rate_limited":
+        monkeypatch.setattr(market_resources, "now_ms", lambda: 125000)
     monkeypatch.setattr(live.settings, "oanda_recovery_minutes", 2)
     monkeypatch.setattr(live.settings, "oanda_resident_symbols", "EUR_USD,XAU_USD")
     live.ensure_catalog([
@@ -127,7 +130,7 @@ def test_controlled_rest_fault_uses_real_commit_fence_and_shared_budget(provider
         assert all(not state.ready for state in db.scalars(select(LiveState)))
         owner = db.get(PricingOwner, ownership[0])
         assert owner.error == ("unauthorized" if status == "unauthorized" else None)
-    assert 1 <= len(calls) <= (2 if status == "unauthorized" else 1)
+    assert len(calls) == (6 if status == "unauthorized" else 1)
     if status == "unauthorized":
         live.disconnected(ownership, epoch, identities, result, now=125000)
         assert live.claim("fault-contract-account", now=999999) is None

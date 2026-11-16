@@ -15,6 +15,7 @@ import httpx
 from .chart_data import FRAMES, bounds
 from .config import settings
 from .domain import Calendar, session_bounds
+from .oanda_auth import AuthRetry
 from .provider_capabilities import SOURCES, fresh_seconds, request_seconds, versions
 from .provider_capabilities import frames as source_frames
 from .provider_deadline import request_deadline
@@ -186,6 +187,8 @@ def _request(client, url, *, params, headers=None, deadline):
         record_timing("upstream_decode", decode_started)
         return payload
     max_attempts = 3 if source == "oanda" else 2
+    auth = AuthRetry(operation="chart_candles", token=settings.oanda_token,
+                     account=settings.oanda_account_id, deadline=deadline)
     for attempt in range(max_attempts):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
@@ -226,6 +229,12 @@ def _request(client, url, *, params, headers=None, deadline):
                     raise
                 finally:
                     record_timing("upstream_http", http_started)
+            auth.observe(response)
+            if response.status_code == 401:
+                response.close()
+                if attempt < max_attempts - 1 and auth.wait():
+                    continue
+                response.raise_for_status()
             if (response.status_code not in (429, 502, 503, 504) or attempt == max_attempts-1
                     or source == "binance" and response.status_code == 429):
                 response.raise_for_status()

@@ -52,6 +52,43 @@ def test_stream_quotes_survive_confirmation_fault_without_confirming_minutes(run
     assert row["confirmation_error"] is None and row["candle_ready"]
 
 
+def test_transient_401_confirms_once_without_persisting_authentication_hold(running, monkeypatch):
+    from alerts.market_resources import lane
+
+    factory, ownership, epoch, identities = running
+    monkeypatch.setattr(settings, "oanda_acquisition_mode", "stream")
+    identity = identities["EUR_USD"]
+    live.publish_event(ownership, epoch, quote(identity, epoch), identities, now=125000)
+    calls = []
+
+    def respond(request):
+        calls.append(str(request.url))
+        if len(calls) == 1:
+            return httpx.Response(401)
+        return httpx.Response(200, json={"instrument": "EUR_USD", "granularity": "M1",
+            "candles": [{"time": str(at), "complete": True,
+                "bid": {"o": "1.1", "h": "1.2", "l": "1.0", "c": "1.1"}, "volume": 7}
+                for at in (0, 60)]})
+
+    with httpx.Client(transport=httpx.MockTransport(respond)) as client:
+        adapter = OandaPractice(token="test", account_id="test-account", rest_client=client,
+                                clock=lambda: 125000)
+        with lane("realtime"):
+            batch = adapter.page(identity, 0, 120000)
+        assert batch.result.status == "data"
+        live.commit_confirmation(ownership, epoch, batch, now=125000)
+    assert len(calls) == 2 and calls[0] == calls[1]
+    row = next(r for r in live.snapshots(now=125000) if r["dataset_id"] == identity.key)
+    assert row["candle_ready"] and not row["authentication_hold"]
+    assert row["confirmation_error"] is None
+    with factory.begin() as db:
+        assert db.get(PricingOwner, ownership[0]).error is None
+        state = db.get(LiveState, identity.key)
+        assert state.confirmed_end == 120000 and state.next_confirm_at < 425000
+        revisions = list(db.scalars(select(SourceMinuteRevision)))
+        assert len(revisions) == 2
+
+
 def test_collect_keeps_publishing_after_confirmation_401(running, monkeypatch):
     _, ownership, _, identities = running
     monkeypatch.setattr(settings, "oanda_acquisition_mode", "stream")
@@ -214,7 +251,8 @@ def test_bootstrap_catalog_success_cannot_release_hold_when_stream_denies(runnin
         adapter = OandaPractice(token="test", account_id="test-account",
             rest_client=client, stream_client=client)
         assert worker.probe_authentication(adapter, probe) is None
-    assert calls[-1].endswith("/pricing/stream") and len(calls) == 3
+    assert calls[:2] == ["/v3/accounts", "/v3/accounts/test-account/instruments"]
+    assert calls[2:] == ["/v3/accounts/test-account/pricing/stream"] * 3
     with factory.begin() as db:
         assert db.get(PricingOwner, ownership[0]).error == "unauthorized"
 

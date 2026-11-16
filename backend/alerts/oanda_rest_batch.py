@@ -23,7 +23,7 @@ from pydantic import (
 )
 
 from .market_contracts import CandleBatch, DatasetIdentity, MinuteRow, RequestResult
-from .market_resources import cooldown, request_slot
+from .market_resources import cooldown
 from .native_series import BASES, OandaParameters, interval_end
 from .oanda_stream import OandaPractice, TransportTrace, timestamp
 from .provider_deadline import request_deadline
@@ -383,19 +383,19 @@ class OandaRestBatch(OandaPractice):
         deadline = deadline if deadline is not None else time.monotonic() + 15
         trace, response = TransportTrace(), None
         try:
-            with request_slot("oanda", deadline=deadline, cancelled=cancelled):
-                if cancelled and cancelled():
-                    raise TimeoutError("Candle demand was superseded")
-                if deadline is not None and time.monotonic() >= deadline:
-                    raise TimeoutError("Candle request deadline expired")
-                params = {**specs[0].group_parameters,
-                    "smooth": str(specs[0].parameters.smooth).lower(),
-                    "candleSpecifications": ",".join(sorted(spec.wire for spec in specs))}
-                trace.phase, trace.route = "request", "upstream"
-                with request_deadline(deadline):
-                    response = self.rest_get(
-                        f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}/candles/latest",
-                        headers=self.headers, params=params, extensions={"trace": trace})
+            if cancelled and cancelled():
+                raise TimeoutError("Candle demand was superseded")
+            if deadline is not None and time.monotonic() >= deadline:
+                raise TimeoutError("Candle request deadline expired")
+            params = {**specs[0].group_parameters,
+                "smooth": str(specs[0].parameters.smooth).lower(),
+                "candleSpecifications": ",".join(sorted(spec.wire for spec in specs))}
+            trace.phase, trace.route = "request", "upstream"
+            with request_deadline(deadline):
+                response = self.rest_get(
+                    f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}/candles/latest",
+                    operation="candles_latest", deadline=deadline, cancelled=cancelled,
+                    headers=self.headers, params=params, extensions={"trace": trace})
             response.raise_for_status()
             return normalize_latest(response.json(), specs, generation=generation, sequence=sequence,
                 demand_revision=demand_revision, requested_at=requested_at, received_at=self.clock())
@@ -429,23 +429,23 @@ class OandaRestBatch(OandaPractice):
         deadline = deadline if deadline is not None else time.monotonic() + 15
         trace, response = TransportTrace(), None
         try:
-            with request_slot("oanda", deadline=deadline, cancelled=cancelled):
-                if cancelled and cancelled():
-                    raise TimeoutError("Candle confirmation was superseded")
-                with request_deadline(deadline):
-                    response = self.rest_get(
-                        f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
-                        f"/instruments/{spec.provider_symbol}/candles",
-                        headers=self.headers,
-                        params={
-                            "granularity": "M1",
-                            "price": spec.parameters.price,
-                            "smooth": str(spec.parameters.smooth).lower(),
-                            "from": str(Decimal(start) / 1000),
-                            "to": str(Decimal(end) / 1000),
-                        },
-                        extensions={"trace": trace},
-                    )
+            if cancelled and cancelled():
+                raise TimeoutError("Candle confirmation was superseded")
+            with request_deadline(deadline):
+                response = self.rest_get(
+                    f"https://api-fxpractice.oanda.com/v3/accounts/{self.account_id}"
+                    f"/instruments/{spec.provider_symbol}/candles",
+                    operation="candles", deadline=deadline, cancelled=cancelled,
+                    headers=self.headers,
+                    params={
+                        "granularity": "M1",
+                        "price": spec.parameters.price,
+                        "smooth": str(spec.parameters.smooth).lower(),
+                        "from": str(Decimal(start) / 1000),
+                        "to": str(Decimal(end) / 1000),
+                    },
+                    extensions={"trace": trace},
+                )
             response.raise_for_status()
             raw = response.json()
             if raw.get("instrument", spec.provider_symbol) != spec.provider_symbol:
