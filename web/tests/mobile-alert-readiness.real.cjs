@@ -63,8 +63,9 @@ const out=process.env.MW_ALERT_UI_OUTPUT||'/tmp/mw-alert-readiness-20261116/depl
       await expect(page.locator('.mobile-app')).toHaveCSS('background-color',theme==='dark'?'rgb(16, 19, 23)':'rgb(248, 249, 252)');
       await shot(`list-${theme}-${width}`);
       await row.locator('.alert-rule-open').click();const detail=page.getByRole('dialog',{name:'规则详情',exact:true});
-      await expect(detail.getByText(/^(最近|上次)检查$/).first()).toBeVisible();
+      await expect(detail.getByText(/^(最近|上次)检查$/, {exact:true})).toBeVisible();
       await expect(detail.getByText('最近判定',{exact:true}).first()).toBeVisible();
+      await expect(detail.locator('.alert-detail-summary')).toContainText(`${selected.count}/${selected.max_triggers} 次`);
       await expect(detail.getByRole('button',{name:'排查信息',exact:true})).toHaveAttribute('aria-expanded','false');
       await shot(`detail-${theme}-${width}`);
       await detail.getByRole('button',{name:'关闭',exact:true}).click();await expect(detail).toHaveCount(0);

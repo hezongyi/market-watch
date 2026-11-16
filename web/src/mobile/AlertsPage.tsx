@@ -4,7 +4,6 @@ import {
   Plus,
   Search,
   ChevronRight,
-  RefreshCw,
   Archive,
   Activity,
   X,
@@ -757,6 +756,7 @@ export default function AlertsPage({
                               <div className="alert-rule-status">
                                 <span
                                   data-attention={state.attention || undefined}
+                                  data-state={state.key}
                                 >
                                   <i data-state={state.key} />
                                   {state.label}
@@ -765,7 +765,7 @@ export default function AlertsPage({
                                   <small>{state.message}</small>
                                 )}
                                 {checked && !state.attention && (
-                                  <small>
+                                  <small className="alert-rule-checked">
                                     {monitor.verified ? "最近检查" : "上次检查"}{" "}
                                     {stamp(checked)}
                                   </small>
@@ -859,14 +859,6 @@ export default function AlertsPage({
                   { value: "all", label: "全部未归档" },
                 ]}
               />
-              <Button
-                variant="outline"
-                disabled={!online || busy}
-                onClick={() => void refresh()}
-              >
-                <RefreshCw data-icon="inline-start" />
-                刷新规则
-              </Button>
               <Button onClick={() => setFiltersOpen(false)}>查看规则</Button>
             </FieldGroup>
           </MobileSheet>
@@ -904,6 +896,19 @@ export default function AlertsPage({
                 <h3 className="alert-condition-title">
                   {selected.condition_summary}
                 </h3>
+                <div className="alert-detail-summary" aria-label="规则设置">
+                  <span>
+                    {selected.config.mode === "close"
+                      ? `${selected.config.timeframe} 收盘确认`
+                      : "实时抽样触价"}
+                  </span>
+                  <span>{selected.count}/{selected.max_triggers} 次</span>
+                  <span>
+                    {selected.config.expires_at
+                      ? `${stamp(selected.config.expires_at)} 到期`
+                      : "不限到期"}
+                  </span>
+                </div>
                 {status.message && (
                   <div className="alert-issue">
                     <p>{status.message || "等待服务器建立观察基准"}</p>
@@ -948,28 +953,6 @@ export default function AlertsPage({
                             monitor.verified
                           ? ` · 等待 ${selected.config.timeframe} 收盘数据`
                           : ""}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>判定方式</dt>
-                    <dd>
-                      {selected.config.mode === "close"
-                        ? `${selected.config.timeframe} 收盘确认`
-                        : "实时抽样触价"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>已触发</dt>
-                    <dd>
-                      {selected.count}/{selected.max_triggers} 次
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>到期</dt>
-                    <dd>
-                      {selected.config.expires_at
-                        ? stamp(selected.config.expires_at)
-                        : "不限到期"}
                     </dd>
                   </div>
                   <div>
