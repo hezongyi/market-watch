@@ -141,6 +141,66 @@ const assert = require("node:assert/strict"),
     execution: { state: "preparing", label: "准备中" },
   };
   assert.equal(ruleState(row).label, "准备中");
+  const waiting = {
+    ...row,
+    effective_at: now - 120000,
+    runtime: { needs_baseline: false },
+    health_reason: "等待来源确认或聚合发布。",
+    execution: {
+      state: "preparing",
+      reason_code: "observed_minute_unconfirmed",
+      taken_over_at: now - 100000,
+      last_checked_at: now,
+      last_evaluated_at: now - 60000,
+      last_outcome: "initial_baseline",
+      message: "等待来源确认或聚合发布。",
+    },
+  };
+  for (const reason_code of [
+    "observed_minute_unconfirmed",
+    "confirmation_aggregation_pending",
+    "confirmation_window_pending",
+  ]) {
+    const state = ruleState({ ...waiting, execution: { ...waiting.execution, reason_code } }, healthy, now);
+    assert.equal(state.label, "监控中", "normal close preparation stays monitoring after a baseline");
+    assert.equal(state.message, undefined, "normal preparation does not become an issue banner");
+    assert.equal(state.attention, false);
+  }
+  for (const execution of [
+    { last_evaluated_at: null },
+    { last_evaluated_at: waiting.effective_at - 1 },
+    { taken_over_at: null },
+    { reason_code: "awaiting_recovery_baseline" },
+    { reason_code: "new_unknown_reason" },
+  ]) {
+    assert.equal(ruleState({ ...waiting, execution: { ...waiting.execution, ...execution } }).label,
+      "准备中", "initial/recovery/unknown preparation must not claim established monitoring");
+  }
+  for (const runtime of [{ needs_baseline: true }, { incident: { opened_at: now - 1000 } }]) {
+    assert.equal(ruleState({ ...waiting, runtime }).label, "准备中");
+  }
+  for (const [state, reason_code, label] of [
+    ["blocked", "observed_minute_unconfirmed", "需处理"],
+    ["recovering", "confirmation_source_unavailable", "等待数据"],
+    ["recovering", "confirmation_query_failed", "等待数据"],
+  ]) {
+    const result = ruleState({ ...waiting, execution: { ...waiting.execution, state, reason_code } }, healthy, now);
+    assert.equal(result.label, label, "overdue input and real source failures remain visible");
+    assert.ok(result.message);
+  }
+  assert.equal(ruleState({ ...waiting, execution: { ...waiting.execution, last_checked_at: now - 61000 } }, healthy, now).label,
+    "判定未推进");
+  assert.equal(ruleState(waiting, absent, now).label, "服务未开启");
+  const waitingDelivery = ruleState({ ...waiting, execution: { ...waiting.execution,
+    notification: { status: "delivery_error", message: "推送失败" } } });
+  assert.equal(waitingDelivery.label, "监控中");
+  assert.equal(waitingDelivery.message, "推送失败");
+  assert.equal(waitingDelivery.attention, true);
+  const waitingPhone = ruleState({ ...waiting, execution: { ...waiting.execution,
+    phone_configuration: { reason_code: "phone_topic_missing", message: "手机通知未配置" } } });
+  assert.equal(waitingPhone.label, "监控中");
+  assert.equal(waitingPhone.message, "手机通知未配置");
+  assert.equal(waitingPhone.attention, true);
   assert.equal(
     ruleState({ ...row, execution: { state: "closed" } }).attention,
     false,

@@ -967,15 +967,17 @@ export default function AlertsPage({
                     <dd>{stamp(selected.last_triggered_at)}</dd>
                   </div>
                 </dl>
-                {selected.execution?.last_gap && (
-                  <p className="alert-gap">
-                    {selected.execution.last_gap.unrecoverable
-                      ? "曾中断，部分时段无法补判"
-                      : "曾有数据缺口"}{" "}
-                    · {stamp(selected.execution.last_gap.start)} —{" "}
-                    {stamp(selected.execution.last_gap.end)}
-                  </p>
-                )}
+                {selected.execution?.last_gap &&
+                  (selected.execution.last_gap.unrecoverable ||
+                    status.key !== "monitoring") && (
+                    <p className="alert-gap">
+                      {selected.execution.last_gap.unrecoverable
+                        ? "曾中断，部分时段无法补判"
+                        : "曾有数据缺口"}{" "}
+                      · {stamp(selected.execution.last_gap.start)} —{" "}
+                      {stamp(selected.execution.last_gap.end)}
+                    </p>
+                  )}
                 {actionError && (
                   <p role="alert" className="mobile-inline-error">
                     {actionError}
@@ -1092,6 +1094,11 @@ export default function AlertsPage({
                       预期输入: stamp(
                         (selected.execution as any)?.expected_input_at,
                       ),
+                      ...(selected.execution?.last_gap
+                        ? {
+                            排查区间: `${stamp(selected.execution.last_gap.start)} — ${stamp(selected.execution.last_gap.end)}`,
+                          }
+                        : {}),
                       修订: selected.config.composite_revision_id || "历史来源",
                       推送状态:
                         selected.execution?.notification?.message ||
