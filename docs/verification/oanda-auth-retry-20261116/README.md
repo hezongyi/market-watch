@@ -41,4 +41,12 @@ python3 deploy/ubuntu/mw_docker.py preview stop --task mw-oanda-auth-retry-20261
 
 ## 部署范围
 
-现有 `mw-dev` / 18443 未更新，Unraid 未触碰。此证据仅代表隔离候选；未合并、未打正式 tag、未发布生产。私人日志、数据库口令及 token 均留在仓库外。
+用户随后明确要求常规验收直接使用开发实例，已将 `f0ff440a` 部署到 Ubuntu `mw-dev` / https://192.168.7.232:18443/m/ 。仅替换四个后端服务，镜像 `sha256:774d763b56856e0de21260ced23e8d2d5f8c4c1bee586d3ebd0911964b73eceb`；Web/APK 0.1.4 无变更。启动/停止使用 `mw-dev up` / `mw-dev stop`，launcher 和 backup helper 已核对指向当前配置和 `dev_mobile_20261116`。
+
+[开发部署证据](development-deployment.json)：严格 TLS、ready/login、四个服务的七份源码逐字节一致；148 个品种配置、13 个维护配置、两条规则及版本/生命周期、图表偏好、241 个稳定 preference key 与部署前一致。更新前保存约 1.1GB 一致性 pg_dump，未恢复/重建库、未改 schema；旧镜像及 run.json、launcher 保留于私有更新目录。
+
+2026-11-16 14:23:15—14:24:55 UTC 五次采样：启动后先处于连接恢复，随后四品种 quote/candle ready，序号与确认 M1 推进。跨连接 epoch 序号会重置，推进判断只比较本次已连接阶段。告警后台心跳推进；两条既有规则生命周期未改变，不宣称活动规则或通知实收。
+
+本次捕获真实握手 401：14:23:13 首次 401，14:23:15 第二次 200；随后正常更新。较早一次 401 后重试遇到总预算内超时，后台按原机制再连。证明观察到了自然 401 的短重试恢复，不能证明全天或永久消除上游认证故障。
+
+开发实例当前数据/凭据/供源/通知策略保留，Unraid 未触碰。未合并、未打正式 tag、未发布生产。私人日志、数据库口令及 token 均留在仓库外。
