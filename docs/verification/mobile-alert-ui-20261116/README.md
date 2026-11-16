@@ -31,3 +31,19 @@ Ubuntu 本机 Docker `mw-dev`：<https://192.168.7.232:18443/m/alerts>。本次�
 私有更新记录、旧运行配置和启动器位于 `~/.local/share/market-watch-dev/updates/mobile-alert-ui-20261116/`。`mw-dev status` 查看、`mw-dev up` 启动、`mw-dev stop` 停止。回退前确认没有后续部署，再用 `before-run.json` 重建 web 并重启 tls，恢复 `before-mw-dev` 启动器；不需恢复数据库。
 
 本次为 WebView 页面更新，无需重新安装 APK。Android 真机触控、系统键盘和锁屏通知实收不由本次浏览器验收证明；后台业务能力沿用上一轮已验证基线。本任务不涉及 Unraid、合并或正式 tag。
+
+## 追加验收：正常收盘等待保持监控中
+
+代码提交 `8a68c774`。M5 收盘后等待分钟确认、聚合或窗口证明，是后台监控流程的正常阶段。手机列表和详情在本次运行已接管且有有效判定/基准记录、无需恢复基准且无未恢复事件时保持“监控中”，不再短暂切成准备中或展示普通等待区间。详细原因与区间仍可展开排查查看。后台算法、查询、等待期限及审计未变。
+
+首次准备、未知原因、真实来源故障、超过期限后的需处理、规则停滞、服务心跳失效、离线待确认，以及手机通知配置/投递错误继续如实显示。不可补判的真实历史缺口不隐藏。
+
+- `node tests/mobile-alert-view.cjs` 通过，覆盖正常等待及上述边界。
+- 完整 `npm run build` 通过，手机 shell `108ab7e02460701c`。
+- `MOBILE_ALERT_READINESS=1 MOBILE_ALERT_OUTPUT=/tmp/mw-alert-steady-monitor-20261116 node tests/mobile-alerts.browser.cjs` 通过，375px 浅色14px、412px深色21px；验证列表/详情状态、等待提示消失、按需排查及真实缺口保留，页面错误为空。摘要 `steady-monitor-checks.json`，代表截图 `normal-close-wait-detail-{light,dark}.png`。
+- Ubuntu 持久开发实例只读浏览器验证通过，页面错误和业务写请求为空，见 `steady-monitor-deployed-ui.json`。浏览器截图用于 UI 验证；严格 CA 验证由独立 HTTPS 检查完成。
+- 严格 HTTPS、已部署 shell 与本机构建一致，3条规则配置、版本、状态、控制修订、次数和运行编号前后相等。2026-11-16 22:38 UTC 当前启用规则实际 monitoring，后台心跳新鲜，见 `steady-monitor-deployment.json`。正常等待转换的边界由 HTTP 夹具覆盖，未修改真实规则制造该状态。
+
+本次仅更新 web 镜像为 `sha256:170512f6491d3de0f55ab94dbd96666e12050cd06fffbaa743c11616f757d1e9`，并重启 TLS 代理以解析 web 新地址；后台和数据库未重启。地址仍为 <https://192.168.7.232:18443/m/alerts>，启动/停止/状态仍使用 `mw-dev up`、`mw-dev stop`、`mw-dev status`。
+
+本补丁的私有配置和前态另存在 `~/.local/share/market-watch-dev/updates/mobile-alert-steady-monitor-20261116/`，没有覆盖上一轮回退记录。回退前确认没有后续部署，使用该目录 `before-run.json` 重建 web、重启 tls，并恢复 `before-mw-dev`；无需数据库回退。APK无需重装，在更多中检查更新应用网页版本。
