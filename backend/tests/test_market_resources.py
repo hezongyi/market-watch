@@ -56,6 +56,7 @@ def test_chart_reads_do_not_wait_for_watchlist_or_backfill_reservations(database
 
 def test_source_cooldown_yields_immediately_instead_of_spending_request_budget(database, monkeypatch):
     import time
+
     import pytest
     from alerts import market_resources as resources
     from alerts.storage import Preference

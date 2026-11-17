@@ -1,23 +1,28 @@
 """Shared cooldown and durable resumption against an isolated PostgreSQL schema."""
 import os
+
 import pytest
 from alerts import provider_chart as upstream
 from alerts.config import settings
-from test_provider_cache import META, page
-from test_provider_postgres import provider_pg
-from test_fxcm_history import fxcm_config
+from test_fxcm_history import fxcm_config as fxcm_config
+from test_provider_cache import META
+from test_provider_postgres import provider_pg as provider_pg
 
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated PostgreSQL')
 
 
 def test_cooldown_releases_worker_and_resumes_durable_history(provider_pg, monkeypatch):
-    from test_market_resources import test_source_cooldown_yields_immediately_instead_of_spending_request_budget
+    from test_market_resources import (
+        test_source_cooldown_yields_immediately_instead_of_spending_request_budget,
+    )
     factory, _ = provider_pg
     test_source_cooldown_yields_immediately_instead_of_spending_request_budget(factory, monkeypatch)
 
 
 def test_durable_history_recovery_at_cooldown_end(provider_pg, monkeypatch):
-    from test_native_history_loads import test_cooling_source_waits_until_eligible_without_spending_stall_budget
+    from test_native_history_loads import (
+        test_cooling_source_waits_until_eligible_without_spending_stall_budget,
+    )
     factory, _ = provider_pg
     monkeypatch.setattr(settings, 'native_history_max_bars', 80000)
     monkeypatch.setattr(upstream, 'metadata', lambda _: META)
@@ -25,12 +30,16 @@ def test_durable_history_recovery_at_cooldown_end(provider_pg, monkeypatch):
 
 
 def test_subscription_schedules_cooldown_end(provider_pg, monkeypatch):
-    from test_provider_service import test_cooling_subscription_schedules_recovery_at_source_retry_time
+    from test_provider_service import (
+        test_cooling_subscription_schedules_recovery_at_source_retry_time,
+    )
     factory, _ = provider_pg
     test_cooling_subscription_schedules_recovery_at_source_retry_time(factory, monkeypatch)
 
 
 def test_bad_native_page_evidence_survives_later_pages(provider_pg, fxcm_config, monkeypatch):
-    from test_provider_fxcm import test_paged_bad_record_evidence_is_retained_without_erasing_other_pages
+    from test_provider_fxcm import (
+        test_paged_bad_record_evidence_is_retained_without_erasing_other_pages,
+    )
     factory, _ = provider_pg
     test_paged_bad_record_evidence_is_retained_without_erasing_other_pages(factory, fxcm_config, monkeypatch)

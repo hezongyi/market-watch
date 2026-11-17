@@ -24,7 +24,7 @@ Dukascopy JSON3 probes using the real pinned SDK headers return completed native
 
 ## Verification
 
-Local adapter/cache/deadline/worker regressions:292 passed. Isolated PostgreSQL provider/native-history/shared-admission contracts:42 passed. Final candidate deployment and chart verification are recorded below after execution.
+Final adapter/cache/deadline/worker regressions:326 passed. Isolated PostgreSQL provider/native-history/shared-admission contracts:43 passed. All changed Python files pass Ruff. Final candidate deployment and chart verification are recorded below.
 
 Helper build: `adapters/fxcm/Dockerfile`, private context contains `history.cpp` and the existing licensed ForexConnect1.6.5 `sdk/include` and `sdk/lib`; build via `mw-docker build`, task `mw-native-provider-bars-20261117`, project `mw-dev`, purpose `acceptance`. No SDK files or credentials are committed.
 
@@ -39,3 +39,13 @@ Helper build: `adapters/fxcm/Dockerfile`, private context contains `history.cpp`
 - Final expanded regression:326 passed; final isolated PostgreSQL run:43 passed, including preservation of quality evidence from multiple pages. Later historical pages now retain earlier FXCM warning records (deduplicated and bounded), instead of overwriting them.
 
 Private task configuration snapshots, container/image manifests, rollback references and provider evidence remain outside Git. Entry: `https://quant.kookvv.com:8443/m/`, Ubuntu Docker project `mw-dev`, LAN HTTPS18443. No APK changes and no Unraid deployment. Original rule versions and notification/user preferences were fingerprinted before/after; web, PostgreSQL, TLS and ntfy containers were preserved.
+
+### Final deployed version and repeat verification
+
+- Runtime source commit: `e1c8cad6`. API/data-worker/market-runtime/notification-worker image: `sha256:c0e225615071343f7b6960f3326936237ce6c21ce796980d6f2ce9cb350a0a4f`.
+- Private helper image: `sha256:c83a0d7c7d0e6a64707080e37b42aa3e5edb21b4e06abedb1d5835b3c8ad8948`; deployed binary SHA256: `0078a61ad20583de3cf5dc6d3e480a4f159c7e6b6e89818f684795593105301d`.
+- Final actual M1 widget, approximately20:00–20:01 UTC: close107.272→107.259, volume33→209. Final D1 widget: close107.271→107.242, volume411393→411667. Both displayed272 bars with no JS errors or business writes. M1 rollover is separately demonstrated by the earlier19:47→19:49 UTC observation; the final100s sample demonstrates an updating current bar, not a second rollover.
+- Final original300-month request:297 returned native bars, current month present, invalid2011 supplier row preserved in quality evidence; no page-wide failure. Returned count is not an assertion that every requested source record was valid or unique.
+- `acceptance-final.json` records explicit chart-update and original-reproduction assertions. `verify-final.py` verifies running module hashes, image, service preservation and unchanged business fingerprints; final output is retained as `deployed-checks.json` in the private evidence directory above.
+- Start/status/stop: `mw-dev up`, `mw-dev status`, `mw-dev stop`. Private deployment and rollback references: `deployment-final.json`, `run.pre.json`, `run.pre-final.json` in that evidence directory. Configuration backups contain credentials and must not be published.
+- Subsequent acceptance-document and test-import cleanup does not change runtime modules and requires no image rebuild.
