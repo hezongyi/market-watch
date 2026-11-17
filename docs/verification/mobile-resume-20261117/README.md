@@ -20,4 +20,14 @@ F0：兼容的手机端会话、行情恢复及显示逻辑；无 schema、服�
 
 原有 `chart-stream-native.browser.cjs` 在未修改的基线 runtime 也失败（固定旧 generation 推送时，native 已重建为另一 generation）；本轮新建的真实许可手机图表用例等待当前订阅后验收。此旧测试失败不冒充通过。
 
-浏览器测试使用明确行情夹具，不代表供应商实盘或 OPPO/ColorOS 锁屏实测。开发实例部署、真实行情和下载链路证据待补。
+浏览器测试使用明确行情夹具，不代表供应商实盘或 OPPO/ColorOS 锁屏实测。
+
+## 开发实例验收
+
+已部署到持久开发实例 `mw-dev`：`https://192.168.7.232:18443`。仅替换 Web 容器，API、行情采集、数据 worker、通知 worker、Postgres、ntfy 和下载目录挂载保持原实例不变。当前 Web 镜像为 `sha256:cc312beed291b887f22ec52f35623613660475c0c35e2f547fb4c2126b8eb036`，提交 `da4ecc7d`；回退使用部署前 Web 镜像 `sha256:e4ebb262013a9a5de2990ff05131760cefc02b5bf2532453edf912d4f321d9e5`，配置副本和入口保存在开发实例私有更新目录。
+
+严格使用开发 CA 验证了 `/readyz`、`/m/` 和 `/downloads/android-update.json` 均为 200，APK 清单保持 `Cache-Control: no-store`。真实浏览器（412px 移动视口）登录后观察到 6 个自选项和 6 条 sparkline；模拟断网时列表和图表 iframe 保留，恢复后请求重新发起且页面无错误。真实图表验证 iframe 数量恢复前后均为 1，说明图表实例没有被销毁重建。
+
+只读状态显示 API、pricing、chart-alert loop 和通知运行角色均健康；当前没有 active 告警规则。OANDA 实时状态为 connected、quote/forming bar 新鲜且无认证错误。部署前后的服务器容器未重启。本次通用 smoke 中的 Yahoo 探测返回 503，通知测试因已有测试状态返回 409；两者均未由本次 Web 变更修改，未重复触发写入测试。
+
+真机锁屏、切换 App 后的 OPPO/ColorOS 行为仍需人工验收；本次明确保持后台手机连接暂停，回前台快速同步，服务器行情采集和后台告警不依赖 App 存活。
