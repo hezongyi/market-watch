@@ -55,8 +55,16 @@ def fixed_snapshot(db, ident, metadata):
               "data_end": last["end"] if last else None}
     if last:
         result["lp"] = float(last["close"])
-        session_start, _ = bucket_bounds(instant(last["start"]), "D1", Calendar(metadata["calendar"]))
-        before = int(session_start.timestamp() * 1000)
+        native_daily = metadata["calendar"] == Calendar.SOURCE_DATE
+        if native_daily:
+            # Source-date D1 is already a trading-day observation. Its bounds
+            # cannot be inferred from M1 sessions; W1/MN are not daily quotes.
+            if frame != "D1":
+                return result
+            before = last["start"]
+        else:
+            session_start, _ = bucket_bounds(instant(last["start"]), "D1", Calendar(metadata["calendar"]))
+            before = int(session_start.timestamp() * 1000)
         try:
             previous_page = chart_page(db, ident, "D1", before=before, count=1)
         except ValueError:
@@ -66,9 +74,19 @@ def fixed_snapshot(db, ident, metadata):
             and bar.get("source_confirmed") is True]
         if previous_bars:
             daily = previous_bars[-1]
-            closing_page = chart_page(db, ident, "M1", before=daily["end"], count=1)
-            closing = closing_page.get("bars", [])
-            previous = confirmed_daily_close(daily, closing[-1]) if closing else None
+            if native_daily:
+                # The supplier confirms a native daily close directly. Requiring
+                # a synthetic closing minute would discard valid daily history.
+                try:
+                    previous = Decimal(str(daily["close"])) if daily.get("complete") is True else None
+                except (InvalidOperation, TypeError, ValueError):
+                    previous = None
+                if previous is not None and (not previous.is_finite() or previous <= 0):
+                    previous = None
+            else:
+                closing_page = chart_page(db, ident, "M1", before=daily["end"], count=1)
+                closing = closing_page.get("bars", [])
+                previous = confirmed_daily_close(daily, closing[-1]) if closing else None
             try:
                 price = Decimal(str(last["close"]))
             except (InvalidOperation, TypeError, ValueError):

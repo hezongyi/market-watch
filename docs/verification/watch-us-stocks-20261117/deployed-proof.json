@@ -1,0 +1,69 @@
+{
+  "at": "2026-11-17T18:24:17.220Z",
+  "base": "https://quant.kookvv.com:8443",
+  "environment": "Ubuntu Docker mw-dev; mobile browser viewport, trusted TLS",
+  "quotes": [
+    {
+      "ticker": "MWH:d834ef58-a084-4b1f-a4bc-d5a0fac9cc74",
+      "status": "ok",
+      "code": "NVDA",
+      "description": "NVDA · 英伟达 · 自建 · Yahoo Finance · 前复权 · 历史数据时间 2026-11-16 00:00:00 UTC",
+      "price": 156.13999939,
+      "change": -4.1203601219883526,
+      "reference": 162.8500061,
+      "resolution": "D1"
+    },
+    {
+      "ticker": "MWH:21c42276-4cc8-416b-b010-4fae093540e3",
+      "status": "ok",
+      "code": "QQQ",
+      "description": "QQQ · Invesco 纳斯达克 100 ETF · 自建 · Yahoo Finance · 前复权 · 历史数据时间 2026-11-16 00:00:00 UTC",
+      "price": 661.75,
+      "change": -2.6680807570527834,
+      "reference": 679.89001465,
+      "resolution": "D1"
+    },
+    {
+      "ticker": "MWH:837b9df3-27ae-4238-9b32-1e7eb7943599",
+      "status": "ok",
+      "code": "SPY",
+      "description": "SPY · SPDR 标普 500 ETF · 自建 · Yahoo Finance · 前复权 · 历史数据时间 2026-11-16 00:00:00 UTC",
+      "price": 739.95001221,
+      "change": -1.9115265722765349,
+      "reference": 754.36999512,
+      "resolution": "D1"
+    }
+  ],
+  "streamTasks": [
+    {
+      "id": "4d1502f29698c8941d6d3b12cb43d2a8fbb47553991d6a0212bac02639767c69",
+      "sequence": 1,
+      "type": "quotes",
+      "status": "ok",
+      "code": "NVDA"
+    },
+    {
+      "id": "d00f6957c7f0fed03742bb24efeb68667f1f9bd8c894e3d75b9c6e8eaffc3e51",
+      "sequence": 1,
+      "type": "quotes",
+      "status": "ok",
+      "code": "SPY"
+    },
+    {
+      "id": "23f12575fadb5f74d5ea3d7d14894aab35b9505471293de18c044fec2033c444",
+      "sequence": 1,
+      "type": "quotes",
+      "status": "ok",
+      "code": "QQQ"
+    }
+  ],
+  "rendered": "NVDA\n英伟达\n自建\nYahoo\n暂无日内数据\n-4.12%\n156.13999939\nQQQ\nInvesco 纳斯达克 100 ETF\n自建\nYahoo\n暂无日内数据\n-2.67%\n661.75000000\nSPY\nSPDR 标普 500 ETF\n自建\nYahoo\n暂无日内数据\n-1.91%\n739.95001221",
+  "captures": [
+    "after-light-412-100.png",
+    "after-light-375-150.png",
+    "after-dark-412-100.png",
+    "after-dark-375-150.png"
+  ],
+  "errors": [],
+  "writes": []
+}
