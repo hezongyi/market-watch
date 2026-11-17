@@ -18,6 +18,7 @@ const server=http.createServer(async(req,res)=>{
   healthReads++;if(holdHealth)await new Promise(resolve=>releaseHealth=resolve);
   return failHealth?json({detail:'健康状态暂时不可用'},503):json(healthResult);
  }
+ if(url.pathname==='/api/settings/notifications')return json({system_quiet_enabled:true,quiet_start:'23:00',quiet_end:'07:00',timezone:'Asia/Shanghai'});
  if(url.pathname==='/api/settings/notification-transport')return json({url:'https://ntfy.example',topic:'fixture-topic',enabled:true,token_configured:false,revision:0,last_test_id:'fixture-test'});
  if(url.pathname==='/api/notification-tests/fixture-test')return json({status:'server_accepted',outbox_status:'accepted',attempts:1,ack_at:null});
  if(url.pathname==='/api/advanced-charts/preferences')return json([]);

@@ -90,7 +90,7 @@ const server=http.createServer(async(req,res)=>{
  await page.screenshot({path:path.join(out,'notification-app-event.png')});await close();
  await enter('/alerts?signal=event-2');await expect(page.getByRole('dialog',{name:'触发详情'})).toBeVisible();await expect(page).toHaveURL(/signal=event-2$/);await close();
  await enter('/alerts?signal=event-2');await expect(page.getByRole('dialog',{name:'触发详情'})).toBeVisible();await close();
- await enter('/more?panel=notifications');await expect(page.getByLabel('订阅主题',{exact:true})).toHaveValue('fixture-topic');
+ await enter('/more?panel=notifications');await page.getByRole('button',{name:/接收设置/}).click();await expect(page.getByLabel('订阅主题',{exact:true})).toHaveValue('fixture-topic');
  await expect(page.getByRole('switch',{name:'运行通知夜间静默',exact:true})).toBeChecked();
  await page.getByRole('switch',{name:'运行通知夜间静默',exact:true}).click();
  await expect.poll(()=>policy.system_quiet_enabled).toBe(false);

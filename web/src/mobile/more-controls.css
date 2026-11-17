@@ -278,15 +278,61 @@
   }
 }
 
-.mobile-more .ntfy-enable { display:flex; align-items:center; gap:16px; }
-.mobile-more .ntfy-enable > div { flex:1; min-width:0; }
-.mobile-more .ntfy-enable label { font-weight:600; }
-.mobile-more .ntfy-enable p { margin-top:5px; }
-.mobile-more .ntfy-settings [data-slot="field"] { gap:8px; }
-.mobile-more .ntfy-settings input { width:100%; min-width:0; }
-.mobile-more .ntfy-test-actions { display:flex; flex-wrap:wrap; gap:8px; }
-.mobile-more .ntfy-test-actions button { flex:1; min-width:8em; }
-.mobile-more .ntfy-test-result { border-left:2px solid var(--quiet-line); padding:4px 0 4px 12px; font-size:.928571rem; }
-.mobile-more .ntfy-test-result strong { font-size:.857143rem; color:var(--muted); font-weight:400; }
-.mobile-more .ntfy-test-result p { margin:5px 0; line-height:1.6; }
-.mobile-more .ntfy-test-result button { min-height:44px; padding-inline:0; color:var(--muted); }
+/* Notification settings use the same quiet rows and touch sizing as More. */
+.mobile-more .ntfy-settings { gap: 0; }
+.mobile-more .ntfy-settings :is(.ntfy-enable, .ntfy-policy) { padding-block: 18px; border-bottom: 1px solid var(--quiet-line); }
+.mobile-more .ntfy-settings [data-slot="field"][data-orientation="horizontal"] { flex-direction: row; align-items: center; gap: 20px; }
+.mobile-more .ntfy-settings [data-slot="field-content"] { min-width: 0; gap: 5px; }
+.mobile-more .ntfy-settings [data-slot="field-label"] { font-size: 1rem; font-weight: 500; line-height: 1.5; }
+.mobile-more .ntfy-settings :is([data-slot="field-description"], .more-description) { font-size: .857143rem; line-height: 1.65; }
+.mobile-more .ntfy-settings [data-slot="field"] { gap: 8px; }
+.mobile-more .ntfy-settings input { width: 100%; min-width: 0; min-height: 48px; font-size: 1rem; }
+.mobile-more .ntfy-settings .ntfy-enable { padding-top: 0; }
+.mobile-more .ntfy-policy-note { margin-top: 8px; }
+.mobile-more .ntfy-policy-error { margin-top: 8px; }
+.mobile-more .ntfy-connection { border-bottom: 1px solid var(--quiet-line); }
+.mobile-more .ntfy-disclosure[data-variant] { gap: 16px; padding-block: 17px; text-align: left; }
+.mobile-more .ntfy-disclosure > span { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.mobile-more .ntfy-disclosure strong { font-size: 1rem; line-height: 1.5; font-weight: 500; color: var(--text); }
+.mobile-more .ntfy-disclosure small { font-size: .857143rem; font-weight: 400; line-height: 1.65; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.mobile-more .ntfy-disclosure > svg { flex: none; }
+.mobile-more .ntfy-connection-fields { padding-block: 4px 14px; gap: 18px; }
+.mobile-more .ntfy-token-state { margin-left: auto; margin-right: 8px; font-size: .857143rem; }
+.mobile-more .ntfy-token [data-slot="field"] { padding-block: 4px 8px; }
+.mobile-more .ntfy-test { padding-block: 20px 16px; }
+.mobile-more .ntfy-section-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.mobile-more .ntfy-section-heading h3 { margin: 0; font-size: 1rem; line-height: 1.5; font-weight: 500; }
+.mobile-more .ntfy-section-heading > span { color: var(--muted); font-size: .785714rem; line-height: 1.5; }
+.mobile-more .ntfy-test-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+.mobile-more .ntfy-test-actions > button { flex: 1; min-width: 0; }
+.mobile-more .ntfy-check { margin: 10px 0 0; }
+.mobile-more .ntfy-test-result { margin-top: 18px; display: flex; flex-direction: column; gap: 7px; }
+.mobile-more .ntfy-result-heading { display: flex; gap: 10px; align-items: center; }
+.mobile-more .ntfy-result-heading > svg { width: 20px; height: 20px; flex: none; color: var(--muted); }
+.mobile-more .ntfy-result-heading > div { flex: 1; min-width: 0; }
+.mobile-more .ntfy-result-heading small { color: var(--muted); font-size: .785714rem; line-height: 1.5; }
+.mobile-more .ntfy-result-heading p { margin: 3px 0 0; font-size: .928571rem; line-height: 1.6; }
+.mobile-more .ntfy-test-result[data-result="confirmed"] .ntfy-result-heading > svg { color: var(--accent); }
+.mobile-more .ntfy-test-result[data-result="failed"] .ntfy-result-heading > svg { color: var(--down); }
+.mobile-more .ntfy-result-actions { display: flex; flex-wrap: wrap; gap: 4px 12px; }
+.mobile-more .ntfy-result-actions button[data-variant] { min-height: 44px; padding: 8px 0; color: var(--muted); }
+.mobile-more button.ntfy-records[data-variant] { display: flex; justify-content: flex-start; gap: 10px; width: 100%; padding: 14px 0; border-top: 1px solid var(--quiet-line); border-radius: 0; font-size: .928571rem; }
+.mobile-more button.ntfy-records > svg:first-child { color: var(--muted); }
+.mobile-more button.ntfy-records > svg:last-child { margin-left: auto; color: var(--muted); }
+.mobile-more .ntfy-help-content { display: flex; flex-direction: column; gap: 10px; padding-bottom: 12px; }
+.mobile-more .ntfy-save-bar { position: sticky; bottom: 0; display: flex; flex-direction: column; gap: 10px; padding-block: 12px; background: var(--surface); border-top: 1px solid var(--quiet-line); }
+.mobile-more .ntfy-save-actions > span { flex: 1; font-size: .857143rem; color: var(--muted); line-height: 1.5; }
+.mobile-more .ntfy-save-actions > button { min-width: 8em; }
+.mobile-more .ntfy-loading { display: flex; flex-direction: column; gap: 18px; }
+.mobile-more .ntfy-loading-row { height: 70px; }
+@media (prefers-reduced-motion: reduce) {
+  .mobile-more .ntfy-loading [data-slot="skeleton"] { animation: none; }
+}
+
+.mobile-more .mobile-control-drawer .ntfy-settings button.more-environment-trigger[data-variant] { padding-inline: 0; border-radius: 0; }
+.mobile-more .mobile-control-drawer .ntfy-settings button.ntfy-records[data-variant] { padding-inline: 0; border-top-color: var(--quiet-line); border-radius: 0; }
+.mobile-more .mobile-control-drawer .ntfy-result-actions button[data-variant] { padding-inline: 0; min-height: 44px; }
+
+.mobile-more .ntfy-save-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px 16px; }
+.mobile-more .ntfy-save-error { display: flex; flex-direction: column; gap: 8px; }
+.mobile-more .ntfy-save-error p { margin: 0; }
