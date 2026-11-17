@@ -139,6 +139,7 @@ function acceptMarketBars(sub,event) {
   const receipts=(event.provider_acceptance || []).filter(row=>acceptedStarts.has(row.start));
   const state=marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || ''));
   if(state){
+    if(event.as_of!=null && acceptedTimes.size===rows.length)state.observed_at=event.as_of;
     if(receipts.length)state.provider_acceptance=mergeProviderAcceptance(state.provider_acceptance,receipts);
     if(event.loaded_before!=null && acceptedTimes.size===rows.length)state.last=event.loaded_before;
     if(event.history_revision!=null)state.history_revision=event.history_revision;
@@ -3181,6 +3182,21 @@ function completeRequest(m) {
 }
 async function update(m) {
   if (disposed) return;
+  if (m.type === 'mobile-market-resume' && mobileMode && ready && !loading) {
+    // Rebuild demand from the candles actually accepted by the native chart,
+    // not a transport cursor that may have advanced before drawing completed.
+    // The shared backend replays the tail or requests history recovery if the
+    // outage exceeds its replay window. Keep the widget and viewport intact.
+    for (const sub of subscriptions.values()) {
+      if (!sub.marketListener || sub.marketPaused ||
+          !hasHistoryViewer({instrument:sub.symbol,timeframe:frames[sub.res]})) continue;
+      compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
+      if (sub.needsHistoryReload) void recoverMarketBar(sub);
+      else registerMarketBar(sub);
+    }
+    void indicatorCoordinator?.sync();
+    return;
+  }
   if(m.type==='history-load-capacity' || m.type==='history-load-admitted') {
     if(m.type==='history-load-admitted' && m.history_client!==clientId) return;
     requestPolicy.capacity(m.available,m.type==='history-load-admitted' ? m.id : undefined);

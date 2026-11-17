@@ -346,6 +346,7 @@ export default function WatchPage({
   const currentQuotes = useRef(quotes);
   currentQuotes.current = quotes;
   const sparkReload = useRef<(() => void) | undefined>(undefined);
+  const pageVisible = useRef(visible); pageVisible.current = visible;
   const lastSparkTrigger = useRef(0);
   const preparedHistory = useMemo(() => new Map<string, number>(), [profile.origin, profile.subject]);
   const currentSparks = useRef(sparks);
@@ -544,6 +545,7 @@ export default function WatchPage({
       }));
     const received = new Set<string>();
     let ready = false,
+      hasOpened = false,
       openedAt: number | null = null,
       snapshotEpoch = 0;
     let snapshot: AbortController | undefined;
@@ -552,8 +554,15 @@ export default function WatchPage({
         return;
       const next = { ...currentQuotes.current };
       for (const row of rows) {
-        if (!visibleRows.includes(row.n) || (!streamed && received.has(row.n)))
+        if (!visibleRows.includes(row.n))
           continue;
+        const previous = next[row.n];
+        const clock = (quote: Quote | undefined) => quote?.v?.read_at ??
+          quote?.v?.quote_time ?? quote?.v?.data_end ?? quote?.v?.data_start;
+        const at = clock(row), before = clock(previous);
+        const ordered = Number.isFinite(at) && Number.isFinite(before);
+        if (ordered && at < before || !streamed && received.has(row.n) &&
+            !(ordered && at > before)) continue;
         if (streamed) received.add(row.n);
         next[row.n] = row;
       }
@@ -594,11 +603,16 @@ export default function WatchPage({
         ++snapshotEpoch;
         setAligned(new Set());
       } else if (!ready || openedAt !== state.openedAt) {
+        const recovering = hasOpened;
+        hasOpened = true;
         ready = true;
         openedAt = state.openedAt;
         received.clear();
         setAligned(new Set());
         loadSnapshot();
+        // Refill the entire curve after a transport outage. A live tail alone
+        // cannot replace the missing observations between two visits.
+        if (recovering && pageVisible.current) sparkReload.current?.();
       }
     });
     for (const args of subscriptions)

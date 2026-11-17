@@ -240,5 +240,22 @@ const {sparklineLoader,sparklinePaths,sparklineScale,sparklineMinimumRange,spark
   const closed={...liveItem,display_state:'closed'};
   assert.strictEqual(sparklineWithQuote(closed,{s:'ok',v:{fetch_status:'ok',quote_time:100,lp:5}},200),closed,'closed display stays blue and does not accept quote tails');
 
+  // A preparation can outlive a newer observation poll. Its older complete
+  // response must not roll the recovered curve back to an earlier tail.
+  let observation=100,releasePreparation,merged;
+  const orderedItem={...liveItem,ticker:'MWP:ORDER',window_end:10000,status:'partial',previous_close_price:'1'};
+  const orderedLoader=sparklineLoader(async()=>({as_of:observation,items:[orderedItem]}),
+    items=>{for(const item of items)merged=mergeSparkline(merged,item,300);},error=>{throw error;},{
+      prepared:new Map(),request:()=>new Promise(resolve=>releasePreparation=resolve),
+    });
+  const preparing=orderedLoader.load([{ticker:'MWP:ORDER'}]);
+  await new Promise(resolve=>setImmediate(resolve));
+  observation=200;const observing=orderedLoader.load([{ticker:'MWP:ORDER'}]);
+  await new Promise(resolve=>setImmediate(resolve));
+  releasePreparation({as_of:150,preparation:'ready',items:[{...orderedItem,points:[orderedItem.points[0]]}]});
+  await Promise.all([preparing,observing]);
+  assert.equal(merged.as_of,200,'late history preparation cannot overwrite a newer complete observation');
+  assert.equal(merged.points.length,orderedItem.points.length);orderedLoader.cancel();
+
   console.log('PASS mobile sparklines: bounded batches/concurrency, deduplication, abort/late replies, window expiry and gaps');
 })().catch(error=>{console.error(error);process.exitCode=1;});

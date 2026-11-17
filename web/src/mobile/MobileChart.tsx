@@ -72,6 +72,7 @@ export default forwardRef<
   const callbacks = useRef({ report, theme, rememberSymbol });
   callbacks.current = { report, theme, rememberSymbol };
   const visibility = useRef(visible); visibility.current = visible;
+  const needsMarketRecovery = useRef(false);
   const selection = useRef({ prop: symbol, target: symbol, settled: false });
   if (selection.current.prop !== symbol) {
     selection.current.prop = symbol;
@@ -153,6 +154,7 @@ export default forwardRef<
   useEffect(() => {
     let stopped = false,
       instance: ChartAdapter | undefined;
+    let adapterReady = false;
     const previews = chartPreviews(profile);
     const local = Promise.all([
       readSnapshot<ChartDocument>(profile, "chart").catch(() => {
@@ -300,7 +302,12 @@ export default forwardRef<
             else pendingHistory.delete(message.id);
             setHistoryLoads(pendingHistory.size);
           } else if (message.type === "ready") {
+            adapterReady = true;
             setReady(true);
+            if (needsMarketRecovery.current && visibility.current) {
+              needsMarketRecovery.current = false;
+              updateChart({ type: "mobile-market-resume" });
+            }
           } else if (message.type === "mobile-shell-ready") {
             setShellReady(true);
           } else if (message.type === "mobile-display-pending") {
@@ -389,6 +396,20 @@ export default forwardRef<
     const unsubscribeCapacity = subscribeHistoryLoadCapacity((available) =>
       updateChart({ type: "history-load-capacity", available }),
     );
+    let opened = false, connected = false;
+    const stopObserving = connection.observe(state => {
+      if (state.state !== "open") { connected = false; return; }
+      if (connected) return;
+      connected = true;
+      if (opened) {
+        needsMarketRecovery.current = true;
+        if (visibility.current && adapterReady) {
+          needsMarketRecovery.current = false;
+          updateChart({ type: "mobile-market-resume" });
+        }
+      }
+      opened = true;
+    });
     const manifestPath = document.querySelector<HTMLMetaElement>(
       'meta[name="mw-chart-manifest"]',
     )?.content;
@@ -420,6 +441,7 @@ export default forwardRef<
       leaveResult.current = undefined;
       setConfirmLeave(false);
       unsubscribeCapacity();
+      stopObserving();
       instance?.dispose();
       if (chart.current === instance) chart.current = null;
       for (const args of owned.values())
@@ -454,6 +476,10 @@ export default forwardRef<
       void chart.current?.update({ type: "mobile-command", action: "leave" });
     if (visible) preparation.foreground(symbol);
     if (visible) dispatchEvent(new Event("resize"));
+    if (visible && ready && needsMarketRecovery.current) {
+      needsMarketRecovery.current = false;
+      void chart.current?.update({ type: "mobile-market-resume" });
+    }
   }, [visible, ready, preparation, symbol]);
   useEffect(() => {
     if (ready)

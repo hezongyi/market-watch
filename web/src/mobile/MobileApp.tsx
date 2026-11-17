@@ -80,21 +80,28 @@ export default function MobileApp() {
     session = useRef<AbortController | undefined>(undefined),
     sessionAllowed = useRef(false),
     signingOut = useRef(false);
+  const verifiedSubject = useRef<string | undefined>(undefined);
+  const verified = Boolean(profile && verifiedSubject.current === profile.subject);
   useLayoutEffect(() => setLogProfile(profile), [profile?.origin, profile?.subject, profile?.generation]);
   const report = useCallback((value: string) => logEvent({module:"应用",action:"运行反馈",message:value,level:"warning"}), []);
   const scopedReports = useMemo(() => {
     const target = profile || profileFor(window.location.origin, "anonymous");
     return Object.fromEntries(["图表", "自选", "数据", "告警", "更多", "行情"].map(module => [module, (value: string) => logFailure(module, "运行反馈", value, undefined, target)]));
   }, [profile?.origin, profile?.subject, profile?.generation]);
-  const preparation = useMemo(() => profile && state === "online"
+  const preparation = useMemo(() => profile && verified
     ? mobileChartPreparation(profile) : undefined,
-    [profile?.origin, profile?.subject, profile?.generation, state === "online"]);
+    [profile?.origin, profile?.subject, profile?.generation, verified]);
   useEffect(() => {
     if (!preparation) return;
-    const visibility = () => preparation.visibility(document.hidden);
-    document.addEventListener("visibilitychange", visibility);
-    return () => { document.removeEventListener("visibilitychange", visibility); preparation.dispose(); };
+    return () => preparation.dispose();
   }, [preparation]);
+  useEffect(() => {
+    if (!preparation) return;
+    const visibility = () => preparation.visibility(document.hidden || state !== "online");
+    visibility();
+    document.addEventListener("visibilitychange", visibility);
+    return () => document.removeEventListener("visibilitychange", visibility);
+  }, [preparation, state]);
   useEffect(() => {
     preparation?.update(symbol, firstWatchSymbol, location.pathname === "/chart");
   }, [preparation, symbol, firstWatchSymbol, location.pathname]);
@@ -118,7 +125,7 @@ export default function MobileApp() {
   cachedPageHasProfile.current =
     ["/", "/data"].includes(location.pathname) && Boolean(profile);
   useEffect(() => {
-    if (!profile || state !== "online") {
+    if (!profile || !verified) {
       setConnection(undefined);
       return;
     }
@@ -127,7 +134,7 @@ export default function MobileApp() {
     return () => {
       void value.dispose().catch(() => {});
     };
-  }, [profile?.origin, profile?.subject, state, scopedReports]);
+  }, [profile?.origin, profile?.subject, profile?.generation, verified, scopedReports]);
   const flush = useCallback(async () => {
     await chart.current?.flush();
   }, []);
@@ -170,12 +177,14 @@ export default function MobileApp() {
       const result = await api("/session", undefined, controller.signal);
       if (token !== generation.current) return;
       setCsrf(result.csrf);
+      const firstSession = verifiedSubject.current !== result.subject;
+      verifiedSubject.current = result.subject;
       const value = profileFor(window.location.origin, result.subject);
       setProfile(value);
       setState("online");
       try {
         await rememberProfile(value.origin, value.subject, value);
-        await restore(
+        if (firstSession) await restore(
           value,
           () => token === generation.current && profileActive(value),
         );
@@ -186,6 +195,7 @@ export default function MobileApp() {
     } catch (error) {
       if (token !== generation.current || controller.signal.aborted) return;
       if (error instanceof ApiError && error.status === 401) {
+        verifiedSubject.current = undefined;
         invalidateProfile(window.location.origin);
         setCsrf("");
         setProfile(undefined);
@@ -227,6 +237,7 @@ export default function MobileApp() {
     })();
     const expire = () => {
       if (signingOut.current) return;
+      verifiedSubject.current = undefined;
       invalidateProfile(window.location.origin);
       ++generation.current;
       session.current?.abort();
@@ -307,6 +318,7 @@ export default function MobileApp() {
   async function logout() {
     if (signingOut.current) return;
     signingOut.current = true;
+    verifiedSubject.current = undefined;
     const token = ++generation.current;
     session.current?.abort();
     notices.runtime.pause();
@@ -423,7 +435,7 @@ export default function MobileApp() {
         ) : (
           <>
             {profile &&
-              state === "online" &&
+              verified &&
               connection &&
               symbol &&
               (chartOpened || location.pathname === "/chart") && (
@@ -447,7 +459,7 @@ export default function MobileApp() {
                   report={scopedReports["图表"]}
                 />
               )}
-            {location.pathname === "/chart" && state !== "online" && (
+            {location.pathname === "/chart" && state !== "online" && !verified && (
               <ChartEmpty
                 offline
                 title="等待连接图表"

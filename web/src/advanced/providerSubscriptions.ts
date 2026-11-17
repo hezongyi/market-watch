@@ -218,6 +218,16 @@ export function providerSubscriptions(
     };
   }
   return {
+    reconnect(client: string) {
+      if (disposed) return;
+      clearTimeout(retries.get(client));
+      retries.delete(client);
+      streams.get(client)?.close();
+      streams.delete(client);
+      // Keep desired registrations and their accepted cursors. The replacement
+      // stream re-registers them on open, just like an ordinary SSE reconnect.
+      open(client);
+    },
     established(instrument: string) {
       // Cross-tab hints always re-check authoritative metadata, never create.
       return Promise.all([...desired.values()].filter(args => {
