@@ -96,7 +96,7 @@ function pythonStudies(PineJS, catalog) {
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
-        format: swing || squeeze ? { type: "inherit" } : { type: "price", precision: 5 },
+        format: swing || squeeze || name === "LWMA" ? { type: "inherit" } : { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
         ...(name === "BBANDS" ? {filledAreas: [
           {id: "band_fill", objAId: "plot0", objBId: "plot2", type: "plot_plot",
@@ -130,7 +130,7 @@ function pythonStudies(PineJS, catalog) {
                 transparency: 0,
                 visible: !squeeze || s.key === 'sma',
                 ...(squeeze && s.key !== 'sma' ? {display:0} : {}),
-                color: squeeze ? '#2196f3' : swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#FFFFFF" : colors[i % colors.length],
+                color: squeeze ? '#2196f3' : swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#787b86" : colors[i % colors.length],
               },
             ]),
           ),
