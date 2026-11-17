@@ -91,6 +91,7 @@ def test_manual_test_bypasses_quiet_hours_and_delivery_off(database):
 def test_notification_click_enters_app_without_confirming_or_legacy_web_routes(database, monkeypatch):
     from urllib.parse import urlsplit, parse_qs
     monkeypatch.setattr(notify.settings, "public_url", "https://192.168.7.232:18443")
+    monkeypatch.setattr(notify.settings, "ntfy_callback_url", "https://quant.kookvv.com:8443/")
     save_transport(body())
     queued = api.send_notification_test()
     sent = []
@@ -100,6 +101,12 @@ def test_notification_click_enters_app_without_confirming_or_legacy_web_routes(d
     assert (link.scheme, link.netloc) == ("marketwatch", "notification")
     assert parse_qs(link.query) == {"server":["https://192.168.7.232:18443"], "page":["notifications"]}
     assert api.notification_test_result(queued["test_id"])["ack_at"] is None
+    action = sent[0]["actions"][0]
+    assert action["action"] == "http" and action["method"] == "POST"
+    assert action["label"] == "确认测试" and action["clear"] is True
+    assert action["url"] == f"https://quant.kookvv.com:8443/api/notification-tests/{queued['test_id']}/ack"
+    assert action["headers"]["Authorization"].startswith("Bearer ")
+    assert "Bearer" not in sent[0]["click"]
     # Explicit confirmation still uses the existing scoped HTTP action, separately from opening the app.
     assert sent[0]["actions"][0]["url"].endswith(f"/api/notification-tests/{queued['test_id']}/ack")
     assert parse_qs(urlsplit(notify.notification_link("signal", "event-1")).query)["signal"] == ["event-1"]

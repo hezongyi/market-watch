@@ -331,7 +331,7 @@ def send_notification_test():
         db.add(Audit(kind="notification_test_requested", details={"test_id": test_id}))
         note = Notification(kind="test", signal_id=None, status="pending", payload={
             "test_id": test_id, "transport_revision": transport["revision"], "title": "守望 · 手机通知测试",
-            "message": "这是你在工作台主动发送的测试通知，不是交易信号。点击打开工作台。",
+            "message": "手机通知测试。点击通知打开守望 App；点击“确认测试”回传已收到。",
             "test_authorized": True,
         })
         db.add(note)

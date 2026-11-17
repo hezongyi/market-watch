@@ -124,6 +124,7 @@ def claim():
             row.next_at = int(quiet_end.timestamp() * 1000)
             note.status = "quiet"
             return None
+        callback_url = (settings.ntfy_callback_url or settings.public_url).rstrip("/")
         token = secrets.token_urlsafe(32)
         # Keep attempt-scoped hashes: an earlier accepted request may have timed out.
         # Its confirmation button must remain usable even after a retry.
@@ -140,11 +141,11 @@ def claim():
                 hashes.append(token_hash)
             pref.value = {**pref.value, "token_hash": token_hash,
                           "token_hashes": hashes, "expires": now + 86400000}
-            ack_url = f"{settings.public_url}/api/notification-tests/{test_id}/ack"
+            ack_url = f"{callback_url}/api/notification-tests/{test_id}/ack"
             ack_label = "确认测试"
         else:
             db.add(AckGrant(token_hash=token_hash, notification_id=note.id))
-            ack_url = f"{settings.public_url}/api/notification-actions/{note.id}/ack"
+            ack_url = f"{callback_url}/api/notification-actions/{note.id}/ack"
             ack_label = "确认"
         row.status = "sending"
         row.lease_until = now + 60_000

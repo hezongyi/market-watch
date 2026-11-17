@@ -54,6 +54,8 @@ class Settings(BaseSettings):
     mcp_calls_per_minute: int = Field(default=60, ge=1, le=600)
     mcp_concurrency: int = Field(default=4, ge=1, le=16)
     public_url: str = "http://localhost:8000"
+    # Optional public HTTPS callback when the App uses a different server origin.
+    ntfy_callback_url: str = ""
     admin_password_hash: str = Field(default="", repr=False)
     cookie_secure: bool = True
     ntfy_url: str = "https://ntfy.sh"
