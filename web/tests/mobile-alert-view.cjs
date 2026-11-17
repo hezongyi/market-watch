@@ -177,6 +177,17 @@ const assert = require("node:assert/strict"),
   });
   assert.equal(delivery.label, "监控中");
   assert.equal(delivery.attention, true);
+  const completedDelivery = ruleState({ ...row, status: "completed",
+    last_notification: {status:"delivery_error",outbox_status:"blocked"} });
+  assert.equal(completedDelivery.label,"次数已用完");
+  assert.equal(completedDelivery.attention,true);
+  assert.equal(completedDelivery.issue,"delivery");
+  assert.equal(ruleState({...row,status:"completed",last_notification:{
+    status:"delivery_error",outbox_status:"blocked",ack_at:1}}).attention,false);
+  assert.equal(ruleState({...row,status:"expired",execution:{
+    state:"settling",settlement_pending:true}},healthy,now).label,"结算中");
+  assert.equal(ruleState({...row,status:"expired",execution:{
+    state:"expired",settlement_pending:false}},healthy,now).label,"已到期");
   assert.equal(
     eventHandled({
       notification_id: "n",

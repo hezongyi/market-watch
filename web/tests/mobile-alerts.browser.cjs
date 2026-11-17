@@ -434,6 +434,12 @@ const server = http.createServer(async (req, res) => {
         setRows:value=>{rows=value;}, setHealth:value=>{monitorHealth=value;}, datasetId, instrument, revision});
       return;
     }
+    if (process.env.MOBILE_ALERT_LIFECYCLE === '1') {
+      allowClose = true;
+      await require('./mobile-alert-lifecycle.scenario.cjs')({page, context, out, shot, close, refresh, choose, pick, errors,
+        setRows:value=>{rows=value;}, setEvents:value=>{events=value;}, event, datasetId, instrument, revision});
+      return;
+    }
     await shot("empty-375-dark");
     if (process.env.MOBILE_TAB_SWIPE === "1") {
       await require('./mobile-tab-swipe.helper.cjs').verifySwipeTabs({ page, context, root: page.locator('.alert-main-tabs'), full: true });

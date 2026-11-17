@@ -1,8 +1,10 @@
 const assert=require('node:assert/strict'),vm=require('node:vm'),{build}=require('esbuild');
 (async()=>{
- const built=await build({entryPoints:['src/mobile/alerts.ts'],bundle:true,write:false,format:'iife',globalName:'Alerts',platform:'browser'});
+ const built=await build({stdin:{contents:'export * from "./src/mobile/alerts"; export {ApiError} from "./src/api";',resolveDir:process.cwd()},bundle:true,write:false,format:'iife',globalName:'Alerts',platform:'browser'});
  const scope={AbortSignal,DOMException,Error,JSON,structuredClone,console,window:{},setTimeout,clearTimeout};vm.createContext(scope);vm.runInContext(built.outputFiles[0].text,scope);
- const {newPriceConfig,admission,savePriceRule,editablePrice}=scope.Alerts;
+ const {newPriceConfig,admission,savePriceRule,editablePrice,uncertainError,ApiError}=scope.Alerts;
+ assert.equal(uncertainError(new ApiError('invalid JSON',200,'INVALID_RESPONSE')),true);
+ assert.equal(uncertainError(new ApiError('conflict',409,'ALERT_CONFLICT')),false);
  const config=newPriceConfig('a'.repeat(64),'fixed-revision');assert.equal(config.association,null);
  const caps={sources:[{source:'composite',series_kind:'composite',available:false,price_modes:{intrabar:{available:true},close:{available:false}}}]};
  assert.equal(admission(caps,{...config,mode:'intrabar'}).available,true);assert.equal(admission(caps,config).available,false);
@@ -11,7 +13,27 @@ const assert=require('node:assert/strict'),vm=require('node:vm'),{build}=require
  const draft=structuredClone(row.config);draft.name='changed';
  const calls=[];const saved=await savePriceRule(draft,'same',row,async(path,body)=>{calls.push({path,body});if(body)throw new TypeError('lost response');return {...row,version:2,config:draft};});
  assert.equal(saved.version,2);assert.equal(calls.length,2);assert.equal(calls[0].body.version,1);assert.equal(calls[0].body.config.association.workspace_id,'desktop');
+ let malformedWrites=0;
+ const malformed=await savePriceRule(draft,'same',row,async(path,body)=>{
+   if(body){malformedWrites++;throw new ApiError('invalid JSON',200,'INVALID_RESPONSE');}
+   return {...row,version:2,config:draft};
+ });
+ assert.equal(malformed.version,2);assert.equal(malformedWrites,1);
  await assert.rejects(savePriceRule(draft,'same',row,async(path,body)=>{if(body)throw new TypeError('lost response');return {...row,version:2,config:{...draft,message:'other edit'}};}));
+ // The first POST and its recovery GET can both lose their responses. The
+ // explicit next check must discover the saved edit without an old-version POST.
+ const resolvingCalls=[];
+ const resolved=await savePriceRule(draft,'same',row,async(path,body)=>{
+   resolvingCalls.push({path,body});assert.equal(body,undefined);
+   return {...row,version:2,config:draft};
+ },true);
+ assert.equal(resolved.version,2);assert.equal(resolvingCalls.length,1);
+ let rejectedWrites=0;
+ await assert.rejects(savePriceRule(draft,'same',row,async(path,body)=>{
+   if(body)rejectedWrites++;
+   return {...row,version:3,config:{...draft,message:'other'}};
+ },true),error=>error.status===409);
+ assert.equal(rejectedWrites,0);
  let writes=0;await assert.rejects(savePriceRule(draft,'same',{...row,config:{...config,series_kind:'provider'}},async()=>{writes++;}));assert.equal(writes,0);
  console.log('PASS mobile alert admission, null/preserved association, lost edit full-config/version verification and retired-source write guard');
 })().catch(error=>{console.error(error);process.exitCode=1;});

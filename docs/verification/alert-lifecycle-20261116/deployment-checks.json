@@ -1,0 +1,82 @@
+{
+  "sample_utc": "2026-11-16T15:40:19.898169+00:00",
+  "strict_TLS": true,
+  "readyz": true,
+  "login": true,
+  "schema": "bd57_notice_source_poll_index",
+  "data_preserved": {
+    "instruments": 148,
+    "maintenance": 13,
+    "rules": 2,
+    "watches": 0,
+    "chart_alert_versions": 4,
+    "advanced_chart_workspaces": 1,
+    "advanced_chart_preferences": 12,
+    "market_datasets": 140,
+    "stable_preference_keys": 241
+  },
+  "web_image_verified": true,
+  "launcher_backup_target_verified": true,
+  "rule_list_detail_consistent": true,
+  "apk_version": "0.1.4",
+  "alert_heartbeat_advances": true,
+  "realtime_all_ready": true,
+  "oanda_progress": {
+    "EURUSD": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    },
+    "USDJPY": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    },
+    "XAUUSD": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    },
+    "USDCAD": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    }
+  },
+  "deployment_passed": true,
+  "mobile_shell_version": "602ef5a7f32880c7",
+  "rule_lifecycle_counts": {
+    "completed": 2
+  },
+  "observation_end_utc": "2026-11-16T15:42:05.068278+00:00",
+  "recovery_observed": {
+    "XAUUSD": "recovering",
+    "USDCAD": "recovering",
+    "EURUSD": "recovering",
+    "USDJPY": "recovering"
+  },
+  "final_runtime_states": {
+    "market_runtime": [
+      "idle",
+      "running"
+    ],
+    "data_runtime": [
+      "idle"
+    ],
+    "notification_runtime": [
+      "idle"
+    ]
+  },
+  "project": "mw-dev",
+  "host": "Ubuntu local Docker",
+  "url": "https://192.168.7.232:18443/m/alerts",
+  "commit": "89b887ffe8106d362ce8d523b3e756a1fdd49cde"
+}

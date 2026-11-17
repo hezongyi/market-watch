@@ -86,6 +86,13 @@ export type AlertRow = {
   market_identity?: Record<string, unknown>;
   display_identity?: DisplayIdentity;
   last_triggered_at?: number | null;
+  last_notification?: {
+    event_id: string;
+    notification_id: string;
+    status: string;
+    outbox_status: string;
+    ack_at?: number | null;
+  } | null;
   display_label?: string;
   id: string;
   name: string;
@@ -111,6 +118,7 @@ export type AlertRow = {
     last_outcome?: string | null;
   };
   execution?: {
+    settlement_pending?: boolean;
     state: string;
     label: string;
     message?: string | null;
@@ -138,6 +146,9 @@ export function offsetSnapshot(value: unknown): string | null {
     ? `原目标 ${v.base_target} · ATR ${v.atr} · 偏移 ${v.signed_offset} · 实际边界 ${v.threshold}` : null;
 }
 export type AlertEvent = {
+  device_received_at?: number | null;
+  delivery_attempts?: number;
+  next_delivery_at?: number | null;
   display_identity?: DisplayIdentity;
   notice?: { id: string; first_seq: number; viewed_at: number | null; handled_at: number | null } | null;
   display_label?: string;
@@ -206,6 +217,8 @@ export const relations: Record<string, string> = {
   break_lower: "下破区间下沿",
 };
 export const deliveryNames: Record<string, string> = {
+  accepted: "推送服务已接受",
+  quiet: "静默时段，稍后投递",
   web_only: "仅网页",
   pending: "等待投递",
   sending: "正在投递",

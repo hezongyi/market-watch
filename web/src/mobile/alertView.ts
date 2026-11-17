@@ -108,23 +108,41 @@ export function ruleState(
   verification: boolean | MonitorState = true,
   now = Date.now(),
 ): RuleState {
+  const execution = row.execution;
+  const triggerNotification = row.last_notification;
+  const triggerDeliveryFailed =
+    !!triggerNotification &&
+    !triggerNotification.ack_at &&
+    (triggerNotification.status === "delivery_error" ||
+      ["failed", "dead", "blocked"].includes(
+        triggerNotification.outbox_status,
+      ));
+  const deliveryMessage = triggerDeliveryFailed
+    ? triggerNotification.outbox_status === "blocked"
+      ? "最近触发的推送认证失败，修正通知设置后可重试。"
+      : "最近触发的推送失败，服务器将自动重试。"
+    : undefined;
   const life: Record<string, string> = {
     paused: "已暂停",
     completed: "次数已用完",
     expired: "已到期",
     archived: "已归档",
   };
-  if (row.status !== "active")
+  if (
+    row.status !== "active" &&
+    !(row.status === "expired" && execution?.settlement_pending)
+  )
     return {
       key: row.status,
       label: life[row.status] || row.status,
-      attention: false,
+      attention: triggerDeliveryFailed,
+      issue: triggerDeliveryFailed ? "delivery" : undefined,
+      message: deliveryMessage,
     };
   if (typeof verification !== "boolean" && !verification.verified)
     return verification;
   if (verification === false)
     return { key: "unknown", label: "状态待确认", attention: false };
-  const execution = row.execution;
   const activity = execution || row.activity;
   // A healthy global loop alone cannot establish that this individual rule advances.
   if (typeof verification !== "boolean" && activity) {
@@ -187,19 +205,26 @@ export function ruleState(
     attention:
       key === "blocked" ||
       deliveryFailed ||
+      triggerDeliveryFailed ||
       !!execution?.phone_configuration?.reason_code,
     issue:
       key === "blocked"
         ? "input"
-        : deliveryFailed || execution?.phone_configuration?.reason_code
+        : deliveryFailed ||
+            triggerDeliveryFailed ||
+            execution?.phone_configuration?.reason_code
           ? "delivery"
           : undefined,
-    message: deliveryFailed
-      ? notification?.message || "推送失败，查看通知设置"
-      : execution?.message ||
-        row.health_reason ||
-        execution?.phone_configuration?.message ||
-        undefined,
+    message:
+      key === "blocked"
+        ? execution?.message || row.health_reason || "所需行情暂不可用"
+        : deliveryMessage ||
+          (deliveryFailed
+            ? notification?.message || "推送失败，查看通知设置"
+            : execution?.message ||
+              row.health_reason ||
+              execution?.phone_configuration?.message ||
+              undefined),
   };
 }
 export function ruleIdentity(row: AlertRow) {

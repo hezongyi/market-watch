@@ -46,6 +46,7 @@ export default function AlertRecords({
     [opened, setOpened] = useState(false);
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
+  const [detailReadError, setDetailReadError] = useState("");
   const [confirmed, setConfirmed] = useState<Record<string, AlertEvent>>({});
   const flight = useRef(false);
   const result = useSymbolSearch<AlertEvent>({
@@ -109,12 +110,45 @@ export default function AlertRecords({
     (events.find((event) => event.id === selection.id) ||
       confirmed[selection.id] ||
       selection);
+  // Refresh a detail independently of the historical page and never apply a
+  // read started before a write while that write is being confirmed.
+  useEffect(() => {
+    if (!opened || !selection || !active || !online || busy) return;
+    const controller = new AbortController();
+    const read = async () => {
+      if (document.hidden) return;
+      try {
+        const latest = await api<AlertEvent>(
+          `/chart-alerts/events/${encodeURIComponent(selection.id)}`,
+          undefined,
+          AbortSignal.any([controller.signal, AbortSignal.timeout(10000)]),
+        );
+        if (!controller.signal.aborted && !flight.current) {
+          result.update((item) => (item.id === latest.id ? latest : item));
+          setSelection(latest);
+          setDetailReadError("");
+        }
+      } catch (error) {
+        if (!controller.signal.aborted) setDetailReadError(errorMessage(error));
+      }
+    };
+    void read();
+    const timer = setInterval(() => void read(), 15000);
+    return () => {
+      controller.abort();
+      clearInterval(timer);
+    };
+  }, [opened, selection?.id, active, online, busy]);
   async function readCurrent(event: AlertEvent) {
     const latest = await api<AlertEvent>(
       `/chart-alerts/events/${encodeURIComponent(event.id)}`,
+      undefined,
+      AbortSignal.timeout(10000),
     );
+    result.update((item) => (item.id === latest.id ? latest : item));
     setConfirmed((old) => ({ ...old, [event.id]: latest }));
     setSelection(latest);
+    setDetailReadError("");
     return latest;
   }
   async function handle(event: AlertEvent) {
@@ -129,6 +163,7 @@ export default function AlertRecords({
         await api(
           `/notifications/${encodeURIComponent(latest.notification_id)}/ack`,
           {},
+          AbortSignal.timeout(10000),
         );
         stopped = true;
       }
@@ -139,13 +174,15 @@ export default function AlertRecords({
           kind: "handled",
           wait_for_sync: true,
         });
-      await readCurrent(event);
+      const confirmed = await readCurrent(event);
+      if (!eventHandled(confirmed))
+        throw Error("服务器尚未确认全部处理结果，请重试未完成的步骤。");
       result.refresh();
       logEvent({
         module: "告警",
         action: "处理本次提醒",
         object: event.id,
-        message: "已回读处理状态；规则继续按条件执行",
+        message: "已回读确认本次提醒处理完成；规则启停状态不变",
         result: "success",
       });
     } catch (error) {
@@ -155,6 +192,33 @@ export default function AlertRecords({
           : "未完成：") + errorMessage(error),
       );
       logFailure("告警", "处理本次提醒", error, event.id);
+      await readCurrent(event).catch(() => {});
+    } finally {
+      flight.current = false;
+      setBusy(false);
+    }
+  }
+  async function retryDelivery(event: AlertEvent) {
+    if (flight.current || !online || !event.notification_id) return;
+    flight.current = true;
+    setBusy(true);
+    setError("");
+    try {
+      await api(
+        `/notifications/${encodeURIComponent(event.notification_id)}/retry`,
+        {},
+        AbortSignal.timeout(10000),
+      );
+      await readCurrent(event);
+      logEvent({
+        module: "告警",
+        action: "重试推送",
+        object: event.id,
+        message: "已提交重试；实际投递状态由服务器更新",
+        result: "success",
+      });
+    } catch (error) {
+      setError(errorMessage(error));
       await readCurrent(event).catch(() => {});
     } finally {
       flight.current = false;
@@ -171,87 +235,90 @@ export default function AlertRecords({
         .every((token) => eventPresentation(event).search.includes(token)),
   );
   const list = (
-      <SymbolSearchPanel
-        query={query}
-        onQuery={setQuery}
-        label="搜索触发记录"
-        placeholder="品种、条件或规则名称"
-        active={active}
-        online={online}
-        loading={result.loading}
-        loaded={result.loaded || !!fallback.length}
-        error={result.error}
-        retry={result.retry}
-        hasNext={!!result.next}
-        loadNext={result.loadNext}
-        filters={
-          <ToggleGroup
-            className="alert-filters"
-            aria-label="记录状态"
-            value={[filter]}
-            onValueChange={(value) => {
-              if (value.length) setFilter(String(value[0]));
-            }}
-          >
-            <ToggleGroupItem value="all">全部</ToggleGroupItem>
-            <ToggleGroupItem value="unhandled">未处理</ToggleGroupItem>
-          </ToggleGroup>
-        }
-      >
-        {!filtered.length && !result.loading && (
-          <DataEmpty
-            title={filter === "unhandled" ? "暂无未处理记录" : "暂无触发记录"}
-          >
-            {result.next
-              ? "继续上滑读取更早记录。"
-              : "满足条件后，记录会显示在这里。"}
-          </DataEmpty>
-        )}
-        {filtered.map((event) => (
-          <Button
-            key={event.id}
-            variant="plain"
-            className="alert-event-row"
-            onClick={() => {
-              setSelection(event);
-              setError("");
-              setOpened(true);
-            }}
-          >
-            <div className="alert-event-top">
-              <span className="alert-event-instrument">
-                <strong>{eventIdentity(event).code}</strong>
-                <small>
-                  {[eventIdentity(event).name, eventIdentity(event).source]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </small>
-              </span>
-              <span
-                className="alert-event-handled"
-                data-unhandled={!eventHandled(event) || undefined}
-              >
-                {eventHandled(event)
-                  ? event.notice
-                    ? "已处理"
-                    : "已确认"
-                  : "未处理"}
-              </span>
-            </div>
-            <strong className="alert-event-condition">
-              {eventPresentation(event).summary ||
-                eventPresentation(event).name}
-            </strong>
-            <div className="alert-event-bottom">
-              <time>{stamp(event.occurred_at)}</time>
-              <span>触发价 {event.price}</span>
-            </div>
-          </Button>
-        ))}
-      </SymbolSearchPanel>
+    <SymbolSearchPanel
+      query={query}
+      onQuery={setQuery}
+      label="搜索触发记录"
+      placeholder="品种、条件或规则名称"
+      active={active}
+      online={online}
+      loading={result.loading}
+      loaded={result.loaded || !!fallback.length}
+      error={result.error}
+      retry={result.retry}
+      hasNext={!!result.next}
+      loadNext={result.loadNext}
+      filters={
+        <ToggleGroup
+          className="alert-filters"
+          aria-label="记录状态"
+          value={[filter]}
+          onValueChange={(value) => {
+            if (value.length) setFilter(String(value[0]));
+          }}
+        >
+          <ToggleGroupItem value="all">全部</ToggleGroupItem>
+          <ToggleGroupItem value="unhandled">未处理</ToggleGroupItem>
+        </ToggleGroup>
+      }
+    >
+      {!filtered.length && !result.loading && (
+        <DataEmpty
+          title={filter === "unhandled" ? "暂无未处理记录" : "暂无触发记录"}
+        >
+          {result.next
+            ? "继续上滑读取更早记录。"
+            : "满足条件后，记录会显示在这里。"}
+        </DataEmpty>
+      )}
+      {filtered.map((event) => (
+        <Button
+          key={event.id}
+          variant="plain"
+          className="alert-event-row"
+          onClick={() => {
+            setSelection(event);
+            setError("");
+            setDetailReadError("");
+            setOpened(true);
+          }}
+        >
+          <div className="alert-event-top">
+            <span className="alert-event-instrument">
+              <strong>{eventIdentity(event).code}</strong>
+              <small>
+                {[eventIdentity(event).name, eventIdentity(event).source]
+                  .filter(Boolean)
+                  .join(" · ")}
+              </small>
+            </span>
+            <span
+              className="alert-event-handled"
+              data-unhandled={!eventHandled(event) || undefined}
+            >
+              {eventHandled(event)
+                ? event.notice
+                  ? "已处理"
+                  : "已确认"
+                : "未处理"}
+            </span>
+          </div>
+          <strong className="alert-event-condition">
+            {eventPresentation(event).summary || eventPresentation(event).name}
+          </strong>
+          <div className="alert-event-bottom">
+            <time>{stamp(event.occurred_at)}</time>
+            <span>触发价 {event.price}</span>
+          </div>
+        </Button>
+      ))}
+    </SymbolSearchPanel>
   );
   return (
-    <div className="alert-records-content" data-pull-refresh={pullToRefresh || undefined}>
+    <div
+      className="alert-records-content"
+      data-pull-refresh={pullToRefresh || undefined}
+    >
       {pullToRefresh ? (
         <AlertListRefresh
           active={active && !opened}
@@ -262,7 +329,9 @@ export default function AlertRecords({
         >
           {list}
         </AlertListRefresh>
-      ) : list}
+      ) : (
+        list
+      )}
       <MobileSheet
         title="触发详情"
         open={opened}
@@ -271,6 +340,7 @@ export default function AlertRecords({
         onClosed={() => {
           setSelection(undefined);
           setError("");
+          setDetailReadError("");
         }}
       >
         {selected && (
@@ -305,17 +375,19 @@ export default function AlertRecords({
               <div>
                 <dt>推送</dt>
                 <dd>
-                  {deliveryNames[selected.delivery_status] ||
-                    selected.delivery_status}
+                  {selected.device_received_at
+                    ? "设备已接收"
+                    : deliveryNames[selected.delivery_status] ||
+                      selected.delivery_status}
                 </dd>
               </div>
             </dl>
             {selected.message && (
               <p className="alert-muted">{selected.message}</p>
             )}
-            {error && (
+            {(error || detailReadError) && (
               <p role="alert" className="mobile-inline-error">
-                {error}
+                {error || detailReadError}
               </p>
             )}
             {!eventHandled(selected) &&
@@ -330,8 +402,24 @@ export default function AlertRecords({
             {!eventHandled(selected) &&
               (selected.notification_id || selected.notice) && (
                 <p className="alert-muted">
-                  停止本次提醒，规则继续执行。
+                  停止本次提醒，不改变规则启停状态。
                 </p>
+              )}
+            {selected.delivery_status === "blocked" &&
+              !selected.ack_at &&
+              selected.notification_id && (
+                <>
+                  <p className="alert-muted">
+                    推送认证失败。修正通知设置后，可重试本次投递。
+                  </p>
+                  <Button
+                    variant="outline"
+                    disabled={!online || busy}
+                    onClick={() => void retryDelivery(selected)}
+                  >
+                    重试推送
+                  </Button>
+                </>
               )}
             <DataMore title="投递与判定详情">
               <dl className="alert-facts">
@@ -348,7 +436,20 @@ export default function AlertRecords({
                 </div>
                 <div>
                   <dt>手机实收</dt>
-                  <dd>未核验</dd>
+                  <dd>
+                    {selected.device_received_at
+                      ? stamp(selected.device_received_at)
+                      : "尚无设备回执"}
+                  </dd>
+                </div>
+                <div>
+                  <dt>投递尝试</dt>
+                  <dd>
+                    {selected.delivery_attempts ?? 0} 次
+                    {selected.next_delivery_at
+                      ? ` · 下次 ${stamp(selected.next_delivery_at)}`
+                      : ""}
+                  </dd>
                 </div>
                 <div>
                   <dt>停止提醒</dt>
