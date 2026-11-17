@@ -1,0 +1,69 @@
+{
+  "passed": true,
+  "host": "Ubuntu local Docker",
+  "project": "mw-dev",
+  "source_commit": "53a32a712497f301e5ea15286d7cdefd700a3b82",
+  "web_image": "sha256:4904739a2d71283ca702ee60479c9132a18dc8d906f590fd6cf22422438b0e2e",
+  "checks": [
+    {
+      "path": "/readyz",
+      "status": 200,
+      "bytes": 39
+    },
+    {
+      "path": "/api/login",
+      "status": 200,
+      "bytes": 61
+    },
+    {
+      "path": "/api/settings/notification-transport",
+      "status": 200,
+      "bytes": 166
+    },
+    {
+      "path": "/api/settings/notifications",
+      "status": 200,
+      "bytes": 309
+    },
+    {
+      "path": "/m/more",
+      "status": 200,
+      "bytes": 755
+    },
+    {
+      "path": "/assets/mobile-BmQKF4GR.js",
+      "status": 200,
+      "bytes": 597497
+    },
+    {
+      "path": "/assets/providerSubscriptions-Cvdfgl4y.js",
+      "status": 200,
+      "bytes": 404104
+    },
+    {
+      "path": "/assets/mobile-BTq45dLA.css",
+      "status": 200,
+      "bytes": 202461
+    },
+    {
+      "path": "/chart-assets.json",
+      "status": 200,
+      "bytes": 93
+    },
+    {
+      "path": "/chart.6562242f4fd0bfc5.js",
+      "status": 200,
+      "bytes": 1093268
+    },
+    {
+      "path": "/downloads/android-update.json",
+      "status": 200,
+      "bytes": 379
+    }
+  ],
+  "other_seven_running_services_unchanged": true,
+  "existing_rule_and_notification_provider_preferences_preserved": true,
+  "backend_and_professional_chart_unchanged": true,
+  "actual_notifications_sent": false,
+  "new_apk_required": false
+}

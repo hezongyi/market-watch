@@ -33,4 +33,8 @@ Target: Ubuntu local Docker, persistent project `mw-dev`. Address: https://quant
 
 Replace Web only. Preserve API, workers, PostgreSQL, TLS, ntfy, private settings, FXCM helper and downloads. Private deployment manifest/configuration snapshots and rule/preference fingerprints live under `~/.local/share/market-watch-dev/evidence/mobile-notification-polish-20261117/`. Rollback only the Web image in the active persistent run configuration to `sha256:9442cb3771f6ccad875f6f60744e3ad4015673c0bafff1a85a63646f019c2756`, then run `docker compose -p mw-dev -f <private-run.json> up -d --no-build --no-deps web`. Do not restore a whole old environment.
 
-Deployment verification will be appended after the actual update. No new APK is needed; Android system keyboard and actual notification receipt remain device acceptance items.
+Deployed at approximately 21:11 UTC on 2026-11-17. Web source commit: `53a32a71`; image ID: `sha256:4904739a2d71283ca702ee60479c9132a18dc8d906f590fd6cf22422438b0e2e`.
+
+[Deployed read-only checks](deployed-checks.json) passed: trusted HTTPS/domain, authenticated transport and quiet-policy reads, deployed JS/CSS byte equality with the accepted build, professional-chart asset equality with the prior release, readiness and APK update manifest. All other seven running service IDs are unchanged. All eight existing rule-version configs and notification/provider preference fingerprints are unchanged. The persistent launcher retains the updated Web digest. A first external TLS connection ended before HTTP; the repeated complete verification passed without changing proxy/TLS settings.
+
+No real notification was sent and no settings were saved during actual-instance acceptance. No new APK is needed; Android system keyboard and actual notification receipt remain device acceptance items.
