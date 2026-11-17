@@ -18,6 +18,21 @@ from .storage import ImportJob, Preference, now_ms, transaction, uid
 LANE = ContextVar("market_resource_lane", default=None)
 
 
+class SourceCoolingDown(TimeoutError):
+    """Yield the worker until the shared source is eligible again."""
+    def __init__(self, retry_at):
+        self.retry_at = retry_at
+        super().__init__("行情来源冷却中，后台将自动重试")
+
+
+def check_cooldown(source):
+    with transaction() as db:
+        row = db.get(Preference, "upstream_slots:" + source)
+        until = row.value.get("cooldown_until", 0) if row else 0
+    if until > now_ms():
+        raise SourceCoolingDown(until)
+
+
 @contextmanager
 def lane(kind):
     token = LANE.set(kind)
@@ -64,7 +79,7 @@ def acquire(source, kind, now):
     return token
 
 
-def cooldown(source, *, retry_seconds=None):
+def cooldown(source, *, retry_seconds=None, reason=None):
     """Persist a shared source cooldown; no per-chart rate-limit retry loops."""
     with transaction() as db:
         insert = pg_insert if db.get_bind().dialect.name == "postgresql" else sqlite_insert
@@ -76,7 +91,8 @@ def cooldown(source, *, retry_seconds=None):
         strikes = min(5, values.get("cooldown_strikes", 0) + 1)
         seconds = retry_seconds if retry_seconds is not None else min(900, 60 * 2**(strikes-1))
         row.value = {**values, "cooldown_strikes": strikes,
-                     "cooldown_until": now_ms() + seconds*1000}
+                     "cooldown_until": now_ms() + seconds*1000,
+                     **({"cooldown_reason": reason} if reason else {})}
 
 
 def release(source, token):
@@ -109,9 +125,13 @@ def request_slot(source, *, deadline=None, cancelled=None):
         return
     deadline = deadline or time.monotonic() + (15 if kind == "realtime" else 23)
     token = None
+    checked_at = 0
     while time.monotonic() < deadline:
         if cancelled and cancelled():
             raise TimeoutError("后台额度等待已让位于前台请求")
+        if time.monotonic() >= checked_at:
+            check_cooldown(source)
+            checked_at = time.monotonic() + 1
         token = acquire(source, kind, now_ms())
         if token:
             break

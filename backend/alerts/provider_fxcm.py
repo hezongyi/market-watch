@@ -65,9 +65,11 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
     requested = min(meta.get("native_query_depths", {}).get(frame, 300), count + optional)
     deadline = deadline or time.monotonic() + 65
     adapter = client or _ADAPTER
+    warnings = []
     # Reuse the active demand session for consecutive pages; never prewarm it.
     raw = adapter.bars(meta["symbol"], frame, 0, before, meta["precision"],
-                       count=requested, deadline=deadline, scope=meta["account_scope"])
+                       count=requested, deadline=deadline, scope=meta["account_scope"],
+                       invalid_records=warnings)
     observed, rows = now_ms(), []
     for index, row in enumerate(raw):
         start = row["start"]
@@ -94,6 +96,7 @@ def native_page(meta, frame, before, count, *, client=None, deadline=None, optio
         "source": "fxcm", "symbol": meta["symbol"], "indicators": [],
         "volume_kind": "tick_count", "volume_unit": "price_changes",
         "completion_basis": COMPLETION, "session_verified": False, "as_of": observed,
+        **({"source_warnings": warnings} if warnings else {}),
         "request_evidence": {"requested": requested, "returned": len(raw),
             "before_exclusive": before, "price": "BID",
             "candle_open": "PreviousClose", "include_weekends": False}}

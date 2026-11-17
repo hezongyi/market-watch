@@ -112,3 +112,24 @@ def test_known_fxcm_code_in_all_search_never_expands_yahoo(database, fxcm_config
 def test_fxcm_snapshot_freshness_matches_its_finite_poll_interval():
     from alerts.provider_capabilities import fresh_seconds, poll_seconds
     assert fresh_seconds('fxcm') == poll_seconds('fxcm') >= 60
+
+
+def test_bad_historical_month_does_not_discard_valid_current_history(database, fxcm_config, monkeypatch):
+    adapter = fxcm_history.FxcmHistory(clock=lambda: 1800000000000)
+    # Recorded AUDJPY 300-month response: close is above source high.
+    bad = {'kind':'candle','time':'2011-02-28T22:00:00Z',
+           'open':'83.254','high':'85.786','low':'74.026','close':'85.820','volume':732244}
+    valid = {**bad,'time':'2011-03-31T21:00:00Z','open':'85.820',
+             'high':'90.017','low':'85.808','close':'88.939','volume':1585760}
+    monkeypatch.setattr(adapter, '_request', lambda *a, **kw: [bad, valid])
+    monkeypatch.setattr(provider_fxcm, 'now_ms', lambda: 1800000000000)
+    meta = {'symbol':'AUD/JPY','precision':3,'account_scope':fxcm_history.account_scope(), 'frames':['MN']}
+    page = provider_fxcm.native_page(meta, 'MN', 1800000000000, 300, client=adapter)
+    assert len(page['bars']) == 1
+    assert page['bars'][0]['close'] == '88.939'
+    assert page['bars'][0]['gap_before']
+    assert page['source_warnings'][0]['reason'] == 'invalid_supplier_ohlcv'
+    assert page['source_warnings'][0]['record']['close'] == '85.820'
+    # A quarantined source record is not a confirmed historical boundary.
+    assert not page['history_boundary']
+    assert page['coverage'][0][0] == page['bars'][0]['start']

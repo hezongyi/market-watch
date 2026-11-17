@@ -1,7 +1,7 @@
 """Finite BID snapshots through the private ForexConnect native helper.
 
 Construction and local directory reads never start a process or log in. Each
-adapter owns a demand-driven session, which logs out after 20 idle seconds.
+adapter owns a demand-driven session, which logs out after 75 idle seconds.
 Credentials cross stdin only; SDK diagnostics stay in a private temporary dir.
 """
 
@@ -141,7 +141,12 @@ class FxcmHistory:
             raise ValueError("FXCM响应格式无效")
         if row.get("kind") == "error":
             auth = row.get("code") == "auth"
-            cooldown("fxcm", retry_seconds=300 if auth else 60)
+            # A snapshot/session timeout is not a rejected credential. Let a
+            # fresh demand retry promptly; only explicit login rejection holds
+            # the account for the authentication backoff.
+            code = row.get("code")
+            reason = code if code in ("auth", "login_timeout", "session_lost", "request_timeout", "request_failed") else "request_failed"
+            cooldown("fxcm", retry_seconds=300 if auth else 10, reason=reason)
             raise MarketRequestError(RequestResult(status="unauthorized" if auth else "unavailable",
                 reason_code="AUTH" if auth else "UNKNOWN"))
         return row
@@ -244,7 +249,8 @@ class FxcmHistory:
         return {frame: min(300, depths[native]) for frame, native in FRAMES.items()
                 if depths.get(native, -1) > 0}
 
-    def bars(self, symbol, frame, start, end, digits, *, count=300, deadline=None, scope=None):
+    def bars(self, symbol, frame, start, end, digits, *, count=300, deadline=None, scope=None,
+             invalid_records=None):
         if (frame not in FRAMES or not 0 <= start < end or not 1 <= count <= 300
                 or type(digits) is not int or not 0 <= digits <= 10
                 or not isinstance(symbol, str) or not 0 < len(symbol) <= 64
@@ -283,11 +289,10 @@ class FxcmHistory:
                            or len(p.partition(".")[2]) > digits
                            for p in prices.values())):
                 raise ValueError("FXCM历史柱无效")
-            Candle(instant(stamp), instant(stamp + 60000),
-                   *(Decimal(value) for value in prices.values()), volume=Decimal(row["volume"]))
             seen.add(stamp)
             # Snapshot `to` can include the boundary bar (observed on XAU D1).
-            # Validate every returned bar, then enforce our [start, end) contract.
+            # Validate source fields, then enforce our [start, end) contract.
+            # Assembled OHLC is validated below, before any row can be cached.
             if start <= stamp < end:
                 rows.append({"start": stamp, **prices, "volume": str(row["volume"])})
         rows.sort(key=lambda row: row["start"])
@@ -295,7 +300,24 @@ class FxcmHistory:
             rows = assemble_native_months(rows)
             if len(raw) == requested and rows:
                 rows = rows[1:]  # Oldest month may be a count-truncated fragment.
-        return rows[-count:]
+        valid, gap = [], False
+        for row in rows:
+            try:
+                Candle(instant(row["start"]), instant(row["start"] + 60000),
+                       *(Decimal(row[key]) for key in ("open", "high", "low", "close")),
+                       volume=Decimal(row["volume"]))
+            except ValueError:
+                if invalid_records is None or row is rows[-1]:
+                    raise
+                # Preserve the supplier values as quality evidence. Never
+                # widen the high/low or invent a replacement candle.
+                invalid_records.append({"source_label": row["start"],
+                    "reason": "invalid_supplier_ohlcv", "record": row})
+                gap = True
+                continue
+            valid.append({**row, "gap_before": True} if gap else row)
+            gap = False
+        return valid[-count:]
 
 
     def page(self, identity, start, end):

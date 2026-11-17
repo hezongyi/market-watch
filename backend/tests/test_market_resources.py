@@ -52,3 +52,18 @@ def test_chart_reads_do_not_wait_for_watchlist_or_backfill_reservations(database
     assert acquire("binance", "history", now) is None
     assert acquire("binance", "chart", now)
     assert acquire("binance", "realtime", now)
+
+
+def test_source_cooldown_yields_immediately_instead_of_spending_request_budget(database, monkeypatch):
+    import time
+    import pytest
+    from alerts import market_resources as resources
+    from alerts.storage import Preference
+    for source in ('fxcm','dukascopy','oanda'):
+        resources.cooldown(source, retry_seconds=60)
+        monkeypatch.setattr(resources.time, 'sleep', lambda _: pytest.fail('cooldown must not occupy a worker'))
+        with resources.lane('realtime'), pytest.raises(resources.SourceCoolingDown) as error:
+            with resources.request_slot(source, deadline=time.monotonic()+65):
+                pytest.fail('cooling source was admitted')
+        with database() as db:
+            assert error.value.retry_at == db.get(Preference,'upstream_slots:'+source).value['cooldown_until']
