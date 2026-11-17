@@ -52,6 +52,7 @@ export default function AlertSymbolPicker({
           new URLSearchParams({
             query,
             mobile: "true",
+            alert_eligible: "true",
             page: String(page),
             page_size: "25",
           }),
@@ -113,14 +114,14 @@ export default function AlertSymbolPicker({
       >
         {result.loaded && !result.items.length && (
           <DataEmpty
-            title="没有匹配的自建行情"
+            title="没有可创建告警的品种"
             action={
               <Button onClick={add} disabled={!online}>
                 添加自建行情
               </Button>
             }
           >
-            先在数据页添加并开启实时，再创建告警。
+            先在数据页添加自建行情并开启实时，再创建告警。
           </DataEmpty>
         )}
         {result.items.map((dataset) => (
