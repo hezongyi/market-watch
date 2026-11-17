@@ -1,0 +1,89 @@
+{
+  "passed": true,
+  "ubuntu_project": "mw-dev",
+  "commit": "0d808b88d3e4eb06eafaa41e4d8b1684ba1f68d5",
+  "images": {
+    "api": "sha256:8ef8340546be075400224f10b6222a7a8ae8579132be1d435946ef045d596daf",
+    "web": "sha256:9442cb3771f6ccad875f6f60744e3ad4015673c0bafff1a85a63646f019c2756"
+  },
+  "checks": [
+    {
+      "path": "/readyz",
+      "status": 200,
+      "bytes": 39
+    },
+    {
+      "path": "/api/login",
+      "status": 200,
+      "bytes": 61
+    },
+    {
+      "path": "/api/chart-alerts",
+      "status": 200,
+      "bytes": 19032
+    },
+    {
+      "path": "/api/chart-alerts/capabilities",
+      "status": 200,
+      "bytes": 4908
+    },
+    {
+      "path": "/api/chart-alerts",
+      "status": 200,
+      "bytes": 14865
+    },
+    {
+      "path": "/api/advanced-charts/workspaces",
+      "status": 200,
+      "bytes": 12290
+    },
+    {
+      "path": "/api/advanced-charts/preferences",
+      "status": 200,
+      "bytes": 15155
+    },
+    {
+      "path": "/m/",
+      "status": 200,
+      "bytes": 755
+    },
+    {
+      "path": "/assets/mobile-Cfbe7hlw.js",
+      "status": 200,
+      "bytes": 593201
+    },
+    {
+      "path": "/assets/providerSubscriptions-Cvdfgl4y.js",
+      "status": 200,
+      "bytes": 404104
+    },
+    {
+      "path": "/chart-assets.json",
+      "status": 200,
+      "bytes": 93
+    },
+    {
+      "path": "/chart.6562242f4fd0bfc5.js",
+      "status": 200,
+      "bytes": 1093268
+    },
+    {
+      "path": "/advanced-charts",
+      "status": 200,
+      "bytes": 558
+    },
+    {
+      "path": "/downloads/android-update.json",
+      "status": 200,
+      "bytes": 379
+    }
+  ],
+  "runtime_source_matches": true,
+  "capabilities_revision_and_actual_phone_transport": true,
+  "full_identity_listing": true,
+  "existing_rule_versions_preserved": 8,
+  "notification_and_provider_preferences_preserved": true,
+  "untouched_services_preserved": 6,
+  "new_apk_required": false,
+  "actual_notification_sent": false
+}

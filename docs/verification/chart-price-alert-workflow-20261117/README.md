@@ -35,4 +35,13 @@ Target: persistent Ubuntu Docker project `mw-dev`, https://quant.kookvv.com:8443
 
 Deployment digest, configuration backup, container identities and read-only rule/preference fingerprints are recorded privately under `~/.local/share/market-watch-dev/evidence/chart-price-alert-workflow-20261117/`. Rollback replaces only the API/Web image references with the recorded previous digests in the active persistent run configuration, then uses `docker compose -p mw-dev -f <private-run.json> up -d --no-build --no-deps api web`; do not restore an entire old environment over newer private settings.
 
-Deployment verification pending below; Android touch/system keyboard and an actual user-created notification remain user acceptance items. Existing real rules are read-only throughout this task.
+Deployed successfully on 2026-11-17 at approximately 20:51 UTC. Runtime source commit: `0d808b88`.
+
+| Service | Previous image ID | Candidate image ID |
+| --- | --- | --- |
+| API | `sha256:c0e225615071343f7b6960f3326936237ce6c21ce796980d6f2ce9cb350a0a4f` | `sha256:8ef8340546be075400224f10b6222a7a8ae8579132be1d435946ef045d596daf` |
+| Web | `sha256:533e28f0377ab978756386cfd035e756bb3281d09218cebfd13578191499c2c2` | `sha256:9442cb3771f6ccad875f6f60744e3ad4015673c0bafff1a85a63646f019c2756` |
+
+[Read-only deployed checks](deployed-checks.json): trusted HTTPS/domain, authenticated capability revision/phone availability, full-identity listing, desktop workspaces/preferences endpoints, mobile entry and shared JS byte equality, professional-chart asset hash equality and APK update manifest passed. All 8 stored rule-version config fingerprints and notification/provider preference fingerprints are unchanged. All 6 other running service container IDs are unchanged. The persistent `mw-dev` launcher uses the updated configuration. Existing FXCM helper and download mounts are preserved.
+
+No new APK is required. No real notification was sent; Android touch/system keyboard and an actual user-created notification remain user acceptance items. Existing real rules were read-only throughout this task.
