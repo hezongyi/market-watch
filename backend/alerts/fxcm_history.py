@@ -145,7 +145,9 @@ class FxcmHistory:
             # fresh demand retry promptly; only explicit login rejection holds
             # the account for the authentication backoff.
             code = row.get("code")
-            reason = code if code in ("auth", "login_timeout", "session_lost", "request_timeout", "request_failed") else "request_failed"
+            reason = code if code in ("auth", "login_timeout", "session_lost", "request_timeout",
+                "request_failed", "unsolicited_data", "invalid_session_mode", "request_creation_failed",
+                "invalid_directory", "invalid_frames", "invalid_request", "invalid_frame", "invalid_bars") else "request_failed"
             cooldown("fxcm", retry_seconds=300 if auth else 10, reason=reason)
             raise MarketRequestError(RequestResult(status="unauthorized" if auth else "unavailable",
                 reason_code="AUTH" if auth else "UNKNOWN"))

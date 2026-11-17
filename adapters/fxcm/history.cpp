@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <map>
 #include <sstream>
+#include <set>
 #include <stdexcept>
 #include <condition_variable>
 #include <iostream>
@@ -241,8 +242,10 @@ int main() {
                     throw std::runtime_error("unsolicited_data");
                 emit("{\"kind\":\"done\"}");
             } catch(const std::exception& error) {
-                const std::string code = std::string(error.what()) == "request_timeout"
-                    ? "request_timeout" : "request_failed";
+                const std::set<std::string> safeCodes = {"request_timeout", "request_failed",
+                    "unsolicited_data", "invalid_session_mode", "request_creation_failed",
+                    "invalid_directory", "invalid_frames", "invalid_request", "invalid_frame", "invalid_bars"};
+                const std::string code = safeCodes.count(error.what()) ? error.what() : "request_failed";
                 emit("{\"kind\":\"error\",\"code\":" + jsonString(code) + "}"); break;
             } catch(...) { emit("{\"kind\":\"error\",\"code\":\"request_failed\"}"); break; }
         }

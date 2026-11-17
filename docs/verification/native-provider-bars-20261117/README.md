@@ -27,3 +27,15 @@ Dukascopy JSON3 probes using the real pinned SDK headers return completed native
 Local adapter/cache/deadline/worker regressions:292 passed. Isolated PostgreSQL provider/native-history/shared-admission contracts:42 passed. Final candidate deployment and chart verification are recorded below after execution.
 
 Helper build: `adapters/fxcm/Dockerfile`, private context contains `history.cpp` and the existing licensed ForexConnect1.6.5 `sdk/include` and `sdk/lib`; build via `mw-docker build`, task `mw-native-provider-bars-20261117`, project `mw-dev`, purpose `acceptance`. No SDK files or credentials are committed.
+
+### Deployed candidate observations
+
+- FXCM actual licensed professional-chart model and screenshots: M1/M5/M15/M30/H1/H4/D1/W1/MN all displayed. MN initial history succeeded;272 visible real bars were retained and invalid supplier rows were quarantined, not repaired into artificial prices.
+- Actual M1 widget over100s: current start19:47→19:49 UTC, volume79→65 on the new bar. Actual D1 widget over180s: close107.306→107.302 and tick volume409065→409226; native session start remains2026-11-16 22:00 UTC. No page JS errors or prohibited preference/rule writes.
+- One transient helper failure occurred during the first sustained multi-period test and recovered automatically with10s cooldown. Its precise native exception was not observable in the old generic code. The helper now emits only an allowlist of local failure codes, never supplier/account text; this improves diagnosis without claiming the old event's exact cause is known.
+- A subsequent three-turn M1/D1/MN adapter observation, with61s idle gaps, reused the same helper PID and advanced prices/volume; warm M1 requests took0.37–0.40s and D1/MN1.4–1.5s. No failure recurred in that sample. This is bounded acceptance, not a long-term supplier uptime guarantee.
+- OANDA: all9 periods returned160 valid native bars and current3-bar tails; a follow-up over a minute boundary advanced M1 and changed D1 price/volume. No equivalent parse/stall problem reproduced.
+- Dukascopy: all9 periods returned160 valid native bars and3-bar tails; completed M1 advanced in the follow-up. D1/W1/MN remain completed-period snapshots as described above.
+- Final expanded regression:326 passed; final isolated PostgreSQL run:43 passed, including preservation of quality evidence from multiple pages. Later historical pages now retain earlier FXCM warning records (deduplicated and bounded), instead of overwriting them.
+
+Private task configuration snapshots, container/image manifests, rollback references and provider evidence remain outside Git. Entry: `https://quant.kookvv.com:8443/m/`, Ubuntu Docker project `mw-dev`, LAN HTTPS18443. No APK changes and no Unraid deployment. Original rule versions and notification/user preferences were fingerprinted before/after; web, PostgreSQL, TLS and ntfy containers were preserved.

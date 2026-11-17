@@ -5,6 +5,7 @@ from alerts import provider_chart as upstream
 from alerts.config import settings
 from test_provider_cache import META, page
 from test_provider_postgres import provider_pg
+from test_fxcm_history import fxcm_config
 
 pytestmark = pytest.mark.skipif(not os.getenv('TEST_POSTGRES_URL'), reason='Requires isolated PostgreSQL')
 
@@ -27,3 +28,9 @@ def test_subscription_schedules_cooldown_end(provider_pg, monkeypatch):
     from test_provider_service import test_cooling_subscription_schedules_recovery_at_source_retry_time
     factory, _ = provider_pg
     test_cooling_subscription_schedules_recovery_at_source_retry_time(factory, monkeypatch)
+
+
+def test_bad_native_page_evidence_survives_later_pages(provider_pg, fxcm_config, monkeypatch):
+    from test_provider_fxcm import test_paged_bad_record_evidence_is_retained_without_erasing_other_pages
+    factory, _ = provider_pg
+    test_paged_bad_record_evidence_is_retained_without_erasing_other_pages(factory, fxcm_config, monkeypatch)

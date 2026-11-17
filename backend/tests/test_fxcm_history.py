@@ -236,7 +236,7 @@ def test_waiting_background_yields_without_closing_reusable_session(database, fx
     assert len(waiting) == 1, "queued background must stop requesting slots once foreground arrives"
 
 
-@pytest.mark.parametrize('code', ['login_timeout','session_lost','request_timeout','request_failed'])
+@pytest.mark.parametrize('code', ['login_timeout','session_lost','request_timeout','request_failed','unsolicited_data','invalid_bars'])
 def test_transient_helper_error_is_not_authentication_hold(database, code):
     read, write = os.pipe()
     os.write(write, json.dumps({'kind':'error','code':code,'message':'private'}).encode()+b'\n')

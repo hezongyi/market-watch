@@ -166,3 +166,25 @@ def test_catalog_identity_opens_and_roundtrips_native_workspace(database, fxcm_c
             assert saved.json()["series_kind"] == "provider"
     finally:
         api.app.dependency_overrides.clear()
+
+
+def test_paged_bad_record_evidence_is_retained_without_erasing_other_pages(database, fxcm_config, monkeypatch):
+    from alerts import provider_cache as cache
+    meta = provider.metadata(directory(database, monkeypatch)[0].id)
+    key = cache.ensure(meta, 'MN')
+    for stamp in (1699999920000, 1600000020000, 1699999920000):
+        lease = cache.claim(key)
+        bar = {'start':stamp,'chart_time':stamp,'end':stamp+60000,'open':'1.1',
+               'high':'1.2','low':'1','close':'1.1','volume':'1','complete':True}
+        warning = {'source_label':stamp-60000,'reason':'invalid_supplier_ohlcv',
+                   'record':{'open':'1.1','high':'1.2','low':'1','close':'1.3'}}
+        try:
+            cache.commit_page(key, lease, {'bars':[bar], 'history_boundary':False,
+                'source_warnings':[warning]}, stamp+60000, cache.now_ms())
+        finally:
+            cache.release(key, lease)
+    from alerts.storage import ProviderDataset
+    with database() as db:
+        warnings = db.get(ProviderDataset, key).metadata_json['source_warnings']
+        assert len(warnings) == 2
+        assert {w['source_label'] for w in warnings} == {1699999860000, 1599999960000}
