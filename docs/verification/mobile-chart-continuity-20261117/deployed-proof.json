@@ -1,0 +1,50 @@
+{
+  "at": "2026-11-17T13:36:43.102Z",
+  "base": "https://quant.kookvv.com:8443",
+  "environment": "Ubuntu Docker mw-dev, trusted TLS, browser mobile viewport",
+  "checks": [
+    "authenticated existing chart has real bars",
+    "interactive candle cache while real history request delayed",
+    "same widget replaces cache after actual backend response",
+    "no screenshot transition",
+    "navigation keeps bars",
+    "desktop settings/workspaces and rule configs unchanged",
+    "no business writes or test notifications",
+    "APK update manifest preserved"
+  ],
+  "cache": [
+    {
+      "kind": "history",
+      "timeframe": "D1",
+      "bars": 60
+    }
+  ],
+  "historyResponses": [
+    {
+      "count": 60,
+      "chart_time": true,
+      "start": true
+    },
+    {
+      "count": 60,
+      "chart_time": true,
+      "start": true
+    },
+    {
+      "count": 60,
+      "chart_time": true,
+      "start": true
+    },
+    {
+      "count": 58,
+      "chart_time": true,
+      "start": true
+    },
+    {
+      "count": 58,
+      "chart_time": true,
+      "start": true
+    }
+  ],
+  "errors": []
+}

@@ -1,0 +1,280 @@
+{
+  "checks": [
+    "native floating-toolbar touch chunks load over HTTP; real Hammer Manager starts and destroys",
+    "native header replaces outer toolbar; period menu only supported intervals; native star adds direct shortcut; Android back closes period popup; one-tap M1/M5",
+    "bounded real candle cache renders interactive widget on reload while history is delayed; no screenshot; synchronization replaces stale candles on same widget; icon-only crosshair remains usable",
+    "saved provider viewport + failed first history: no infinite cover; readable failure; pending retry disabled; real data retry clears failure on same widget; period switch works",
+    "successful autosave automatically clears a previous real storage failure",
+    "normal pending autosave is silent; study settings restored on reload; actual local write failure is reported; flush retries and persists after storage recovery"
+  ],
+  "captures": [
+    {
+      "mode": "dark",
+      "width": 375,
+      "font": 14,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "dark",
+      "width": 375,
+      "font": 21,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "dark",
+      "width": 412,
+      "font": 14,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "dark",
+      "width": 412,
+      "font": 21,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "light",
+      "width": 375,
+      "font": 14,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "light",
+      "width": 375,
+      "font": 21,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 375,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "light",
+      "width": 412,
+      "font": 14,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        }
+      ]
+    },
+    {
+      "mode": "light",
+      "width": 412,
+      "font": 21,
+      "button": {
+        "x": 142.765625,
+        "y": 0,
+        "width": 44,
+        "height": 38
+      },
+      "ancestors": [
+        {
+          "x": 142.765625,
+          "y": 0,
+          "width": 44,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 412,
+          "height": 38
+        }
+      ]
+    }
+  ],
+  "diagnostics": [
+    {
+      "symbol": "MWP:YAHOO:AAPL",
+      "resolution": "1",
+      "at": 1794921627444,
+      "steps": {
+        "配置": 17,
+        "本机设置": 19,
+        "资源": 86,
+        "行情请求": 380,
+        "行情返回": 459,
+        "工具栏": 490,
+        "图表就绪": 556,
+        "画面可用": 573
+      },
+      "outcome": "ready"
+    }
+  ],
+  "forbidden": [],
+  "errors": []
+}

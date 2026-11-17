@@ -4,8 +4,8 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {chromium,expect}=require('@playwright/test');
 const dist=path.resolve('dist'),id='a'.repeat(64),ticker='MWC:'+id;
 const out=process.env.MOBILE_CHART_OUTPUT || '/tmp/mw-chart-round1';fs.mkdirSync(out,{recursive:true});
-const requests=[],errors=[],checks=[],consoleErrors=[],layouts=[];let catalogMode='hold',releaseCatalog,holdHistory=false,failHistory=false;const heldHistory=[];
-const provider=process.env.MOBILE_CHART_IDENTITY_ONLY ? 'MWP:DUKA:'+'A1'.repeat(16) : 'MWP:YAHOO:AAPL';
+const requests=[],errors=[],checks=[],consoleErrors=[],layouts=[];let catalogMode='hold',releaseCatalog,holdHistory=false,failHistory=false,priceOffset=0;const heldHistory=[];
+const provider='MWP:YAHOO:AAPL';
 const alertRule={id:'fixture-rule',name:'EURUSD H1',status:'paused',health:'ready',version:1,control_revision:1,run:1,count:0,max_triggers:1,created_at:Date.now(),updated_at:Date.now(),display_identity:{code:'EURUSD',source:'composite'},condition_summary:'价格 上穿 101',runtime:{},config:{name:'EURUSD H1',instrument:id,series_kind:'composite',source:'composite',timeframe:'H1',mode:'close',condition:{relation:'cross_up',left:{kind:'price'},right:{kind:'constant',value:'101'}},max_triggers:1,expires_at:null,message:'',notify_web:true,notify_ntfy:false,late_delivery:'log_only',association:null,calculation_version:'chart-python-v1'}};
 let logged=false,shellRevision=0,brokenInstall=false,delayLogin=false,pendingLogin;
 const server=http.createServer(async(req,res)=>{
@@ -50,13 +50,14 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/notification-center/events')return json({events:[],before:null});
    if(url.pathname==='/api/charts/history-loads/fixture-load/cancel')return json({ok:true});
    if(['/api/charts/data','/api/charts/history-loads','/api/charts/reserve'].includes(url.pathname)){
-     const candleQuery=query.query || query;if(url.pathname==='/api/charts/history-loads'&&holdHistory)await new Promise(resolve=>heldHistory.push(resolve));
+     const candleQuery=query.query || query;if(process.env.MOBILE_CHART_DEBUG)console.log('HISTORY',url.pathname,JSON.stringify(candleQuery));if(holdHistory && (url.pathname==='/api/charts/history-loads' || process.env.MOBILE_CHART_CACHE_COMPOSITE && url.pathname==='/api/charts/data' && !candleQuery.indicators?.length))await new Promise(resolve=>heldHistory.push(resolve));
+     if(failHistory && process.env.MOBILE_CHART_CACHE_COMPOSITE && url.pathname==='/api/charts/data' && !candleQuery.indicators?.length)return json({detail:'历史暂不可用，请重试'},503);
      if(failHistory && url.pathname==='/api/charts/history-loads')return json({load:{id:'fixture-load',state:'failed',error:{code:'HISTORY_UNAVAILABLE',message:'平台历史暂不可用，请重试',status:503}}});
      const step={M1:60000,M5:300000,H1:3600000,D1:86400000}[candleQuery.timeframe] || 3600000;
      const end=Math.floor(Math.min(candleQuery.before || Date.now(),Date.now())/step)*step;
      const bars=Array.from({length:Math.min(candleQuery.limit || 100,500)},(_,i)=>{
        const start=end-(Math.min(candleQuery.limit || 100,500)-i)*step;
-       const close=100+Math.sin(i/13)*1.2+Math.sin(i/4)*.25+i*.006,open=close+Math.sin(i*2)*.15;return {start,end:start+step,open:open.toFixed(2),high:(Math.max(open,close)+.12).toFixed(2),low:(Math.min(open,close)-.12).toFixed(2),close:close.toFixed(2),complete:true,revision:1};
+       const close=100+priceOffset+Math.sin(i/13)*1.2+Math.sin(i/4)*.25+i*.006,open=close+Math.sin(i*2)*.15;return {start,end:start+step,open:open.toFixed(2),high:(Math.max(open,close)+.12).toFixed(2),low:(Math.min(open,close)-.12).toFixed(2),close:close.toFixed(2),complete:true,revision:1};
      });
      const result={bars,has_more:false,pending:[],revision_id:'b'.repeat(64),input_revision:1,as_of:Date.now()};return json(url.pathname==='/api/charts/history-loads'?{load:{id:'fixture-load',state:'ready',pages:1},result}:result);
    }
@@ -120,6 +121,14 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await page.evaluate(()=>IDBObjectStore.prototype.put=window.MW_TEST_STORAGE_PUT);
   await page.getByRole('button',{name:'重试保存',exact:true}).click();await expect(page.locator('.chart-operation-error')).toHaveCount(0);await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();await page.reload();await widgetReady();
   assert.equal(await page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().getAllStudies().length),baseline,'retry flush persists latest settings after local storage recovers');await shot('autosave-reloaded');
+  // A subsequent successful autosave must remove the old error by itself.
+  await page.evaluate(()=>{const put=IDBObjectStore.prototype.put;window.MW_TEST_STORAGE_PUT=put;IDBObjectStore.prototype.put=function(value,key){if(this.name==='records'&&Array.isArray(key)&&key[3]==='chart')throw Error('本机存储写入失败');return put.call(this,value,key);};});
+  const recoveredStudy=await page.evaluate(()=>MW_TEST_WIDGET.activeChart().createStudy('Relative Strength Index',false,false,{length:13}));
+  await expect(page.locator('.chart-operation-error')).toBeVisible();
+  await page.evaluate(()=>IDBObjectStore.prototype.put=window.MW_TEST_STORAGE_PUT);
+  await page.evaluate(id=>MW_TEST_WIDGET.activeChart().removeEntity(id),recoveredStudy);
+  await expect(page.locator('.chart-operation-error')).toHaveCount(0,{timeout:15000});
+  checks.push('successful autosave automatically clears a previous real storage failure');
   checks.push('normal pending autosave is silent; study settings restored on reload; actual local write failure is reported; flush retries and persists after storage recovery');
  };
  const failedHistoryStartup=async()=>{
@@ -127,16 +136,17 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await page.getByRole('link',{name:'更多',exact:true}).click();
   const saved=await page.evaluate(()=>new Promise((resolve,reject)=>{const req=indexedDB.open('mw-mobile',2);req.onerror=()=>reject(req.error);req.onsuccess=()=>{const db=req.result,read=db.transaction('records').objectStore('records').get([location.origin,'admin',1,'chart']);read.onsuccess=()=>{db.close();resolve(read.result?.value?.state?._mwViewports);};};}));
   assert(saved?.[0]?.symbol===provider && saved[0].range?.to>saved[0].range?.from,'saved provider viewport is required to reproduce startup history failure');
+  await page.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('mw-mobile',2);r.onsuccess=()=>{const db=r.result,tx=db.transaction('records','readwrite');tx.objectStore('records').delete([location.origin,'admin',1,'chart-history']);tx.oncomplete=()=>{db.close();resolve();};};}));
   failHistory=true;
   await page.getByRole('link',{name:'图表',exact:true}).click();await page.reload();
   await expect(page.locator('.chart-workspace')).toHaveAttribute('aria-busy','false',{timeout:8000});
   await expect(page.getByRole('status',{name:'准备图表'})).toHaveCount(0);
-  await expect(page.getByText('行情暂时无法读取',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'重试行情',exact:true})).toBeEnabled();
+  await expect(page.getByText('行情读取失败',{exact:true})).toBeVisible();await expect(page.getByRole('button',{name:'重试行情',exact:true})).toBeEnabled();
   await shot('failed-history-startup');
   // A genuine pending read still reports progress; the retry resets only data,
   // preserving the same widget, saved studies and local document.
   const instance=await page.evaluateHandle(()=>window.MW_TEST_WIDGET);failHistory=false;holdHistory=true;
-  await page.getByRole('button',{name:'重试行情',exact:true}).click();await expect(page.getByRole('button',{name:'正在重试…',exact:true})).toBeDisabled();
+  await page.getByRole('button',{name:'重试行情',exact:true}).click();await expect(page.getByRole('button',{name:'正在重试行情',exact:true})).toBeDisabled();
   holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();
   await expect(page.locator('.chart-history-failure')).toHaveCount(0);assert(await page.evaluate(w=>w===window.MW_TEST_WIDGET,instance));await instance.dispose();
   await symbolIs(provider);await shot('failed-history-recovered');
@@ -145,23 +155,52 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   console.log('SAVED VIEWPORT + FAILED HISTORY: usable chart, explicit retry restores real bars');
  };
  const continuity=async()=>{
-  await page.evaluate(t=>window.MW_TEST_WIDGET.activeChart().setSymbol(t),provider);await widgetReady();await symbolIs(provider);
-  const readPreviews=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile',2);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,q=db.transaction('records').objectStore('records').get([location.origin,'admin',1,'chart-previews']);q.onsuccess=()=>{db.close();resolve((q.result?.value||[]).map(({image,...row})=>({...row,bytes:image.length})));};};}));
-  const save=async()=>{await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();};
+  const chosen=process.env.MOBILE_CHART_CACHE_COMPOSITE ? ticker.toUpperCase() : provider;
+  await page.evaluate(t=>window.MW_TEST_WIDGET.activeChart().setSymbol(t),chosen);await widgetReady();await symbolIs(chosen);
+  if(process.env.MOBILE_CHART_CACHE_STUDY)await page.evaluate(()=>MW_TEST_WIDGET.activeChart().createStudy('Relative Strength Index',false,false,{length:9}));
+  const readHistory=()=>page.evaluate(()=>new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile',2);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,q=db.transaction('records').objectStore('records').get([location.origin,'admin',1,'chart-history']);q.onsuccess=()=>{db.close();resolve(q.result?.value||[]);};};}));
+  const values=()=>page.evaluate(()=>{const chart=window.MW_TEST_WIDGET.activeChart(),bars=chart._chartWidget.model().model().mainSeries().bars();return {size:bars.size(),last:bars.valueAt(bars.lastIndex()),range:chart.getVisibleRange()};});
   for(const resolution of ['60','5']){
-   await page.evaluate(r=>window.MW_TEST_WIDGET.activeChart().setResolution(r),resolution);await widgetReady();await save();
-   await expect.poll(async()=>(await readPreviews()).some(row=>row.symbol===provider&&row.resolution===resolution)).toBe(true);
+   await page.evaluate(r=>window.MW_TEST_WIDGET.activeChart().setResolution(r),resolution);await widgetReady();
+   await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();
+   await expect.poll(async()=> (await readHistory()).some(row=>row.query.instrument===(process.env.MOBILE_CHART_CACHE_COMPOSITE ? id : 'YAHOO:AAPL')&&row.query.timeframe===(resolution==='5'?'M5':'H1'))).toBe(true);
   }
-  holdHistory=true;await page.reload();
-  await expect(page.locator('.chart-preview')).toBeVisible({timeout:10000});
-  await expect(page.locator('.chart-preview img')).toBeVisible();await expect(page.locator('.chart-preview-caption')).toContainText('上次画面');
-  assert.equal(await page.locator('.chart-loading [data-slot="spinner"]').count(),0);await shot('previous-view-reload');
-  holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();await expect(page.locator('.chart-preview')).toHaveCount(0);
-  holdHistory=true;await page.evaluate(()=>{void window.MW_TEST_WIDGET.activeChart().setResolution('60');});
-  await expect(page.locator('.chart-preview')).toBeVisible();await shot('previous-period-pending');
-  assert.equal(await native().locator('.mw-mobile-crosshair-entry:visible').innerText(),'','crosshair is icon-only');
-  holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();await expect(page.locator('.chart-preview')).toHaveCount(0);
-  checks.push('bounded actual native screenshots persist locally; matching saved view appears during delayed reload; matching H1 preview replaces M5 while H1 is delayed; live-ready removes preview; crosshair has accessible name with no visible text');
+  if(process.env.MOBILE_CHART_DEBUG)console.log('CACHE BEFORE',JSON.stringify((await readHistory()).map(e=>({query:e.query,count:e.page.bars.length,first:e.page.bars[0].start,last:e.page.bars.at(-1).start,as_of:e.page.as_of}))));
+  failHistory=Boolean(process.env.MOBILE_CHART_CACHE_FAILURE);holdHistory=!failHistory;await page.reload();await widgetReady();
+  await expect(page.locator('.chart-preview')).toHaveCount(0);
+  if(!failHistory)await expect(page.getByText('正在同步行情',{exact:true})).toBeVisible();
+  assert((await values()).size>10,'real cached candles render while authoritative history is held');
+  const oldClose=(await values()).last[4];
+  const instance=await page.evaluateHandle(()=>window.MW_TEST_WIDGET);
+  const crosshair=native().locator('.mw-mobile-crosshair-entry:visible');await crosshair.click();await expect(crosshair).toHaveAttribute('aria-pressed','true');await crosshair.click();
+  assert.equal(await crosshair.innerText(),'','crosshair is icon-only');
+  await shot('real-cached-chart-pending');
+  let pastRange;
+  if(process.env.MOBILE_CHART_CACHE_PAST){
+   pastRange=await page.evaluate(async()=>{const chart=MW_TEST_WIDGET.activeChart(),range=chart.getVisibleRange();await chart.setVisibleRange({from:range.from+1800,to:range.to-1800});return chart.getVisibleRange();});
+  }
+  if(process.env.MOBILE_CHART_CACHE_SWITCH){
+   await page.evaluate(()=>{void MW_TEST_WIDGET.activeChart().setResolution('1');});
+   await expect.poll(()=>page.evaluate(()=>MW_TEST_WIDGET.activeChart().resolution())).toBe('1');
+  }
+  if(failHistory){
+   await expect(page.locator('.chart-history-failure')).toBeVisible();await shot('cached-chart-sync-failed');
+   await page.waitForTimeout(250);await expect(page.locator('.chart-history-failure')).toBeVisible();
+   failHistory=false;priceOffset=10;
+   await page.getByRole('button',{name:'重试行情',exact:true}).click();
+  }
+  priceOffset=10;holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());
+  if(process.env.MOBILE_CHART_CACHE_SWITCH){
+   await widgetReady();await page.evaluate(()=>MW_TEST_WIDGET.activeChart().setResolution('5'));
+   await expect.poll(()=>page.evaluate(()=>MW_TEST_WIDGET.activeChart().resolution())).toBe('5');
+  }
+  await expect(page.getByText('正在同步行情',{exact:true})).toHaveCount(0,{timeout:20000});await widgetReady();
+  await expect.poll(async()=> (await values()).last[4]).toBeGreaterThan(oldClose+8);
+  if(pastRange){const range=(await values()).range;assert(Math.abs(range.from-pastRange.from)<600 && Math.abs(range.to-pastRange.to)<600,'cache revalidation preserves historical viewport');}
+  assert(await page.evaluate(w=>w===window.MW_TEST_WIDGET,instance),'fresh history keeps same widget');await instance.dispose();
+  await shot('real-cached-chart-synchronized');
+  priceOffset=0;
+  checks.push('bounded real candle cache renders interactive widget on reload while history is delayed; no screenshot; synchronization replaces stale candles on same widget; icon-only crosshair remains usable');
  };
  const desktopIsolation=async()=>{
   const desktopContext=await browser.newContext({viewport:{width:1440,height:1000},serviceWorkers:'block'});
@@ -247,27 +286,6 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,captures,diagnostics,forbidden,errors},null,2));
   console.log('PASS mobile chart polish: real widget, local saves, error recovery, continuity, layouts and settings isolation');
  };
- const identityPreview=async()=>{
-  await page.evaluate(t=>window.MW_TEST_WIDGET.activeChart().setSymbol(t),provider);await widgetReady();
-  await page.getByRole('link',{name:'更多',exact:true}).click();
-  await page.evaluate(()=>new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile',2);r.onerror=()=>reject(r.error);r.onsuccess=()=>{
-   const db=r.result,tx=db.transaction('records','readwrite'),store=tx.objectStore('records'),key=[location.origin,'admin',1,'chart-previews'],q=store.get(key);
-   q.onsuccess=()=>{const row=q.result;if(!row?.value?.length){tx.abort();return;}row.value=row.value.map(v=>({...v,symbol:v.symbol.replace(/[a-f0-9]{32}$/i,id=>id.toLowerCase())}));store.put(row,key);};
-   tx.oncomplete=()=>{db.close();resolve();};tx.onabort=()=>{db.close();reject(Error('expected saved native preview'));};
-  };}));
-  await page.getByRole('link',{name:'图表',exact:true}).click();holdHistory=true;await page.reload();
-  await expect(page.locator('.chart-preview')).toBeVisible({timeout:10000});await shot('dataset-id-preview');
-  holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();await expect(page.locator('.chart-preview')).toHaveCount(0);
-  // A new target without an album entry still exposes the real native header
-  // while history is pending, instead of covering it with preparation text.
-  await page.getByRole('link',{name:'更多',exact:true}).click();
-  await page.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('mw-mobile',2);r.onsuccess=()=>{const db=r.result,tx=db.transaction('records','readwrite');tx.objectStore('records').put({value:[],readAt:Date.now()},[location.origin,'admin',1,'chart-previews']);tx.oncomplete=()=>{db.close();resolve();};};}));
-  await page.getByRole('link',{name:'图表',exact:true}).click();holdHistory=true;await page.reload();
-  await expect(native().getByRole('button',{name:'图表周期',exact:true})).toBeVisible({timeout:10000});
-  await expect(page.getByRole('status',{name:'准备图表'})).toHaveCount(0);await shot('cold-history-native-header');
-  holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();
-  checks.push('uppercase native dataset identity reuses lowercase stored preview; real header stays visible during cold pending history with no preview');
- };
  try{
   await page.goto(base+'/m/');await page.getByLabel('密码',{exact:true}).fill('fixture-only');await page.getByRole('button',{name:'登录',exact:true}).click();await expect(page.getByRole('navigation',{name:'主导航'})).toBeVisible();
   await page.getByRole('link',{name:'图表',exact:true}).click();await expect(page.getByText('选择要查看的品种',{exact:true})).toBeVisible();await shot('empty-dark-412');
@@ -309,9 +327,27 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   if(process.env.MOBILE_CHART_BENCHMARK_ONLY){await benchmark();return;}
   if(process.env.MOBILE_CHART_POLISH_ONLY){await polish();return;}
   if(process.env.MOBILE_CHART_STARTUP_ONLY){await failedHistoryStartup();return;}
+  if(process.env.MOBILE_CHART_ERROR_ONLY){
+   await failedHistoryStartup();
+   failHistory=true;await page.reload();
+   await expect(page.getByRole('button',{name:'重试行情',exact:true})).toBeVisible();
+   await expect(page.getByRole('button',{name:'关闭行情提示',exact:true})).toBeVisible({timeout:1500});
+   for(const mode of ['dark','light']){
+    await theme(mode);
+    for(const width of [375,412])for(const font of [14,21]){
+     await page.setViewportSize({width,height:width===375?812:915});await page.evaluate(v=>document.documentElement.style.fontSize=v+'px',font);
+     await expect(page.getByRole('button',{name:'关闭行情提示',exact:true})).toBeInViewport();
+     await expect(page.getByRole('button',{name:'重试行情',exact:true})).toBeInViewport();
+     await shot(`error-${mode}-${width}-${font}`);
+    }
+   }
+   await page.getByRole('button',{name:'关闭行情提示',exact:true}).click();
+   await expect(page.locator('.chart-history-failure')).toHaveCount(0);
+   await page.waitForTimeout(500);await expect(page.locator('.chart-history-failure')).toHaveCount(0);
+   console.log('PASS actionable chart history failures can be dismissed without blocking chart');return;
+  }
   if(process.env.MOBILE_CHART_SAVE_ONLY){await silentLocalSave();return;}
   if(process.env.MOBILE_CHART_CONTINUITY_ONLY){await continuity();assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));return;}
-  if(process.env.MOBILE_CHART_IDENTITY_ONLY){await identityPreview();assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));return;}
   await expect(native().getByRole('button',{name:'设置',exact:true})).toHaveCount(0);
   const crosshairEntry=native().locator('.mw-mobile-crosshair-entry:visible');
   await expect(native().getByRole('button',{name:'绘图与十字线',exact:true})).toHaveCount(0);

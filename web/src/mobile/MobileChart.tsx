@@ -33,9 +33,9 @@ import {
   type Profile,
 } from "./cache";
 import type { MobileChartPreparation } from "./chartPreparation";
-import { chartPreviews, type ChartPreview } from "./chartPreview";
-import { sameChartSymbol } from "./chartIdentity";
+import { chartSymbolKey, sameChartSymbol } from "./chartIdentity";
 import { chartTiming } from "./chartTimings";
+import { mobileChartHistory } from "./chartHistory";
 const timeframes: Record<string, string> = {"1":"M1","5":"M5","15":"M15","30":"M30","60":"H1","240":"H4","1D":"D1","1W":"W1","1M":"MN"};
 
 export type MobileChartHandle = {
@@ -101,13 +101,21 @@ export default forwardRef<
   };
   const [historyLoads, setHistoryLoads] = useState(0);
   const [historyPending, setHistoryPending] = useState(false);
+  const [cachePending, setCachePending] = useState(false);
+  const cacheStates = useRef(new Map<string, {state:string;error?:string}>());
+  const cacheKey = (symbol:string,resolution:string) => JSON.stringify([chartSymbolKey(symbol),resolution]);
   const [historyFailure, setHistoryFailure] = useState<{
     epoch: number;
     index: number;
     symbol: string;
     resolution: string;
     error: string;
+    source?: "cache";
   } | null>(null);
+  const dismissedHistory = useRef("");
+  const loggedHistory = useRef("");
+  const failureKey = (value: {epoch:number;symbol:string;resolution:string;error:string}) =>
+    JSON.stringify([value.epoch,chartSymbolKey(value.symbol),value.resolution,value.error]);
   const historyBusy = historyLoads > 0;
   useEffect(() => {
     if (!historyBusy) {
@@ -118,8 +126,6 @@ export default forwardRef<
     return () => clearTimeout(timer);
   }, [historyBusy]);
   const [ready, setReady] = useState(false);
-  const [displayReady, setDisplayReady] = useState(false);
-  const [preview, setPreview] = useState<ChartPreview>();
   const [shellReady, setShellReady] = useState(false);
   const [toolbarHeight, setToolbarHeight] = useState(38);
   const [savePending, setSavePending] = useState(false);
@@ -161,17 +167,22 @@ export default forwardRef<
     let stopped = false,
       instance: ChartAdapter | undefined;
     let adapterReady = false;
-    const previews = chartPreviews(profile);
     let timing = chartTiming(profile, symbol, "60"), hasDisplayTarget = false;
     const mark = (phase: string) => { if (!stopped) timing.mark(phase); };
+    const history = mobileChartHistory(profile, (query, error) => {
+      if (!stopped) void chart.current?.update({type:"mobile-history-refreshed",
+        instrument:query.instrument,series_kind:query.series_kind,timeframe:query.timeframe,
+        ...(error ? {error:errorMessage(error)} : {})});
+    });
     const local = Promise.all([
       readSnapshot<ChartDocument>(profile, "chart").catch(() => {
         if (!stopped) callbacks.current.report("本机图表设置无法读取，当前使用不会自动记住");
         return undefined;
       }),
       readSnapshot<Record<string, string>>(profile, "chart-settings").catch(() => undefined),
-      previews.load(),
+      history.load(),
     ]);
+    void dropSnapshot(profile, "chart-previews").catch(() => {});
     // Configuration and local state begin before the licensed scripts load.
     const configuration = preparation.config();
     void configuration.then(() => mark("配置"), () => {});
@@ -183,9 +194,6 @@ export default forwardRef<
         resolution:document?.interval || "60", theme:callbacks.current.theme};
       timing.target(displayTarget.current.symbol, displayTarget.current.resolution);
       if (visibility.current) preparation.foreground(displayTarget.current.symbol, timeframes[displayTarget.current.resolution]);
-      setPreview(document && validChartDocument(document)
-        ? previews.find(displayTarget.current, JSON.stringify({...document, theme:callbacks.current.theme === "light" ? "Light" : "Dark"}))
-        : undefined);
     });
     const pendingHistory = new Set<string>();
     setHistoryLoads(0);
@@ -302,8 +310,21 @@ export default forwardRef<
           } else if (message.type === "chart-history-failures" &&
             message.epoch === nativeLoadEpoch.current) {
             if (message.failures.length) { timing.mark("行情失败"); timing.finish("failed"); }
-            setHistoryFailure(message.failures[0]
-              ? { ...message.failures[0], epoch: message.epoch } : null);
+            const failure = message.failures.find((item: any) =>
+              sameChartSymbol(item.symbol, displayTarget.current.symbol) &&
+              item.resolution === displayTarget.current.resolution);
+            const next = failure ? { ...failure, epoch: message.epoch } : null;
+            if (next) {
+              const key = failureKey(next);
+              if (key !== loggedHistory.current) {callbacks.current.report(next.error);loggedHistory.current=key;}
+              setHistoryFailure(key === dismissedHistory.current ? null : next);
+            } else {
+              const cached = cacheStates.current.get(cacheKey(displayTarget.current.symbol,displayTarget.current.resolution));
+              if(cached?.state !== "error") {
+                dismissedHistory.current="";loggedHistory.current="";
+                setHistoryFailure(previous => previous?.source === "cache" && cached?.state === "pending" ? previous : null);
+              }
+            }
           } else if (
             message.epoch === nativeLoadEpoch.current &&
             ["native-load-start", "native-load-end"].includes(message.type)
@@ -336,17 +357,17 @@ export default forwardRef<
             hasDisplayTarget = true;
             displayTarget.current = {symbol:message.symbol, resolution:message.resolution, theme:message.theme};
             preparation.foreground(message.symbol, timeframes[message.resolution]);
-            setPreview(previews.find(displayTarget.current));
-            setDisplayReady(false);
+            const cached=cacheStates.current.get(cacheKey(message.symbol,message.resolution));
+            setCachePending(cached?.state === "pending");
+            if(cached?.state === "error") {
+              const next={epoch:nativeLoadEpoch.current,index:0,symbol:message.symbol,
+                resolution:message.resolution,error:cached.error || "行情同步未完成",source:"cache" as const};
+              setHistoryFailure(failureKey(next) === dismissedHistory.current ? null : next);
+            }
           } else if (message.type === "mobile-display-ready") {
             if (sameChartSymbol(message.symbol, displayTarget.current.symbol) && message.resolution === displayTarget.current.resolution && message.theme === callbacks.current.theme) {
               mark("画面可用"); timing.finish("ready");
-              setDisplayReady(true);
             }
-          } else if (message.type === "mobile-preview") {
-            previews.put(message as ChartUpdate & ChartPreview);
-          } else if (message.type === "mobile-preview-invalidated") {
-            previews.clear();setPreview(undefined);
           } else if (message.type === "mobile-series") {
             setHistoryFailure(previous => previous &&
               sameChartSymbol(previous.symbol, message.symbol) && previous.resolution === message.resolution
@@ -358,6 +379,23 @@ export default forwardRef<
               selection.current.target = message.symbol;
               initial.current = message.symbol;
               callbacks.current.rememberSymbol(message.symbol);
+            }
+          } else if (message.type === "mobile-saved") {
+            setOperationError("");
+          } else if (message.type === "mobile-cache-state") {
+            cacheStates.current.set(cacheKey(message.symbol,message.resolution),{state:message.state,error:message.error});
+            if (sameChartSymbol(message.symbol, displayTarget.current.symbol) &&
+                message.resolution === displayTarget.current.resolution) {
+              setCachePending(message.state === "pending");
+              if (message.state === "error") {
+                const next={epoch:nativeLoadEpoch.current,index:0,symbol:message.symbol,
+                  resolution:message.resolution,error:message.error || "行情同步未完成",source:"cache" as const};
+                const key=failureKey(next);
+                setHistoryFailure(key === dismissedHistory.current ? null : next);
+                if(key !== loggedHistory.current) {callbacks.current.report(next.error);loggedHistory.current=key;}
+              } else if (message.state === "ready") {
+                dismissedHistory.current="";loggedHistory.current="";setHistoryFailure(null);
+              }
             }
           } else if (message.type === "mobile-flushed") {
             const pending = flushes.current.get(message.request);
@@ -393,7 +431,9 @@ export default forwardRef<
       market: (kind, query, context, source) => {
         if (visibility.current && kind === "data") preparation.foreground(selection.current.target, query.timeframe);
         if (visibility.current && kind === "market" && query.op === "resolve") preparation.foreground(selection.current.target);
-        if (kind === "data" || kind === "market")
+        if (kind === "data")
+          return history.read(query, () => market.data(query, source, context));
+        if (kind === "market")
           return market[kind](query, source, context);
         return api(
           "/charts/indicator-demands/" +
@@ -444,10 +484,10 @@ export default forwardRef<
     setFailure("");
     setOperationError("");
     setHistoryFailure(null);
+    setCachePending(false);
+    cacheStates.current.clear();
     setReady(false);
     setShellReady(false);
-    setPreview(undefined);
-    setDisplayReady(false);
     initial.current = "";
     selection.current.settled = false;
     void mountChart(root.current!, application, manifestPath)
@@ -467,6 +507,7 @@ export default forwardRef<
     return () => {
       timing.finish("superseded");
       stopped = true;
+      history.dispose();
       leaveResult.current?.(false);
       leaveResult.current = undefined;
       setConfirmLeave(false);
@@ -518,8 +559,6 @@ export default forwardRef<
         theme: theme === "light" ? "Light" : "Dark",
       });
   }, [theme, ready]);
-  const matchingPreview = preview && !displayReady && sameChartSymbol(preview.symbol, symbol) &&
-    preview.resolution === displayTarget.current.resolution && preview.theme === theme ? preview : undefined;
   const retrySave = async () => {
     setSavePending(true);
     try { await flush(); setOperationError(""); }
@@ -536,36 +575,28 @@ export default forwardRef<
         <h1 className="sr-only">图表</h1>
         <div className="chart-workspace" style={{"--chart-toolbar-height":`${toolbarHeight}px`} as React.CSSProperties} aria-busy={!ready && !failure}>
           <div className="mobile-chart-canvas" ref={root} />
-          {matchingPreview && (
-            <div className="chart-preview" style={{top:toolbarHeight,bottom:matchingPreview.bottom}}
-              aria-label={`上次图表，${new Date(matchingPreview.at).toLocaleString()}`}>
-              <img src={matchingPreview.image} alt="" />
-              <div className="chart-preview-caption">
-                <span>上次画面</span>
-                <time dateTime={new Date(matchingPreview.at).toISOString()}>
-                  {new Date(matchingPreview.at).toLocaleTimeString([], {hour:"2-digit",minute:"2-digit"})}
-                </time>
-              </div>
-            </div>
-          )}
           {operationError && ready && !historyFailure && (
-            <Alert className="chart-operation-error">
+            <Alert className="chart-operation-error chart-history-failure" role="status">
               <CircleAlert aria-hidden="true" />
-              <AlertTitle>设置尚未保存到本机</AlertTitle>
-              <AlertDescription>当前修改仍在，重试保存后再离开。</AlertDescription>
-              <Button variant="outline" disabled={savePending} onClick={() => void retrySave()}>
-                {savePending ? "正在保存…" : "重试保存"}
-              </Button>
+              <div className="chart-history-failure-copy">
+                <AlertTitle>设置尚未保存到本机</AlertTitle>
+                <AlertDescription>当前修改仍在，请重试保存。</AlertDescription>
+              </div>
+              <HeaderIconButton icon={RefreshCw} label={savePending ? "正在保存" : "重试保存"}
+                disabled={savePending} onClick={() => void retrySave()} />
               <HeaderIconButton icon={X} label="关闭保存提示" onClick={() => setOperationError("")} />
             </Alert>
           )}
           {ready && !failure && historyFailure && (
-            <Alert className="chart-history-failure">
+            <Alert className="chart-history-failure" role="status">
               <CircleAlert aria-hidden="true" />
-              <AlertTitle>行情暂时无法读取</AlertTitle>
-              <AlertDescription>{errorMessage(historyFailure.error).replace(/^(?:Error:\s*)+/, "")}</AlertDescription>
-              <Button
-                variant="outline"
+              <div className="chart-history-failure-copy">
+                <AlertTitle>行情读取失败</AlertTitle>
+                <AlertDescription>{errorMessage(historyFailure.error).replace(/^(?:Error:\s*)+/, "")}</AlertDescription>
+              </div>
+              <HeaderIconButton
+                icon={RefreshCw}
+                label={historyLoads > 0 ? "正在重试行情" : "重试行情"}
                 disabled={historyLoads > 0}
                 onClick={() => void chart.current?.update({
                   type: "retry-chart-history",
@@ -574,20 +605,19 @@ export default forwardRef<
                   symbol: historyFailure.symbol,
                   resolution: historyFailure.resolution,
                 })}
-              >
-                <RefreshCw data-icon="inline-start" aria-hidden="true" />
-                {historyLoads > 0 ? "正在重试…" : "重试行情"}
-              </Button>
+              />
+              <HeaderIconButton icon={X} label="关闭行情提示" onClick={() => {
+                dismissedHistory.current=failureKey(historyFailure);setHistoryFailure(null);
+              }} />
             </Alert>
           )}
-          {shellReady && !failure && historyPending && !historyFailure &&
-            !matchingPreview && (
+          {shellReady && !failure && (historyPending || cachePending) && !historyFailure && (
             <div className="chart-history-progress" role="status">
-              <span className="chart-status-dot" aria-hidden="true" />正在更新行情
+              <span className="chart-status-dot" aria-hidden="true" />{cachePending ? "正在同步行情" : "正在更新行情"}
             </div>
           )}
           {failure && (
-            <div className={matchingPreview ? "chart-failure-over-preview" : "chart-state-cover"}>
+            <div className="chart-state-cover">
               <Alert className="chart-failure">
                 <CircleAlert aria-hidden="true" />
                 <AlertTitle>图表暂时无法加载</AlertTitle>
@@ -602,12 +632,7 @@ export default forwardRef<
               </Alert>
             </div>
           )}
-          {!shellReady && !failure && matchingPreview && (
-            <div className="chart-loading-toolbar chart-preview-toolbar" aria-hidden="true">
-              <Skeleton /><Skeleton /><Skeleton /><Skeleton />
-            </div>
-          )}
-          {!shellReady && !failure && !matchingPreview && (
+          {!shellReady && !failure && (
             <div className="chart-state-cover chart-loading" role="status" aria-label="准备图表">
               <div className="chart-loading-toolbar" aria-hidden="true">
                 <Skeleton /><Skeleton /><Skeleton /><Skeleton />

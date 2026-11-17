@@ -1,4 +1,45 @@
-let activePreferences, mobileHeaderEntry, mobileContinuity;
+let activePreferences, mobileHeaderEntry, mobileReadiness;
+const mobileCachedSeries = new Set();
+const mobileRefreshes = new Map();
+const mobileHistoryUpdates = new Map();
+function mobileSeriesKey(ticker,res) { return MWSeries.encode(decode(ticker).symbol,decode(ticker).series_kind)+'|'+res; }
+function mobileCachePage(ticker,res,page) {
+  if(!mobileMode || decode(ticker).spec) return;
+  const key=mobileSeriesKey(ticker,res);
+  if(page.mobile_cached) {
+    mobileCachedSeries.add(key);
+    send({type:'mobile-cache-state',symbol:ticker,resolution:res,state:'pending'});
+    if(mobileHistoryUpdates.has(key))refreshMobileCache(ticker,res,mobileHistoryUpdates.get(key).error);
+  }
+}
+function mobileCacheAccepted(ticker,res,page) {
+  if(!mobileMode || decode(ticker).spec || !page.mobile_revalidated) return;
+  const key=mobileSeriesKey(ticker,res);
+  mobileHistoryUpdates.delete(key);
+  if(mobileCachedSeries.delete(key))
+    send({type:'mobile-cache-state',symbol:ticker,resolution:res,state:'ready'});
+}
+function refreshMobileCache(ticker,res,error) {
+  const key=mobileSeriesKey(ticker,res);
+  mobileHistoryUpdates.set(key,{error});
+  if(!mobileCachedSeries.has(key)) return;
+  if(error) {send({type:'mobile-cache-state',symbol:ticker,resolution:res,state:'error',error});return;}
+  if(mobileRefreshes.has(key)) return;
+  const deadline=Date.now()+30000;
+  const attempt=async()=>{
+    mobileRefreshes.delete(key);
+    if(disposed || !mobileCachedSeries.has(key) || document.hidden)return;
+    if(Date.now()>=deadline) {send({type:'mobile-cache-state',symbol:ticker,resolution:res,state:'error',error:'行情同步未完成，请重试'});return;}
+    if(!ready || loading) {mobileRefreshes.set(key,setTimeout(attempt,100));return;}
+    if(!chartUsesSymbol(widget.activeChart(),ticker,res))return;
+    try {
+      const result=await reloadHistory(ticker,res,()=>true,true);
+      if(result.status==='deferred')mobileRefreshes.set(key,setTimeout(attempt,150));
+      else if(result.status==='failed')send({type:'mobile-cache-state',symbol:ticker,resolution:res,state:'error',error:'行情同步未完成，请重试'});
+    } catch(error) {send({type:'mobile-cache-state',symbol:ticker,resolution:res,state:'error',error:String(error)});}
+  };
+  mobileRefreshes.set(key,setTimeout(attempt,0));
+}
 let disposed = false;
 const send = value => { if (!disposed) application.observe(value, adapter); };
 const pending = new Map();
@@ -277,6 +318,7 @@ function marketQuery(ticker, res) {
 }
 function registerMarketBar(sub) {
   if (!usesMarketStream(sub.symbol) || !sub.marketListener || sub.marketPaused) return;
+  if (mobileMode && mobileCachedSeries.has(mobileSeriesKey(sub.symbol,sub.res))) return;
   const state = marketHistoryState.get(sub.symbol+'|'+sub.res+'|'+(sub.window || '')) || {};
   sub.marketGeneration = ++marketGeneration;
   sub.marketSequence = 0;
@@ -439,7 +481,7 @@ function startIndicatorCoordinator(catalog) {
           dependencyBefore:page.dependency_before ?? old.dependencyBefore,
           dependencyRevision:page.dependency_revision ?? old.dependencyRevision});},
     },
-    status:(consumer,state,error,quality)=>{if(mobileMode)mobileContinuity?.indicator(state);send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
+    status:(consumer,state,error,quality)=>{send({type:'chart-indicator-state',epoch:workspaceEpoch,index:consumer.index,
       id:consumer.id,name:consumer.meta.label || consumer.id,state,error:error?.message || '',
       quality,
       previousParams:MWNativeIndicatorResults.scope(consumer.chart,consumer.id)?.transition?.params || null});},
@@ -623,6 +665,8 @@ async function recoverDisplaySnapshot(ticker,res,token,retry=false,failureEviden
   return entry.promise;
 }
 function acceptMarketHistory(ticker,res,page,window = '', acceptedRows) {
+  if(mobileMode && page.mobile_cached) return;
+  mobileCacheAccepted(ticker,res,page);
   rememberIndicatorBinding(ticker,res,page);
   if(!usesMarketStream(ticker)) return;
   const key=ticker+'|'+res+'|'+(window || ''), old=marketHistoryState.get(key) || {};
@@ -1153,6 +1197,8 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
       ...(managedSessions.get(symbol+'|'+res)?.start != null
         ? {dataset_start:managedSessions.get(symbol+'|'+res).start} : {})} : {}),
     ...args,
+    ...(mobileMode && !spec && ['first-screen','navigation'].includes(scheduling.purpose) ?
+      {mobile_history:true,...(scheduling.purpose==='first-screen' ? {mobile_first_screen:true} : {})} : {}),
     ...(spec ? { indicators: [spec] } : {}),
     ...(spec && ['history','composite'].includes(series_kind) ? {indicator_input_policy:'observed_display_v1'} : {}),
   };
@@ -1174,6 +1220,8 @@ function query(ticker, res, args, expires = Infinity, current = () => true, sche
   }})
     .then(page=>{
       if (!currentRead()) throw Object.assign(Error('已取消旧图表的历史加载'), {code:'HISTORY_CANCELLED'});
+      mobileCachePage(ticker,res,page);
+      if(mobileMode && page.mobile_cached) return page;
       if(epoch===workspaceEpoch && series_kind==='composite' && page.revision_id)
         alertCompositeRevisions.set(MWSeries.encode(symbol,series_kind)+'|'+res,page.revision_id);
       if (epoch===workspaceEpoch && spec && Number.isSafeInteger(page.calculation_origin ?? page.origin))
@@ -1642,12 +1690,15 @@ const feed = {
             observed_at:Math.min(old?.observed_at ?? Infinity,page.as_of||0),
           };
         }
-        if(!historyOlder(page,providerHistoryState.get(historyKey))) {
+        if(!page.mobile_cached && !historyOlder(page,providerHistoryState.get(historyKey))) {
           const previous=providerHistoryState.get(historyKey);
           providerHistoryState.set(historyKey,{revision:page.cache_revision||0,
             observed_at:page.as_of||0,cursor:Math.max(previous?.cursor||0,rows.at(-1)?.time||0)});
         }
-        const boundary = page.has_more === undefined
+        // The bootstrap is a bounded snapshot. Finish this native load even
+        // when a study asks for extra warm-up; authoritative reset replaces
+        // both candles and this temporary history boundary immediately.
+        const boundary = page.mobile_cached ? true : page.has_more === undefined
           ? page.history_boundary === true || page.window_limit === true
           : page.has_more === false;
         if(page.window_limit) send({type:'feed-poll-state',key:s.ticker,
@@ -1707,6 +1758,7 @@ const feed = {
             fixedHistoryStarts.set(historyKey,Math.min(fixedHistoryStarts.get(historyKey)??Infinity,page.bars[0].start));
           rawRows.push(...page.bars);
           rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
+          if(mobileMode && page.mobile_cached) {boundary=true;break;}
           if (page.revision_id) fixed={composite_revision_id:page.revision_id,
             ...(page.display_snapshot_id ? {display_snapshot_id:page.display_snapshot_id} : {input_revision:page.input_revision})};
           boundary=page.has_more===false && !page.pending?.length;
@@ -1769,6 +1821,7 @@ const feed = {
         }
         rawRows.push(...page.bars);
         rows=barsOf(page,res,s.ticker).filter(bar=>bar.time<p.to*1000).concat(rows);
+        if(mobileMode && page.mobile_cached) {boundary=true;break;}
         boundary=!page.has_more;
         if(boundary) break;
         const next=page.bars[0]?.start;
@@ -2248,9 +2301,6 @@ function snapshot(manual = true) {
       savedDoc=document;
       if (revision === editRevision) {
         dirty = false; send({type:'mobile-saved'});
-        // Keep the preview bound to the document that was actually persisted,
-        // including saves made without navigating away from the chart.
-        void mobileContinuity?.capture();
       }
     })().catch(error => {send({type:'error',error:'本次图表设置未记住：'+String(error)});throw error;})
       .finally(() => {mobileSaving = undefined;});
@@ -2716,7 +2766,7 @@ function boot(
   indicatorPicker?.dispose();
   mobileHeaderEntry?.dispose();
   mobileHeaderEntry = undefined;
-  mobileContinuity?.dispose(); mobileContinuity=undefined;
+  mobileReadiness?.dispose(); mobileReadiness=undefined;
   barRangeMapping?.dispose();
   barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
     markWorkspaceDirty();
@@ -2860,7 +2910,7 @@ function boot(
     activeTab?.dispose();
     activeTab = chartTab({widget,feed,send,workspace:()=>currentNativeWorkspace,epoch:()=>workspaceEpoch,metadata:presentationFor});
     startIndicatorCoordinator(catalog);
-    if(mobileMode)mobileContinuity=mobileChartContinuity(widget,container.querySelector('iframe').contentDocument,send,()=>JSON.stringify(savedDoc),
+    if(mobileMode)mobileReadiness=mobileChartReadiness(widget,send,
       (target,current)=>indicatorCoordinator.settle((ticker,res)=>ticker===target.symbol && res===target.resolution,current),()=>ready && !loading && !mobileChartParameterEditing(container));
     globalThis.MWChartMaximize = chartBlankDoubleClick(widget, { readonly });
     ensureSync();
@@ -3004,6 +3054,8 @@ function boot(
           display_symbol:metadata?.display_symbol || metadata?.symbol || chart.symbolExt?.()?.name || MWSeries.display(decode(ticker).symbol),
           source:metadata?.source && !["composite","history"].includes(metadata.source) ? metadata.source : "",
           resolutions:chart.symbolExt?.()?.supported_resolutions || (metadata?.frames ? resolutions.filter(r=>metadata.frames.includes(frames[r])) : resolutions)});
+        const update=mobileHistoryUpdates.get(mobileSeriesKey(ticker,chart.resolution()));
+        if(update)refreshMobileCache(ticker,chart.resolution(),update.error);
       };
       widget.activeChart().onSymbolChanged().subscribe(null, changed);
       widget.activeChart().onIntervalChanged().subscribe(null, changed);
@@ -3149,7 +3201,7 @@ function boot(
     await alertUIAttach();
     if (mobileMode) reportHistoryFailures();
     send({ type: "ready" });
-    if(mobileMode)void mobileContinuity?.loaded();
+    if(mobileMode)void mobileReadiness?.loaded();
     clearInterval(progressivePoll);
     demandReporter?.dispose();
     demandReporter=undefined;
@@ -3182,6 +3234,12 @@ function completeRequest(m) {
 }
 async function update(m) {
   if (disposed) return;
+  if(m.type==='mobile-history-refreshed' && mobileMode && Object.values(frames).includes(m.timeframe)) {
+    const ticker=MWSeries.encode(m.instrument,m.series_kind || 'managed');
+    const res=resolutions.find(res=>frames[res]===m.timeframe);
+    refreshMobileCache(ticker,res,m.error);
+    return;
+  }
   if (m.type === 'mobile-market-resume' && mobileMode && ready && !loading) {
     // Rebuild demand from the candles actually accepted by the native chart,
     // not a transport cursor that may have advanced before drawing completed.
@@ -3193,6 +3251,11 @@ async function update(m) {
       compositeDisplayBatches.cancel(indicatorKey(sub.symbol,sub.res));
       if (sub.needsHistoryReload) void recoverMarketBar(sub);
       else registerMarketBar(sub);
+    }
+    if(mobileCachedSeries.size) {
+      const active=widget.activeChart(), ticker=active.symbolExt?.()?.ticker || active.symbol();
+      const update=mobileHistoryUpdates.get(mobileSeriesKey(ticker,active.resolution()));
+      if(update)refreshMobileCache(ticker,active.resolution(),update.error);
     }
     void indicatorCoordinator?.sync();
     return;
@@ -3351,7 +3414,6 @@ async function update(m) {
         await snapshot(false);
       } else if (m.action === "flush") {
         await snapshot(true);
-        await mobileContinuity?.capture();
         send({type:"mobile-flushed",request:m.request});
       }
     } catch (error) {send({type:"error",error:String(error)}); if(m.request)send({type:"mobile-flushed",request:m.request,error:String(error)});}
@@ -3413,7 +3475,14 @@ async function update(m) {
   } else if (m.type === 'retry-chart-history' && ready && !loading && m.epoch===workspaceEpoch &&
       Number.isSafeInteger(m.index) && m.index>=0 && m.index<widget.chartsCount()) {
     const chart=widget.chart(m.index);
-    if(chart.symbol()===m.symbol && chart.resolution()===m.resolution) {
+    if((chart.symbol()===m.symbol || mobileMode && MWSeries.same(chart.symbol(),m.symbol)) && chart.resolution()===m.resolution) {
+      if(mobileMode && mobileCachedSeries.has(mobileSeriesKey(m.symbol,m.resolution))) {
+        mobileHistoryUpdates.delete(mobileSeriesKey(m.symbol,m.resolution));
+        send({type:'mobile-cache-state',symbol:m.symbol,resolution:m.resolution,state:'pending'});
+        const result=await reloadHistory(m.symbol,m.resolution,()=>true,true);
+        if(result.status!=='restored')refreshMobileCache(m.symbol,m.resolution);
+        return;
+      }
       // The mobile widget has one chart. v31 requires clearing its datafeed
       // cache before resetData can retry a failed first read.
       if (mobileMode) widget.resetCache();
@@ -3459,7 +3528,9 @@ async function update(m) {
 
 
 function disposeChart() {
-  ignoreTeardownFailure(() => mobileContinuity?.dispose()); mobileContinuity=undefined;
+  for(const timer of mobileRefreshes.values())clearTimeout(timer);
+  mobileRefreshes.clear();mobileHistoryUpdates.clear();mobileCachedSeries.clear();
+  ignoreTeardownFailure(() => mobileReadiness?.dispose()); mobileReadiness=undefined;
   ignoreTeardownFailure(() => mobileHeaderEntry?.dispose());
   mobileHeaderEntry = undefined;
   resolveDisposed=true; chartResolves.clear();
