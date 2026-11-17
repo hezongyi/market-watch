@@ -40,12 +40,16 @@ def test_list_switch_eligibility_matches_write_rules_without_creating_demand(dat
         assert db.scalar(select(func.count()).select_from(MarketComposite)) == 0
         assert db.scalar(select(func.count()).select_from(MarketDemand)) == 0
         toggle(db, identity().key, value=True)
+        eligible = summaries(db, alert_eligible=True)
+        assert eligible["total"] == 1
+        assert eligible["items"][0]["continuation"]["enabled"]
         db.get(MarketCatalog, catalog).available = False
         db.flush()
         broken = summaries(db)["items"][0]["continuation"]
         assert broken["enabled"] and broken["can_disable"] and not broken["can_enable"]
         toggle(db, identity().key, value=False)
         assert not summaries(db)["items"][0]["continuation"]["enabled"]
+        assert summaries(db, alert_eligible=True)["total"] == 0
 
 
 def test_rows_batch_without_per_item_detail_and_preserve_period_versions(database):
@@ -63,6 +67,52 @@ def test_rows_batch_without_per_item_detail_and_preserve_period_versions(databas
             assert row[key] == full[key]
         assert {p["timeframe"]: p["available_version_id"] for p in row["periods"]} == {
             p["timeframe"]: p["available_version_id"] for p in full["periods"]}
+
+
+def test_alert_picker_filters_before_paging_and_requires_saved_live_mapping(database, monkeypatch):
+    from alerts import api
+    from alerts.composite_definitions import save_mapping
+    from alerts.managed_continuation import configure as toggle
+    from alerts.storage import Instrument, MarketDataset, Preference
+    from fastapi.testclient import TestClient
+    from test_composite_definitions import PROOF, prepare, publish
+
+    catalog = prepare(database, monkeypatch)
+    publish(database)
+    with database.begin() as db:
+        configure(db, identity().key, target_start=0, timeframes=["M1"])
+        save_mapping(db, identity().key, catalog, PROOF)
+        inst = db.get(Instrument, db.get(MarketDataset, identity().key).instrument_id)
+        inst.enabled = True
+        db.flush()
+        # A provider collection flag is not a saved managed realtime choice.
+        assert summaries(db, alert_eligible=True)["total"] == 0
+        toggle(db, identity().key, value=True)
+        for code in ("AAA", "BBB"):
+            seed(db, code)
+            dataset = db.get(MarketDataset, identity(provider_symbol=code).key)
+            db.get(Instrument, dataset.instrument_id).enabled = True
+            if code == "BBB":
+                # Even an enabled preference cannot substitute for a mapping.
+                db.add(Preference(key="managed_realtime:" + dataset.instrument_id, value={"enabled": True}))
+        db.flush()
+        selected = summaries(db, alert_eligible=True, mobile=True, page_size=1)
+        assert selected["total"] == 1
+        assert [row["id"] for row in selected["items"]] == [identity().key]
+        assert summaries(db, alert_eligible=True, page=2, page_size=1)["items"] == []
+        assert summaries(db, alert_eligible=True, mobile=True, query="AAA")["total"] == 0
+
+    api.app.dependency_overrides[api.authenticated] = lambda: None
+    try:
+        with TestClient(api.app) as client:
+            path = "/api/market-data/center/dataset-summaries"
+            assert client.get(path).json()["total"] == 3
+            response = client.get(path, params={"alert_eligible": True, "mobile": True, "page_size": 1})
+            assert response.status_code == 200
+            assert response.json()["total"] == 1
+            assert response.json()["items"][0]["id"] == identity().key
+    finally:
+        api.app.dependency_overrides.clear()
 
 
 def test_query_count_is_bounded_and_full_api_stays_compatible(database):

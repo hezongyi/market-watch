@@ -145,8 +145,11 @@ const server = http.createServer(async (req, res) => {
   }
   if (url.pathname === "/api/market-data/series/page")
     return json({ items: [], next_offset: null });
-  if (url.pathname === "/api/market-data/center/dataset-summaries")
+  if (url.pathname === "/api/market-data/center/dataset-summaries") {
+    if (url.searchParams.get("alert_eligible") === "true" && !dataset.continuation.enabled)
+      return json({ items: [], total: 0, page: 1, page_size: 25 });
     return json({ items: [dataset], total: 1 });
+  }
   if (
     url.pathname ===
     "/api/market-data/datasets/" + datasetId + "/continuation"
@@ -656,19 +659,15 @@ const server = http.createServer(async (req, res) => {
     filter = page.getByRole("dialog", { name: "搜索规则", exact: true });
     await choose(filter, "规则范围", "当前规则");
     await filter.getByRole("button", { name: "查看规则", exact: true }).click();
-    // A closed realtime source keeps the picker open and exposes the real data workflow.
+    // A closed realtime source is removed from the picker instead of appearing
+    // as a selectable row that can only fail after the click.
     dataset.continuation.enabled = false;
-    const unavailableRoute = "**/api/market-data/datasets/" + datasetId + "/continuation";
-    await page.route(unavailableRoute, route => route.fulfill({ json: { enabled: false, ready_to_enable: true, status: "disabled", supported: true } }));
     await page.getByRole("button", { name: "创建告警", exact: true }).first().click();
     const unavailablePicker = page.getByRole("dialog", { name: "选择告警品种", exact: true });
-    await unavailablePicker.getByRole("button", { name: /EURUSD/ }).click();
-    await expect(unavailablePicker.getByRole("alert")).toContainText("尚未开启实时");
-    await unavailablePicker.getByRole("button", { name: "去数据详情", exact: true }).click();
-    const dataDetails = page.getByRole("dialog", { name: "自建行情", exact: true });
-    await expect(dataDetails).toContainText("EURUSD"); await shot("picker-data-workflow"); await close(dataDetails);
-    await expect(unavailablePicker).toBeVisible(); await close(unavailablePicker);
-    await page.unroute(unavailableRoute); dataset.continuation.enabled = true;
+    await expect(unavailablePicker).toContainText("没有可创建告警的品种");
+    await expect(unavailablePicker.getByRole("button", { name: /EURUSD/ })).toHaveCount(0);
+    await shot("picker-excludes-disabled-realtime"); await close(unavailablePicker);
+    dataset.continuation.enabled = true;
     // Range validation stays inline, preserves values and does not issue a write.
     form = await pick();
     await choose(form, "触发条件", "进入价格区间");
@@ -833,7 +832,7 @@ const server = http.createServer(async (req, res) => {
       checks: [
         ...pullChecks,
         "independent symbol picker",
-        "unavailable source routes to real data details and returns",
+        "disabled realtime sources are excluded from the picker",
         "invalid range retains fields without a write",
         "per-mode/timeframe capabilities",
         "request ID and config retained after uncertain create",

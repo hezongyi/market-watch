@@ -13,6 +13,7 @@ from .storage import (
     HistoryVersion,
     Instrument,
     MarketDataset,
+    Preference,
     RealtimeMapping,
 )
 
@@ -115,7 +116,8 @@ def dataset_detail(db, dataset_id):
 
 
 def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, status="all", page=1, page_size=25,
-                   include_continuations=False, mobile=False, exclude_watch=False, excluded_watch_ids=()):
+                   include_continuations=False, mobile=False, exclude_watch=False, excluded_watch_ids=(),
+                   realtime_only=False):
     if not 1 <= page_size <= 100 or page < 1 or status not in (
             "all", "available", "preparing", "attention", "paused", "archived"):
         raise ValueError("无效的列表范围或状态")
@@ -123,14 +125,24 @@ def _dataset_query(*, query="", source=None, calendar=None, asset_class=None, st
     # A saved maintenance plan is what makes an identity managed history.
     # Restrict before counting/paging, so directory rows cannot displace it.
     base = select(MarketDataset.id).join(Instrument)
+    saved = select(RealtimeMapping.id).where(RealtimeMapping.dataset_id == MarketDataset.id,
+        RealtimeMapping.permission_scope == "workspace:default").exists()
     if include_continuations:
         # Legacy fixed histories can own saved continuation mappings without a
         # newer maintenance plan. Their target/provider-only identities stay out.
-        saved = select(RealtimeMapping.id).where(RealtimeMapping.dataset_id == MarketDataset.id,
-            RealtimeMapping.permission_scope == "workspace:default").exists()
         base = base.outerjoin(DatasetMaintenance).where(or_(DatasetMaintenance.dataset_id.is_not(None), saved))
     else:
         base = base.join(DatasetMaintenance)
+    if realtime_only:
+        # The picker requires the saved managed switch and a continuation
+        # mapping. A provider collection flag alone cannot create an alert.
+        base = base.join(
+            Preference,
+            Preference.key == "managed_realtime:" + MarketDataset.instrument_id,
+        ).where(
+            Preference.value["enabled"].as_boolean().is_(True),
+            saved,
+        )
     if exclude_watch:
         base = base.where(MarketDataset.id.not_in(excluded_watch_ids))
     if mobile:

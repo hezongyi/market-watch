@@ -78,6 +78,8 @@ services:
   web:
     <<: *limits
     image: ${MW_WEB_IMAGE:?}
+    volumes:
+      - ${MW_PRIVATE_DIR:?}/downloads:/usr/share/nginx/html/downloads:ro
     mem_limit: 128m
     cpus: 0.25
     depends_on:
