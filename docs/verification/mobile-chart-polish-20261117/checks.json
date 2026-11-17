@@ -1,0 +1,17 @@
+{
+  "build": "passed",
+  "preparation": "passed (failure/cancellation retry, no automatic loop)",
+  "native_resume": "passed",
+  "cache": "passed",
+  "logs": "passed",
+  "theme_and_style": "passed",
+  "mobile_chart_full": "passed",
+  "mobile_chart_polish": "passed (two review rounds)",
+  "mobile_chart_benchmark": "passed (controlled responses)",
+  "mobile_chart_resume_browser": "passed",
+  "desktop_isolation": "passed (actual desktop + mobile widget and fixture storage)",
+  "development_deployment": "passed (trusted CA, only Web replacement, unchanged server config)",
+  "android_device": "not performed",
+  "actual_market_browser": "passed (same widget, offline/foreground recovery, forming M5 bar update, native indicator back, no desktop settings writes)",
+  "apk_update_download": "passed (trusted CA, no-store manifest, SHA256/size, missing404)"
+}

@@ -15,7 +15,7 @@ export function mobileChartPreparation(profile: Profile) {
   let resourcesPrepared = false;
   let reschedule = false;
   let lastInterval = "60";
-  const intervals = new Map<string, string>(), completed = new Set<string>();
+  const intervals = new Map<string, string>(), completed = new Set<string>(), unsupported = new Set<string>();
   const startup = { current: null as StartupPreparation | null };
   const config = () => configuration ||= Promise.all([
     api("/advanced-charts/catalog", undefined, controller.signal),
@@ -24,7 +24,7 @@ export function mobileChartPreparation(profile: Profile) {
   const active = () => !controller.signal.aborted && profileActive(profile);
   const schedule = () => {
     clearTimeout(timer);
-    if (resourcesPrepared && candidates.every(ticker => completed.has(ticker+"|"+(intervals.get(ticker) || lastInterval)))) return;
+    if (resourcesPrepared && candidates.every(ticker => (completed.has(ticker+"|"+(intervals.get(ticker) || lastInterval)) || unsupported.has(ticker+"|"+(intervals.get(ticker) || lastInterval))))) return;
     if (running) {reschedule = true; return;}
     if (active() && !paused && !focused && !running) timer = setTimeout(() => void warm(), 1200);
   };
@@ -43,12 +43,13 @@ export function mobileChartPreparation(profile: Profile) {
         if (!active() || paused || focused) break;
         const interval = intervals.get(ticker) || lastInterval;
         const key = ticker + "|" + interval;
-        if (completed.has(key)) continue;
+        if (completed.has(key) || unsupported.has(key)) continue;
         // Reuse the existing startup preparation protocol (one opportunity
         // page); it warms the authoritative cache, not a second candle store.
         const query = startupHistoryQuery({symbol:ticker, interval});
-        completed.add(key);
-        if (!query || !capabilities.startup_preparation) continue;
+        if (!query || !capabilities.startup_preparation) { unsupported.add(key); continue; }
+        // Failed/aborted work remains eligible at the next idle lifecycle.
+        // No automatic retry loop competes with the foreground chart.
         const warming = new AbortController();
         const result = loadNativeHistory({...query, native_history:{...query.native_history, focused:false}},
           warming.signal, capabilities, () => {}, {}, undefined, true);

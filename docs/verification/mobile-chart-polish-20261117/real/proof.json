@@ -1,0 +1,966 @@
+{
+  "environment": "Ubuntu persistent mw-dev; actual authenticated API/market data; instrumented constructor in this browser only",
+  "checks": [
+    "navigation returns to the same native widget",
+    "offline and foreground recovery keep the same native widget and populated bars",
+    "native indicators open and Android back closes the dialog; no desktop workspace/preferences writes"
+  ],
+  "timings": [
+    {
+      "resolution": "5",
+      "ms": 227,
+      "values": {
+        "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+        "resolution": "5",
+        "size": 60,
+        "last": [
+          1794893700,
+          3886.085,
+          3886.685,
+          3881.335,
+          3882.285,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "studies": []
+      }
+    },
+    {
+      "resolution": "60",
+      "ms": 49,
+      "values": {
+        "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+        "resolution": "60",
+        "size": 173,
+        "last": [
+          1794891600,
+          3874.835,
+          3886.685,
+          3872.165,
+          3882.325,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "studies": []
+      }
+    },
+    {
+      "resolution": "5",
+      "ms": 41,
+      "values": {
+        "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+        "resolution": "5",
+        "size": 60,
+        "last": [
+          1794893700,
+          3886.085,
+          3886.685,
+          3881.335,
+          3882.285,
+          null,
+          null,
+          null,
+          null,
+          null,
+          null
+        ],
+        "studies": []
+      }
+    }
+  ],
+  "initial": {
+    "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+    "resolution": "60",
+    "size": 60,
+    "last": [
+      1794891600,
+      3874.835,
+      3886.685,
+      3872.165,
+      3882.325,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "studies": []
+  },
+  "afterReconnect": {
+    "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+    "resolution": "5",
+    "size": 162,
+    "last": [
+      1794893700,
+      3886.085,
+      3886.685,
+      3881.335,
+      3883.425,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "studies": []
+  },
+  "afterForeground": {
+    "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+    "resolution": "5",
+    "size": 162,
+    "last": [
+      1794893700,
+      3886.085,
+      3886.685,
+      3881.335,
+      3882.995,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+    ],
+    "studies": []
+  },
+  "tailSamples": [
+    {
+      "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+      "resolution": "5",
+      "size": 162,
+      "last": [
+        1794893700,
+        3886.085,
+        3886.685,
+        3881.335,
+        3882.995,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "studies": []
+    },
+    {
+      "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+      "resolution": "5",
+      "size": 162,
+      "last": [
+        1794893700,
+        3886.085,
+        3886.685,
+        3881.335,
+        3883.355,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "studies": []
+    },
+    {
+      "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+      "resolution": "5",
+      "size": 162,
+      "last": [
+        1794893700,
+        3886.085,
+        3886.685,
+        3881.335,
+        3883.415,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "studies": []
+    },
+    {
+      "symbol": "MWC:4087CAEE7E525A3864EE1B083B8FE65F6DDD13A738D72681EC92CD46D5615EA6",
+      "resolution": "5",
+      "size": 162,
+      "last": [
+        1794893700,
+        3886.085,
+        3886.685,
+        3881.335,
+        3883.515,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "studies": []
+    }
+  ],
+  "formingUpdated": true,
+  "diagnostics": [
+    {
+      "symbol": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+      "resolution": "60",
+      "at": 1794893861802,
+      "steps": {
+        "本机设置": 49,
+        "配置": 273,
+        "资源": 498,
+        "工具栏": 1877,
+        "图表就绪": 2231,
+        "画面可用": 2281
+      },
+      "outcome": "ready"
+    },
+    {
+      "symbol": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+      "resolution": "5",
+      "at": 1794893864518,
+      "steps": {
+        "画面可用": 214
+      },
+      "outcome": "ready"
+    },
+    {
+      "symbol": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+      "resolution": "60",
+      "at": 1794893864748,
+      "steps": {
+        "画面可用": 20
+      },
+      "outcome": "ready"
+    },
+    {
+      "symbol": "MWC:4087caee7e525a3864ee1b083b8fe65f6ddd13a738d72681ec92cd46d5615ea6",
+      "resolution": "5",
+      "at": 1794893864813,
+      "steps": {
+        "画面可用": 20
+      },
+      "outcome": "ready"
+    }
+  ],
+  "requests": [
+    {
+      "path": "/api/session",
+      "method": "GET"
+    },
+    {
+      "path": "/api/login",
+      "method": "POST"
+    },
+    {
+      "path": "/api/session",
+      "method": "GET"
+    },
+    {
+      "path": "/api/advanced-charts/preferences",
+      "method": "GET"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/sparklines",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/events",
+      "method": "GET"
+    },
+    {
+      "path": "/api/advanced-charts/catalog",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/history-capabilities",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/events",
+      "method": "GET"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/health",
+      "method": "GET"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/health",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/session",
+      "method": "GET"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/events",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/data",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/session",
+      "method": "GET"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/events",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/quotes",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/market-data/resolve",
+      "method": "POST"
+    },
+    {
+      "path": "/api/charts/stream/subscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/charts/stream/unsubscribe",
+      "method": "POST"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    },
+    {
+      "path": "/api/notification-center/changes",
+      "method": "GET"
+    }
+  ],
+  "errors": [],
+  "forbiddenWrites": []
+}

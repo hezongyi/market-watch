@@ -2822,7 +2822,7 @@ function boot(
     const style = doc.createElement('style');
     style.textContent = '.chart-container .tv-spinner{display:none!important}';
     doc.head.append(style);
-    send({type:'mobile-shell-ready'});
+    send({type:'mobile-shell-ready',height:doc.querySelector('#header-toolbar-intervals')?.parentElement?.parentElement?.getBoundingClientRect().bottom || 38});
   }).catch(e => send({type:'error',error:String(e)}));
   if (!mobileMode) widget
     .headerReady()
