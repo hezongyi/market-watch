@@ -27,6 +27,7 @@ let logged = false,
   errors = [];
 const now = Date.now();
 let monitorHealth = () => ({enabled:true, loop:{state:'idle',heartbeat_at:Date.now()}});
+let phoneEnabled = process.env.MOBILE_ALERT_PUSH_DEFAULT === '1';
 const dataset = {
   id: datasetId,
   logical_symbol: "EURUSD",
@@ -138,8 +139,8 @@ const server = http.createServer(async (req, res) => {
     const health=monitorHealth();
     if(health._delay)await new Promise(resolve=>setTimeout(resolve,health._delay));
     return json({
-      ntfy_configured: false,
-      delivery_enabled: false,
+      ntfy_configured: phoneEnabled,
+      delivery_enabled: phoneEnabled,
       chart_alerts: health,
     });
   }
@@ -438,6 +439,11 @@ const server = http.createServer(async (req, res) => {
     await expect(
       page.getByRole("button", { name: "创建告警", exact: true }).first(),
     ).toBeEnabled();
+    if (process.env.MOBILE_ALERT_PUSH_DEFAULT === '1') {
+      await require('./mobile-alert-push-default.scenario.cjs')({page, pick, close, refresh, shot, errors,
+        rows, createBodies, setPhoneEnabled: value => { phoneEnabled = value; }});
+      return;
+    }
     if (process.env.MOBILE_ALERT_READINESS === '1') {
       await require('./mobile-alert-readiness.scenario.cjs')({page, context, out, shot, close, refresh, errors,
         setRows:value=>{rows=value;}, setHealth:value=>{monitorHealth=value;}, datasetId, instrument, revision});

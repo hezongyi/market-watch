@@ -39,3 +39,14 @@
 - 后端通知/告警回归 40 passed、1 skipped；真实已部署手机设置从新域名认证并发送一次测试，ntfy 读回验证 click 指向新域名 App 深链，action 是新域名 HTTPS POST。公开回调的无效凭证探针返回应用预期 403，证明路由和 TLS 可达，没有确认真实通知。
 - 用户反馈通知按钮可以打勾；核对时最新这次测试仍未记录 ack，不能将设备显示直接声明为该测试的服务器确认成功。后续以对应 test_id 的 ack_at 与确认审计为准，不模拟用户确认。
 - 本次最终 API/通知 worker 镜像 `sha256:605ee68c0782fd0e8bb612be46c87e14519e6784e502b47562331d53862a2f5a`；Web 恢复使用原一键确认说明的镜像 `sha256:210ddf1726317ee23f3c0f3b34c9fdf7f8c1c7895db0178951ad8dc7e1b512a8`。私有 launcher 候选 `run.candidate-domain.json`；回退仅选择对应服务旧镜像及地址配置，不整体覆盖其他后续任务。
+
+
+## 手机新建规则默认推送（同日追加）
+
+- 用户认可 ntfy 作为当前手机通知线路。手机端新建规则时，只有在线、近期健康配置确认已配置 topic 且全局投递开启，才默认打开“手机推送”；未配置或关闭时保持关闭。单条规则仍可手动关闭，后台健康刷新不覆盖草稿选择。
+- 编辑规则沿用保存的配置，不追溯打开旧规则。仅修改手机新建配置入口；后端默认值及专业图表新建行为不变。App 内告警记录、通知正文打开 App、显式确认才回传的语义保留。
+- 核对确认链路时扩大至实际通知，而非只看最后一条测试。2026-11-17 08:53:17/19 UTC，ntfy Android 客户端经域名回调两个实际系统通知，Web 返回 200；数据库状态均为 acknowledged、ack_at 非空、Outbox cancelled。08:56:07 UTC，实际告警信号 `3e01246f-afed-430d-8aa9-4d9b5da30436` 也记录 acknowledged / cancelled。只读核验，没有由 agent 代点确认；私有证据 real-domain-confirmations.json。最后一条测试没有回执不再被误判为所有通知确认都失败。
+- `MOBILE_ALERT_PUSH_DEFAULT=1 node tests/mobile-alerts.browser.cjs` 使用 HTTP 夹具验证默认开启、提交字段、丢响应重试、手动关闭、健康刷新保留选择、编辑已开/已关规则及全局不可用默认关闭；无真实规则或推送写入。截图位于 `/tmp/mw-mobile-alert-push-default/`。
+- 后端通知及告警回归 40 passed、1 skipped；前端完整构建通过。本轮仅需要更新 Web，无需新 APK。
+- 原完整手机告警浏览器回归及本次推送场景均通过。已部署 Web `sha256:23bf85de00a3399d6761b8e7df7a6c15105f09c1f6e75cc1ac18140eb3833768` 至 Ubuntu `mw-dev`，系统可信 TLS 的真实认证页面验证新建开关默认开启；只打开/关闭草稿，没有保存真实规则或发送新测试。前后规则配置/版本一致，其余容器 ID 保持原样；APK 0.1.5 下载清单仍可用。
+- 当前入口 `https://quant.kookvv.com:8443/m/`；启停仍为 `mw-dev up` / `mw-dev stop`。本次私有快照与截图在 `~/.local/share/market-watch-dev/updates/mobile-ntfy-default-20261117/`。如需回退，只将 launcher 使用的 run.json 内 Web 镜像恢复为 run.before.json 中对应值，再定向重建 Web，不覆盖其他配置。

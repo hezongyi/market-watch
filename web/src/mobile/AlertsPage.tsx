@@ -433,7 +433,7 @@ export default function AlertsPage({
       const value: Editor = {
         config: row
           ? structuredClone(row.config)
-          : newPriceConfig(identity.instrument, detail.active_revision_id),
+          : newPriceConfig(identity.instrument, detail.active_revision_id, ntfy),
         row,
         frames: meta.frames || [],
         label: row
