@@ -47,10 +47,16 @@ def mobile_category_ids(db, *, archived=False):
     return groups
 
 
-def summaries(db, *, ids=None, view=None, anchor=None, retain_watch=(), category=None, include_categories=False, **filters):
+def summaries(db, *, ids=None, view=None, anchor=None, retain_watch=(), category=None,
+              include_categories=False, alert_eligible=False, **filters):
     from .mobile_symbol_search import watched
     excluded = watched(db, retain_watch)["dataset"] if filters.get("exclude_watch") else ()
-    base = _dataset_query(include_continuations=True, excluded_watch_ids=excluded, **filters)
+    base = _dataset_query(
+        include_continuations=True,
+        excluded_watch_ids=excluded,
+        realtime_only=alert_eligible,
+        **filters,
+    )
     categories = None
     if category or include_categories:
         if category and category not in MOBILE_CATEGORIES:

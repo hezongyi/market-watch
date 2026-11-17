@@ -156,14 +156,16 @@ def router(authenticated):
                           asset_class: str | None = None, status: str = "all", page: int = 1,
                           page_size: int = 25, ids: str | None = None, view: str | None = None,
                           anchor: str | None = None, mobile: bool = False, exclude_watch: bool = False, retain_watch: str = "",
-                          category: str | None = None, include_categories: bool = False):
+                          category: str | None = None, include_categories: bool = False,
+                          alert_eligible: bool = False):
         from .dataset_summaries import summaries
 
         try:
             with transaction() as db:
                 return summaries(db, ids=ids, view=view, anchor=anchor, query=query, source=source, calendar=calendar,
                     asset_class=asset_class, status=status, page=page, page_size=page_size, mobile=mobile, exclude_watch=exclude_watch,
-                    retain_watch=retain_watch.split(",") if retain_watch else (), category=category, include_categories=include_categories)
+                    retain_watch=retain_watch.split(",") if retain_watch else (), category=category, include_categories=include_categories,
+                    alert_eligible=alert_eligible)
         except ValueError as error:
             raise HTTPException(422, str(error)) from None
 
