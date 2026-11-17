@@ -188,6 +188,57 @@ def signal_event_id(signal_id):
     return 's:' + str(uuid.uuid5(uuid.NAMESPACE_URL, 'market-watch:chart-signal:' + signal_id))
 
 
+def _system_notification(db, state, ident):
+    note = db.get(Notification, ident)
+    if not note or note.kind != 'system' or note.created_at < now_ms() - 30 * 86400_000:
+        return None
+    payload = note.payload
+    recovery = (payload.get('incident_id', '').startswith('runtime-recovery:')
+                or payload.get('incident_id', '').endswith(':recovery'))
+    event_id = 'n:' + note.id
+    body = {'title': safe_text(payload.get('title', '后台运行通知'), 160),
+            'message': safe_text(payload.get('message', ''), 2000),
+            'context': payload.get('context', {}),
+            'evidence': {'initial_message': safe_text(payload.get('observed_message', ''), 2000)},
+            'notification_id': note.id, 'notification_status': note.status,
+            'ack_at': note.ack_at, 'resolved_at': payload.get('resolved_at'),
+            'notify_web': False}
+    event = db.get(NoticeEvent, event_id)
+    if event is None:
+        event = _new_event(db, state, ident=event_id, source_kind='runtime',
+            source_id=note.id, occurred_at=note.created_at, body=body,
+            severity='info' if recovery else 'warning', kind='recovery' if recovery else 'failure',
+            backfill=note.created_at < state.started_at)
+    elif any(event.body.get(key) != value for key, value in body.items()):
+        event.body = clean({**event.body, **body})
+        event.version = state.seq + 1
+        publish(db, state, 'updated', event.id, summary(db, event))
+    if payload.get('resolved_at') or recovery:
+        group = db.get(NoticeIncident, event.incident_id)
+        closed = payload.get('resolved_at') or note.created_at
+        if group and group.closed_at is None:
+            group.closed_at = closed
+            publish(db, state, 'incident', '', incident_dict(group))
+    for attempt in db.scalars(select(DeliveryAttempt).where(DeliveryAttempt.notification_id == note.id)):
+        ident = 'phone-attempt:' + str(attempt.id)
+        if not db.get(NoticeObservation, ident):
+            facts = {'status': attempt.status, **{key: safe_text(value) for key, value in attempt.details.items()
+                                                if key in ('provider_id', 'status_code', 'error')}}
+            db.add(NoticeObservation(id=ident, event_id=event_id, subject=state.subject,
+                profile='server', kind='phone_attempt', at=attempt.at, details=facts,
+                intent_hash=intent_hash(facts)))
+    return event
+
+
+def system_notification(db, ident):
+    """Resolve the exact source row even while the asynchronous projection catches up."""
+    state = stream(db, lock=True)
+    row = _system_notification(db, state, ident)
+    if row is None:
+        raise HTTPException(404, '该通知记录不存在或已超过保留期')
+    return summary(db, row)
+
+
 def _signal(db, state, ident, at):
     signal = db.get(SignalRow, ident)
     if not signal or not signal.chart_alert_id:
@@ -217,6 +268,9 @@ def _signal(db, state, ident, at):
 def _server_source(db, state, audit):
     source = audit.details
     kind, facts = source['kind'], source['facts']
+    if kind == 'system_notice':
+        row = _system_notification(db, state, facts['notification_id'])
+        return row.id if row else None
     if kind == 'signal':
         row = _signal(db, state, facts['signal_id'], audit.at)
         return row.id if row else None
@@ -698,6 +752,16 @@ def backfill(db, *, limit=100):
         ~exists(select(NoticeSourceReceipt.source_key).where(NoticeSourceReceipt.source_key == 'backfill:' + SignalRow.id)))
         .order_by(SignalRow.occurred_at, SignalRow.id).limit(limit)))
     count = 0
+    for note in db.scalars(select(Notification).where(Notification.kind == 'system',
+            Notification.created_at >= now_ms() - 30 * 86400_000,
+            ~exists(select(NoticeEvent.id).where(NoticeEvent.id == 'n:' + Notification.id)),
+            ~exists(select(NoticeSourceReceipt.source_key).where(
+                NoticeSourceReceipt.source_key == 'system-backfill:' + Notification.id)))
+            .order_by(Notification.created_at, Notification.id).limit(limit)):
+        row = _system_notification(db, state, note.id)
+        db.add(NoticeSourceReceipt(source_key='system-backfill:' + note.id,
+                                  event_id=row.id if row else None))
+        count += 1
     for signal in rows:
         marker = 'backfill:' + signal.id
         if db.get(NoticeSourceReceipt, marker):

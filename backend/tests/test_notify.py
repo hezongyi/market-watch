@@ -116,7 +116,7 @@ def test_system_notice_obeys_quiet_hours(database, monkeypatch):
 
     with database.begin() as db:
         _queue_system_notice(db, title="runtime fault", message="database unavailable",
-                             incident_id="runtime-faults:test")
+                             incident_id="system:test")
         note_id = db.scalar(select(Notification).order_by(Notification.created_at.desc())).id
         db.scalar(select(Outbox)).next_at = 0
         db.add(Preference(key="notifications", value={

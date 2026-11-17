@@ -24,6 +24,9 @@ export type Notice = {
   evidence: Record<string, unknown>;
   original_evidence?: Record<string, unknown>;
   notification_id?: string;
+  notification_status?: string;
+  ack_at?: number | null;
+  resolved_at?: number | null;
   notify_web?: boolean;
   channels?: Record<string, any>;
   incident?: {
@@ -119,6 +122,7 @@ export const severityLabels: Record<string, string> = {
   info: "信息",
 };
 export const sourceLabels: Record<string, string> = {
+  runtime: "后台运行",
   chart_alert: "交易告警",
   chart_alert_execution: "告警执行",
   workspace: "工作区",

@@ -8,6 +8,7 @@ import { Field, FieldLabel, FieldDescription } from "./components/ui/field";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "./components/ui/collapsible";
 import { MobileConfirm, useOverlayActive } from "./WatchOverlays";
 import { logEvent, logFailure } from "./logs";
+import RuntimeNotificationPolicy from "./RuntimeNotificationPolicy";
 
 type Config = { url: string; topic: string; enabled: boolean; token_configured: boolean; revision: number; last_test_id?: string };
 type Result = { status: string; ack_at?: number; outbox_status?: string; attempts: number };
@@ -22,6 +23,7 @@ export default function NotificationSettings({ online, changed, state, records }
   const [token, setToken] = useState("");
   const [clearToken, setClearToken] = useState(false);
   const [busy, setBusy] = useState("");
+  const [policyBusy, setPolicyBusy] = useState(false);
   const [error, setError] = useState("");
   const [conflict, setConflict] = useState(false);
   const [reloadConfirm, setReloadConfirm] = useState(false);
@@ -34,7 +36,7 @@ export default function NotificationSettings({ online, changed, state, records }
   const flight = useRef(false);
   const loadedFor = useRef(-1);
   const dirty = Boolean(draft && saved && (draft.url !== saved.url || draft.topic !== saved.topic || draft.enabled !== saved.enabled || token || clearToken));
-  useEffect(() => { state(dirty, Boolean(busy)); }, [dirty, busy]);
+  useEffect(() => { state(dirty, Boolean(busy) || policyBusy); }, [dirty, busy, policyBusy]);
   useEffect(() => () => state(false, false), []);
   useEffect(() => {
     if (!online || !active || loadedFor.current === retry) return;
@@ -74,12 +76,13 @@ export default function NotificationSettings({ online, changed, state, records }
     {error && <p role="alert" className="mobile-inline-error">{error}</p>}
     <Button variant="outline" disabled={!online} onClick={() => setRetry(x => x + 1)}>重新读取</Button>
   </div>;
-  const locked = Boolean(busy) || !online;
+  const locked = Boolean(busy) || policyBusy || !online;
   return <div className="more-panel ntfy-settings">
     <div className="ntfy-enable">
       <div><label htmlFor="ntfy-enabled">后台通知</label><p className="more-description">服务器持续监控，退出 App 后由 ntfy 提醒。</p></div>
       <Switch id="ntfy-enabled" checked={draft.enabled} disabled={locked} onCheckedChange={enabled => { setDraft({ ...draft, enabled }); setMessage(""); }} />
     </div>
+    <RuntimeNotificationPolicy online={online} saving={setPolicyBusy} />
     <Field><FieldLabel htmlFor="ntfy-url">服务地址</FieldLabel>
       <Input id="ntfy-url" type="url" inputMode="url" autoCapitalize="none" autoComplete="off" spellCheck={false} value={draft.url} disabled={locked} onChange={e => { setDraft({ ...draft, url: e.target.value }); setCheck(undefined); setMessage(""); }} />
     </Field>

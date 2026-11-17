@@ -74,7 +74,7 @@ def test_restart_loop_is_deduplicated_across_worker_restarts(incident_pg, monkey
     with transaction() as db:
         notes = list(db.scalars(select(Notification).order_by(Notification.created_at,
                                                              Notification.id)))
-        assert len(notes) == 3 and "已恢复" in notes[-1].payload["message"]
+        assert len(notes) == 2 and "已恢复" in notes[-1].payload["message"]
         assert db.get(Preference, "runtime_incident:market:boot_loop").value["state"] == "recovered"
 
 
@@ -125,7 +125,7 @@ def test_maintenance_window_is_durable_and_expires(incident_pg, monkeypatch):
         assert db.get(Preference, runtime_health.maintenance_key()) is None
 
 
-def test_active_fault_reminder_time_reaches_the_row(incident_pg, monkeypatch):
+def test_active_fault_episode_survives_without_periodic_repush(incident_pg, monkeypatch):
     import json
 
     from alerts import notification_runtime, runtime_health, storage
@@ -137,25 +137,26 @@ def test_active_fault_reminder_time_reaches_the_row(incident_pg, monkeypatch):
     monkeypatch.setattr(storage, "now_ms", lambda: clock[0])
 
     notification_runtime.inspect_health()
+    opened_at = clock[0]
     clock[0] += 900_000
     notification_runtime.inspect_health()
     with transaction() as db:
-        assert len(list(db.scalars(select(Notification)))) == 2
+        assert len(list(db.scalars(select(Notification)))) == 1
         persisted = db.get(Preference, "runtime_incident:market:chart_alert").value
-    assert persisted["last_notified_at"] == clock[0]
+    assert persisted["last_notified_at"] == opened_at
     assert persisted["observed_at"] == clock[0]
 
     # An independent connection sees the same stored reminder time.
     with incident_pg[1].connect() as connection:
         raw = connection.execute(text("SELECT value FROM preferences WHERE key = :key"),
                                  {"key": "runtime_incident:market:chart_alert"}).scalar_one()
-    assert (json.loads(raw) if isinstance(raw, str) else raw)["last_notified_at"] == clock[0]
+    assert (json.loads(raw) if isinstance(raw, str) else raw)["last_notified_at"] == opened_at
 
     for _ in range(5):
         clock[0] += 15_000
         notification_runtime.inspect_health()
     with transaction() as db:
-        assert len(list(db.scalars(select(Notification)))) == 2
+        assert len(list(db.scalars(select(Notification)))) == 1
 
 
 def test_scoped_restart_maintenance_survives_fresh_sessions(incident_pg, monkeypatch):

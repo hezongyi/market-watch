@@ -39,10 +39,12 @@ DEFAULTS = {
     "ring_seconds": 15,
     "max_repeats": 0,
     "mode": "ntfy_native",
+    "system_quiet_enabled": True,
 }
 
 
-def notification_link(kind: str, signal_id: str | None = None, *, alert: bool = False) -> str:
+def notification_link(kind: str, signal_id: str | None = None, *, alert: bool = False,
+                      notification_id: str | None = None) -> str:
     # Only select a page on the APK's saved server. No credentials or acknowledgement grants in the link.
     public = urlsplit(settings.public_url)
     server = f"{public.scheme}://{public.netloc}"
@@ -51,6 +53,10 @@ def notification_link(kind: str, signal_id: str | None = None, *, alert: bool = 
         query["page"] = "notifications"
     elif kind == "signal" and signal_id:
         query["signal"] = signal_id
+    elif notification_id:
+        # Typed reference fits notification-link-v1's existing 36-character opaque ID.
+        # Existing APKs can open exact records without a new native permission or route.
+        query["signal"] = "n_" + notification_id.replace("-", "")
     else:
         query["records"] = "alerts" if alert else "system"
     return "marketwatch://notification?" + urlencode(query)
@@ -111,6 +117,12 @@ def claim():
         )
         if not row:
             return None
+        from .notification_policy import obsolete_system_notice
+        if note.kind == "system" and obsolete_system_notice(db, note, at=now):
+            row.status = "cancelled"
+            if not note.ack_at:
+                note.status = "resolved"
+            return None
         signal = db.get(SignalRow, note.signal_id) if note.signal_id else None
         if note.ack_at or note.status == "retired" or (
             note.kind == "signal" and (not signal or not current_signal(signal))
@@ -119,8 +131,29 @@ def claim():
             return None
         pref = db.get(Preference, "notifications")
         config = {**DEFAULTS, **(pref.value if pref else {})}
+        system_recovery = note.kind == "system" and (
+            note.payload.get("incident_id", "").endswith(":recovery")
+            or note.payload.get("incident_id", "").startswith("runtime-recovery:"))
+        if note.kind == "system" and note.payload.get("incident_id", "").startswith("runtime-faults:"):
+            from .runtime_health import maintenance, paused
+            from .notification_policy import current_runtime_faults
+            window = maintenance(db, at=now)
+            faults = current_runtime_faults(db, note, at=now)
+            faults = [fault for fault in faults if not paused(window, fault["id"].split(":", 1)[0])]
+            if not faults:
+                row.next_at = window["until"]
+                return None
+            message = "以下运行角色持续异常，请检查：\n" + "\n".join(
+                fault["id"].replace(":", " / ") for fault in faults)
+            note.payload = {**note.payload, "observed_message": note.payload.get("observed_message", note.payload.get("message")),
+                            "message": message}
         quiet_end = quiet_until(instant(now), config)
+        if note.kind == "system" and config["system_quiet_enabled"]:
+            quiet_end = quiet_until(instant(now), {**config, "quiet_enabled": True}) or quiet_end
         if quiet_end and note.kind != "test":
+            if system_recovery:
+                row.status, note.status = "cancelled", "recorded"
+                return None  # A recovery is informational; never replay it the next morning.
             row.next_at = int(quiet_end.timestamp() * 1000)
             note.status = "quiet"
             return None
@@ -159,12 +192,16 @@ def claim():
             title = note.payload.get("title", "守望运行通知")
             message = note.payload.get("message", "")
             alert_id = note.payload.get("context", {}).get("alert_id")
-            click = notification_link(note.kind, alert=bool(alert_id))
+            click = notification_link(note.kind, alert=bool(alert_id),
+                notification_id=note.id if note.kind == "system" else None)
+        priority = config["priority"]
+        if note.kind == "system":
+            priority = min(priority, 2 if system_recovery else 3)
         body = {
             "topic": transport["topic"],
             "title": title,
             "message": message,
-            "priority": 1 if config["mode"] == "companion" else config["priority"],
+            "priority": 1 if config["mode"] == "companion" else priority,
             "click": click,
             "actions": [
                 {
@@ -214,7 +251,7 @@ def deliver_once(client=None):
             return True
         row.lease_until = None
         signal = db.get(SignalRow, note.signal_id) if note.signal_id else None
-        if note.ack_at or note.status == "retired" or row.status == "cancelled" or (
+        if note.ack_at or note.status in ("retired", "resolved") or row.status == "cancelled" or (
             note.kind == "signal" and (not signal or not current_signal(signal))
         ):
             row.status = "cancelled"

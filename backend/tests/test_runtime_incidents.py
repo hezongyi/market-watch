@@ -51,10 +51,10 @@ def test_restarted_worker_does_not_repush_an_active_fault(database, monkeypatch)
         assert len(list(db.scalars(select(Notification)))) == 1
         incident = db.get(Preference, "runtime_incident:market:chart_alert")
         assert incident.value["state"] == "active" and incident.value["last_notified_at"]
-        # The reminder interval, not a restart, decides the next push.
+        # An unacknowledged operational incident is not a reason to ring repeatedly.
         incident.value = {**incident.value, "last_notified_at": now_ms() - 900_000}
     notification_runtime.inspect_health()
-    assert len(notes(database)) == 2
+    assert len(notes(database)) == 1
 
 
 def test_one_stuck_role_is_not_masked_by_other_heartbeats(database, monkeypatch):
@@ -426,8 +426,8 @@ def test_background_default_window_covers_retention_poll_and_still_expires(datab
 
 
 
-def test_active_fault_reminder_time_is_persisted_for_the_next_cycle(database, monkeypatch):
-    """A reminder only counts once the row holds it; an edited alias would not."""
+def test_active_fault_keeps_one_durable_episode_without_periodic_repush(database, monkeypatch):
+    """The worker restart and elapsed time must preserve the existing episode."""
     from alerts import notification_runtime, runtime_health, storage
     from alerts.storage import Preference
 
@@ -438,19 +438,21 @@ def test_active_fault_reminder_time_is_persisted_for_the_next_cycle(database, mo
 
     notification_runtime.inspect_health()
     assert len(notes(database)) == 1
+    opened_at = clock[0]
 
     clock[0] += 900_000
     notification_runtime.inspect_health()
-    assert len(notes(database)) == 2
+    assert len(notes(database)) == 1
 
     # Only a fresh read of the row proves the write reached the JSON column.
     with database.begin() as db:
         db.expire_all()
         persisted = db.get(Preference, "runtime_incident:market:chart_alert").value
-    assert persisted["last_notified_at"] == clock[0]
+    assert persisted["last_notified_at"] == opened_at
+    assert persisted["opened_at"] == opened_at
     assert persisted["observed_at"] == clock[0]
 
     for _ in range(5):
         clock[0] += 15_000
         notification_runtime.inspect_health()
-    assert len(notes(database)) == 2
+    assert len(notes(database)) == 1

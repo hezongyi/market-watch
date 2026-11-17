@@ -89,7 +89,10 @@ export default function AlertsPage({
 }: Props) {
   const location = useLocation();
   const entry = new URLSearchParams(location.search);
-  const signalEntry = entry.get("signal") || undefined;
+  const notificationEntry = /^n_[a-f0-9]{32}$/.test(entry.get("signal") || "")
+    ? entry.get("signal")!.slice(2).replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5")
+    : undefined;
+  const signalEntry = notificationEntry ? undefined : entry.get("signal") || undefined;
   const recordEntry = entry.get("records");
   const [cached, setCached] = useState<AlertRow[]>([]),
     [readAt, setReadAt] = useState<number>(),
@@ -103,7 +106,7 @@ export default function AlertsPage({
   useEffect(() => {
     if (!visible) return;
     if (signalEntry) setTab("records");
-    else if (recordEntry === "alerts" || recordEntry === "system") showRecords();
+    else if (notificationEntry || recordEntry === "alerts" || recordEntry === "system") showRecords();
   }, [visible, location.key]);
   const [filtersOpen, setFiltersOpen] = useState(false),
     [archived, setArchived] = useState<AlertRow[]>([]),
@@ -1369,7 +1372,8 @@ export default function AlertsPage({
         runtime={runtime}
         close={closeRecords}
         report={report}
-        initialTab={visible ? (recordEntry === "system" ? "system" : "alerts") : "triggers"}
+        targetNotification={visible ? notificationEntry : undefined}
+        initialTab={visible ? (notificationEntry || recordEntry === "system" ? "system" : "alerts") : "triggers"}
       />
     </>
   );

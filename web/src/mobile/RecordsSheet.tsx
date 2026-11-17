@@ -35,9 +35,11 @@ export default function RecordsSheet({
   close,
   report,
   initialTab = "triggers",
+  targetNotification,
 }: {
   open?: boolean;
   initialTab?: string;
+  targetNotification?: string;
   profile: Profile;
   online: boolean;
   events: AlertEvent[];
@@ -51,9 +53,27 @@ export default function RecordsSheet({
   const [busy, setBusy] = useState(false),
     [retry, setRetry] = useState(0),
     [error, setError] = useState("");
+  const [targetError, setTargetError] = useState(""),
+    [targetLoading, setTargetLoading] = useState(false),
+    [targetRetry, setTargetRetry] = useState(0);
   useEffect(() => {
     if (open) setTab(initialTab);
   }, [open, initialTab]);
+  useEffect(() => {
+    if (!open || !targetNotification) return;
+    setSelected(undefined);
+    setTargetError("");
+    if (!online) { setTargetLoading(false); setTargetError("联网后可读取这条通知，尚未确认收到。"); return; }
+    const controller = new AbortController();
+    setTargetLoading(true);
+    void api<Notice>(`/notification-center/notifications/${encodeURIComponent(targetNotification)}`,
+      undefined, controller.signal).then(value => {
+        if (!controller.signal.aborted) setSelected(value);
+      }).catch(error => {
+        if (!controller.signal.aborted) setTargetError(errorMessage(error));
+      }).finally(() => { if (!controller.signal.aborted) setTargetLoading(false); });
+    return () => controller.abort();
+  }, [open, targetNotification, online, targetRetry]);
   useEffect(() => {
     if (!open || !selected || !online) return;
     const controller = new AbortController();
@@ -118,6 +138,9 @@ export default function RecordsSheet({
             setTimeline([]);
           }}
         >
+          {targetLoading && <p role="status">正在读取这条通知…</p>}
+          {targetError && <div><p role="alert">{targetError}</p>
+            <Button variant="outline" disabled={!online} onClick={() => setTargetRetry(value => value + 1)}>重试读取通知</Button></div>}
           <Tabs
             swipe
             className="mobile-record-tabs"
@@ -170,15 +193,17 @@ export default function RecordsSheet({
                 <p>{noticeInstrument(selected)}</p>
                 <p>{selected.message}</p>
                 <p>发生 {stamp(selected.occurred_at)}</p>
-                <p>
+                {selected.notification_status && <p>{selected.ack_at ? "已确认收到" : "尚未确认收到"}
+                  {selected.resolved_at ? ` · 已恢复 ${stamp(selected.resolved_at)}` : ""}</p>}
+                {selected.source_kind !== "runtime" && <p>
                   {selected.handled_at
                     ? "已处理 " + stamp(selected.handled_at)
                     : "未处理"}
-                </p>
+                </p>}
                 {selected.observation_status === "ended" && (
                   <p>页面观察已结束；未确认恢复。</p>
                 )}
-                {selected.incident && (
+                {selected.incident && selected.source_kind !== "runtime" && (
                   <p>
                     {selected.incident.closed_at
                       ? "已恢复 " + stamp(selected.incident.closed_at)
@@ -196,22 +221,28 @@ export default function RecordsSheet({
                           received: "网页接收",
                           rendered: "页面展示",
                           sound_started: "网页声音开始",
+                          phone_attempt: row.details?.status === "accepted" ? "ntfy 已接受" : "投递失败或结果未知",
                         } as Record<string, string>
                       )[row.kind] || row.kind}
                     </strong>
-                    <p>
-                      服务器记录 {stamp(row.received_at)} · 客户端报告{" "}
-                      {stamp(row.reported_at)}
-                    </p>
+                    <p>{row.kind === "phone_attempt" ? `投递时间 ${stamp(row.received_at)}` :
+                      `服务器记录 ${stamp(row.received_at)} · 客户端报告 ${stamp(row.reported_at)}`}</p>
                   </article>
                 ))}
-                <Button
+                {selected.notification_id && selected.source_kind === "runtime" && <Button
+                  disabled={!online || busy || Boolean(selected.ack_at)} onClick={() => {
+                    setBusy(true);
+                    void api(`/notifications/${encodeURIComponent(selected.notification_id!)}/ack`, {})
+                      .then(() => api<Notice>(`/notification-center/notifications/${encodeURIComponent(selected.notification_id!)}`))
+                      .then(setSelected).catch(error => setError(errorMessage(error))).finally(() => setBusy(false));
+                  }}>{selected.ack_at ? "已确认收到" : "确认收到"}</Button>}
+                {selected.source_kind !== "runtime" && <Button
                   variant="outline"
                   disabled={!online || busy || Boolean(selected.handled_at)}
                   onClick={() => void confirmNotice(selected)}
                 >
                   标记已处理
-                </Button>
+                </Button>}
               </>
             )}
           </MobileSheet>
@@ -310,7 +341,7 @@ function HistoryRecords({
             <strong>{notice.title}</strong>
             <span>
               {noticeInstrument(notice)} ·{" "}
-              {notice.handled_at ? "已处理" : "未处理"} ·{" "}
+              {notice.source_kind === "runtime" ? (notice.ack_at ? "已确认收到" : "未确认收到") : (notice.handled_at ? "已处理" : "未处理")} ·{" "}
               {severityLabels[notice.severity] || notice.severity}
             </span>
             <span>{notice.message}</span>

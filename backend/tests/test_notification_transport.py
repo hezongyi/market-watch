@@ -29,6 +29,7 @@ def test_secrets_are_preserved_not_returned_or_audited_and_revision_checked(data
 
 
 def test_enabled_transition_keeps_old_history_without_delivery_burst(database, monkeypatch):
+    monkeypatch.setattr(notify, "now_ms", lambda: 1794920400000)  # Daytime Shanghai, independent of CI clock.
     monkeypatch.setattr(notify.settings, "delivery_enabled", False)
     with database.begin() as db:
         note = Notification(kind="system", status="pending", payload={"message":"old"})

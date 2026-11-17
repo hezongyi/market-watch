@@ -63,7 +63,10 @@ def signal_created(mapper, connection, signal):
 @event.listens_for(Notification, 'after_insert')
 @event.listens_for(Notification, 'after_update')
 def phone_state(mapper, connection, note):
-    if not any(inspect(note).attrs[key].history.has_changes() for key in ('status', 'ack_at')):
+    if not any(inspect(note).attrs[key].history.has_changes() for key in ('status', 'ack_at', 'payload')):
+        return
+    if note.kind == 'system':
+        _append(connection, 'system_notice', note.id, {'notification_id': note.id})
         return
     if _chart_signal(connection, note.signal_id):
         _append(connection, 'phone_state', note.id, {'signal_id': note.signal_id,
@@ -74,6 +77,10 @@ def phone_state(mapper, connection, note):
 def phone_attempt(mapper, connection, attempt):
     note = connection.execute(select(Notification.__table__).where(
         Notification.id == attempt.notification_id)).mappings().first()
+    if note and note['kind'] == 'system':
+        _append(connection, 'system_notice', attempt.notification_id,
+                {'notification_id': attempt.notification_id})
+        return
     if note and _chart_signal(connection, note['signal_id']):
         _append(connection, 'phone_attempt', attempt.id, {'signal_id': note['signal_id'],
             'notification_id': attempt.notification_id, 'attempt_id': attempt.id, 'at': attempt.at,

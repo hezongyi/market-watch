@@ -622,6 +622,7 @@ def notification_test_result(test_id: str):
 
 class NotificationSettings(BaseModel):
     quiet_enabled: bool = False
+    system_quiet_enabled: bool = True
     quiet_start: str = Field(default="23:00", pattern=r"^(?:[01]\d|2[0-3]):[0-5]\d$")
     quiet_end: str = Field(default="07:00", pattern=r"^(?:[01]\d|2[0-3]):[0-5]\d$")
     timezone: str = "Asia/Shanghai"
