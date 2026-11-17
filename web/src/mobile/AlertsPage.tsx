@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { api, ApiError, errorMessage } from "../api";
 import {
   Plus,
@@ -86,6 +87,10 @@ export default function AlertsPage({
   report,
   openChart,
 }: Props) {
+  const location = useLocation();
+  const entry = new URLSearchParams(location.search);
+  const signalEntry = entry.get("signal") || undefined;
+  const recordEntry = entry.get("records");
   const [cached, setCached] = useState<AlertRow[]>([]),
     [readAt, setReadAt] = useState<number>(),
     [loaded, setLoaded] = useState(false);
@@ -95,6 +100,11 @@ export default function AlertsPage({
   const [tab, setTab] = useState("rules"),
     [filter, setFilter] = useState("current"),
     [query, setQuery] = useState("");
+  useEffect(() => {
+    if (!visible) return;
+    if (signalEntry) setTab("records");
+    else if (recordEntry === "alerts" || recordEntry === "system") showRecords();
+  }, [visible, location.key]);
   const [filtersOpen, setFiltersOpen] = useState(false),
     [archived, setArchived] = useState<AlertRow[]>([]),
     [archiveError, setArchiveError] = useState("");
@@ -824,11 +834,13 @@ export default function AlertsPage({
                 </TabsContent>
                 <TabsContent value="records" className="alert-list-panel">
                   <AlertRecords
+                    key={signalEntry ? location.key : "records"}
                     profile={profile}
                     online={online}
                     active={visible && tab === "records"}
                     runtime={runtime}
                     pullToRefresh
+                    targetEvent={signalEntry}
                   />
                 </TabsContent>
               </TabsPanels>
@@ -1312,7 +1324,7 @@ export default function AlertsPage({
               提供。请允许通知与后台运行；锁屏实收需要在手机检查。
             </p>
             <p className="alert-muted">
-              服务器通知配置可在网页端设置，暂未配置也能创建站内记录。
+              请到“更多 → 后台通知”配置与测试；未配置也能创建站内记录。
             </p>
             <Button
               variant="outline"
@@ -1357,7 +1369,7 @@ export default function AlertsPage({
         runtime={runtime}
         close={closeRecords}
         report={report}
-        initialTab={visible ? "alerts" : "triggers"}
+        initialTab={visible ? (recordEntry === "system" ? "system" : "alerts") : "triggers"}
       />
     </>
   );

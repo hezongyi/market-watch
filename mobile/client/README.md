@@ -2,7 +2,7 @@
 
 当前应用基线 v2.0.6 / A06（最初从 v2.0.5 实施，2026-11-11 按用户要求变基）；本目录是新建工程，不恢复归档 Android 工程。
 
-- applicationId：`com.kookvv.marketwatch`，versionCode：`5`，versionName：`0.1.4`。
+- applicationId：`com.kookvv.marketwatch`，versionCode：`6`，versionName：`0.1.5`。
 - 工具链：JDK 17、Gradle 8.11.1（wrapper 固定 distribution SHA-256）、AGP 8.9.2、Kotlin 2.1.20、compile/target SDK 35、min SDK 26。
 - AndroidX Activity 1.10.1、WebKit 1.13.0。本机 SDK 35 assembleDebug/lintDebug 已通过；Find X8 待用户验收。
 - 首次输入可信 HTTPS origin，打开同源 `/m/`。禁止明文、混合内容、文件和 content 访问；主框架网络/HTTP/TLS 失败提供重试与连接设置，证书错误取消；release 禁用 WebView 调试。
@@ -11,6 +11,7 @@
 - 系统栏、刘海与键盘空间由原生容器统一处理并消费 insets；网页使用已避让的 WebView 视口。启动图标复用网站浅色主题的绿色 Waves 图形，白底 adaptive icon。
 - 0.1.3 通过 `appearance-v1` 将网页深浅主题同步到原生安全区和系统图标；浅色背景为 `#f8f9fc`，深色为 `#101317`，保持现有安全区尺寸。
 - 0.1.4 将离线可用的原生服务器设置统一为手机端表单风格，支持深浅主题、清空地址、就地校验、键盘连接与返回原服务器；首次配置及更换服务器不自动弹键盘。原有 HTTPS 与切源清会话流程不变。
+- 0.1.5 接收 `marketwatch://notification`，以 `singleTask` 复用现有 App。通知仅选择已保存 HTTPS 服务器上的手机页面，不切源、不携带确认凭据，也不自动确认告警。`notification-link-v1` 在首次桥接和热启动时交付白名单路径；登录过期保留落点，有表单时等关闭后进入，专业图表沿用现有离开确认和保存逻辑。
 
 在已安装 SDK 35、JDK 17 且磁盘预算充足的环境执行：
 
@@ -21,7 +22,7 @@ cd mobile/client
 
 Debug APK 位于 `app/build/outputs/apk/debug/app-debug.apk`。首次构建通过，lint 为 0 errors / 12 warnings（版本更新建议、中文资源化、图标/备份规则及已做运行时特性检查的提示）；不设 lint baseline。Debug 专用网络安全配置仅为 `192.168.7.232` 增加本任务公共开发 CA；私钥在 gitignored `.tools/dev-tls/`。Release 不包含该配置或 CA，仍使用系统信任链。发行签名使用仓库外的私有文件，当前未配置发行签名、未验收覆盖升级。不要提交 `local.properties`、签名文件、凭据或完整浏览器状态。
 
-本机工具位于任务自己的 `.tools/android-sdk`、`.tools/gradle`。下载的官方 Gradle 8.11.1 distribution 已校验与 wrapper 相同的 SHA-256。设备 `adb devices -l` 当前为空。开发候选地址为 `https://192.168.7.232:18445`，不占用既有 `mw-dev:18443`。
+Android 工具链可通过 `ANDROID_HOME`、`GRADLE_USER_HOME` 指向仓库外或已有任务的 SDK/缓存。下载的官方 Gradle 8.11.1 distribution 已校验与 wrapper 相同的 SHA-256。2026-11-17 设备 `adb devices -l` 为空；常规验收使用 Ubuntu 持久开发实例 `https://192.168.7.232:18443`。
 
 Find X8 验收需记录 Android / ColorOS / WebView、APK hash / 签名指纹 / 源码 SHA，以及真实 HTTPS 登录、原生返回/旋转、进程回收、SW/IDB、同签名升级与 ntfy 实收。桌面 Chromium 的触屏模拟不能替代这些项目。
 

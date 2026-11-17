@@ -29,6 +29,7 @@ export default function AlertRecords({
   alertId,
   fallback = [],
   pullToRefresh = false,
+  targetEvent,
 }: {
   profile: Profile;
   online: boolean;
@@ -37,6 +38,7 @@ export default function AlertRecords({
   alertId?: string;
   fallback?: AlertEvent[];
   pullToRefresh?: boolean;
+  targetEvent?: string;
 }) {
   const overlayActive = useOverlayActive();
   active = active && overlayActive;
@@ -49,6 +51,25 @@ export default function AlertRecords({
   const [detailReadError, setDetailReadError] = useState("");
   const [confirmed, setConfirmed] = useState<Record<string, AlertEvent>>({});
   const flight = useRef(false);
+  const entered = useRef<string | undefined>(undefined);
+  const [entryError, setEntryError] = useState("");
+  const [entryRetry, setEntryRetry] = useState(0);
+  useEffect(() => {
+    if (!targetEvent || entered.current === targetEvent || !active || !online) return;
+    const controller = new AbortController();
+    void api<AlertEvent>(`/chart-alerts/events/${encodeURIComponent(targetEvent)}`, undefined,
+      AbortSignal.any([controller.signal, AbortSignal.timeout(10000)]))
+      .then(event => {
+        if (controller.signal.aborted) return;
+        entered.current = targetEvent;
+        setSelection(event);
+        setOpened(true);
+        setEntryError("");
+      }).catch(error => {
+        if (!controller.signal.aborted) { entered.current = targetEvent; setEntryError(errorMessage(error)); }
+      });
+    return () => controller.abort();
+  }, [targetEvent, active, online, entryRetry]);
   const result = useSymbolSearch<AlertEvent>({
     profile,
     active,
@@ -244,8 +265,8 @@ export default function AlertRecords({
       online={online}
       loading={result.loading}
       loaded={result.loaded || !!fallback.length}
-      error={result.error}
-      retry={result.retry}
+      error={entryError || result.error}
+      retry={entryError ? () => { entered.current = undefined; setEntryError(""); setEntryRetry(value => value + 1); } : result.retry}
       hasNext={!!result.next}
       loadNext={result.loadNext}
       filters={

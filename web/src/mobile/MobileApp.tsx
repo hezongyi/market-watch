@@ -73,6 +73,17 @@ export default function MobileApp() {
   const [firstWatchSymbol, setFirstWatchSymbol] = useState("");
   const [createAlert, setCreateAlert] = useState(0);
   const [records, setRecords] = useState(false);
+  const [notificationPath, setNotificationPath] = useState<string>();
+  // Register before the native hello reply. A pending entry survives login and never discards a form.
+  useEffect(() => {
+    const receive = (event: Event) => {
+      const path = (event as CustomEvent).detail;
+      if (typeof path === "string" && /^\/(alerts\?(signal=[A-Za-z0-9_-]{1,36}|records=(alerts|system))|more\?panel=notifications)$/.test(path))
+        setNotificationPath(path);
+    };
+    addEventListener("mw-mobile-notification", receive);
+    return () => removeEventListener("mw-mobile-notification", receive);
+  }, []);
   const notices = useMobileNotices(profile, state === "online");
   const [connection, setConnection] = useState<MobileMarket>();
   const chart = useRef<MobileChartHandle>(null),
@@ -145,6 +156,32 @@ export default function MobileApp() {
       Boolean(document.querySelector('[data-mobile-dirty="true"]')),
     theme,
   );
+  useEffect(() => {
+    if (!notificationPath || !verified || state !== "online") return;
+    let active = true, running = false;
+    const enter = async () => {
+      if (running || document.querySelector(MOBILE_OVERLAYS) || password) return;
+      running = true;
+      try {
+        if (location.pathname === "/chart" && chart.current && !(await chart.current.canLeave())) {
+          if (active) setNotificationPath(undefined);
+          return;
+        }
+        await flush();
+        if (active && !document.querySelector(MOBILE_OVERLAYS)) {
+          setRecords(false);
+          navigate(notificationPath);
+          setNotificationPath(undefined);
+        }
+      } catch (error) {
+        if (active) { report(String(error)); setNotificationPath(undefined); }
+      }
+      finally { running = false; }
+    };
+    void enter();
+    const timer = setInterval(() => void enter(), 400);
+    return () => { active = false; clearInterval(timer); };
+  }, [notificationPath, verified, state, password, location.pathname, flush, navigate, report]);
   const restore = async (
     value: Profile,
     active = () => profileActive(value),

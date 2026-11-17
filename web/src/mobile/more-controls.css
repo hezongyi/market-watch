@@ -277,3 +277,16 @@
     transition: none;
   }
 }
+
+.mobile-more .ntfy-enable { display:flex; align-items:center; gap:16px; }
+.mobile-more .ntfy-enable > div { flex:1; min-width:0; }
+.mobile-more .ntfy-enable label { font-weight:600; }
+.mobile-more .ntfy-enable p { margin-top:5px; }
+.mobile-more .ntfy-settings [data-slot="field"] { gap:8px; }
+.mobile-more .ntfy-settings input { width:100%; min-width:0; }
+.mobile-more .ntfy-test-actions { display:flex; flex-wrap:wrap; gap:8px; }
+.mobile-more .ntfy-test-actions button { flex:1; min-width:8em; }
+.mobile-more .ntfy-test-result { border-left:2px solid var(--quiet-line); padding:4px 0 4px 12px; font-size:.928571rem; }
+.mobile-more .ntfy-test-result strong { font-size:.857143rem; color:var(--muted); font-weight:400; }
+.mobile-more .ntfy-test-result p { margin:5px 0; line-height:1.6; }
+.mobile-more .ntfy-test-result button { min-height:44px; padding-inline:0; color:var(--muted); }

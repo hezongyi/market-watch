@@ -18,6 +18,9 @@ from .calendar_profile import closures_from
 from .chart_alert_message import signal_message, signal_title
 from .chart_series import is_gold
 from .config import settings
+from fastapi.exceptions import RequestValidationError
+from fastapi.exception_handlers import request_validation_exception_handler
+from .notification_transport import TransportInput, read_transport, save_transport, check_connection, transport_config
 from .domain import calendar_for, previous_session
 from .logging_config import configure_api_logging
 from .notify import DEFAULTS
@@ -74,6 +77,14 @@ async def lifespan(app):
 
 configure_api_logging()
 app = FastAPI(title="守望 · Market Watch", lifespan=lifespan)
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_error_response(request: Request, error: RequestValidationError):
+    if request.url.path == "/api/settings/notification-transport":
+        return JSONResponse(status_code=422, content={"detail": [
+            {"loc": list(e["loc"]), "msg": e["msg"], "type": e["type"]} for e in error.errors()]})
+    return await request_validation_exception_handler(request, error)
 
 
 @app.exception_handler(QueryError)
@@ -303,7 +314,8 @@ def mobile_ack(notification_id: str, request: Request):
 
 @app.post("/api/notification-tests", dependencies=[Depends(authenticated)])
 def send_notification_test():
-    if not settings.ntfy_topic:
+    transport = transport_config()
+    if not transport["topic"]:
         raise HTTPException(409, "尚未配置 ntfy topic")
     with transaction() as db:
         # Serialize test requests with the existing notification preferences row.
@@ -318,7 +330,7 @@ def send_notification_test():
         test_id = secrets.token_hex(16)
         db.add(Audit(kind="notification_test_requested", details={"test_id": test_id}))
         note = Notification(kind="test", signal_id=None, status="pending", payload={
-            "test_id": test_id, "title": "守望 · 手机通知测试",
+            "test_id": test_id, "transport_revision": transport["revision"], "title": "守望 · 手机通知测试",
             "message": "这是你在工作台主动发送的测试通知，不是交易信号。点击打开工作台。",
             "test_authorized": True,
         })
@@ -331,10 +343,43 @@ def send_notification_test():
         return {"status": "queued", "device_delivery": "unknown", "test_id": test_id}
 
 
+def _lock_test_delivery(db, test_id):
+    # Same lock order as publisher: notification, outbox, then test preference.
+    lookup = db.get(Preference, "test_notification:" + test_id)
+    if lookup:
+        ident = lookup.value["notification_id"]
+        db.scalar(select(Notification).where(Notification.id == ident).with_for_update())
+        db.scalar(select(Outbox).where(Outbox.notification_id == ident).with_for_update())
+        db.expire(lookup)
+
+
+@app.post("/api/notification-tests/{test_id}/received", dependencies=[Depends(authenticated)])
+def confirm_notification_test_received(test_id: str):
+    with transaction() as db:
+        _lock_test_delivery(db, test_id)
+        row = db.scalar(select(Preference).where(
+            Preference.key == "test_notification:" + test_id).with_for_update())
+        if not row:
+            raise HTTPException(404, "测试记录不存在")
+        if row.value.get("ack_at") is None:
+            stamp = now_ms()
+            row.value = {**row.value, "ack_at": stamp}
+            note = db.get(Notification, row.value["notification_id"])
+            if note:
+                note.ack_at, note.status = stamp, "acknowledged"
+                task = db.scalar(select(Outbox).where(Outbox.notification_id == note.id))
+                if task:
+                    task.status = "cancelled"
+            db.add(Audit(kind="notification_test_acknowledged", details={
+                "test_id": test_id, "confirmation": "user_reported"}))
+        return {"status": "acknowledged", "confirmation": "user_reported"}
+
+
 @app.post("/api/notification-tests/{test_id}/ack")
 def acknowledge_test(test_id: str, request: Request):
     token = request.headers.get("authorization", "").removeprefix("Bearer ")
     with transaction() as db:
+        _lock_test_delivery(db, test_id)
         row = db.scalar(select(Preference).where(
             Preference.key == "test_notification:" + test_id).with_for_update())
         legacy_row = None
@@ -471,8 +516,8 @@ def health():
             "history_services": [row for row in history_services if row["role"] == "current"],
             "legacy_import": next(row for row in history_services if row["role"] == "compatibility"),
             "blocked_notifications": blocked,
-            "delivery_enabled": settings.delivery_enabled,
-            "ntfy_configured": bool(settings.ntfy_topic),
+            "delivery_enabled": transport_config(db)["enabled"],
+            "ntfy_configured": bool(transport_config(db)["topic"]),
             "mobile_condition": "开启即时投递；不要从最近任务划掉 ntfy。手机送达状态未知。",
         }
 
@@ -544,6 +589,35 @@ async def events(request: Request, after: int = 0):
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
     )
+
+
+@app.get("/api/settings/notification-transport", dependencies=[Depends(authenticated)])
+def notification_transport():
+    return read_transport()
+
+
+@app.post("/api/settings/notification-transport", dependencies=[Depends(authenticated)])
+def save_notification_transport(body: TransportInput):
+    return save_transport(body)
+
+
+@app.post("/api/settings/notification-transport/check", dependencies=[Depends(authenticated)])
+def check_notification_connection():
+    return check_connection()
+
+
+@app.get("/api/notification-tests/{test_id}", dependencies=[Depends(authenticated)])
+def notification_test_result(test_id: str):
+    with transaction() as db:
+        row = db.get(Preference, "test_notification:" + test_id)
+        if not row:
+            raise HTTPException(404, "测试记录不存在")
+        note = db.get(Notification, row.value["notification_id"])
+        task = db.scalar(select(Outbox).where(Outbox.notification_id == note.id))
+        return {"test_id": test_id, "status": note.status, "ack_at": note.ack_at,
+                "created_at": note.created_at,
+                "outbox_status": task.status if task else None,
+                "attempts": task.attempts if task else 0}
 
 
 class NotificationSettings(BaseModel):

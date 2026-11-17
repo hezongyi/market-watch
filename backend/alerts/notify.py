@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import secrets
 import threading
+from urllib.parse import urlencode, urlsplit
 from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
@@ -12,6 +13,7 @@ from sqlalchemy import or_, select
 
 from .chart_alert_message import signal_message, signal_title
 from .config import settings
+from .notification_transport import transport_config
 from .retire_legacy import current_signal
 from .storage import (
     AckGrant,
@@ -40,6 +42,20 @@ DEFAULTS = {
 }
 
 
+def notification_link(kind: str, signal_id: str | None = None, *, alert: bool = False) -> str:
+    # Only select a page on the APK's saved server. No credentials or acknowledgement grants in the link.
+    public = urlsplit(settings.public_url)
+    server = f"{public.scheme}://{public.netloc}"
+    query = {"server": server, "page": "alerts"}
+    if kind == "test":
+        query["page"] = "notifications"
+    elif kind == "signal" and signal_id:
+        query["signal"] = signal_id
+    else:
+        query["records"] = "alerts" if alert else "system"
+    return "marketwatch://notification?" + urlencode(query)
+
+
 def quiet_until(moment: datetime, config: dict):
     if not config["quiet_enabled"]:
         return None
@@ -57,10 +73,11 @@ def quiet_until(moment: datetime, config: dict):
 
 
 def claim():
-    if not settings.ntfy_topic:
-        return None
     now = now_ms()
     with transaction() as db:
+        transport = transport_config(db)
+        if not transport["topic"]:
+            return None
         eligible = (Outbox.next_at <= now) & or_(
             Outbox.status == "pending", (Outbox.status == "sending") & (Outbox.lease_until < now)
         )
@@ -70,8 +87,8 @@ def claim():
             .outerjoin(SignalRow, SignalRow.id == Notification.signal_id)
             .where(eligible, or_(
                 Notification.kind == "test",
-                (Notification.kind == "system") & settings.delivery_enabled,
-                (Notification.kind == "signal") & settings.delivery_enabled
+                (Notification.kind == "system") & transport["enabled"],
+                (Notification.kind == "signal") & transport["enabled"]
                 & SignalRow.chart_alert_id.is_not(None) & SignalRow.watch_id.is_(None),
             ))
             .order_by(Outbox.next_at)
@@ -103,7 +120,7 @@ def claim():
         pref = db.get(Preference, "notifications")
         config = {**DEFAULTS, **(pref.value if pref else {})}
         quiet_end = quiet_until(instant(now), config)
-        if quiet_end:
+        if quiet_end and note.kind != "test":
             row.next_at = int(quiet_end.timestamp() * 1000)
             note.status = "quiet"
             return None
@@ -136,15 +153,14 @@ def claim():
             occurred = instant(signal.occurred_at).astimezone(ZoneInfo("Asia/Shanghai")).isoformat()
             title = signal_title(signal)
             message = signal_message(signal) if signal.evidence.get("chart_alert") else f"价格 {signal.price} / 阈值 {signal.threshold}\n发生时间 {occurred}\n信号 {signal.id}\n请使用“确认”停止后续提醒。"
-            click = f"{settings.public_url}/advanced-charts?panel=notifications&signal={signal.id}"
+            click = notification_link("signal", signal.id)
         else:
             title = note.payload.get("title", "守望运行通知")
             message = note.payload.get("message", "")
             alert_id = note.payload.get("context", {}).get("alert_id")
-            click = (f"{settings.public_url}/advanced-charts?panel=alerts&alert={alert_id}"
-                if alert_id else settings.public_url + "/settings")
+            click = notification_link(note.kind, alert=bool(alert_id))
         body = {
-            "topic": settings.ntfy_topic,
+            "topic": transport["topic"],
             "title": title,
             "message": message,
             "priority": 1 if config["mode"] == "companion" else config["priority"],
@@ -160,19 +176,20 @@ def claim():
                 }
             ],
         }
-        return row.id, note.id, body, row.attempts
+        return row.id, note.id, body, row.attempts, transport
 
 
 def deliver_once(client=None):
     task = claim()
     if task is None:
         return False
-    task_id, note_id, body, attempt = task
-    headers = {"Authorization": f"Bearer {settings.ntfy_token}"} if settings.ntfy_token else {}
+    task_id, note_id, body, attempt, transport = task
+    headers = {"Authorization": f"Bearer {transport['token']}"} if transport["token"] else {}
+    target_url = transport["url"]
     accepted, detail = False, {}
     try:
         with httpx.Client(timeout=15) if client is None else _Existing(client) as transport:
-            response = transport.post(settings.ntfy_url.rstrip("/"), json=body, headers=headers)
+            response = transport.post(target_url, json=body, headers=headers)
             response.raise_for_status()
             detail = {"provider_id": response.json().get("id")}
             accepted = True

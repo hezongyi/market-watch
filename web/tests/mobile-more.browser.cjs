@@ -18,6 +18,8 @@ const server=http.createServer(async(req,res)=>{
   healthReads++;if(holdHealth)await new Promise(resolve=>releaseHealth=resolve);
   return failHealth?json({detail:'健康状态暂时不可用'},503):json(healthResult);
  }
+ if(url.pathname==='/api/settings/notification-transport')return json({url:'https://ntfy.example',topic:'fixture-topic',enabled:true,token_configured:false,revision:0,last_test_id:'fixture-test'});
+ if(url.pathname==='/api/notification-tests/fixture-test')return json({status:'server_accepted',outbox_status:'accepted',attempts:1,ack_at:null});
  if(url.pathname==='/api/advanced-charts/preferences')return json([]);
  if(url.pathname==='/api/notification-center/events')return json({events:url.searchParams.has('audience')?[record]:[],before:null});
  if(url.pathname.endsWith('/timeline'))return json({observations:[]});
@@ -154,7 +156,7 @@ const server=http.createServer(async(req,res)=>{
    await page.getByRole('button',{name:/连接状态/}).click();await dialog().getByRole('button',{name:'刷新服务状态',exact:true}).click();await expect(dialog().getByRole('button',{name:'刷新服务状态',exact:true})).toBeEnabled();await close();
    await expect(page.getByRole('button',{name:/后台通知/})).toContainText(expected);
   }
-  await page.getByRole('button',{name:/后台通知/}).click();await expect(dialog().locator('dd').filter({hasText:'推送服务已接受'})).toBeVisible();await expect(dialog()).not.toContainText('notification_test_');await shot('notification-test-result');await close();
+  await page.getByRole('button',{name:/后台通知/}).click();await expect(dialog().getByText('ntfy 已接受 · 等待手机确认',{exact:true})).toBeVisible();await expect(dialog()).not.toContainText('notification_test_');await shot('notification-test-result');await close();
   for(const theme of ['light','dark']){
    if(await page.locator('.mobile-app').getAttribute('data-theme')!==theme)await page.getByRole('button',{name:/显示主题/}).click();
    await page.setViewportSize({width:375,height:480});await page.evaluate(()=>document.documentElement.style.fontSize='21px');

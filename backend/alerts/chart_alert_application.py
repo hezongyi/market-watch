@@ -212,10 +212,10 @@ def alert_dict(db, alert, *, latest=None):
             "runtime": alert.runtime,
             "activity": {key: alert.runtime.get(key) for key in (
                 "taken_over_at", "last_checked_at", "last_evaluated_at", "last_input_at", "last_outcome")},
-            "execution": execution_dict(alert, version)}
+            "execution": execution_dict(alert, version, db=db)}
 
 
-def execution_dict(alert, version, *, at=None):
+def execution_dict(alert, version, *, at=None, db=None):
     from .config import settings
     from .price_alert_inputs import is_price_rule
     from .price_alert_reasons import message
@@ -242,8 +242,9 @@ def execution_dict(alert, version, *, at=None):
         phase = "settling" if runtime.get("settlement_pending") else "expired"
     elif not runtime.get("taken_over_at") and phase in ("monitoring", "closed"):
         phase = "preparing"
-    phone_code = ("phone_topic_missing" if not settings.ntfy_topic.strip() else
-        "phone_delivery_disabled" if not settings.delivery_enabled else None) if version.config.get("notify_ntfy") else None
+    from .notification_transport import phone_reason
+    from sqlalchemy.orm import object_session
+    phone_code = phone_reason(db if db is not None else object_session(alert)) if version.config.get("notify_ntfy") else None
     return {"contract": runtime.get("execution_contract"), "state": phase, "label": labels.get(phase, "需处理"),
         "reason_code": reason, "message": message(reason), "enabled_intent": alert.status == "active",
         "expired": expired, "settlement_pending": bool(runtime.get("settlement_pending")),

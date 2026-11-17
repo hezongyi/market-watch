@@ -147,8 +147,8 @@ def refresh_phone(db, alert, *, now):
     code = None
     status = note.status if note else "unknown"
     if outbox and outbox.status in ("pending", "sending"):
-        code = ("phone_topic_missing" if not settings.ntfy_topic.strip() else
-                "phone_delivery_disabled" if not settings.delivery_enabled else None)
+        from .notification_transport import phone_reason
+        code = phone_reason(db)
         if code:
             status = "blocked_configuration"
     if outbox and outbox.status == "blocked":
