@@ -43,6 +43,27 @@ module.exports=async({page,context,out,shot,close,refresh,errors,setRows,setHeal
     await expect(detail()).toContainText('已完成判定');
     await expect(detail().getByRole('button',{name:'排查信息',exact:true})).toHaveAttribute('aria-expanded','false');
     await shot(`monitoring-detail-${theme}`);await close(detail());
+    for(const reason_code of ['observed_minute_unconfirmed','confirmation_aggregation_pending','confirmation_window_pending']){
+      const message='窗口内的确认和聚合仍在进行，等待发布。';
+      row.health='warming';row.health_reason=message;
+      await state(healthy,{state:'preparing',reason_code,message,last_gap:{start:now-300000,end:now,bounds:'exact'}},'监控中');
+      await expect(list()).not.toContainText(message);
+      await list().locator('.alert-rule-open').click();
+      await expect(detail().locator('.alert-issue')).toHaveCount(0);
+      await expect(detail().locator('.alert-gap')).toHaveCount(0);
+      await expect(detail().getByText('监控中',{exact:true})).toBeVisible();
+      if(reason_code==='confirmation_aggregation_pending')await shot(`normal-close-wait-detail-${theme}`);
+      await detail().getByRole('button',{name:'排查信息',exact:true}).click();
+      await expect(detail()).toContainText(message);
+      await expect(detail()).toContainText('排查区间');
+      await close(detail());
+    }
+    row.health='ready';row.health_reason=null;
+    await state(healthy,{last_gap:{start:now-300000,end:now,bounds:'possible',unrecoverable:true}},'监控中');
+    await list().locator('.alert-rule-open').click();await expect(detail().locator('.alert-gap')).toContainText('部分时段无法补判');await close(detail());
+    await state(healthy,{state:'preparing',reason_code:'observed_minute_unconfirmed',last_evaluated_at:null},'准备中');
+    await state(healthy,{state:'blocked',reason_code:'observed_minute_unconfirmed',message:'确认输入超过等待期限。'},'需处理');
+    await list().locator('.alert-rule-open').click();await expect(detail().locator('.alert-issue')).toContainText('超过等待期限');await close(detail());
     await state(healthy,{state:'preparing',reason_code:'awaiting_worker',taken_over_at:null,last_checked_at:null},'尚未接管');
     await shot(`not-taken-over-${theme}`);
     await state(healthy,{last_checked_at:Date.now()-90000},'判定未推进');await shot(`stalled-rule-${theme}`);
@@ -58,7 +79,7 @@ module.exports=async({page,context,out,shot,close,refresh,errors,setRows,setHeal
     await state(healthy,{},'监控中');await context.setOffline(true);
     await expect(list()).toContainText('离线待确认');await expect(list().getByRole('switch')).toBeDisabled();await shot(`offline-${theme}`);
     await context.setOffline(false);await refresh();await expect(list()).toContainText('监控中');
-    checks.push(`${width}px ${theme} ${font}px：未开启、接管、正常、规则停滞、心跳过期、恢复、休市、推送错误、基准、离线及联网恢复`);
+    checks.push(`${width}px ${theme} ${font}px：未开启、接管、正常、正常收盘等待保持监控/排查可读、首次准备、输入超时、规则停滞、心跳过期、恢复、休市、推送错误、基准、离线及联网恢复`);
   }
   assert.deepEqual(errors,[]);
   const proof={passed:true,checks,screenshots:fs.readdirSync(out).filter(f=>f.endsWith('.png')),errors};

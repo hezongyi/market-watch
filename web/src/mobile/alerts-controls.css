@@ -45,11 +45,12 @@
 }
 .mobile-alerts .alert-rule {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 60px;
+  grid-template-columns: minmax(0, 1fr) 44px;
   align-items: center;
-  gap: 10px 16px;
-  padding: 16px 0;
+  gap: 12px;
+  padding: 13px 0;
   border-bottom: 1px solid var(--quiet-line);
+  transition: background-color 140ms ease;
 }
 .mobile-alerts button.alert-rule-open {
   display: block;
@@ -62,11 +63,16 @@
   background: transparent;
   font-weight: 400;
   text-align: left;
+  transition: opacity 120ms ease, transform 120ms ease;
+}
+.mobile-alerts button.alert-rule-open:active {
+  opacity: 0.76;
+  transform: scale(0.995);
 }
 .mobile-alerts .alert-rule-heading {
   display: grid;
   grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.65fr);
-  gap: 16px;
+  gap: 12px;
   width: 100%;
 }
 .mobile-alerts .alert-rule .symbol-info {
@@ -109,10 +115,10 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 5px 10px;
+  gap: 3px 8px;
   min-width: 0;
   font-size: 0.857143rem;
-  line-height: 1.6;
+  line-height: 1.45;
   color: var(--muted);
 }
 .mobile-alerts .alert-rule-status > span {
@@ -120,13 +126,22 @@
   align-items: center;
   gap: 6px;
   flex-shrink: 0;
+  color: var(--text);
+  font-weight: 550;
 }
-.mobile-alerts .alert-rule-status [data-attention] {
+.mobile-alerts .alert-rule-status > span[data-state="monitoring"] {
+  color: var(--accent);
+}
+.mobile-alerts .alert-rule-status > span[data-attention] {
   color: var(--warning);
 }
 .mobile-alerts .alert-rule-status small {
+  flex: 1 1 100%;
   font-size: inherit;
   overflow-wrap: anywhere;
+}
+.mobile-alerts .alert-rule-status .alert-rule-checked {
+  flex: 0 1 auto;
 }
 .mobile-alerts .alert-rule-status i {
   width: 5px;
@@ -137,7 +152,12 @@
 .mobile-alerts .alert-rule-status i[data-state="monitoring"] {
   background: var(--accent);
 }
-.mobile-alerts .alert-rule-status i[data-state="blocked"] {
+.mobile-alerts .alert-rule-status i[data-state="preparing"],
+.mobile-alerts .alert-rule-status i[data-state="recovering"],
+.mobile-alerts .alert-rule-status i[data-state="blocked"],
+.mobile-alerts .alert-rule-status i[data-state="service_unavailable"],
+.mobile-alerts .alert-rule-status i[data-state="rule_stalled"],
+.mobile-alerts .alert-rule-status i[data-state="not_taken_over"] {
   background: var(--warning);
 }
 .mobile-alerts .alert-offline,
@@ -184,6 +204,19 @@
   line-height: 1.45;
   margin: 0;
   letter-spacing: -0.025em;
+  overflow-wrap: anywhere;
+}
+.mobile-alerts .alert-detail-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  margin-top: -12px;
+  color: var(--muted);
+  font-size: 0.857143rem;
+  line-height: 1.6;
+  font-variant-numeric: tabular-nums;
+}
+.mobile-alerts .alert-detail-summary > span {
   overflow-wrap: anywhere;
 }
 .alert-facts {
@@ -516,6 +549,10 @@
   .mobile-alerts * {
     scroll-behavior: auto;
   }
+  .mobile-alerts .alert-rule,
+  .mobile-alerts button.alert-rule-open {
+    transition: none;
+  }
 }
 /* ToggleGroup is not a primary Button; override the shared button default. */
 .mobile-alerts .mobile-control-drawer button[data-slot="toggle-group-item"] {
@@ -725,4 +762,31 @@
   overscroll-behavior-y: contain;
   margin-inline: -16px;
   padding: 0 16px 24px;
+}
+
+/* Alert form toggles are a single choice, never a second primary action. */
+.mobile-controls.mobile-alerts .mobile-control-drawer
+  button[data-slot="toggle-group-item"][data-variant]:not(.mobile-header-icon) {
+  background: transparent;
+  color: var(--muted);
+  border-color: transparent;
+  font-weight: 500;
+  box-shadow: none;
+}
+.mobile-controls.mobile-alerts .mobile-control-drawer
+  button[data-slot="toggle-group-item"][data-variant][aria-pressed="true"]:not(.mobile-header-icon) {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+  box-shadow: 0 1px 4px #0001;
+}
+.mobile-alerts [data-slot="field"].alert-switch-field {
+  flex-direction: row;
+  align-items: center;
+}
+.mobile-alerts .alert-switch-field > div {
+  min-width: 0;
+}
+.mobile-alerts .alert-switch-field > [data-slot="switch"] {
+  flex-shrink: 0;
 }

@@ -1,0 +1,24 @@
+{
+  "host": "Ubuntu local Docker",
+  "origin": "https://192.168.7.232:18443",
+  "errors": [],
+  "blockedWrites": [],
+  "screenshots": [
+    "list-light-375.png",
+    "detail-light-375.png",
+    "list-dark-412.png",
+    "detail-dark-412.png"
+  ],
+  "checks": [
+    "375px light 14px: 保留原规则active、真实生命周期、检查/判定首屏、排查默认收起",
+    "412px dark 21px: 保留原规则active、真实生命周期、检查/判定首屏、排查默认收起"
+  ],
+  "rule": {
+    "id": "a1edf2da-c9c5-4ef8-967b-32a0f8e47adb",
+    "status": "active",
+    "version": 1,
+    "run": 1,
+    "count": 0
+  },
+  "passed": true
+}

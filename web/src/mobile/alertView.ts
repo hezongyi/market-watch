@@ -168,18 +168,34 @@ export function ruleState(
         message: "此规则已超过一分钟未被检查，请检查告警执行服务。",
       };
   }
-  const key =
-    execution?.state ||
-    (!execution && row.runtime?.closed ? "closed" : undefined) ||
-    {
-      ready: "monitoring",
-      warming: "preparing",
-      stale: "recovering",
-      coverage_pending: "recovering",
-      blocked: "blocked",
-      error: "blocked",
-    }[row.health] ||
-    "unknown";
+  // Confirming/aggregating the next close is part of monitoring once a baseline
+  // has been evaluated. The worker promotes overdue input to blocked; preserve
+  // that state, recovery incidents and first-time preparation as distinct facts.
+  const routineCloseWait =
+    execution?.state === "preparing" &&
+    [
+      "observed_minute_unconfirmed",
+      "confirmation_aggregation_pending",
+      "confirmation_window_pending",
+    ].includes(execution.reason_code || "") &&
+    !!execution.taken_over_at &&
+    !!execution.last_evaluated_at &&
+    execution.last_evaluated_at >= row.effective_at &&
+    !row.runtime?.needs_baseline &&
+    !row.runtime?.incident;
+  const key = routineCloseWait
+    ? "monitoring"
+    : execution?.state ||
+      (!execution && row.runtime?.closed ? "closed" : undefined) ||
+      {
+        ready: "monitoring",
+        warming: "preparing",
+        stale: "recovering",
+        coverage_pending: "recovering",
+        blocked: "blocked",
+        error: "blocked",
+      }[row.health] ||
+      "unknown";
   const label =
     (
       {
@@ -221,10 +237,11 @@ export function ruleState(
         : deliveryMessage ||
           (deliveryFailed
             ? notification?.message || "推送失败，查看通知设置"
-            : execution?.message ||
-              row.health_reason ||
-              execution?.phone_configuration?.message ||
-              undefined),
+            : (routineCloseWait
+                ? execution?.phone_configuration?.message
+                : execution?.message ||
+                  row.health_reason ||
+                  execution?.phone_configuration?.message) || undefined),
   };
 }
 export function ruleIdentity(row: AlertRow) {

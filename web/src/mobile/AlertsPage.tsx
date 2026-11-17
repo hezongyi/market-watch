@@ -4,7 +4,6 @@ import {
   Plus,
   Search,
   ChevronRight,
-  RefreshCw,
   Archive,
   Activity,
   X,
@@ -757,6 +756,7 @@ export default function AlertsPage({
                               <div className="alert-rule-status">
                                 <span
                                   data-attention={state.attention || undefined}
+                                  data-state={state.key}
                                 >
                                   <i data-state={state.key} />
                                   {state.label}
@@ -765,7 +765,7 @@ export default function AlertsPage({
                                   <small>{state.message}</small>
                                 )}
                                 {checked && !state.attention && (
-                                  <small>
+                                  <small className="alert-rule-checked">
                                     {monitor.verified ? "最近检查" : "上次检查"}{" "}
                                     {stamp(checked)}
                                   </small>
@@ -859,14 +859,6 @@ export default function AlertsPage({
                   { value: "all", label: "全部未归档" },
                 ]}
               />
-              <Button
-                variant="outline"
-                disabled={!online || busy}
-                onClick={() => void refresh()}
-              >
-                <RefreshCw data-icon="inline-start" />
-                刷新规则
-              </Button>
               <Button onClick={() => setFiltersOpen(false)}>查看规则</Button>
             </FieldGroup>
           </MobileSheet>
@@ -904,6 +896,19 @@ export default function AlertsPage({
                 <h3 className="alert-condition-title">
                   {selected.condition_summary}
                 </h3>
+                <div className="alert-detail-summary" aria-label="规则设置">
+                  <span>
+                    {selected.config.mode === "close"
+                      ? `${selected.config.timeframe} 收盘确认`
+                      : "实时抽样触价"}
+                  </span>
+                  <span>{selected.count}/{selected.max_triggers} 次</span>
+                  <span>
+                    {selected.config.expires_at
+                      ? `${stamp(selected.config.expires_at)} 到期`
+                      : "不限到期"}
+                  </span>
+                </div>
                 {status.message && (
                   <div className="alert-issue">
                     <p>{status.message || "等待服务器建立观察基准"}</p>
@@ -951,28 +956,6 @@ export default function AlertsPage({
                     </dd>
                   </div>
                   <div>
-                    <dt>判定方式</dt>
-                    <dd>
-                      {selected.config.mode === "close"
-                        ? `${selected.config.timeframe} 收盘确认`
-                        : "实时抽样触价"}
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>已触发</dt>
-                    <dd>
-                      {selected.count}/{selected.max_triggers} 次
-                    </dd>
-                  </div>
-                  <div>
-                    <dt>到期</dt>
-                    <dd>
-                      {selected.config.expires_at
-                        ? stamp(selected.config.expires_at)
-                        : "不限到期"}
-                    </dd>
-                  </div>
-                  <div>
                     <dt>提醒</dt>
                     <dd>
                       {selected.config.notify_ntfy ? "手机推送 · " : ""}
@@ -984,15 +967,17 @@ export default function AlertsPage({
                     <dd>{stamp(selected.last_triggered_at)}</dd>
                   </div>
                 </dl>
-                {selected.execution?.last_gap && (
-                  <p className="alert-gap">
-                    {selected.execution.last_gap.unrecoverable
-                      ? "曾中断，部分时段无法补判"
-                      : "曾有数据缺口"}{" "}
-                    · {stamp(selected.execution.last_gap.start)} —{" "}
-                    {stamp(selected.execution.last_gap.end)}
-                  </p>
-                )}
+                {selected.execution?.last_gap &&
+                  (selected.execution.last_gap.unrecoverable ||
+                    status.key !== "monitoring") && (
+                    <p className="alert-gap">
+                      {selected.execution.last_gap.unrecoverable
+                        ? "曾中断，部分时段无法补判"
+                        : "曾有数据缺口"}{" "}
+                      · {stamp(selected.execution.last_gap.start)} —{" "}
+                      {stamp(selected.execution.last_gap.end)}
+                    </p>
+                  )}
                 {actionError && (
                   <p role="alert" className="mobile-inline-error">
                     {actionError}
@@ -1109,6 +1094,11 @@ export default function AlertsPage({
                       预期输入: stamp(
                         (selected.execution as any)?.expected_input_at,
                       ),
+                      ...(selected.execution?.last_gap
+                        ? {
+                            排查区间: `${stamp(selected.execution.last_gap.start)} — ${stamp(selected.execution.last_gap.end)}`,
+                          }
+                        : {}),
                       修订: selected.config.composite_revision_id || "历史来源",
                       推送状态:
                         selected.execution?.notification?.message ||

@@ -393,6 +393,12 @@ const server = http.createServer(async (req, res) => {
       .last()
       .evaluateAll((nodes) => nodes.forEach((node) => (node.scrollTop = 0)));
     await page.waitForTimeout(350);
+    await page.waitForFunction(() => {
+      if (document.querySelector('[data-mobile-overlay="true"]')) return true;
+      const slide = document.querySelector('.alert-main-tabs .mobile-tabs-slide:not([inert])');
+      const viewport = slide?.closest('[data-slot="carousel-content"]');
+      return !slide || !viewport || Math.abs(slide.getBoundingClientRect().left - viewport.getBoundingClientRect().left) < 0.5;
+    });
     assert(
       await page.evaluate(
         () => document.documentElement.scrollWidth <= innerWidth,
@@ -462,6 +468,9 @@ const server = http.createServer(async (req, res) => {
       form.getByText("完成柱尚不可用", { exact: true }),
     ).toBeVisible();
     await form.getByRole("button", { name: "触价", exact: true }).click();
+    await expect(form.getByRole("button", { name: "触价", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(form.getByRole("button", { name: "收盘确认", exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect.poll(() => form.getByRole("button", { name: "收盘确认", exact: true }).evaluate(node => getComputedStyle(node).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
     await form.getByLabel("目标价格", { exact: true }).fill("1.08500");
     await expect(
       form.getByRole("switch", { name: "手机推送", exact: true }),
