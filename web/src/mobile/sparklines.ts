@@ -1,5 +1,6 @@
 export type Sparkline = {
   ticker: string;
+  as_of?: number;
   revision: {
     history_version_id?: string;
     composite_revision_id?: string;
@@ -81,6 +82,8 @@ export function sparklineWithQuote(item: Sparkline, quote?: SparkQuote, now = Da
 
 /** Empty refreshes do not erase a still-valid, identity-matched curve. */
 export function mergeSparkline(old: Sparkline | undefined, next: Sparkline, now = Date.now()): Sparkline {
+  if (old?.ticker === next.ticker && old.as_of != null && next.as_of != null &&
+      next.as_of < old.as_of && sparklineExpires(old) > now) return old;
   if (!next.points.length && next.status !== "unavailable" && next.display_state !== "unsupported" && next.preparation_error === undefined &&
       old?.preparation_error && old.ticker === next.ticker && old.identity_key === next.identity_key &&
       old.revision?.input_revision === next.revision?.input_revision &&
@@ -154,7 +157,8 @@ export function sparklineLoader(
         try {
           const response = await history.request(task.item.ticker, controller.signal);
           if (task.lifetime !== lifetime || controller.signal.aborted) return;
-          receive(response.items.filter(row => sparklineExpires(row) > response.as_of));
+          receive(response.items.filter(row => sparklineExpires(row) > response.as_of)
+            .map(row => ({...row, as_of: response.as_of})));
           for (const row of response.items) {
             const key = preparationKey(row);
             if (response.preparation === "unsupported") history.prepared.set(key, row.previous_close_price == null ? response.as_of + 900000 : Math.max(response.as_of + 900000, row.target_window_end ?? row.window_end));
@@ -215,7 +219,7 @@ export function sparklineLoader(
               if (generation !== epoch || controller.signal.aborted) continue;
               // A cached HTTP reply can cross midnight; old windows cannot redraw.
               const current = response.items.filter(item => sparklineExpires(item) > response.as_of);
-              receive(current);
+              receive(current.map(row => ({...row, as_of: response.as_of})));
               if (history) {
                 for (const [key, end] of history.prepared)
                   if (end <= response.as_of) history.prepared.delete(key);

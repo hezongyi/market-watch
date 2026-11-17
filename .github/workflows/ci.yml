@@ -238,6 +238,9 @@ jobs:
           node tests/mobile-cache.cjs
           node tests/mobile-watchlists.cjs
           node tests/mobile-sparklines.cjs
+          node tests/mobile-transport.cjs
+          node tests/mobile-resume.cjs
+          node tests/mobile-chart-resume.cjs
           node tests/mobile-alerts.cjs
 
       - name: Single application regressions
@@ -266,6 +269,7 @@ jobs:
           # reinstalling fonts/system packages through the runner's apt mirror.
           npx playwright install chromium
           node tests/mobile-watch.browser.cjs
+          node tests/mobile-watch-resume.browser.cjs
           node tests/mobile-alerts.browser.cjs
           node tests/saved-layout-startup.browser.cjs
           node tests/chart-stream-shared.browser.cjs
