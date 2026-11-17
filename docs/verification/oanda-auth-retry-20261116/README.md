@@ -18,6 +18,25 @@ OANDA 只读 GET 遇到 401 时最多三次总尝试，间隔约 1s、2s（±10%
 
 新增恢复测试将正常报价先发布，再验证确认 K 线 ready；这保留了正式链路需要活跃连接的条件。旧 401 请求次数断言按三次尝试更新；429 仍单次。数据库测试只让 401 admission 时钟正常推进，429 固定时钟继续验证精确 cooldown 边界。
 
+### PR #138 CI 测试修复（2026-11-17）
+
+CI 在 `test_notice_reliability.py` 的 TLS 错误测试中失败：请求限流已迁入共享的 `OandaPractice.rest_get`，测试却仍替换已移除的 `oanda_rest_batch.request_slot`。本地运行该测试文件复现 `AttributeError`（1 failed、18 passed）；改为替换实际使用的 `oanda_stream.request_slot`，保留 TLS 阶段、操作类型、时间窗口与秘密文本不泄露的断言。
+
+本次补丁为 P0，仅修正测试，不改运行时代码或部署。以下回归为 275 passed、14 skipped（未提供 PostgreSQL 测试连接时跳过相应集成用例）；Ruff 和 `git diff --check` 通过。完整 PostgreSQL 验证由 PR CI 继续执行。
+
+```bash
+PYTHONPATH=backend python -m pytest -q \
+  backend/tests/test_notice_reliability.py \
+  backend/tests/test_oanda_auth_retry.py \
+  backend/tests/test_oanda_rest_batch.py \
+  backend/tests/test_oanda_stream.py \
+  backend/tests/test_oanda_stream_recovery.py \
+  backend/tests/test_oanda_recovery.py \
+  backend/tests/test_provider_chart.py \
+  backend/tests/test_provider_network_recovery.py \
+  backend/tests/test_oanda_provider_account_prices.py
+```
+
 ## Ubuntu Docker R1
 
 主机：当前 Ubuntu；task/project 均为 `mw-oanda-auth-retry-20261116`。API-only 隔离实例地址 `http://127.0.0.1:18448`，独立 PostgreSQL、网络、volume、凭据。无真实告警规则和通知发送。
