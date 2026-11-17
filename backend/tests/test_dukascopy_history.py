@@ -114,3 +114,86 @@ def test_shared_budget_timeout_does_not_enter_sdk_retry_path(monkeypatch):
     with httpx.Client(transport=httpx.MockTransport(lambda request: pytest.fail("must not fetch"))) as client:
         result = DukascopyHistory(client=client).page(identity(), 0, 120000)
     assert result.result.status == "timeout" and result.checkpoint == 0
+
+
+@pytest.mark.parametrize("failure", ["connect_tls", "pool"])
+def test_owned_proxy_pool_recovers_after_failed_connect_tls(monkeypatch, caplog, failure):
+    """A TLS failure after CONNECT can leave HTTPcore's only tunnel active.
+
+    Exercise the real HTTPX/HTTPcore proxy pool, then retry through the same
+    history adapter. Reusing the poisoned pool would produce PoolTimeout.
+    """
+    import httpcore
+
+    clients, streams = [], []
+    original_client = httpx.Client
+
+    class ProxyStream(httpcore.NetworkStream):
+        closed = False
+
+        def read(self, max_bytes, timeout=None):
+            return b"HTTP/1.1 200 Connection established\r\n\r\n"
+
+        def write(self, buffer, timeout=None):
+            pass
+
+        def start_tls(self, ssl_context, server_hostname=None, timeout=None):
+            raise httpcore.ConnectTimeout("private proxy credentials must not be logged")
+
+        def close(self):
+            self.closed = True
+
+        def get_extra_info(self, info):
+            return None
+
+    class ProxyBackend(httpcore.NetworkBackend):
+        def connect_tcp(self, *args, **kwargs):
+            stream = ProxyStream()
+            streams.append(stream)
+            return stream
+
+    def make_client(**kwargs):
+        if not clients and failure == "connect_tls":
+            transport = httpx.HTTPTransport(proxy="http://proxy.invalid:8080",
+                limits=httpx.Limits(max_connections=1))
+            transport._pool._network_backend = ProxyBackend()
+        elif not clients:
+            def exhausted_pool(request):
+                raise httpx.PoolTimeout("private proxy credentials must not be logged")
+
+            transport = httpx.MockTransport(exhausted_pool)
+        else:
+            transport = httpx.MockTransport(lambda request: jsonp(request, [
+                [0, "1.1", "1.2", "1.0", "1.1", 1]]))
+        client = original_client(transport=transport, timeout=.01, trust_env=False)
+        clients.append(client)
+        return client
+
+    monkeypatch.setattr("alerts.dukascopy_history.httpx.Client", make_client)
+    adapter = DukascopyHistory(proxy="http://proxy.invalid:8080")
+    try:
+        failed = adapter.page(identity(), 0, 120000)
+        assert failed.result.status == "timeout" and failed.checkpoint == 0
+        assert len(streams) == (1 if failure == "connect_tls" else 0)
+        recovered = adapter.page(identity(), 0, 120000)
+        assert recovered.result.status == "data", recovered.result
+        assert recovered.checkpoint == 120000 and len(recovered.rows) == 1
+        assert len(clients) == 2 and clients[0].is_closed
+        if streams:
+            assert streams[0].closed
+        assert f"error_type={'ConnectTimeout' if failure == 'connect_tls' else 'PoolTimeout'}" in caplog.text
+        assert "client_reset=True" in caplog.text
+        assert "private proxy" not in caplog.text
+    finally:
+        adapter.close()
+
+
+def test_borrowed_client_transport_failure_is_not_closed(caplog):
+    def timeout(request):
+        raise httpx.PoolTimeout("private proxy credentials must not be logged")
+
+    with httpx.Client(transport=httpx.MockTransport(timeout)) as client:
+        result = DukascopyHistory(client=client).page(identity(), 0, 120000)
+        assert result.result.status == "timeout" and not client.is_closed
+    assert "error_type=PoolTimeout" in caplog.text and "phase=pool" in caplog.text
+    assert "client_reset=False" in caplog.text and "private proxy" not in caplog.text
