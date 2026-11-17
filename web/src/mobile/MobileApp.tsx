@@ -93,10 +93,15 @@ export default function MobileApp() {
     [profile?.origin, profile?.subject, profile?.generation, verified]);
   useEffect(() => {
     if (!preparation) return;
-    const visibility = () => preparation.visibility(document.hidden);
-    document.addEventListener("visibilitychange", visibility);
-    return () => { document.removeEventListener("visibilitychange", visibility); preparation.dispose(); };
+    return () => preparation.dispose();
   }, [preparation]);
+  useEffect(() => {
+    if (!preparation) return;
+    const visibility = () => preparation.visibility(document.hidden || state !== "online");
+    visibility();
+    document.addEventListener("visibilitychange", visibility);
+    return () => document.removeEventListener("visibilitychange", visibility);
+  }, [preparation, state]);
   useEffect(() => {
     preparation?.update(symbol, firstWatchSymbol, location.pathname === "/chart");
   }, [preparation, symbol, firstWatchSymbol, location.pathname]);

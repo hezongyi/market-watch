@@ -7,8 +7,9 @@ const clock={now:()=>now},timer=(fn,delay)=>{timers.set(++id,{fn,at:now+delay});
 const provider={};vm.runInNewContext(compile('src/advanced/providerSubscriptions.ts'),{exports:provider,Map,Set,Promise,Error,JSON,Date:clock,setTimeout:timer,clearTimeout:id=>timers.delete(id)});
 const document={hidden:false,addEventListener:(name,fn)=>events.set(name,fn),removeEventListener:()=>{}};
 const windowEvents=new Map();
+const navigator={onLine:true};
 const mobile={};vm.runInNewContext(compile('src/mobile/market.ts'),{exports:mobile,require:name=>name==='../api'?{api:async(path,args)=>{calls.push({path,args:structuredClone(args)});}}:name==='./logs'?{logEvent:()=>{}}:provider,
- document,Date:clock,Map,Set,Promise,Error,JSON,AbortSignal,crypto:{randomUUID:()=> 'mobile'},encodeURIComponent,
+ document,navigator,Date:clock,Map,Set,Promise,Error,JSON,AbortSignal,crypto:{randomUUID:()=> 'mobile'},encodeURIComponent,
  setTimeout:timer,clearTimeout:id=>timers.delete(id),addEventListener:(name,fn)=>windowEvents.set(name,fn),removeEventListener:name=>windowEvents.delete(name),
  EventSource:class{constructor(){this.readyState=0;this.events={};streams.push(this);}close(){this.closed=true;}addEventListener(name,fn){this.events[name]=fn;}}});
 (async()=>{
@@ -31,6 +32,13 @@ const mobile={};vm.runInNewContext(compile('src/mobile/market.ts'),{exports:mobi
  assert.equal(streams.length,3);streams[2].readyState=1;streams[2].onopen({});await flush();
  resumed=calls.filter(row=>row.path.endsWith('/subscribe')).at(-1).args;
  assert.equal(resumed.cursor,60000);assert.equal(resumed.sequence,7,'one hour away cannot silently skip missed bars');
+ navigator.onLine=false;windowEvents.get('offline')();await flush();assert(streams[2].closed);
+ navigator.onLine=true;windowEvents.get('online')();await flush();assert.equal(streams.length,4,'network recovery reconnects immediately');
+ streams[3].readyState=1;streams[3].onopen({});await flush();
+ await connection.subscribe({listener:'chart',generation:2,sequence:0,kind:'bars',query:{series_kind:'managed',instrument:'EURUSD'}},event=>received.push(event));
+ await connection.unsubscribe({listener:'chart',generation:1});await flush();
+ streams[3].onmessage({data:JSON.stringify({listener:'chart',generation:2,type:'bars',sequence:1,cursor:120000})});
+ assert.equal(received.at(-1).generation,2,'late cleanup from an old generation cannot remove its replacement');
  await connection.dispose();assert.equal(timers.size,0);assert.equal(windowEvents.size,0);
  console.log('PASS mobile recovery: silent connection, cursor, old-stream fence, quiet-market heartbeat, hour-long background and disposal');
 })().catch(error=>{console.error(error);process.exitCode=1});
