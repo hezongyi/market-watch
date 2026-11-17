@@ -42,7 +42,7 @@ two transport requests for a 15-second blip, priority 5, and identical click URL
 
 ## Verification
 
-109 passed, 1 optional test skipped:
+110 passed, 1 optional test skipped:
 
 ```sh
 PYTHONPATH=backend .venv/bin/python -m pytest -q \

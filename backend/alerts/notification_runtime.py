@@ -173,7 +173,7 @@ def inspect_health(*, startup_grace_until=0):
             # attribute unchanged and the reminder time never reaches the row.
             value = dict(row.value) if row else {"state": "active", "opened_at": now,
                                                  "last_notified_at": 0}
-            newly_opened = row is None or value.get("state") != "active"
+            newly_opened = row is None or value.get("state") != "active" or not value.get("notification_id")
             if newly_opened:
                 value = {"state": "active", "opened_at": now, "last_notified_at": 0}
             group, role = fault_id.split(":", 1)

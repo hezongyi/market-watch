@@ -328,3 +328,19 @@ def test_price_alert_keeps_urgent_policy_at_night(database, monkeypatch):
         db.scalar(select(Outbox)).next_at = 0
     task = notify.claim()
     assert task and task[2]["priority"] == 5
+
+
+def test_upgrade_adopts_an_active_legacy_incident_with_a_fresh_delay(database, monkeypatch):
+    from alerts import notification_runtime, notify
+    from alerts.storage import Preference
+    clock = setup_runtime(monkeypatch)
+    with database.begin() as db:
+        db.add(Preference(key="runtime_incident:data:provider_live_fxcm", value={
+            "state": "active", "opened_at": clock[0] - 3600_000, "last_notified_at": clock[0] - 3600_000}))
+    notification_runtime.inspect_health()
+    with database.begin() as db:
+        value = db.get(Preference, "runtime_incident:data:provider_live_fxcm").value
+        assert value["notification_id"] and value["opened_at"] == clock[0]
+    assert notify.claim() is None
+    clock[0] += 180_000
+    assert notify.claim() is not None
