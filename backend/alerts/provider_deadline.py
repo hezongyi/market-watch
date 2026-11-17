@@ -9,6 +9,12 @@ import httpx
 _DEADLINE = ContextVar("provider_http_deadline", default=None)
 
 
+def effective_deadline(deadline):
+    """Keep a nested operation inside its caller's absolute time budget."""
+    outer = _DEADLINE.get()
+    return min(deadline, outer) if outer is not None else deadline
+
+
 def remaining_timeout(timeout, error_type):
     deadline = _DEADLINE.get()
     if deadline is None:

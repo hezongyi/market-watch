@@ -43,10 +43,10 @@ def test_safe_request_reason_is_specific_and_never_contains_supplier_text(code, 
 def test_real_adapter_retains_tls_failure_phase_without_secret_text(method, failure, monkeypatch):
     from contextlib import nullcontext
 
-    from alerts import oanda_rest_batch
+    from alerts import oanda_rest_batch, oanda_stream
     from test_oanda_rest_batch import spec
     from test_oanda_stream import oanda_identity
-    monkeypatch.setattr(oanda_rest_batch, 'request_slot', lambda *a, **kw: nullcontext())
+    monkeypatch.setattr(oanda_stream, 'request_slot', lambda *a, **kw: nullcontext())
 
     def respond(request):
         request.extensions['trace']('connection.start_tls.failed', {})

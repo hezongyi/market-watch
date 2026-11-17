@@ -7,6 +7,8 @@ import httpx
 
 from .config import settings
 from .market_resources import request_slot
+from .oanda_auth import AuthRetry
+from .provider_deadline import effective_deadline, request_deadline
 from .provider_transport import binance_get, pooled_client
 from .storage import now_ms
 from .volume import encoded
@@ -108,10 +110,21 @@ def fetch_oanda(symbol, start=None, end=None, mode="live", client=None):
     def request(path, params):
         import time
 
+        deadline = effective_deadline(time.monotonic() + 15)
+        auth = AuthRetry(operation="history", token=settings.oanda_token,
+                         account=settings.oanda_account_id, deadline=deadline)
         for attempt in range(3):
             try:
-                with request_slot("oanda"):
-                    response = client.get(base + path, params=params, headers=headers)
+                auth.check()
+                with request_slot("oanda", deadline=deadline), request_deadline(deadline):
+                    response = client.get(base + path, params=params, headers=headers,
+                                          timeout=max(0.001, deadline - time.monotonic()))
+                auth.observe(response)
+                if response.status_code == 401:
+                    response.close()
+                    if attempt < 2 and auth.wait():
+                        continue
+                    response.raise_for_status()
                 if response.status_code not in {502, 503, 504} or attempt == 2:
                     response.raise_for_status()
                     return response
@@ -221,9 +234,12 @@ def fetch_oanda_catalog(client=None):
     owns = client is None
     client = client or httpx.Client(timeout=15, proxy=settings.oanda_proxy or None, trust_env=False)
     try:
-        response = client.get(
+        from .oanda_stream import OandaPractice
+
+        response = OandaPractice(token=settings.oanda_token, account_id=settings.oanda_account_id,
+                                 rest_client=client).rest_get(
             f"https://api-fxpractice.oanda.com/v3/accounts/{settings.oanda_account_id}/instruments",
-            headers={"Authorization": "Bearer " + settings.oanda_token},
+            operation="instruments", headers={"Authorization": "Bearer " + settings.oanda_token},
         )
         response.raise_for_status()
         return response.json()["instruments"]

@@ -1,0 +1,81 @@
+{
+  "sample_utc": "2026-11-16T14:23:11.063573+00:00",
+  "strict_TLS": true,
+  "readyz": true,
+  "login": true,
+  "schema": "bd57_notice_source_poll_index",
+  "data_preserved": {
+    "instruments": 148,
+    "maintenance": 13,
+    "rules": 2,
+    "watches": 0,
+    "chart_alert_versions": 4,
+    "advanced_chart_workspaces": 1,
+    "advanced_chart_preferences": 12,
+    "market_datasets": 140,
+    "stable_preference_keys": 241
+  },
+  "launcher_backup_target_verified": true,
+  "apk_version": "0.1.4",
+  "alert_heartbeat_advances": true,
+  "realtime_all_ready": true,
+  "oanda_progress": {
+    "EURUSD": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    },
+    "USDJPY": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    },
+    "XAUUSD": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    },
+    "USDCAD": {
+      "quote_sequence_advances": true,
+      "confirmed_m1_advances": true,
+      "final_quote_ready": true,
+      "final_candle_ready": true,
+      "final_error": null
+    }
+  },
+  "deployment_passed": true,
+  "natural_401_then_200_observed": true,
+  "observed_utc": [
+    "2026-11-16T14:23:15.205265+00:00",
+    "2026-11-16T14:23:40.306340+00:00",
+    "2026-11-16T14:24:05.387725+00:00",
+    "2026-11-16T14:24:30.471696+00:00",
+    "2026-11-16T14:24:55.556419+00:00"
+  ],
+  "deployment": {
+    "commit": "f0ff440adb35f7b5f2405ef459045c7cf790dc8f",
+    "image": "sha256:774d763b56856e0de21260ced23e8d2d5f8c4c1bee586d3ebd0911964b73eceb",
+    "project": "mw-dev",
+    "database": "dev_mobile_20261116",
+    "schema": "bd57_notice_source_poll_index",
+    "backup_bytes": 1107714655,
+    "backup_sha256": "3907401ff8599d44608b84fede9efcc46b8abee30393d8b60b5ab8642eb934f7",
+    "web_unchanged": true,
+    "production_touched": false
+  },
+  "auth_events": [
+    "2026-11-16 14:22:54,359 INFO oanda_auth_attempt operation=pricing_stream identity=6685f17951ea8fc7 attempt=1 http_status=401 outcome=refused request_id=818176033195061134 reason=unread",
+    "2026-11-16 14:22:54,361 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=138 http_status=401 body_kind=json elapsed_ms=6463 since_record_ms=- records=0",
+    "2026-11-16 14:23:02,904 WARNING pricing_transport_failed phase=receive_headers route=upstream type=ReadTimeout epoch=138 http_status=- body_kind=other elapsed_ms=7536 since_record_ms=- records=0",
+    "2026-11-16 14:23:02,904 WARNING pricing_stream_ended status=timeout stage=stream type=ReadTimeout sqlstate=- epoch=138",
+    "2026-11-16 14:23:13,054 INFO oanda_auth_attempt operation=pricing_stream identity=6685f17951ea8fc7 attempt=1 http_status=401 outcome=refused request_id=782147236252060084 reason=unread",
+    "2026-11-16 14:23:13,054 WARNING pricing_transport_failed phase=http_status route=upstream type=HTTPStatusError epoch=139 http_status=401 body_kind=json elapsed_ms=8257 since_record_ms=- records=0",
+    "2026-11-16 14:23:15,206 INFO oanda_auth_attempt operation=pricing_stream identity=6685f17951ea8fc7 attempt=2 http_status=200 outcome=recovered request_id=800161634795095887 reason=unread"
+  ]
+}

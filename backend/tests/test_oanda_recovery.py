@@ -196,7 +196,7 @@ def test_pricing_failure_keeps_hold_even_with_successful_account_endpoints(runni
     result = failed_request(failure.value, observed_at=due)
     assert result.status == status
     live.finish_auth_probe(probe, result, now=due + 1)
-    assert len(calls) == 4 and calls[1] == '/v3/accounts'
+    assert len(calls) == (6 if code == 401 else 4) and calls[1] == '/v3/accounts'
     assert all('/accounts/test-account/' in path for path in (calls[0], *calls[2:]))
     assert live.claim('test-account', now=due + 2) is None
     assert live.claim_auth_probe('test-account', now=due + 2) is None
