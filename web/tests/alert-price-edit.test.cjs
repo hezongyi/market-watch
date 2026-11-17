@@ -165,3 +165,33 @@ test("generated names follow grouped or fractional native display prices", async
     assert.equal(saved.config.condition.right.value, value);
   }
 });
+
+test("lost response and failed readback remain explicitly unknown", async()=>{
+ const row=base();let reads=0,writes=0;
+ await assert.rejects(editAlertPrice(row,"1.15",async(p,b)=>{
+  if(b){writes++;throw Error('response lost');}
+  if(reads++===0)return row;
+  throw Error('offline');
+ }),error=>error.outcomeUnknown===true && !error.currentRow);
+ assert.equal(writes,1);
+});
+
+test("same price with different concurrent config is not mistaken for this save",async()=>{
+ const row=base();let reads=0;
+ await assert.rejects(editAlertPrice(row,"1.15",async(p,b)=>{
+  if(b)throw Error('response lost');
+  if(reads++===0)return row;
+  return {...row,version:4,config:{...row.config,condition:{...row.config.condition,right:{kind:'constant',value:'1.15'}},message:'other client'}};
+ }),e=>e.currentRow?.config.message==='other client');
+});
+
+test('a read of the old version cannot disprove a timed-out edit that commits later',async()=>{
+ for(const status of [504,200,undefined]){
+  const row=base();let stored=structuredClone(row),commit;
+  await assert.rejects(editAlertPrice(row,'1.15',async(p,b)=>{
+   if(b){commit=()=>{stored={...row,version:row.version+1,control_revision:row.control_revision+1,config:b.config};};throw Object.assign(Error('ambiguous response'),{status});}
+   return structuredClone(stored);
+  }),e=>e.outcomeUnknown===true && e.currentRow.version===row.version);
+  commit();assert.equal(stored.config.condition.right.value,'1.15');
+ }
+});

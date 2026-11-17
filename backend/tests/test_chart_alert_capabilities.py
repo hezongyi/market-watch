@@ -270,3 +270,40 @@ def test_duplicate_observations_have_one_event_and_outbox_across_adapters(mcp, m
     with database() as db:
         assert db.scalar(select(func.count()).select_from(storage.Outbox)) == 1
         assert db.get(storage.ChartAlert, row["id"]).count == 1
+
+
+def test_chart_price_capabilities_publish_revision_and_actual_phone_availability(mcp, monkeypatch):
+    client, _, database = mcp
+    make = ready_config(database, monkeypatch)
+    config = make(notify_ntfy=True)
+    monkeypatch.setattr(storage, "now_ms", lambda: make.at)
+    query = {"instrument": config.instrument, "series_kind": "composite", "timeframe": "M1"}
+    response = client.post("/api/chart-alerts/capabilities", json=query)
+    assert response.status_code == 200, response.text
+    value = response.json()
+    assert value["composite_revision_id"] == config.composite_revision_id
+    assert value["phone"] == {"available": True, "reason": None}
+    monkeypatch.setattr(storage.settings, "delivery_enabled", False)
+    value = client.post("/api/chart-alerts/capabilities", json=query).json()
+    assert value["phone"]["available"] is False
+    assert value["phone"]["reason"]
+
+
+def test_drag_revision_fence_rejects_lifecycle_change_between_read_and_edit(mcp, monkeypatch):
+    client, _, database = mcp
+    payload = ready_config(database, monkeypatch)().model_dump(mode="json")
+    row = client.post("/api/chart-alerts", json={"request_id": "drag-fence", "config": payload}).json()
+    paused = client.post(f"/api/chart-alerts/{row['id']}/lifecycle", json={
+        "version": row["version"], "control_revision": row["control_revision"],
+        "request_id": "pause-during-drag", "action": "pause",
+    })
+    assert paused.status_code == 200, paused.text
+    changed = {**payload, "condition": {**payload["condition"], "right": {"kind": "constant", "value": "1.20"}}}
+    response = client.post(f"/api/chart-alerts/{row['id']}/edit", json={
+        "version": row["version"], "control_revision": row["control_revision"], "config": changed,
+    })
+    assert response.status_code == 409, response.text
+    current = client.get(f"/api/chart-alerts/{row['id']}").json()
+    assert current["version"] == row["version"]
+    assert current["status"] == "paused"
+    assert current["config"] == row["config"]

@@ -4,6 +4,9 @@ function nativeAlertPriceLines({
   current,
   archive,
   move,
+  read,
+  edit,
+  action,
   readonly = false,
   report = () => {},
 }) {
@@ -36,6 +39,7 @@ function nativeAlertPriceLines({
     entry.line?.remove();
     entry.label?.remove();
     entry.dot?.remove();
+    entry.details?.remove();
   }
   function destroyEntry(id) {
     const entry = entries.get(id);
@@ -60,30 +64,54 @@ function nativeAlertPriceLines({
   function visibility(entry, visible) {
     entry.label.style.display = visible ? "flex" : "none";
     entry.dot.style.display = visible ? "block" : "none";
+    if(entry.details)entry.details.style.display = visible && entry.expanded ? "flex" : "none";
   }
+  function caption(entry) {
+    const text = typeof chartAlertPricePresentation === "function" ? chartAlertPricePresentation(entry.chart,entry.price).text : String(entry.price);
+    return `${entry.row.status==='paused'?'Ⅱ ':attention(entry.row)?'! ':''}${text}${entry.busy?' · 保存中':entry.uncertain?(entry.pendingAction?' · 操作待核实':' · 改价待核实'):entry.failure?' · 未保存':''}`;
+  }
+  function attention(row) { return row.status === 'active' && row.execution?.state === 'blocked'; }
   function canMove(entry) {
-    return !readonly && typeof move === "function" && !entry.busy &&
+    return !readonly && typeof move === "function" && !entry.busy && !entry.uncertain &&
+      entry.row.config.series_kind === "composite" &&
       !entry.row.config.condition.offset && !entry.row.config.association?.object_kind &&
       !entry.dead && current(entry.row, entry.chart, entry.epoch);
+  }
+  function descriptionText(row) {
+    return `${row.name} · ${row.config.mode === 'close' ? (row.config.timeframe + ' 收盘') : '盘中'} · ${row.count || 0}/${row.max_triggers || row.config.max_triggers || 1}${attention(row)?' · '+(row.execution.message || row.health_reason || '需要处理，请检查实时设置'):''}`;
   }
   function controls(entry) {
     const enabled = canMove(entry);
     entry.line.setEditable(enabled);
     entry.label.style.cursor = enabled ? "ns-resize" : "default";
     entry.label.setAttribute("aria-busy", String(!!entry.busy));
-    entry.label.title = entry.row.name + (enabled ? "；上下拖动调整价格，Escape取消" : "");
-    entry.remove.disabled = readonly || !!entry.busy;
+    entry.label.title = entry.row.name + (enabled ? "；拖动改价，点击管理，Escape取消" : "");
+    entry.remove.disabled = readonly || !!entry.busy || !!entry.uncertain;
+    if(entry.editButton)entry.editButton.disabled=readonly || !!entry.busy || !!entry.uncertain;
+    if(entry.toggleButton){entry.toggleButton.disabled=readonly || !!entry.busy || !!entry.uncertain;entry.toggleButton.textContent=entry.row.status==='paused'?'恢复':'暂停';}
+    if(entry.recheck)entry.recheck.hidden=!entry.uncertain;
+  }
+  function actionFailure(entry, error) {
+    if (entry.dead) return;
+    if (error?.currentRow) entry.row=error.currentRow;
+    entry.uncertain=!!error?.outcomeUnknown;
+    if(entry.uncertain) entry.uncertainBase ||= entry.row;
+    entry.failure=!entry.uncertain;
+    entry.expanded=true;
+    restore(entry);
+    entry.description.textContent=entry.uncertain?'操作待核实，请读取后台结果后再操作。':'操作未完成；已保留后台确认状态。';
+    report(entry.row,entry.description.textContent);
   }
   function restore(entry) {
     entry.preview = null;
     entry.gestureRow = null;
     entry.price = threshold(entry.row);
     if (entry.price === null || !["active", "paused"].includes(entry.row.status)) {
-      destroyEntry(entry.row.id);
+      destroyEntry(entry.key);
       return;
     }
     entry.line.setPrice(entry.price);
-    entry.text.textContent = entry.row.name;
+    entry.text.textContent = caption(entry);
     schedule(entry);
   }
   function preview(entry, price) {
@@ -103,6 +131,9 @@ function nativeAlertPriceLines({
     entry.preview = null;
     entry.gestureRow = null;
     entry.busy = true;
+    entry.pendingAction=false;
+    entry.failure=false;
+    entry.text.textContent=caption(entry);
     controls(entry);
     try {
       const saved = await move(row, presented.value, {
@@ -116,11 +147,17 @@ function nativeAlertPriceLines({
     } catch (error) {
       if (!entry.dead && !disposed && current(entry.row, entry.chart, entry.epoch)) {
         if (error?.currentRow) entry.row = error.currentRow;
-        restore(entry);
-        report(entry.row, "改价未确认，已恢复最后确认价格；请核对后重试：" + String(error));
+        entry.uncertain=!!error?.outcomeUnknown;
+        if(entry.uncertain)entry.uncertainBase=row;
+        entry.failure=!entry.uncertain;
+        if(entry.uncertain){entry.preview=presented;entry.price=Number(presented.value);entry.text.textContent=caption(entry);}
+        else restore(entry);
+        entry.expanded=true;
+        if(entry.description)entry.description.textContent=entry.uncertain?"改价待核实；暂时不能继续改价，请重新读取后台结果。":"未保存，已显示后台确认价格。";
+        report(entry.row, entry.uncertain ? "改价待核实，请重新读取后台结果" : "改价未保存，已读取后台价格：" + String(error));
       }
     } finally {
-      if (!entry.dead) { entry.busy = false; controls(entry); }
+      if (!entry.dead) { entry.busy = false; entry.text.textContent=caption(entry);controls(entry);schedule(entry); }
     }
   }
   function bindDragging(entry) {
@@ -132,18 +169,19 @@ function nativeAlertPriceLines({
       try { entry.label.releasePointerCapture(id); } catch { /* Node may have been removed. */ }
     };
     const down = (event) => {
-      if (event.button !== 0 || event.target.closest("button") || !canMove(entry)) return;
+      if (event.button !== 0 || event.target.closest("button") || entry.dead || !current(entry.row,entry.chart,entry.epoch)) return;
       event.preventDefault();
       event.stopPropagation();
       entry.cancelledMove = false;
       const bounds = entry.label.getBoundingClientRect();
-      pointer = { id: event.pointerId, y: event.clientY, offsetY: event.clientY - (bounds.top + bounds.height / 2), moved: false };
-      entry.gestureRow = entry.row;
+      pointer = { id: event.pointerId, y: event.clientY, offsetY: event.clientY - (bounds.top + bounds.height / 2), moved: false, draggable:canMove(entry) };
+      if(pointer.draggable)entry.gestureRow = entry.row;
       entry.label.focus({ preventScroll: true });
       entry.label.setPointerCapture(event.pointerId);
     };
     const moving = (event) => {
       if (!pointer || pointer.id !== event.pointerId) return;
+      if (!pointer.draggable) return;
       if (!canMove(entry)) { end(); restore(entry); return; }
       event.preventDefault();
       event.stopPropagation();
@@ -161,11 +199,12 @@ function nativeAlertPriceLines({
       event.stopPropagation();
       const moved = pointer.moved;
       end();
-      if (moved) void finish(entry); else restore(entry);
+      if (moved) void finish(entry); else {if(!entry.uncertain && !entry.busy)restore(entry);entry.expanded=!entry.expanded;schedule(entry);}
     };
-    const cancel = () => { if (pointer || entry.preview) { entry.cancelledMove = true; end(); restore(entry); } };
+    const cancel = () => { if (!entry.uncertain && !entry.busy && (pointer || entry.preview)) { entry.cancelledMove = true; end(); restore(entry); } else end(); };
+    const lost = () => {if(pointer)cancel();};
     const escape = (event) => {
-      if (event.key === "Escape" && (pointer || entry.preview)) {
+      if (event.key === "Escape" && !entry.uncertain && !entry.busy && (pointer || entry.preview)) {
         event.preventDefault(); event.stopPropagation(); cancel();
       }
     };
@@ -173,7 +212,7 @@ function nativeAlertPriceLines({
     entry.doc.addEventListener("pointermove", moving, true);
     entry.doc.addEventListener("pointerup", up, true);
     entry.label.addEventListener("pointercancel", cancel);
-    entry.label.addEventListener("lostpointercapture", cancel);
+    entry.label.addEventListener("lostpointercapture", lost);
     entry.doc.addEventListener("keydown", escape, true);
     entry.view.addEventListener("blur", cancel);
     entry.cleanups.push(() => {
@@ -182,7 +221,7 @@ function nativeAlertPriceLines({
       entry.doc.removeEventListener("pointermove", moving, true);
       entry.doc.removeEventListener("pointerup", up, true);
       entry.label.removeEventListener("pointercancel", cancel);
-      entry.label.removeEventListener("lostpointercapture", cancel);
+      entry.label.removeEventListener("lostpointercapture", lost);
       entry.doc.removeEventListener("keydown", escape, true);
       entry.view.removeEventListener("blur", cancel);
     });
@@ -199,7 +238,7 @@ function nativeAlertPriceLines({
   function position(entry) {
     if (entry.dead || disposed) return;
     if (!current(entry.row, entry.chart, entry.epoch)) {
-      destroyEntry(entry.row.id);
+      destroyEntry(entry.key);
       return;
     }
     try {
@@ -232,16 +271,22 @@ function nativeAlertPriceLines({
       entry.label.style.left = left + "px";
       entry.label.style.top = top + "px";
       entry.label.style.maxWidth = Math.max(0, bounds.width - 28) + "px";
+      if(entry.details){
+        entry.details.style.left=left+"px";
+        entry.details.style.top=Math.min(bounds.bottom-96,Math.max(bounds.top,top+18))+"px";
+        entry.details.style.maxWidth=Math.max(120,bounds.width-20)+"px";
+      }
       entry.dot.style.left = bounds.right - 5 + "px";
       entry.dot.style.top = top + "px";
       const light =
         entry.doc.documentElement.classList.contains("theme-light") ||
         !entry.doc.documentElement.classList.contains("theme-dark");
-      const color = light ? "#434651" : "#b2b5be",
+      const color = entry.row.status==='paused' ? (light?'#969da8':'#787f8c') : attention(entry.row) ? (light?'#99621d':'#d5ac76') : (light ? "#526d96" : "#96afd5"),
         background = light ? "#fff" : "#0f0f0f";
       entry.label.style.color = entry.dot.style.color = color;
       entry.label.style.background = background;
       entry.line?.setLineColor(color).setBodyTextColor(color);
+      if(entry.details){entry.details.style.background=background;entry.details.style.color=light?'#303744':'#d1d4dc';entry.details.style.borderColor=color;}
     } catch (error) {
       visibility(entry, false);
       if (!entry.reported) {
@@ -250,9 +295,10 @@ function nativeAlertPriceLines({
       }
     }
   }
-  async function add(row, chart, epoch, price) {
+  async function add(row, chart, epoch, price, key) {
     const entry = {
       row,
+      key,
       chart,
       epoch,
       price,
@@ -260,7 +306,7 @@ function nativeAlertPriceLines({
       cleanups: [],
       raf: 0,
     };
-    entries.set(row.id, entry);
+    entries.set(key, entry);
     try {
       if (!supported) throw Error("不支持当前图表库的价格几何");
       const model = chart._chartWidget.model().model(),
@@ -272,10 +318,15 @@ function nativeAlertPriceLines({
       if (!canvas) throw Error("主价格窗格尚未就绪");
       entry.doc = canvas.ownerDocument;
       entry.view = entry.doc.defaultView;
+      if(!entry.doc.querySelector('style[data-mw-alert-hitarea]')) {
+        const style=entry.doc.createElement('style');style.dataset.mwAlertHitarea='';
+        style.textContent='[data-name="mw-alert-price-label"]::before{content:"";position:absolute;inset:-8px -4px}';
+        entry.doc.head.append(style);
+      }
       const line = await chart.createOrderLine();
       if (entry.dead || disposed || !current(row, chart, epoch)) {
         line.remove();
-        if (entries.get(row.id) === entry) destroyEntry(row.id);
+        if (entries.get(key) === entry) destroyEntry(key);
         return;
       }
       entry.line = line;
@@ -297,36 +348,54 @@ function nativeAlertPriceLines({
       entry.remove = remove;
       label.dataset.name = "mw-alert-price-label";
       label.dataset.alertId = row.id;
-      label.tabIndex = -1;
+      label.tabIndex = 0;
+      label.setAttribute("role","button");label.setAttribute("aria-label","管理价格告警："+row.name);
       label.style.cssText =
-        "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);height:20px;border:1px solid currentColor;border-radius:3px;padding:0 2px 0 4px;font:12px/18px Arial,sans-serif;box-sizing:border-box;pointer-events:auto;user-select:none;touch-action:none";
-      text.textContent = row.name;
+        "position:fixed;z-index:12;display:none;align-items:center;gap:4px;transform:translateY(-50%);min-height:28px;border:1px solid currentColor;border-radius:5px;padding:2px 7px;font:12px/20px Arial,sans-serif;box-sizing:border-box;pointer-events:auto;user-select:none;touch-action:none";
+      text.textContent = caption(entry);
       text.style.cssText =
         "overflow:hidden;text-overflow:ellipsis;white-space:nowrap";
       label.title = row.name;
       remove.disabled = readonly;
       remove.type = "button";
-      remove.setAttribute("aria-label", "删除告警：" + row.name);
+      remove.setAttribute("aria-label", "结束告警：" + row.name);
       remove.style.cssText =
         "border:0;border-left:1px solid currentColor;background:transparent;color:inherit;padding:4px;margin:-4px -4px -4px 0;min-width:24px;min-height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center";
-      remove.innerHTML =
-        '<svg data-name="mw-alert-trash" width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round" aria-hidden="true"><path d="M1 3.5h10M4 3.5V1.5h4v2M2 3.5l1 9h6l1-9"/></svg>';
+      remove.textContent="结束告警";
       remove.onpointerdown = (e) => e.stopPropagation();
       remove.onclick = async (e) => {
         e.stopPropagation();
         if (remove.disabled || !current(entry.row, chart, epoch)) return;
-        remove.disabled = true;
+        entry.busy = true;entry.pendingAction=true;controls(entry);
         try {
           await archive(entry.row);
-          if (entries.get(row.id) === entry) destroyEntry(row.id);
+          if (entries.get(key) === entry) destroyEntry(key);
         } catch (error) {
           if (!entry.dead) {
-            remove.disabled = false;
-            report(entry.row, "删除未确认，价格线保留：" + String(error));
+            actionFailure(entry,error);
           }
-        }
+        } finally {if(!entry.dead){entry.busy=false;controls(entry);entry.text.textContent=caption(entry);schedule(entry);}}
       };
-      label.append(text, remove);
+      const bell=entry.doc.createElement("span");bell.setAttribute("aria-hidden","true");
+      bell.innerHTML='<svg width="12" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></svg>';
+      label.append(bell,text);
+      const details=entry.doc.createElement("div"),description=entry.doc.createElement("span"),actions=entry.doc.createElement("div");
+      entry.details=details;entry.description=description;
+      details.dataset.name="mw-alert-price-actions";details.dataset.alertId=row.id;
+      details.style.cssText="position:fixed;z-index:30;display:none;flex-direction:column;gap:6px;padding:10px;border:1px solid;border-radius:8px;font:12px/1.5 sans-serif;box-shadow:0 5px 20px #0002";
+      description.textContent=descriptionText(row);
+      actions.style.cssText="display:flex;gap:6px;flex-wrap:wrap";
+      const toggle=entry.doc.createElement("button"),editButton=entry.doc.createElement("button"),recheck=entry.doc.createElement("button"),close=entry.doc.createElement("button");
+      entry.toggleButton=toggle;entry.editButton=editButton;entry.recheck=recheck;
+      toggle.textContent=row.status==='paused'?'恢复':'暂停';toggle.hidden=typeof action!=="function";
+      toggle.onclick=async()=>{if(toggle.disabled)return;entry.busy=true;entry.pendingAction=true;controls(entry);try{entry.row=await action(entry.row,entry.row.status==='paused'?'resume':'pause');restore(entry);}catch(error){actionFailure(entry,error);}finally{if(!entry.dead){entry.busy=false;controls(entry);entry.text.textContent=caption(entry);schedule(entry);}}};
+      editButton.textContent="编辑";editButton.hidden=typeof edit!=="function";editButton.onclick=()=>{entry.expanded=false;schedule(entry);edit?.(entry.row);};
+      recheck.textContent="核验结果";recheck.hidden=true;recheck.onclick=async()=>{recheck.disabled=true;try{const saved=await read(entry.row);if(entry.dead)return;if(entry.uncertainBase && saved.version<=entry.uncertainBase.version && saved.control_revision<=entry.uncertainBase.control_revision){entry.description.textContent='后台仍未确认本次操作，请稍后再核验。';return;}entry.row=saved;entry.uncertain=false;entry.uncertainBase=null;entry.failure=false;entry.pendingAction=false;restore(entry);report(saved,"");entry.description.textContent=descriptionText(saved);}catch(error){report(entry.row,"操作仍待核实，请联网后重试");}finally{if(!entry.dead){recheck.disabled=false;controls(entry);schedule(entry);}}};
+      close.textContent="关闭";close.onclick=()=>{entry.expanded=false;schedule(entry);};
+      for(const button of [toggle,editButton,recheck,remove,close]){button.type="button";button.style.cssText="border:0;border-radius:5px;padding:4px 8px;background:transparent;color:inherit;min-height:40px;cursor:pointer";}
+      actions.append(toggle,editButton,recheck,remove,close);details.append(description,actions);entry.doc.body.append(details);
+      const keydown=event=>{if(['Enter',' '].includes(event.key)){event.preventDefault();entry.expanded=!entry.expanded;schedule(entry);}if(event.key==='Escape'){entry.expanded=false;schedule(entry);}};
+      label.addEventListener('keydown',keydown);entry.cleanups.push(()=>label.removeEventListener('keydown',keydown));
       entry.doc.body.append(label);
       const dot = entry.doc.createElement("span");
       entry.dot = dot;
@@ -348,10 +417,10 @@ function nativeAlertPriceLines({
       ])
         listen(entry, event);
       listen(entry, series.priceScaleChanged(), () => {
-        destroyEntry(row.id);
+        destroyEntry(key);
       });
-      listen(entry, chart.onSymbolChanged(), () => destroyEntry(row.id));
-      listen(entry, chart.onIntervalChanged(), () => destroyEntry(row.id));
+      listen(entry, chart.onSymbolChanged(), () => destroyEntry(key));
+      listen(entry, chart.onIntervalChanged(), () => destroyEntry(key));
       entry.resize = new entry.view.ResizeObserver(() => schedule(entry));
       entry.resize.observe(canvas);
       const themeObserver = new entry.view.MutationObserver(() =>
@@ -371,7 +440,7 @@ function nativeAlertPriceLines({
     } catch (error) {
       const reportFailure =
         !disposed && !entry.dead && current(row, chart, epoch);
-      if (entries.get(row.id) === entry) destroyEntry(row.id);
+      if (entries.get(key) === entry) destroyEntry(key);
       if (reportFailure) report(row, "价格线暂不可展示：" + String(error));
     }
   }
@@ -379,7 +448,7 @@ function nativeAlertPriceLines({
     sync(candidates) {
       if (disposed) return;
       const live = new Set();
-      for (const { row, chart, epoch } of candidates) {
+      for (const { row, chart, epoch, key = row.id } of candidates) {
         const price = threshold(row);
         if (
           price === null ||
@@ -388,8 +457,8 @@ function nativeAlertPriceLines({
           !current(row, chart, epoch)
         )
           continue;
-        live.add(row.id);
-        const previous = entries.get(row.id);
+        live.add(key);
+        const previous = entries.get(key);
         if (
           previous &&
           previous.chart === chart &&
@@ -398,17 +467,18 @@ function nativeAlertPriceLines({
         ) {
           previous.row = row;
           if (previous.label) {
-            if (!previous.preview && !previous.busy) previous.text.textContent = row.name;
+            if (!previous.preview && !previous.busy) previous.text.textContent = caption(previous);
+            if (!previous.failure && !previous.uncertain) previous.description.textContent = descriptionText(row);
             controls(previous);
             previous.label
-              .querySelector("button")
-              .setAttribute("aria-label", "删除告警：" + row.name);
+              .setAttribute("aria-label", "管理价格告警：" + row.name);
+            previous.remove.setAttribute("aria-label","结束告警："+row.name);
             schedule(previous);
           }
           continue;
         }
-        destroyEntry(row.id);
-        void add(row, chart, epoch, price);
+        destroyEntry(key);
+        void add(row, chart, epoch, price, key);
       }
       for (const id of entries.keys()) if (!live.has(id)) destroyEntry(id);
     },

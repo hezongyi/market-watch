@@ -294,8 +294,10 @@ def execution_history(alert):
         "last_gap", "execution_notification") if key in alert.runtime}
 
 
-def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
+def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None, expected_revision=None):
     alert = locked(db, alert_id, expected_version, config=config)
+    if expected_revision is not None and alert.control_revision != expected_revision:
+        raise Conflict("告警运行状态已改变，请读取当前状态后重试")
     if alert.status == "archived":
         raise ValueError("已删除的告警不能编辑")
     clock = now_ms if at is None else None

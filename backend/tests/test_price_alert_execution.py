@@ -217,6 +217,8 @@ def test_execution_phone_http_outcomes(database, monkeypatch, response, expected
         monkeypatch.setattr(settings, "ntfy_url", f"http://127.0.0.1:{server.server_port}")
         monkeypatch.setattr(notify, "now_ms", lambda: stamp)
         with database.begin() as db:
+            # Transport outcomes are independent of the user's nighttime policy.
+            db.merge(Preference(key="notifications", value={"system_quiet_enabled": False}))
             alert = db.get(ChartAlert, ident)
             execution.transition(db, alert, state="blocked", now=stamp, reason="realtime_disabled")
             if response == "quiet":
@@ -237,7 +239,11 @@ def test_execution_phone_http_outcomes(database, monkeypatch, response, expected
                     assert not seen and note.status == "quiet" and row.next_at > stamp
                 else:
                     assert len(seen) == 1 and seen[0]["topic"] == settings.ntfy_topic
-                    assert seen[0]["click"].endswith("?panel=alerts&alert=" + ident)
+                    from urllib.parse import parse_qs, urlparse
+                    destination = urlparse(seen[0]["click"])
+                    assert destination.scheme == "marketwatch"
+                    assert parse_qs(destination.query)["page"] == ["alerts"]
+                    assert parse_qs(destination.query)["signal"] == ["n_" + note.id.replace("-", "")]
                     attempt = db.scalar(select(DeliveryAttempt))
                     if response == 200:
                         assert note.status == projected["status"] == "server_accepted"

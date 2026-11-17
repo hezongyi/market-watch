@@ -294,7 +294,7 @@ export default function PriceRuleSheet({
     >
       <form
         ref={form}
-        className="alert-editor"
+        className="alert-editor mobile-price-editor"
         onSubmit={(event) => {
           event.preventDefault();
           void submit();

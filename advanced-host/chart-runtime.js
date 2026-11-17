@@ -966,11 +966,12 @@ function drain() {
     }
     const id = ++seq;
     const directoryRefresh = type === "data-center-api" && query.path?.split("?")[0] === "/market-data/history-catalog/refresh";
-    const managementTimeout = directoryRefresh ? (query.body?.source === "fxcm" ? 70000 : query.body?.source === "yahoo" ? 120000 : 40000) : 30000;
+    const priceMutation = type === "chart-alert-rpc" && ["price_create","price_edit","price_action"].includes(query.op);
+    const managementTimeout = priceMutation ? 75000 : directoryRefresh ? (query.body?.source === "fxcm" ? 70000 : query.body?.source === "yahoo" ? 120000 : 40000) : 30000;
     const timer = setTimeout(() => {
       pending.delete(id);
       application.cancel(id,adapter);
-      reject(Object.assign(Error("行情请求超时"),{code:"HISTORY_TIMEOUT"}));
+      reject(Object.assign(Error(priceMutation ? "告警操作待核实，请重新读取后台结果" : "行情请求超时"),{code:priceMutation?"ALERT_OUTCOME_UNKNOWN":"HISTORY_TIMEOUT",...(priceMutation?{outcomeUnknown:true}:{})}));
       drain();
     }, query.native_history && !query.native_reserve ? ((globalThis.MW_HISTORY_CAPABILITIES?.task_seconds || 600)+10)*1000 : (query.series_kind === "provider" && /^(MWP:)?FXCM:/i.test(query.instrument || "")) ? 70000 : managementTimeout);
     const entry = {resolve,reject,timer,cancellationTimer:null,...requestPolicy.describe(selected)};
@@ -2575,12 +2576,17 @@ function boot(
       indicatorBindings.get(indicatorKey(ticker,res))?.calculationStart ??
       (MWSeries.decode(ticker).series_kind === "managed" ? managedSessions.get(MWSeries.decode(ticker).symbol+'|'+res)?.start : null),
     compositeRevision:(ticker,res)=>alertCompositeRevisions.get(MWSeries.encode(MWSeries.decode(ticker).symbol,'composite')+'|'+res) ?? null,
+    mobile:mobileMode,
+    active:()=>!document.hidden && (!window.frameElement || window.frameElement.getClientRects().length > 0),
     movePrice:(row,price,presentation)=>{
       if (!alertUI) throw Error("请等待告警界面就绪后改价");
       return alertUI.movePrice(row,price,presentation);
     },
     rpc:async query=>{if(query.op==="edit")await checkpointWorkspace();return request(query,"chart-alert-rpc");},send: message => {
-      if (message.type === 'chart-alert-association') alertUI?.association(message.alert_id, message.text);
+      if (message.type === 'chart-alert-association') {if(!mobileMode)alertUI?.association(message.alert_id, message.text);else if(message.text)send({type:'error',error:message.text});}
+      else if (!mobileMode && message.type === 'chart-alert-rule-open')alertUI?.rule(message.alert_id);
+      else if (!mobileMode && message.type === 'chart-alert-price-saved')alertUI?.saved?.(message.row);
+      else if (!mobileMode && message.type === 'chart-alert-maintain')dataCenter?.open('/market-data?'+new URLSearchParams({query:message.context.display_identity?.code || ''}));
       else send(message);
     },
     fail:error=>send({type:"error",error:String(error)})});
@@ -2779,7 +2785,7 @@ function boot(
   unbindActiveChartEvent();
   MWNativeIndicatorResults.configure(catalog,{enable:globalThis.MW_NATIVE_RESERVE_ENABLED!==false});
   widget = new TradingView.widget({
-    context_menu:{items_processor:(items,factory,params)=>mobileMode ? items : alertBridge.menu(items,factory,params)},
+    context_menu:{items_processor:(items,factory,params)=>alertBridge.menu(items,factory,params)},
     save_load_adapter: { ...prefs.templates, ...layouts },
     settings_adapter: prefs.settings,
     custom_indicators_getter: (PineJS) =>
@@ -3199,6 +3205,7 @@ function boot(
     undoStack.onChange().subscribe(null,undoChanged);
     addEventListener('pagehide',()=>undoStack.onChange().unsubscribe(null,undoChanged),{once:true});
     await alertUIAttach();
+    if(mobileMode)alertBridge.attach();
     if (mobileMode) reportHistoryFailures();
     send({ type: "ready" });
     if(mobileMode)void mobileReadiness?.loaded();
@@ -3291,6 +3298,7 @@ async function update(m) {
   if (m.type === "chart-alert-create" && ready && !loading) {void alertBridge?.create(); return;}
   if (m.type === "chart-alert-drawing-action" && typeof m.alert_id === "string" && ["retry","restore"].includes(m.action) && ready && !loading) {void alertBridge?.drawingAction(m.alert_id,m.action); return;}
   if (m.type === "chart-alert-rows" && Array.isArray(m.rows)) {alertBridge?.setRows(m.rows); return;}
+  if (m.type === "chart-alert-price-saved" && m.row) {alertBridge?.replacePrice(m.row);return;}
   if (m.type === "chart-alert-locate" && m.row && JSON.stringify(m.row).length < 20_000 && ready && !loading) {void alertBridge?.locate(m.row,m.event); return;}
   if (m.type === "notifications" && Array.isArray(m.notices) && ready) {
     activeNotices = m.notices.slice(0, 24).filter(entry =>

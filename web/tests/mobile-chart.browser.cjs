@@ -7,6 +7,7 @@ const out=process.env.MOBILE_CHART_OUTPUT || '/tmp/mw-chart-round1';fs.mkdirSync
 const requests=[],errors=[],checks=[],consoleErrors=[],layouts=[];let catalogMode='hold',releaseCatalog,holdHistory=false,failHistory=false,priceOffset=0;const heldHistory=[];
 const provider='MWP:YAHOO:AAPL';
 const alertRule={id:'fixture-rule',name:'EURUSD H1',status:'paused',health:'ready',version:1,control_revision:1,run:1,count:0,max_triggers:1,created_at:Date.now(),updated_at:Date.now(),display_identity:{code:'EURUSD',source:'composite'},condition_summary:'价格 上穿 101',runtime:{},config:{name:'EURUSD H1',instrument:id,series_kind:'composite',source:'composite',timeframe:'H1',mode:'close',condition:{relation:'cross_up',left:{kind:'price'},right:{kind:'constant',value:'101'}},max_triggers:1,expires_at:null,message:'',notify_web:true,notify_ntfy:false,late_delivery:'log_only',association:null,calculation_version:'chart-python-v1'}};
+const priceRules=[alertRule];
 let logged=false,shellRevision=0,brokenInstall=false,delayLogin=false,pendingLogin;
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
@@ -41,11 +42,18 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/market-data/series/page')return json({items:[{ticker,symbol:'EURUSD · 日内观察组合',source:'composite',instrument_name:'受控组合',description:'受控浏览器测试组合',series_kind:'composite'},{ticker:provider,symbol:'AAPL',description:'苹果',instrument_name:'苹果',source:'yahoo',series_kind:'provider',frames:['M1','M5','H1','D1']}]});
    if(url.pathname==='/api/advanced-charts/catalog'){if(catalogMode==='hold')await new Promise(resolve=>releaseCatalog=resolve);if(catalogMode==='fail')return json({detail:'图表目录读取失败'},500);return json({SMA:{label:"SMA 简单均线",pane:"main",aliases:["SMA","均线"],params:{period:20},series:[{key:"value",type:"line"}]}});}
    if(url.pathname==='/api/charts/history-capabilities')return json({protocol:1,version:'test',mode:'continuous',max_bars:20000,workspace_bars:100000,default_bars:1000,task_seconds:30});
-   if(url.pathname==='/api/market-data/resolve')return json({symbol:query.series_kind==='provider'?'AAPL':'EURUSD · 日内观察组合',source:query.series_kind==='provider'?'yahoo':'composite',price_description:'收盘价',name:query.series_kind==='provider'?'苹果':'受控组合',precision:2,calendar:'utc0',asset_type:'CRYPTO',frames:['M1','M5','H1','D1'],created:true,stream:false});
+   if(url.pathname==='/api/market-data/resolve')return json({symbol:query.series_kind==='provider'?'AAPL':'EURUSD · 日内观察组合',source:query.series_kind==='provider'?'yahoo':'composite',price_description:'收盘价',source_display:'FXCM',historical_source:'fxcm',name:query.series_kind==='provider'?'苹果':'受控组合',precision:2,calendar:'utc0',asset_type:'CRYPTO',frames:['M1','M5','H1','D1'],created:true,stream:false});
    if(url.pathname==='/api/chart-alerts/page')return json({items:[alertRule],next_cursor:null});
    if(url.pathname==='/api/chart-alerts/fixture-rule')return json(alertRule);
+   if(url.pathname==='/api/chart-alerts/capabilities')return json({composite_revision_id:'b'.repeat(64),phone:{available:true,reason:null},sources:[{source:'composite',series_kind:'composite',available:true,atr_frames:['M1','M5','H1','D1'],price_modes:{intrabar:{available:true},close:{available:true}}}]});
+   if(url.pathname==='/api/chart-alerts'){
+     if(req.method==='POST'){const row={...structuredClone(alertRule),id:query.request_id,name:query.config.name,config:query.config,status:'active',version:1,control_revision:1};priceRules.push(row);return json(row);}
+     return json(priceRules.filter(r=>r.status!=='archived'));
+   }
+   const priceMatch=url.pathname.match(/^\/api\/chart-alerts\/([a-f0-9-]{36})(?:\/(edit|lifecycle))?$/);
+   if(priceMatch){const row=priceRules.find(r=>r.id===priceMatch[1]);if(!row)return json({detail:'not found'},404);if(req.method==='POST'){if(query.version!==row.version || (query.control_revision!==undefined && query.control_revision!==row.control_revision))return json({detail:'conflict'},409);if(priceMatch[2]==='edit'){row.config=query.config;row.name=query.config.name;row.version++;}else row.status={pause:'paused',resume:'active',archive:'archived'}[query.action];row.control_revision++;}return json(row);}
    if(url.pathname==='/api/chart-alerts/events/page')return json({items:[],next_cursor:null});
-   if(url.pathname==='/api/health')return json({version:'fixture'});
+   if(url.pathname==='/api/health')return json({version:'fixture',ntfy_configured:true,delivery_enabled:true});
    if(url.pathname==='/api/notification-center/snapshot')return json({events:[],cursor:'test'});
    if(url.pathname==='/api/notification-center/events')return json({events:[],before:null});
    if(url.pathname==='/api/charts/history-loads/fixture-load/cancel')return json({ok:true});
@@ -310,6 +318,28 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await native().getByRole('radio',{name:'1 分钟',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('1');
   await native().getByRole('radio',{name:'5 分钟',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('5');await widgetReady();await shot('favorite-shortcuts-dark-412');
   checks.push('native header replaces outer toolbar; period menu only supported intervals; native star adds direct shortcut; Android back closes period popup; one-tap M1/M5');
+  if(process.env.MOBILE_CHART_PRICE_ALERT_ONLY){
+   await page.evaluate(()=>MW_TEST_WIDGET.activeChart().setResolution('60'));await widgetReady();
+   const labels=native().locator('[data-name="mw-alert-price-label"]');await expect(labels).toHaveCount(1);
+   const plus=async()=>{const b=await page.evaluate(()=>MW_TEST_WIDGET.activeChart()._chartWidget.paneWidgets().find(p=>p.containsMainSeries()).canvasElement().getBoundingClientRect().toJSON());await page.mouse.move(b.left+40,b.y+b.height*.46);await page.mouse.move(b.right-9,b.y+b.height*.46);await page.waitForTimeout(250);await page.mouse.click(b.right-9,b.y+b.height*.46);};
+   await plus();await native().getByText(/^价格穿越 .* 时提醒$/,{exact:true}).click();await expect(labels).toHaveCount(2);await shot('price-created-412-dark');
+   assert.equal(priceRules.length,2);assert.equal(priceRules[1].config.mode,'intrabar');assert.equal(priceRules[1].config.association,null);assert.equal(priceRules[1].config.notify_ntfy,true);
+   const active=native().locator('[data-name="mw-alert-price-label"][data-alert-id="'+priceRules[1].id+'"]');
+   const cdp=await context.newCDPSession(page),touch=async(type,x,y)=>cdp.send('Input.dispatchTouchEvent',{type,touchPoints:type==='touchEnd'?[]:[{x,y}]});
+   let b=await active.boundingBox(),x=b.x+20,y=b.y+b.height/2;
+   await touch('touchStart',x,y);for(let i=1;i<=8;i++)await touch('touchMove',x,y+24*i/8);await touch('touchEnd',x,y+24);
+   await expect.poll(()=>priceRules[1].version).toBe(2);assert.equal(requests.filter(r=>r.path.endsWith('/edit')).length,1);
+   b=await active.boundingBox();await touch('touchStart',b.x+20,b.y+b.height/2);await touch('touchEnd',b.x+20,b.y+b.height/2);
+   await native().getByRole('button',{name:'编辑',exact:true}).click();await expect(page.getByRole('heading',{name:'编辑告警',exact:true})).toBeVisible();
+   for(const mode of ['dark','light'])for(const width of [375,412])for(const font of [14,21]){
+    await page.locator('.mobile-app').evaluate((el,mode)=>el.setAttribute('data-theme',mode),mode);await page.setViewportSize({width,height:width===375?812:915});await page.evaluate(font=>document.documentElement.style.fontSize=font+'px',font);
+    await shot('price-editor-'+mode+'-'+width+'-font'+font);await expect(page.getByRole('button',{name:'保存告警',exact:true})).toBeInViewport();const saveBox=await page.getByRole('button',{name:'保存告警',exact:true}).boundingBox();assert(saveBox.y>=0 && saveBox.y+saveBox.height<=page.viewportSize().height,'complete save target remains visible at large text sizes');
+   }
+   await page.getByRole('button',{name:'保存告警',exact:true}).click();await expect(page.getByRole('heading',{name:'编辑告警',exact:true})).toHaveCount(0);assert.equal(priceRules[1].version,3);
+   const forbidden=requests.filter(r=>r.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)|\/tasks/.test(r.path));assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
+   checks.push('actual built MobileApp + licensed chart: native plus quick creates; CDP touch drag writes once; tap opens editor; shared mobile sheet saves same rule; 375/412 light/dark 100/150% screenshots; no desktop layout/preference writes');
+   fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors,forbidden},null,2));console.log(JSON.stringify({checks,errors}));return;
+  }
   if(process.env.MOBILE_CHART_ALERT_ONLY){
    await page.getByRole('link',{name:'告警',exact:true}).click();
    await page.locator('.alert-rule-open').first().click();

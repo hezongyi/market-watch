@@ -36,6 +36,10 @@ import type { MobileChartPreparation } from "./chartPreparation";
 import { chartSymbolKey, sameChartSymbol } from "./chartIdentity";
 import { chartTiming } from "./chartTimings";
 import { mobileChartHistory } from "./chartHistory";
+import { alertRuntime } from "../runtime/alerts";
+import { freshDraft, isChartPrice, type AlertConfig, type AlertContext, type AlertRow, type Capabilities } from "../advanced/chartAlerts";
+import PriceRuleSheet from "./PriceRuleSheet";
+import { useNavigate } from "react-router-dom";
 const timeframes: Record<string, string> = {"1":"M1","5":"M5","15":"M15","30":"M30","60":"H1","240":"H4","1D":"D1","1W":"W1","1M":"MN"};
 
 export type MobileChartHandle = {
@@ -70,6 +74,11 @@ export default forwardRef<
   },
   ref,
 ) {
+  const navigate=useNavigate();
+  const [priceEditor,setPriceEditor]=useState<{context?:AlertContext;row?:AlertRow;config:AlertConfig;label:string;source?:string;name?:string} | null>(null);
+  const [priceEditorOpen,setPriceEditorOpen]=useState(false);
+  const [phoneAvailable,setPhoneAvailable]=useState(false);
+  const [chartOnline,setChartOnline]=useState(false);
   const root = useRef<HTMLDivElement>(null),
     chart = useRef<ChartAdapter | null>(null);
   const callbacks = useRef({ report, theme, rememberSymbol });
@@ -255,6 +264,7 @@ export default forwardRef<
     const unavailable = async () => {
       throw Error("此操作请在对应手机页面完成");
     };
+    const priceAlerts=alertRuntime({api,mobile:true,scope:()=>({workspace_id:"mobile",session:connection.client})});
     const application: ChartApplication = {
       observe(message, source) {
         if (stopped || source !== chart.current) return;
@@ -292,6 +302,26 @@ export default forwardRef<
               history_capabilities: capabilities,
               preferences: await localSettings("preferences", { op: "read" }),
             });
+          } else if(message.type === "chart-alert-context") {
+            const context=message.context as AlertContext;
+            if(context?.series_kind!=="composite" || context.line || context.indicator)return;
+            setPhoneAvailable(context.phone_available===true);
+            setPriceEditor({context,config:freshDraft(context),label:context.display_identity?.code || context.display_label || "价格告警",source:context.display_source,name:context.display_name});setPriceEditorOpen(true);
+          } else if(message.type === "chart-alert-price-edit") {
+            const row=message.row as AlertRow;
+            if(row?.config?.series_kind!=="composite" || !isChartPrice(row.config))return;
+            const query={instrument:row.config.instrument,series_kind:"composite",timeframe:row.config.timeframe};
+            const [caps,meta]=await Promise.all([
+              api<Capabilities>("/chart-alerts/capabilities",query,AbortSignal.timeout(15000)),
+              api<{name?:string;source_display?:string;historical_source?:string}>("/market-data/resolve",query,AbortSignal.timeout(15000)),
+            ]);
+            if(stopped || source!==chart.current || !visibility.current)return;
+            setPhoneAvailable(caps.phone?.available===true);
+            setPriceEditor({row,config:structuredClone(row.config),label:row.display_identity?.code || row.name,source:meta.source_display || meta.historical_source,name:meta.name});setPriceEditorOpen(true);
+          } else if(message.type === "chart-alert-maintain") {
+            navigate("/data?"+new URLSearchParams({query:message.context?.display_identity?.code || ""}));
+          } else if(message.type === "chart-alert-price-saved") {
+            callbacks.current.report("价格告警已保存，后台持续监控");
           } else if (message.type === "market-subscribe") {
             owned.set(message.args.listener, message.args);
             await connection.subscribe(message.args, (event) =>
@@ -456,7 +486,7 @@ export default forwardRef<
           leaveResult.current = resolve;
         });
       },
-      alerts: unavailable,
+      alerts: (kind,query,_context,source)=>priceAlerts(kind,query,()=>!stopped && source===chart.current),
       notifications: unavailable,
       dataCenter: unavailable,
       cancel: (id, source) => marketRequests.get(source)?.get(id)?.abort(),
@@ -466,6 +496,7 @@ export default forwardRef<
     );
     let opened = false, connected = false;
     const stopObserving = connection.observe(state => {
+      if(!stopped)setChartOnline(state.state==='open');
       if (state.state !== "open") { connected = false; return; }
       if (connected) return;
       connected = true;
@@ -572,6 +603,12 @@ export default forwardRef<
       aria-label="图表"
     >
       <MobileOverlaysProvider>
+        {priceEditor && <PriceRuleSheet key={priceEditor.row?.id || priceEditor.context?.request_id}
+          initial={priceEditor.config} editing={priceEditor.row} label={priceEditor.label} source={priceEditor.source} name={priceEditor.name}
+          frames={Object.values(timeframes)} online={chartOnline} ntfy={phoneAvailable}
+          open={priceEditorOpen && visible} close={()=>setPriceEditorOpen(false)} onClosed={()=>setPriceEditor(null)}
+          saved={row=>{setPriceEditorOpen(false);void chart.current?.update({type:'chart-alert-price-saved',row});}}
+          maintain={()=>{setPriceEditorOpen(false);navigate('/data?'+new URLSearchParams({query:priceEditor.label}));}} report={report} />}
         <h1 className="sr-only">图表</h1>
         <div className="chart-workspace" style={{"--chart-toolbar-height":`${toolbarHeight}px`} as React.CSSProperties} aria-busy={!ready && !failure}>
           <div className="mobile-chart-canvas" ref={root} />

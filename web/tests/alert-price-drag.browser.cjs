@@ -125,6 +125,7 @@ const { chromium } = require("@playwright/test"),
           status: "active",
           name: "EURUSD 上穿 80.00",
           config: {
+            series_kind: "composite",
             condition: {
               left: { kind: "price" },
               right: { kind: "constant", value: "80.00" },
@@ -140,10 +141,12 @@ const { chromium } = require("@playwright/test"),
           readonly: !!options.readonly,
           archive: async () => {},
           report: (r, text) => t.notes.push(text),
+          read: async()=>structuredClone(t.row),
           move: async (row, price) => {
             t.writes.push({ version: row.version, price });
             if (t.mode === "hold") await new Promise((r) => (release = r));
             if (t.mode === "fail") throw Error("version conflict");
+            if (t.mode === "unknown") throw Object.assign(Error("response lost"),{outcomeUnknown:true});
             t.row = {
               ...t.row,
               version: row.version + 1,
@@ -229,7 +232,7 @@ const { chromium } = require("@playwright/test"),
     await frame.evaluate(() => (t.mode = "fail"));
     await moveBy(-20);
     await frame.waitForFunction(() =>
-      t.notes.some((n) => n.includes("改价未确认")),
+      t.notes.some((n) => n.includes("改价未保存")),
     );
     assert.equal(
       await frame.evaluate(() => t.lines.at(-1).getPrice()),
@@ -240,7 +243,7 @@ const { chromium } = require("@playwright/test"),
     await moveBy(-20);
     await frame.waitForFunction(() => t.writes.length === 3);
     assert.equal(await label.getAttribute("aria-busy"), "true");
-    assert.equal(await label.locator("button").isDisabled(), true);
+    assert.equal(await frame.locator('[data-name="mw-alert-price-actions"] button[aria-label^="结束告警"]').isDisabled(), true);
     assert.equal(await frame.evaluate(() => t.lines.at(-1).editable), false);
     await moveBy(-10);
     assert.equal(
@@ -272,6 +275,18 @@ const { chromium } = require("@playwright/test"),
       4,
       "Escape suppresses native drag completion",
     );
+    await frame.evaluate(()=>{t.start();t.mode='unknown';});
+    await moveBy(-20);
+    await label.filter({hasText:'待核实'}).waitFor();
+    assert.equal(await frame.evaluate(()=>t.lines.at(-1).getPrice()),82);
+    await page.keyboard.press('Escape');await frame.evaluate(()=>dispatchEvent(new Event('blur')));
+    assert.equal(await frame.evaluate(()=>t.lines.at(-1).getPrice()),82,'Escape and blur cannot revert an uncertain mutation');
+    await label.click();await frame.getByRole('button',{name:'关闭',exact:true}).click();await label.click();
+    const recheck=frame.getByRole('button',{name:'核验结果',exact:true});await recheck.waitFor();await recheck.click();
+    assert.equal(await frame.evaluate(()=>t.lines.at(-1).getPrice()),82,'old read is not proof a delayed write failed');
+    assert.match(await label.innerText(),/待核实/);
+    await frame.evaluate(()=>{t.row={...t.row,version:2,control_revision:2,config:{...t.row.config,condition:{...t.row.config.condition,right:{kind:'constant',value:'82.00'}}}};});
+    await recheck.click();assert.doesNotMatch(await label.innerText(),/待核实/);
     for (const options of [{ readonly: true }, { offset: true }]) {
       await frame.evaluate((o) => t.start(o), options);
       await label.waitFor();

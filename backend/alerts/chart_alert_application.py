@@ -56,6 +56,7 @@ def capabilities(body):
             from .series_access import composite_definition
             from .series_access import metadata as fixed_metadata
             from .storage import CompositeRevision, now_ms
+            from .notification_transport import phone_reason
 
             meta = fixed_metadata(db, body.instrument, "composite")
             _, _, composite = composite_definition(db, body.instrument)
@@ -82,7 +83,10 @@ def capabilities(body):
                 except ValueError as exc:
                     code = getattr(exc, "reason_code", "binding_unavailable")
                 price_modes[mode] = {"available": code is None, "reason_code": code, "reason": message(code)}
+            phone = phone_reason(db)
             return {"instrument": body.instrument, "timeframe": body.timeframe,
+                "composite_revision_id": revision.id if revision else None,
+                "phone": {"available": phone is None, "reason": message(phone)},
                 "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
                     "calendar": meta["calendar"], "available": available, "price_modes": price_modes,
                     "reason": None if available else "实时流已关闭或来源不可用",
@@ -125,6 +129,7 @@ class Create(Contract):
 
 class Edit(Contract):
     version: int = Field(ge=1)
+    control_revision: int | None = Field(default=None, ge=1)
     config: AlertConfig
 
 
@@ -404,7 +409,8 @@ def update(db, alert_id: str, body: Edit, *, dataset_id=None):
     require_executable_source(body.config)
     validate_association(db, body.config)
     validate_geometry(db, body.config, dataset_id=dataset_id)
-    return alert_dict(db, edit(db, alert_id, body.version, body.config, dataset_id=dataset_id))
+    return alert_dict(db, edit(db, alert_id, body.version, body.config, dataset_id=dataset_id,
+                              expected_revision=body.control_revision))
 
 
 def require_executable_source(config):

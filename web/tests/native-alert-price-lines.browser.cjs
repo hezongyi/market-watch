@@ -155,20 +155,20 @@ const { chromium } = require("@playwright/test"),
         parseFloat(label.style.top) === 280,
         "mode/axis coordinate changes use actual native mapping",
       );
-      document.querySelector("button").click();
+      document.querySelector('button[aria-label^="结束告警"]').click();
       await frame();
       expect(
         label.isConnected && !lines[0].removed,
         "failed archive preserves primitive and label",
       );
       expect(
-        reports.some((x) => x.includes("删除未确认")),
+        reports.some((x) => x.includes("操作未完成")),
         "failed archive is explained",
       );
       fail = false;
       sync({ ...row, version: 2, control_revision: 2 });
       await frame();
-      document.querySelector("button").click();
+      document.querySelector('button[aria-label^="结束告警"]').click();
       await frame();
       expect(
         archives.join(",") === "1,2",

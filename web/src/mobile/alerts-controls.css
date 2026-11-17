@@ -183,6 +183,7 @@
   flex-shrink: 0;
 }
 .mobile-alerts .alert-muted,
+.mobile-price-editor .alert-muted,
 .mobile-records .alert-muted {
   margin: 0;
   color: var(--muted);
@@ -317,12 +318,12 @@
   color: var(--down);
   padding-left: 0;
 }
-.mobile-alerts .alert-editor {
+.mobile-controls .alert-editor {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
-.mobile-alerts .alert-editor-symbol {
+:is(.mobile-alerts, .mobile-price-editor) .alert-editor-symbol {
   display: flex;
   justify-content: space-between;
   gap: 16px;
@@ -331,20 +332,20 @@
   border-bottom: 1px solid var(--quiet-line);
 }
 
-.mobile-alerts [data-slot="field-group"] {
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="field-group"] {
   gap: 22px;
 }
-.mobile-alerts [data-slot="field"] {
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="field"] {
   gap: 9px;
   min-width: 0;
 }
-.mobile-alerts [data-slot="field-label"] {
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="field-label"] {
   font-size: 0.928571rem;
   line-height: 1.5;
   font-weight: 500;
 }
-.mobile-alerts [data-slot="input"],
-.mobile-alerts [data-slot="select-trigger"] {
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="input"],
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="select-trigger"] {
   width: 100%;
   min-height: 48px;
   height: auto;
@@ -354,39 +355,39 @@
   line-height: 1.5;
   background: var(--surface);
 }
-.mobile-alerts input.alert-target {
+:is(.mobile-alerts, .mobile-price-editor) input.alert-target {
   font-size: 1.714286rem;
   line-height: 1.4;
   padding: 14px 12px;
   font-weight: 550;
   font-variant-numeric: tabular-nums;
 }
-.mobile-alerts input.alert-target::placeholder {
+:is(.mobile-alerts, .mobile-price-editor) input.alert-target::placeholder {
   font-size: 1rem;
   font-weight: 400;
 }
-.mobile-alerts [data-slot="field-description"] {
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="field-description"] {
   font-size: 0.785714rem;
   line-height: 1.6;
   color: var(--muted);
 }
-.mobile-alerts .alert-price-range {
+:is(.mobile-alerts, .mobile-price-editor) .alert-price-range {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
 }
-.mobile-alerts .alert-switch-field {
+:is(.mobile-alerts, .mobile-price-editor) .alert-switch-field {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
 }
-.mobile-alerts .alert-switch-field > div {
+:is(.mobile-alerts, .mobile-price-editor) .alert-switch-field > div {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
-.mobile-alerts [data-slot="toggle-group"],
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="toggle-group"],
 .mobile-records .alert-filters {
   display: flex;
   gap: 6px;
@@ -395,7 +396,7 @@
   background: var(--surface2);
   border-radius: 12px;
 }
-.mobile-alerts [data-slot="toggle-group-item"],
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="toggle-group-item"],
 .mobile-records .alert-filters [data-slot="toggle-group-item"] {
   flex: 1;
   min-width: 0;
@@ -408,7 +409,7 @@
   border-radius: 9px;
   white-space: normal;
 }
-.mobile-alerts [data-slot="toggle-group-item"][aria-pressed="true"],
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="toggle-group-item"][aria-pressed="true"],
 .mobile-records
   .alert-filters
   [data-slot="toggle-group-item"][aria-pressed="true"] {
@@ -416,7 +417,7 @@
   background: var(--surface);
   box-shadow: 0 1px 4px #0001;
 }
-.mobile-alerts .data-more > button,
+:is(.mobile-alerts, .mobile-price-editor) .data-more > button,
 .mobile-records .alert-detail .data-more > button {
   display: flex;
   width: 100%;
@@ -429,27 +430,27 @@
   font-size: 0.928571rem;
   font-weight: 400;
 }
-.mobile-alerts
+:is(.mobile-alerts, .mobile-price-editor)
   .data-more
   [data-slot="collapsible-content"]
   > [data-slot="field-group"] {
   padding: 16px 0;
 }
-.mobile-alerts .alert-defaults,
-.mobile-alerts .alert-capability {
+:is(.mobile-alerts, .mobile-price-editor) .alert-defaults,
+:is(.mobile-alerts, .mobile-price-editor) .alert-capability {
   margin: 0;
   color: var(--muted);
   font-size: 0.785714rem;
   line-height: 1.65;
 }
-.mobile-alerts .alert-save-bar {
+:is(.mobile-alerts, .mobile-price-editor) .alert-save-bar {
   position: sticky;
-  bottom: -20px;
+  bottom: 0;
   background: var(--surface);
   padding: 12px 0 0;
   border-top: 1px solid var(--quiet-line);
 }
-.mobile-alerts .alert-save-bar button {
+:is(.mobile-alerts, .mobile-price-editor) .alert-save-bar button {
   width: 100%;
   min-height: 50px;
   font-size: 1rem;
@@ -702,16 +703,16 @@
   flex-wrap: wrap;
   gap: 4px 12px;
 }
-.mobile-alerts .alert-editor-symbol {
+.mobile-controls .alert-editor-symbol {
   min-width: 0;
 }
-.mobile-alerts .alert-editor-symbol > .symbol-info {
+.mobile-controls .alert-editor-symbol > .symbol-info {
   min-width: 0;
 }
-.mobile-alerts .alert-editor-symbol .symbol-info > strong {
+.mobile-controls .alert-editor-symbol .symbol-info > strong {
   overflow-wrap: anywhere;
 }
-.mobile-alerts .alert-price-range > [data-slot="field"] {
+.mobile-controls .alert-price-range > [data-slot="field"] {
   min-width: 0;
 }
 .mobile-alerts .alert-picker-note {
@@ -719,7 +720,7 @@
   line-height: 1.5;
 }
 
-.mobile-alerts .alert-switch-field [data-variant="link"] {
+.mobile-controls .alert-switch-field [data-variant="link"] {
   min-height: 44px;
   font-size: 0.857143rem;
   line-height: 1.5;
@@ -766,6 +767,8 @@
 
 /* Alert form toggles are a single choice, never a second primary action. */
 .mobile-controls.mobile-alerts .mobile-control-drawer
+  button[data-slot="toggle-group-item"][data-variant]:not(.mobile-header-icon),
+.mobile-controls .mobile-control-drawer .mobile-price-editor
   button[data-slot="toggle-group-item"][data-variant]:not(.mobile-header-icon) {
   background: transparent;
   color: var(--muted);
@@ -774,19 +777,21 @@
   box-shadow: none;
 }
 .mobile-controls.mobile-alerts .mobile-control-drawer
+  button[data-slot="toggle-group-item"][data-variant][aria-pressed="true"]:not(.mobile-header-icon),
+.mobile-controls .mobile-control-drawer .mobile-price-editor
   button[data-slot="toggle-group-item"][data-variant][aria-pressed="true"]:not(.mobile-header-icon) {
   background: var(--surface);
   color: var(--text);
   font-weight: 600;
   box-shadow: 0 1px 4px #0001;
 }
-.mobile-alerts [data-slot="field"].alert-switch-field {
+:is(.mobile-alerts, .mobile-price-editor) [data-slot="field"].alert-switch-field {
   flex-direction: row;
   align-items: center;
 }
-.mobile-alerts .alert-switch-field > div {
+:is(.mobile-alerts, .mobile-price-editor) .alert-switch-field > div {
   min-width: 0;
 }
-.mobile-alerts .alert-switch-field > [data-slot="switch"] {
+:is(.mobile-alerts, .mobile-price-editor) .alert-switch-field > [data-slot="switch"] {
   flex-shrink: 0;
 }
