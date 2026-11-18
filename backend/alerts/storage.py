@@ -1799,3 +1799,34 @@ class MarketSwitchRun(Base):
 # Capture writes only to the existing reliable Audit table in the source transaction.
 # It never accesses notification projections or calls external channels.
 from . import notification_sources as _notification_sources  # noqa: E402,F401
+
+
+class BriefingPlan(Base):
+    """One daily plan in the existing single-user workspace."""
+    __tablename__ = "briefing_plans"
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    enabled: Mapped[bool] = mapped_column(Boolean, default=False)
+    group_ids: Mapped[list] = mapped_column(JSON, default=list)
+    revision: Mapped[int] = mapped_column(default=1)
+    next_run_at: Mapped[int | None] = mapped_column(BigInteger)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    updated_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+
+
+class BriefingReport(Base):
+    __tablename__ = "briefing_reports"
+    __table_args__ = (UniqueConstraint("plan_id", "scheduled_for"), Index("ix_briefing_reports_history", "mode", "created_at", "id"))
+    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=uid)
+    plan_id: Mapped[str] = mapped_column(ForeignKey("briefing_plans.id"))
+    mode: Mapped[str] = mapped_column(String(16))
+    scheduled_for: Mapped[int | None] = mapped_column(BigInteger)
+    cutoff_at: Mapped[int] = mapped_column(BigInteger)
+    status: Mapped[str] = mapped_column(String(16), default="pending")
+    attempt: Mapped[int] = mapped_column(default=0)
+    snapshot: Mapped[dict] = mapped_column(JSON)
+    body: Mapped[dict] = mapped_column(JSON, default=dict)
+    created_at: Mapped[int] = mapped_column(BigInteger, default=now_ms)
+    started_at: Mapped[int | None] = mapped_column(BigInteger)
+    finished_at: Mapped[int | None] = mapped_column(BigInteger)
+    notification_id: Mapped[str | None] = mapped_column(ForeignKey("notifications.id"))
+    error: Mapped[str | None] = mapped_column(String(500))

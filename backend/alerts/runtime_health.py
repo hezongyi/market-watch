@@ -25,6 +25,7 @@ MAINTENANCE_PREFIX = "runtime_maintenance:"
 MARKET_ROLES = ("pricing", "realtime", "composite_aggregate", "alert_indicator",
                 "chart_alert", "switch_activation", "market_ownership")
 NOTIFICATION_ROLES = (
+    "briefing_generation",
     "notification_projection", "notification_retention", "notification_delivery",
     "notification_ownership", "notification_health",
 )

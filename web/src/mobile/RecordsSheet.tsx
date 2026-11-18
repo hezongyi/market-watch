@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { EventChartNavigation } from "./alertChartTarget";
 import { logEvent } from "./logs";
 import { useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../api";
@@ -47,6 +49,9 @@ export default function RecordsSheet({
   close(): void;
   report(message: string): void;
 }) {
+  const eventChart = useContext(EventChartNavigation);
+  const suspended=useRef(false);suspended.current=eventChart.suspended;
+  useEffect(()=>{const abandon=()=>close();addEventListener("mw-event-chart-abandon",abandon);return()=>removeEventListener("mw-event-chart-abandon",abandon);},[close]);
   const [tab, setTab] = useState(initialTab);
   const [selected, setSelected] = useState<Notice>(),
     [timeline, setTimeline] = useState<any[]>([]);
@@ -125,13 +130,15 @@ export default function RecordsSheet({
     <div className="mobile-controls mobile-records">
       <MobileOverlaysProvider>
         <MobileSheet
-          open={open}
+          open={open && !eventChart.suspended}
+          retain={open || eventChart.suspended}
           title="事件记录"
           // Keep the tab bar in place across loading, empty and populated lists.
           fullHeight
           close={close}
           dismissible={!busy}
           onClosed={() => {
+            if(suspended.current)return;
             setTab("triggers");
             setSelected(undefined);
             setError("");

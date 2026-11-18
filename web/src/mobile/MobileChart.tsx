@@ -1,3 +1,4 @@
+import type { AlertChartTarget } from "./alertChartTarget";
 import {
   forwardRef,
   useEffect,
@@ -53,6 +54,9 @@ export default forwardRef<
     profile: Profile;
     connection: MobileMarket;
     symbol: string;
+    eventTarget?: AlertChartTarget;
+    returnFromEvent(): void;
+    returnFromBriefing?: () => void;
     target?: { symbol: string; resolution: string; token: number };
     theme: "dark" | "light";
     rememberSymbol(ticker: string): void;
@@ -66,6 +70,9 @@ export default forwardRef<
     connection,
     symbol,
     target,
+    eventTarget,
+    returnFromEvent,
+    returnFromBriefing,
     theme,
     rememberSymbol,
     visible,
@@ -74,6 +81,10 @@ export default forwardRef<
   },
   ref,
 ) {
+  const [eventStatus,setEventStatus]=useState({status:"waiting",reason:""});
+  const [eventAttempt,setEventAttempt]=useState(0);
+  const eventCurrent=useRef(eventTarget);eventCurrent.current=eventTarget;
+  const eventLatest=useRef(false);
   const navigate=useNavigate();
   const [priceEditor,setPriceEditor]=useState<{context?:AlertContext;row?:AlertRow;config:AlertConfig;label:string;source?:string;name?:string} | null>(null);
   const [priceEditorOpen,setPriceEditorOpen]=useState(false);
@@ -269,7 +280,10 @@ export default forwardRef<
       observe(message, source) {
         if (stopped || source !== chart.current) return;
         const handle = async () => {
-          if (message.type === "loaded") {
+          if (message.type === "mobile-event-location") {
+            const target=eventCurrent.current;
+            if(target && target.eventId===message.eventId && target.token===message.token) setEventStatus({status:message.status,reason:message.reason || ""});
+          } else if (message.type === "loaded") {
             const [[catalog, capabilities], [saved, preferences]] = await Promise.all([configuration, local]);
             if (stopped) return;
             historyCapabilities.current = capabilities;
@@ -562,6 +576,7 @@ export default forwardRef<
   const initial = useRef("");
   useEffect(() => {
     if (!ready) return;
+    if(eventTarget){initial.current=symbol;if(target?.symbol===symbol)appliedTarget.current=target.token;return;}
     const requested = target?.symbol === symbol && appliedTarget.current !== target.token ? target : undefined;
     if (sameChartSymbol(initial.current, symbol) && !requested) return;
     initial.current = symbol;
@@ -572,7 +587,7 @@ export default forwardRef<
       symbol,
       ...(requested ? { resolution: requested.resolution } : {}),
     });
-  }, [symbol, ready, target]);
+  }, [symbol, ready, target, eventTarget]);
   useEffect(() => {
     if (!visible && ready)
       void chart.current?.update({ type: "mobile-command", action: "leave" });
@@ -590,6 +605,13 @@ export default forwardRef<
         theme: theme === "light" ? "Light" : "Dark",
       });
   }, [theme, ready]);
+  useEffect(() => {
+    eventLatest.current=false;setEventStatus({status:"waiting",reason:""});
+    if(!ready || !visible)return;
+    if(eventTarget)void chart.current?.update({type:"mobile-command",action:"locate-event",target:eventTarget});
+    else void chart.current?.update({type:"mobile-command",action:"clear-event"});
+    return ()=>{void chart.current?.update({type:"mobile-command",action:"clear-event"});};
+  },[ready,visible,eventTarget,eventAttempt]);
   const retrySave = async () => {
     setSavePending(true);
     try { await flush(); setOperationError(""); }
@@ -610,6 +632,12 @@ export default forwardRef<
           saved={row=>{setPriceEditorOpen(false);void chart.current?.update({type:'chart-alert-price-saved',row});}}
           maintain={()=>{setPriceEditorOpen(false);navigate('/data?'+new URLSearchParams({query:priceEditor.label}));}} report={report} />}
         <h1 className="sr-only">图表</h1>
+        {returnFromBriefing && !eventTarget && <div className="chart-event-actions"><Button variant="ghost" onClick={returnFromBriefing}>返回简报</Button></div>}
+        {eventTarget && <section className="chart-event-summary" aria-label="触发位置">
+          <div><strong>{eventTarget.summary}</strong><small>{new Date(eventTarget.occurredAtMs).toLocaleString("zh-CN")} · {eventTarget.resolution} · 触发价 {eventTarget.price}</small><small>{eventTarget.leftKind === "indicator" ? `观察值 ${eventTarget.observed} · ${eventTarget.unit} · ` : ""}{eventTarget.leftKind === "price" ? "当时阈值" : "指标阈值"} {eventTarget.threshold} · 条件取自触发时记录，历史行情可能有修订</small></div>
+          <div className="chart-event-actions"><Button variant="outline" onClick={returnFromEvent}>返回触发记录</Button>{eventStatus.status === "error" || eventStatus.status === "changed" ? <Button variant="ghost" onClick={()=>setEventAttempt(x=>x+1)}>重试定位</Button> : <Button variant="ghost" onClick={()=>{eventLatest.current=true;void chart.current?.update({type:"mobile-command",action:"latest-event"});setEventStatus({status:"latest",reason:""});}}>查看最新</Button>}</div>
+          {eventStatus.reason && <p role="status">{eventStatus.reason}</p>}
+        </section>}
         <div className="chart-workspace" style={{"--chart-toolbar-height":`${toolbarHeight}px`} as React.CSSProperties} aria-busy={!ready && !failure}>
           <div className="mobile-chart-canvas" ref={root} />
           {operationError && ready && !historyFailure && (

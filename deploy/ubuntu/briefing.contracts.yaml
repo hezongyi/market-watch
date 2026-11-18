@@ -1,0 +1,45 @@
+services:
+  postgres:
+    image: postgres:14.24-bookworm@sha256:993166bee3ea12e2baa70f47efe7ba4a191b3e92f44f9767eaefbb6194f53872
+    cpus: 0.5
+    mem_limit: 384m
+    labels: {market-watch.task: mw-mobile-pending-20261117}
+    environment:
+      POSTGRES_DB: briefings
+      POSTGRES_USER: briefings
+      POSTGRES_PASSWORD: briefing_test_only
+    command: [postgres, -c, jit=off, -c, max_connections=30]
+    volumes: [briefing-pg:/var/lib/postgresql/data]
+    healthcheck:
+      test:
+        - CMD-SHELL
+        - >-
+          pg_isready -U briefings -d briefings &&
+          test "$$(PGOPTIONS='-c jit=on' psql -U briefings -d briefings -Atqc "SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()")" = t
+      interval: 2s
+      timeout: 3s
+      retries: 30
+  contracts:
+    image: ${MW_PENDING_API_IMAGE:?}
+    cpus: 1
+    mem_limit: 768m
+    labels: {market-watch.task: mw-mobile-pending-20261117}
+    working_dir: /candidate
+    user: '0:0'
+    volumes: ['${MW_PENDING_REPO:?}:/candidate:ro']
+    environment:
+      PYTHONPATH: /candidate/backend:/candidate/backend/tests
+      PYTHONDONTWRITEBYTECODE: '1'
+      TEST_POSTGRES_URL: postgresql+psycopg://briefings:briefing_test_only@postgres/briefings
+      ALERTS_DATABASE_URL: postgresql+psycopg://briefings:briefing_test_only@postgres/briefings
+      ALERTS_DATABASE_EXPECTED_VERSION: '140024'
+      ALERTS_NTFY_TOPIC: ''
+      ALERTS_DELIVERY_ENABLED: 'false'
+    depends_on:
+      postgres: {condition: service_healthy}
+    entrypoint: [python, -m, pytest, -q, -p, 'no:cacheprovider']
+networks:
+  default: {internal: true}
+volumes:
+  briefing-pg:
+    labels: {market-watch.task: mw-mobile-pending-20261117}

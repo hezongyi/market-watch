@@ -8,6 +8,7 @@ import java.net.URLEncoder
 data class NotificationLink(val server: String, val path: String) {
     companion object {
         fun parse(value: String?): NotificationLink? = runCatching {
+            BriefingLink.parse(value)?.let { return it }
             val uri = URI(value ?: return null)
             require(uri.scheme == "marketwatch" && uri.rawAuthority == "notification")
             require(uri.rawPath.isNullOrEmpty() && uri.rawFragment == null)

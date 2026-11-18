@@ -262,6 +262,9 @@ jobs:
           node tests/market-notice-lifecycle.cjs
           node tests/provider-notice-lifecycle.cjs
           node tests/native-chunk-recovery.cjs
+          node tests/mobile-position.cjs
+          node tests/mobile-alert-event.cjs
+          node tests/mobile-event-target.cjs
 
       - name: Watchlist native DOM regressions
         working-directory: web
@@ -272,6 +275,7 @@ jobs:
           node tests/mobile-watch.browser.cjs
           node tests/mobile-watch-resume.browser.cjs
           node tests/mobile-alerts.browser.cjs
+          node tests/mobile-pending.browser.cjs
           node tests/saved-layout-startup.browser.cjs
           node tests/chart-stream-shared.browser.cjs
           node tests/advanced-watchlist-layout.browser.cjs
