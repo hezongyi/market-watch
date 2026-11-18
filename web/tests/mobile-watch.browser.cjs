@@ -6,7 +6,7 @@ const first='MWP:TEST',second='MWP:SECOND',third='MWP:THIRD';
 let remote={kind:'setting',name:'mw.watchlists.v1',tool:'',revision:3,content:{envelope:'keep',value:{active:'a',unknown:'keep',lists:[
   {id:'a',title:'第一组',symbols:[first],unknown:'keep-list'}, {id:'b',title:'第二组',symbols:[second]}
 ]}}},logged=false,conflict=false;
-const writes=[],clients=new Set(),streams=new Set(),errors=[],subscriptions=new Map();let holdSave=false,pendingSave;let maxStreams=0,holdQuotes=false,quoteReads=0,sparkReads=0,unsubscribes=0,quotePrice=123.45;const pendingQuotes=[];
+const writes=[],clients=new Set(),streams=new Set(),errors=[],subscriptions=new Map();let holdSave=false,pendingSave;let holdQuotes=false,quoteReads=0,sparkReads=0,unsubscribes=0,quotePrice=123.45;const pendingQuotes=[];
 const dist=path.resolve('dist'),controlsOutput=process.env.MOBILE_WATCH_OUTPUT||'/tmp/mw-watch-controls-regression';
 fs.mkdirSync(controlsOutput,{recursive:true});
 const server=http.createServer(async(req,res)=>{
@@ -42,9 +42,12 @@ const server=http.createServer(async(req,res)=>{
    points:[{time:left,price:'122',gap_before:false},{time:left+60000,price:'123',gap_before:false},{time:left+180000,price:'123.45',gap_before:true}],status:'partial',last_data_at:left+180000}))});
  }
  if(url.pathname==='/api/charts/stream/events'){
-  clients.add(url.searchParams.get('client'));streams.add(res);maxStreams=Math.max(maxStreams,streams.size);
+  clients.add(url.searchParams.get('client'));streams.add(res);
   res.writeHead(200,{'Content-Type':'text/event-stream'});res.write('event: heartbeat\ndata: {}\n\n');
-  res.on('close',()=>streams.delete(res));return;
+  // The real stream heartbeats every 500ms, even when no quote changes.
+  // Keep this long UI scenario healthy instead of exercising the watchdog.
+  const heartbeat=setInterval(()=>{if(!res.writableEnded&&!res.destroyed)res.write('event: heartbeat\ndata: {}\n\n');},500);
+  res.on('close',()=>{clearInterval(heartbeat);streams.delete(res);});return;
  }
  if(url.pathname.startsWith('/api/charts/stream/')){
   clients.add(body.client);
@@ -64,6 +67,20 @@ const server=http.createServer(async(req,res)=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
  const browser=await chromium.launch({executablePath:process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE||undefined});
  const context=await browser.newContext({viewport:{width:412,height:915},isMobile:true,hasTouch:true,recordVideo:{dir:controlsOutput+'/video',size:{width:412,height:915}}}),page=await context.newPage();
+ // Count browser-owned sources per document. A server close callback may arrive
+ // after the replacement request during group changes or a full page reload.
+ await context.addInitScript(()=>{
+  const NativeEventSource=window.EventSource,active=new Set();
+  const stats=window.__watchStreamStats={active:0,maximum:0};
+  window.EventSource=class extends NativeEventSource{
+   constructor(url,options){
+    super(url,options);
+    if(new URL(url,location.href).pathname!=='/api/charts/stream/events')return;
+    active.add(this);stats.active=active.size;stats.maximum=Math.max(stats.maximum,active.size);
+   }
+   close(){super.close();active.delete(this);stats.active=active.size;}
+  };
+ });
  page.on('pageerror',error=>errors.push(error.message));
  try{
   await page.goto('http://127.0.0.1:'+server.address().port+'/m/');
@@ -305,9 +322,13 @@ const server=http.createServer(async(req,res)=>{
     const db=await new Promise(resolve=>{const r=indexedDB.open('mw-mobile');r.onsuccess=()=>resolve(r.result);});
     return new Promise(resolve=>{const r=db.transaction('records').objectStore('records').get([location.origin,'admin',1,'watch-scroll']);r.onsuccess=()=>{db.close();resolve(r.result?.value?.['']||0);};});
   })).toBe(700);
+  assert.equal(clientCountBeforeReload,1,'one application market client');
+  assert.deepEqual(await page.evaluate(()=>window.__watchStreamStats),{active:1,maximum:1},'only one browser SSE channel before reload');
   await page.reload();await expect(page.locator('.mobile-watch-row')).toHaveCount(33);
   await expect.poll(()=>page.locator('.mobile-watch-list').evaluate(el=>el.scrollTop)).toBe(700);
-  assert.equal(clientCountBeforeReload,1,'one application market client');assert.equal(maxStreams,1,'only one SSE channel');
+  await expect.poll(()=>streams.size).toBe(1);
+  await expect.poll(()=>page.evaluate(()=>window.__watchStreamStats.active)).toBe(1);
+  assert.equal(await page.evaluate(()=>window.__watchStreamStats.maximum),1,'only one browser SSE channel after reload');
   assert.deepEqual(errors,[]);
   console.log(JSON.stringify({evidence:'built mobile UI with API doubles',checks:['all visible Watch controls use shadcn slots','unified search without source or group filters','current group add and visible success notification; simulated Android back','drawer enter and exit transitions','touch follows, rebounds and dismisses','dirty swipe and Android back preserve unsaved input','reduced-motion close lifecycle','reorder animation and delete cancel/discard','small viewport form and rapid repeated close','saving blocks back and close','real transport heartbeat status','navigation retains original SSE and receives live quotes','background pauses subscriptions; foreground reconnects and refreshes quotes','hidden Watch pauses historical refresh','SSE drop grays rows until new connection snapshot aligns','scroll restored after reload','visible quote/spark rows and gaps','375/412 at 150% font','phone group selection isolated','latest desktop active and unknown fields retained','409 keeps input','late search discarded','actual supported periods shown','favorite add and shared refresh','one market client/SSE'],errors},null,2));
  }finally{for(const response of streams)response.end();await context.close();await browser.close();server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
