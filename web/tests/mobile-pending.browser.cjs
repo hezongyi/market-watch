@@ -4,6 +4,7 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),path=require('n
 const {chromium,expect}=require('@playwright/test');
 const dist=path.resolve('dist'),out=process.env.MW_PENDING_OUTPUT||'/tmp/mw-mobile-pending-browser';
 fs.mkdirSync(out,{recursive:true});
+let holdBriefingPlan=false,releaseBriefingPlan;
 let logged=true,healthReads=0,failHealth=false,holdHealth=false,releaseHealth;
 let healthResult={version:'fixture-1',ntfy_configured:true,delivery_enabled:true,chart_alerts:{loop:{state:'idle'}}};
 const streams=new Set(),errors=[],requests=[];
@@ -16,7 +17,7 @@ const server=http.createServer(async(req,res)=>{
  const json=(v,status=200)=>{res.writeHead(status,{'Content-Type':'application/json'});res.end(JSON.stringify(v));};
  if(url.pathname.startsWith('/api/'))requests.push({path:url.pathname,method:req.method});
  if(url.pathname==='/api/market-data/quotes'){const body=JSON.parse(raw);assert(Array.isArray(body.symbols),'symbols payload');return json(body.symbols.map(n=>({n,s:'ok',v:{lp:1.1,quote_time:Date.now()}})));}
- if(url.pathname==='/api/briefings/plan'){if(req.method==='POST'){const body=JSON.parse(raw);if(body.revision!==plan.revision)return json({detail:'简报设置已在其他窗口修改，请重新读取后保存'},409);plan={...plan,...body,revision:plan.revision+1};}return json(plan);}
+ if(url.pathname==='/api/briefings/plan'){if(holdBriefingPlan&&req.method==='GET')await new Promise(resolve=>releaseBriefingPlan=resolve);if(req.method==='POST'){const body=JSON.parse(raw);if(body.revision!==plan.revision)return json({detail:'简报设置已在其他窗口修改，请重新读取后保存'},409);plan={...plan,...body,revision:plan.revision+1};}return json(plan);}
  if(url.pathname==='/api/briefings/reports')return json({items:[report],next_cursor:null});
  if(url.pathname.startsWith('/api/briefings/reports/'))return url.pathname.endsWith(reportId)?json(report):json({detail:'该期简报不存在'},404);
  if(url.pathname==='/api/session')return logged?json({csrf:'test',subject:'admin'}):json({},401);
@@ -64,8 +65,9 @@ const server=http.createServer(async(req,res)=>{
  proof.checks.push('dirty plan survives reconnect + saved revision + categorized report + Android back body→history');
  await page.getByRole('button',{name:/市场简报/}).click();await dialog().getByRole('switch').click();plan={...plan,revision:plan.revision+1,group_ids:['stocks']};await dialog().getByRole('button',{name:'保存计划'}).click();await expect(dialog().getByRole('button',{name:'读取最新设置'})).toBeVisible();await dialog().getByRole('button',{name:'读取最新设置'}).click();await expect(dialog().getByRole('button',{name:'保存计划'})).toHaveCount(0);await expect(dialog().getByRole('switch')).toBeChecked();await close();proof.checks.push('409 keeps draft; explicit reload replaces plan and draft atomically');
  await page.goto(base+'?briefing='+reportId);await expect(dialog().getByText('EURUSD',{exact:true})).toBeVisible();await context.setOffline(true);await settle();await expect(dialog().getByText('EURUSD',{exact:true})).toBeVisible();await context.setOffline(false);
- await page.goto(base+'?briefing=7c276e57-6191-42cf-8c2f-79e3b29f439a');await expect(dialog().getByText('该期简报不存在',{exact:true})).toBeVisible();await expect(dialog().getByText('EURUSD',{exact:true})).toHaveCount(0);
- proof.checks.push('direct report + offline cached body + missing report never shows old body');
+ holdBriefingPlan=true;await page.goto(base+'?briefing=7c276e57-6191-42cf-8c2f-79e3b29f439a');await expect(dialog().getByText('该期简报不存在',{exact:true})).toBeVisible();await expect.poll(()=>Boolean(releaseBriefingPlan)).toBe(true);const planResponse=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/briefings/plan');holdBriefingPlan=false;releaseBriefingPlan();await planResponse;await settle();await expect(dialog().getByText('该期简报不存在',{exact:true})).toBeVisible();await expect(dialog().getByText('正在读取正文…',{exact:true})).toHaveCount(0);await expect(dialog().getByText('EURUSD',{exact:true})).toHaveCount(0);
+ await shot('briefing-missing-report');
+ proof.checks.push('direct report + offline cached body + missing report survives later history success and never shows old body');
  assert.deepEqual(errors,[]);proof.errors=errors;fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify(proof,null,2));console.log(JSON.stringify({passed:true,...proof}));
  }finally{await context.close();await browser.close();for(const r of streams)r.end();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1;});

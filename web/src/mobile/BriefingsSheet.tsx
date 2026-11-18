@@ -68,6 +68,7 @@ export default function BriefingsSheet({
   const [selected, setSelected] = useState<BriefingReport>();
   const [reportId, setReportId] = useState(target);
   const [error, setError] = useState("");
+  const [reportError, setReportError] = useState("");
   const [retry, setRetry] = useState(0);
   const [busy, setBusy] = useState(false);
   const [order, setOrder] = useState("desc");
@@ -162,7 +163,7 @@ export default function BriefingsSheet({
   useEffect(() => {
     if (!active || !reportId) return;
     setSelected((old) => (old?.id === reportId ? old : undefined));
-    setError("");
+    setReportError("");
     const abort = new AbortController();
     let timer: ReturnType<typeof setTimeout>;
     let reads = 0;
@@ -176,7 +177,7 @@ export default function BriefingsSheet({
           );
           if (!abort.signal.aborted) {
             setSelected(snapshot?.value);
-            if (!snapshot) setError("这期正文尚未缓存，联网后可查看");
+            if (!snapshot) setReportError("这期正文尚未缓存，联网后可查看");
           }
           return;
         }
@@ -187,14 +188,14 @@ export default function BriefingsSheet({
         );
         if (abort.signal.aborted) return;
         setSelected(row);
-        setError("");
+        setReportError("");
         if (finished(row.status))
           void writeSnapshot(profile, "briefing-report:" + row.id, row).catch(
             (e) => logFailure("简报", "缓存正文", e),
           );
         else if (++reads < 100) timer = setTimeout(() => void read(), 2000);
       } catch (e) {
-        if (!abort.signal.aborted) setError(errorMessage(e));
+        if (!abort.signal.aborted) setReportError(errorMessage(e));
       }
     };
     const visibility = () => {
@@ -386,12 +387,12 @@ export default function BriefingsSheet({
               <p role="status">正在生成本期简报，可稍后回来查看。</p>
             )}
           </>
-        ) : (
+        ) : !reportError ? (
           <p role="status">{online ? "正在读取正文…" : "正文未缓存"}</p>
-        )}
-        {error && (
+        ) : null}
+        {reportError && (
           <p role="alert" className="mobile-inline-error">
-            {error}
+            {reportError}
           </p>
         )}
         <Button
