@@ -16,7 +16,8 @@ const { chromium } = require("playwright");
  import {useAlertData} from './src/advanced/useAlertData';
  const config=freshDraft({request_id:'test',instrument:'EURUSD',series_kind:'managed',source:'fixture',timeframe:'H1',price:'101',association:null});
  const row={id:'rule',name:'中文历史名称',version:2,control_revision:2,run:1,status:'paused',health:'ready',health_reason:null,count:0,max_triggers:1,effective_at:1,created_at:1,updated_at:1,config,condition_summary:'上穿 101',runtime:{}};
- const event={id:'evt',alert_id:'rule',occurred_at:1700000000000,detected_at:1700000000000,evidence:{config:{...config,name:'中文历史名称'},rule_version:2,ordinal:1,left:'102',observation:{}},message:'body message',threshold:'101',price:'102',notification_status:'web_only'};
+ // Historical evidence owns its relation; new-rule defaults may change independently.
+ const event={id:'evt',alert_id:'rule',occurred_at:1700000000000,detected_at:1700000000000,evidence:{config:{...config,name:'中文历史名称',condition:{...config.condition,relation:'cross_up'}},rule_version:2,ordinal:1,left:'102',observation:{}},message:'body message',threshold:'101',price:'102',notification_status:'web_only'};
  let root, mode, options={}, current={...row},hold=false, held=[],writes=[],bridgeRows=[];
  async function request(path,body){
  if(path==='/chart-alerts/capabilities')return {sources:[{source:'fixture',series_kind:'managed',available:true,atr_frames:['H1']}],modes:['close'],indicators:[]};

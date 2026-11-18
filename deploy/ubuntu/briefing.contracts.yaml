@@ -11,7 +11,11 @@ services:
     command: [postgres, -c, jit=off, -c, max_connections=30]
     volumes: [briefing-pg:/var/lib/postgresql/data]
     healthcheck:
-      test: [CMD-SHELL, pg_isready -U briefings -d briefings]
+      test:
+        - CMD-SHELL
+        - >-
+          pg_isready -U briefings -d briefings &&
+          test "$$(PGOPTIONS='-c jit=on' psql -U briefings -d briefings -Atqc "SELECT current_setting('server_version_num') = '140024' AND pg_jit_available()")" = t
       interval: 2s
       timeout: 3s
       retries: 30
@@ -28,6 +32,7 @@ services:
       PYTHONDONTWRITEBYTECODE: '1'
       TEST_POSTGRES_URL: postgresql+psycopg://briefings:briefing_test_only@postgres/briefings
       ALERTS_DATABASE_URL: postgresql+psycopg://briefings:briefing_test_only@postgres/briefings
+      ALERTS_DATABASE_EXPECTED_VERSION: '140024'
       ALERTS_NTFY_TOPIC: ''
       ALERTS_DELIVERY_ENABLED: 'false'
     depends_on:
