@@ -21,6 +21,7 @@
 - 隔离 PostgreSQL 合同68项通过：旧schema真实升级、既有自选及通知保留、重复迁移、并发计划/预览幂等/attempt fence、后台预算、周末/DST、真实来源日历身份、稀疏确认D1、通知quiet/401/403/有限重试/无ack/未读隔离；HTTP仅使用测试替身。
 - Android Docker离线unit/lint/assemble通过（51 tasks）。0.1.6 / versionCode7，签名SHA256与开发实例已发布0.1.5一致。APK SHA256 `27de9bd04ef8727a13af34b90201c8123048ebb8a80fdbaa7809aafe49bb9b60`。
 - F1独立Spec与Standards复审均通过，无剩余阻断。
+- PR #144 CI补充回归：健康接口的通知任务集合断言补入已注册的 `briefing_generation`，保留精确集合检查；原失败本地复现后，健康、通知运行组、晨报与运行循环相关37项通过。仅测试预期更新，运行镜像不变；最终CI结果以PR检查为准。
 
 ## 开发实例部署
 
