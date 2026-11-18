@@ -19,11 +19,18 @@
 - 桌面隔离：真实许可桌面widget的增强指标入口、布局保存和偏好不受手机操作影响。
 - 隔离 PostgreSQL 合同68项通过：旧schema真实升级、既有自选及通知保留、重复迁移、并发计划/预览幂等/attempt fence、后台预算、周末/DST、真实来源日历身份、稀疏确认D1、通知quiet/401/403/有限重试/无ack/未读隔离；HTTP仅使用测试替身。
 - Android Docker离线unit/lint/assemble通过（51 tasks）。0.1.6 / versionCode7，签名SHA256与开发实例已发布0.1.5一致。APK SHA256 `27de9bd04ef8727a13af34b90201c8123048ebb8a80fdbaa7809aafe49bb9b60`。
-- F1独立Spec复审：无剩余阻断；Standards修复后复核记录在交付证据。
+- F1独立Spec与Standards复审均通过，无剩余阻断。
 
 ## 开发实例部署
 
-正在准备 Ubuntu 本机 Docker `mw-dev` 迁移及R1，只替换本轮需要的API/Web/三个后台角色，保留真实配置与数据。首次部署不启用晨报，不改真实规则，不发送真实测试通知。
+已部署并完成 Ubuntu 本机 Docker `mw-dev` R1，候选 `a5efdf7e83bfcd0a0c5a94b978e91105ef7ed66f`。只替换 API、Web、data-worker、market-runtime、notification-worker，TLS/PostgreSQL/ntfy 保持原容器。保留此前图表、供源、通知等未合并成果。
+
+- 入口：`https://quant.kookvv.com:8443/m/more`；内网 `https://192.168.7.232:18443/m/more`。启动/状态/停止：`mw-dev up`、`mw-dev status`、`mw-dev stop`。
+- API镜像 `sha256:2859c77d79d491911adf59309760de5841c006d594e0b1d021455ec8f4dacaa2`；Web镜像 `sha256:76bd14db7cdc54cf0ae2fcd15482cee875e4f64a3cc6ff5ba21f6fb5f325f53f`，均来自干净提交。后续文档提交不改变运行镜像。
+- 实际 API 数据库为 `dev_mobile_20261116`。已备份完整schema及15张受影响的持久业务表，在隔离数据库恢复原主键/唯一约束/索引并升级至 `be58_market_briefings`；恢复前后及部署后，11份规则版本与通知/供源配置指纹相等。大体积历史行情缓存未复制，未宣称全库恢复。首次误取的默认 `dev` 库归档保留并明确标为不可用于本次部署。
+- 域名HTTPS证书校验、ready、真实认证的自建列表/告警列表/简报计划与历史通过；新 `briefing_generation` 后台角色有实际成功进度。晨报计划不存在时返回默认关闭、revision0，报告为空；未修改真实规则、供源或通知设置，未发送真实测试通知。
+- 真实D1抽样：Dukascopy黄金和Yahoo英伟达，旧缓存被识别为未更新；有限补取分别约1.53/2.19秒后读取到11月16/17日两根已结束日线并标为ok。未知日历仍明确仅作日期参考，不纳入有效排行。没有为验收开启订阅或维护计划。
+- APK 0.1.6/versionCode7 已原子发布到开发实例持久下载目录，保留旧包。HTTPS清单 `no-store`、文件大小/哈希和缺失路径404验证通过；可在更多→检查更新获取。系统覆盖安装与实际手机签名仍待真机确认。
 
 ## 回退
 
@@ -31,6 +38,6 @@
 
 ## 证据与边界
 
-本机 `/tmp/mw-pending-contracts.log`、`/tmp/mw-event-chart-browser/proof.json`、`/tmp/mw-mobile-pending-browser/proof.json`、`/tmp/mw-pending-desktop.log`、`/tmp/mw-pending-android.log`；私有部署、备份与配置指纹置于仓库外 `~/.local/share/market-watch-dev/evidence/mobile-pending-20261117/`。
+本机 `/tmp/mw-pending-final-contracts.log`、`/tmp/mw-event-chart-browser/proof.json`、`/tmp/mw-mobile-pending-browser/proof.json`、`/tmp/mw-pending-desktop.log`、`/tmp/mw-pending-android.log`；私有部署、备份与配置指纹置于仓库外 `~/.local/share/market-watch-dev/evidence/mobile-pending-20261117/`。
 
 Android真机输入法、覆盖安装、真实ntfy实收及锁屏点击冷/热启动待用户协助验证。本轮未发送真实通知，浏览器测试不等于手机端到端验收。
