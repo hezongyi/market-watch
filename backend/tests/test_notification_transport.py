@@ -1,12 +1,19 @@
 import json
+
 import httpx
 import pytest
+from alerts import api, notify
+from alerts.notification_transport import (
+    TransportInput,
+    check_connection,
+    phone_reason,
+    read_transport,
+    save_transport,
+)
+from alerts.storage import Audit, Notification, Outbox, Preference, now_ms
 from fastapi import HTTPException
 from pydantic import ValidationError
 from sqlalchemy import select
-from alerts import api, notify
-from alerts.notification_transport import TransportInput, save_transport, read_transport, check_connection, phone_reason
-from alerts.storage import Audit, Notification, Outbox, Preference, now_ms
 
 
 def body(**values):
@@ -33,7 +40,8 @@ def test_enabled_transition_keeps_old_history_without_delivery_burst(database, m
     monkeypatch.setattr(notify.settings, "delivery_enabled", False)
     with database.begin() as db:
         note = Notification(kind="system", status="pending", payload={"message":"old"})
-        db.add(note); db.flush()
+        db.add(note)
+        db.flush()
         db.add(Outbox(notification_id=note.id, status="pending", next_at=0))
         ident = note.id
     save_transport(body(enabled=True))
@@ -43,7 +51,8 @@ def test_enabled_transition_keeps_old_history_without_delivery_burst(database, m
     # A fresh event after enabling uses the DB config, not process env.
     with database.begin() as db:
         note = Notification(kind="system", status="pending", payload={"message":"new"})
-        db.add(note); db.flush()
+        db.add(note)
+        db.flush()
         db.add(Outbox(notification_id=note.id, status="pending", next_at=0))
     calls = []
     client = httpx.Client(transport=httpx.MockTransport(lambda req: (calls.append(req) or httpx.Response(200, json={"id":"accepted"}))))
@@ -90,7 +99,7 @@ def test_manual_test_bypasses_quiet_hours_and_delivery_off(database):
 
 
 def test_notification_click_enters_app_without_confirming_or_legacy_web_routes(database, monkeypatch):
-    from urllib.parse import urlsplit, parse_qs
+    from urllib.parse import parse_qs, urlsplit
     monkeypatch.setattr(notify.settings, "public_url", "https://192.168.7.232:18443")
     monkeypatch.setattr(notify.settings, "ntfy_callback_url", "https://quant.kookvv.com:8443/")
     save_transport(body())

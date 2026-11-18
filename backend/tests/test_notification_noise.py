@@ -189,8 +189,9 @@ def test_send_rechecks_heartbeat_even_before_next_health_inspection(database, mo
 
 
 def test_system_records_exact_source_and_delivery_without_popup_or_ack(database, monkeypatch):
-    from alerts import notification_runtime, notify, notification_center as center
-    from alerts.storage import Notification, NoticeEvent
+    from alerts import notification_center as center
+    from alerts import notification_runtime, notify
+    from alerts.storage import NoticeEvent, Notification
     clock = setup_runtime(monkeypatch)
     notification_runtime.inspect_health()
     with database.begin() as db:
@@ -222,7 +223,8 @@ def test_system_records_exact_source_and_delivery_without_popup_or_ack(database,
 
 
 def test_backfill_imports_old_system_records_without_network(database, monkeypatch):
-    from alerts import notification_center as center, notification_runtime
+    from alerts import notification_center as center
+    from alerts import notification_runtime
     from alerts.storage import NoticeEvent
     setup_runtime(monkeypatch)
     with database.begin() as db:
@@ -246,7 +248,7 @@ def test_legacy_queued_runtime_summary_is_not_replayed(database, monkeypatch):
 
 def test_recovery_during_send_preserves_resolution_and_receipt(database, monkeypatch):
     from alerts import notification_runtime, notify
-    from alerts.storage import Notification, Outbox, DeliveryAttempt
+    from alerts.storage import DeliveryAttempt, Notification, Outbox
     clock = setup_runtime(monkeypatch)
     notification_runtime.inspect_health()
     clock[0] += 180_000
@@ -308,8 +310,8 @@ def test_recovery_push_after_accepted_fault_is_low_priority(database, monkeypatc
 
 def test_system_detail_unknown_id_does_not_return_another_message(database, monkeypatch):
     import pytest
-    from fastapi import HTTPException
     from alerts import notification_center as center
+    from fastapi import HTTPException
     setup_runtime(monkeypatch)
     with database.begin() as db:
         with pytest.raises(HTTPException) as error:

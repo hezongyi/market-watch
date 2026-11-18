@@ -51,12 +51,12 @@ def capabilities(body):
     with transaction() as db:
         if body.series_kind == "composite":
             from .composite_alerts import require_live_eligibility
+            from .notification_transport import phone_reason
             from .price_alert_evaluator import eligibility
             from .price_alert_reasons import Unavailable, message
             from .series_access import composite_definition
             from .series_access import metadata as fixed_metadata
             from .storage import CompositeRevision, now_ms
-            from .notification_transport import phone_reason
 
             meta = fixed_metadata(db, body.instrument, "composite")
             _, _, composite = composite_definition(db, body.instrument)
@@ -221,7 +221,6 @@ def alert_dict(db, alert, *, latest=None):
 
 
 def execution_dict(alert, version, *, at=None, db=None):
-    from .config import settings
     from .price_alert_inputs import is_price_rule
     from .price_alert_reasons import message
     from .storage import now_ms
@@ -247,8 +246,9 @@ def execution_dict(alert, version, *, at=None, db=None):
         phase = "settling" if runtime.get("settlement_pending") else "expired"
     elif not runtime.get("taken_over_at") and phase in ("monitoring", "closed"):
         phase = "preparing"
-    from .notification_transport import phone_reason
     from sqlalchemy.orm import object_session
+
+    from .notification_transport import phone_reason
     phone_code = phone_reason(db if db is not None else object_session(alert)) if version.config.get("notify_ntfy") else None
     return {"contract": runtime.get("execution_contract"), "state": phase, "label": labels.get(phase, "需处理"),
         "reason_code": reason, "message": message(reason), "enabled_intent": alert.status == "active",

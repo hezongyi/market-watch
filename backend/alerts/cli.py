@@ -70,7 +70,6 @@ def main():
         _retention(args)
     else:
         from .config import settings
-
         from .notification_transport import transport_config
         delivery = transport_config()
         print(

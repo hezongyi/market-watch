@@ -133,7 +133,6 @@ def refresh_phone(db, alert, *, now):
     # Only the notifications role has authoritative sending configuration.
     from sqlalchemy import select
 
-    from .config import settings
     from .storage import DeviceReceipt, Notification, Outbox
 
     if alert.status in ("active", "expired") or alert.runtime.get("demand_hold") == "stale_input":

@@ -1,11 +1,11 @@
 """Concurrent first-save and cross-session transport settings on isolated PG."""
 from concurrent.futures import ThreadPoolExecutor
-import pytest
-from fastapi import HTTPException
-from sqlalchemy.orm import sessionmaker
+
 from alerts import storage
 from alerts.notification_transport import TransportInput, save_transport, transport_config
-from test_chart_alert_postgres import postgres_alerts
+from fastapi import HTTPException
+from sqlalchemy.orm import sessionmaker
+from test_chart_alert_postgres import postgres_alerts as postgres_alerts
 
 
 def test_concurrent_first_save_does_not_overwrite_and_other_process_reads_new_config(postgres_alerts, monkeypatch):

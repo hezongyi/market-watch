@@ -1,9 +1,11 @@
 """Shared live ntfy settings; credentials stay on the server."""
 from urllib.parse import urlsplit
+
 import httpx
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, SecretStr, model_validator
 from sqlalchemy import select
+
 from .config import settings
 from .storage import Audit, Notification, Outbox, Preference, now_ms, transaction
 
