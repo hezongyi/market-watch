@@ -7,6 +7,7 @@ import "./mobile.css";
 import "./watch-a07.css";
 import "./watch-controls.css";
 import "./more-controls.css";
+import "./tools.css";
 import "./records-controls.css";
 import "./data-controls.css";
 import "./login-controls.css";

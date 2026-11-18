@@ -1,3 +1,5 @@
+import { useContext } from "react";
+import { EventChartNavigation } from "./alertChartTarget";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useLocation } from "react-router-dom";
 import { api, ApiError, errorMessage } from "../api";
@@ -87,6 +89,8 @@ export default function AlertsPage({
   report,
   openChart,
 }: Props) {
+  const eventChart=useContext(EventChartNavigation);
+  const eventSuspended=useRef(false);eventSuspended.current=eventChart.suspended;
   const location = useLocation();
   const entry = new URLSearchParams(location.search);
   const notificationEntry = /^n_[a-f0-9]{32}$/.test(entry.get("signal") || "")
@@ -122,6 +126,7 @@ export default function AlertsPage({
     [maintenanceOpen, setMaintenanceOpen] = useState(false);
   const [ruleRecords, setRuleRecords] = useState(""),
     [ruleRecordsOpen, setRuleRecordsOpen] = useState(false);
+  useEffect(()=>{const abandon=()=>setRuleRecordsOpen(false);addEventListener("mw-event-chart-abandon",abandon);return()=>removeEventListener("mw-event-chart-abandon",abandon);},[]);
   const [catalogMounted, setCatalogMounted] = useState(false),
     [catalogOpen, setCatalogOpen] = useState(false);
   const catalogNext = useRef<(() => void) | undefined>(undefined);
@@ -837,7 +842,7 @@ export default function AlertsPage({
                 </TabsContent>
                 <TabsContent value="records" className="alert-list-panel">
                   <AlertRecords
-                    key={signalEntry ? location.key : "records"}
+                    key="records"
                     profile={profile}
                     online={online}
                     active={visible && tab === "records"}
@@ -1279,9 +1284,10 @@ export default function AlertsPage({
           )}
           <MobileSheet
             title="规则触发记录"
-            open={ruleRecordsOpen}
+            open={ruleRecordsOpen && !eventChart.suspended}
+            retain={ruleRecordsOpen || eventChart.suspended}
             close={() => setRuleRecordsOpen(false)}
-            onClosed={() => setRuleRecords("")}
+            onClosed={() => { if(!eventSuspended.current) setRuleRecords(""); }}
             fullHeight
           >
             {ruleRecords && (

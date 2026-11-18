@@ -36,7 +36,7 @@ def test_notification_profile_owns_projection_retention_and_delivery_loops():
 
     roles = [loop.role for loop in build_loops()]
     assert roles == [
-        "notification_projection", "notification_retention", "notification_delivery",
+        "briefing_generation", "notification_projection", "notification_retention", "notification_delivery",
     ]
 
 

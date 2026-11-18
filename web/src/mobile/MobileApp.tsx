@@ -1,3 +1,5 @@
+import { alertChartTarget, EventChartNavigation, type AlertChartTarget } from "./alertChartTarget";
+import type { AlertEvent } from "../advanced/chartAlerts";
 import {
   useCallback,
   useEffect,
@@ -67,6 +69,12 @@ export default function MobileApp() {
   const [loginIntent, setLoginIntent] = useState<LoginIntent>();
   const [checking, setChecking] = useState(false);
   const [symbol, setSymbol] = useState("");
+  const eventId = location.pathname === "/chart" ? new URLSearchParams(location.search).get("event") : null;
+  const [eventTarget, setEventTarget] = useState<AlertChartTarget>();
+  const [eventError, setEventError] = useState("");
+  const [eventRetry, setEventRetry] = useState(0);
+  const eventReturn = useRef<{ path: string; restore(): void } | undefined>(undefined);
+  const eventActive = useRef(false);
   const [chartTarget, setChartTarget] = useState<{ symbol: string; resolution: string; token: number }>();
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [chartOpened, setChartOpened] = useState(false);
@@ -78,7 +86,7 @@ export default function MobileApp() {
   useEffect(() => {
     const receive = (event: Event) => {
       const path = (event as CustomEvent).detail;
-      if (typeof path === "string" && /^\/(alerts\?(signal=[A-Za-z0-9_-]{1,36}|records=(alerts|system))|more\?panel=notifications)$/.test(path))
+      if (typeof path === "string" && /^\/(alerts\?(signal=[A-Za-z0-9_-]{1,36}|records=(alerts|system))|more\?(panel=notifications|briefing=[a-f0-9-]{36}))$/.test(path))
         setNotificationPath(path);
     };
     addEventListener("mw-mobile-notification", receive);
@@ -283,6 +291,7 @@ export default function MobileApp() {
       setState("login");
       setPassword("");
       setChartOpened(false);
+    eventReturn.current=undefined;eventActive.current=false;setEventTarget(undefined);setEventError("");
       setBusy(false);
       setChecking(false);
       setLoginIntent(undefined);
@@ -335,6 +344,8 @@ export default function MobileApp() {
       void (async () => {
         if (location.pathname === "/chart" && (await chart.current?.back()))
           return;
+        if (eventId) { await returnFromEvent(); return; }
+        if (location.pathname === "/chart" && new URLSearchParams(location.search).get("from") === "briefing") { await flush(); navigate(-1); return; }
         await flush();
         if (location.pathname !== "/") navigate("/");
         else shell.exit();
@@ -344,6 +355,7 @@ export default function MobileApp() {
     return () => removeEventListener("mw-mobile-back", back);
   }, [
     location.pathname,
+    eventId,
     password,
     busy,
     checking,
@@ -352,6 +364,35 @@ export default function MobileApp() {
     report,
     navigate,
   ]);
+  useEffect(() => {
+    if (!eventId) {
+      setEventTarget(undefined); setEventError("");
+      if (eventActive.current) { eventActive.current=false; const prior=eventReturn.current; eventReturn.current=undefined; if (prior?.path === location.pathname+location.search) prior.restore(); else dispatchEvent(new Event("mw-event-chart-abandon")); }
+      return;
+    }
+    eventActive.current=true;
+    if (!profile || !verified || state !== "online" || eventTarget?.eventId === eventId) return;
+    const abort=new AbortController(); setEventTarget(undefined); setEventError("");
+    void api<AlertEvent>(`/chart-alerts/events/${encodeURIComponent(eventId)}`,undefined,AbortSignal.any([abort.signal,AbortSignal.timeout(10000)])).then(event=>{
+      if(abort.signal.aborted)return;
+      const target=alertChartTarget(event,Date.now()); setEventTarget(target);setChartTarget(target);setSymbol(target.symbol);
+    }).catch(error=>{if(!abort.signal.aborted)setEventError(errorMessage(error));});
+    return ()=>abort.abort();
+  },[eventId,profile?.subject,verified,state,eventRetry]);
+  async function returnFromEvent() {
+    if(chart.current && !(await chart.current.canLeave()))return;
+    await flush();
+    if(eventReturn.current)navigate(-1);
+    else navigate("/alerts?signal="+encodeURIComponent(eventId || eventTarget?.eventId || ""),{replace:true});
+  }
+  const openEventChart = (event: AlertEvent, restore: () => void) => {
+    try {
+      const target=alertChartTarget(event,Date.now());
+      eventReturn.current={path:location.pathname+location.search,restore};eventActive.current=true;
+      setEventTarget(target);setChartTarget(target);setSymbol(target.symbol);setEventError("");
+      navigate("/chart?event="+encodeURIComponent(event.id));
+    }catch(error){restore();report(errorMessage(error));}
+  };
   async function logout() {
     if (signingOut.current) return;
     signingOut.current = true;
@@ -438,6 +479,7 @@ export default function MobileApp() {
     );
   }
   return (
+    <EventChartNavigation.Provider value={{suspended:Boolean(eventId) || Boolean(eventActive.current && eventReturn.current?.path !== location.pathname+location.search),open:openEventChart}}>
     <div
       className="mobile-app"
       data-theme={theme}
@@ -483,6 +525,9 @@ export default function MobileApp() {
                   preparation={preparation!}
                   symbol={symbol}
                   target={chartTarget}
+                  eventTarget={eventTarget}
+                  returnFromBriefing={new URLSearchParams(location.search).get("from") === "briefing" ? () => {void (async()=>{if(chart.current && !(await chart.current.canLeave()))return;await flush();navigate(-1);})().catch(e=>report(errorMessage(e)));} : undefined}
+                  returnFromEvent={() => void returnFromEvent().catch(error => report(errorMessage(error)))}
                   theme={theme}
                   rememberSymbol={(ticker) => {
                     setSymbol(ticker);
@@ -496,6 +541,7 @@ export default function MobileApp() {
                   report={scopedReports["图表"]}
                 />
               )}
+            {eventId && !eventTarget && <div className="chart-event-entry" role="status"><p>{eventError || (state === "online" ? "正在读取触发记录…" : "联网后可查看触发位置")}</p><Button variant="outline" onClick={() => void returnFromEvent()}>返回触发记录</Button>{eventError && <Button onClick={() => setEventRetry(x=>x+1)}>重试</Button>}</div>}
             {location.pathname === "/chart" && state !== "online" && !verified && (
               <ChartEmpty
                 offline
@@ -571,8 +617,11 @@ export default function MobileApp() {
                 report={scopedReports["告警"]}
               />
             )}
-            {location.pathname === "/more" && (
+            {profile && (
               <MorePage
+                profile={profile}
+                visible={location.pathname === "/more"}
+                openChart={ticker=>void select({ticker},"D1").then(()=>navigate("/chart?from=briefing",{replace:true})).catch(error=>report(errorMessage(error)))}
                 online={state === "online"}
                 theme={theme}
                 connection={connection}
@@ -640,5 +689,6 @@ export default function MobileApp() {
         </nav>
       )}
     </div>
+    </EventChartNavigation.Provider>
   );
 }

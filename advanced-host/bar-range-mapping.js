@@ -598,6 +598,17 @@ function chartBarRangeMapping({
   }
   return {
     observeBars,
+    // A read-only lookup over the exact intervals accepted by this native pane.
+    eventBar(chart, target) {
+      const store = stores.get(chartKey(chart));
+      if (!store) return;
+      for (const [time, row] of store.rows) {
+        const matches = target.bar
+          ? row.start === target.bar.start && row.end === target.bar.end
+          : row.start <= target.anchorMs && target.anchorMs < row.end;
+        if (matches) return { time: time / 1000, ...row };
+      }
+    },
     cachePurged: () => schedule(true),
     refreshCharts,
     hide,

@@ -2,7 +2,7 @@
 
 当前应用基线 v2.0.6 / A06（最初从 v2.0.5 实施，2026-11-11 按用户要求变基）；本目录是新建工程，不恢复归档 Android 工程。
 
-- applicationId：`com.kookvv.marketwatch`，versionCode：`6`，versionName：`0.1.5`。
+- applicationId：`com.kookvv.marketwatch`，versionCode：`7`，versionName：`0.1.6`。
 - 工具链：JDK 17、Gradle 8.11.1（wrapper 固定 distribution SHA-256）、AGP 8.9.2、Kotlin 2.1.20、compile/target SDK 35、min SDK 26。
 - AndroidX Activity 1.10.1、WebKit 1.13.0。本机 SDK 35 assembleDebug/lintDebug 已通过；Find X8 待用户验收。
 - 首次输入可信 HTTPS origin，打开同源 `/m/`。禁止明文、混合内容、文件和 content 访问；主框架网络/HTTP/TLS 失败提供重试与连接设置，证书错误取消；release 禁用 WebView 调试。
@@ -45,3 +45,5 @@ python3 mobile/client/package_update.py --notes '本版更新说明'
 部署后使用 APK 信任的 CA 验证同源 `/downloads/android-update.json` 返回真实 JSON（200、`Cache-Control: no-store`），清单所指 APK 返回 200 且字节数和 SHA-256 一致，不存在的 APK 返回 404；不能只验证网页 `/m/` 可以打开。生产下载目录的修复仍须按仓库生产授权边界执行。
 
 更新清单边界与网页桥接测试已通过；原生下载、权限跳转、系统安装器及覆盖安装保留数据仍需真机验收，不能以 JVM/Chromium 检查代替。
+
+0.1.6 新增 `marketwatch://briefing/open?origin=<HTTPS origin>&report=<UUID>`，复用已保存服务器校验、登录后落点和脏表单保护；旧通知协议保持不变。正文仅查询已保存报告，不确认告警。

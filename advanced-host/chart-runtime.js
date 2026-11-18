@@ -1,4 +1,4 @@
-let activePreferences, mobileHeaderEntry, mobileReadiness;
+let activePreferences, mobileHeaderEntry, mobileReadiness, mobileEventLocation;
 const mobileCachedSeries = new Set();
 const mobileRefreshes = new Map();
 const mobileHistoryUpdates = new Map();
@@ -360,6 +360,7 @@ function rememberIndicatorBinding(ticker,res,page,{correction=false}={}) {
   }
   indicatorBindings.set(key,{...old,
     revision:page.revision_id ?? old.revision,
+    historyVersion:page.history_version_id ?? old.historyVersion,
     inputRevision:page.input_revision ?? page.initial_input_revision ?? old.inputRevision,
     displaySnapshot:hasTail ? page.display_snapshot_id ?? old.displaySnapshot : old.displaySnapshot ?? page.display_snapshot_id,
     providerSnapshot:hasTail ? page.provider_snapshot_id ?? old.providerSnapshot : old.providerSnapshot ?? page.provider_snapshot_id,
@@ -2773,6 +2774,7 @@ function boot(
   mobileHeaderEntry?.dispose();
   mobileHeaderEntry = undefined;
   mobileReadiness?.dispose(); mobileReadiness=undefined;
+  mobileEventLocation?.dispose(); mobileEventLocation=undefined;
   barRangeMapping?.dispose();
   barRangeMapping = chartBarRangeMapping({widget:()=>widget,initial:pendingBarRange,readonly,changed:()=>{
     markWorkspaceDirty();
@@ -2911,6 +2913,7 @@ function boot(
       const report = error => send({type: "error", error: String(error)});
       indicatorPicker = mobileChartNativeIndicators(widget, container.querySelector('iframe').contentDocument);
       mobileHeaderEntry = mobileChartCrosshairEntry(widget, report);
+      mobileEventLocation = mobileAlertEvent(widget,container,send,providerRecoveryRows,(chart,target)=>{const row=barRangeMapping.eventBar(chart,target);if(!row)return;const binding=indicatorBindings.get(indicatorKey(target.symbol,target.resolution));return {...row,versionChanged:!!((target.compositeRevision && binding?.revision && target.compositeRevision!==binding.revision)||(target.historyVersion && binding?.historyVersion && target.historyVersion!==binding.historyVersion))};});
     }
     await restoreTheme();
     activeTab?.dispose();
@@ -3397,7 +3400,10 @@ async function update(m) {
   }
   if (m.type === "mobile-command" && mobileMode && ready) {
     try {
-      if (m.action === "indicators") await indicatorPicker.open();
+      if (m.action === "locate-event") {void mobileEventLocation?.locate(m.target);}
+      else if (m.action === "clear-event") mobileEventLocation?.clear();
+      else if (m.action === "latest-event") {void mobileEventLocation?.latest();}
+      else if (m.action === "indicators") await indicatorPicker.open();
       else if (m.action === "settings") widget.activeChart().executeActionById("chartProperties");
       else if (m.action === "resolution") await widget.activeChart().setResolution(m.resolution);
       else if (m.action === "symbol") {

@@ -1,3 +1,6 @@
+import BriefingsSheet from "./BriefingsSheet";
+import PositionCalculatorSheet from "./PositionCalculatorSheet";
+import type { Profile } from "./cache";
 import NotificationSettings from "./NotificationSettings";
 import { useLocation } from "react-router-dom";
 import LogsSheet from "./LogsSheet";
@@ -5,6 +8,8 @@ import { setLogVersions } from "./logs";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Bell,
+  Calculator,
+  Newspaper,
   ChevronDown,
   ChevronRight,
   History,
@@ -29,8 +34,10 @@ import {
 } from "./components/ui/collapsible";
 import type { useMobileShell } from "./shell";
 
-type Panel = "connection" | "notifications" | "about" | "update";
+type Panel = "briefings" | "position" | "connection" | "notifications" | "about" | "update";
 const titles: Record<Panel, string> = {
+  briefings: "市场简报",
+  position: "头寸计算",
   connection: "连接状态",
   notifications: "后台通知",
   about: "关于守望",
@@ -91,6 +98,9 @@ function Setting({
 
 export default function MorePage({
   online,
+  profile,
+  visible = true,
+  openChart,
   theme,
   setTheme,
   connection,
@@ -100,6 +110,9 @@ export default function MorePage({
   report,
 }: {
   online: boolean;
+  profile?: Profile;
+  visible?: boolean;
+  openChart?(ticker:string):void;
   theme: string;
   setTheme(): void;
   connection?: MobileMarket;
@@ -108,6 +121,10 @@ export default function MorePage({
   logout(): Promise<void>;
   report(message: string): void;
 }) {
+  const briefingBack=useRef<(()=>boolean)|undefined>(undefined);
+  const [briefingDirty,setBriefingDirty]=useState(false);
+  const [briefingBusy,setBriefingBusy]=useState(false);
+  const [briefingTarget,setBriefingTarget]=useState<string>();
   const [notificationDirty, setNotificationDirty] = useState(false);
   const [notificationBusy, setNotificationBusy] = useState(false);
   const [logsOpen, setLogsOpen] = useState(false);
@@ -124,6 +141,7 @@ export default function MorePage({
   useEffect(() => {
     if (new URLSearchParams(location.search).get("panel") === "notifications") setPanel("notifications");
   }, [location.key]);
+  useEffect(()=>{const value=new URLSearchParams(location.search).get("briefing");if(location.pathname==="/more" && value && /^[a-f0-9-]{36}$/.test(value)){setBriefingTarget(value);setPanel("briefings");}},[location.key]);
   const [switchServer, setSwitchServer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const pendingRecords = useRef(false);
@@ -182,6 +200,7 @@ export default function MorePage({
   return (
     <section
       className="mobile-content mobile-more mobile-controls"
+      hidden={!visible}
       aria-label="更多设置"
     >
       <MobileOverlaysProvider>
@@ -206,6 +225,7 @@ export default function MorePage({
               value={notificationState}
               onClick={() => setPanel("notifications")}
             />
+            <Setting icon={<Newspaper />} label="市场简报" value="每日晨报" onClick={() => {setBriefingTarget(undefined);setPanel("briefings");}} />
             <Setting
               icon={<History />}
               label="告警记录"
@@ -213,6 +233,9 @@ export default function MorePage({
               onClick={records}
             />
           </div>
+        </section>
+        <section className="mobile-setting-group" aria-labelledby="more-tools">
+          <h2 id="more-tools">交易工具</h2><div><Setting icon={<Calculator />} label="头寸计算" value="MT4 · USD" onClick={() => setPanel("position")} /></div>
         </section>
         <section className="mobile-setting-group" aria-labelledby="more-app">
           <h2 id="more-app">应用</h2>
@@ -285,11 +308,12 @@ export default function MorePage({
           }}
         />
         <MobileSheet
-          open={Boolean(panel)}
-          dirty={panel === "notifications" && notificationDirty}
-          dismissible={!notificationBusy}
+          open={Boolean(panel) && visible}
+          retain={panel === "briefings"}
+          dirty={(panel === "notifications" && notificationDirty) || (panel === "briefings" && briefingDirty)}
+          dismissible={!notificationBusy && !briefingBusy}
           title={panel ? titles[panel] : "设置"}
-          close={() => setPanel(undefined)}
+          close={() => {if(panel === "briefings" && briefingBack.current?.())return;setPanel(undefined);}}
           onClosed={() => {
             if (pendingRecords.current) {
               pendingRecords.current = false;
@@ -297,6 +321,8 @@ export default function MorePage({
             }
           }}
         >
+          {panel === "briefings" && profile && <BriefingsSheet backRef={briefingBack} profile={profile} online={online && visible} target={briefingTarget} state={(dirty,busy)=>{setBriefingDirty(dirty);setBriefingBusy(busy);}} openChart={ticker=>openChart?.(ticker)} />}
+          {panel === "position" && profile && <PositionCalculatorSheet profile={profile} online={online} />}
           {panel === "update" && (
             <div className="more-panel">
               <dl className="mobile-facts more-facts">

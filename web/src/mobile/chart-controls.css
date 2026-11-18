@@ -277,3 +277,10 @@
     animation: none;
   }
 }
+
+.mobile-chart .chart-event-summary { flex: 0 0 auto; padding: 10px 14px; border-bottom: 1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
+.mobile-chart .chart-event-summary strong,.mobile-chart .chart-event-summary small {display:block;overflow-wrap:anywhere;}
+.mobile-chart .chart-event-summary small {color:var(--muted);margin-top:4px;line-height:1.45;}
+.mobile-chart .chart-event-summary p {margin:0;color:var(--muted);font-size:.86rem;}
+.mobile-chart .chart-event-actions {display:flex;gap:8px;flex-wrap:wrap;}
+.chart-event-entry {padding:16px;}

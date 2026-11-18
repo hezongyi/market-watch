@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { api, errorMessage } from "../api";
 import {
   deliveryNames,
@@ -19,6 +19,7 @@ import AlertListRefresh from "./AlertListRefresh";
 import SymbolInfo from "./SymbolInfo";
 import { eventIdentity, eventHandled } from "./alertView";
 import { logEvent, logFailure } from "./logs";
+import { alertChartTarget, EventChartNavigation } from "./alertChartTarget";
 import { stamp } from "./alertTime";
 
 export default function AlertRecords({
@@ -40,6 +41,9 @@ export default function AlertRecords({
   pullToRefresh?: boolean;
   targetEvent?: string;
 }) {
+  const eventChart = useContext(EventChartNavigation);
+  const pendingChart = useRef<AlertEvent | undefined>(undefined);
+  const navigating = useRef(false);
   const overlayActive = useOverlayActive();
   active = active && overlayActive;
   const [query, setQuery] = useState(""),
@@ -49,6 +53,7 @@ export default function AlertRecords({
   const [busy, setBusy] = useState(false),
     [error, setError] = useState("");
   const [detailReadError, setDetailReadError] = useState("");
+  useEffect(()=>{const abandon=()=>{navigating.current=false;pendingChart.current=undefined;setOpened(false);setSelection(undefined);};addEventListener("mw-event-chart-abandon",abandon);return()=>removeEventListener("mw-event-chart-abandon",abandon);},[]);
   const [confirmed, setConfirmed] = useState<Record<string, AlertEvent>>({});
   const flight = useRef(false);
   const entered = useRef<string | undefined>(undefined);
@@ -359,6 +364,12 @@ export default function AlertRecords({
         close={() => setOpened(false)}
         dismissible={!busy}
         onClosed={() => {
+          if (pendingChart.current) {
+            const event = pendingChart.current; pendingChart.current = undefined; navigating.current = true;
+            eventChart.open(event, () => { navigating.current = false; setSelection(event); setOpened(true); });
+            return;
+          }
+          if (navigating.current) return;
           setSelection(undefined);
           setError("");
           setDetailReadError("");
@@ -403,6 +414,7 @@ export default function AlertRecords({
                 </dd>
               </div>
             </dl>
+            <EventChartButton event={selected} online={online} disabled={busy} open={() => { pendingChart.current = selected; setOpened(false); }} />
             {selected.message && (
               <p className="alert-muted">{selected.message}</p>
             )}
@@ -502,4 +514,10 @@ export default function AlertRecords({
       </MobileSheet>
     </div>
   );
+}
+
+function EventChartButton({event,online,disabled,open}:{event:AlertEvent;online:boolean;disabled:boolean;open():void}) {
+  let reason = online ? "" : "联网后可查看触发位置";
+  try { alertChartTarget(event,0); } catch(error) { reason=errorMessage(error); }
+  return <><Button variant="outline" disabled={disabled || Boolean(reason)} onClick={open}>查看触发位置</Button>{reason && <p className="alert-muted">{reason}</p>}</>;
 }

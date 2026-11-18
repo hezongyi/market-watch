@@ -9,6 +9,8 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 from argon2 import PasswordHasher
 from argon2.exceptions import VerificationError
 from fastapi import Depends, FastAPI, HTTPException, Request, Response
+from fastapi.exception_handlers import request_validation_exception_handler
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field, model_validator
 from sqlalchemy import delete, func, select
@@ -18,11 +20,15 @@ from .calendar_profile import closures_from
 from .chart_alert_message import signal_message, signal_title
 from .chart_series import is_gold
 from .config import settings
-from fastapi.exceptions import RequestValidationError
-from fastapi.exception_handlers import request_validation_exception_handler
-from .notification_transport import TransportInput, read_transport, save_transport, check_connection, transport_config
 from .domain import calendar_for, previous_session
 from .logging_config import configure_api_logging
+from .notification_transport import (
+    TransportInput,
+    check_connection,
+    read_transport,
+    save_transport,
+    transport_config,
+)
 from .notify import DEFAULTS
 from .query_errors import QueryError
 from .service import acknowledge
@@ -267,7 +273,7 @@ def signals(signal: str | None = None):
 @app.get("/api/signals/pending-count", dependencies=[Depends(authenticated)])
 def pending_signals():
     with transaction() as db:
-        return {"count": db.scalar(select(func.count(Notification.id)).where(Notification.ack_at.is_(None)))}
+        return {"count": db.scalar(select(func.count(Notification.id)).where(Notification.kind != "briefing", Notification.ack_at.is_(None)))}
 
 
 @app.post("/api/notifications/{notification_id}/retry", dependencies=[Depends(authenticated)])
@@ -952,3 +958,7 @@ app.include_router(chart_alert_router(authenticated))
 from .notification_center_api import router as notification_center_router  # noqa: E402
 
 app.include_router(notification_center_router(authenticated))
+
+from .briefing_api import router as briefing_router  # noqa: E402
+
+app.include_router(briefing_router(authenticated))

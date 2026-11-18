@@ -15,6 +15,7 @@ from .runtime_supervisor import Loop, RuntimeGroupError, exit_if_unstopped, run_
 # Each role's deadline must exceed its own idle period: retention polls once a
 # minute and the health loop every 15s. data and market set the same per role.
 LOOP_DEADLINES = {
+    "briefing_generation": 240_000,
     "notification_projection": 60_000,
     "notification_retention": 90_000,
     "notification_delivery": 60_000,
@@ -28,9 +29,10 @@ def deadline_ms(role):
 
 
 def build_loops():
-    from . import notification_center_worker, notify
+    from . import briefing_worker, notification_center_worker, notify
 
     return (
+        Loop("briefing_generation", briefing_worker.run),
         Loop("notification_projection", notification_center_worker.run_projection),
         Loop("notification_retention", notification_center_worker.run_retention),
         Loop("notification_delivery", notify.run),
@@ -225,8 +227,8 @@ def inspect_health(*, startup_grace_until=0):
 
 
 def _queue_system_notice(db, *, title, message, incident_id, context=None, at=None):
-    from .storage import Notification, Outbox, now_ms
     from .notification_policy import RUNTIME_PUSH_DELAY_MS
+    from .storage import Notification, Outbox, now_ms
 
     stamp = now_ms() if at is None else at
     note = Notification(kind="system", signal_id=None, status="pending", created_at=stamp,

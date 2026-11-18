@@ -98,8 +98,10 @@ function DrawerContent({
   className,
   children,
   container,
+  keepMounted,
   ...props
 }: DrawerPrimitive.Popup.Props & {
+  keepMounted?: boolean
   container?: DrawerPrimitive.Portal.Props["container"]
 }) {
   const { hasSnapPoints, modal, showSwipeHandle, swipeDirection } = useDrawer()
@@ -107,7 +109,7 @@ function DrawerContent({
     swipeDirection === "down" || swipeDirection === "up" ? "y" : "x"
 
   return (
-    <DrawerPortal data-slot="drawer-portal" container={container}>
+    <DrawerPortal data-slot="drawer-portal" container={container} keepMounted={keepMounted}>
       {modal === true && (
         <DrawerOverlay data-snap-points={hasSnapPoints ? "" : undefined} />
       )}

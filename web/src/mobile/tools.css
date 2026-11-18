@@ -1,0 +1,169 @@
+.mobile-more .position-tool {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.mobile-more .position-price-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 12px;
+}
+.mobile-more .position-result {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 20px 0;
+  border-block: 1px solid var(--line);
+}
+.mobile-more .position-result > strong {
+  font-size: 2.3rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent);
+  line-height: 1.2;
+}
+.mobile-more .position-result > strong span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--muted);
+}
+.mobile-more .position-result p {
+  margin: 0;
+}
+.mobile-more .position-result > small {
+  color: var(--muted);
+}
+.mobile-more .position-result dl {
+  width: 100%;
+  margin: 4px 0;
+}
+.mobile-more .position-reference {
+  margin-block: 14px 24px;
+  overflow-wrap: anywhere;
+}
+.mobile-more .position-tool [data-slot="field-group"] {
+  min-width: 0;
+}
+.mobile-more .position-tool input {
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.mobile-more .briefings-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.mobile-more .briefing-report-title h3 {
+  margin: 6px 0;
+  font-size: 1.6rem;
+}
+.mobile-more .briefing-report-title p {
+  margin: 0;
+  color: var(--muted);
+}
+.mobile-more .briefing-report-title > small {
+  color: var(--accent);
+}
+.mobile-more .briefing-market-row,
+.mobile-more .briefing-history-row {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  text-align: left;
+  padding: 14px 0;
+  border-bottom: 1px solid var(--line);
+  border-radius: 0;
+  white-space: normal;
+  height: auto;
+}
+.mobile-more .briefing-market-row > span:first-child {
+  min-width: 0;
+  flex: 1;
+}
+.mobile-more .briefing-market-row > span:last-child {
+  text-align: right;
+  flex: none;
+}
+.mobile-more .briefing-market-row small,
+.mobile-more .briefing-history-row small {
+  display: block;
+  color: var(--muted);
+  margin-top: 4px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+.mobile-more .briefing-market-row [data-direction="up"] {
+  color: var(--up);
+}
+.mobile-more .briefing-market-row [data-direction="down"] {
+  color: var(--down);
+}
+.mobile-more .briefing-section h3 {
+  font-size: 1.1rem;
+}
+.mobile-more .briefing-section h4 {
+  color: var(--muted);
+  font-size: 0.9rem;
+  margin: 20px 0 0;
+  font-weight: 500;
+}
+.mobile-more .briefing-skeleton {
+  height: 160px;
+}
+.mobile-more .briefings-panel [data-slot="toggle-group"] {
+  flex-wrap: wrap;
+}
+/* Shared drawer defaults also target Toggle's data-variant. Give these local
+   choices their own restrained selected state instead of two primary buttons. */
+.mobile-more :is(.position-tool, .briefings-panel) [data-slot="toggle-group"] {
+  gap: 8px;
+  max-width: 100%;
+}
+.mobile-more
+  .mobile-control-drawer
+  :is(.position-tool, .briefings-panel)
+  button[data-slot="toggle-group-item"][data-variant] {
+  min-height: 44px;
+  height: auto;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  box-shadow: none;
+  white-space: normal;
+  text-align: left;
+}
+.mobile-more
+  .mobile-control-drawer
+  :is(.position-tool, .briefings-panel)
+  button[data-slot="toggle-group-item"][aria-pressed="true"] {
+  color: var(--accent);
+  background: var(--selected);
+  border-color: color-mix(in srgb, var(--accent) 30%, var(--line));
+}
+.mobile-more
+  .mobile-control-drawer
+  :is(.briefing-market-row, .briefing-history-row)[data-variant="plain"] {
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+  padding: 14px 0;
+}
+.mobile-more .briefing-market-row > span:last-child {
+  max-width: 30%;
+}
+.mobile-more .briefing-market-row > span:last-child strong {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.mobile-more .briefing-market-row > span:last-child svg {
+  width: 16px;
+  height: 16px;
+  display: block;
+  margin: 6px 0 0 auto;
+  color: var(--muted);
+}

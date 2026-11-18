@@ -4,12 +4,12 @@ import argparse
 import hashlib
 import secrets
 import threading
-from urllib.parse import urlencode, urlsplit
 from datetime import datetime, timedelta
+from urllib.parse import urlencode, urlsplit
 from zoneinfo import ZoneInfo
 
 import httpx
-from sqlalchemy import or_, select
+from sqlalchemy import case, or_, select
 
 from .chart_alert_message import signal_message, signal_title
 from .config import settings
@@ -93,11 +93,12 @@ def claim():
             .outerjoin(SignalRow, SignalRow.id == Notification.signal_id)
             .where(eligible, or_(
                 Notification.kind == "test",
+                Notification.kind == "briefing",
                 (Notification.kind == "system") & transport["enabled"],
                 (Notification.kind == "signal") & transport["enabled"]
                 & SignalRow.chart_alert_id.is_not(None) & SignalRow.watch_id.is_(None),
             ))
-            .order_by(Outbox.next_at)
+            .order_by(case((Notification.kind == "briefing", 1), else_=0), Outbox.next_at)
             .limit(1)
         ).first()
         if not candidate:
@@ -117,6 +118,8 @@ def claim():
         )
         if not row:
             return None
+        if note.kind == "briefing":
+            return claim_briefing(db, note, row, transport, now)
         from .notification_policy import obsolete_system_notice
         if note.kind == "system" and obsolete_system_notice(db, note, at=now):
             row.status = "cancelled"
@@ -135,8 +138,8 @@ def claim():
             note.payload.get("incident_id", "").endswith(":recovery")
             or note.payload.get("incident_id", "").startswith("runtime-recovery:"))
         if note.kind == "system" and note.payload.get("incident_id", "").startswith("runtime-faults:"):
-            from .runtime_health import maintenance, paused
             from .notification_policy import current_runtime_faults
+            from .runtime_health import maintenance, paused
             window = maintenance(db, at=now)
             faults = current_runtime_faults(db, note, at=now)
             faults = [fault for fault in faults if not paused(window, fault["id"].split(":", 1)[0])]
@@ -217,6 +220,41 @@ def claim():
         return row.id, note.id, body, row.attempts, transport
 
 
+
+def claim_briefing(db, note, row, transport, now):
+    from .briefing_service import PLAN_ID
+    from .storage import BriefingPlan
+    plan = db.get(BriefingPlan, PLAN_ID)
+    reason = ("计划已暂停" if not plan or not plan.enabled else
+              "通知未启用" if not transport["enabled"] else
+              "已超过本期投递时限" if now >= note.payload["expires_at"] else
+              "已达到最大重试次数" if row.attempts >= 3 else None)
+    if reason:
+        row.status, row.error, note.status = "cancelled", reason, "recorded"
+        return
+    pref = db.get(Preference, "notifications")
+    config = {**DEFAULTS, **(pref.value if pref else {})}
+    quiet = quiet_until(instant(now), {**config, "quiet_enabled": config["quiet_enabled"] or config["system_quiet_enabled"]})
+    if quiet:
+        until = int(quiet.timestamp()*1000)
+        if until >= note.payload["expires_at"]:
+            row.status, row.error, note.status = "cancelled", "静默期结束已超过投递时限", "recorded"
+        else:
+            row.next_at, note.status = until, "quiet"
+        return
+    public = urlsplit(settings.public_url)
+    origin = f"{public.scheme}://{public.netloc}"
+    report = note.payload["report_id"]
+    click = "marketwatch://briefing/open?" + urlencode({"origin": origin, "report": report})
+    fallback = origin + "/m/more?" + urlencode({"briefing": report})
+    row.status, row.lease_until, row.attempts = "sending", now + 60000, row.attempts + 1
+    body = {"topic": transport["topic"], "title": note.payload["title"],
+        "message": note.payload["message"] + "\n查看全文：" + fallback,
+        "priority": 1 if config["mode"] == "companion" else 3, "click": click}
+    # No actions, AckGrant or unread-alert semantics for a market report.
+    return row.id, note.id, body, row.attempts, transport
+
+
 def deliver_once(client=None):
     task = claim()
     if task is None:
@@ -265,7 +303,12 @@ def deliver_once(client=None):
         else:
             row.error = str(detail)
             row.status = "blocked" if detail.get("status_code") in (401, 403) else "pending"
-            row.next_at = now_ms() + min(300, 2 ** min(row.attempts, 8)) * 1000
+            if note.kind == "briefing":
+                expired = now_ms() >= note.payload["expires_at"]
+                row.status = "blocked" if detail.get("status_code") in (401, 403) else "cancelled" if row.attempts >= 3 or expired else "pending"
+                row.next_at = now_ms() + (30000 if row.attempts == 1 else 120000)
+            else:
+                row.next_at = now_ms() + min(300, 2 ** min(row.attempts, 8)) * 1000
             note.status = "delivery_error"
             if note.kind == "test":
                 db.add(Audit(kind="notification_test_failed_or_unknown",
