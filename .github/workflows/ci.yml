@@ -241,6 +241,7 @@ jobs:
           node tests/mobile-transport.cjs
           node tests/mobile-resume.cjs
           node tests/mobile-chart-resume.cjs
+          node tests/mobile-chart-preparation.cjs
           node tests/mobile-alerts.cjs
 
       - name: Single application regressions

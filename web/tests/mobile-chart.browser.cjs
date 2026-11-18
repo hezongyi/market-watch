@@ -10,6 +10,25 @@ const alertRule={id:'fixture-rule',name:'EURUSD H1',status:'paused',health:'read
 let logged=false,shellRevision=0,brokenInstall=false,delayLogin=false,pendingLogin;
 const server=http.createServer(async(req,res)=>{
  const url=new URL(req.url,'http://localhost');
+ if(url.pathname==='/desktop-isolation') {
+  const manifest=JSON.parse(fs.readFileSync(path.join(dist,'chart-assets.json')));
+  res.writeHead(200,{'Content-Type':'text/html'});
+  return res.end(`<!doctype html><html><head><meta charset="utf-8"><style>html,body,#chart{margin:0;width:100%;height:100%}</style></head><body><div id="chart"></div>
+   <script src="/${manifest.libraryDirectory}/charting_library.js"></script><script src="/${manifest.script}"></script><script>
+   globalThis.desktopReady=false;globalThis.desktopErrors=[];globalThis.desktopMessages=[];globalThis.desktopWrites=[];
+   globalThis.desktopSettings=[{kind:'setting',name:'mw.theme',tool:'',content:{value:'Light'}}];
+   globalThis.desktopWorkspace={id:'desktop-fixture',name:'桌面配置隔离验收',revision:1,document:{engine:'tv31',schemaVersion:1,symbol:'${provider}',interval:'60'}};
+   const copy=value=>JSON.parse(JSON.stringify(value));
+   const call=async(path,query)=>{const response=await fetch('/api'+path,{method:query?'POST':'GET',headers:{'Content-Type':'application/json'},body:query?JSON.stringify(query):undefined});return response.json();};
+   const adapter=MWChartAdapter.mount(document.querySelector('#chart'),{
+    observe(message,source){desktopMessages.push(message.type);if(message.type==='loaded')source.update({type:'init',readonly:false,workspace:copy(desktopWorkspace),document:copy(desktopWorkspace.document),catalog:{SMA:{label:'SMA 简单均线',pane:'main',params:{period:20},series:[{key:'value',type:'line'}]}},preferences:copy(desktopSettings),history_capabilities:{protocol:1,version:'fixture',mode:'continuous',task_seconds:30,default_bars:1000,max_bars:20000,workspace_bars:100000}}).catch(error=>desktopErrors.push(error.message));if(message.type==='ready')desktopReady=true;if(message.type==='error')desktopErrors.push(message.error);},
+    market:async(kind,q)=>{if(kind==='data')return call('/charts/data',q);if(kind.startsWith('indicator-demand'))return {ok:true};const endpoints={resolve:'/market-data/resolve',quotes:'/market-data/quotes',search:'/market-data/series/page',searchPage:'/market-data/series/page',dataset:'/market-data/dataset',historyCache:'/market-data/history/cache'};if(q.op==='serverTime')return Math.floor(Date.now()/1000);return call(endpoints[q.op]||'/market-data/resolve',q.args||q);},
+    workspace:async(kind,q)=>{if(q.op==='list')return [];if(q.op==='save'){const state=JSON.parse(q.args.content);desktopWorkspace={...desktopWorkspace,revision:desktopWorkspace.revision+1,document:{engine:'tv31',schemaVersion:1,state,symbol:q.args.symbol,interval:q.args.resolution}};desktopWrites.push('workspace');return copy(desktopWorkspace);}throw Error('Unexpected workspace operation '+q.op);},
+    session:async(kind,q)=>{if(q.op==='read')return copy(desktopSettings);if(q.op==='draftCheck')return true;if(q.op==='save'){const row={...q.args,id:'b'.repeat(64),revision:1,content:{value:q.args.value}};desktopSettings=desktopSettings.filter(p=>p.name!==q.args.name);desktopSettings.push(row);desktopWrites.push('preferences');return row;}return {ok:true};},
+    alerts:async()=>[],notifications:async()=>({events:[],cursor:'fixture'}),dataCenter:async()=>({items:[]}),cancel(){}
+   });adapter.start();
+   </script></body></html>`);
+ }
  if(url.pathname.startsWith('/api/')) {
    let text='';for await(const chunk of req)text+=chunk;
    const query=text?JSON.parse(text):{};requests.push({path:url.pathname,method:req.method});
@@ -57,7 +76,7 @@ const server=http.createServer(async(req,res)=>{
  res.writeHead(200,{'Content-Type':mime[path.extname(file)] || 'application/octet-stream','Cache-Control':'no-store'});
  let body=fs.readFileSync(file);
  if(url.pathname==='/m/sw.js'&&shellRevision){body=Buffer.from(body.toString().replace(/const CACHE='([^']+)'/,(_,name)=>`const CACHE='${name}-test-${shellRevision}'`).replace('const FILES=[',brokenInstall?"const FILES=['/missing-mobile-shell-resource.js',":'const FILES=['));}
- if(/^chart\.[a-f0-9]+\.js$/.test(path.basename(file)))body=Buffer.from(`const Original=TradingView.widget;TradingView.widget=function(...args){const widget=new Original(...args);globalThis.MW_TEST_WIDGET=widget;return widget;};\n`+body);
+ if(/^chart\.[a-f0-9]+\.js$/.test(path.basename(file)))body=Buffer.from(`const Original=TradingView.widget;TradingView.widget=function(...args){const widget=new Original(...args);globalThis.MW_TEST_WIDGET=widget;globalThis.MW_TEST_OPTIONS=args[0];return widget;};\n`+body);
  if(/^chart\.[a-f0-9]+\.js$/.test(path.basename(file)))body=Buffer.from(body.toString()+`
 const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>originalMount(root,{...app,workspace:async(...args)=>{if(window.MW_TEST_SAVE_HOLD)await new Promise(resolve=>window.MW_TEST_RELEASE_SAVE=resolve);const result=await app.workspace(...args);window.MW_TEST_SAVE_COUNT=(window.MW_TEST_SAVE_COUNT||0)+1;return result;}});`);
  res.end(body);
@@ -97,9 +116,9 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   // reach the existing notification, and an explicit flush can retry the write.
   await page.evaluate(()=>{const put=IDBObjectStore.prototype.put;window.MW_TEST_STORAGE_PUT=put;IDBObjectStore.prototype.put=function(value,key){if(this.name==='records'&&Array.isArray(key)&&key[3]==='chart')throw Error('本机存储写入失败');return put.call(this,value,key);};});
   await page.evaluate(id=>window.MW_TEST_WIDGET.activeChart().removeEntity(id),study);
-  await expect(page.locator('.mobile-toast')).toContainText('本次图表设置未记住');await shot('autosave-real-write-failure');
+  await expect(page.locator('.chart-operation-error')).toContainText('设置尚未保存到本机');await expect(page.locator('.mobile-toast')).toHaveCount(0);await shot('autosave-real-write-failure');
   await page.evaluate(()=>IDBObjectStore.prototype.put=window.MW_TEST_STORAGE_PUT);
-  await expect(page.locator('.mobile-toast')).toHaveCount(0);await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();await page.reload();await widgetReady();
+  await page.getByRole('button',{name:'重试保存',exact:true}).click();await expect(page.locator('.chart-operation-error')).toHaveCount(0);await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();await page.reload();await widgetReady();
   assert.equal(await page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().getAllStudies().length),baseline,'retry flush persists latest settings after local storage recovers');await shot('autosave-reloaded');
   checks.push('normal pending autosave is silent; study settings restored on reload; actual local write failure is reported; flush retries and persists after storage recovery');
  };
@@ -135,7 +154,7 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   }
   holdHistory=true;await page.reload();
   await expect(page.locator('.chart-preview')).toBeVisible({timeout:10000});
-  await expect(page.locator('.chart-preview img')).toBeVisible();await expect(page.locator('.chart-preview span')).toHaveCount(0);
+  await expect(page.locator('.chart-preview img')).toBeVisible();await expect(page.locator('.chart-preview-caption')).toContainText('上次画面');
   assert.equal(await page.locator('.chart-loading [data-slot="spinner"]').count(),0);await shot('previous-view-reload');
   holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();await expect(page.locator('.chart-preview')).toHaveCount(0);
   holdHistory=true;await page.evaluate(()=>{void window.MW_TEST_WIDGET.activeChart().setResolution('60');});
@@ -143,6 +162,90 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   assert.equal(await native().locator('.mw-mobile-crosshair-entry:visible').innerText(),'','crosshair is icon-only');
   holdHistory=false;heldHistory.splice(0).forEach(resolve=>resolve());await widgetReady();await expect(page.locator('.chart-preview')).toHaveCount(0);
   checks.push('bounded actual native screenshots persist locally; matching saved view appears during delayed reload; matching H1 preview replaces M5 while H1 is delayed; live-ready removes preview; crosshair has accessible name with no visible text');
+ };
+ const desktopIsolation=async()=>{
+  const desktopContext=await browser.newContext({viewport:{width:1440,height:1000},serviceWorkers:'block'});
+  const desktop=await desktopContext.newPage();desktop.on('pageerror',e=>{errors.push(e.message);console.error('DESKTOP ERROR',e.message)});
+  await desktop.goto(base+'/desktop-isolation');await desktop.waitForFunction(()=>desktopReady && window.MW_TEST_WIDGET?.activeChart().dataReady(),null,{timeout:30000}).catch(async error=>{console.error('DESKTOP STATE',await desktop.evaluate(()=>({errors:desktopErrors,messages:desktopMessages,html:document.body.innerHTML.slice(0,600),ready:desktopReady,widget:!!window.MW_TEST_WIDGET,options:window.MW_TEST_OPTIONS?.symbol,text:document.body.innerText})));await desktop.screenshot({path:path.join(out,'desktop-failure.png')});throw error;});
+  const desktopNative=desktop.frameLocator('#chart iframe');
+  await expect(desktopNative.getByRole('button',{name:'数据中心',exact:true})).toBeVisible();
+  const options=await desktop.evaluate(()=>({enabled:MW_TEST_OPTIONS.enabled_features,disabled:MW_TEST_OPTIONS.disabled_features,theme:MW_TEST_WIDGET.getTheme()}));
+  assert(options.enabled.includes('support_multicharts'));assert(!options.disabled.includes('header_settings'));assert.equal(options.theme.toLowerCase(),'light');
+  assert.equal(await desktopNative.locator('.mw-mobile-crosshair-entry').count(),0);
+  await desktopNative.getByRole('button',{name:'指标',exact:true}).click();
+  await expect(desktopNative.locator('.mw-native-indicator-content')).toBeVisible();
+  await desktopNative.getByRole('button',{name:'关闭指标窗口',exact:true}).click();
+  const study=await desktop.evaluate(()=>window.MW_TEST_WIDGET.activeChart().createStudy('Relative Strength Index',false,false,{length:17}));
+  await desktop.evaluate(()=>window.MW_TEST_WIDGET.activeChart().setResolution('5'));
+  await desktop.waitForFunction(()=>MW_TEST_WIDGET.activeChart().resolution()==='5' && MW_TEST_WIDGET.activeChart().dataReady());
+  await expect.poll(()=>desktop.evaluate(()=>new Promise(resolve=>MW_TEST_WIDGET.save(resolve)).then(s=>s.charts[0].panes.flatMap(p=>p.sources).some(p=>/Study/.test(p.type))))).toBe(true);
+  // Save through the real vendor adapter; fixture storage cannot touch user workspaces.
+  await expect.poll(()=>desktop.evaluate(()=>new Promise(resolve=>MW_TEST_WIDGET.saveChartToServer(()=>resolve('ok'),error=>resolve(String(error))))),{timeout:20000,intervals:[300]}).toBe('ok');
+  await desktop.waitForTimeout(500);
+  const before=await desktop.evaluate(()=>JSON.stringify({settings:desktopSettings,workspace:desktopWorkspace}));
+  const desktopWidget=await desktop.evaluateHandle(()=>MW_TEST_WIDGET);
+  await page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().setResolution('1'));
+  await theme('dark');await continuity();
+  assert.equal(await desktop.evaluate(()=>JSON.stringify({settings:desktopSettings,workspace:desktopWorkspace})),before,'mobile changes do not change desktop preferences/layout');
+  assert(await desktop.evaluate(w=>w===MW_TEST_WIDGET,desktopWidget));await desktopWidget.dispose();
+  assert.equal(await desktop.evaluate(()=>MW_TEST_WIDGET.activeChart().resolution()),'5');
+  assert.equal(await desktop.evaluate(id=>MW_TEST_WIDGET.activeChart().getStudyById(id).getInputValues().find(row=>row.id==='length').value,study),17);
+  await desktop.screenshot({path:path.join(out,'desktop-isolation.png')});
+  await desktop.evaluate(()=>({errors:desktopErrors})).then(value=>assert.deepEqual(value.errors,[]));
+  await desktopContext.close();assert.deepEqual(errors,[]);
+  fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks:['real desktop native adapter keeps multicharts, enhanced indicators, native save','mobile changes preserve desktop widget, H1/M5 settings and RSI 17'],options,errors},null,2));
+  console.log('PASS desktop/mobile isolation: real licensed widgets, enhanced desktop picker, native save; mobile operations preserve desktop settings/layout and widget');
+ };
+ const benchmark=async()=>{
+  const rows=[];
+  const painted=()=>page.waitForFunction(()=>{const all=window.MWMobileChartDiagnostics?.();return all?.at(-1)?.outcome==='ready' && !document.querySelector('.chart-preview');},null,{timeout:30000});
+  // Measure only immediate fixture responses. Held-network/error tests are separate.
+  for(let i=0;i<5;i++) {
+   await page.reload();await widgetReady();await painted();
+   const startup=await page.evaluate(()=>window.MWMobileChartDiagnostics()[0]);
+   rows.push({kind:'reload',...startup});
+   const instance=await page.evaluateHandle(()=>window.MW_TEST_WIDGET);
+   await page.getByRole('link',{name:'更多',exact:true}).click();
+   const before=Date.now();await page.getByRole('link',{name:'图表',exact:true}).click();
+   assert(await page.evaluate(w=>w===window.MW_TEST_WIDGET,instance));await instance.dispose();
+   assert.equal(await page.locator('.chart-loading:visible').count(),0);
+   rows.push({kind:'navigation',elapsedMs:Date.now()-before});
+   for(const resolution of ['60','5']) {
+    const before=Date.now();await page.evaluate(r=>window.MW_TEST_WIDGET.activeChart().setResolution(r),resolution);await widgetReady();await painted();
+    rows.push({kind:'period',resolution,elapsedMs:Date.now()-before,trace:await page.evaluate(()=>window.MWMobileChartDiagnostics().at(-1))});
+   }
+  }
+  fs.writeFileSync(path.join(out,'timings.json'),JSON.stringify({environment:'local HTTP fixture + real licensed widget; no live upstream latency claim',rows},null,2));
+  console.log('PASS repeat-five loading/navigation/period observations');
+ };
+ const polish=async()=>{
+  const captures=[];
+  for(const mode of ['dark','light']) {
+   await theme(mode);
+   for(const width of [375,412])for(const font of [14,21]) {
+    await page.setViewportSize({width,height:width===375?812:915});
+    await page.evaluate(v=>document.documentElement.style.fontSize=v+'px',font);
+    await shot(`polish-${mode}-${width}-${font}`);
+    const geometry=await native().locator('.mw-mobile-crosshair-entry:visible').evaluate(el=>{
+     const box=node=>{const r=node.getBoundingClientRect();return {x:r.x,y:r.y,width:r.width,height:r.height};};
+     return {button:box(el),ancestors:[el.parentElement,el.parentElement.parentElement,el.closest('.mw-mobile-header-row'),el.ownerDocument.querySelector('[data-name="header-toolbar"]')].filter(Boolean).map(box)};
+    });
+    assert(geometry.button.width>=44 && geometry.button.height>=38 && geometry.button.y>=0,'native-height crosshair touch target is fully inside the toolbar');
+    captures.push({mode,width,font,...geometry});
+   }
+  }
+  fs.writeFileSync(path.join(out,'geometry.json'),JSON.stringify(captures,null,2));
+  await page.setViewportSize({width:412,height:915});await page.evaluate(()=>document.documentElement.style.fontSize='14px');await theme('dark');
+  const instance=await page.evaluateHandle(()=>window.MW_TEST_WIDGET);
+  await page.getByRole('link',{name:'更多',exact:true}).click();await page.getByRole('link',{name:'图表',exact:true}).click();
+  assert(await page.evaluate(w=>w===window.MW_TEST_WIDGET,instance),'navigation keeps the same native widget');await instance.dispose();
+  await continuity();await failedHistoryStartup();await silentLocalSave();
+  const diagnostics=await page.evaluate(()=>window.MWMobileChartDiagnostics?.());
+  assert(diagnostics?.some(row=>row.outcome==='ready' && row.steps['画面可用']>=0),'native first painted frame has bounded support timing');
+  const forbidden=requests.filter(r=>r.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)|\/alerts|\/tasks/.test(r.path));
+  assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
+  fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,captures,diagnostics,forbidden,errors},null,2));
+  console.log('PASS mobile chart polish: real widget, local saves, error recovery, continuity, layouts and settings isolation');
  };
  const identityPreview=async()=>{
   await page.evaluate(t=>window.MW_TEST_WIDGET.activeChart().setSymbol(t),provider);await widgetReady();
@@ -202,6 +305,9 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
    assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
    fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({evidence:'HTTP fixtures + actual licensed native widget; browser only',checks,errors,forbidden},null,2));console.log(JSON.stringify({checks,errors}));return;
   }
+  if(process.env.MOBILE_CHART_ISOLATION_ONLY){await desktopIsolation();return;}
+  if(process.env.MOBILE_CHART_BENCHMARK_ONLY){await benchmark();return;}
+  if(process.env.MOBILE_CHART_POLISH_ONLY){await polish();return;}
   if(process.env.MOBILE_CHART_STARTUP_ONLY){await failedHistoryStartup();return;}
   if(process.env.MOBILE_CHART_SAVE_ONLY){await silentLocalSave();return;}
   if(process.env.MOBILE_CHART_CONTINUITY_ONLY){await continuity();assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors},null,2));console.log(JSON.stringify({checks,errors}));return;}
@@ -271,7 +377,7 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await page.setViewportSize({width:915,height:412});await shot('landscape-light-font21');
   await page.setViewportSize({width:412,height:915});await page.evaluate(()=>document.documentElement.style.fontSize='14px');
   await continuity();await failedHistoryStartup();await silentLocalSave();
-  const failing=await browser.newContext({viewport:{width:375,height:812},isMobile:true,hasTouch:true,serviceWorkers:'block'}),p2=await failing.newPage();p2.on('pageerror',e=>errors.push(e.message));catalogMode='fail';await p2.goto(base+'/m/');await expect(p2.getByRole('navigation',{name:'主导航'})).toBeVisible();await p2.getByRole('link',{name:'数据',exact:true}).click();await p2.getByRole('button',{name:/EURUSD · 日内观察组合/}).click();await p2.getByRole('button',{name:'打开图表',exact:true}).click();await expect(p2.getByText('图表暂时无法加载',{exact:true})).toBeVisible();await p2.screenshot({path:path.join(out,'failure-dark-375.png')});catalogMode='ok';await p2.getByRole('button',{name:'重新加载图表',exact:true}).click();await expect(p2.locator('.chart-workspace')).toHaveAttribute('aria-busy','false',{timeout:30000});await failing.close();
+  const failing=await browser.newContext({viewport:{width:375,height:812},isMobile:true,hasTouch:true,serviceWorkers:'block'}),p2=await failing.newPage();p2.on('pageerror',e=>errors.push(e.message));catalogMode='fail';await p2.goto(base+'/m/');await expect(p2.getByRole('navigation',{name:'主导航'})).toBeVisible();await p2.evaluate(ticker=>new Promise((resolve,reject)=>{const r=indexedDB.open('mw-mobile',2);r.onerror=()=>reject(r.error);r.onsuccess=()=>{const db=r.result,tx=db.transaction('records','readwrite');tx.objectStore('records').put({value:ticker,readAt:Date.now()},[location.origin,'admin',1,'chart-selection']);tx.oncomplete=()=>{db.close();resolve();};tx.onerror=()=>reject(tx.error);};}),ticker);await p2.goto(base+'/m/chart');await expect(p2.getByText('图表暂时无法加载',{exact:true})).toBeVisible();await p2.screenshot({path:path.join(out,'failure-dark-375.png')});catalogMode='ok';await p2.getByRole('button',{name:'重新加载图表',exact:true}).click();await expect(p2.locator('.chart-workspace')).toHaveAttribute('aria-busy','false',{timeout:30000});await failing.close();
   const forbidden=requests.filter(r=>r.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)|\/alerts|\/tasks/.test(r.path));assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({evidence:'API fixture with actual licensed widget; browser only',checks,layouts,errors,forbidden},null,2));console.log(JSON.stringify({out,checks,errors,layouts},null,2));
  }catch(e){await page.screenshot({path:path.join(out,'failure.png')}).catch(()=>{});console.error('STATE',await page.locator('body').innerText(),consoleErrors);console.error('NATIVE DIALOGS',await Promise.all(page.frames().map(f=>f.locator('[role=dialog]').evaluateAll(els=>els.map(el=>({name:el.dataset.name,html:el.outerHTML.slice(0,350)}))).catch(()=>[]))));throw e;}finally{await context.close();await browser.close();server.closeAllConnections();await new Promise(r=>server.close(r));}
 })().catch(e=>{console.error(e);process.exitCode=1});

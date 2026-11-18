@@ -27,7 +27,9 @@ function mobileChartCrosshairEntry(widget, report) {
     .mw-mobile-header-row > div:has(#header-toolbar-chart-styles){order:40}
     .mw-mobile-header-row > .separatorWrap-MBOVGQRI{display:none}
     .mw-mobile-crosshair-entry .js-button-text{display:flex;align-items:center;justify-content:center;width:100%;height:100%;line-height:0}
-    .mw-mobile-crosshair-entry{width:38px;min-width:38px;padding:0;justify-content:center}
+    .mw-mobile-crosshair-entry{width:44px;min-width:44px;height:38px;padding:0;justify-content:center;touch-action:manipulation}
+    .mw-mobile-crosshair-entry:active{opacity:.65}
+    @media(prefers-reduced-motion:no-preference){.mw-mobile-crosshair-entry{transition:color 120ms,background-color 120ms,opacity 120ms}}
     .mw-mobile-crosshair-entry svg{width:24px;height:24px;flex-shrink:0}
     .mw-mobile-crosshair-entry[aria-pressed="true"]{color:var(--tv-color-toolbar-button-text-active,#2962ff);background:var(--tv-color-toolbar-button-background-active,rgba(41,98,255,.12))}
     .mw-mobile-crosshair-entry:focus-visible{outline:2px solid #2962ff;outline-offset:-3px}
@@ -153,7 +155,7 @@ function mobileChartContinuity(widget, doc, send, layout, settle, usable) {
       image.getContext('2d').drawImage(canvas,0,0,image.width,image.height);
       const toolbar=doc.querySelector('[data-name="header-toolbar"]');
       send({type:'mobile-preview',...target,image:image.toDataURL('image/webp',.82),at:Date.now(),layout:layout(),
-        top:toolbar?.getBoundingClientRect().bottom || 46,bottom:0});
+        top:toolbar?.getBoundingClientRect().bottom || doc.querySelector('.mw-mobile-header-row')?.getBoundingClientRect().bottom || 38,bottom:0});
     } catch { /* Preview failure must not interrupt live charts or local saves. */ }
     finally {capturing=false;}
   }

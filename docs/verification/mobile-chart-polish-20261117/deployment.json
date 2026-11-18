@@ -1,0 +1,45 @@
+{
+  "at": "2026-11-17T05:41:12.391921+00:00",
+  "host": "Ubuntu local Docker mw-dev",
+  "base": "https://192.168.7.232:18443",
+  "checks": {
+    "/readyz": {
+      "status": 200,
+      "bytes": 39,
+      "cache_control": null
+    },
+    "/m/": {
+      "status": 200,
+      "bytes": 745,
+      "cache_control": null
+    },
+    "/m/shell-manifest.json": {
+      "status": 200,
+      "bytes": 237,
+      "cache_control": null
+    },
+    "/downloads/android-update.json": {
+      "status": 200,
+      "bytes": 393,
+      "cache_control": "no-store"
+    },
+    "apk_manifest_fields": [
+      "applicationId",
+      "versionCode",
+      "versionName",
+      "apk",
+      "size",
+      "sha256",
+      "notes"
+    ]
+  },
+  "server_chart_config_unchanged": true,
+  "only_web_replaced": true,
+  "image": "sha256:6b7dce8d4ac30d731da71dd8866a9af04e315886647086533be2c9d494f09580",
+  "apk_download": {
+    "status": 200,
+    "size_matches": true,
+    "sha256_matches": true,
+    "missing_returns_404": true
+  }
+}
