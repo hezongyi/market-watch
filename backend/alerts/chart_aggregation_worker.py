@@ -51,11 +51,14 @@ def cycle(*, observer=None):
 
 
 def wait_seconds(worked, published):
+    if worked:
+        # Give the database and other loops time between backlog slices.
+        return .15
     # Drain a confirmed ready publication queue promptly. Progress alone does
     # not prove another target is ready. A healthy listener wakes new work immediately.
     if getattr(published, 'runnable_remaining', False):
         return 0.005
-    if worked or published:
+    if published:
         return 0.02
     due = getattr(published, 'next_due_at', None)
     if due is not None:
@@ -81,7 +84,13 @@ def run(stop):
                     logging.info('chart_aggregation_slice seconds=%.3f', time.monotonic()-started)
                 from .runtime_health import progress
                 progress()
-                wakeup.wait(wait_seconds(worked, published), stop)
+                delay = wait_seconds(worked, published)
+                if worked:
+                    # A slice can notify on its own commit. Do not let that
+                    # wakeup bypass the inter-slice pause.
+                    stop.wait(delay)
+                else:
+                    wakeup.wait(delay, stop)
             except Exception as error:
                 logging.warning('chart_aggregation_cycle_failed type=%s', type(error).__name__)
                 from .runtime_health import progress
