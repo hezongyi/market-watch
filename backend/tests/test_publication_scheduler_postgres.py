@@ -406,7 +406,7 @@ def test_postgres_large_aged_aggregation_backlog_yields_to_every_target(publicat
     test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(publication_pg[0], monkeypatch)
 
 
-def test_postgres_fixed_history_defers_unused_old_chart_work_until_requested(publication_pg, monkeypatch):
+def test_postgres_fixed_history_drains_all_old_work_without_a_viewer(publication_pg, monkeypatch):
     from test_chart_aggregation import (
         test_fixed_history_drains_all_old_work_without_a_viewer,
     )
