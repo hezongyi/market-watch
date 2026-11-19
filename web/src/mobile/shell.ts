@@ -36,6 +36,11 @@ export function useMobileShell(
   const latest = useRef({ flush, hasInput });
   latest.current = { flush, hasInput };
   useEffect(() => {
+    const notification = () => host("notification-link");
+    window.addEventListener("mw-mobile-notification-ready", notification);
+    return () => window.removeEventListener("mw-mobile-notification-ready", notification);
+  }, []);
+  useEffect(() => {
     if (window.MWMobileHost) {
       window.MWMobileHost.onmessage = (event) => {
         try {
@@ -43,6 +48,10 @@ export function useMobileShell(
           if (result.version !== protocol || result.error) {
             const message=result.error || "请更新 APK：页面协议不兼容";
             setError(message);logFailure("应用","APK 桥接",message);
+          } else if (Object.hasOwn(result, "notificationPath")) {
+            if (result.appVersion) { setInfo(result); setLogVersions(undefined,result.appVersion); }
+            if (typeof result.notificationPath === "string")
+              window.dispatchEvent(new CustomEvent("mw-mobile-notification", { detail: result.notificationPath }));
           } else if (result.appUpdate) {
             setAppUpdate(result.appUpdate);
             logEvent({module:"应用",action:"APK 更新",message:result.appUpdate.label,level:result.appUpdate.status==="error" ? "error" : "info"});

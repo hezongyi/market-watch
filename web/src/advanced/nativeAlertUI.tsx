@@ -201,7 +201,7 @@ async function attach({
   return {
     open: shell.open,
     movePrice: async (row: AlertRow, price: string, presentation?: PricePresentation) => {
-      if (disposed || readonly || row.config.association?.workspace_id !== scope.workspace_id)
+      if (disposed || readonly || (row.config.association && row.config.association.workspace_id !== scope.workspace_id))
         throw Error("告警当前不可编辑");
       try {
         const saved = await editAlertPrice(row, price, call, presentation);
@@ -213,6 +213,7 @@ async function attach({
       }
     },
     noticeState: (state: NoticeState) => {update({alertUnread: state.alertUnread}); shell.setBadge?.(state.alertUnread);},
+    saved: (row: AlertRow) => update({updatedRow:row}),
     rule: (id: string) => {
       update({ focusRule: { id, revision: Date.now() }, focusEvent: undefined });
       shell.open();

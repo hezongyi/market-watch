@@ -224,7 +224,7 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
         raise ValueError("到期时间必须晚于生效时间")
     from .price_alert_reasons import validate_notification
 
-    validate_notification(config)
+    validate_notification(config, db)
     identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at, clock=clock), dataset_id)
     at = clock() if clock is not None else at
     if config.expires_at is not None and config.expires_at <= at:
@@ -294,8 +294,10 @@ def execution_history(alert):
         "last_gap", "execution_notification") if key in alert.runtime}
 
 
-def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
+def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None, expected_revision=None):
     alert = locked(db, alert_id, expected_version, config=config)
+    if expected_revision is not None and alert.control_revision != expected_revision:
+        raise Conflict("告警运行状态已改变，请读取当前状态后重试")
     if alert.status == "archived":
         raise ValueError("已删除的告警不能编辑")
     clock = now_ms if at is None else None
@@ -304,7 +306,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None):
         raise ValueError("到期时间必须晚于生效时间")
     from .price_alert_reasons import validate_notification
 
-    validate_notification(config)
+    validate_notification(config, db)
     identity = bind_offset(db, config, market_identity(db, config, dataset_id, at=at, clock=clock), dataset_id)
     at = clock() if clock is not None else at
     if config.expires_at is not None and config.expires_at <= at:
@@ -365,7 +367,7 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         config = AlertConfig.model_validate(current_version(db, alert).config)
         from .price_alert_reasons import validate_notification
 
-        validate_notification(config)
+        validate_notification(config, db)
         if config.series_kind == "composite":
             from .composite_alerts import require_live_eligibility
             from .storage import CompositeRevision

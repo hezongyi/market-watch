@@ -1,4 +1,7 @@
+import { useContext } from "react";
+import { EventChartNavigation } from "./alertChartTarget";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useLocation } from "react-router-dom";
 import { api, ApiError, errorMessage } from "../api";
 import {
   Plus,
@@ -86,6 +89,15 @@ export default function AlertsPage({
   report,
   openChart,
 }: Props) {
+  const eventChart=useContext(EventChartNavigation);
+  const eventSuspended=useRef(false);eventSuspended.current=eventChart.suspended;
+  const location = useLocation();
+  const entry = new URLSearchParams(location.search);
+  const notificationEntry = /^n_[a-f0-9]{32}$/.test(entry.get("signal") || "")
+    ? entry.get("signal")!.slice(2).replace(/^(.{8})(.{4})(.{4})(.{4})(.{12})$/, "$1-$2-$3-$4-$5")
+    : undefined;
+  const signalEntry = notificationEntry ? undefined : entry.get("signal") || undefined;
+  const recordEntry = entry.get("records");
   const [cached, setCached] = useState<AlertRow[]>([]),
     [readAt, setReadAt] = useState<number>(),
     [loaded, setLoaded] = useState(false);
@@ -95,6 +107,11 @@ export default function AlertsPage({
   const [tab, setTab] = useState("rules"),
     [filter, setFilter] = useState("current"),
     [query, setQuery] = useState("");
+  useEffect(() => {
+    if (!visible) return;
+    if (signalEntry) setTab("records");
+    else if (notificationEntry || recordEntry === "alerts" || recordEntry === "system") showRecords();
+  }, [visible, location.key]);
   const [filtersOpen, setFiltersOpen] = useState(false),
     [archived, setArchived] = useState<AlertRow[]>([]),
     [archiveError, setArchiveError] = useState("");
@@ -109,6 +126,7 @@ export default function AlertsPage({
     [maintenanceOpen, setMaintenanceOpen] = useState(false);
   const [ruleRecords, setRuleRecords] = useState(""),
     [ruleRecordsOpen, setRuleRecordsOpen] = useState(false);
+  useEffect(()=>{const abandon=()=>setRuleRecordsOpen(false);addEventListener("mw-event-chart-abandon",abandon);return()=>removeEventListener("mw-event-chart-abandon",abandon);},[]);
   const [catalogMounted, setCatalogMounted] = useState(false),
     [catalogOpen, setCatalogOpen] = useState(false);
   const catalogNext = useRef<(() => void) | undefined>(undefined);
@@ -423,7 +441,7 @@ export default function AlertsPage({
       const value: Editor = {
         config: row
           ? structuredClone(row.config)
-          : newPriceConfig(identity.instrument, detail.active_revision_id),
+          : newPriceConfig(identity.instrument, detail.active_revision_id, ntfy),
         row,
         frames: meta.frames || [],
         label: row
@@ -824,11 +842,13 @@ export default function AlertsPage({
                 </TabsContent>
                 <TabsContent value="records" className="alert-list-panel">
                   <AlertRecords
+                    key="records"
                     profile={profile}
                     online={online}
                     active={visible && tab === "records"}
                     runtime={runtime}
                     pullToRefresh
+                    targetEvent={signalEntry}
                   />
                 </TabsContent>
               </TabsPanels>
@@ -1264,9 +1284,10 @@ export default function AlertsPage({
           )}
           <MobileSheet
             title="规则触发记录"
-            open={ruleRecordsOpen}
+            open={ruleRecordsOpen && !eventChart.suspended}
+            retain={ruleRecordsOpen || eventChart.suspended}
             close={() => setRuleRecordsOpen(false)}
-            onClosed={() => setRuleRecords("")}
+            onClosed={() => { if(!eventSuspended.current) setRuleRecords(""); }}
             fullHeight
           >
             {ruleRecords && (
@@ -1312,7 +1333,7 @@ export default function AlertsPage({
               提供。请允许通知与后台运行；锁屏实收需要在手机检查。
             </p>
             <p className="alert-muted">
-              服务器通知配置可在网页端设置，暂未配置也能创建站内记录。
+              请到“更多 → 后台通知”配置与测试；未配置也能创建站内记录。
             </p>
             <Button
               variant="outline"
@@ -1357,7 +1378,8 @@ export default function AlertsPage({
         runtime={runtime}
         close={closeRecords}
         report={report}
-        initialTab={visible ? "alerts" : "triggers"}
+        targetNotification={visible ? notificationEntry : undefined}
+        initialTab={visible ? (notificationEntry || recordEntry === "system" ? "system" : "alerts") : "triggers"}
       />
     </>
   );

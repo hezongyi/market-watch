@@ -10,6 +10,7 @@
 #include <iomanip>
 #include <map>
 #include <sstream>
+#include <set>
 #include <stdexcept>
 #include <condition_variable>
 #include <iostream>
@@ -23,7 +24,7 @@ class SessionObserver final : public IO2GSessionStatus {
 public:
     std::mutex mutex;
     std::condition_variable changed;
-    bool connected = false, failed = false, disconnected = false;
+    bool connected = false, failed = false, disconnected = false, authRejected = false;
     std::vector<int> events;
     long addRef() override { return ++refs; }
     long release() override { auto n=--refs; if (!n) delete this; return n; }
@@ -38,13 +39,17 @@ public:
     void onLoginFailed(const char*) override {
         // Never echo upstream error text that could contain an account identifier.
         std::lock_guard<std::mutex> lock(mutex);
-        failed = true;
+        failed = true; authRejected = true;
         changed.notify_all();
     }
     bool waitConnected() {
         std::unique_lock<std::mutex> lock(mutex);
         changed.wait_for(lock, 45s, [&] { return connected || failed; });
         return connected && !failed;
+    }
+    std::string failureCode() {
+        std::lock_guard<std::mutex> lock(mutex);
+        return authRejected ? "auth" : failed ? "session_lost" : "login_timeout";
     }
     void waitDisconnected() {
         std::unique_lock<std::mutex> lock(mutex);
@@ -158,7 +163,8 @@ int main() {
     bool accepted=session->login(user.c_str(),password.c_str(),url.c_str(),connection.c_str());
     std::fill(user.begin(),user.end(),'\0'); std::fill(password.begin(),password.end(),'\0');
     bool connected=accepted && status->waitConnected();
-    emit(connected?"{\"kind\":\"ready\"}":"{\"kind\":\"error\",\"code\":\"auth\"}");
+    emit(connected?"{\"kind\":\"ready\"}":
+         "{\"kind\":\"error\",\"code\":" + jsonString(status->failureCode()) + "}");
     if(connected) {
         O2G2Ptr<IO2GRequestFactory> factory=session->getRequestFactory();
         O2G2Ptr<IO2GResponseReaderFactory> readers=session->getResponseReaderFactory();
@@ -167,7 +173,9 @@ int main() {
         while(factory && readers) {
             // No request, refresh or price subscription is performed while idle.
             pollfd descriptor{STDIN_FILENO,POLLIN,0};
-            if(poll(&descriptor,1,20000)<=0 || !std::getline(std::cin,command)) break;
+            // A demanded chart polls every 60s. Keep that session across its
+            // next snapshot; with no demand it still exits, without any I/O.
+            if(poll(&descriptor,1,75000)<=0 || !std::getline(std::cin,command)) break;
             try {
                 if(responses->offers || responses->accounts || responses->trades || responses->other)
                     throw std::runtime_error("unsolicited_data");
@@ -233,6 +241,12 @@ int main() {
                 if(responses->offers || responses->accounts || responses->trades || responses->other)
                     throw std::runtime_error("unsolicited_data");
                 emit("{\"kind\":\"done\"}");
+            } catch(const std::exception& error) {
+                const std::set<std::string> safeCodes = {"request_timeout", "request_failed",
+                    "unsolicited_data", "invalid_session_mode", "request_creation_failed",
+                    "invalid_directory", "invalid_frames", "invalid_request", "invalid_frame", "invalid_bars"};
+                const std::string code = safeCodes.count(error.what()) ? error.what() : "request_failed";
+                emit("{\"kind\":\"error\",\"code\":" + jsonString(code) + "}"); break;
             } catch(...) { emit("{\"kind\":\"error\",\"code\":\"request_failed\"}"); break; }
         }
     }

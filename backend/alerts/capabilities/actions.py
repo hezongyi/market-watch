@@ -323,12 +323,14 @@ def system(ctx, query):
             .select_from(SignalRow)
             .where(SignalRow.created_at > now_ms() - 86400000)
         )
+        from ..notification_transport import transport_config
+        delivery_enabled = transport_config(db)["enabled"]
     return {
         "mcp_enabled": settings.mcp_enabled,
         "queried_at": now_ms(),
         "active_alerts": active,
         "recent_signals": recent,
-        "delivery_enabled": settings.delivery_enabled,
+        "delivery_enabled": delivery_enabled,
         "tools": [cap.name for cap in build_registry().visible(ctx.scopes)],
     }
 

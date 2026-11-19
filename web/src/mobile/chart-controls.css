@@ -105,7 +105,6 @@
   border-radius: 5px;
 }
 .chart-loading-toolbar [data-slot="skeleton"]:first-child { width: 112px; }
-.chart-preview-toolbar { position: absolute; inset: 0 0 auto; background: var(--bg); }
 .chart-loading-content {
   position: absolute;
   inset: var(--chart-toolbar-height, 38px) 0 0;
@@ -232,33 +231,7 @@
   pointer-events: none;
 }
 .chart-status-dot { width: 5px; height: 5px; flex: none; border-radius: 50%; background: var(--accent); opacity: .7; }
-.chart-preview {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
-  background: var(--bg);
-  pointer-events: auto;
-}
-.chart-preview img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-.chart-preview-caption {
-  position: absolute;
-  bottom: 36px;
-  left: 12px;
-  display: flex;
-  gap: 8px;
-  align-items: center;
-  padding: 4px 8px;
-  border-radius: 6px;
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
-  color: var(--muted);
-  font-size: .785714rem;
-  line-height: 1.5;
-}
-.chart-preview-caption time { font-variant-numeric: tabular-nums; }
 .chart-state-cover:has(.chart-failure) { z-index: 2; }
-.chart-failure-over-preview { position: absolute; inset: auto 12px 36px; z-index: 2; display: flex; justify-content: center; }
 .chart-history-progress svg {
   width: 14px;
   height: 14px;
@@ -269,45 +242,45 @@
   bottom: 36px;
   left: 12px;
   width: calc(100% - 24px);
-  max-height: calc(100% - var(--chart-toolbar-height, 38px) - 48px);
-  overflow: auto;
-  padding: 14px;
+  min-height: 58px;
+  grid-template-columns: 18px minmax(0, 1fr) 44px 44px;
+  align-items: center;
+  gap: 4px 8px;
+  padding: 7px 8px;
+  border-radius: 12px;
   border-color: var(--line);
   background: var(--surface);
   color: var(--text);
 }
-.mobile-chart .chart-history-failure [data-slot="alert-description"] {
-  overflow-wrap: anywhere;
-  color: var(--muted);
+.mobile-chart .chart-history-failure > svg { width: 18px; height: 18px; color: var(--muted); }
+.mobile-chart .chart-history-failure-copy { min-width: 0; }
+.mobile-chart .chart-history-failure [data-slot="alert-title"] {
+  overflow: hidden;
+  color: var(--text);
+  font-size: .857143rem;
+  line-height: 1.35;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
-.mobile-chart .chart-history-failure button {
-  grid-column: 1 / -1;
-  min-height: 44px;
-  margin-top: 10px;
+.mobile-chart .chart-history-failure [data-slot="alert-description"] {
+  overflow: hidden;
+  color: var(--muted);
+  display: -webkit-box;
+  font-size: .785714rem;
+  line-height: 1.35;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow-wrap: anywhere;
 }
 @media (prefers-reduced-motion: reduce) {
   .chart-history-progress [data-slot="spinner"] {
     animation: none;
   }
 }
-/* A real write failure is actionable, compact, and never replaces the chart. */
-.mobile-chart .chart-operation-error {
-  position: absolute;
-  z-index: 2;
-  bottom: 36px;
-  left: 12px;
-  width: calc(100% - 24px);
-  display: grid;
-  grid-template-columns: 20px minmax(0, 1fr) 44px;
-  gap: 4px 10px;
-  padding: 14px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: var(--surface);
-  color: var(--text);
-}
-.mobile-chart .chart-operation-error > svg { width: 20px; height: 20px; color: var(--muted); }
-.mobile-chart .chart-operation-error [data-slot="alert-title"] { grid-column: 2; font-size: 1rem; line-height: 1.5; }
-.mobile-chart .chart-operation-error [data-slot="alert-description"] { grid-column: 2; color: var(--muted); font-size: .857143rem; line-height: 1.6; }
-.mobile-chart .chart-operation-error > button:not(.mobile-header-icon) { grid-column: 2; justify-self: start; min-height: 44px; margin-top: 6px; }
-.mobile-chart .chart-operation-error .mobile-header-icon { grid-column: 3; grid-row: 1 / 3; align-self: start; margin: -8px -8px 0 0; }
+
+.mobile-chart .chart-event-summary { flex: 0 0 auto; padding: 10px 14px; border-bottom: 1px solid var(--line); display:flex; flex-direction:column; gap:8px; }
+.mobile-chart .chart-event-summary strong,.mobile-chart .chart-event-summary small {display:block;overflow-wrap:anywhere;}
+.mobile-chart .chart-event-summary small {color:var(--muted);margin-top:4px;line-height:1.45;}
+.mobile-chart .chart-event-summary p {margin:0;color:var(--muted);font-size:.86rem;}
+.mobile-chart .chart-event-actions {display:flex;gap:8px;flex-wrap:wrap;}
+.chart-event-entry {padding:16px;}

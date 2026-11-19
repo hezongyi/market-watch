@@ -1,0 +1,17 @@
+const assert=require('node:assert/strict'),vm=require('node:vm'),fs=require('node:fs');
+const source=fs.readFileSync('../advanced-host/mobile-alert-event.js','utf8'),flush=async()=>{for(let i=0;i<30;i++)await Promise.resolve()};
+function fixture(){
+ let range={from:1,to:100},noReady=false,latest=0,clock=Date.now();const ranges=[],messages=[],shapes=new Map(),roots=[];
+ const doc={addEventListener(type,fn){roots.push({type,fn})},removeEventListener(){},querySelectorAll(){return[]}},container={...doc,querySelectorAll(){return[{contentDocument:doc}]}},sub={subscribe(){},unsubscribe(){}};
+ const chart={symbol:()=> 'EURUSD',symbolExt:()=>({ticker:'EURUSD'}),resolution:()=> '60',onSymbolChanged:()=>sub,onIntervalChanged:()=>sub,getVisibleRange:()=>range,dataReady(cb){if(cb&&!noReady)cb();return !noReady},setVisibleRange(value){return new Promise(resolve=>ranges.push({value,finish(){range=value;resolve()}}))},createShape(point,opts){const id=String(shapes.size+1);shapes.set(id,{point,opts});return Promise.resolve(id)},removeEntity(id){shapes.delete(id)},getTimeScale:()=>({setRightOffset(){latest++}})};
+ const context={setTimeout,clearTimeout,setInterval,clearInterval,Date:{now:()=>clock},MWSeries:{same:(a,b)=>a===b}};vm.createContext(context);vm.runInContext(source+'\nthis.factory=mobileAlertEvent',context);
+ const runtime=context.factory({activeChart:()=>chart},container,m=>messages.push(m),()=>[[10000],[1000000]],(_,target)=>({time:target.bar.start/1000}));
+ return {runtime,ranges,messages,shapes,roots,get range(){return range},get latest(){return latest},noReady(){noReady=true},advance(){clock+=20000}};
+}
+const target=(token,anchorMs)=>({token,eventId:String(token),symbol:'EURUSD',resolution:'60',anchorMs,bar:{start:anchorMs,end:anchorMs+3600000},anchorKind:'evidence-bar',threshold:'1.1',leftKind:'price'});
+(async()=>{
+ let f=fixture();const a=f.runtime.locate(target(1,10000000));await flush();assert.equal(f.ranges.length,1);const b=f.runtime.locate(target(2,1000000000));await flush();assert.equal(f.ranges.length,1,'B cannot overtake submitted A native range');f.ranges[0].finish();await flush();assert.equal(f.ranges.length,2);f.ranges[1].finish();await Promise.all([a,b]);assert.equal(f.messages.at(-1).token,2);assert.equal(f.messages.at(-1).status,'located');assert.equal(f.shapes.size,2);await f.runtime.latest();assert.equal(f.latest,1);assert.equal(f.shapes.size,0);f.runtime.dispose();
+ f=fixture();f.noReady();const waiting=f.runtime.locate(target(3,10000000));await flush();f.advance();await new Promise(r=>setTimeout(r,120));await waiting;await flush();for(const pending of f.ranges)pending.finish();await flush();await f.runtime.latest();assert.equal(f.latest,1,'missing dataReady callback must release queue');f.runtime.dispose();
+ f=fixture();const drag=f.runtime.locate(target(4,10000000));await flush();assert(f.roots.filter(x=>x.type==='pointerdown').length>=2,'real iframe document bound');f.roots.find(x=>x.type==='pointerdown').fn();f.ranges[0].finish();await flush();assert.equal(f.ranges.length,2,'cancelled native range restores user viewport');f.ranges[1].finish();await drag;assert.equal(f.shapes.size,0);assert(f.messages.some(x=>x.status==='changed'));f.runtime.dispose();
+ console.log('event: serialized native ranges, finite dataReady wait, iframe cancellation, latest and marker cleanup passed');
+})().catch(e=>{console.error(e);process.exitCode=1});

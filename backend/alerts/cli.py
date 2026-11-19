@@ -70,13 +70,14 @@ def main():
         _retention(args)
     else:
         from .config import settings
-
+        from .notification_transport import transport_config
+        delivery = transport_config()
         print(
             {
                 "database": settings.database_url.split(":", 1)[0],
                 "password_configured": bool(settings.admin_password_hash),
-                "delivery_enabled": settings.delivery_enabled,
-                "topic_configured": bool(settings.ntfy_topic),
+                "delivery_enabled": delivery["enabled"],
+                "topic_configured": bool(delivery["topic"]),
                 "cookie_secure": settings.cookie_secure,
             }
         )

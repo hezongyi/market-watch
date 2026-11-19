@@ -234,3 +234,26 @@ def test_waiting_background_yields_without_closing_reusable_session(database, fx
     with market_resources.lane("history"), pytest.raises(TimeoutError, match="让位"):
         adapter._request("catalog\n", expected="instrument", limit=1, deadline=time.monotonic() + .3)
     assert len(waiting) == 1, "queued background must stop requesting slots once foreground arrives"
+
+
+@pytest.mark.parametrize('code', ['login_timeout','session_lost','request_timeout','request_failed','unsolicited_data','invalid_bars'])
+def test_transient_helper_error_is_not_authentication_hold(database, code):
+    read, write = os.pipe()
+    os.write(write, json.dumps({'kind':'error','code':code,'message':'private'}).encode()+b'\n')
+    os.close(write)
+    adapter = fxcm.FxcmHistory()
+    class Process:
+        stdout = os.fdopen(read, 'rb', buffering=0)
+    adapter.process = Process()
+    try:
+        with pytest.raises(MarketRequestError) as error:
+            adapter._line(time.monotonic()+1)
+        assert error.value.result.status == 'unavailable'
+        with database() as db:
+            state = db.get(Preference, 'upstream_slots:fxcm').value
+            assert state['cooldown_until'] <= fxcm.now_ms()+10000
+            assert state['cooldown_reason'] == code
+        assert 'private' not in str(error.value)
+    finally:
+        adapter.process.stdout.close()
+        adapter.process = None

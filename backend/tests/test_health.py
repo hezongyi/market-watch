@@ -60,6 +60,7 @@ def test_health_exposes_both_runtime_groups_and_data_roles(database):
         "native_history", "chart_aggregation", "market_stream", "data_ownership",
     }
     assert {row["role"] for row in result["notification_runtime"]} == {
+        "briefing_generation",
         "notification_projection", "notification_retention", "notification_delivery",
         "notification_ownership", "notification_health",
     }

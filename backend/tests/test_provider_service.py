@@ -435,3 +435,22 @@ def test_late_old_activation_after_disable_is_not_fetched(database, monkeypatch)
     assert service.warm_step("oanda")[1] is False
     with database() as db:
         assert db.get(ProviderInterest, ident).targets == []
+
+
+def test_cooling_subscription_schedules_recovery_at_source_retry_time(database, monkeypatch):
+    from alerts.market_resources import SourceCoolingDown
+    from alerts.storage import now_ms
+    retry_at = now_ms() + 300000
+    calls = []
+    def cooling(*args, **kwargs):
+        calls.append(1)
+        raise SourceCoolingDown(retry_at)
+    monkeypatch.setattr(upstream, 'native_page', cooling)
+    subscribed(monkeypatch, 'cooling', 'listener', 0)
+    service.realtime_step()
+    with database() as db:
+        row = db.scalar(select(ProviderInterest).where(ProviderInterest.subscribed.is_(True)))
+        assert row.next_poll == retry_at
+        assert row.error == 'SourceCoolingDown'
+    service.realtime_step()
+    assert calls == [1], 'do not spend another upstream budget before cooldown ends'

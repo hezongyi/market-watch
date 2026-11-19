@@ -1,9 +1,11 @@
 import type {api as requestAPI} from '../api';
 import {chartAlertUiRequest,type AlertUiScope} from '../advanced/chartAlertUiApi';
+import {chartPriceAlertRequest,priceOperation} from '../advanced/chartPriceAlertRuntime';
 /** Native drawing edits retain the saved object identity and current workspace scope. */
 export function alertRuntime({api,mobile,scope}:{api:typeof requestAPI;mobile:boolean;scope:()=>AlertUiScope}) {
  return async (kind:string,q:any,valid:()=>boolean)=>{
   const current=scope();
+  if(kind==='chart-alert-rpc' && priceOperation(q?.op))return chartPriceAlertRequest(q,api,valid);
   if(kind==='chart-alert-ui-rpc')return chartAlertUiRequest(q,current,valid,(path,body)=>{
    if(mobile && body!==undefined && path!=='/chart-alerts/capabilities' && !path.endsWith('/ack'))throw Error('当前图表只读');
    return api(path,body);

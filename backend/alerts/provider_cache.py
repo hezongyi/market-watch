@@ -495,7 +495,13 @@ def commit_page(key, lease, page, before, observed_at, *, latest=False):
             dataset.coverage = merge_ranges(dataset.coverage + proven)
         evidence = page.get("boundary_evidence")
         if "source_warnings" in page:
-            dataset.metadata_json = {**dataset.metadata_json, "source_warnings": page["source_warnings"]}
+            warnings = page["source_warnings"]
+            if dataset.source == "fxcm":
+                # Native history is paged; a second old bad record must not
+                # erase the evidence retained from the preceding page.
+                warnings = list({warning["source_label"]: warning for warning in
+                    dataset.metadata_json.get("source_warnings", []) + warnings}.values())[-4000:]
+            dataset.metadata_json = {**dataset.metadata_json, "source_warnings": warnings}
         if evidence and evidence.get("kind") == "rolling_window":
             dataset.metadata_json = {**dataset.metadata_json, "history_window": evidence}
         dataset.earliest = dataset.earliest or boundary

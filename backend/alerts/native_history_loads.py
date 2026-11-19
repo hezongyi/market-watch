@@ -191,7 +191,7 @@ def result(owner, ident):
 
 def once():
     from .chart_query import DataQuery
-    from .market_resources import lane
+    from .market_resources import SourceCoolingDown, lane
     claim_started = time.monotonic()
     with transaction() as db:
         now = now_ms()
@@ -226,6 +226,7 @@ def once():
     state, failure = "waiting", None
     waiting_latest = False
     waiting_acquisition = False
+    retry_at = None
     fill_started = time.monotonic()
     try:
         if pages >= settings.native_history_task_pages:
@@ -244,6 +245,8 @@ def once():
                               io_deadline=io_deadline), lane("chart"):
                 cache.prepare(DataQuery.model_validate(query), initial=query.get('_prepare', False))
             state = "ready"
+    except SourceCoolingDown as exc:
+        state, waiting_acquisition, retry_at = "waiting", True, exc.retry_at
     except cache.LatestObservationPending:
         state, waiting_latest = "waiting", True
     except AcquisitionBusy:
@@ -269,7 +272,7 @@ def once():
             NativeHistoryLoad.id == ident, NativeHistoryLoad.generation == generation,
             NativeHistoryLoad.state == "filling", NativeHistoryLoad.lease_until > now_ms())
             .values(state=state, error_json=failure,
-                    lease_until=now_ms()+1000 if waiting_latest or waiting_acquisition else 0,
+                    lease_until=retry_at or (now_ms()+1000 if waiting_latest or waiting_acquisition else 0),
                     pages=pages+progress["pages"],
                     stalls=0 if progress["advanced"] else stalls if waiting_latest or waiting_acquisition else stalls+1))
         if result.rowcount:

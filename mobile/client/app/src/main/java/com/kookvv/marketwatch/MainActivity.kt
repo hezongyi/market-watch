@@ -41,6 +41,7 @@ class MainActivity : ComponentActivity() {
     private var updater: AppUpdater? = null
     private var safeContainer: View? = null
     private var serverSettings: ServerSettingsView? = null
+    private var notificationLink: NotificationLink? = null
     private val lightAppearance get() = preferences.getString("appearance", "dark") == "light"
     private val surfaceColor get() = Color.parseColor(if (lightAppearance) "#f8f9fc" else "#101317")
     private val installPermission = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -72,7 +73,35 @@ class MainActivity : ComponentActivity() {
             }
         })
         val saved = preferences.getString("origin", null)
+        notificationLink = NotificationLink.parse(savedInstanceState?.getString("notificationLink") ?: intent?.dataString)
         if (saved == null) configure() else open(saved)
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+        notificationLink = NotificationLink.parse(intent.dataString) ?: return
+        if (!checkNotificationServer()) return
+        web?.evaluateJavascript("window.dispatchEvent(new Event('mw-mobile-notification-ready'))", null)
+    }
+
+    private fun checkNotificationServer(): Boolean {
+        val target = notificationLink ?: return false
+        if (origin == null) return false // First configure the server explicitly.
+        if (target.server == origin) return true
+        notificationLink = null
+        AlertDialog.Builder(this).setMessage("通知来自其他服务器，请先在连接设置中切换到 ${target.server}，再点击通知。")
+            .setPositiveButton("知道了", null).show()
+        return false
+    }
+
+    private fun takeNotificationPath(): String? {
+        if (!checkNotificationServer()) return null
+        return notificationLink?.path.also {
+            notificationLink = null
+            // A later launcher start or Activity recreation must not reopen a consumed notification.
+            intent?.data = null
+        }
     }
 
     private fun trustedOrigin(text: String): String? {
@@ -117,6 +146,7 @@ class MainActivity : ComponentActivity() {
         if (trustedOrigin(value) != value) { configure(); return }
         serverSettings = null
         origin = value
+        checkNotificationServer()
         if (!WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
             AlertDialog.Builder(this).setMessage("请更新 Android System WebView 后重新打开守望")
                 .setPositiveButton("关闭") { _, _ -> finish() }.show()
@@ -177,8 +207,11 @@ class MainActivity : ComponentActivity() {
             when (payload.optString("action")) {
                 "hello" -> reply.postMessage(JSONObject().put("version", 1)
                     .put("appVersion", BuildConfig.VERSION_NAME)
-                    .put("capabilities", org.json.JSONArray(listOf("app-update-v1", "appearance-v1")))
+                    .put("capabilities", org.json.JSONArray(listOf("app-update-v1", "appearance-v1", "notification-link-v1")))
+                    .put("notificationPath", takeNotificationPath() ?: JSONObject.NULL)
                     .put("webViewVersion", WebViewCompat.getCurrentWebViewPackage(this)?.versionName).toString())
+                "notification-link" -> reply.postMessage(JSONObject().put("version", 1)
+                    .put("notificationPath", takeNotificationPath() ?: JSONObject.NULL).toString())
                 "appearance" -> {
                     val theme = payload.optString("theme")
                     if (theme == "light" || theme == "dark") {

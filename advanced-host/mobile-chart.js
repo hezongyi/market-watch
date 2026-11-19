@@ -133,85 +133,40 @@ function mobileChartNativeIndicators(widget, doc) {
       if(win.webpackChunktradingview.push===push)win.webpackChunktradingview.push=previousPush;}};
 }
 
-/** A bounded picture of the last rendered chart; never fed back as market data. */
-function mobileChartContinuity(widget, doc, send, layout, settle, usable) {
+/** Announces when a native mobile chart can be used. */
+function mobileChartReadiness(widget, send, settle, usable) {
   const chart = widget.activeChart();
-  let generation = 0, selected = '', closed = false, timer, failed = false, capturing = false, rendered = false;
+  let generation = 0, selected = '', closed = false;
   const identity = () => ({symbol:chart.symbolExt?.()?.ticker || chart.symbol(),
     resolution:chart.resolution(),theme:widget.getTheme().toLowerCase()});
   const key = value => JSON.stringify(value);
   const current = (version, target) => !closed && generation===version && key(identity())===key(target);
-  async function capture() {
-    if (closed || capturing || !rendered || document.hidden || !usable() || !chart.dataReady()) return;
-    const target = identity(), version = generation;
-    capturing = true;
-    try {
-      const canvas = await widget.takeClientScreenshot();
-      if (!current(version,target) || !canvas.width || !canvas.height) return;
-      // Limit pixel memory and persistence size even on high-DPI phones.
-      const scale = Math.min(1, 900/canvas.width, 1600/canvas.height);
-      const image = document.createElement('canvas');
-      image.width = Math.round(canvas.width*scale); image.height = Math.round(canvas.height*scale);
-      image.getContext('2d').drawImage(canvas,0,0,image.width,image.height);
-      const toolbar=doc.querySelector('[data-name="header-toolbar"]');
-      send({type:'mobile-preview',...target,image:image.toDataURL('image/webp',.82),at:Date.now(),layout:layout(),
-        top:toolbar?.getBoundingClientRect().bottom || doc.querySelector('.mw-mobile-header-row')?.getBoundingClientRect().bottom || 38,bottom:0});
-    } catch { /* Preview failure must not interrupt live charts or local saves. */ }
-    finally {capturing=false;}
-  }
   async function loaded() {
     const target=identity(), version=generation;
     if (!usable() || !chart.dataReady()) return;
-    await settle(target,()=>current(version,target) && !failed);
-    // Let native studies and canvas paints commit before releasing the preview.
+    await settle(target,()=>current(version,target));
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       if(!current(version,target) || !chart.dataReady())return;
-      rendered=true;
       send({type:'mobile-display-ready',...target});
-      clearTimeout(timer);timer=setTimeout(()=>{void capture();},450);
     }));
   }
   function changed() {
     const target=identity(), next=key(target);
     if(next===selected)return;
-    selected=next;generation++;failed=false;rendered=false;clearTimeout(timer);
+    selected=next;generation++;
     send({type:'mobile-display-pending',...target});
     void loaded();
   }
-  const edited=()=>{clearTimeout(timer);timer=setTimeout(()=>{void capture();},650);};
-  const invalidate=()=>{if(rendered){send({type:'mobile-preview-invalidated'});rendered=false;void loaded();edited();}};
-  // Native restoration also emits these events. Only real content changes
-  // invalidate other periods; repeated type/scale notifications keep previews.
-  let chartType = chart.chartType();
-  const typeChanged=()=>{const next=chart.chartType();if(next!==chartType){chartType=next;invalidate();}};
-  const studies=new Set(chart.getAllStudies().map(study=>study.id));
-  const studyChanged=(id,event)=>{
-    if(event==='remove'){if(studies.delete(id))invalidate();}
-    else if(event==='create' || event==='paste_study'){if(!studies.has(id)){studies.add(id);invalidate();}}
-  };
-  const drawingChanged=(_id,event)=>{if(['create','remove','hide','show','properties_changed','points_changed'].includes(event))invalidate();};
   chart.onSymbolChanged().subscribe(null,changed);
   chart.onIntervalChanged().subscribe(null,changed);
   chart.onDataLoaded().subscribe(null,loaded);
   widget.subscribe('chart_theme_changed',changed);
-  widget.subscribe('onAutoSaveNeeded',edited);
-  widget.subscribe('study_event',studyChanged);
-  widget.subscribe('study_properties_changed',invalidate);
-  widget.subscribe('drawing_event',drawingChanged);
-  chart.onChartTypeChanged().subscribe(null,typeChanged);
-  const refresh=setInterval(()=>{if(!document.hidden)void capture();},30000);
   changed();
-  return {capture,changed,loaded,
-    indicator(state) {if(state==='error' || state==='unavailable' || state==='insufficient_input'){failed=true;void loaded();}},
-    invalidate,
-    dispose() {closed=true;generation++;clearTimeout(timer);clearInterval(refresh);
+  return {changed,loaded,
+    dispose() {closed=true;generation++;
       chart.onSymbolChanged().unsubscribe(null,changed);chart.onIntervalChanged().unsubscribe(null,changed);
       chart.onDataLoaded().unsubscribe(null,loaded);widget.unsubscribe('chart_theme_changed',changed);
-      chart.onChartTypeChanged().unsubscribe(null,typeChanged);
-      widget.unsubscribe('study_event',studyChanged);
-      widget.unsubscribe('study_properties_changed',invalidate);
-      widget.unsubscribe('drawing_event',drawingChanged);
-      widget.unsubscribe('onAutoSaveNeeded',edited);}};
+    }};
 }
 
 function mobileChartParameterDialogs(container) {

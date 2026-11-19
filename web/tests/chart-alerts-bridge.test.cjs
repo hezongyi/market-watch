@@ -6,7 +6,7 @@ const { test } = require("node:test"),
   path = require("node:path");
 const root = path.resolve(__dirname, "../..");
 const tick = () => new Promise((r) => setTimeout(r, 5));
-function fixture({ readonly = false } = {}) {
+function fixture({ readonly = false, series_kind = "managed" } = {}) {
   const subscriptions = {},
     shapes = new Map(),
     messages = [],
@@ -14,7 +14,7 @@ function fixture({ readonly = false } = {}) {
     failures = [];
   let symbol = "BTCUSDT",
     resolution = "60",
-    source = "binance",
+    source = series_kind === "composite" ? "composite" : "binance",
     epoch = 1,
     loading = false,
     nextId = 0,
@@ -85,7 +85,7 @@ function fixture({ readonly = false } = {}) {
     Map,
     Set,
     MWSeries: {
-      decode: (t) => ({ symbol: t, series_kind: "managed" }),
+      decode: (t) => ({ symbol: t, series_kind }),
       encode: (t) => t,
       same: (a, b) => a === b,
     },
@@ -111,6 +111,8 @@ function fixture({ readonly = false } = {}) {
     fail: (e) => failures.push(String(e)),
     rpc: async (q) => {
       calls.push(structuredClone(q));
+      if(q.op === "price_capabilities") return {sources:[{source:"composite",series_kind:"composite",price_modes:{intrabar:{available:true}}}],phone:{available:true},composite_revision_id:"revision"};
+      if(q.op === "price_create") return {id:"created",version:1,control_revision:1,status:"active",config:{source:"composite",instrument:q.context.instrument,series_kind:"composite",mode:"intrabar",timeframe:q.context.timeframe,association:null,condition:{left:{kind:"price"},right:{kind:"constant",value:q.context.price},relation:"cross"}}};
       if (q.op === "geometry")
         return {
           kind: "horizontal_line",
@@ -278,7 +280,7 @@ test("explicit removal pauses; symbol, interval and layout changes never pause",
   }
 });
 test("source changes fence drawing edits and menu contexts are captured at open", async () => {
-  const f = fixture();
+  const f = fixture({series_kind:"composite"});
   await tick();
   let action;
   await f.api.menu(
@@ -408,20 +410,19 @@ test('squeeze alert captures calculation parameters and boolean, excluding displ
 
 
 test('price-axis plus opens selection; only its alert action creates at captured display price', async () => {
-  const f = fixture();
+  const f = fixture({series_kind:'composite'});
   f.subscriptions.onPlusClick({symbol: 'BTCUSDT', price: 1.1195149});
   await tick();
   assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'plus itself never creates');
   const items = await f.api.menu([], {createAction: value => value}, {menuName:'CrosshairMenuView'});
-  assert.equal(items.length, 1);assert.match(items[0].label, /1\.11951.*创建告警/);
+  assert.equal(items.length, 3);assert.match(items[0].label, /穿越 1\.11951 时提醒/);
   assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'opening menu never creates');
   await items[0].onExecute();
-  const contexts = f.messages.filter(m => m.type === 'chart-alert-context');
-  assert.equal(contexts.length, 1);
-  assert.equal(contexts[0].context.quick_create, true);
-  assert.equal(contexts[0].context.price, '1.11951');
-  assert.equal(contexts[0].context.price_presentation.text, '1.11951');
-  assert.equal(contexts[0].context.association.workspace_id, 'fixture');
+  const created=f.calls.filter(q=>q.op==='price_create');
+  assert.equal(created.length,1);
+  assert.equal(created[0].context.price,'1.11951');
+  assert.equal(created[0].context.phone_available,true);
+  assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0,'quick creation does not open the full panel');
   assert.equal(f.calls.filter(q => ['edit', 'lifecycle'].includes(q.op)).length, 0);
 });
 
@@ -445,7 +446,7 @@ test('price-axis plus rejects invalid price, loading, missing metadata and reado
 
 
 test('dismissed plus menus never create or affect an ordinary menu', async () => {
-  const f=fixture(); f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
+  const f=fixture({series_kind:'composite'}); f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
   await f.api.menu([], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
   assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0);
   const normal=await f.api.menu([], {createAction:v=>v}, {menuName:'MainSeriesContextMenu',detail:{type:'series'}});
@@ -456,7 +457,7 @@ test('dismissed plus menus never create or affect an ordinary menu', async () =>
 
 test('plus selection rejects changed chart and missing/invalid captured price', async () => {
   for(const change of ['switchSymbol','switchInterval','layoutLoad']){
-    const f=fixture();f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
+    const f=fixture({series_kind:'composite'});f.subscriptions.onPlusClick({symbol:'BTCUSDT',price:120});
     const items=await f.api.menu([], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
     f[change]();await items[0].onExecute();
     assert.equal(f.messages.filter(m=>m.type==='chart-alert-context').length,0,change);

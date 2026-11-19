@@ -104,6 +104,11 @@ def router(authenticated):
         with transaction() as db:
             return center.detail(db, center.SUBJECT, event_id)
 
+    @routes.get('/notifications/{notification_id}')
+    def notification(notification_id: str):
+        with transaction() as db:
+            return center.system_notification(db, notification_id)
+
     @routes.get('/events/{event_id}/timeline')
     def timeline(event_id: str, before: str | None = Query(None, max_length=2000),
                  limit: int = Query(100, ge=1, le=500)):

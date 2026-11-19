@@ -66,13 +66,12 @@ class NotificationConfigurationError(ValueError):
         super().__init__(message(code))
 
 
-def validate_notification(config):
-    from .config import settings
+def validate_notification(config, db=None):
     from .price_alert_inputs import is_price_rule
 
     if not is_price_rule(config) or not config.notify_ntfy:
         return
-    if not settings.ntfy_topic.strip():
-        raise NotificationConfigurationError("phone_topic_missing")
-    if not settings.delivery_enabled:
-        raise NotificationConfigurationError("phone_delivery_disabled")
+    from .notification_transport import phone_reason
+    code = phone_reason(db)
+    if code:
+        raise NotificationConfigurationError(code)

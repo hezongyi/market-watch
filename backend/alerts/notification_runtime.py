@@ -15,6 +15,7 @@ from .runtime_supervisor import Loop, RuntimeGroupError, exit_if_unstopped, run_
 # Each role's deadline must exceed its own idle period: retention polls once a
 # minute and the health loop every 15s. data and market set the same per role.
 LOOP_DEADLINES = {
+    "briefing_generation": 240_000,
     "notification_projection": 60_000,
     "notification_retention": 90_000,
     "notification_delivery": 60_000,
@@ -28,9 +29,10 @@ def deadline_ms(role):
 
 
 def build_loops():
-    from . import notification_center_worker, notify
+    from . import briefing_worker, notification_center_worker, notify
 
     return (
+        Loop("briefing_generation", briefing_worker.run),
         Loop("notification_projection", notification_center_worker.run_projection),
         Loop("notification_retention", notification_center_worker.run_retention),
         Loop("notification_delivery", notify.run),
@@ -165,21 +167,24 @@ def inspect_health(*, startup_grace_until=0):
                       for group in {group for group, _role, _count in restarts(db, at=now)})
         faults = [fault for fault in faults if not paused(window, fault[0])]
         current = {f"{group}:{role}" for group, role, _category in faults}
-        notifications_due = []
-        for fault_id in current:
+        notifications_due, opened = [], []
+        for fault_id in sorted(current):
             key_name = "runtime_incident:" + fault_id
             row = db.get(Preference, key_name)
             # A copy, never the column's own dict: an in-place edit leaves the
             # attribute unchanged and the reminder time never reaches the row.
             value = dict(row.value) if row else {"state": "active", "opened_at": now,
                                                  "last_notified_at": 0}
-            newly_opened = row is None or value.get("state") != "active"
+            newly_opened = row is None or value.get("state") != "active" or not value.get("notification_id")
+            if newly_opened:
+                value = {"state": "active", "opened_at": now, "last_notified_at": 0}
             group, role = fault_id.split(":", 1)
             category = next(category for fault_group, fault_role, category in faults
                             if fault_group == group and fault_role == role)
             value.update(state="active", observed_at=now, category=category)
-            if newly_opened or now - value.get("last_notified_at", 0) >= 900_000:
+            if newly_opened:
                 notifications_due.append(f"{group} / {role}：{category}")
+                opened.append({"id": fault_id, "opened_at": value["opened_at"]})
                 value["last_notified_at"] = now
             if row:
                 row.value = value
@@ -187,7 +192,7 @@ def inspect_health(*, startup_grace_until=0):
                 db.add(Preference(key=key_name, value=value))
         # Recovery is a durable state transition; it does not acknowledge an incident.
         # A paused group keeps its incident open because maintenance is not recovery.
-        recovered = []
+        recovered, recovery_of = [], set()
         for row in db.scalars(select(Preference).where(
                 Preference.key.like("runtime_incident:%"))).all():
             fault_id = row.key.removeprefix("runtime_incident:")
@@ -196,15 +201,25 @@ def inspect_health(*, startup_grace_until=0):
                 continue
             if row.value.get("last_notified_at"):
                 recovered.append(fault_id.replace(":", " / "))
+            if row.value.get("notification_id"):
+                recovery_of.add(row.value["notification_id"])
             row.value = {**row.value, "state": "recovered", "recovered_at": now}
         if notifications_due:
-            _queue_system_notice(db, title="后台服务异常",
+            note = _queue_system_notice(db, title="后台服务异常",
                 message="以下运行角色状态异常，请检查：\n" + "\n".join(notifications_due),
-                incident_id=f"runtime-faults:{now}")
+                incident_id=f"runtime-faults:{now}", at=now,
+                context={"runtime_faults": opened})
+            for fault in opened:
+                row = db.get(Preference, "runtime_incident:" + fault["id"])
+                row.value = {**row.value, "notification_id": note.id}
         if recovered:
+            db.flush()
+            from .notification_policy import resolve_runtime_notices
+            resolve_runtime_notices(db, recovery_of, at=now)
             _queue_system_notice(db, title="后台服务已恢复",
                 message="以下运行角色已恢复正常：\n" + "\n".join(recovered),
-                incident_id=f"runtime-recovery:{now}")
+                incident_id=f"runtime-recovery:{now}", at=now,
+                context={"recovery_of": sorted(recovery_of)})
         if not paused(window, "market"):
             from .chart_alert_execution import patrol
 
@@ -212,6 +227,7 @@ def inspect_health(*, startup_grace_until=0):
 
 
 def _queue_system_notice(db, *, title, message, incident_id, context=None, at=None):
+    from .notification_policy import RUNTIME_PUSH_DELAY_MS
     from .storage import Notification, Outbox, now_ms
 
     stamp = now_ms() if at is None else at
@@ -221,7 +237,7 @@ def _queue_system_notice(db, *, title, message, incident_id, context=None, at=No
     db.add(note)
     db.flush()
     db.add(Outbox(notification_id=note.id, status="pending", attempts=0,
-                  next_at=stamp,
+                  next_at=stamp + (RUNTIME_PUSH_DELAY_MS if incident_id.startswith("runtime-faults:") else 0),
                   lease_until=None, error=None, provider_id=None))
     return note
 

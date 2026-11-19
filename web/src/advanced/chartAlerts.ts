@@ -72,6 +72,9 @@ export type AlertContext = {
   timeframe: string;
   price?: string;
   quick_create?: boolean;
+  phone_available?: boolean;
+  display_name?: string;
+  display_source?: string;
   display_label?: string;
   price_presentation?: {text: string; value: string};
   source?: string;
@@ -139,6 +142,12 @@ export function isFixedPrice(config: AlertConfig) {
     (["enter", "exit", "break_upper", "break_lower"].includes(c.relation) ||
       c.right?.kind === "constant" || c.right?.line?.kind === "horizontal_line");
 }
+/** Price-axis alerts follow the full series identity, independently of layout. */
+export function isChartPrice(config: AlertConfig) {
+  const c = config.condition;
+  return !config.association?.object_kind && !c.offset && c.left.kind === "price" &&
+    c.right?.kind === "constant" && ["cross", "cross_up", "cross_down", "above", "below"].includes(c.relation);
+}
 export function offsetSnapshot(value: unknown): string | null {
   if (!value || typeof value !== "object") return null;
   const v = value as Record<string, unknown>;
@@ -175,6 +184,8 @@ export type AlertEvent = {
   delivery_status: string;
 };
 export type Capabilities = {
+  composite_revision_id?: string | null;
+  phone?: {available: boolean; reason: string | null};
   sources: {
     source: string;
     series_kind: "managed" | "provider" | "composite";
@@ -283,17 +294,18 @@ export function validAlertContext(
 }
 export function freshDraft(context: AlertContext): AlertConfig {
   const squeeze = context.indicator?.name === "ROLLING_RANGE_SQUEEZE" && context.indicator.output === "signal";
+  const price = !context.line && !context.indicator;
   return {
     name: squeeze ? "Rolling Range Squeeze" : context.display_identity?.code && !context.line && !context.indicator
-      ? `${context.display_identity.code} ${relations.cross_up} ${context.price_presentation?.text || context.price || ""}`
+      ? `${context.display_identity.code} ${relations.cross} ${context.price_presentation?.text || context.price || ""}`
       : (context.display_label || context.instrument) + " 告警",
     instrument: context.instrument,
     series_kind: context.series_kind,
     source: context.source || "",
     timeframe: context.timeframe,
-    mode: "close",
+    mode: price ? "intrabar" : "close",
     condition: {
-      relation: squeeze ? "above" : "cross_up",
+      relation: squeeze ? "above" : price ? "cross" : "cross_up",
       left: context.indicator
         ? { kind: "indicator", indicator: context.indicator }
         : { kind: "price" },
@@ -305,9 +317,9 @@ export function freshDraft(context: AlertContext): AlertConfig {
     expires_at: null,
     message: squeeze ? "Rolling Range Squeeze triggered" : "",
     notify_web: true,
-    notify_ntfy: false,
+    notify_ntfy: price && context.phone_available === true,
     late_delivery: "log_only",
-    association: context.association,
+    association: price ? null : context.association,
     calculation_version: "chart-python-v1",
     calculation_origin: context.calculation_origin ?? null,
     published: context.published ?? false,

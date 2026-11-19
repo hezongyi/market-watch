@@ -9,6 +9,7 @@ export type MobileSheetProps = {
   dirty?: boolean;
   open?: boolean;
   fullHeight?: boolean;
+  retain?: boolean;
   dismissible?: boolean;
   close(): void;
   onClosed?(): void;

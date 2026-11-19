@@ -375,11 +375,14 @@ def realtime_step(source=None):
                 ):
                     row.error = None
         except Exception as exc:
+            from .market_resources import SourceCoolingDown
             with transaction() as db:
                 for row in db.scalars(
                     select(ProviderInterest).where(ProviderInterest.dataset_id == key)
                 ):
                     row.error = type(exc).__name__
+                    if isinstance(exc, SourceCoolingDown):
+                        row.next_poll = exc.retry_at
 
     return bool(active)
 
@@ -470,8 +473,12 @@ def warm_step(source, after=None, *, activity=None):
         target["done"] = satisfied or state["window_limit"] or target.get("stop_reason") == "no_progress"
         target["next_at"] = now_ms() + 1000
     except Exception as exc:
-        target["attempts"] += 1
-        target["next_at"] = now_ms() + min(60000, 1000 * 2 ** min(6, target["attempts"]))
+        from .market_resources import SourceCoolingDown
+        if isinstance(exc, SourceCoolingDown):
+            target["next_at"] = exc.retry_at
+        else:
+            target["attempts"] += 1
+            target["next_at"] = now_ms() + min(60000, 1000 * 2 ** min(6, target["attempts"]))
         target["error"] = type(exc).__name__
     with transaction() as db:
         interest = db.scalar(select(ProviderInterest).where(ProviderInterest.id == ident)

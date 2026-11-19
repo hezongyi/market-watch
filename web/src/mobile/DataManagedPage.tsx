@@ -66,6 +66,7 @@ import {
   TabsPanels,
 } from "./components/ui/tabs";
 import { usePullRefresh, PULL_THRESHOLD } from "./usePullRefresh";
+import { useLocation } from "react-router-dom";
 import { useManagedList } from "./useManagedList";
 import DataCatalogSheet from "./DataCatalogSheet";
 import DataMaintenanceSheet, {
@@ -81,6 +82,8 @@ type Props = {
   report(message: string): void;
 };
 export default function DataManagedPage(props: Props) {
+  const location=useLocation();
+  const appliedLocation=useRef<string | undefined>(undefined);
   const { profile, visible } = props;
   const [networkOnline, setNetworkOnline] = useState(navigator.onLine);
   const online = props.online && networkOnline;
@@ -88,6 +91,12 @@ export default function DataManagedPage(props: Props) {
     [source, setSource] = useState("all"),
     [status, setStatus] = useState("all"),
     [category, setCategory] = useState("all");
+  useEffect(()=>{
+    if(!props.visible || appliedLocation.current === location.key)return;
+    appliedLocation.current=location.key;
+    const query=new URLSearchParams(location.search).get('query');
+    if(query!==null){setQuery(query);setSource('all');setCategory('all');setStatus('all');}
+  },[location.key,location.search,props.visible]);
   const [hydrated, setHydrated] = useState(false);
   const [categories, setCategories] = useState<
     { value: string; label: string }[]

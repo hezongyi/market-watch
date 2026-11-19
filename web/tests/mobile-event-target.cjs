@@ -1,0 +1,12 @@
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm'),ts=require('typescript');
+const input=fs.readFileSync('src/mobile/alertChartTarget.ts','utf8'),moduleObj={exports:{}};
+vm.runInNewContext(ts.transpileModule(input,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports:moduleObj.exports,require});
+const parse=moduleObj.exports.alertChartTarget;
+const base={id:'immutable',occurred_at:1800000000000,price:'1.1',threshold:'1.2',evidence:{left:'1.1',config:{name:'rule',instrument:'EURUSD',series_kind:'managed',timeframe:'D1',mode:'close',condition:{left:{kind:'price'}}},observation:{bar:{start:1799913600000,end:1800000000000}}}};
+for(const [kind,prefix] of [['managed',''],['provider','MWP:'],['composite','MWC:']]){const event=structuredClone(base);event.evidence.config.series_kind=kind;assert.equal(parse(event,7).symbol,prefix+'EURUSD');}
+assert.equal(parse(base,7).anchorKind,'evidence-bar');let old=structuredClone(base);delete old.evidence.observation;assert.equal(parse(old,8).anchorKind,'approximate-time');old.evidence.config.mode='intrabar';assert.equal(parse(old,8).anchorKind,'intrabar-time');
+for(const mutate of [e=>e.evidence.config.timeframe='bad',e=>e.occurred_at=NaN,e=>e.evidence.config.series_kind='unknown',e=>delete e.evidence.config.instrument]){const event=structuredClone(base);mutate(event);assert.throws(()=>parse(event,1));}
+const context={requestAnimationFrame:()=>1,cancelAnimationFrame(){},MWSeries:{decode:s=>({symbol:s,series_kind:'managed'}),encode:s=>s}};vm.createContext(context);vm.runInContext(fs.readFileSync('../advanced-host/bar-range-mapping.js','utf8')+'\nthis.factory=chartBarRangeMapping',context);
+const mapping=context.factory({frame:()=>1,cancelFrame(){}});let res='1D';const chart={symbol:()=> 'EURUSD',resolution:()=>res};
+for(const [resolution,span,labelOffset] of [['1D',86400000,7200000],['1W',604800000,93600000],['1M',2678400000,93600000]]){res=resolution;const start=1799913600000,end=start+span,label=start+labelOffset;mapping.observeBars({symbol:'EURUSD',resolution,bars:[{start,end,chart_time:label,high:'2',low:'1',complete:true}]});const hit=mapping.eventBar(chart,{bar:{start,end}});assert.equal(hit.time,label/1000);assert.equal(hit.start,start);assert.equal(mapping.eventBar(chart,{bar:{start:start+1,end}}),undefined);}
+console.log('event target: immutable identities, invalid legacy records, exact D1/W1/MN accepted interval mapping passed');

@@ -31,6 +31,7 @@ export function admission(
 export function newPriceConfig(
   instrument: string,
   revision: string | null,
+  phoneAvailable = false,
 ): AlertConfig {
   return {
     name: "",
@@ -48,7 +49,7 @@ export function newPriceConfig(
     expires_at: null,
     message: "",
     notify_web: true,
-    notify_ntfy: false,
+    notify_ntfy: phoneAvailable,
     late_delivery: "log_only",
     association: null,
     calculation_version: "chart-python-v1",

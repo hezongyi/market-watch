@@ -426,3 +426,27 @@ def test_upstream_timeout_without_progress_is_terminal(history, monkeypatch):
     assert result['state'] == 'failed'
     assert result['error']['code'] == 'HISTORY_TIMEOUT'
     assert result['error']['history_boundary'] is False
+
+
+def test_cooling_source_waits_until_eligible_without_spending_stall_budget(history, monkeypatch):
+    from alerts.market_resources import SourceCoolingDown
+    from alerts.storage import now_ms
+    clock = [now_ms()]
+    retry_at = clock[0] + 60000
+    monkeypatch.setattr(loads, 'now_ms', lambda: clock[0])
+    def cooling(*args, **kwargs):
+        raise SourceCoolingDown(retry_at)
+    monkeypatch.setattr(upstream, 'native_page', cooling)
+    ident = loads.submit('owner', 'cooling-source', body(5))['load']['id']
+    assert loads.once()
+    with history() as db:
+        row = db.get(NativeHistoryLoad, ident)
+        assert row.state == 'waiting' and row.error_json is None
+        assert row.stalls == 0 and row.lease_until == retry_at
+    assert not loads.once(), 'a cooling source must not spin through task turns'
+    with history.begin() as db:
+        db.get(NativeHistoryLoad, ident).consumer_until = retry_at + 60000
+    clock[0] = retry_at
+    monkeypatch.setattr(upstream, 'native_page', lambda m, f, b, n, **k: page(b-n*1000,b))
+    assert loads.once()
+    assert loads.status('owner', ident)['state'] == 'ready'

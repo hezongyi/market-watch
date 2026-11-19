@@ -51,6 +51,7 @@ def capabilities(body):
     with transaction() as db:
         if body.series_kind == "composite":
             from .composite_alerts import require_live_eligibility
+            from .notification_transport import phone_reason
             from .price_alert_evaluator import eligibility
             from .price_alert_reasons import Unavailable, message
             from .series_access import composite_definition
@@ -82,7 +83,10 @@ def capabilities(body):
                 except ValueError as exc:
                     code = getattr(exc, "reason_code", "binding_unavailable")
                 price_modes[mode] = {"available": code is None, "reason_code": code, "reason": message(code)}
+            phone = phone_reason(db)
             return {"instrument": body.instrument, "timeframe": body.timeframe,
+                "composite_revision_id": revision.id if revision else None,
+                "phone": {"available": phone is None, "reason": message(phone)},
                 "sources": [{"source": "composite", "series_kind": "composite", "basis": meta["basis"], "atr_frames": meta["frames"],
                     "calendar": meta["calendar"], "available": available, "price_modes": price_modes,
                     "reason": None if available else "实时流已关闭或来源不可用",
@@ -125,6 +129,7 @@ class Create(Contract):
 
 class Edit(Contract):
     version: int = Field(ge=1)
+    control_revision: int | None = Field(default=None, ge=1)
     config: AlertConfig
 
 
@@ -212,11 +217,10 @@ def alert_dict(db, alert, *, latest=None):
             "runtime": alert.runtime,
             "activity": {key: alert.runtime.get(key) for key in (
                 "taken_over_at", "last_checked_at", "last_evaluated_at", "last_input_at", "last_outcome")},
-            "execution": execution_dict(alert, version)}
+            "execution": execution_dict(alert, version, db=db)}
 
 
-def execution_dict(alert, version, *, at=None):
-    from .config import settings
+def execution_dict(alert, version, *, at=None, db=None):
     from .price_alert_inputs import is_price_rule
     from .price_alert_reasons import message
     from .storage import now_ms
@@ -242,8 +246,10 @@ def execution_dict(alert, version, *, at=None):
         phase = "settling" if runtime.get("settlement_pending") else "expired"
     elif not runtime.get("taken_over_at") and phase in ("monitoring", "closed"):
         phase = "preparing"
-    phone_code = ("phone_topic_missing" if not settings.ntfy_topic.strip() else
-        "phone_delivery_disabled" if not settings.delivery_enabled else None) if version.config.get("notify_ntfy") else None
+    from sqlalchemy.orm import object_session
+
+    from .notification_transport import phone_reason
+    phone_code = phone_reason(db if db is not None else object_session(alert)) if version.config.get("notify_ntfy") else None
     return {"contract": runtime.get("execution_contract"), "state": phase, "label": labels.get(phase, "需处理"),
         "reason_code": reason, "message": message(reason), "enabled_intent": alert.status == "active",
         "expired": expired, "settlement_pending": bool(runtime.get("settlement_pending")),
@@ -403,7 +409,8 @@ def update(db, alert_id: str, body: Edit, *, dataset_id=None):
     require_executable_source(body.config)
     validate_association(db, body.config)
     validate_geometry(db, body.config, dataset_id=dataset_id)
-    return alert_dict(db, edit(db, alert_id, body.version, body.config, dataset_id=dataset_id))
+    return alert_dict(db, edit(db, alert_id, body.version, body.config, dataset_id=dataset_id,
+                              expected_revision=body.control_revision))
 
 
 def require_executable_source(config):

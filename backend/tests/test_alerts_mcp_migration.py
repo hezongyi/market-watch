@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[2]
 # The display-observation, indicator-task and demand migrations are part of the
 # current single line of deployed schema.  Keep the upgrade-path contract tied
 # to the actual Alembic head so new branches cannot silently regress it.
-HEAD = "bd57_notice_source_poll_index"
+HEAD = "be58_market_briefings"
 
 
 def configuration():
@@ -59,6 +59,7 @@ def verify_upgrade_paths(engine, monkeypatch, initial):
                 "market_datasets", "market_history_versions", "market_live_states",
                 "market_stream_tasks", "market_stream_clients", "market_stream_subscriptions"} <= set(tables)
         assert {"market_indicator_demands", "market_indicator_schedule"} <= set(tables)
+        assert {"briefing_plans", "briefing_reports"} <= set(tables)
         assert {"event_key", "chart_alert_id"} <= {c["name"] for c in inspect(connection).get_columns("signals")}
         if initial == "s20_agent_capabilities":
             assert connection.execute(text("SELECT agent_id, quota_count FROM agent_credentials WHERE token_hash='kept-hash'")).one() == ("migration-fixture", 3)

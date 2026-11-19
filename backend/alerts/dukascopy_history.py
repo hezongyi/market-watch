@@ -45,11 +45,15 @@ class DukascopyHistory:
         isolated.loader.exec_module(self.sdk)
         # Avoid SDK info logs containing per-page dates and tracebacks.
         self.sdk.logging = SimpleNamespace(info=lambda *args: None)
-        self.client = client or httpx.Client(proxy=proxy or None, trust_env=False,
-                                             timeout=httpx.Timeout(20, connect=5))
+        self._proxy = proxy
+        self.client = client or self._new_client()
         self.owns_client = client is None
         self.clock = clock or (lambda: int(time.time() * 1000))
         self.page_size = page_size
+
+    def _new_client(self):
+        return httpx.Client(proxy=self._proxy or None, trust_env=False,
+                            timeout=httpx.Timeout(20, connect=5))
 
     def close(self):
         if self.owns_client:
@@ -124,8 +128,21 @@ class DukascopyHistory:
             error = failure
         observed = self.clock()
         if error is not None:
+            result = failed_request(error, observed_at=observed)
+            reset = self.owns_client and isinstance(error, httpx.TransportError)
+            if reset:
+                # A failed TLS upgrade after proxy CONNECT can leave HTTPcore
+                # tunnels active until its pool is exhausted. Scheduler retries
+                # must use a fresh pool, rather than repeatedly waiting on it.
+                self.client.close()
+                self.client = self._new_client()
+            logging.getLogger(__name__).warning(
+                "dukascopy_history_request_failed error_type=%s phase=%s client_reset=%s "
+                "window_start=%s window_end=%s",
+                type(error).__name__, "pool" if isinstance(error, httpx.PoolTimeout) else result.phase,
+                reset, start, end)
             return CandleBatch(identity=identity, window_start=start, window_end=end,
-                observed_at=observed, result=failed_request(error, observed_at=observed),
+                observed_at=observed, result=result,
                 volume_kind="quantity", volume_unit="source_quantity", checkpoint=start)
         # A full page continues after its last minute. Short/empty page records
         # a queried remainder as unknown; it never certifies missing observations.

@@ -689,10 +689,10 @@ def quote(meta, *, deadline=None):
         }
 
 
-def regular_sessions(meta, stamp):
+def regular_sessions(meta, stamp, *, deadline=None):
     """Mobile-only calendar evidence; never feed this read into price caches."""
     from .sparkline_calendar import source_sessions
-    deadline = time.monotonic() + max(20, settings.provider_request_seconds)
+    deadline = min(deadline or float("inf"), time.monotonic() + max(20, settings.provider_request_seconds))
     with _operation(deadline, stage="mobile_session") as session:
         try:
             _history(yf.Ticker(meta["symbol"], session=session), meta, "M5", stamp - 5 * 86400000, stamp + 1, deadline)

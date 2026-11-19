@@ -1,8 +1,15 @@
+import BriefingsSheet from "./BriefingsSheet";
+import PositionCalculatorSheet from "./PositionCalculatorSheet";
+import type { Profile } from "./cache";
+import NotificationSettings from "./NotificationSettings";
+import { useLocation } from "react-router-dom";
 import LogsSheet from "./LogsSheet";
 import { setLogVersions } from "./logs";
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import {
   Bell,
+  Calculator,
+  Newspaper,
   ChevronDown,
   ChevronRight,
   History,
@@ -27,8 +34,10 @@ import {
 } from "./components/ui/collapsible";
 import type { useMobileShell } from "./shell";
 
-type Panel = "connection" | "notifications" | "about" | "update";
+type Panel = "briefings" | "position" | "connection" | "notifications" | "about" | "update";
 const titles: Record<Panel, string> = {
+  briefings: "市场简报",
+  position: "头寸计算",
   connection: "连接状态",
   notifications: "后台通知",
   about: "关于守望",
@@ -89,6 +98,9 @@ function Setting({
 
 export default function MorePage({
   online,
+  profile,
+  visible = true,
+  openChart,
   theme,
   setTheme,
   connection,
@@ -98,6 +110,9 @@ export default function MorePage({
   report,
 }: {
   online: boolean;
+  profile?: Profile;
+  visible?: boolean;
+  openChart?(ticker:string):void;
   theme: string;
   setTheme(): void;
   connection?: MobileMarket;
@@ -106,6 +121,12 @@ export default function MorePage({
   logout(): Promise<void>;
   report(message: string): void;
 }) {
+  const briefingBack=useRef<(()=>boolean)|undefined>(undefined);
+  const [briefingDirty,setBriefingDirty]=useState(false);
+  const [briefingBusy,setBriefingBusy]=useState(false);
+  const [briefingTarget,setBriefingTarget]=useState<string>();
+  const [notificationDirty, setNotificationDirty] = useState(false);
+  const [notificationBusy, setNotificationBusy] = useState(false);
   const [logsOpen, setLogsOpen] = useState(false);
   const [connectionError, setConnectionError] = useState("");
   const [updateError, setUpdateError] = useState("");
@@ -115,7 +136,12 @@ export default function MorePage({
   const [readAt, setReadAt] = useState<number>();
   const [refreshing, setRefreshing] = useState(false);
   const [version, setVersion] = useState("");
-  const [panel, setPanel] = useState<Panel>();
+  const location = useLocation();
+  const [panel, setPanel] = useState<Panel | undefined>(() => new URLSearchParams(location.search).get("panel") === "notifications" ? "notifications" : undefined);
+  useEffect(() => {
+    if (new URLSearchParams(location.search).get("panel") === "notifications") setPanel("notifications");
+  }, [location.key]);
+  useEffect(()=>{const value=new URLSearchParams(location.search).get("briefing");if(location.pathname==="/more" && value && /^[a-f0-9-]{36}$/.test(value)){setBriefingTarget(value);setPanel("briefings");}},[location.key]);
   const [switchServer, setSwitchServer] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const pendingRecords = useRef(false);
@@ -171,19 +197,10 @@ export default function MorePage({
       : health.delivery_enabled
         ? "已启用"
         : "未启用";
-  const notificationTest = health?.last_notification_test;
-  const notificationTestLabel =
-    (
-      {
-        notification_test_requested: "已请求 · 待确认",
-        notification_test_accepted: "推送服务已接受",
-        notification_test_failed_or_unknown: "失败或结果未知",
-        notification_test_acknowledged: "手机已确认",
-      } as Record<string, string>
-    )[notificationTest?.status] || "结果待确认";
   return (
     <section
       className="mobile-content mobile-more mobile-controls"
+      hidden={!visible}
       aria-label="更多设置"
     >
       <MobileOverlaysProvider>
@@ -208,6 +225,7 @@ export default function MorePage({
               value={notificationState}
               onClick={() => setPanel("notifications")}
             />
+            <Setting icon={<Newspaper />} label="市场简报" value="每日晨报" onClick={() => {setBriefingTarget(undefined);setPanel("briefings");}} />
             <Setting
               icon={<History />}
               label="告警记录"
@@ -215,6 +233,9 @@ export default function MorePage({
               onClick={records}
             />
           </div>
+        </section>
+        <section className="mobile-setting-group" aria-labelledby="more-tools">
+          <h2 id="more-tools">交易工具</h2><div><Setting icon={<Calculator />} label="头寸计算" value="MT4 · USD" onClick={() => setPanel("position")} /></div>
         </section>
         <section className="mobile-setting-group" aria-labelledby="more-app">
           <h2 id="more-app">应用</h2>
@@ -287,9 +308,12 @@ export default function MorePage({
           }}
         />
         <MobileSheet
-          open={Boolean(panel)}
+          open={Boolean(panel) && visible}
+          retain={panel === "briefings"}
+          dirty={(panel === "notifications" && notificationDirty) || (panel === "briefings" && briefingDirty)}
+          dismissible={!notificationBusy && !briefingBusy}
           title={panel ? titles[panel] : "设置"}
-          close={() => setPanel(undefined)}
+          close={() => {if(panel === "briefings" && briefingBack.current?.())return;setPanel(undefined);}}
           onClosed={() => {
             if (pendingRecords.current) {
               pendingRecords.current = false;
@@ -297,6 +321,8 @@ export default function MorePage({
             }
           }}
         >
+          {panel === "briefings" && profile && <BriefingsSheet backRef={briefingBack} profile={profile} online={online && visible} target={briefingTarget} state={(dirty,busy)=>{setBriefingDirty(dirty);setBriefingBusy(busy);}} openChart={ticker=>openChart?.(ticker)} />}
+          {panel === "position" && profile && <PositionCalculatorSheet profile={profile} online={online} />}
           {panel === "update" && (
             <div className="more-panel">
               <dl className="mobile-facts more-facts">
@@ -410,63 +436,12 @@ export default function MorePage({
               </div>
             </div>
           )}
-          {panel === "notifications" && (
-            <div className="more-panel">
-              <dl className="mobile-facts more-facts">
-                <div>
-                  <dt>推送配置</dt>
-                  <dd>
-                    {health
-                      ? health.ntfy_configured
-                        ? "ntfy 已配置"
-                        : "ntfy 尚未配置"
-                      : "待确认"}
-                  </dd>
-                </div>
-                <div>
-                  <dt>服务器投递</dt>
-                  <dd>{health?.delivery_enabled ? "已启用" : "未确认启用"}</dd>
-                </div>
-                {readAt && (
-                  <div>
-                    <dt>最近核验</dt>
-                    <dd>
-                      <MoreTime value={readAt} />
-                    </dd>
-                  </div>
-                )}
-                {health?.last_notification_test && (
-                  <div>
-                    <dt>最近测试</dt>
-                    <dd>
-                      {notificationTestLabel}
-                      <MoreTime value={notificationTest.at} />
-                    </dd>
-                  </div>
-                )}
-              </dl>
-              <div className="more-notification-help">
-                <p className="more-description">
-                  服务器持续检测，退出 App 不停止规则。后台提醒由 ntfy 提供。
-                </p>
-                <p className="more-description">
-                  请允许 ntfy
-                  即时投递、系统通知和后台运行。推送服务接受后，仍需检查手机锁屏实收。
-                </p>
-              </div>
-              <div className="mobile-sheet-actions more-panel-actions">
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    pendingRecords.current = true;
-                    setPanel(undefined);
-                  }}
-                >
-                  通知与事件记录
-                </Button>
-              </div>
-            </div>
-          )}
+          {panel === "notifications" && <NotificationSettings
+            online={online}
+            state={(dirty, busy) => { setNotificationDirty(dirty); setNotificationBusy(busy); }}
+            changed={() => void refresh()}
+            records={() => { pendingRecords.current = true; setPanel(undefined); }}
+          />}
           {panel === "about" && (
             <div className="more-panel">
               <dl className="mobile-facts more-facts">

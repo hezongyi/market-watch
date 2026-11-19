@@ -63,6 +63,9 @@ function chartQuoteScale(quote, symbolInfo) {
 // formatter's decimal notation, with grouping validated before removing it.
 // This is deliberately independent of an optional/private formatter.parse.
 function chartAlertPricePresentation(chart, price) {
+  const tick = chart.symbolExt?.();
+  if (tick?.minmov > 0 && tick?.pricescale > 0 && !tick.variable_tick_size)
+    price = Math.round(price * tick.pricescale / tick.minmov) * tick.minmov / tick.pricescale;
   const formatter = chart.priceFormatter?.();
   const text = formatter?.format(price);
   const normalized = value => String(value || '').replace(/[\u200e\u200f\u202a-\u202e\u2066-\u2069]/g,'').replace(/\u2212/g, '-');

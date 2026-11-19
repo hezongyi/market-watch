@@ -1,6 +1,12 @@
 import type { AlertApi } from "./chartAlertUiApi";
 import { relations, type AlertRow } from "./chartAlerts";
 
+function canonical(value: any): string {
+  if (Array.isArray(value)) return "[" + value.map(canonical).join(",") + "]";
+  if (value && typeof value === "object") return "{" + Object.keys(value).sort().map(key => JSON.stringify(key) + ":" + canonical(value[key])).join(",") + "}";
+  return JSON.stringify(value);
+}
+
 export type PricePresentation = { previousText: string; text: string };
 
 /** Price gestures use the existing authenticated edit route and version fence. */
@@ -37,6 +43,8 @@ export async function editAlertPrice(
   )
     throw Error("此告警不能拖动改价，请通过编辑窗口调整");
   const config = structuredClone(latest.config);
+  // A fixed threshold is a series rule; editing it never checkpoints a layout.
+  config.association = null;
   const code = latest.display_identity?.code;
   const automatic =
     code &&
@@ -50,6 +58,7 @@ export async function editAlertPrice(
   try {
     return await request<AlertRow>(`/chart-alerts/${row.id}/edit`, {
       version: row.version,
+      control_revision: row.control_revision,
       config,
     });
   } catch (error) {
@@ -62,13 +71,18 @@ export async function editAlertPrice(
     }
     if (
       saved &&
-      saved.version > row.version &&
-      saved.config.condition.right?.kind === "constant" &&
-      saved.config.condition.right.value === price
+      saved.version === row.version + 1 &&
+      canonical(saved.config) === canonical(config)
     )
       return saved;
     if (saved && error instanceof Error)
       Object.assign(error, { currentRow: saved });
+    const status = (error as any)?.status;
+    const ambiguous = !status || status < 400 || status >= 500 || status === 408;
+    // A read of the old revision can race a POST whose response timed out.
+    if (ambiguous && error instanceof Error && (!saved ||
+        (saved.version <= row.version && saved.control_revision <= row.control_revision)))
+      Object.assign(error, {outcomeUnknown: true});
     throw error;
   }
 }

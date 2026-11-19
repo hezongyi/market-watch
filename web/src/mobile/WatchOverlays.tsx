@@ -45,7 +45,7 @@ export function useOverlayBack(element: RefObject<HTMLElement | null>, leave: ()
 }
 
 export function WatchDrawer(props: MobileSheetProps) {
-  const { open = true } = props;
+  const { open = true, retain = false } = props;
   // Keep the last open view during exit; don't flash another panel or empty its form.
   const lastOpen = useRef(props);
   if (open) lastOpen.current = props;
@@ -81,10 +81,11 @@ export function WatchDrawer(props: MobileSheetProps) {
     <DrawerPrimitive.VirtualKeyboardProvider>
       <DrawerContent
         ref={popup}
+        keepMounted={retain}
         container={host.container}
         className="mobile-sheet mobile-control-drawer"
-        data-mobile-overlay="true"
-        data-mobile-dirty={dirty || undefined}
+        data-mobile-overlay={open ? "true" : undefined}
+        data-mobile-dirty={open && dirty || undefined}
         data-full-height={fullHeight || undefined}
         initialFocus={popup}
       >
