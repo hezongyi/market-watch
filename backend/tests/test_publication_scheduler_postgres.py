@@ -507,3 +507,26 @@ for _ in range(30):
         rows = managed.read_rows(db, inst, 'M1', clock[0], 100)
         assert len(rows) == 31 and Decimal(str(rows[-1]['close'])) == 12
         assert managed.status(db, inst, 'M1')['complete_count'] == 31
+
+
+def test_pg_old_week_batch_leaves_live_and_retry_jobs(publication_pg, monkeypatch):
+    from test_historical_aggregation_batch import (
+        test_worker_batches_one_old_week_leaving_live_and_retry_jobs,
+    )
+    test_worker_batches_one_old_week_leaving_live_and_retry_jobs(publication_pg[0], monkeypatch)
+
+
+def test_pg_failed_week_batch_is_atomic(publication_pg, monkeypatch):
+    from test_historical_aggregation_batch import (
+        test_failed_week_rebuild_keeps_every_job_and_rolls_back_all_outputs,
+    )
+    test_failed_week_rebuild_keeps_every_job_and_rolls_back_all_outputs(publication_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize('available,days', [(16384, 7), (10000, 6)])
+def test_pg_old_week_dst_budget(publication_pg, monkeypatch, available, days):
+    from test_historical_aggregation_batch import (
+        test_ny17_autumn_dst_batch_respects_complete_buckets_and_row_bound,
+    )
+    test_ny17_autumn_dst_batch_respects_complete_buckets_and_row_bound(
+        publication_pg[0], monkeypatch, available, days)

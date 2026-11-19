@@ -19,6 +19,7 @@ class Budget:
     started: bool = False
     history_served: bool = False
     aggregation_served: bool = False
+    historical_rows: int = 0
 
     @property
     def available(self):
@@ -38,17 +39,24 @@ class Budget:
         self.started |= progressed
         self.rows -= rows
 
+    def reserve_historical_slice(self):
+        # Only the worker opts in, and only an eligible old price repair uses
+        # this allowance. Publication/live work keeps the ordinary row limit.
+        if self.available:
+            self.rows += self.historical_rows
+            self.historical_rows = 0
+
 
 def current():
     return _CURRENT.get()
 
 
 @contextmanager
-def work_budget():
+def work_budget(*, historical_rows=0):
     if current() is not None:
         yield current()
         return
-    token = _CURRENT.set(Budget())
+    token = _CURRENT.set(Budget(historical_rows=historical_rows))
     try:
         yield current()
     finally:

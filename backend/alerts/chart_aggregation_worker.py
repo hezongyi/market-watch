@@ -12,7 +12,7 @@ from .publication_budget import work_budget
 def cycle(*, observer=None):
     # Service publication first, then only start aggregation if its complete
     # bucket fits the remaining shared budget. Each transaction commits alone.
-    with work_budget() as budget:
+    with work_budget(historical_rows=12288) as budget:
         publication_started = time.monotonic() if observer is not None else None
         published = publish_once()
         publication_finished = time.monotonic() if observer is not None else None

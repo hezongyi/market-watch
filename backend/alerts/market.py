@@ -374,11 +374,25 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     closures = closures_from(instrument.calendar_profile)
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
     minute_candles = {}
+    minute_times, open_minutes = {}, {}
+    gold = is_gold(instrument.id)
+
+    def minute_time(at):
+        if at not in minute_times:
+            minute_times[at] = instant(at)
+        return minute_times[at]
+
+    def minute_is_open(at):
+        # Calendar/profile are fixed for this locked instrument and invocation.
+        # A subsequent batch or correction must evaluate them afresh.
+        if at not in open_minutes:
+            open_minutes[at] = scheduled_open(at, calendar, gold=gold, closures=closures)
+        return open_minutes[at]
 
     def minute_candle(row):
         candle = minute_candles.get(row.start)
         if candle is None:
-            candle = Candle(instant(row.start), instant(row.end), row.open, row.high, row.low,
+            candle = Candle(minute_time(row.start), minute_time(row.end), row.open, row.high, row.low,
                             row.close, row.complete, volume=row.volume, volume_complete=row.volume_complete,
                             volume_supplied=True)
             minute_candles[row.start] = candle
@@ -403,21 +417,16 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
             rows = grouped.get((left, right))
             if not rows:
                 continue
-            conflicted = instrument.id.startswith("MD:") and any(not scheduled_open(
-                instant(row.start), calendar, gold=is_gold(instrument.id), closures=closures) for row in rows)
+            conflicted = instrument.id.startswith("MD:") and any(
+                not minute_is_open(minute_time(row.start)) for row in rows)
             if coverage and covers_interval(coverage, ms(left), ms(right)):
                 # Fully queried sparse observations need no calendar enumeration.
-                expected = {instant(r.start) for r in rows}
+                expected = {minute_time(r.start) for r in rows}
             else:
                 expected = set()
                 t = left
                 while t < right:
-                    if conflicted or scheduled_open(
-                        t,
-                        calendar,
-                        gold=is_gold(instrument.id),
-                        closures=closures,
-                    ):
+                    if conflicted or minute_is_open(t):
                         expected.add(t)
                     t += timedelta(minutes=1)
             c = aggregate([minute_candle(row) for row in rows], left, right, expected_starts=expected)
@@ -427,7 +436,7 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
 
                 from .volume import total
                 observed_expected = {t for t in expected if ms(t)+60000 <= received_at-5000}
-                amount = total(rows) if observed_expected <= {instant(r.start) for r in rows} else None
+                amount = total(rows) if observed_expected <= {minute_time(r.start) for r in rows} else None
                 if ms(right) <= received_at-5000 and not c.complete:
                     amount = None
                 c = replace(c, volume=amount)

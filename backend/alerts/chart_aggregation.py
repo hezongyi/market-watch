@@ -16,6 +16,10 @@ PERIODS = ('M5', 'M15', 'H1', 'H4', 'D1')
 MAX_RANGE = 1440 * 60000
 
 
+def _historical_price(job, now):
+    return job.kind == 'price' and job.end <= now - MAX_RANGE and not job.attempts
+
+
 def _coalesce_observed(db, instrument, frame, left, right, *, kind='observed', all_kinds=False):
     """The caller owns Instrument; retain bounded ranges and durable retry age."""
     model = ChartAggregationJob
@@ -193,30 +197,30 @@ def _batch(db, job, calendar, now, available):
     from .storage import instant, ms
 
     # Leave recent adjustments, observations, and retries at the normal cadence.
-    if job.kind != 'price' or job.end > now - MAX_RANGE or job.attempts:
+    if not _historical_price(job, now):
         return [(job, *_slice_bounds(job, calendar))]
     start, end = (ms(at) for at in session_bounds(instant(job.start), calendar))
     if (end - start) // 60000 > available:
         return [(job, *_slice_bounds(job, calendar))]
 
     model = ChartAggregationJob
-    following_end = ms(session_bounds(instant(end), calendar)[1])
-    cutoff = following_end if (following_end - start) // 60000 <= available else end
+    cutoff = end
+    # Bound both the calendar window and source rows, including 25-hour NY17
+    # days. Always finish complete buckets before yielding the instrument lock.
+    for _ in range(6):
+        following_end = ms(session_bounds(instant(cutoff), calendar)[1])
+        if (following_end - start) // 60000 > available:
+            break
+        cutoff = following_end
     plans = [(job, *_slice_bounds(job, calendar, cutoff=cutoff))]
     eligible = select(model).where(
         model.instrument_id == job.instrument_id, model.kind == 'price',
         model.timeframe.in_(PERIODS), model.end <= now - MAX_RANGE,
         model.next_at <= now, model.attempts == 0,
-    ).order_by(model.timeframe, model.start, model.end).limit(20).with_for_update(skip_locked=True)
-    # Allow one range per frame in each session. A range crossing the boundary
-    # can consume its own prefix in both, even if the provider used UTC pages.
-    for left, right, frames in ((start, end, {job.timeframe}), (end, cutoff, set())):
-        if right <= left:
-            continue
-        for sibling in db.scalars(eligible.where(model.start >= left, model.start < right)):
-            if sibling.timeframe not in frames:
-                plans.append((sibling, *_slice_bounds(sibling, calendar, cutoff=cutoff)))
-                frames.add(sibling.timeframe)
+        model.start >= start, model.start < cutoff, model.id != job.id,
+    ).order_by(model.timeframe, model.start, model.end).limit(63).with_for_update(skip_locked=True)
+    for sibling in db.scalars(eligible):
+        plans.append((sibling, *_slice_bounds(sibling, calendar, cutoff=cutoff)))
     plans.sort(key=lambda plan: PERIODS.index(plan[0].timeframe))
     return plans
 
@@ -244,6 +248,8 @@ def aggregate_once():
         from .storage import instant
 
         budget = current()
+        if budget and _historical_price(job, now):
+            budget.reserve_historical_slice()
         available = budget.available if budget else 4096
         plans = _batch(db, job, calendar_for(inst), now, available)
         needed = (max(right for _, _, _, right in plans)
