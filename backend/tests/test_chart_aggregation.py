@@ -304,7 +304,7 @@ def test_old_period_backfill_batches_staggered_ranges(database, monkeypatch):
         assert not db.scalar(select(ChartAggregationJob.id))
 
 
-def test_fixed_history_defers_unused_old_chart_work_until_requested(database, monkeypatch):
+def test_fixed_history_drains_all_old_work_without_a_viewer(database, monkeypatch):
     from alerts import generic_derivation, market, storage
     from test_history_versions import create
     from test_publication_scheduler import MINUTE, START
@@ -335,19 +335,10 @@ def test_fixed_history_defers_unused_old_chart_work_until_requested(database, mo
     monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kwargs:
                         calls.append(min(touched)))
 
-    assert aggregate_once()
+    for _ in range(4):
+        assert aggregate_once()
     assert not aggregate_once()
-    assert calls == [storage.instant(now-MINUTE)]
-
-    with database.begin() as db:
-        from alerts.managed_dataset import status
-
-        assert status(db, db.get(Instrument, ident), 'M5', request_derivation=False)['reason'] == 'preparing'
-        assert not db.scalar(select(storage.MarketDemand.id))
-        assert generic_derivation.touch(db, ident)
-    assert aggregate_once()
-    assert aggregate_once()
-    assert aggregate_once()
-    assert calls[1:] == [storage.instant(START)] * 3
+    assert sorted(calls) == [storage.instant(START)] * 3 + [storage.instant(now-MINUTE)]
     with database() as db:
         assert not db.scalar(select(ChartAggregationJob.id))
+        assert not db.scalar(select(storage.MarketDemand.id)), 'No reader should be needed to finish history'

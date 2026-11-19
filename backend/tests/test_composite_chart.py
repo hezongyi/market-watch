@@ -1,5 +1,6 @@
 """Exclusive indexed chart pagination with frozen inputs and seam aggregation."""
 
+import pytest
 from alerts.composite_chart import chart_page
 from alerts.composite_inputs import apply_minutes
 from alerts.composite_series import period, read_window
@@ -139,3 +140,31 @@ def test_pending_artifact_is_disclosed_without_mutating_or_switching_baseline(da
         assert page["history_version_id"] == revision.history_version_id
         assert page["bars"] == [] and page["pending"] and page["has_more"]
         assert page["bounded_partitions"] == 0 and page["input_revision"] == 0
+
+
+@pytest.mark.parametrize('cached', [False, True])
+def test_display_capacity_warning_cannot_reopen_exhausted_history(database, monkeypatch, cached):
+    from alerts.composite_realtime import CurrentBuckets
+    from alerts.storage import Preference
+
+    composite, revision_id, seam = populated(database, monkeypatch)
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, revision_id)
+        mapping = db.get(RealtimeMapping, revision.mapping_id)
+        db.add(Preference(key='display_capacity:' + mapping.target_dataset_id,
+                          value={'reason': 'capacity_exhausted', 'at': 200010000}))
+    with database.begin() as db:
+        confirmed = chart_page(db, composite, 'M1', before=seam, count=20, now=200010000)
+        display = chart_page(db, composite, 'M1', before=seam, count=20,
+                             provisional=True, now=200010000)
+        assert display['bars'] == confirmed['bars']
+        assert not confirmed['has_more']
+        assert not display['has_more'], 'Live degradation must not invent another history page'
+        assert not display['pending'], 'Available prices must not wait for a live warning'
+        assert display['warnings'], 'Keep the operational diagnosis available'
+        worker = CurrentBuckets()
+        if cached:
+            chart_page(db, composite, 'M1', count=20, provisional=True, now=200010000, realtime=worker)
+        live = chart_page(db, composite, 'M1', count=20, provisional=True, now=200010000, realtime=worker)
+        assert live['bars'] and not live['has_more']
+        assert not live['pending'] and live['warnings']

@@ -7,10 +7,10 @@ from alerts.history_maintenance import (
     configure,
     create_run,
     next_daily,
+    now_ms,
     plan_report,
     schedule_tick,
     task_control,
-    now_ms,
 )
 from alerts.history_versions import import_page, snapshot_rows
 from alerts.market_contracts import RequestResult
@@ -359,6 +359,7 @@ def test_legacy_resume_and_unrelated_retry_cannot_enable_rounding(database, acti
         pass
     with database.begin() as db:
         from decimal import Decimal
+
         from alerts.history_artifacts import read_artifact
         from alerts.storage import Bar
 
@@ -368,3 +369,37 @@ def test_legacy_resume_and_unrelated_retry_cannot_enable_rounding(database, acti
         assert db.scalar(select(Bar)).close == Decimal("1.11111")
         assert list(snapshot_rows(db, ident))[0]["close"] == "1.11111"
         assert read_artifact(db, ident, "M1")[0]["close"] == "1.11111"
+
+
+def test_all_configured_periods_materialize_before_success_without_any_chart(database, monkeypatch):
+    from alerts import history_versions
+    from alerts.chart_data import FRAMES
+    from alerts.history_artifacts import read_artifact
+    from alerts.storage import ChartViewportDemand, HistoryArtifact, HistoryRun
+
+    with database.begin() as db:
+        register(db)
+        configure(db, identity().key, target_start=0, timeframes=list(FRAMES))
+        version = create_run(db, identity().key, end=120000, request_id='all-periods').id
+    import_page(Adapter(), version_id=version)
+    for _ in range(30):
+        with database() as db:
+            artifacts = list(db.scalars(select(HistoryArtifact).where(HistoryArtifact.version_id == version)))
+            complete = len(artifacts) == len(FRAMES) and all(row.status == 'published' for row in artifacts)
+            assert (db.get(HistoryRun, version).completed_at is not None) == complete
+            assert not db.scalar(select(MarketDemand.id))
+            assert not db.scalar(select(ChartViewportDemand.id))
+        if complete:
+            break
+        assert artifact_tick(version)
+    assert complete, 'Background creation must prepare every requested timeframe'
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError('Reading completed periods must not reconstruct the original M1')
+    monkeypatch.setattr(history_versions, 'snapshot_rows', forbidden)
+    # New sessions model subsequent reads, independent of builder memory.
+    for frame in FRAMES:
+        with database() as db:
+            bars = read_artifact(db, version, frame)
+            assert bars and all(row['parent_version_id'] == version for row in bars)
+            assert plan_report(db, identity().key)['last_success'] is not None

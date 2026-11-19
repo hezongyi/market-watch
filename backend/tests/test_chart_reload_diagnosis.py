@@ -307,7 +307,8 @@ def test_display_capacity_freezes_append_and_old_backfill_demand_survives_empty(
     with database.begin() as db:
         page = series_access.chart_data(db, DataQuery(instrument=composite, series_kind='composite', timeframe='M1'))
         assert page['bars'][-1]['start'] == seam + 600000
-        assert any('暂停追加' in reason for reason in page['pending'])
+        assert any('暂停追加' in reason for reason in page['warnings'])
+        assert not page['pending']
         state = db.get(LiveState, ident.key)
         state.ready, state.confirmed_end = True, seam + 1020000
     # Even with the fixed highest watermark far ahead, a much older accepted

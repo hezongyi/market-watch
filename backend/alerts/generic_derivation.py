@@ -1,7 +1,8 @@
 """Demand-bound compatibility aggregates; source/composite inputs never pause.
 
-Keep dirty ranges durable while a compatibility series has no independent
-consumer. Readers commit an expiring demand before checking readiness.
+Keep coalesced dirty ranges durable while an explicitly disabled mapped target
+has no independent consumer. Readers commit an expiring demand before checking
+readiness, so deferred results cannot be returned as current.
 """
 import hashlib
 
@@ -14,9 +15,6 @@ from .storage import (
     ChartHistoryPlan,
     ChartPublicationState,
     ChartViewportDemand,
-    HistoryArtifact,
-    HistoryReclamation,
-    HistoryVersion,
     ImportJob,
     MarketDataset,
     MarketDemand,
@@ -34,19 +32,6 @@ def candidates():
         Preference.value['enabled'].as_boolean().is_(False),
         select(RealtimeMapping.id).where(
             RealtimeMapping.target_dataset_id == MarketDataset.id).exists())
-
-
-def historical_candidates():
-    """Fixed history is available and the separate chart plan is inactive."""
-    return select(ChartHistoryPlan.instrument_id).join(
-        MarketDataset, MarketDataset.instrument_id == ChartHistoryPlan.instrument_id
-    ).where(ChartHistoryPlan.status == 'cancelled',
-        select(HistoryVersion.id).join(HistoryArtifact, HistoryArtifact.version_id == HistoryVersion.id).where(
-            HistoryVersion.dataset_id == MarketDataset.id, HistoryVersion.status == 'published',
-            HistoryArtifact.status == 'published', HistoryArtifact.timeframe != 'M1', HistoryArtifact.count > 0,
-            ~select(HistoryReclamation.version_id).where(
-                HistoryReclamation.version_id == HistoryVersion.id).exists(),
-        ).exists())
 
 
 def independent_consumers(stamp):
@@ -69,15 +54,9 @@ def paused_query(stamp):
 
 
 def runnable_aggregation(stamp):
-    from .chart_aggregation import MAX_RANGE
-
-    idle_history = historical_candidates().where(
-        ChartHistoryPlan.instrument_id.not_in(independent_consumers(stamp)))
-    job = ChartAggregationJob
-    # Observation and volume work for the same old history must wait with its
-    # price repairs, or it can retry indefinitely against a deferred dependency.
-    return job.instrument_id.not_in(paused_query(stamp)) & or_(
-        job.end > stamp - MAX_RANGE, job.instrument_id.not_in(idle_history))
+    # Fixed history is materialized continuously, including with no chart open.
+    # Only explicitly disabled mapped compatibility targets retain their pause.
+    return ChartAggregationJob.instrument_id.not_in(paused_query(stamp))
 
 
 def paused_instruments(db, *, now=None):
@@ -90,8 +69,7 @@ def is_paused(db, instrument):
 
 
 def is_candidate(db, instrument):
-    return db.scalar(candidates().where(MarketDataset.instrument_id == instrument).union_all(
-        historical_candidates().where(ChartHistoryPlan.instrument_id == instrument)).limit(1)) is not None
+    return db.scalar(candidates().where(MarketDataset.instrument_id == instrument).limit(1)) is not None
 
 
 def touch(db, instrument, *, now=None):

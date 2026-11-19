@@ -10,7 +10,7 @@ import heapq
 from collections import Counter
 from decimal import Decimal
 
-from .composite_series import _closed, period
+from .composite_series import _closed, display_ranges, period
 
 
 class Bucket:
@@ -219,7 +219,8 @@ class CurrentBuckets:
                     existing = self.items.get((revision.id, frame))
                     current_cache = self if existing and existing[2].left == left else None
                     updated = read_window(db, composite.id, frame, left, right, revision_id=revision.id,
-                        now=stamp, permission_scope=permission_scope, realtime=current_cache)["bars"]
+                        input_revision=prep.input_revision, now=stamp,
+                        permission_scope=permission_scope, realtime=current_cache)["bars"]
                     base["bars"] = sorted([bar for bar in base["bars"] if bar["start"] != left] + updated,
                                           key=lambda bar: bar["start"])[-count:]
             # Completion of a fixed history period artifact is independent of
@@ -244,11 +245,16 @@ class CurrentBuckets:
         # Also refresh the last confirmed bucket's time closure without a quote.
         if base["bars"] and not base["bars"][-1]["time_closed"]:
             candidates.append(base["bars"][-1]["start"])
-        for left, right in sorted({period(at, frame, phase) for at in candidates}):
+        floor = base['bars'][0]['start'] if len(base['bars']) >= count else period(revision.seam, frame, phase)[0]
+        ranges = display_ranges(candidates, frame, phase, floor=floor, cutoff=stamp + 1, count=count)
+        overlay = {}
+        for left, right in ranges:
             updated = read_window(db, composite.id, frame, left, right, revision_id=revision.id,
-                provisional=True, now=stamp, permission_scope=permission_scope, realtime=self, display_snapshot=display_snapshot)["bars"]
-            base["bars"] = sorted([bar for bar in base["bars"] if bar["start"] != left] + updated,
-                                  key=lambda bar: bar["start"])[-count:]
+                provisional=True, now=stamp, permission_scope=permission_scope, realtime=self,
+                display_snapshot=display_snapshot)['bars']
+            overlay.update((bar['start'], bar) for bar in updated)
+        base['bars'] = sorted({**{bar['start']: bar for bar in base['bars']}, **overlay}.values(),
+                              key=lambda bar: bar['start'])[-count:]
         # Every output carries the current fixed input credential, including
         # otherwise unchanged bars and provenance from the confirmed baseline.
         for bar in base["bars"]:
@@ -259,6 +265,6 @@ class CurrentBuckets:
         if display_snapshot:
             base['display_snapshot_id'] = display_snapshot.id
             if display_snapshot.content.get('degraded'):
-                base['pending'] = [*base.get('pending', []),
+                base['warnings'] = [*base.get('warnings', []),
                     '待确认观测容量已满，已保留现有图表并暂停追加；确认补齐后恢复']
         return base
