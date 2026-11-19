@@ -208,8 +208,7 @@ def test_staging_revision_does_not_replace_published_candles_until_aggregation(d
         market.ingest(db, inst, payload(START, 10, 20), received_at=now, defer_aggregation=True)
         publish_frame(db, inst, plan, "M5", now)
         assert read_rows(db, inst, "M5", end, 100) == original
-    for _ in range(5):
-        assert aggregate_once()
+    assert aggregate_once()
     with database.begin() as db:
         inst = db.get(Instrument, "BTCUSDT")
         plan = db.get(ChartHistoryPlan, inst.id)
@@ -330,8 +329,7 @@ def test_derived_corrections_wait_for_aggregation_and_survive_rollback(database,
                       received_at=now, defer_aggregation=True)
         publish_frame(db, inst, plan, "M30", now)
         assert Decimal(read_rows(db, inst, "M30", START + 60 * MINUTE, 1)[0]["close"]) == 10
-    for _ in range(5):
-        assert aggregate_once()
+    assert aggregate_once()
     with pytest.raises(RuntimeError, match="interrupted correction"):
         with database.begin() as db:
             inst = db.get(Instrument, "BTCUSDT")

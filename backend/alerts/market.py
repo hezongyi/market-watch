@@ -325,7 +325,8 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
 
 
 def aggregate_touched(db, instrument, touched, *, received_at=None,
-                      timeframes=("M5", "M15", "H1", "H4", "D1"), kind="price"):
+                      timeframes=("M5", "M15", "H1", "H4", "D1"), kind="price",
+                      touched_by_frame=None):
     """Rebuild selected periods from persisted M1, without fetching or altering M1.
 
     Callers may process one period in a short independent transaction. The
@@ -334,13 +335,22 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     timeframes = tuple(dict.fromkeys(timeframes))
     if any(frame not in {"M5", "M15", "H1", "H4", "D1"} for frame in timeframes):
         raise ValueError("Unsupported persisted aggregate timeframe")
-    if not touched or not timeframes:
+    if touched_by_frame is None:
+        touched_by_frame = {frame: touched for frame in timeframes}
+    else:
+        touched_by_frame = {
+            frame: set(touched_by_frame.get(frame, ())) for frame in timeframes
+        }
+        timeframes = tuple(frame for frame in timeframes if touched_by_frame[frame])
+    if not timeframes or not any(touched_by_frame.values()):
         return
     db.scalar(select(Instrument).where(Instrument.id == instrument.id).with_for_update())
     received_at = received_at or now_ms()
     calendar = calendar_for(instrument)
-    earliest = min(ms(bucket_bounds(min(touched), frame, calendar)[0]) for frame in timeframes)
-    latest_boundary = max(ms(bucket_bounds(max(touched), frame, calendar)[1]) for frame in timeframes)
+    earliest = min(ms(bucket_bounds(min(touched_by_frame[frame]), frame, calendar)[0])
+                   for frame in timeframes)
+    latest_boundary = max(ms(bucket_bounds(max(touched_by_frame[frame]), frame, calendar)[1])
+                          for frame in timeframes)
     source = select(Bar).where(Bar.instrument_id == instrument.id, Bar.timeframe == 'M1',
                               Bar.start >= earliest, Bar.start < latest_boundary).order_by(Bar.start)
     if kind == 'observed':
@@ -354,10 +364,11 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     from .publication_budget import current
     if current():
         current().consume(len(minute_rows))
-    remaining = {frame: touched for frame in timeframes}
+    remaining = touched_by_frame
     if kind == 'observed':
         from .aggregate_observation import refresh
-        remaining = {frame: refresh(db, instrument, touched, frame, minute_rows) for frame in timeframes}
+        remaining = {frame: refresh(db, instrument, remaining[frame], frame, minute_rows)
+                     for frame in timeframes}
         timeframes = tuple(frame for frame in timeframes if remaining[frame])
         if not timeframes:
             return True

@@ -172,10 +172,54 @@ def _select_job(db, now):
     return None
 
 
+def _slice_bounds(job, calendar, *, cutoff=None):
+    from .domain import bucket_bounds
+    from .storage import instant, ms
+
+    first, last = bucket_bounds(instant(job.start), job.timeframe, calendar)
+    if cutoff is None:
+        cutoff = ms(last)
+        if job.timeframe not in ('H4', 'D1'):
+            cutoff = max(cutoff, job.start + 120 * 60000)
+    end = min(job.end, cutoff)
+    right = ms(bucket_bounds(instant(end - 1), job.timeframe, calendar)[1])
+    return min(job.end, right), ms(first), right
+
+
+def _batch(db, job, calendar, now, available):
+    from .domain import session_bounds
+    from .storage import instant, ms
+
+    # Leave recent adjustments, observations, and retries at the normal cadence.
+    if job.kind != 'price' or job.end > now - MAX_RANGE or job.attempts:
+        return [(job, *_slice_bounds(job, calendar))]
+    start, end = (ms(at) for at in session_bounds(instant(job.start), calendar))
+    if (end - start) // 60000 > available:
+        return [(job, *_slice_bounds(job, calendar))]
+
+    model = ChartAggregationJob
+    # All frame boundaries lie within the same session, including shortened
+    # final buckets and DST. Each job consumes only its own prefix.
+    plans = [(job, *_slice_bounds(job, calendar, cutoff=end))]
+    siblings = db.scalars(select(model).where(
+        model.instrument_id == job.instrument_id, model.kind == 'price',
+        model.timeframe.in_(PERIODS), model.timeframe != job.timeframe,
+        model.start >= start, model.start < end, model.end <= now - MAX_RANGE,
+        model.next_at <= now, model.attempts == 0,
+    ).order_by(model.timeframe, model.start, model.end).limit(20).with_for_update(skip_locked=True))
+    frames = {job.timeframe}
+    for sibling in siblings:
+        if sibling.timeframe not in frames:
+            plans.append((sibling, *_slice_bounds(sibling, calendar, cutoff=end)))
+            frames.add(sibling.timeframe)
+    plans.sort(key=lambda plan: PERIODS.index(plan[0].timeframe))
+    return plans
+
+
 def aggregate_once():
     from .market import aggregate_touched
     from .publication_budget import current
-    from .storage import instant, now_ms, transaction
+    from .storage import now_ms, transaction
 
     with transaction() as db:
         now = now_ms()
@@ -191,36 +235,34 @@ def aggregate_once():
             job = _coalesce_observed(db, inst.id, job.timeframe, job.start, job.end) or job
             if job.next_at > now:
                 return True
-        from .domain import bucket_bounds, calendar_for
-        from .storage import ms
+        from .domain import calendar_for
+        from .storage import instant
+
         budget = current()
-        # Complete buckets only: the largest indivisible D1 uses <=1500 source
-        # minutes across DST. No partial bucket is persisted as complete.
-        frame_end = ms(bucket_bounds(instant(job.start), job.timeframe, calendar_for(inst))[1])
-        slice_end = min(job.end, frame_end if job.timeframe in ('H4','D1') else
-                        max(frame_end, job.start + 120 * 60000))
-        slice_end = min(job.end, ms(bucket_bounds(instant(slice_end - 1),
-            job.timeframe, calendar_for(inst))[1]))
-        source_left = ms(bucket_bounds(instant(job.start), job.timeframe, calendar_for(inst))[0])
-        source_right = ms(bucket_bounds(instant(slice_end - 1), job.timeframe, calendar_for(inst))[1])
-        needed = (source_right - source_left) // 60000
-        if budget and budget.available < needed:
+        available = budget.available if budget else 4096
+        plans = _batch(db, job, calendar_for(inst), now, available)
+        needed = (max(right for _, _, _, right in plans)
+                  - min(left for _, _, left, _ in plans)) // 60000
+        if needed > available:
             return False
         from .source_history_store import _insert
         state = ChartAggregationState
-        db.execute(_insert(db)(state).values(instrument_id=inst.id, timeframe=job.timeframe
-            ).on_conflict_do_nothing(index_elements=['instrument_id', 'timeframe']))
-        target = db.get(state, (inst.id, job.timeframe))
-        target.last_service_seq = (db.scalar(AGGREGATION_SERVICE_SEQUENCE.next_value())
-            if db.get_bind().dialect.name == 'postgresql' else
-            (db.scalar(select(func.max(state.last_service_seq))) or 0) + 1)
-        touched = {instant(at) for at in range(job.start, slice_end, 60000)}
+        for item, *_ in plans:
+            db.execute(_insert(db)(state).values(instrument_id=inst.id, timeframe=item.timeframe
+                ).on_conflict_do_nothing(index_elements=['instrument_id', 'timeframe']))
+            target = db.get(state, (inst.id, item.timeframe))
+            target.last_service_seq = (db.scalar(AGGREGATION_SERVICE_SEQUENCE.next_value())
+                if db.get_bind().dialect.name == 'postgresql' else
+                (db.scalar(select(func.max(state.last_service_seq))) or 0) + 1)
+        touched_by_frame = {item.timeframe: {instant(at) for at in range(item.start, end, 60000)}
+                            for item, end, _, _ in plans}
         try:
             # A failed calculation/write must not publish any partial aggregate.
             # Keep the outer transaction usable to persist retry state.
             with db.begin_nested():
-                refreshed = aggregate_touched(db, inst, touched, received_at=now,
-                                             timeframes=(job.timeframe,), kind=job.kind)
+                refreshed = aggregate_touched(db, inst, touched_by_frame[job.timeframe],
+                    received_at=now, timeframes=tuple(touched_by_frame), kind=job.kind,
+                    touched_by_frame=touched_by_frame if len(plans) > 1 else None)
                 if job.kind == 'observed' and refreshed is False:
                     # A content repair owns these inputs. Preserve this freshness
                     # request until that repair commits, without counting failure.
@@ -228,24 +270,29 @@ def aggregate_once():
                     return True
                 from .publication_schedule import AGGREGATED, request, source_frames
                 if job.kind != 'observed':
-                    # Observation writers request publication only on a real
-                    # change; an obsolete duplicate job has nothing to publish.
-                    request(db, inst.id, frames=source_frames(job.timeframe), reason=AGGREGATED, stamp=now)
-                if slice_end < job.end:
-                    remaining = db.scalar(select(ChartAggregationJob).where(
-                        ChartAggregationJob.instrument_id == inst.id,
-                        ChartAggregationJob.timeframe == job.timeframe,
-                        ChartAggregationJob.start == slice_end, ChartAggregationJob.end == job.end))
-                    if remaining is None:
-                        db.add(ChartAggregationJob(instrument_id=inst.id, timeframe=job.timeframe,
-                            start=slice_end, end=job.end, created_at=job.created_at, kind=job.kind))
-                    elif job.kind == 'price' or job.kind == 'volume' and remaining.kind == 'observed':
-                        remaining.kind = job.kind
-                db.delete(job)
+                    frames = sorted({frame for item, *_ in plans for frame in source_frames(item.timeframe)})
+                    request(db, inst.id, frames=frames, reason=AGGREGATED, stamp=now)
+                for item, slice_end, _, _ in plans:
+                    if slice_end < item.end:
+                        remaining = db.scalar(select(ChartAggregationJob).where(
+                            ChartAggregationJob.instrument_id == inst.id,
+                            ChartAggregationJob.timeframe == item.timeframe,
+                            ChartAggregationJob.start == slice_end,
+                            ChartAggregationJob.end == item.end))
+                        if remaining is None:
+                            db.add(ChartAggregationJob(instrument_id=inst.id,
+                                timeframe=item.timeframe, start=slice_end, end=item.end,
+                                created_at=item.created_at, kind=item.kind))
+                        elif item.kind == 'price' or item.kind == 'volume' and remaining.kind == 'observed':
+                            remaining.kind = item.kind
+                    db.delete(item)
                 db.flush()
                 if job.kind == 'observed':
-                    _wake_unblocked_publications(db, inst, job.timeframe, source_left, source_right)
+                    _, _, left, right = plans[0]
+                    _wake_unblocked_publications(db, inst, job.timeframe, left, right)
         except Exception as error:
+            # Keep siblings runnable. Retrying the selected job alone lets a
+            # bad timeframe fall back to the normal retry path.
             job.attempts += 1
             job.next_at = now + min(300_000, 1000 * 2 ** min(job.attempts, 9))
             job.error = type(error).__name__

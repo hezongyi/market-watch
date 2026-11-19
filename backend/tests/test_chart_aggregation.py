@@ -74,12 +74,12 @@ def test_failed_aggregation_keeps_task_for_restart(database, monkeypatch):
         failed_id = failed.id
     calls = []
     monkeypatch.setattr(market, 'aggregate_touched', lambda *args, **kwargs:
-                        calls.append(kwargs['timeframes'][0]))
+                        calls.append(tuple(kwargs['timeframes'])))
     assert aggregate_once()
     assert len(calls) == 1
     with database.begin() as db:
         assert db.get(ChartAggregationJob, failed_id) is not None
-        assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 4
+        assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 1
 
 
 def test_failed_calculation_rolls_back_partial_bars(database, monkeypatch):
@@ -230,13 +230,44 @@ def test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(
         enqueue_aggregation(db, 'EURUSD', START, START + MINUTE, now - 15000)
     served = []
     monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw:
-                        served.append((inst.id, kw['timeframes'][0])))
+                        served.append((inst.id, tuple(kw['timeframes']))))
     # Every call opens a fresh transaction, as on an independent worker restart.
     for _ in range(10):
         assert aggregate_once()
-    assert {frame for ident, frame in served if ident == 'EURUSD'} == set(('M5','M15','H1','H4','D1'))
+    assert {frame for ident, frames in served if ident == 'EURUSD' for frame in frames} == set(
+        ('M5', 'M15', 'H1', 'H4', 'D1'))
     with database.begin() as db:
         assert db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
             ChartAggregationJob.instrument_id == 'BTCUSDT')) > 0
         assert db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
             ChartAggregationJob.instrument_id == 'EURUSD')) == 0
+
+
+def test_old_period_backfill_batches_staggered_ranges(database, monkeypatch):
+    from alerts import market, storage
+    from test_publication_scheduler import MINUTE, START
+
+    day = 1440 * MINUTE
+    now = START + 5 * day
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        db.add_all([
+            ChartAggregationJob(instrument_id='BTCUSDT', timeframe='M5',
+                start=START + 120 * MINUTE, end=START + day + 60 * MINUTE, created_at=now - 20000),
+            ChartAggregationJob(instrument_id='BTCUSDT', timeframe='D1',
+                start=START, end=START + day, created_at=now - 20000),
+        ])
+    calls = []
+    monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw:
+                        calls.append(kw.get('touched_by_frame')))
+
+    assert aggregate_once()
+
+    m5, daily = calls[0]['M5'], calls[0]['D1']
+    assert min(m5) == storage.instant(START + 120 * MINUTE)
+    assert min(daily) == storage.instant(START)
+    assert max(m5) == max(daily) == storage.instant(START + day - MINUTE)
+    with database.begin() as db:
+        jobs = list(db.scalars(select(ChartAggregationJob)))
+        assert [(job.timeframe, job.start, job.end) for job in jobs] == [
+            ('M5', START + day, START + day + 60 * MINUTE)]
