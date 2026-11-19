@@ -74,8 +74,10 @@ def runnable_aggregation(stamp):
     idle_history = historical_candidates().where(
         ChartHistoryPlan.instrument_id.not_in(independent_consumers(stamp)))
     job = ChartAggregationJob
+    # Observation and volume work for the same old history must wait with its
+    # price repairs, or it can retry indefinitely against a deferred dependency.
     return job.instrument_id.not_in(paused_query(stamp)) & or_(
-        job.kind != 'price', job.end > stamp - MAX_RANGE, job.instrument_id.not_in(idle_history))
+        job.end > stamp - MAX_RANGE, job.instrument_id.not_in(idle_history))
 
 
 def paused_instruments(db, *, now=None):

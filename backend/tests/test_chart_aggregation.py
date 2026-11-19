@@ -295,6 +295,10 @@ def test_fixed_history_defers_unused_old_chart_work_until_requested(database, mo
         db.add_all([
             ChartAggregationJob(instrument_id=ident, timeframe='M5',
                 start=START, end=START+MINUTE, created_at=now-20000),
+            ChartAggregationJob(instrument_id=ident, timeframe='H1', kind='observed',
+                start=START, end=START+MINUTE, created_at=now-20000),
+            ChartAggregationJob(instrument_id=ident, timeframe='H4', kind='volume',
+                start=START, end=START+MINUTE, created_at=now-20000),
             ChartAggregationJob(instrument_id=ident, timeframe='M5',
                 start=now-MINUTE, end=now, created_at=now),
         ])
@@ -313,6 +317,8 @@ def test_fixed_history_defers_unused_old_chart_work_until_requested(database, mo
         assert not db.scalar(select(storage.MarketDemand.id))
         assert generic_derivation.touch(db, ident)
     assert aggregate_once()
-    assert calls[-1] == storage.instant(START)
+    assert aggregate_once()
+    assert aggregate_once()
+    assert calls[1:] == [storage.instant(START)] * 3
     with database() as db:
         assert not db.scalar(select(ChartAggregationJob.id))
