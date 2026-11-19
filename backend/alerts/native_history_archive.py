@@ -230,8 +230,14 @@ def _publish(db, version, frames):
             rule = frame_plan[frame.timeframe]
             if frame.status == "success":
                 rule["last_success"] = frame.last_success
+                rule["consecutive_failures"] = 0
             elif frame.status in ("stale", "unavailable"):
-                rule["next_due"] = min(rule["next_due"], frame.retry_at)
+                failures = min(rule.get("consecutive_failures", 0) + 1, 5)
+                rule["consecutive_failures"] = failures
+                # Keep automatic recovery, without replacing a failed daily
+                # snapshot every minute during a sustained provider outage.
+                delay = min(3600000, 300000 * 2 ** (failures - 1))
+                rule["next_due"] = max(frame.retry_at, now_ms() + delay)
         plan.frame_plan = frame_plan
         plan.next_at = min(rule["next_due"] for rule in frame_plan.values())
     if not any(frame.status == "success" for frame in frames):

@@ -424,3 +424,73 @@ def test_pending_legacy_artifact_resumes_using_its_original_rule(database):
         row = read_artifact(db, version, 'D1')[0]
         assert row['close'] == '11'
         assert row['rule_version'] == 'source-trading-date-artifact-v1'
+
+
+def test_failed_native_maintenance_backs_off_without_changing_saved_configuration(database, monkeypatch):
+    from alerts import (
+        history_maintenance,
+        history_mode_maintenance,
+        native_history_archive,
+        storage,
+    )
+    from alerts.history_maintenance import configuration_revision, schedule_tick
+
+    clock = [stamp('2026-11-19')]
+    for module in (storage, history_maintenance, history_mode_maintenance, native_history_archive):
+        monkeypatch.setattr(module, 'now_ms', lambda: clock[0])
+    dataset = prepare(database)
+    previous = run(database, dataset, '2024-01-04', Adapter({'D1': [day('2024-01-02')]}))
+    with database.begin() as db:
+        plan = db.get(DatasetMaintenance, dataset)
+        plan.frame_plan = {key: {**rule, 'next_due': clock[0]} for key, rule in plan.frame_plan.items()}
+        plan.next_at = clock[0]
+        revision = configuration_revision(plan)
+    for delay in (300000, 600000, 1200000, 2400000, 3600000, 3600000):
+        assert schedule_tick()
+        with database.begin() as db:
+            version = db.get(DatasetMaintenance, dataset).active_version_id
+        drain(version, Adapter({'D1': TimeoutError()}))
+        with database.begin() as db:
+            plan = db.get(DatasetMaintenance, dataset)
+            assert plan.next_at == clock[0]+delay
+            assert plan.latest_version_id == previous
+            assert configuration_revision(plan) == revision
+        clock[0] += delay-1
+        assert not schedule_tick(), 'No new failed version during the backoff'
+        clock[0] += 1
+    assert schedule_tick()
+    with database.begin() as db:
+        version = db.get(DatasetMaintenance, dataset).active_version_id
+    drain(version, Adapter({'D1': [day('2024-01-03')]}))
+    with database.begin() as db:
+        plan = db.get(DatasetMaintenance, dataset)
+        assert plan.latest_version_id == version
+        assert plan.frame_plan['D1'].get('consecutive_failures', 0) == 0
+        assert configuration_revision(plan) == revision
+
+
+def test_native_failure_respects_later_provider_retry_and_unchanged_editor_save(database, monkeypatch):
+    from alerts import (
+        history_maintenance,
+        history_mode_maintenance,
+        native_history_archive,
+        storage,
+    )
+    from alerts.history_maintenance import configuration_revision
+    from alerts.market_contracts import MarketRequestError, RequestResult
+
+    now = stamp('2026-11-19')
+    for module in (storage, history_maintenance, history_mode_maintenance, native_history_archive):
+        monkeypatch.setattr(module, 'now_ms', lambda: now)
+    dataset = prepare(database)
+    error = MarketRequestError(RequestResult(status='rate_limited', retry_at=now+7200000))
+    run(database, dataset, '2024-01-04', Adapter({'D1': error}))
+    with database.begin() as db:
+        plan = db.get(DatasetMaintenance, dataset)
+        assert plan.next_at == now+7200000
+        revision = configuration_revision(plan)
+        configure(db, dataset, target_start=plan.target_start, timeframes=plan.timeframes,
+            timezone=plan.timezone, daily_minute=plan.daily_minute,
+            expected_configuration_revision=revision)
+        assert plan.frame_plan['D1']['consecutive_failures'] == 1
+        assert plan.next_at == now+7200000

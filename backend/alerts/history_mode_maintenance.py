@@ -37,7 +37,8 @@ def configure_frames(db, dataset, outputs, requested, previous, *, target_start,
         due = old.get("next_due") if same else None
         result[frame] = {**rules, "next_due": due or (
             now_ms() + rules["interval_minutes"] * 60000 if rules["schedule"] == "interval"
-            else next_daily(now_ms(), daily_minute, timezone)), "last_success": old.get("last_success")}
+            else next_daily(now_ms(), daily_minute, timezone)), "last_success": old.get("last_success"),
+            "consecutive_failures": old.get("consecutive_failures", 0) if same else 0}
     return result
 
 
