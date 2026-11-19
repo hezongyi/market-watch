@@ -111,15 +111,22 @@ def _merged(spans):
     return result
 
 
-def continuous_coverage(db, inst, plan, now):
+def continuous_coverage(db, inst, plan, now, *, latest_only=False):
+    from .config import settings
+    from .coverage_projection import read
     from .market import stored_coverage
 
     cutoff = (now - 5000) // 60000 * 60000
-    spans = _merged(stored_coverage(db, inst, plan.target_start, cutoff))
+    spans = read(db, inst, plan.target_start, cutoff, latest=True) if (
+        latest_only and settings.coverage_projection_enabled) else None
+    intervals = _merged(stored_coverage(db, inst, plan.target_start, cutoff)) if spans is None else [
+        (span['start'], span['end']) for span in spans]
+    if latest_only:
+        intervals = intervals[-1:]
     spans = [
         (max(a, plan.target_start), min(b, cutoff))
-        for a, b in spans
-        if b > plan.target_start and a < cutoff
+        for a, b in intervals
+        if max(a, plan.target_start) < min(b, cutoff)
     ]
     # Only the most recent continuous interval is the live dataset. Other
     # intervals are reported separately; no artificial join across a gap.
@@ -270,7 +277,7 @@ def publish_frame(db, inst, plan, frame, now):
                                  next_due_at=corrections.next_due_at or next_due,
                                  blocked_reason=corrections.blocked_reason or blocked)
 
-    spans = continuous_coverage(db, inst, plan, now)
+    spans = continuous_coverage(db, inst, plan, now, latest_only=True)
     if not spans:
         pub = db.get(ChartPublication, (inst.id, frame))
         if pub:
@@ -552,11 +559,12 @@ def adopt_legacy_once(*, limit=None):
             request(db, ident, reason=INITIAL, stamp=now_ms(), approved=True)
 
 
-def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
+def status(db, inst, frame, *, width=960, spacing=6, lookback=0, request_derivation=True):
     if frame not in FRAMES or not 0 < width <= 16384 or not 0 < spacing <= 1000:
         raise ValueError("无效图表尺寸或周期")
-    from .generic_derivation import pending, touch
-    deferred = touch(db, inst.id) and pending(db, inst.id, frame, published=True)
+    from .generic_derivation import is_candidate, pending, touch
+    check = touch if request_derivation else is_candidate
+    deferred = check(db, inst.id) and pending(db, inst.id, frame, published=True)
     plan = db.get(ChartHistoryPlan, inst.id)
     pub = db.get(ChartPublication, (inst.id, frame))
     threshold = 3 * ceil(width / spacing)

@@ -25,12 +25,12 @@ def cycle(*, observer=None):
         # make the worker spin, but runnable/failed work retains its cadence.
         from sqlalchemy import func, select
 
-        from .generic_derivation import paused_query
+        from .generic_derivation import runnable_aggregation
         from .storage import ChartAggregationJob, now_ms, transaction
         with transaction() as db:
             stamp = now_ms()
             due = db.scalar(select(func.min(ChartAggregationJob.next_at)).where(
-                ChartAggregationJob.instrument_id.not_in(paused_query(stamp))))
+                runnable_aggregation(stamp)))
         if due is not None:
             # A due row can still be locked or exceed this turn's budget.
             # Preserve bounded polling rather than claiming it is runnable.

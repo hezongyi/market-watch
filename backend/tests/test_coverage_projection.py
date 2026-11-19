@@ -6,6 +6,30 @@ from alerts.storage import Audit, Instrument, MarketCoverage
 from sqlalchemy import event
 
 
+def test_latest_publication_coverage_preserves_cutoff_and_unverified_fallback(database, monkeypatch):
+    from alerts import coverage_projection, managed_dataset
+    from alerts.storage import ChartHistoryPlan
+
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        plan = ChartHistoryPlan(instrument_id=inst.id, target_start=60000, target_end=480000)
+        db.add(plan)
+        for a, b in ((0, 120000), (180000, 300000), (240000, 420000), (540000, 660000)):
+            db.add(MarketCoverage(instrument_id=inst.id, source=inst.source,
+                                  basis=inst.basis, start=a, end=b))
+        db.flush()
+        assert managed_dataset.continuous_coverage(db, inst, plan, 365000, latest_only=True) == [(180000, 360000)]
+        coverage_projection.backfill_page(db, inst)
+        assert coverage_projection.backfill_page(db, inst, administrative=True)['complete']
+        assert managed_dataset.continuous_coverage(db, inst, plan, 365000) == [(60000, 120000), (180000, 360000)]
+
+        def unexpected(*args):
+            pytest.fail('Verified publication should not scan raw proof')
+        monkeypatch.setattr(market, 'stored_coverage', unexpected)
+        assert managed_dataset.continuous_coverage(db, inst, plan, 365000, latest_only=True) == [(180000, 360000)]
+        assert managed_dataset.continuous_coverage(db, inst, plan, 65000, latest_only=True) == []
+
+
 def test_publication_status_reports_required_verification_without_running_it(database):
     from alerts.coverage_projection import backfill_page
     from alerts.managed_dataset import status

@@ -256,6 +256,8 @@ def test_old_period_backfill_batches_staggered_ranges(database, monkeypatch):
                 start=START + 120 * MINUTE, end=START + day + 60 * MINUTE, created_at=now - 20000),
             ChartAggregationJob(instrument_id='BTCUSDT', timeframe='D1',
                 start=START, end=START + day, created_at=now - 20000),
+            ChartAggregationJob(instrument_id='BTCUSDT', timeframe='M5',
+                start=START + day + 60 * MINUTE, end=START + 2 * day, created_at=now - 20000),
         ])
     calls = []
     monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw:
@@ -266,8 +268,51 @@ def test_old_period_backfill_batches_staggered_ranges(database, monkeypatch):
     m5, daily = calls[0]['M5'], calls[0]['D1']
     assert min(m5) == storage.instant(START + 120 * MINUTE)
     assert min(daily) == storage.instant(START)
-    assert max(m5) == max(daily) == storage.instant(START + day - MINUTE)
+    assert len(m5) == 2 * 1440 - 120
+    assert max(m5) == storage.instant(START + 2 * day - MINUTE)
+    assert max(daily) == storage.instant(START + day - MINUTE)
     with database.begin() as db:
-        jobs = list(db.scalars(select(ChartAggregationJob)))
-        assert [(job.timeframe, job.start, job.end) for job in jobs] == [
-            ('M5', START + day, START + day + 60 * MINUTE)]
+        assert not db.scalar(select(ChartAggregationJob.id))
+
+
+def test_fixed_history_defers_unused_old_chart_work_until_requested(database, monkeypatch):
+    from alerts import generic_derivation, market, storage
+    from test_history_versions import create
+    from test_publication_scheduler import MINUTE, START
+
+    day = 1440 * MINUTE
+    now = START + 5 * day
+    version, ident = create(database)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    monkeypatch.setattr(generic_derivation, 'now_ms', lambda: now)
+    with database.begin() as db:
+        fixed = db.get(storage.HistoryVersion, version)
+        fixed.start, fixed.end, fixed.cursor, fixed.status = START, START+MINUTE, START+MINUTE, 'published'
+        db.add(storage.HistoryArtifact(id='fixed', version_id=version, timeframe='M5',
+            status='published', count=1, cursor=fixed.end, rule_version='test'))
+        db.add(storage.ChartHistoryPlan(instrument_id=ident, target_start=START+day,
+            target_end=now, status='cancelled', realtime_enabled=True))
+        db.add_all([
+            ChartAggregationJob(instrument_id=ident, timeframe='M5',
+                start=START, end=START+MINUTE, created_at=now-20000),
+            ChartAggregationJob(instrument_id=ident, timeframe='M5',
+                start=now-MINUTE, end=now, created_at=now),
+        ])
+    calls = []
+    monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kwargs:
+                        calls.append(min(touched)))
+
+    assert aggregate_once()
+    assert not aggregate_once()
+    assert calls == [storage.instant(now-MINUTE)]
+
+    with database.begin() as db:
+        from alerts.managed_dataset import status
+
+        assert status(db, db.get(Instrument, ident), 'M5', request_derivation=False)['reason'] == 'preparing'
+        assert not db.scalar(select(storage.MarketDemand.id))
+        assert generic_derivation.touch(db, ident)
+    assert aggregate_once()
+    assert calls[-1] == storage.instant(START)
+    with database() as db:
+        assert not db.scalar(select(ChartAggregationJob.id))

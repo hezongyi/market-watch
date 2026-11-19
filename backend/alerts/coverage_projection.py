@@ -106,13 +106,15 @@ def merge(db, inst, spans):
     return changed
 
 
-def read(db, inst, left, right):
+def read(db, inst, left, right, *, latest=False):
     state = db.get(MarketCoverageCheckpoint, (inst.id, inst.source, inst.basis))
     if state is None or not state.complete:
         return None
-    return [dict(start=row.start, end=row.end) for row in db.scalars(select(MarketCoverageProjection).where(
-        *_where(MarketCoverageProjection, inst), MarketCoverageProjection.start < right,
-        MarketCoverageProjection.end > left).order_by(MarketCoverageProjection.start))]
+    span = MarketCoverageProjection
+    query = select(span.start, span.end).where(*_where(span, inst), span.start < right, span.end > left)
+    # Projected spans are already disjoint and merged.
+    query = query.order_by(span.start.desc()).limit(1) if latest else query.order_by(span.start)
+    return [dict(start=start, end=end) for start, end in db.execute(query)]
 
 
 def maintenance_status(db, inst):

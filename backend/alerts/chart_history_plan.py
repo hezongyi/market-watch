@@ -304,7 +304,7 @@ def plan_status(db, plan, now):
             attempts=j.attempts, retry_at=j.next_at, status=j.status) for j in jobs if j.error],
         aggregation_errors=[dict(id=j.id, timeframe=j.timeframe, start=j.start, end=j.end,
             error=j.error, attempts=j.attempts, retry_at=j.next_at) for j in aggregation if j.error],
-        periods=[status(db, inst, frame) for frame in (*sorted(FRAMES), 'W1', 'MN')])
+        periods=[status(db, inst, frame, request_derivation=False) for frame in (*sorted(FRAMES), 'W1', 'MN')])
 
 
 def control_plan(db, instrument, action, now):

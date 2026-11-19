@@ -225,6 +225,7 @@ def segments(db, job, rows, outcomes, left, right):
 
 def once(fetcher=None):
     from .chart_aggregation import enqueue_aggregation
+    from .generic_derivation import runnable_aggregation
     from .market import fetch_source
     from .provider_cache import interactive_busy
 
@@ -233,8 +234,9 @@ def once(fetcher=None):
         if db.scalar(select(ImportJob.id).where(ImportJob.priority == 0,
                 ImportJob.status.in_(('pending', 'running'))).limit(1)):
             return False
-        if db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
-                ChartAggregationJob.error.is_(None))) >= 60:
+        runnable = runnable_aggregation(now)
+        if db.scalar(select(ChartAggregationJob.id).where(
+                ChartAggregationJob.error.is_(None), runnable).offset(59).limit(1)):
             return False
         candidate = db.scalar(select(VolumeBackfillJob).where(
             VolumeBackfillJob.next_at <= now,
@@ -253,8 +255,8 @@ def once(fetcher=None):
         if cooldown and cooldown.value.get('until', 0) > now:
             job.next_at = cooldown.value['until']
             return False
-        if interactive_busy(job.source) or db.scalar(select(func.count()).select_from(ChartAggregationJob)
-                .where(ChartAggregationJob.instrument_id == job.instrument_id)) >= 60:
+        if interactive_busy(job.source) or db.scalar(select(ChartAggregationJob.id).where(
+                ChartAggregationJob.instrument_id == job.instrument_id, runnable).offset(59).limit(1)):
             job.next_at = now+1000
             return False
         retry = db.scalar(select(VolumeBackfillSegment).where(VolumeBackfillSegment.job_id == job.id,

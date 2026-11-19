@@ -118,7 +118,7 @@ def _wake_unblocked_publications(db, inst, frame, left, right):
 
 
 def _select_job(db, now):
-    from .generic_derivation import paused_query
+    from .generic_derivation import runnable_aggregation
 
     model, demand, state = ChartAggregationJob, ChartViewportDemand, ChartAggregationState
     active = (demand.instrument_id == model.instrument_id, demand.expires > now)
@@ -136,12 +136,12 @@ def _select_job(db, now):
         (exists(*active), 170), else_=300)
     range_order = case((aged, model.created_at), else_=-model.end)
     service_turn = func.coalesce(state.last_service_seq, 0)
-    paused = paused_query(now)
+    runnable = runnable_aggregation(now)
     ranked = select(model, Instrument).join(Instrument,
         Instrument.id == model.instrument_id).outerjoin(state,
             (state.instrument_id == model.instrument_id) & (state.timeframe == model.timeframe)
-        ).where(model.next_at <= now, model.instrument_id.not_in(paused)).order_by(
-            service_turn, priority, range_order, model.created_at, model.id
+        ).where(model.next_at <= now, runnable).order_by(
+            service_turn, priority, range_order, model.created_at, model.start, model.id
         ).limit(1).with_for_update(of=Instrument, skip_locked=True)
     if db.get_bind().dialect.name != 'postgresql':
         return db.execute(ranked).first()
@@ -152,12 +152,12 @@ def _select_job(db, now):
         [(frame,) for frame in PERIODS])
     ready = (select(model.start)
         .where(model.instrument_id == Instrument.id, model.timeframe == periods.c.timeframe,
-               model.next_at <= now)
+               model.next_at <= now, runnable)
         .order_by(model.start).limit(1).correlate(Instrument, periods).scalar_subquery())
     targets = db.execute(select(Instrument.id, periods.c.timeframe, service_turn.label('turn'))
         .select_from(Instrument).join(periods, true()).outerjoin(state,
             (state.instrument_id == Instrument.id) & (state.timeframe == periods.c.timeframe))
-        .where(Instrument.id.not_in(paused), ready.is_not(None)).order_by(service_turn)).all()
+        .where(ready.is_not(None)).order_by(service_turn)).all()
     # All jobs in a target share its service turn. Rank only the earliest tied
     # targets, and advance past a group if its instruments are locked or stale.
     for turn, group in groupby(targets, key=lambda target: target.turn):
@@ -198,20 +198,23 @@ def _batch(db, job, calendar, now, available):
         return [(job, *_slice_bounds(job, calendar))]
 
     model = ChartAggregationJob
-    # All frame boundaries lie within the same session, including shortened
-    # final buckets and DST. Each job consumes only its own prefix.
-    plans = [(job, *_slice_bounds(job, calendar, cutoff=end))]
-    siblings = db.scalars(select(model).where(
+    following_end = ms(session_bounds(instant(end), calendar)[1])
+    cutoff = following_end if (following_end - start) // 60000 <= available else end
+    plans = [(job, *_slice_bounds(job, calendar, cutoff=cutoff))]
+    eligible = select(model).where(
         model.instrument_id == job.instrument_id, model.kind == 'price',
-        model.timeframe.in_(PERIODS), model.timeframe != job.timeframe,
-        model.start >= start, model.start < end, model.end <= now - MAX_RANGE,
+        model.timeframe.in_(PERIODS), model.end <= now - MAX_RANGE,
         model.next_at <= now, model.attempts == 0,
-    ).order_by(model.timeframe, model.start, model.end).limit(20).with_for_update(skip_locked=True))
-    frames = {job.timeframe}
-    for sibling in siblings:
-        if sibling.timeframe not in frames:
-            plans.append((sibling, *_slice_bounds(sibling, calendar, cutoff=end)))
-            frames.add(sibling.timeframe)
+    ).order_by(model.timeframe, model.start, model.end).limit(20).with_for_update(skip_locked=True)
+    # Allow one range per frame in each session. A range crossing the boundary
+    # can consume its own prefix in both, even if the provider used UTC pages.
+    for left, right, frames in ((start, end, {job.timeframe}), (end, cutoff, set())):
+        if right <= left:
+            continue
+        for sibling in db.scalars(eligible.where(model.start >= left, model.start < right)):
+            if sibling.timeframe not in frames:
+                plans.append((sibling, *_slice_bounds(sibling, calendar, cutoff=cutoff)))
+                frames.add(sibling.timeframe)
     plans.sort(key=lambda plan: PERIODS.index(plan[0].timeframe))
     return plans
 
@@ -247,15 +250,19 @@ def aggregate_once():
             return False
         from .source_history_store import _insert
         state = ChartAggregationState
-        for item, *_ in plans:
-            db.execute(_insert(db)(state).values(instrument_id=inst.id, timeframe=item.timeframe
-                ).on_conflict_do_nothing(index_elements=['instrument_id', 'timeframe']))
-            target = db.get(state, (inst.id, item.timeframe))
+        touched_by_frame = {}
+        for item, end, _, _ in plans:
+            touched_by_frame.setdefault(item.timeframe, set()).update(
+                instant(at) for at in range(item.start, end, 60000))
+        for frame in touched_by_frame:
+            target = db.get(state, (inst.id, frame))
+            if target is None:
+                db.execute(_insert(db)(state).values(instrument_id=inst.id, timeframe=frame
+                    ).on_conflict_do_nothing(index_elements=['instrument_id', 'timeframe']))
+                target = db.get(state, (inst.id, frame))
             target.last_service_seq = (db.scalar(AGGREGATION_SERVICE_SEQUENCE.next_value())
                 if db.get_bind().dialect.name == 'postgresql' else
                 (db.scalar(select(func.max(state.last_service_seq))) or 0) + 1)
-        touched_by_frame = {item.timeframe: {instant(at) for at in range(item.start, end, 60000)}
-                            for item, end, _, _ in plans}
         try:
             # A failed calculation/write must not publish any partial aggregate.
             # Keep the outer transaction usable to persist retry state.

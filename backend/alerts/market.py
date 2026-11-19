@@ -351,16 +351,15 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                    for frame in timeframes)
     latest_boundary = max(ms(bucket_bounds(max(touched_by_frame[frame]), frame, calendar)[1])
                           for frame in timeframes)
-    source = select(Bar).where(Bar.instrument_id == instrument.id, Bar.timeframe == 'M1',
-                              Bar.start >= earliest, Bar.start < latest_boundary).order_by(Bar.start)
+    columns = (Bar.start, Bar.end, Bar.open, Bar.high, Bar.low, Bar.close,
+               Bar.complete, Bar.volume, Bar.volume_complete)
     if kind == 'observed':
         # Scalar input serves both metadata comparison and a rejected fast path.
         # Reading it twice would exceed the worker's complete-bucket row budget.
-        minute_rows = list(db.execute(source.with_only_columns(
-            Bar.start, Bar.end, Bar.open, Bar.high, Bar.low, Bar.close, Bar.complete,
-            Bar.volume, Bar.volume_complete, Bar.observed_at)))
-    else:
-        minute_rows = list(db.scalars(source))
+        columns += (Bar.observed_at,)
+    minute_rows = list(db.execute(select(*columns).where(
+        Bar.instrument_id == instrument.id, Bar.timeframe == 'M1',
+        Bar.start >= earliest, Bar.start < latest_boundary).order_by(Bar.start)))
     from .publication_budget import current
     if current():
         current().consume(len(minute_rows))
@@ -374,6 +373,17 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
             return True
     closures = closures_from(instrument.calendar_profile)
     coverage = stored_coverage(db, instrument, earliest, latest_boundary)
+    minute_candles = {}
+
+    def minute_candle(row):
+        candle = minute_candles.get(row.start)
+        if candle is None:
+            candle = Candle(instant(row.start), instant(row.end), row.open, row.high, row.low,
+                            row.close, row.complete, volume=row.volume, volume_complete=row.volume_complete,
+                            volume_supplied=True)
+            minute_candles[row.start] = candle
+        return candle
+
     blocked = False
     for timeframe in timeframes:
         bounds, pair = set(), None
@@ -390,7 +400,9 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                 grouped.setdefault(ranges[index][2], []).append(row)
         outputs = []
         for left, right in sorted(bounds):
-            rows = grouped.get((left, right), [])
+            rows = grouped.get((left, right))
+            if not rows:
+                continue
             conflicted = instrument.id.startswith("MD:") and any(not scheduled_open(
                 instant(row.start), calendar, gold=is_gold(instrument.id), closures=closures) for row in rows)
             if coverage and covers_interval(coverage, ms(left), ms(right)):
@@ -408,9 +420,7 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
                     ):
                         expected.add(t)
                     t += timedelta(minutes=1)
-            c = aggregate([Candle(instant(r.start), instant(r.end), r.open, r.high, r.low, r.close,
-                r.complete, volume=r.volume, volume_complete=r.volume_complete, volume_supplied=True)
-                for r in rows], left, right, expected_starts=expected)
+            c = aggregate([minute_candle(row) for row in rows], left, right, expected_starts=expected)
             if c:
                 complete = c.complete and bool(expected) and ms(right) <= received_at - 5000
                 from dataclasses import replace
@@ -696,6 +706,7 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
                 realtime_only=False, history_only=False, source_filter=None):
     """One daily slice per iteration. Durable cursor and lease permit safe restart."""
     with transaction() as db:
+        from .generic_derivation import runnable_aggregation
         from .storage import ChartAggregationJob
 
         live_instruments = realtime_instruments()
@@ -707,10 +718,11 @@ def import_once(*, chart_only=False, fetcher=None, defer_aggregation=False,
         # Bound ready CPU work without throttling live M1 ingestion. Failed
         # slices retain their durable retry state but must not exhaust capacity
         # for unrelated symbols. Also bound each symbol including failed work.
-        if defer_aggregation and db.scalar(select(func.count()).select_from(
-                ChartAggregationJob).where(ChartAggregationJob.error.is_(None))) >= 60:
+        runnable = runnable_aggregation(now_ms())
+        if defer_aggregation and db.scalar(select(ChartAggregationJob.id).where(
+                ChartAggregationJob.error.is_(None), runnable).offset(59).limit(1)):
             return False
-        saturated_symbols = select(ChartAggregationJob.instrument_id).group_by(
+        saturated_symbols = select(ChartAggregationJob.instrument_id).where(runnable).group_by(
             ChartAggregationJob.instrument_id).having(func.count() >= 60)
         # Skip all jobs of a cooling-down source in the selection query, rather
         # than spending one worker iteration deferring each of its queued jobs.

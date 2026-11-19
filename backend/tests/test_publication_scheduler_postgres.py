@@ -398,6 +398,14 @@ def test_postgres_large_aged_aggregation_backlog_yields_to_every_target(publicat
     test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(publication_pg[0], monkeypatch)
 
 
+def test_postgres_fixed_history_defers_unused_old_chart_work_until_requested(publication_pg, monkeypatch):
+    from test_chart_aggregation import (
+        test_fixed_history_defers_unused_old_chart_work_until_requested,
+    )
+
+    test_fixed_history_defers_unused_old_chart_work_until_requested(publication_pg[0], monkeypatch)
+
+
 def test_postgres_explicit_verify_rechecks_completed_projection(publication_pg):
     projection_contracts.test_explicit_verify_rechecks_completed_projection_after_old_writer(publication_pg[0])
 
