@@ -415,12 +415,16 @@ def test_postgres_rollback_invalidates_unpublished_coverage(publication_pg, monk
     test_rollback_invalidates_every_coverage_identity_including_unpublished(publication_pg[0], monkeypatch)
 
 
-def test_postgres_locked_aggregation_identity_does_not_block_other_target(publication_pg, monkeypatch):
+@pytest.mark.parametrize('other_target_turn', [0, 10])
+def test_postgres_locked_aggregation_identity_does_not_block_other_target(
+        publication_pg, monkeypatch, other_target_turn):
     from alerts.chart_aggregation import aggregate_once, enqueue_aggregation
     factory, clock = publication_pg
     with factory.begin() as db:
         for ident in ('BTCUSDT', 'EURUSD'):
             enqueue_aggregation(db, ident, START, START + MINUTE, clock[0] - 20000)
+        db.add_all(storage.ChartAggregationState(instrument_id='EURUSD', timeframe=frame,
+            last_service_seq=other_target_turn) for frame in ('M5', 'M15', 'H1', 'H4', 'D1'))
     served = []
     monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw: served.append(inst.id))
     with factory.begin() as db:

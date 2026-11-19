@@ -1,5 +1,8 @@
 """Durable small aggregation slices; focus changes affect the next selection."""
-from sqlalchemy import case, func, select
+
+from itertools import groupby
+
+from sqlalchemy import String, case, column, func, select, true, tuple_, values
 
 from .storage import (
     AGGREGATION_SERVICE_SEQUENCE,
@@ -114,37 +117,69 @@ def _wake_unblocked_publications(db, inst, frame, left, right):
         request(db, inst.id, frames=frames)
 
 
-def aggregate_once():
+def _select_job(db, now):
     from .generic_derivation import paused_query
+
+    model, demand, state = ChartAggregationJob, ChartViewportDemand, ChartAggregationState
+    active = (demand.instrument_id == model.instrument_id, demand.expires > now)
+    source = case((demand.timeframe == 'M30', 'M15'), else_=demand.timeframe)
+    exact = (*active, source == model.timeframe, model.start < demand.end, model.end > demand.start)
+    warm = (*active, model.start < demand.end, model.end > demand.warm_start)
+
+    def exists(*conditions):
+        return select(demand.id).where(*conditions).exists()
+
+    aged = model.created_at <= now - 10000
+    priority = case((aged, 0),
+        (exists(*exact, demand.focused.is_(True)), 100), (exists(*exact), 110),
+        (exists(*warm, demand.focused.is_(True)), 130), (exists(*warm), 150),
+        (exists(*active), 170), else_=300)
+    range_order = case((aged, model.created_at), else_=-model.end)
+    service_turn = func.coalesce(state.last_service_seq, 0)
+    paused = paused_query(now)
+    ranked = select(model, Instrument).join(Instrument,
+        Instrument.id == model.instrument_id).outerjoin(state,
+            (state.instrument_id == model.instrument_id) & (state.timeframe == model.timeframe)
+        ).where(model.next_at <= now, model.instrument_id.not_in(paused)).order_by(
+            service_turn, priority, range_order, model.created_at, model.id
+        ).limit(1).with_for_update(of=Instrument, skip_locked=True)
+    if db.get_bind().dialect.name != 'postgresql':
+        return db.execute(ranked).first()
+
+    # Probe each supported target through the existing instrument/period index.
+    # A correlated LIMIT keeps this a first-match lookup even with a deep queue.
+    periods = values(column('timeframe', String(8)), name='aggregation_periods').data(
+        [(frame,) for frame in PERIODS])
+    ready = (select(model.start)
+        .where(model.instrument_id == Instrument.id, model.timeframe == periods.c.timeframe,
+               model.next_at <= now)
+        .order_by(model.start).limit(1).correlate(Instrument, periods).scalar_subquery())
+    targets = db.execute(select(Instrument.id, periods.c.timeframe, service_turn.label('turn'))
+        .select_from(Instrument).join(periods, true()).outerjoin(state,
+            (state.instrument_id == Instrument.id) & (state.timeframe == periods.c.timeframe))
+        .where(Instrument.id.not_in(paused), ready.is_not(None)).order_by(service_turn)).all()
+    # All jobs in a target share its service turn. Rank only the earliest tied
+    # targets, and advance past a group if its instruments are locked or stale.
+    for turn, group in groupby(targets, key=lambda target: target.turn):
+        pairs = [(ident, frame) for ident, frame, _ in group]
+        if len(pairs) > 1 and len(pairs) == len(targets):
+            # A wholly new backlog has no service order to narrow by yet.
+            return db.execute(ranked).first()
+        selected = db.execute(ranked.where(service_turn == turn,
+            tuple_(model.instrument_id, model.timeframe).in_(pairs))).first()
+        if selected is not None:
+            return selected
+    return None
+
+
+def aggregate_once():
     from .market import aggregate_touched
     from .publication_budget import current
     from .storage import instant, now_ms, transaction
 
     with transaction() as db:
         now = now_ms()
-        model, demand = ChartAggregationJob, ChartViewportDemand
-        active = (demand.instrument_id == model.instrument_id, demand.expires > now)
-        source = case((demand.timeframe == 'M30', 'M15'), else_=demand.timeframe)
-        exact = (*active, source == model.timeframe, model.start < demand.end, model.end > demand.start)
-        warm = (*active, model.start < demand.end, model.end > demand.warm_start)
-        def exists(*conditions):
-            return select(demand.id).where(*conditions).exists()
-        aged = model.created_at <= now - 10000
-        priority = case((aged, 0),
-            (exists(*exact, demand.focused.is_(True)), 100), (exists(*exact), 110),
-            (exists(*warm, demand.focused.is_(True)), 130), (exists(*warm), 150),
-            (exists(*active), 170), else_=300)
-        state = ChartAggregationState
-        # A whole backlog shares its target's last service turn. Keeping the
-        # original job age for within-target priority must not let every old
-        # slice take a turn ahead of an unrelated ready target.
-        selected = db.execute(select(model, Instrument).join(Instrument,
-            Instrument.id == model.instrument_id).outerjoin(state,
-                (state.instrument_id == model.instrument_id) & (state.timeframe == model.timeframe)
-            ).where(model.next_at <= now, model.instrument_id.not_in(paused_query(now))).order_by(
-                func.coalesce(state.last_service_seq, 0), priority,
-                case((aged, model.created_at), else_=-model.end), model.created_at, model.id)
-            .limit(1).with_for_update(of=Instrument, skip_locked=True)).first()
+        selected = _select_job(db, now)
         if selected is None:
             return False
         job, inst = selected
@@ -172,6 +207,7 @@ def aggregate_once():
         if budget and budget.available < needed:
             return False
         from .source_history_store import _insert
+        state = ChartAggregationState
         db.execute(_insert(db)(state).values(instrument_id=inst.id, timeframe=job.timeframe
             ).on_conflict_do_nothing(index_elements=['instrument_id', 'timeframe']))
         target = db.get(state, (inst.id, job.timeframe))
