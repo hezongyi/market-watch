@@ -378,7 +378,9 @@ def test_postgres_aggregation_backfill_service_with_continuous_live_work(publica
 
 
 def test_postgres_due_price_repair_precedes_older_observation(publication_pg, monkeypatch):
-    from test_chart_aggregation import test_due_price_repair_precedes_older_observation_in_same_bucket
+    from test_chart_aggregation import (
+        test_due_price_repair_precedes_older_observation_in_same_bucket,
+    )
 
     test_due_price_repair_precedes_older_observation_in_same_bucket(publication_pg[0], monkeypatch)
 
