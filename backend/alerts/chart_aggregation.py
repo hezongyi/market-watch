@@ -134,6 +134,8 @@ def _select_job(db, now):
         (exists(*exact, demand.focused.is_(True)), 100), (exists(*exact), 110),
         (exists(*warm, demand.focused.is_(True)), 130), (exists(*warm), 150),
         (exists(*active), 170), else_=300)
+    # Within the same urgency, refreshes must yield to the repairs they read.
+    kind_order = case((model.kind == 'price', 0), (model.kind == 'volume', 1), else_=2)
     range_order = case((aged, model.created_at), else_=-model.end)
     service_turn = func.coalesce(state.last_service_seq, 0)
     runnable = runnable_aggregation(now)
@@ -141,7 +143,7 @@ def _select_job(db, now):
         Instrument.id == model.instrument_id).outerjoin(state,
             (state.instrument_id == model.instrument_id) & (state.timeframe == model.timeframe)
         ).where(model.next_at <= now, runnable).order_by(
-            service_turn, priority, range_order, model.created_at, model.start, model.id
+            service_turn, priority, kind_order, range_order, model.created_at, model.start, model.id
         ).limit(1).with_for_update(of=Instrument, skip_locked=True)
     if db.get_bind().dialect.name != 'postgresql':
         return db.execute(ranked).first()

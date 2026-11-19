@@ -377,6 +377,12 @@ def test_postgres_aggregation_backfill_service_with_continuous_live_work(publica
     test_old_backfill_gets_service_during_continuous_focused_live_work(publication_pg[0], monkeypatch)
 
 
+def test_postgres_due_price_repair_precedes_older_observation(publication_pg, monkeypatch):
+    from test_chart_aggregation import test_due_price_repair_precedes_older_observation_in_same_bucket
+
+    test_due_price_repair_precedes_older_observation_in_same_bucket(publication_pg[0], monkeypatch)
+
+
 def test_postgres_unavailable_older_bucket_waits_for_input(publication_pg, monkeypatch):
     from test_publication_scheduler import (
         test_incomplete_older_source_bucket_does_not_keep_publication_runnable,

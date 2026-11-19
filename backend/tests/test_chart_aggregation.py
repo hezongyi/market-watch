@@ -220,6 +220,35 @@ def test_old_backfill_gets_service_during_continuous_focused_live_work(database,
             Bar.timeframe == 'M5', Bar.start == START)) is not None, 'Focused live work must not starve old backfill'
 
 
+def test_due_price_repair_precedes_older_observation_in_same_bucket(database, monkeypatch):
+    from alerts import market, storage
+    from alerts.storage import Bar
+    from test_publication_scheduler import MINUTE, START
+
+    now = START + 3 * 86400000
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    rows = [dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10) for i in range(60)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        market.ingest(db, inst, {'rows': rows}, received_at=now-30000)
+        market.ingest(db, inst, {'rows': [{**rows[0], 'high': 15}]},
+                      received_at=now-20000, defer_aggregation=True)
+        observation = ChartAggregationJob(id='older-observation', instrument_id=inst.id,
+            timeframe='H1', kind='observed', start=START+59*MINUTE, end=START+60*MINUTE,
+            created_at=now-25000)
+        db.add(observation)
+
+    assert aggregate_once()
+    with database.begin() as db:
+        hour = db.scalar(select(Bar).where(Bar.instrument_id == 'BTCUSDT',
+            Bar.timeframe == 'H1', Bar.start == START))
+        assert hour.complete and hour.high == 15
+        assert db.get(ChartAggregationJob, 'older-observation').next_at == 0
+    assert aggregate_once()
+    with database.begin() as db:
+        assert not db.scalar(select(ChartAggregationJob.id))
+
+
 def test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(database, monkeypatch):
     from alerts import market, storage
     from test_publication_scheduler import MINUTE, START
