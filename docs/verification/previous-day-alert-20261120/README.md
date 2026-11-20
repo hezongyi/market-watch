@@ -47,8 +47,10 @@ mw-dev stop api market-runtime data-worker notification-worker web
 
 点击标签或任一边界管理同一条规则，支持暂停/恢复、编辑和结束；手机复用原编辑抽屉，桌面进入原生规则详情。暂停后两条线和标签一起变灰；完成、到期或归档后一起清除。跨图表周期仍保留规则自身的 M5 标识；换品种按完整行情身份隔离。标签及原生订单展示不进入绘图、撤销栈或布局存档。
 
-验证：桥接单测 6 passed，原生几何/生命周期浏览器契约通过；特别覆盖生命周期写响应丢失后，后台轮询先取得新修订，用户仍能核验成功且不重复写。桌面真实许可 widget 覆盖双边界、下沿打开同一规则、暂停恢复、M5→H1、深浅主题、编辑及到期清理。手机完整模板→提交→双边界→打开原规则通过，含 375/412px、深浅主题及表单 150% 字号。独立桌面/手机 widget 的布局、偏好和指标隔离回归通过，未写桌面布局/偏好。完整 Web 构建通过；旧 CI 的默认配置序列化断言已修正，相关后端 13 passed。截图经人工检查：[手机浅色](range-light-375.png)、[手机深色](range-dark-412.png)、[桌面双边界](range-desktop.png)。这些交互写入仅使用夹具，非真实规则或 ntfy 投递。
+验证：桥接单测 6 passed，原生几何/生命周期浏览器契约通过；特别覆盖生命周期写响应丢失后，后台轮询先取得新修订，用户仍能核验成功且不重复写。桌面真实许可 widget 覆盖双边界、下沿打开同一规则、暂停恢复、M5→H1、深浅主题、编辑及到期清理。手机完整模板→提交→双边界→打开原规则通过，含 375/412px、深浅主题及表单 150% 字号。独立桌面/手机 widget 的布局、偏好和指标隔离回归通过，未写桌面布局/偏好。完整 Web 构建通过；默认配置序列化断言与旧版本 hash 夹具均已按旧字段集合修正：兼容配置回归 13 passed，ATR/旧请求重放及 service 回归 77 passed。截图经人工检查：[手机浅色](range-light-375.png)、[手机深色](range-dark-412.png)、[桌面双边界](range-desktop.png)。这些交互写入仅使用夹具，非真实规则或 ntfy 投递。
 
 2026-11-20 13:41 UTC 已部署 Ubuntu 本机 `mw-dev`，仅替换 Web 为 `sha256:46b935cf0f4f8d989e3a9812870adab93615c71bcab2b881028a50c5abcc4f9b`；API、各 worker、PostgreSQL、TLS、ntfy 容器保持。持久 launcher 的 run.json 已同步。旧 Web 为 `sha256:a4fd9a432e5bdee12f3332838df914afdc361ec5e9a989e694912606bcf1a432`，本轮展示层可仅将 Web image 改回并执行上述 compose 命令（只指定 web），无需数据库回退。配置快照为同一私有 evidence 目录的 `range-run-before.json`，不整份覆盖其他配置。
 
 访问地址和操作入口沿用上文；无需新 APK。部署后实际 XAUUSD/EURUSD 页面打开预填并关闭，无告警或布局写请求；新部署原生图表脚本与已验收构建逐字节一致。`/m/chart`、认证告警列表、ready 与 APK 更新清单均通过；真实规则、版本及自建修订的部署前后快照一致。详细报告及完整截图位于私有 evidence 下 `range-deployment-checks.json`、`desktop-range-final/`、`mobile-range-final/`、`range-isolation/`。Android 真机触控仍需用户验收。
+
+现有真实 EURUSD 前日高低规则的部署页面也已只读核验：1 条规则对应 1 个“前日高低 · M5”标签和 2 个边界，H1 图表保留 M5 规则标识。人工检查实际截图，未发出告警或桌面布局写请求；私有证据为 `live-range-result.json` 与 `live-EURUSD-range.png`。
