@@ -6,6 +6,7 @@ from sqlalchemy.exc import IntegrityError
 from . import chart_alert_application as application
 from .chart_alert_application import Action, CapabilityQuery, Create, Edit, capabilities
 from .chart_alert_geometry import GeometryQuery, geometry
+from .chart_alert_presets import PreviousDayQuery, previous_day
 from .chart_alert_service import Conflict
 from .storage import transaction
 
@@ -33,6 +34,10 @@ def router(authenticated):
             return capabilities(body)
         except ValueError as exc:
             raise error(exc) from exc
+
+    @api.post("/presets/previous-day")
+    def previous_day_preset(body: PreviousDayQuery):
+        return read_operation(previous_day, body)
 
     @api.post("/geometry")
     def drawing_geometry(body: GeometryQuery):

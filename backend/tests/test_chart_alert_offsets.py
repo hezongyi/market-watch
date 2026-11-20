@@ -87,7 +87,8 @@ def seed(db, rows):
 
 def test_legacy_null_config_keeps_original_hash_and_request_replay(database):
     plain = config(condition={"relation": "cross_up", "right": {"kind": "constant", "value": "100"}})
-    payload = plain.model_dump(mode="json")
+    # A pre-offset request has neither ATR offset nor the later close-expiry option.
+    payload = plain.model_dump(mode="json", exclude={"close_expiry_grace_ms"})
     payload["condition"].pop("offset")
     legacy = hashlib.sha256(json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()).hexdigest()
     assert config_hash(plain) == legacy

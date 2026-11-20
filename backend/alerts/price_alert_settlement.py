@@ -58,10 +58,42 @@ def begin(db, alert, version, config, *, now):
             known_input_revision=prep.input_revision if prep else -1,
             query_fact=facts(db, identity["target_identity"]),
             cursor_limit=period(alert.expires_at - 1, config.timeframe, identity["rules"]["aggregation_calendar"])[0])
+        if config.close_expiry_grace_ms:
+            value["awaiting_close_until"] = alert.expires_at + config.close_expiry_grace_ms
     alert.runtime = {**alert.runtime, "settlement_pending": True, "settlement": value}
     transition(db, alert, state="settling", now=now)
     db.add(Audit(kind="chart_alert_settlement_started", at=now, details={"alert_id": alert.id,
         **{key: item for key, item in value.items() if key != "query_fact"}}))
+
+
+def settle_close_inputs(db, alert, revision, target, config, *, now):
+    """Opt-in bounded wait for a just-ended bar, then freeze one final snapshot.
+
+    Never moves cursor_limit or expires_at; future bars cannot enter settlement.
+    Existing rules have no grace and keep their original immediate freeze.
+    """
+    value = alert.runtime["settlement"]
+    deadline = value.get("awaiting_close_until")
+    if deadline is None:
+        return True
+    from .price_alert_close import window_reason
+    from .price_alert_confirmation import facts
+
+    task = db.get(CompositeAggregateTask, (revision.id, config.timeframe))
+    prep = db.get(CompositePreparation, revision.id)
+    applied = task.applied_input_revision if task else -1
+    fact = facts(db, target.identity)
+    cursor, limit = alert.runtime["close_cursor"], value["cursor_limit"]
+    reason = window_reason(db, revision, target, applied, fact, cursor, limit) if cursor < limit else None
+    if reason and now < deadline:
+        alert.runtime = {**alert.runtime, "last_checked_at": now}
+        transition(db, alert, state="settling", now=now)
+        return False
+    selected = {key: item for key, item in value.items() if key != "awaiting_close_until"}
+    selected.update(input_revision=applied, known_input_revision=prep.input_revision if prep else -1,
+                    query_fact=fact, frozen_at=now)
+    alert.runtime = {**alert.runtime, "settlement": selected}
+    return True
 
 
 def accepts(alert, observation, config):

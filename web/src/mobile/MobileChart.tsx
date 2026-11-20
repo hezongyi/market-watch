@@ -38,7 +38,7 @@ import { chartSymbolKey, sameChartSymbol } from "./chartIdentity";
 import { chartTiming } from "./chartTimings";
 import { mobileChartHistory } from "./chartHistory";
 import { alertRuntime } from "../runtime/alerts";
-import { freshDraft, isChartPrice, type AlertConfig, type AlertContext, type AlertRow, type Capabilities } from "../advanced/chartAlerts";
+import { freshDraft, isChartPrice, isChartRange, type AlertConfig, type AlertContext, type AlertRow, type Capabilities } from "../advanced/chartAlerts";
 import PriceRuleSheet from "./PriceRuleSheet";
 import { useNavigate } from "react-router-dom";
 const timeframes: Record<string, string> = {"1":"M1","5":"M5","15":"M15","30":"M30","60":"H1","240":"H4","1D":"D1","1W":"W1","1M":"MN"};
@@ -323,7 +323,7 @@ export default forwardRef<
             setPriceEditor({context,config:freshDraft(context),label:context.display_identity?.code || context.display_label || "价格告警",source:context.display_source,name:context.display_name});setPriceEditorOpen(true);
           } else if(message.type === "chart-alert-price-edit") {
             const row=message.row as AlertRow;
-            if(row?.config?.series_kind!=="composite" || !isChartPrice(row.config))return;
+            if(row?.config?.series_kind!=="composite" || (!isChartPrice(row.config) && !isChartRange(row.config)))return;
             const query={instrument:row.config.instrument,series_kind:"composite",timeframe:row.config.timeframe};
             const [caps,meta]=await Promise.all([
               api<Capabilities>("/chart-alerts/capabilities",query,AbortSignal.timeout(15000)),
@@ -626,7 +626,7 @@ export default forwardRef<
     >
       <MobileOverlaysProvider>
         {priceEditor && <PriceRuleSheet key={priceEditor.row?.id || priceEditor.context?.request_id}
-          initial={priceEditor.config} editing={priceEditor.row} label={priceEditor.label} source={priceEditor.source} name={priceEditor.name}
+          preset={priceEditor.context?.previous_day} initial={priceEditor.config} editing={priceEditor.row} label={priceEditor.label} source={priceEditor.source} name={priceEditor.name}
           frames={Object.values(timeframes)} online={chartOnline} ntfy={phoneAvailable}
           open={priceEditorOpen && visible} close={()=>setPriceEditorOpen(false)} onClosed={()=>setPriceEditor(null)}
           saved={row=>{setPriceEditorOpen(false);void chart.current?.update({type:'chart-alert-price-saved',row});}}

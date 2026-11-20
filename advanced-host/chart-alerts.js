@@ -36,12 +36,20 @@ function chartAlertBridge({
       c.left?.kind === "price" && c.right?.kind === "constant" &&
       ["cross", "cross_up", "cross_down", "above", "below"].includes(c.relation);
   };
+  const isRange = row => {
+    const c=row.config?.condition;
+    return row.config?.series_kind==='composite' && !row.config.association?.object_kind &&
+      c?.left?.kind==='price' && !c.offset && c.relation==='exit' &&
+      [c.lower,c.upper].every(v=>typeof v==='string'&&Number.isFinite(Number(v))&&Number(v)>0)&&Number(c.lower)<Number(c.upper);
+  };
+  const isTrackedPrice = row => isPrice(row) || isRange(row);
   let pricePoll, priceFlight = false, mutation = 0;
   const confirmedPrices = new Map();
   const quickFlights = new Set();
   const feedbacks = new Map();
   const priceLines = typeof nativeAlertPriceLines === "function" ? nativeAlertPriceLines({
     readonly,
+    rangeEditLabel: mobile ? "编辑" : "查看规则",
     move: typeof movePrice === "function" ? async (row, price, presentation) => {
       if (readonly || disposed || isLoading()) throw Error("告警当前不可编辑");
       const saved = isPrice(row) ? await rpc({op:"price_edit", alert_id:row.id,
@@ -49,7 +57,7 @@ function chartAlertBridge({
       if (!disposed) replace(saved);
       return saved;
     } : undefined,
-    current: (row, chart, epoch) => !disposed && !isLoading() && epoch === generation(chart) && matches(chart,row) && (isPrice(row) || associatedChart(row.config.association,row) === chart),
+    current: (row, chart, epoch) => !disposed && !isLoading() && epoch === generation(chart) && matches(chart,row) && (isTrackedPrice(row) || associatedChart(row.config.association,row) === chart),
     read: row => rpc({op:"price_read",alert_id:row.id}),
     edit: row => { if(mobile) send({type:"chart-alert-price-edit", row}); else send({type:"chart-alert-rule-open",alert_id:row.id}); },
     action: async (row, action) => {
@@ -58,7 +66,7 @@ function chartAlertBridge({
     },
     archive: async row => {
       if (readonly || disposed) throw Error("告警当前不可编辑");
-      const saved = await rpc({op:isPrice(row)?"price_action":"lifecycle",alert_id:row.id,version:row.version,
+      const saved = await rpc({op:isTrackedPrice(row)?"price_action":"lifecycle",alert_id:row.id,version:row.version,
         control_revision:row.control_revision,request_id:crypto.randomUUID(),action:"archive",
         object_id:row.config.association?.object_id,chart_id:row.config.association?.chart_id,
         workspace_id:row.config.association?.workspace_id});
@@ -84,7 +92,7 @@ function chartAlertBridge({
     return ids.get(chart);
   }
   function associatedChart(a, row) {
-    if (row && isPrice(row)) return chartList().find(chart => matches(chart,row)) || null;
+    if (row && isTrackedPrice(row)) return chartList().find(chart => matches(chart,row)) || null;
     if (!a || a.workspace_id !== String(getWorkspace()?.id)) return null;
     const known = chartList().find(
       (chart) => chartIdentity(chart) === a.chart_id,
@@ -320,6 +328,23 @@ function chartAlertBridge({
       if(!disposed && stillCurrent(chart,context))feedback(chart,"创建尚未确认："+String(error.message || error),()=>quickCreate(chart,context));
     } finally {quickFlights.delete(context.request_id);}
   }
+  const presetFlights = new Set();
+  async function previousDay(chart, context) {
+    if (readonly || !stillCurrent(chart,context) || presetFlights.has(chart)) return;
+    presetFlights.add(chart);
+    feedback(chart,"正在读取前日高低价…");
+    try {
+      const preset = await rpc({op:"price_previous_day", instrument:context.instrument,
+        series_kind:context.series_kind, timeframe:"M5", composite_revision_id:context.composite_revision_id});
+      if (!stillCurrent(chart,context)) return;
+      feedback(chart,"");
+      send({type:"chart-alert-context", context:{...context, request_id:crypto.randomUUID(),
+        previous_day:preset, phone_available:preset.phone_available,
+        composite_revision_id:preset.composite_revision_id}});
+    } catch(error) {
+      if (stillCurrent(chart,context)) feedback(chart,String(error.message || error),()=>previousDay(chart,context));
+    } finally {presetFlights.delete(chart);}
+  }
   async function menu(items, actionsFactory, params) {
     if (readonly || disposed) return items;
     const plus = params.menuName === "CrosshairMenuView" ? plusMenuPoint : null;
@@ -359,6 +384,9 @@ function chartAlertBridge({
       if(context.series_kind !== "composite")return [
         actionsFactory.createAction({actionId:"mw-chart-price-unavailable",label:"原生行情暂不支持价格告警",disabled:true}),
         actionsFactory.createAction({actionId:"mw-chart-price-maintain",label:"查看对应自建行情…",onExecute:()=>send({type:"chart-alert-maintain",context})}),...items];
+      // Preset uses M5 close capability independently of current chart/intrabar.
+      const presetAction=actionsFactory.createAction({actionId:"mw-chart-previous-day",
+        label:"前日高低突破…",onExecute:()=>previousDay(chart,context)});
       let caps,reason;
       try {
         caps=await rpc({op:"price_capabilities",instrument:context.instrument,series_kind:context.series_kind,timeframe:context.timeframe});
@@ -369,13 +397,14 @@ function chartAlertBridge({
         context.phone_available=caps.phone?.available===true;
         context.composite_revision_id=caps.composite_revision_id || context.composite_revision_id;
       } catch(error) {reason="能力核验未完成，请重新打开菜单重试";}
-      if(reason)return [actionsFactory.createAction({actionId:"mw-chart-price-unavailable",label:reason,disabled:true}),
+      if(reason)return [presetAction,actionsFactory.createAction({actionId:"mw-chart-price-unavailable",label:reason,disabled:true}),
         actionsFactory.createAction({actionId:"mw-chart-price-maintain",label:"查看实时自建设置…",onExecute:()=>send({type:"chart-alert-maintain",context})}),
         actionsFactory.createAction({actionId:"mw-chart-price-settings",label:"更多告警设置…",onExecute:()=>create({chart,price,context})}),...items];
       if(Number.isFinite(price))return [
         actionsFactory.createAction({actionId:"mw-chart-alert-create",label:`价格穿越 ${context.price_presentation.text} 时提醒`,onExecute:()=>create({chart,price,context,quick:true})}),
         actionsFactory.createAction({actionId:"mw-chart-price-summary",label:`盘中 · 一次 · ${context.phone_available?'手机推送':'仅站内记录（手机推送未启用）'}`,disabled:true}),
-        actionsFactory.createAction({actionId:"mw-chart-price-settings",label:"更多设置…",onExecute:()=>create({chart,price,context})}),...items];
+        actionsFactory.createAction({actionId:"mw-chart-price-settings",label:"更多设置…",onExecute:()=>create({chart,price,context})}),presetAction,...items];
+      items=[presetAction,...items];
     }
     const item = actionsFactory.createAction({
       actionId: "mw-chart-alert-create",
@@ -418,7 +447,7 @@ function chartAlertBridge({
         chart.symbol(),
         MWSeries.encode(row.config.instrument, row.config.series_kind),
       ) &&
-      (isPrice(row) || frames[chart.resolution()] === row.config.timeframe)
+      (isTrackedPrice(row) || frames[chart.resolution()] === row.config.timeframe)
     );
   }
   function sameLine(a, b) {
@@ -499,7 +528,7 @@ function chartAlertBridge({
   }
   function replace(row) {
     mutation++;
-    if (isPrice(row)) confirmedPrices.set(row.id, row);
+    if (isTrackedPrice(row)) confirmedPrices.set(row.id, row);
     if (!rows.some(old=>old.id===row.id))rows.push(row);
     rows = rows.map((old) =>
       old.id === row.id &&
@@ -766,7 +795,7 @@ function chartAlertBridge({
     });
   }
   async function reconcile(row) {
-    if (isPrice(row))return;
+    if (isTrackedPrice(row))return;
     const a = row.config.association,
       chart = associatedChart(a, row);
     if (
@@ -865,7 +894,7 @@ function chartAlertBridge({
       .slice(0, 500)
       .filter(
         (row) =>
-          isPrice(row) || row.config?.association?.workspace_id === String(getWorkspace()?.id),
+          isTrackedPrice(row) || row.config?.association?.workspace_id === String(getWorkspace()?.id),
       )
       .map((row) => {
         const previous = rows.find((old) => old.id === row.id);
@@ -889,7 +918,7 @@ function chartAlertBridge({
       }
   }
   function syncPriceLines() {
-    priceLines?.sync(rows.flatMap(row => (isPrice(row)?chartList().filter(chart=>matches(chart,row)):[associatedChart(row.config.association,row)])
+    priceLines?.sync(rows.flatMap(row => (isTrackedPrice(row)?chartList().filter(chart=>matches(chart,row)):[associatedChart(row.config.association,row)])
       .filter(Boolean).map(chart=>({row,chart,key:row.id+":"+chartIdentity(chart),epoch:generation(chart)}))));
   }
   function destroy() {

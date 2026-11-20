@@ -1,5 +1,5 @@
 import type { AlertApi } from "./chartAlertUiApi";
-import { freshDraft, isChartPrice, type AlertConfig, type AlertContext, type AlertRow, type Capabilities } from "./chartAlerts";
+import { freshDraft, isChartPrice, isChartRange, type AlertConfig, type AlertContext, type AlertRow, type Capabilities } from "./chartAlerts";
 import { editAlertPrice } from "./alertPriceEdit";
 
 const frames = ["M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"];
@@ -20,6 +20,12 @@ export async function chartPriceAlertRequest(q: any, call: AlertApi, current: ()
     if (!value || value.series_kind !== "composite" || !/^[a-f0-9]{64}$/.test(value.instrument) || !frames.includes(value.timeframe))
       throw Error("仅支持已开启实时的自建行情；请到数据页查看对应自建，核对来源后重新设价");
   };
+  if (q.op === "price_previous_day") {
+    identity(q);
+    return request("/chart-alerts/presets/previous-day", {
+      instrument:q.instrument, composite_revision_id:q.composite_revision_id ?? null,
+    });
+  }
   if (q.op === "price_capabilities") {
     identity(q);
     return request<Capabilities>("/chart-alerts/capabilities", {instrument:q.instrument, series_kind:q.series_kind, timeframe:q.timeframe});
@@ -29,7 +35,8 @@ export async function chartPriceAlertRequest(q: any, call: AlertApi, current: ()
       throw Error("无效的图表行情范围");
     const lists = await Promise.all([...new Set<string>(q.instruments)].map(instrument =>
       request<AlertRow[]>("/chart-alerts?" + new URLSearchParams({instrument}))));
-    return lists.flat().filter(row => row.config.series_kind === "composite" && isChartPrice(row.config));
+    return lists.flat().filter(row => row.config.series_kind === "composite" &&
+      (isChartPrice(row.config) || isChartRange(row.config)));
   }
   if (q.op === "price_create") {
     const context = q.context as AlertContext;
@@ -46,9 +53,11 @@ export async function chartPriceAlertRequest(q: any, call: AlertApi, current: ()
   }
   if (!uuid.test(q.alert_id)) throw Error("无效告警身份");
   const row = await request<AlertRow>(`/chart-alerts/${q.alert_id}`);
-  if (row.config.series_kind !== "composite" || !isChartPrice(row.config)) throw Error("此操作只支持固定价格告警");
+  const range = row.config.series_kind === "composite" && isChartRange(row.config);
+  if (row.config.series_kind !== "composite" || (!isChartPrice(row.config) && !range)) throw Error("此操作只支持固定价格告警");
   if (q.op === "price_read") return row;
   if (q.op === "price_edit") {
+    if (range) throw Error("区间告警请在告警编辑器中修改");
     if (!Number.isInteger(q.version) || !Number.isInteger(q.control_revision)) throw Error("无效告警版本");
     return editAlertPrice({...row,version:q.version,control_revision:q.control_revision}, q.price, request, q.presentation);
   }

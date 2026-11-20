@@ -23,6 +23,20 @@ def sample(i, price, *, timestamp=None):
                        D(price), D(10), D(price), {"revision": 1})
 
 
+def test_default_grace_preserves_existing_request_hash():
+    import hashlib
+    import json
+
+    from alerts.chart_alert_service import config_hash, config_payload
+
+    value = config()
+    legacy = value.model_dump(mode="json", exclude={"close_expiry_grace_ms"})
+    legacy["condition"].pop("offset", None)
+    assert "close_expiry_grace_ms" not in config_payload(value)
+    assert config_hash(value) == hashlib.sha256(json.dumps(legacy, sort_keys=True,
+        separators=(",", ":")).encode()).hexdigest()
+
+
 def test_new_events_and_independent_acknowledgements_survive_session_restarts(database):
     with database.begin() as db:
         ident = create(db, "create-1", config(notify_ntfy=True), at=300_000).id

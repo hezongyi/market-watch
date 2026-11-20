@@ -1,5 +1,6 @@
 """Shared log/notification wording; indicator values retain their own units."""
 
+from decimal import Decimal
 from string import Formatter
 
 from .market_names import display_code
@@ -46,6 +47,16 @@ def condition_label(condition):
     return label + f" [{condition['lower']}, {condition['upper']}]"
 
 
+def event_condition_label(condition, price):
+    label = condition_label(condition)
+    if condition["relation"] == "exit":
+        if Decimal(str(price)) > Decimal(str(condition["upper"])):
+            label += "（上破上沿）"
+        elif Decimal(str(price)) < Decimal(str(condition["lower"])):
+            label += "（下破下沿）"
+    return label
+
+
 def signal_title(signal):
     if not signal.evidence.get("chart_alert"):
         return f"{signal.instrument_id} · {signal.reason}"
@@ -62,7 +73,7 @@ def signal_message(signal):
     delay = max(0, evidence["detected_at"] - signal.occurred_at) / 1000
     values = {"symbol": display_code(identity.get("symbol") or signal.instrument_id, identity.get("source")),
               "source": identity["source"],
-              "timeframe": config["timeframe"], "condition": condition_label(config["condition"]),
+              "timeframe": config["timeframe"], "condition": event_condition_label(config["condition"], evidence["left"]),
               "value": evidence["left"], "threshold": evidence.get("threshold", str(signal.threshold)),
               "price": evidence.get("price", str(signal.price)), "event_time": instant(signal.occurred_at).isoformat(),
               "delay": f"{delay:g}s"}

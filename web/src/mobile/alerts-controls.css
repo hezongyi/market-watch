@@ -795,3 +795,13 @@
 :is(.mobile-alerts, .mobile-price-editor) .alert-switch-field > [data-slot="switch"] {
   flex-shrink: 0;
 }
+
+.mobile-controls .alert-preset-note {
+  display: grid;
+  gap: 4px;
+  padding: 0 0 12px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}

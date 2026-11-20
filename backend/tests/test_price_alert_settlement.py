@@ -243,3 +243,61 @@ def test_disabled_acquisition_still_settles_committed_valid_input(database, monk
         assert alert.count == 1 and not alert.runtime["settlement_pending"]
         assert evaluate(db, ident, now=expiry + 20) == []
     assert not live_pricing.desired_datasets(live_pricing.settings.oanda_account_id)
+
+
+@pytest.mark.parametrize("closing_price", ["1.119", "1.100"])
+def test_preset_waits_for_last_m5_and_emits_only_one_event(database, monkeypatch, closing_price):
+    from alerts.chart_alert_message import signal_message
+    from alerts.storage import LiveMinute
+    from test_composite_aggregates import drain as aggregate
+    from test_fixed_indicators import add_tail
+    from test_market_contracts import minute
+
+    end = 165600000 + 900000
+    ident, _, revision, seam, _ = armed(database, monkeypatch, mode="close", timeframe="M5",
+        condition={"relation": "exit", "lower": "1.105", "upper": "1.115"},
+        max_triggers=1, expires_at=end + 1, close_expiry_grace_ms=120000, notify_ntfy=True)
+    with database.begin() as db:
+        target = current_version(db, db.get(ChartAlert, ident)).market_identity["target_dataset_id"]
+        db.add(LiveMinute(dataset_id=target, start=end - 60000, expected=True,
+            expectation="source_tradeable", first_attempt=end - 60000, last_attempt=end - 1000))
+    with database.begin() as db:
+        assert evaluate(db, ident, now=end + 10) == []
+        alert = db.get(ChartAlert, ident)
+        assert alert.status == "expired" and alert.runtime["settlement_pending"]
+        assert alert.runtime["settlement"]["cursor_limit"] == end
+        assert alert.runtime["settlement"].get("awaiting_close_until")
+    # Confirmation arrives after the displayed deadline. It belongs to the
+    # final M5, whereas a next-day M5 must never be judged by this rule.
+    rows = [minute(at, volume="3", close=closing_price) for at in range(seam + 600000, end, 60000)]
+    add_tail(database, revision, rows, observed_at=end + 30000)
+    aggregate(revision, "M5")
+    with database.begin() as db:
+        observed = db.scalar(select(LiveMinute).where(LiveMinute.dataset_id == target,
+            LiveMinute.start == end - 60000))
+        observed.confirmed_at = observed.last_attempt = end + 30000
+    with database.begin() as db:
+        events = evaluate(db, ident, now=end + 30010)
+        assert len(events) == 1 and events[0].occurred_at == end
+        assert events[0].threshold == (Decimal("1.115") if closing_price == "1.119" else Decimal("1.105"))
+        assert ("上破上沿" if closing_price == "1.119" else "下破下沿") in signal_message(events[0])
+        assert db.scalar(select(Outbox)).status == "pending"
+        assert db.get(ChartAlert, ident).count == 1
+        assert evaluate(db, ident, now=end + 300000) == []
+        assert db.scalar(select(func.count()).select_from(SignalRow).where(SignalRow.chart_alert_id == ident)) == 1
+
+
+def test_preset_settlement_wait_is_bounded_and_does_not_admit_next_m5(database, monkeypatch):
+    end = 165600000 + 900000
+    ident, _, _, _, _ = armed(database, monkeypatch, timeframe="M5", mode="close",
+        condition={"relation": "exit", "lower": "1.105", "upper": "1.115"},
+        max_triggers=1, expires_at=end + 1, close_expiry_grace_ms=120000)
+    with database.begin() as db:
+        assert evaluate(db, ident, now=end + 10) == []
+        assert db.get(ChartAlert, ident).runtime["settlement_pending"]
+        assert evaluate(db, ident, now=end + 120002) == []
+        alert = db.get(ChartAlert, ident)
+        assert not alert.runtime["settlement_pending"]
+        assert alert.runtime["settlement"]["cursor_limit"] == end
+        assert alert.runtime["settlement"]["outcome"] == "confirmation_window_pending"
+        assert evaluate(db, ident, now=end + 300010) == []

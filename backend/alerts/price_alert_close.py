@@ -54,8 +54,9 @@ def window_reason(db, revision, target, value, fact, start, end, *, row=None, se
     observations = select(LiveMinute.id).where(LiveMinute.dataset_id == target.id,
             LiveMinute.start >= start, LiveMinute.start < end,
             LiveMinute.expected.is_(True))
+    frozen_at = settlement.get("frozen_at", settlement["started_at"]) if settlement else None
     observations = observations.where(or_(LiveMinute.confirmed_at.is_(None),
-        LiveMinute.confirmed_at > settlement["started_at"]), LiveMinute.first_attempt <= settlement["started_at"]
+        LiveMinute.confirmed_at > frozen_at), LiveMinute.first_attempt <= frozen_at
         ) if settlement else observations.where(LiveMinute.confirmed_at.is_(None))
     if db.scalar(observations.limit(1)) is not None:
         return "observed_minute_unconfirmed"
@@ -71,7 +72,7 @@ def window_reason(db, revision, target, value, fact, start, end, *, row=None, se
         # Old accepted preparation reads already carry a bounded source proof.
         cursor = start
         attempts = select(CompositeReadAttempt.start, CompositeReadAttempt.checkpoint)
-        attempts = attempts.where(CompositeReadAttempt.finished_at <= settlement["started_at"]) if settlement else attempts
+        attempts = attempts.where(CompositeReadAttempt.finished_at <= frozen_at) if settlement else attempts
         for lower, upper in db.execute(attempts
                 .where(CompositeReadAttempt.revision_id == revision.id,
                     CompositeReadAttempt.accepted.is_(True), CompositeReadAttempt.start < end,
@@ -191,7 +192,7 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
     from .live_session import session_status, unclosed_milliseconds
     from .live_window import lower_bound
     from .price_alert_evaluator import eligibility
-    from .price_alert_settlement import begin, finish, pending, runnable
+    from .price_alert_settlement import begin, finish, pending, runnable, settle_close_inputs
 
     try:
         revision, target = bound_identity(db, version.market_identity)
@@ -203,6 +204,9 @@ def evaluate_close(db, alert, version, config, now, *, clock=None):
         now = clock()
     begin(db, alert, version, config, now=now)
     if not runnable(alert):
+        return []
+    settlement = alert.runtime["settlement"] if pending(alert) else None
+    if settlement and not settle_close_inputs(db, alert, revision, target, config, now=now):
         return []
     settlement = alert.runtime["settlement"] if pending(alert) else None
     if alert.runtime.get("execution_contract") != CONTRACT:

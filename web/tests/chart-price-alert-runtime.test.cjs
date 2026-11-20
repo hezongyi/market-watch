@@ -29,6 +29,18 @@ test('listing deduplicates full series identities and excludes drawings and indi
  const rows=await request({op:'price_list',instruments:[instrument,instrument]},async()=>{calls++;return [fixed,{...fixed,config:{...fixed.config,association:{object_kind:'drawing'}}}];},()=>true);
  assert.equal(calls,1);assert.equal(rows.length,1);
 });
+
+test('previous-day exit ranges are listed and retain normal pause/archive lifecycle; drag editing is rejected',async()=>{
+ const range={id,version:1,control_revision:1,status:'active',config:{series_kind:'composite',instrument,timeframe:'M5',condition:{relation:'exit',left:{kind:'price'},lower:'100',upper:'110'},association:null}};
+ const rows=await request({op:'price_list',instruments:[instrument]},async()=>[range],()=>true);
+ assert.equal(rows.length,1);
+ await assert.rejects(request({op:'price_edit',alert_id:id,price:105},async()=>range,()=>true),/区间告警请在告警编辑器中修改/);
+ const calls=[];
+ const saved=await request({op:'price_action',alert_id:id,action:'pause',request_id:id,version:1,control_revision:1},async(path,body)=>{
+  calls.push([path,body]);if(!body)return range;return {...range,status:'paused',control_revision:2};
+ },()=>true);
+ assert.equal(saved.status,'paused');assert.equal(calls.at(-1)[0],`/chart-alerts/${id}/lifecycle`);
+});
 test('delayed responses are fenced by the actual chart owner',async()=>{
  let current=true;
  await assert.rejects(request({op:'price_capabilities',...context()},async()=>{current=false;return {};},()=>current),/图表已切换/);

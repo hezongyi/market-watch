@@ -202,7 +202,9 @@ def test_geometry_and_association_cannot_bypass_shared_write_validation(mcp, mon
         assert client.post("/api/chart-alerts", json={"request_id": args["request_id"], "config": cfg}).status_code == 422
     row = result(client, token, "chart_alerts_create", {
         "idempotency_key": "verified", "request_id": "verified", "config": payload})
-    assert row["config"] == config(**payload).model_dump(mode="json")
+    from alerts.chart_alert_service import config_payload
+
+    assert row["config"] == config_payload(config(**payload))
     discovered = result(client, token, "charts_get_drawings", {"workspace_id":"bound", "engine":"native"})
     assert discovered["charts"][0]["chart_id"] == "chart-uuid"
     indicator = {**payload, "association":{**payload["association"], "chart_index":None,

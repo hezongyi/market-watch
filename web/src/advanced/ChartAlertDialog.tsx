@@ -1,3 +1,4 @@
+import { PreviousDayAlertNote } from "./PreviousDayAlertNote";
 import { useChartTime } from "../time/ChartTimeContext";
 import { formatTimestamp } from "../time/chartTime";
 import { ZonedDateTimeInput } from "../time/ZonedDateTimeInput";
@@ -27,6 +28,7 @@ import {
   relations,
   isFixedPrice,
   type AlertConfig,
+  type PreviousDayPreset,
   type AlertRow,
   type Capabilities,
   type IndicatorSpec,
@@ -139,6 +141,7 @@ const defaultIndicator = (): IndicatorSpec => ({
 });
 
 export function ChartAlertDialog({
+  preset,
   initial,
   displayLabel,
   displayCode,
@@ -156,6 +159,7 @@ export function ChartAlertDialog({
   onDelete,
   onReload,
 }: {
+  preset?: PreviousDayPreset;
   initial: AlertConfig;
   displayLabel?: string;
   displayCode?: string;
@@ -286,6 +290,7 @@ export function ChartAlertDialog({
     setDraft((p) => ({
       ...p,
       ...value,
+      ...(value.mode === "intrabar" || value.expires_at === null ? {close_expiry_grace_ms:0 as const} : {}),
       condition: normalizeCondition(value.condition ?? p.condition),
     }));
   }
@@ -1248,6 +1253,7 @@ export function ChartAlertDialog({
             </p>
           )}
         </fieldset>
+        {preset && <PreviousDayAlertNote preset={preset} />}
         <footer>
           {page === "condition" ? (
             <>

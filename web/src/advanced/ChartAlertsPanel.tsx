@@ -54,6 +54,7 @@ export type AlertDraft = {
   config: AlertConfig;
   requestId: string;
   editing: { id: string; version: number } | null;
+  previousDay?: AlertContext["previous_day"];
   displayLabel?: string;
   displayCode?: string;
   automaticName?: boolean;
@@ -224,10 +225,11 @@ function ScopedChartAlertsPanel({
       config: freshDraft(context),
       requestId: context.request_id,
       editing: null,
+      previousDay: context.previous_day,
       displayLabel: context.display_label,
       displayCode: context.display_identity?.code,
       automaticName:
-        !!context.display_identity?.code && !context.line && !context.indicator,
+        !!context.display_identity?.code && !context.line && !context.indicator && !context.previous_day,
     });
     setFormOpen(true);
   }, [context?.request_id]);
@@ -1165,6 +1167,7 @@ function ScopedChartAlertsPanel({
       {formOpen && draft && (
         <ChartAlertDialog
           key={draft.requestId}
+          preset={draft.previousDay}
           initial={draft.config}
           displayLabel={draft.displayLabel}
           displayCode={draft.displayCode}

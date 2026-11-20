@@ -52,6 +52,7 @@ export type AlertConfig = {
   condition: Condition;
   max_triggers: 1 | 2 | 3;
   expires_at: number | null;
+  close_expiry_grace_ms?: 0 | 120000;
   message: string;
   notify_web: boolean;
   notify_ntfy: boolean;
@@ -64,7 +65,22 @@ export type AlertConfig = {
   seam_policy?: "reject" | "accept_raw";
 };
 export type DisplayIdentity = { code: string; series_kind: string; source: string; basis?: string | null; timeframe: string };
+export type PreviousDayPreset = {
+  kind: "previous_day";
+  lower: string;
+  upper: string;
+  reference_date: string;
+  reference_start: number;
+  reference_end: number;
+  day_end: number;
+  expires_at: number;
+  calendar: string;
+  outside: boolean;
+  composite_revision_id: string;
+  phone_available: boolean;
+};
 export type AlertContext = {
+  previous_day?: PreviousDayPreset;
   display_identity?: DisplayIdentity;
   request_id: string;
   instrument: string;
@@ -147,6 +163,12 @@ export function isChartPrice(config: AlertConfig) {
   const c = config.condition;
   return !config.association?.object_kind && !c.offset && c.left.kind === "price" &&
     c.right?.kind === "constant" && ["cross", "cross_up", "cross_down", "above", "below"].includes(c.relation);
+}
+export function isChartRange(config: AlertConfig) {
+  const c = config.condition;
+  return config.series_kind === "composite" && !config.association?.object_kind && c.left.kind === "price" && !c.offset &&
+    c.relation === "exit" && [c.lower, c.upper].every(v => typeof v === "string" &&
+      Number.isFinite(Number(v)) && Number(v) > 0) && Number(c.lower) < Number(c.upper);
 }
 export function offsetSnapshot(value: unknown): string | null {
   if (!value || typeof value !== "object") return null;
@@ -295,16 +317,17 @@ export function validAlertContext(
 export function freshDraft(context: AlertContext): AlertConfig {
   const squeeze = context.indicator?.name === "ROLLING_RANGE_SQUEEZE" && context.indicator.output === "signal";
   const price = !context.line && !context.indicator;
+  const preset = context.previous_day;
   return {
-    name: squeeze ? "Rolling Range Squeeze" : context.display_identity?.code && !context.line && !context.indicator
+    name: preset ? `${context.display_identity?.code || context.display_name || ""} 前日高低突破`.trim().slice(0,100) : squeeze ? "Rolling Range Squeeze" : context.display_identity?.code && !context.line && !context.indicator
       ? `${context.display_identity.code} ${relations.cross} ${context.price_presentation?.text || context.price || ""}`
       : (context.display_label || context.instrument) + " 告警",
     instrument: context.instrument,
     series_kind: context.series_kind,
     source: context.source || "",
-    timeframe: context.timeframe,
-    mode: price ? "intrabar" : "close",
-    condition: {
+    timeframe: preset ? "M5" : context.timeframe,
+    mode: preset ? "close" : price ? "intrabar" : "close",
+    condition: preset ? {relation:"exit", left:{kind:"price"}, lower:preset.lower, upper:preset.upper} : {
       relation: squeeze ? "above" : price ? "cross" : "cross_up",
       left: context.indicator
         ? { kind: "indicator", indicator: context.indicator }
@@ -314,8 +337,9 @@ export function freshDraft(context: AlertContext): AlertConfig {
         : { kind: "constant", value: squeeze ? "0" : context.price || "" },
     },
     max_triggers: 1,
-    expires_at: null,
-    message: squeeze ? "Rolling Range Squeeze triggered" : "",
+    expires_at: preset?.expires_at ?? null,
+    ...(preset ? {close_expiry_grace_ms:120000 as const} : {}),
+    message: preset ? `前日高低突破 · 参考交易日 ${preset.reference_date}` : squeeze ? "Rolling Range Squeeze triggered" : "",
     notify_web: true,
     notify_ntfy: price && context.phone_available === true,
     late_delivery: "log_only",
@@ -323,7 +347,7 @@ export function freshDraft(context: AlertContext): AlertConfig {
     calculation_version: "chart-python-v1",
     calculation_origin: context.calculation_origin ?? null,
     published: context.published ?? false,
-    ...(context.series_kind === "composite" ? {composite_revision_id:context.composite_revision_id ?? null,
+    ...(context.series_kind === "composite" ? {composite_revision_id:preset?.composite_revision_id ?? context.composite_revision_id ?? null,
       seam_policy:"reject" as const} : {}),
   };
 }
@@ -350,8 +374,9 @@ export function eventPresentation(event: AlertEvent) {
     `${value.indicator?.name ?? "指标"} ${value.indicator?.output ?? ""}` :
     value?.kind === "constant" ? value.value ?? "" : value?.kind === "line" ? "画线" : "价格";
   const c = config?.condition;
+  const edge = c?.relation === "exit" ? (Number(event.evidence.left) > Number(c.upper) ? " · 上破上沿" : Number(event.evidence.left) < Number(c.lower) ? " · 下破下沿" : "") : "";
   const summary = c ? `${operand(c.left)} ${relations[c.relation] ?? c.relation} ${
-    ["enter", "exit", "break_upper", "break_lower"].includes(c.relation) ? `${c.lower ?? ""}–${c.upper ?? ""}` : operand(c.right)}` : "";
+    ["enter", "exit", "break_upper", "break_lower"].includes(c.relation) ? `${c.lower ?? ""}–${c.upper ?? ""}` : operand(c.right)}${edge}` : "";
   const name = config?.name ?? "";
   return { name, summary, search: [name, summary, config?.instrument, event.display_label, event.message].filter(Boolean).join(" ").toLocaleLowerCase() };
 }
