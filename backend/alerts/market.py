@@ -289,6 +289,9 @@ def ingest(db, instrument, payload, received_at=None, *, defer_aggregation=False
                 "dataset": batch.identity.key, "calendar_revision": batch.identity.calendar_version,
                 "observed_minute_starts": conflicts, "observed_at": received_at,
                 "action": "preserve source M1; conflicting closure cannot certify aggregate completeness"}))
+    from .compatibility_retirement import retired
+    if retired(db, instrument.id):
+        return Ingestion(len(changed), bool(changes.price)) if report_changes else len(changed)
     touched = {instant(at) for at in changes.price}
     volume_touched = {instant(at) for at in changes.volume}
     if instrument.source == "oanda":
@@ -332,6 +335,9 @@ def aggregate_touched(db, instrument, touched, *, received_at=None,
     Callers may process one period in a short independent transaction. The
     instrument lock serializes revisions with live ingestion of the same bars.
     """
+    from .compatibility_retirement import retired
+    if retired(db, instrument.id):
+        return True
     timeframes = tuple(dict.fromkeys(timeframes))
     if any(frame not in {"M5", "M15", "H1", "H4", "D1"} for frame in timeframes):
         raise ValueError("Unsupported persisted aggregate timeframe")

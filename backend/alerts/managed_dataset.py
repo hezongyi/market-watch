@@ -48,12 +48,14 @@ def date_start(inst, value):
 
 def join(db, inst, start, now):
     from .chart_history_plan import lock_plan_instrument
+    from .compatibility_retirement import require_available
     from .realtime_switch import configured
 
     end = (now - 5000) // 60000 * 60000
     if start < 0 or start % 60000 or start >= end:
         raise ValueError("历史起点必须早于最新已完成分钟")
     lock_plan_instrument(db, inst.id)
+    require_available(db, inst.id)
     plan = db.get(ChartHistoryPlan, inst.id, populate_existing=True)
     if plan is None:
         plan = ChartHistoryPlan(
@@ -504,19 +506,20 @@ def adopt_legacy_once(*, limit=None):
     never adopted merely because somebody searched or opened its chart.
     """
     from .chart_history_plan import lock_plan_instrument
+    from .compatibility_retirement import retired, retired_query
     from .market import stored_coverage
     from .storage import MarketCoverage
-
     with transaction() as db:
         query = select(Instrument.id).where(
                     Instrument.id.not_in(select(ChartHistoryPlan.instrument_id)),
+                    Instrument.id.not_in(retired_query()),
                     Instrument.id.in_(select(MarketCoverage.instrument_id)),
                 ).order_by(Instrument.id)
         ids = list(db.scalars(query.limit(limit) if limit is not None else query))
     for ident in ids:
         with transaction() as db:
             inst = lock_plan_instrument(db, ident, skip_locked=True)
-            if inst is None:
+            if inst is None or retired(db, ident):
                 continue
             if db.get(ChartHistoryPlan, ident):
                 continue
@@ -560,6 +563,8 @@ def adopt_legacy_once(*, limit=None):
 
 
 def status(db, inst, frame, *, width=960, spacing=6, lookback=0, request_derivation=True):
+    from .compatibility_retirement import require_read
+    require_read(db, inst.id)
     if frame not in FRAMES or not 0 < width <= 16384 or not 0 < spacing <= 1000:
         raise ValueError("无效图表尺寸或周期")
     from .generic_derivation import is_candidate, pending, touch
@@ -611,6 +616,8 @@ def status(db, inst, frame, *, width=960, spacing=6, lookback=0, request_derivat
 
 
 def read_rows(db, inst, frame, before, limit, *, dataset_start=None):
+    from .compatibility_retirement import require_read
+    require_read(db, inst.id)
     pub = db.get(ChartPublication, (inst.id, frame))
     if pub is None:
         return []

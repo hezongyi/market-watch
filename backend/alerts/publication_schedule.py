@@ -52,6 +52,9 @@ def _queue(db, stamp, **facts):
 
 def request(db, instrument_id, *, frames=FRAMES, reason=BARS, stamp=None, approved=False):
     """Coalesce one input transaction, keeping every newer request generation."""
+    from .compatibility_retirement import retired
+    if retired(db, instrument_id):
+        return
     if not frames:
         return
     if not approved and not db.scalar(select(ChartHistoryPlan.instrument_id).where(
@@ -93,10 +96,12 @@ def discover(db, stamp):
     # Set before scanning so exceptions do not immediately hammer legacy history.
     _DISCOVER_AT[engine] = time.monotonic() + 60
     adopt_legacy_once(limit=20)
+    from .compatibility_retirement import retired_query
     targets = select(ChartHistoryPlan.instrument_id).union(select(ChartPublication.instrument_id)).subquery()
     # A migration seeds existing records. This catches post-upgrade plans created
     # by older applications without turning every target into periodic busy work.
     missing = list(db.scalars(select(targets.c.instrument_id).where(
+        targets.c.instrument_id.not_in(retired_query()),
         select(func.count()).select_from(ChartPublicationState).where(
             ChartPublicationState.instrument_id == targets.c.instrument_id,
             ChartPublicationState.timeframe.in_(FRAMES)).scalar_subquery() < len(FRAMES)).limit(20)))
@@ -171,6 +176,9 @@ def _publish_target(publisher, corrections, ident, frame, stamp, *, conflict=Fal
     with transaction() as db:
         inst = lock_plan_instrument(db, ident, skip_locked=True)
         if inst is None:
+            return None
+        from .compatibility_retirement import retired
+        if retired(db, ident):
             return None
         from . import managed_dataset
 

@@ -10,6 +10,9 @@ from .storage import ChartPublication, ChartPublicationJob, Instrument, instant,
 
 
 def enqueue_publication(db, instrument_id, source, starts, *, include_source=True):
+    from .compatibility_retirement import retired
+    if retired(db, instrument_id):
+        return
     if not starts:
         return
     frames = (source, "M30") if source == "M15" else (source, "W1", "MN") if source == "D1" else (source,)

@@ -820,6 +820,11 @@ def router(authenticated):
             job = db.get(ImportJob, ident)
             if not job or job.priority < 100:
                 raise HTTPException(404, "图表任务不存在")
+            from .chart_history_plan import lock_plan_instrument
+            from .compatibility_retirement import require_read
+            lock_plan_instrument(db, job.instrument_id)
+            require_read(db, job.instrument_id)
+            db.refresh(job)
             if job.status == "failed":
                 job.status = "pending"
                 job.attempts = 0

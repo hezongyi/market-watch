@@ -37,8 +37,11 @@ def authorized(job, inst):
 
 
 def create(db, instrument, *, start=None, end=None, automatic=False, now=None):
+    from .compatibility_retirement import require_available
+
     now = now if now is not None else now_ms()
     inst = db.scalar(select(Instrument).where(Instrument.id == instrument).with_for_update())
+    require_available(db, instrument)
     if not inst or inst.source not in ('oanda', 'binance'):
         raise ValueError('该来源尚无可确认的量口径')
     plan = db.get(ChartHistoryPlan, instrument)
@@ -115,6 +118,9 @@ def control(db, ident, action):
     if action not in ('cancel', 'resume', 'retry'):
         raise ValueError('未知量任务操作')
     inst, job = locked(db, ident)
+    if action != "cancel":
+        from .compatibility_retirement import require_available
+        require_available(db, inst.id)
     if action != 'cancel' and not authorized(job, inst):
         raise ValueError('来源或价格口径变化，旧量任务不能恢复')
     if action != "cancel" and db.scalar(select(VolumeBackfillJob.id).where(

@@ -167,6 +167,8 @@ def market_identity(db, config: AlertConfig, dataset_id=None, *, at=None, clock=
             raise ValueError("组合告警不能绑定平台缓存数据集")
         return bind(db, config, now=at, clock=clock)
     if config.series_kind == "managed":
+        from .compatibility_retirement import require_available
+        require_available(db, config.instrument)
         instrument = db.get(Instrument, config.instrument)
         if not instrument or not instrument.enabled or instrument.source != config.source:
             raise ValueError("品种或行情来源已改变，请刷新图表后重试")
@@ -272,6 +274,11 @@ def locked(db, alert_id, expected_version=None, *, config=None, skip_locked=Fals
                 mapping_id = revision.mapping_id
         mapping = db.get(RealtimeMapping, mapping_id)
         datasets.update((dataset_id, mapping.target_dataset_id))
+    managed_ids = {identity.get("instrument")}
+    if config and config.series_kind == "managed":
+        managed_ids.add(config.instrument)
+    datasets.update(db.scalars(select(MarketDataset.id).where(
+        MarketDataset.instrument_id.in_([v for v in managed_ids if v and v.startswith("MD:")]))))
     rows = list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(datasets))
         .order_by(MarketDataset.id).with_for_update(skip_locked=skip_locked)))
     if skip_locked and set(rows) != datasets:
@@ -365,6 +372,9 @@ def lifecycle(db, alert_id, expected_version, action, *, expected_revision, requ
         if alert.expires_at is not None and alert.expires_at <= at:
             raise ValueError("告警已到期，请先修改到期时间")
         config = AlertConfig.model_validate(current_version(db, alert).config)
+        if config.series_kind == "managed":
+            from .compatibility_retirement import require_available
+            require_available(db, config.instrument)
         from .price_alert_reasons import validate_notification
 
         validate_notification(config, db)

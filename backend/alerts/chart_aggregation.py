@@ -64,6 +64,9 @@ def _coalesce_observed(db, instrument, frame, left, right, *, kind='observed', a
 
 def enqueue_aggregation(db, instrument, start, end, now, *, kind="price"):
     """Caller owns the instrument lock and commits this alongside M1 coverage."""
+    from .compatibility_retirement import retired
+    if retired(db, instrument):
+        return
     from .generic_derivation import is_paused
     paused = is_paused(db, instrument)
     for left in range(start, end, MAX_RANGE):
