@@ -396,3 +396,44 @@ def test_sqlite_bootstrap_adds_sharing_without_rewriting_legacy_payload():
             )
         ).one() == (b"\x12\x34\x56", None, None, None)
     engine.dispose()
+
+
+def test_sqlite_bootstrap_migration_roundtrip_preserves_legacy_payload():
+    import importlib.util
+    from pathlib import Path
+
+    from alembic.migration import MigrationContext
+    from alembic.operations import Operations
+    from alerts.storage import _bootstrap_artifact_sharing
+    from sqlalchemy import create_engine, inspect, text
+
+    path = Path(__file__).resolve().parents[2] / "migrations/versions/bf59_history_block_sharing.py"
+    spec = importlib.util.spec_from_file_location("sharing_sqlite_migration", path)
+    migration = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(migration)
+    engine = create_engine("sqlite://")
+    with engine.begin() as db:
+        db.execute(
+            text(
+                "CREATE TABLE market_history_artifact_blocks (id VARCHAR(36) PRIMARY KEY, content BLOB NOT NULL)"
+            )
+        )
+        db.execute(text("INSERT INTO market_history_artifact_blocks VALUES ('legacy', X'123456')"))
+        _bootstrap_artifact_sharing(db)
+        with Operations.context(MigrationContext.configure(db)):
+            migration.upgrade()
+            migration.downgrade()
+        assert {c["name"] for c in inspect(db).get_columns("market_history_artifact_blocks")} == {
+            "id",
+            "content",
+        }
+        assert (
+            db.scalar(text("SELECT content FROM market_history_artifact_blocks")) == b"\x12\x34\x56"
+        )
+        with Operations.context(MigrationContext.configure(db)):
+            migration.upgrade()
+        assert db.execute(text("PRAGMA foreign_key_check")).all() == []
+        assert (
+            db.scalar(text("SELECT content FROM market_history_artifact_blocks")) == b"\x12\x34\x56"
+        )
+    engine.dispose()

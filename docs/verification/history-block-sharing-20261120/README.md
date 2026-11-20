@@ -56,21 +56,21 @@ the copy/decode/recompress path using the same candidate reader.
 
 | Second incremental generation | Copy payloads | Share payloads |
 |---|---:|---:|
-| Materialization | 3.985 s | 1.911 s |
-| SQL statements during materialization | 2,030 | 766 |
-| Period payload SELECTs during materialization | 93 | 0 |
-| Compression calls | 104 | 11 |
-| Newly stored compressed bytes | 532,863 | 3,182 |
-| Shared blocks | 0 | 93 |
+| Materialization | 4.233 s | 1.745 s |
+| SQL statements during materialization | 1,997 | 697 |
+| Period payload SELECTs during materialization | 97 | 0 |
+| Compression calls | 107 | 10 |
+| Newly stored compressed bytes | 533,872 | 2,930 |
+| Shared blocks | 0 | 97 |
 | Full nine-period read SQL statements | 54 | 54 |
-| Full nine-period read | 1.133 s | 1.169 s |
-| Returned bars | 79,284 | 79,284 |
+| Full nine-period read | 1.191 s | 1.211 s |
+| Returned bars | 79,309 | 79,309 |
 
-For this fixture: approximately **2.1×** materialization throughput, **99.4%**
+For this fixture: approximately **2.4×** materialization throughput, **99.5%**
 less new compressed payload, with no additional read SQL. Every returned field
 except the necessarily different parent version ID has the same SHA-256 digest
 across all three variants. Existing legacy blocks without counters take
-2.886 s on first adoption and 2.034 s on the following generation. These are
+2.221 s on first adoption and 1.577 s on the following generation. These are
 controlled local samples, not a promise of end-to-end supplier latency; the
 shared host also ran isolated PostgreSQL regression tests during sampling.
 
@@ -91,6 +91,10 @@ PYTHONPATH=backend python docs/verification/history-block-sharing-20261120/bench
 ```
 
 SQLite: **34 passed**. PostgreSQL: **16 passed**.
+Additional migration-chain checks: **8 SQLite passed** (six old branch entry
+points, joined-head preservation, and anonymous-FK bootstrap roundtrip), and
+**2 PostgreSQL passed** (actual predecessor upgrade and safe/unsafe downgrade).
+These sets overlap the focused suite and are not an additive total.
 Contracts cover three generations/direct roots, pagination, unchanged parent
 manifest/payload, revised tails, legacy adoption, corruption detection,
 dataset/price-policy/frame separation, no reference chains, whole-dataset
@@ -139,6 +143,45 @@ only maintenance, and a targeted Compose `up -d --no-build --no-deps data-worker
 using the recorded `run.json` resumes it. Do not use a generic old-image rollback
 or the helper's all-service `up` during this staged deployment.
 
-The development results and exact candidate commit/image will be recorded
-after deployment. This task does not authorize merge, release tags, production
-deployment, historical data cleanup or unrelated service retirement.
+## Persistent development acceptance
+
+Artifact reader/writer commit: `19cd5da7`; exact image:
+`sha256:65c468a3ecca5bbccaecb4d242089a19ad8666c4b76e5eccb206e399751d327e`.
+API, market-runtime and data-worker use this candidate. The final migration
+compatibility patch does not change application code; its rebuilt image is
+recorded separately in the launcher's migration service. Schema is
+`bf59_history_block_sharing`.
+
+- Authenticated domain API reads: **135/135 published periods**, 47–149 ms
+  per small chart request, no pending data. An initial audit attempt hit a
+  transient TLS EOF before completion; the complete rerun passed without
+  changing TLS, proxy or supplier configuration.
+- A normal existing BTCUSD/Dukascopy incremental maintenance was submitted
+  through its authenticated API with an idempotent request ID. It completed
+  in **15.14 s**, all nine periods published. The version holds 119 blocks,
+  **103 shared**, with 170,197 newly stored compressed bytes. This includes
+  the normal two-day refresh interval; it is not compared with an artificial
+  one-minute production update.
+- Explicit old-history chart reads inside shared blocks: **9/9**, 43–78 ms,
+  nonempty bars and `pending=[]`, including weekly/monthly periods.
+- After acceptance: **zero pending artifacts**, no active unfinished history
+  maintenance. No development data was deleted or replaced.
+- Post-acceptance resource sample at approximately 08:09 UTC: host busy
+  **15.57%** over five seconds (four logical CPUs); API 0.12%, market-runtime
+  4.80%, data-worker 7.22%, PostgreSQL 4.69% in Docker's per-core units. This
+  brief idle/ongoing-runtime sample is not a controlled CPU reduction claim.
+- Web, notification-worker, PostgreSQL, TLS and ntfy retain their original
+  container identities and mounts. The Android update manifest still returns
+  HTTP 200. No APK rebuild/install is needed for this backend optimization.
+- Isolated task PostgreSQL was stopped after tests; its existing volume is
+  preserved. Private safety snapshots include the actual launcher, exact
+  container inventory and schema-only dump. Shared-reader fallback config is
+  retained beside them.
+
+CI initially identified a stale migration-head expectation. Both affected
+tests now follow the new head, and fresh/legacy upgrade paths are explicitly
+verified. Final CI status must be checked against the updated PR head; the
+initial failing run is not reported as a successful check.
+
+This task does not authorize merge, release tags, production deployment,
+historical data cleanup or unrelated service retirement.
