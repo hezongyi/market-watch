@@ -107,3 +107,8 @@ def test_postgres_qfq_basis_revision(provider_pg, family, kind, first, revised, 
 ], ids=lambda contract: contract.__name__)
 def test_postgres_qfq_unavailable_and_upgrade(provider_pg, contract):
     contract(provider_pg[0])
+
+
+def test_postgres_native_failure_backoff(provider_pg, monkeypatch):
+    contracts.test_failed_native_maintenance_backs_off_without_changing_saved_configuration(
+        provider_pg[0], monkeypatch)

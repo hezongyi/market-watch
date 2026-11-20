@@ -19,6 +19,7 @@ from .storage import (
     ChartPublication,
     ChartPublicationJob,
     ChartPublishedBar,
+    ChartViewportDemand,
     ChartWorkspace,
     CompositePreparation,
     CompositeRevision,
@@ -103,6 +104,8 @@ def reference_values(row):
         return {"version_id": row.version_id}
     if isinstance(row, HistoryFrameRun):
         return {"version_id": row.version_id, "parent_version_id": row.inherited_version_id}
+    if isinstance(row, ChartViewportDemand):
+        return row.instrument_id
     if isinstance(row, MarketDemand):
         return {"instrument_id": row.instrument_id, "composite_revision_id": row.composite_revision_id}
     if isinstance(row, (ChartHistoryPlan, WeeklyHistoryRequest)):
@@ -117,6 +120,7 @@ def plan_blocks_reclamation(plan):
 
 def guard_reference_writes(db):
     documents = []
+    independent = []
     for row in set(db.new) | set(db.dirty):
         if isinstance(row, ChartHistoryPlan):
             state = inspect(row)
@@ -129,8 +133,14 @@ def guard_reference_writes(db):
                                     for key in ("instrument_id", "status", "realtime_enabled"))
             if state.persistent and plan_blocks_reclamation(row) and not reference_changed:
                 continue
-        documents.append(reference_values(row))
-    lock_reference_values(db, documents)
+        value = reference_values(row)
+        documents.append(value)
+        if isinstance(row, (AdvancedPreference, AdvancedWorkspace, ChartWorkspace,
+                            MarketDemand, ChartViewportDemand, ChartAlertVersion)):
+            independent.append(value)
+    lock_reference_values(db, documents, reject_retired=False)
+    from .compatibility_retirement import require_references
+    require_references(db, independent)
     content_ids = {row.content_id for row in db.new if isinstance(row, HistoryChunk) and row.content_id}
     content_ids.update(blob for row in set(db.new) | set(db.dirty) if isinstance(row, HistoryFrameRun)
                        for blob in (row.facts or {}).get("pages", []))
@@ -142,7 +152,7 @@ def guard_reference_writes(db):
             raise ValueError("共享来源内容已被回收，请重新获取观测")
 
 
-def lock_reference_values(db, document, *, shared=False):
+def lock_reference_values(db, document, *, shared=False, reject_retired=True):
     """Also called explicitly by optimistic SQL workspace updates."""
     values = set(string_values(document))
     if not values:
@@ -187,6 +197,9 @@ def lock_reference_values(db, document, *, shared=False):
         return
     list(db.scalars(select(MarketDataset.id).where(MarketDataset.id.in_(dataset_ids))
                     .order_by(MarketDataset.id).with_for_update(read=shared)))
+    if reject_retired:
+        from .compatibility_retirement import require_references
+        require_references(db, document)
     # Recheck after the deletion fence, including Core upsert callers. An old
     # revision may still exist after its unreferenced live inputs were trimmed.
     if revision_ids and db.scalar(select(CompositePreparation.revision_id).where(

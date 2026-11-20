@@ -48,12 +48,14 @@ def date_start(inst, value):
 
 def join(db, inst, start, now):
     from .chart_history_plan import lock_plan_instrument
+    from .compatibility_retirement import require_available
     from .realtime_switch import configured
 
     end = (now - 5000) // 60000 * 60000
     if start < 0 or start % 60000 or start >= end:
         raise ValueError("历史起点必须早于最新已完成分钟")
     lock_plan_instrument(db, inst.id)
+    require_available(db, inst.id)
     plan = db.get(ChartHistoryPlan, inst.id, populate_existing=True)
     if plan is None:
         plan = ChartHistoryPlan(
@@ -111,15 +113,22 @@ def _merged(spans):
     return result
 
 
-def continuous_coverage(db, inst, plan, now):
+def continuous_coverage(db, inst, plan, now, *, latest_only=False):
+    from .config import settings
+    from .coverage_projection import read
     from .market import stored_coverage
 
     cutoff = (now - 5000) // 60000 * 60000
-    spans = _merged(stored_coverage(db, inst, plan.target_start, cutoff))
+    spans = read(db, inst, plan.target_start, cutoff, latest=True) if (
+        latest_only and settings.coverage_projection_enabled) else None
+    intervals = _merged(stored_coverage(db, inst, plan.target_start, cutoff)) if spans is None else [
+        (span['start'], span['end']) for span in spans]
+    if latest_only:
+        intervals = intervals[-1:]
     spans = [
         (max(a, plan.target_start), min(b, cutoff))
-        for a, b in spans
-        if b > plan.target_start and a < cutoff
+        for a, b in intervals
+        if max(a, plan.target_start) < min(b, cutoff)
     ]
     # Only the most recent continuous interval is the live dataset. Other
     # intervals are reported separately; no artificial join across a gap.
@@ -270,7 +279,7 @@ def publish_frame(db, inst, plan, frame, now):
                                  next_due_at=corrections.next_due_at or next_due,
                                  blocked_reason=corrections.blocked_reason or blocked)
 
-    spans = continuous_coverage(db, inst, plan, now)
+    spans = continuous_coverage(db, inst, plan, now, latest_only=True)
     if not spans:
         pub = db.get(ChartPublication, (inst.id, frame))
         if pub:
@@ -497,19 +506,20 @@ def adopt_legacy_once(*, limit=None):
     never adopted merely because somebody searched or opened its chart.
     """
     from .chart_history_plan import lock_plan_instrument
+    from .compatibility_retirement import retired, retired_query
     from .market import stored_coverage
     from .storage import MarketCoverage
-
     with transaction() as db:
         query = select(Instrument.id).where(
                     Instrument.id.not_in(select(ChartHistoryPlan.instrument_id)),
+                    Instrument.id.not_in(retired_query()),
                     Instrument.id.in_(select(MarketCoverage.instrument_id)),
                 ).order_by(Instrument.id)
         ids = list(db.scalars(query.limit(limit) if limit is not None else query))
     for ident in ids:
         with transaction() as db:
             inst = lock_plan_instrument(db, ident, skip_locked=True)
-            if inst is None:
+            if inst is None or retired(db, ident):
                 continue
             if db.get(ChartHistoryPlan, ident):
                 continue
@@ -552,11 +562,14 @@ def adopt_legacy_once(*, limit=None):
             request(db, ident, reason=INITIAL, stamp=now_ms(), approved=True)
 
 
-def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
+def status(db, inst, frame, *, width=960, spacing=6, lookback=0, request_derivation=True):
+    from .compatibility_retirement import require_read
+    require_read(db, inst.id)
     if frame not in FRAMES or not 0 < width <= 16384 or not 0 < spacing <= 1000:
         raise ValueError("无效图表尺寸或周期")
-    from .generic_derivation import pending, touch
-    deferred = touch(db, inst.id) and pending(db, inst.id, frame, published=True)
+    from .generic_derivation import is_candidate, pending, touch
+    check = touch if request_derivation else is_candidate
+    deferred = check(db, inst.id) and pending(db, inst.id, frame, published=True)
     plan = db.get(ChartHistoryPlan, inst.id)
     pub = db.get(ChartPublication, (inst.id, frame))
     threshold = 3 * ceil(width / spacing)
@@ -603,6 +616,8 @@ def status(db, inst, frame, *, width=960, spacing=6, lookback=0):
 
 
 def read_rows(db, inst, frame, before, limit, *, dataset_start=None):
+    from .compatibility_retirement import require_read
+    require_read(db, inst.id)
     pub = db.get(ChartPublication, (inst.id, frame))
     if pub is None:
         return []

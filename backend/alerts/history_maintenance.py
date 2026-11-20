@@ -61,7 +61,8 @@ def configuration_revision(plan):
     values = {key: getattr(plan, key) for key in fields}
     if plan.frame_plan:
         values["frame_plan"] = {frame: {key: value for key, value in rules.items()
-            if key not in ("next_due", "last_success")} for frame, rules in plan.frame_plan.items()}
+            if key not in ("next_due", "last_success", "consecutive_failures")}
+            for frame, rules in plan.frame_plan.items()}
     return hashlib.sha256(json.dumps(values,
         sort_keys=True, separators=(",", ":")).encode()).hexdigest()
 

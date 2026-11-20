@@ -36,6 +36,18 @@ def period(at, frame, phase):
     return ms(left), ms(right)
 
 
+def display_ranges(starts, frame, phase, *, floor, cutoff, count):
+    """Group visible provisional buckets into bounded contiguous reads."""
+    affected = {period(at, frame, phase) for at in starts}
+    ranges = []
+    for left, right in sorted(pair for pair in affected if floor <= pair[0] < cutoff)[-(count + 1):]:
+        if ranges and ranges[-1][1] == left and right - ranges[-1][0] <= 32 * 86400000:
+            ranges[-1] = (ranges[-1][0], right)
+        else:
+            ranges.append((left, right))
+    return ranges
+
+
 def _closed(at, segment, phase):
     return not scheduled_open(instant(at), calendar_from(phase, segment["profile"], explicit=True),
                               closures=closures_from(segment["profile"]))
@@ -185,10 +197,10 @@ def read_window(db, composite_id, frame, start, end, *, revision_id=None, input_
             observed = observations(display_snapshot, tail_left, right)
         else:
             observed = read(db, target.id, revision.id, value, tail_left, right, now=stamp)
+        confirmed_starts = {row['timestamp'] for row in minutes} if state is None else state.rows
         for observation in observed:
             at = observation['start']
-            if not (at in state.rows if state else
-                    any(row['timestamp'] == at for row in minutes)):
+            if at not in confirmed_starts:
                 minutes.append({**observation, 'timestamp': at, 'segment': 'target',
                     'source_id': target_meta['source_id'], 'volume_kind': 'unavailable', 'volume_unit': None})
         minutes.sort(key=lambda row: row['timestamp'])

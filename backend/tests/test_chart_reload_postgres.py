@@ -245,3 +245,37 @@ def test_mixed_stale_retry_rollback(provider_pg, monkeypatch):
         test_mixed_stale_display_retry_survives_transaction_rollback,
     )
     test_mixed_stale_display_retry_survives_transaction_rollback(provider_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize('cached', [False, True])
+def test_capacity_warning_does_not_block_history_or_realtime(provider_pg, monkeypatch, cached):
+    from test_composite_chart import test_display_capacity_warning_cannot_reopen_exhausted_history
+
+    test_display_capacity_warning_cannot_reopen_exhausted_history(provider_pg[0], monkeypatch, cached)
+
+
+@pytest.mark.parametrize('frame', ['M1', 'M5'])
+@pytest.mark.parametrize('mode', ['ordinary', 'cold', 'warm'])
+@pytest.mark.parametrize('count', [3, 30])
+def test_visible_observations_use_bounded_range_reads(provider_pg, monkeypatch, frame, mode, count):
+    from test_composite_aggregates import (
+        test_materialized_display_batches_contiguous_pending_buckets,
+    )
+
+    test_materialized_display_batches_contiguous_pending_buckets(provider_pg[0], monkeypatch, frame, mode, count)
+
+
+def test_background_creation_persists_all_periods(provider_pg, monkeypatch):
+    from test_history_maintenance import (
+        test_all_configured_periods_materialize_before_success_without_any_chart,
+    )
+
+    test_all_configured_periods_materialize_before_success_without_any_chart(provider_pg[0], monkeypatch)
+
+
+def test_warm_display_uses_frozen_confirmation_revision(provider_pg, monkeypatch):
+    from test_composite_aggregates import (
+        test_warm_display_snapshot_never_adopts_later_confirmed_prices,
+    )
+
+    test_warm_display_snapshot_never_adopts_later_confirmed_prices(provider_pg[0], monkeypatch)

@@ -20,6 +20,13 @@ from .calendar_profile import closures_from
 from .chart_data import FRAMES, bounds
 from .chart_series import is_gold
 from .domain import bucket_bounds, calendar_for, scheduled_open
+from .history_artifact_blocks import (
+    iter_rows,
+    manifest_blocks,
+    metadata_query,
+    read_rows,
+    reference_blocks,
+)
 from .market_datasets import price_rule, version_price_rows
 
 # ``raw_chunk`` remains a public test/diagnostic seam for older callers.  The
@@ -195,16 +202,41 @@ def _reuse_period_block(db, artifact, version):
         HistoryArtifact.rule_version == artifact.rule_version))
     if not previous:
         return None
-    block = db.scalar(select(HistoryArtifactBlock).where(HistoryArtifactBlock.artifact_id == previous.id,
-        HistoryArtifactBlock.start >= artifact.cursor).order_by(HistoryArtifactBlock.start).limit(1))
+    # Use the (artifact_id, start) index in both directions, including near the
+    # tail of a large archive, rather than filtering its entire old prefix.
+    block = db.scalar(metadata_query().where(HistoryArtifactBlock.artifact_id == previous.id,
+        HistoryArtifactBlock.start <= artifact.cursor).order_by(HistoryArtifactBlock.start.desc()).limit(1))
+    if not block or block.end <= artifact.cursor:
+        block = db.scalar(metadata_query().where(HistoryArtifactBlock.artifact_id == previous.id,
+            HistoryArtifactBlock.start >= artifact.cursor).order_by(HistoryArtifactBlock.start).limit(1))
+    # The first H4/D1/W1/MN bucket can start before the requested history
+    # range. Do not skip its entire block when reusing an unchanged prefix.
+    # A partly rebuilt block elsewhere must instead continue from M1 input.
+    if block and block.start < artifact.cursor and not (artifact.cursor == parent.start == version.start):
+        return None
     if not block or block.end > min(parent.end, version.end):
         return None
     if artifact.cursor < run.refresh_end and block.end > run.refresh_start:
         return None
-    raw = gzip.decompress(block.content)
-    if hashlib.sha256(raw).hexdigest() != block.checksum:
-        raise ValueError("Original timeframe artifact checksum mismatch")
-    return [{**row, "parent_version_id": version.id} for row in json.loads(raw)], block.end
+    from .config import settings
+
+    if not settings.history_block_sharing_enabled:
+        return read_rows(db, block, artifact), block.end, []
+    # Metadata-only adoption is bounded independently of the source M1 batch.
+    # Legacy blocks have no counters: decode at most eight on the first adoption.
+    blocks = list(db.scalars(metadata_query().where(HistoryArtifactBlock.artifact_id == previous.id,
+        HistoryArtifactBlock.start >= block.start).order_by(HistoryArtifactBlock.start).limit(64)))
+    eligible, legacy = [], 0
+    for item in blocks:
+        if item.end > min(parent.end, version.end) or (
+                artifact.cursor < run.refresh_end and item.end > run.refresh_start):
+            break
+        legacy += item.input_count is None or item.complete_count is None
+        if legacy > 8:
+            break
+        eligible.append(item)
+    refs = reference_blocks(db, eligible, previous, artifact)
+    return [], refs[-1].end, refs
 
 
 def artifact_tick(version_id=None):
@@ -250,8 +282,14 @@ def artifact_tick(version_id=None):
             HistoryChunk.timeframe == "M1",
             HistoryChunk.end > artifact.cursor).order_by(HistoryChunk.start).limit(1))
         if reused:
-            output, artifact.cursor = reused
-            processed = sum(row["observed_minutes"] for row in output)
+            output, artifact.cursor, refs = reused
+            if refs:
+                db.add_all(refs)
+                artifact.count += sum(block.count for block in refs)
+                artifact.complete_count += sum(block.complete_count for block in refs)
+                processed = sum(block.input_count for block in refs)
+            else:
+                processed = sum(row["observed_minutes"] for row in output)
         elif chunk:
             if chunk.start > artifact.cursor:
                 raise ValueError("Artifact parent query partition is discontinuous")
@@ -282,7 +320,9 @@ def artifact_tick(version_id=None):
         if output:
             raw = json.dumps(output, sort_keys=True, separators=(",", ":")).encode()
             db.add(HistoryArtifactBlock(artifact_id=artifact.id, start=output[0]["start"], end=output[-1]["end"],
-                count=len(output), checksum=hashlib.sha256(raw).hexdigest(), content=gzip.compress(raw, mtime=0)))
+                count=len(output), checksum=hashlib.sha256(raw).hexdigest(), content=gzip.compress(raw, mtime=0),
+                input_count=sum(row["observed_minutes"] for row in output),
+                complete_count=sum(row["complete"] for row in output)))
             artifact.count += len(output)
             artifact.complete_count += sum(row["complete"] for row in output)
         artifact.accumulator = state
@@ -298,8 +338,7 @@ def artifact_tick(version_id=None):
         artifact.manifest = {**artifact.manifest, "progress": progress}
         db.flush()
         if artifact.cursor == version.end:
-            blocks = db.scalars(select(HistoryArtifactBlock).where(HistoryArtifactBlock.artifact_id == artifact.id)
-                .order_by(HistoryArtifactBlock.start)).all()
+            blocks = manifest_blocks(db, artifact.id)
             artifact.manifest = {"parent_version_id": version.id, "parent_checksum": version.manifest["checksum"],
                 "timeframe": artifact.timeframe, "rule_version": RULE_VERSION, "aggregation_calendar": instrument.calendar,
                 "identity": dataset.identity, "rows": artifact.count, "complete_rows": artifact.complete_count,
@@ -383,20 +422,8 @@ def published_artifact(db, version_id, frame):
 def iter_artifact(db, version_id, frame, *, start=None, end=None, newest_first=False):
     """Stream verified immutable period blocks; at most one block in memory."""
     artifact = published_artifact(db, version_id, frame)
-    query = select(HistoryArtifactBlock).where(HistoryArtifactBlock.artifact_id == artifact.id)
-    if start is not None:
-        query = query.where(HistoryArtifactBlock.end > start)
-    if end is not None:
-        query = query.where(HistoryArtifactBlock.start < end)
-    ordering = HistoryArtifactBlock.start.desc() if newest_first else HistoryArtifactBlock.start
-    for block in db.scalars(query.order_by(ordering).execution_options(yield_per=1)):
-        raw = gzip.decompress(block.content)
-        if hashlib.sha256(raw).hexdigest() != block.checksum:
-            raise ValueError("Published timeframe artifact checksum mismatch")
-        rows = json.loads(raw)
-        for row in reversed(rows) if newest_first else rows:
-            if (start is None or row["start"] >= start) and (end is None or row["start"] < end):
-                yield row
+    yield from iter_rows(db, artifact, db.get(HistoryVersion, version_id),
+                         start=start, end=end, newest_first=newest_first)
 
 
 def read_artifact(db, version_id, frame, *, start=None, end=None, limit=2000, newest_first=False):

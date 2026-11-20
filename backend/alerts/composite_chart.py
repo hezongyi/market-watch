@@ -9,7 +9,7 @@ import json
 
 from sqlalchemy import func, select
 
-from .composite_series import period, read_window
+from .composite_series import display_ranges, period, read_window
 from .history_artifacts import read_artifact
 from .source_registry import collection_identity
 from .storage import (
@@ -86,14 +86,17 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
     if provisional and persisted is not None and cutoff > seam_bucket:
         # Materialized confirmed buckets do not contain older pending minutes.
         # Overlay every affected bucket, including pending below the fixed tail.
-        candidates = display_snapshot.content['observations']
-        affected = sorted({period(row['start'], frame, phase) for row in candidates
-                           if period(row['start'], frame, phase)[0] < cutoff})[-(count + 1):]
-        for left, right in affected:
+        floor = output[0]['start'] if len(output) > count else seam_bucket
+        ranges = display_ranges((row['start'] for row in display_snapshot.content['observations']),
+            frame, phase, floor=floor, cutoff=cutoff, count=count)
+        overlay = {}
+        for left, right in ranges:
             sampled = read_window(db, composite.id, frame, left, right, revision_id=revision.id,
-                provisional=True, now=stamp, permission_scope=permission_scope, realtime=realtime, display_snapshot=display_snapshot)['bars']
-            output = sorted([bar for bar in output if bar['start'] != left] + sampled,
-                            key=lambda bar: bar['start'])
+                provisional=True, now=stamp, permission_scope=permission_scope, realtime=realtime,
+                display_snapshot=display_snapshot)['bars']
+            overlay.update((bar['start'], bar) for bar in sampled)
+        output = sorted({**{bar['start']: bar for bar in output}, **overlay}.values(),
+                        key=lambda bar: bar['start'])
     while cursor > seam_bucket and len(output) <= count and partitions < 4:
         if latest is None:
             # W1/MN can contain historical observations in the seam bucket even
@@ -124,9 +127,9 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
         latest = latest_display(left) if left > seam_bucket else None
         if left == seam_bucket:
             break
-    pending = []
+    pending, warnings = [], []
     if display_snapshot and display_snapshot.content.get('degraded'):
-        pending.append('待确认观测容量已满，已保留现有图表并暂停追加；确认补齐后恢复')
+        warnings.append('待确认观测容量已满，已保留现有图表并暂停追加；确认补齐后恢复')
     if cursor <= seam_bucket and len(output) <= count:
         try:
             history = read_artifact(db, version.id, frame, end=min(cutoff, seam_bucket),
@@ -158,6 +161,6 @@ def chart_page(db, composite_id, frame, *, before=None, count=300, revision_id=N
         "next_before": next_before, "has_more": next_before is not None,
         "history_revision": hashlib.sha256(json.dumps(fingerprint, sort_keys=True).encode()).hexdigest(),
         "origin": version.start, "rule_version": revision.rules["aggregation"],
-        "preparation_status": prep.status, "pending": pending, "bounded_partitions": partitions,
+        "preparation_status": prep.status, "pending": pending, "warnings": warnings, "bounded_partitions": partitions,
         "materialized": persisted is not None,
         "queried_cutoff": prep.cutoff, "current_observed_confirmed_end": prep.confirmed_end}

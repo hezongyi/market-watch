@@ -2,6 +2,7 @@ import { logEvent, logFailure } from "./logs";
 import {
   HistoryTags,
   HistoryFacts,
+  historyUpdateError,
   liveSummary,
   maintenanceState,
   liveSettingLabel,
@@ -1161,7 +1162,7 @@ export function ManagedDetails({
                   历史数据
                 </h3>
                 <HistoryFacts dataset={dataset} />
-                <DataFeedback error={dataset.maintenance.task_error} />
+                <DataFeedback error={historyUpdateError(dataset)} />
                 <div className="data-action-row">
                   <Button
                     variant="secondary"

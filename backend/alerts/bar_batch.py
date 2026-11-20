@@ -91,6 +91,10 @@ def write_bars(db, instrument_id, timeframe, candles, *, observed_at=None,
             db.execute(stmt, values)
         for row in old.values():
             db.expire(row)
+    from .compatibility_retirement import retired
+    if retired(db, instrument_id):
+        db.flush()
+        return changes
     from .publication_jobs import enqueue_publication
     from .publication_observation import refresh
     observed_only = changes.observation - changes.price - changes.volume

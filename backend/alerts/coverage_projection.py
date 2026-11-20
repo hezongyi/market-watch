@@ -6,6 +6,9 @@ older audit IDs or UUIDs that landed behind a saved checkpoint. No completion
 flag is published until the independent compatibility union equals projection.
 """
 
+from bisect import bisect_right
+from operator import itemgetter
+
 from sqlalchemy import delete, select, update
 
 from .source_history_store import _insert
@@ -106,13 +109,15 @@ def merge(db, inst, spans):
     return changed
 
 
-def read(db, inst, left, right):
+def read(db, inst, left, right, *, latest=False):
     state = db.get(MarketCoverageCheckpoint, (inst.id, inst.source, inst.basis))
     if state is None or not state.complete:
         return None
-    return [dict(start=row.start, end=row.end) for row in db.scalars(select(MarketCoverageProjection).where(
-        *_where(MarketCoverageProjection, inst), MarketCoverageProjection.start < right,
-        MarketCoverageProjection.end > left).order_by(MarketCoverageProjection.start))]
+    span = MarketCoverageProjection
+    query = select(span.start, span.end).where(*_where(span, inst), span.start < right, span.end > left)
+    # Projected spans are already disjoint and merged.
+    query = query.order_by(span.start.desc()).limit(1) if latest else query.order_by(span.start)
+    return [dict(start=start, end=end) for start, end in db.execute(query)]
 
 
 def maintenance_status(db, inst):
@@ -211,9 +216,9 @@ def removed_intervals(previous, current):
     result = []
     for left, right in previous:
         cursor = left
-        for a, b in current:
-            if b <= cursor:
-                continue
+        first = bisect_right(current, left, key=itemgetter(1))
+        for index in range(first, len(current)):
+            a, b = current[index]
             if a >= right:
                 break
             if a > cursor:
@@ -270,7 +275,7 @@ def _unproven_open_intervals(db, inst, removed):
     calendar, closures = calendar_for(inst), closures_from(inst.calendar_profile)
     result = []
     for left, right in removed:
-        observed = merged((row.start, row.end) for row in db.scalars(select(Bar).where(
+        observed = merged(db.execute(select(Bar.start, Bar.end).where(
             Bar.instrument_id == inst.id, Bar.timeframe == 'M1', Bar.complete.is_(True),
             Bar.start < right, Bar.end > left)))
         for a, b in removed_intervals([(left, right)], observed):
@@ -297,12 +302,17 @@ def rebuild(db, inst):
     # conservatively rechecked rather than trusting a partial proof projection.
     was_complete = state.complete
     if not was_complete:
+        from .market_contracts import HISTORY_FRAMES
         from .storage import Bar, ChartPublishedBar
-        previous = merged(previous + [(row.start, row.end) for row in db.scalars(select(Bar).where(
-            Bar.instrument_id == inst.id, Bar.timeframe != 'M1', Bar.complete.is_(True)))] +
-            [(row.start, row.end) for row in db.scalars(select(ChartPublishedBar).where(
-                ChartPublishedBar.instrument_id == inst.id, ChartPublishedBar.timeframe != 'M1',
-                ChartPublishedBar.complete.is_(True)))])
+
+        # Equality on the instrument and period uses the existing compound indexes.
+        # A negative period filter can scan the entire source table, mostly M1.
+        for model in (Bar, ChartPublishedBar):
+            for frame in HISTORY_FRAMES:
+                if frame != 'M1':
+                    previous.extend(db.execute(select(model.start, model.end).where(
+                        model.instrument_id == inst.id, model.timeframe == frame, model.complete.is_(True))))
+        previous = merged(previous)
     counter = [0]
     expected = valid_union(db, inst, quarantine=True, examined=counter)
     actual = [[row.start, row.end] for row in db.scalars(select(MarketCoverageProjection).where(

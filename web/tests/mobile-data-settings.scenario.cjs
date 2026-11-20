@@ -60,6 +60,17 @@ module.exports = async ({page, context, server, datasets, mappings, make, entrie
   row.maintenance.task_status='retrying';row.maintenance.task_error='timeout';
   await reload();
   await expect(eur().getByText('维护已配置',{exact:true})).toBeVisible();
+  await open();
+  await expect(detail().getByText('历史读取超时，系统自动重试；已有历史仍可查看',{exact:true})).toBeVisible();
+  await expect(detail().getByText('timeout',{exact:true})).toHaveCount(0);
+  await close('自建行情');
+  row.maintenance.task_error='unavailable';
+  await reload();
+  await open();
+  await expect(detail().getByText('历史来源暂不可用，系统自动重试；已有历史仍可查看',{exact:true})).toBeVisible();
+  await expect(detail().getByText('unavailable',{exact:true})).toHaveCount(0);
+  await shot('05-history-source-unavailable-retained-data');
+  await close('自建行情');
   delete row.maintenance.task_error;
   proof.checks.push('准备、重连、收盘、来源维护、历史派生及自动重试均不改写长期设置状态');
   row.runtime_status = 'recovering';

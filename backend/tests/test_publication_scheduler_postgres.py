@@ -377,6 +377,14 @@ def test_postgres_aggregation_backfill_service_with_continuous_live_work(publica
     test_old_backfill_gets_service_during_continuous_focused_live_work(publication_pg[0], monkeypatch)
 
 
+def test_postgres_due_price_repair_precedes_older_observation(publication_pg, monkeypatch):
+    from test_chart_aggregation import (
+        test_due_price_repair_precedes_older_observation_in_same_bucket,
+    )
+
+    test_due_price_repair_precedes_older_observation_in_same_bucket(publication_pg[0], monkeypatch)
+
+
 def test_postgres_unavailable_older_bucket_waits_for_input(publication_pg, monkeypatch):
     from test_publication_scheduler import (
         test_incomplete_older_source_bucket_does_not_keep_publication_runnable,
@@ -396,6 +404,14 @@ def test_postgres_large_aged_aggregation_backlog_yields_to_every_target(publicat
         test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts,
     )
     test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(publication_pg[0], monkeypatch)
+
+
+def test_postgres_fixed_history_drains_all_old_work_without_a_viewer(publication_pg, monkeypatch):
+    from test_chart_aggregation import (
+        test_fixed_history_drains_all_old_work_without_a_viewer,
+    )
+
+    test_fixed_history_drains_all_old_work_without_a_viewer(publication_pg[0], monkeypatch)
 
 
 def test_postgres_explicit_verify_rechecks_completed_projection(publication_pg):
@@ -491,3 +507,26 @@ for _ in range(30):
         rows = managed.read_rows(db, inst, 'M1', clock[0], 100)
         assert len(rows) == 31 and Decimal(str(rows[-1]['close'])) == 12
         assert managed.status(db, inst, 'M1')['complete_count'] == 31
+
+
+def test_pg_old_week_batch_leaves_live_and_retry_jobs(publication_pg, monkeypatch):
+    from test_historical_aggregation_batch import (
+        test_worker_batches_one_old_week_leaving_live_and_retry_jobs,
+    )
+    test_worker_batches_one_old_week_leaving_live_and_retry_jobs(publication_pg[0], monkeypatch)
+
+
+def test_pg_failed_week_batch_is_atomic(publication_pg, monkeypatch):
+    from test_historical_aggregation_batch import (
+        test_failed_week_rebuild_keeps_every_job_and_rolls_back_all_outputs,
+    )
+    test_failed_week_rebuild_keeps_every_job_and_rolls_back_all_outputs(publication_pg[0], monkeypatch)
+
+
+@pytest.mark.parametrize('available,days', [(16384, 7), (10000, 6)])
+def test_pg_old_week_dst_budget(publication_pg, monkeypatch, available, days):
+    from test_historical_aggregation_batch import (
+        test_ny17_autumn_dst_batch_respects_complete_buckets_and_row_bound,
+    )
+    test_ny17_autumn_dst_batch_respects_complete_buckets_and_row_bound(
+        publication_pg[0], monkeypatch, available, days)

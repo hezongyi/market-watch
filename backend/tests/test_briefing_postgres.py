@@ -66,7 +66,7 @@ def test_real_old_head_upgrade_preserves_preferences_and_notifications(monkeypat
             assert db.get(AdvancedPreference, "migration-watch").revision == 4
             assert (
                 db.scalar(text("SELECT version_num FROM alembic_version"))
-                == "be58_market_briefings"
+                == "bf59_history_block_sharing"
             )
             assert db.scalar(text("SELECT count(*) FROM briefing_plans")) == 0, (
                 "Never enable daily sends on upgrade"

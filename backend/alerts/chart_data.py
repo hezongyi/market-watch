@@ -65,6 +65,8 @@ def expected_days(left, right, calendar, gold, closures):
 
 
 def chart_rows(db, instrument, frame, before, limit, now, *, observed=False, after=None):
+    from .compatibility_retirement import require_read
+    require_read(db, instrument.id)
     rows = _chart_rows(db, instrument, frame, before, limit, now, observed=observed, after=after)
     if not rows or frame == "M1":
         return rows

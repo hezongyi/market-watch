@@ -43,3 +43,9 @@ assert.equal(out.liveRuntimeSummary({enabled:true,status:'receiving',composite:{
 assert.equal(out.liveRuntimeSummary({enabled:true,status:'unauthorized'}), '连接认证失败，系统自动重试');
 console.log('managed settings: saved intent stays stable across runtime transitions; actionable settings/history failures remain visible; runtime readiness remains distinct');
 assert.equal(out.maintenanceState({...dataset,maintenance:{...dataset.maintenance,active_version_id:'v',task_status:'retrying',task_error:'timeout'}}), '维护已配置','automatic retry does not mean configuration needs manual repair');
+const retryingHistory = {...dataset, maintenance:{...dataset.maintenance,task_status:'retrying',task_error:'unavailable'}};
+assert.equal(out.historyUpdateError(retryingHistory), '历史来源暂不可用，系统自动重试；已有历史仍可查看');
+assert.equal(out.historyUpdateError({...retryingHistory, periods:[]}), '历史来源暂不可用，系统自动重试；尚无可用历史');
+assert.equal(out.historyUpdateError({...retryingHistory, maintenance:{...retryingHistory.maintenance,task_status:'failed'}}), '历史来源暂不可用；已有历史仍可查看', 'terminal failure must not promise automatic retry');
+assert.equal(out.historyUpdateError(dataset), undefined, 'successful recovery removes the error');
+assert.equal(out.historyError('price_precision_overflow'), 'price_precision_overflow', 'unmapped actionable errors are preserved');

@@ -16,6 +16,7 @@ from .storage import (
     ChartPublicationState,
     ChartViewportDemand,
     ImportJob,
+    Instrument,
     MarketDataset,
     MarketDemand,
     Preference,
@@ -27,9 +28,12 @@ from .storage import (
 
 
 def candidates():
+    from .compatibility_retirement import retired_query
+
     return select(MarketDataset.instrument_id).join(Preference,
         Preference.key == 'managed_realtime:' + MarketDataset.instrument_id).where(
         Preference.value['enabled'].as_boolean().is_(False),
+        MarketDataset.instrument_id.not_in(retired_query()),
         select(RealtimeMapping.id).where(
             RealtimeMapping.target_dataset_id == MarketDataset.id).exists())
 
@@ -50,7 +54,15 @@ def independent_consumers(stamp):
 
 
 def paused_query(stamp):
-    return candidates().where(MarketDataset.instrument_id.not_in(independent_consumers(stamp)))
+    from .compatibility_retirement import retired_query
+
+    return candidates().where(MarketDataset.instrument_id.not_in(independent_consumers(stamp))).union(retired_query())
+
+
+def runnable_aggregation(stamp):
+    # Fixed history is materialized continuously, including with no chart open.
+    # Only explicitly disabled mapped compatibility targets retain their pause.
+    return ChartAggregationJob.instrument_id.not_in(paused_query(stamp))
 
 
 def paused_instruments(db, *, now=None):
@@ -58,8 +70,8 @@ def paused_instruments(db, *, now=None):
 
 
 def is_paused(db, instrument):
-    return db.scalar(paused_query(now_ms()).where(
-        MarketDataset.instrument_id == instrument).limit(1)) is not None
+    return db.scalar(select(Instrument.id).where(
+        Instrument.id == instrument, Instrument.id.in_(paused_query(now_ms())))) is not None
 
 
 def is_candidate(db, instrument):
@@ -67,8 +79,13 @@ def is_candidate(db, instrument):
 
 
 def touch(db, instrument, *, now=None):
+    from .compatibility_retirement import require_read
+    require_read(db, instrument)
     if not is_candidate(db, instrument):
         return False
+    from .chart_history_plan import lock_plan_instrument
+    lock_plan_instrument(db, instrument)
+    require_read(db, instrument)
     stamp = now_ms() if now is None else now
     ident = 'derive:' + hashlib.sha256(instrument.encode()).hexdigest()[:32]
     from .publication_wakeup import notify_derivation
@@ -98,6 +115,8 @@ def pending(db, instrument, frame, *, published=False):
 
 
 def check_read(db, instrument, frame, *, published=False):
+    from .compatibility_retirement import require_read
+    require_read(db, instrument)
     if is_candidate(db, instrument) and pending(db, instrument, frame, published=published):
         from .query_errors import QueryError
         raise QueryError(503, {'code': 'DERIVATION_PENDING', 'message': '独立行情正在补齐，请稍后重试'})

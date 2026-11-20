@@ -51,9 +51,12 @@ def router(authenticated):
     @routes.post("/demand")
     def demand(body: Demand):
         with transaction() as db:
-            dataset = db.get(MarketDataset, body.dataset_id)
+            dataset = db.scalar(select(MarketDataset).where(
+                MarketDataset.id == body.dataset_id).with_for_update())
             if not dataset or dataset.identity.get("source") != "oanda":
                 raise HTTPException(422, "只有已注册 OANDA 数据集支持实时订阅")
+            from .compatibility_retirement import require_read
+            require_read(db, dataset.instrument_id)
             ident = hashlib.sha256((body.client + "|" + dataset.instrument_id).encode()).hexdigest()[:40]
             row = db.get(MarketDemand, ident)
             if not row:

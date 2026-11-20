@@ -4,7 +4,7 @@ import pytest
 from alerts import composite_aggregates as cache
 from alerts.chart_data import FRAMES
 from alerts.composite_chart import chart_page
-from alerts.composite_series import read_window
+from alerts.composite_series import period, read_window
 from alerts.storage import (
     CompositeAggregateBar,
     CompositeAggregateTask,
@@ -226,3 +226,80 @@ def test_only_the_commit_that_advances_the_waterline_wakes_alert_rules(database,
     drain(revision, 'M1')
     # The commit that moves the waterline is the one that wakes alert rules.
     assert len(notified) == 1
+
+
+@pytest.mark.parametrize('frame', ['M1', 'M5'])
+@pytest.mark.parametrize('mode', ['ordinary', 'cold', 'warm'])
+@pytest.mark.parametrize('count', [3, 30])
+def test_materialized_display_batches_contiguous_pending_buckets(database, monkeypatch, frame, mode, count):
+    from alerts import composite_chart, composite_series
+    from alerts import live_pricing as live
+    from alerts.composite_realtime import CurrentBuckets
+    from alerts.display_snapshots import capture
+    from alerts.market_contracts import DatasetIdentity, QuoteEvent
+    from alerts.storage import MarketDataset, RealtimeMapping
+
+    composite, revision_id, _ = populated(database, monkeypatch)
+    drain(revision_id, frame)
+    with database.begin() as db:
+        revision = db.get(CompositeRevision, revision_id)
+        target = db.get(MarketDataset, db.get(RealtimeMapping, revision.mapping_id).target_dataset_id)
+        ident = DatasetIdentity.model_validate(target.identity)
+    start, now = 200005000, 200005000 + 11 * 60000
+    owner = live.claim(live.settings.oanda_account_id, now=start)
+    epoch = live.begin_connection(owner, {'EUR_USD': ident}, now=start)
+    with database.begin() as db:
+        db.get(live.PricingOwner, owner[0]).expires = now + 60000
+    for i in range(12):
+        at = start + i * 60000
+        live.publish_event(owner, epoch, QuoteEvent(identity=ident, bid=str(1.1 + i / 10000),
+            ask='1.12', source_time=at, received_at=at, tradeable=True,
+            connection_epoch=epoch, sequence=i+1), {'EUR_USD': ident}, now=at)
+    with database.begin() as db:
+        snapshot = capture(db, db.get(CompositeRevision, revision_id), frame, now)
+        assert len(snapshot.content['observations']) == 12
+        left = period(start, frame, 'ny17')[0]
+        right = period(now, frame, 'ny17')[1]
+        expected = read_window(db, composite, frame, left, right,
+            revision_id=revision_id, provisional=True, now=now, display_snapshot=snapshot)['bars']
+        worker = None if mode == 'ordinary' else CurrentBuckets()
+        if mode == 'warm':
+            chart_page(db, composite, frame, count=count, provisional=True,
+                       now=now, display_snapshot=snapshot, realtime=worker)
+        calls = []
+        original = composite_chart.read_window
+        def measured(*args, **kwargs):
+            calls.append((args[3], args[4]))
+            return original(*args, **kwargs)
+        monkeypatch.setattr(composite_chart, 'read_window', measured)
+        monkeypatch.setattr(composite_series, 'read_window', measured)
+        page = chart_page(db, composite, frame, count=count, provisional=True,
+                          now=now, display_snapshot=snapshot, realtime=worker)
+        assert page['materialized']
+        assert [bar for bar in page['bars'] if bar['start'] >= left] == expected[-count:]
+        assert calls == [(expected[-(min(count + 1, len(expected)))]['start'], right)], (
+            'Read only visible pending buckets in one bounded range')
+
+
+def test_warm_display_snapshot_never_adopts_later_confirmed_prices(database, monkeypatch):
+    from alerts.composite_realtime import CurrentBuckets
+    from alerts.display_snapshots import capture
+
+    composite, revision_id, seam = populated(database, monkeypatch)
+    worker = CurrentBuckets()
+    with database.begin() as db:
+        chart_page(db, composite, 'M1', count=20, provisional=True, now=200010000, realtime=worker)
+    with database.begin() as db:
+        correction(db, revision_id, seam + 60000, 200001000, '1.115')
+    with database.begin() as db:
+        snapshot = capture(db, db.get(CompositeRevision, revision_id), 'M1', 200010000)
+        assert snapshot.input_revision == 2
+    with database.begin() as db:
+        correction(db, revision_id, seam + 60000, 200002000, '1.116')
+    with database.begin() as db:
+        expected = chart_page(db, composite, 'M1', count=20, provisional=True,
+            now=200010000, display_snapshot=snapshot)
+        actual = chart_page(db, composite, 'M1', count=20, provisional=True,
+            now=200010000, display_snapshot=snapshot, realtime=worker)
+        assert actual['input_revision'] == 2
+        assert actual['bars'] == expected['bars'], 'Later confirmations cannot leak into an older display credential'

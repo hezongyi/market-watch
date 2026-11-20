@@ -135,9 +135,11 @@ def revision_enabled(db, revision):
 
 
 def set_enabled(db, instrument_id, value, *, now):
+    from .compatibility_retirement import require_available
     if type(value) is not bool:
         raise ValueError("实时开关必须是布尔值")
     instrument = lock_plan_instrument(db, instrument_id)
+    require_available(db, instrument_id)
     if instrument.source not in ("dukascopy", "oanda", "binance", "fxcm"):
         raise ValueError("实时开关仅适用于自建行情")
     plan = db.get(ChartHistoryPlan, instrument_id, populate_existing=True)

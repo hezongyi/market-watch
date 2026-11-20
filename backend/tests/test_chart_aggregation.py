@@ -74,12 +74,12 @@ def test_failed_aggregation_keeps_task_for_restart(database, monkeypatch):
         failed_id = failed.id
     calls = []
     monkeypatch.setattr(market, 'aggregate_touched', lambda *args, **kwargs:
-                        calls.append(kwargs['timeframes'][0]))
+                        calls.append(tuple(kwargs['timeframes'])))
     assert aggregate_once()
     assert len(calls) == 1
     with database.begin() as db:
         assert db.get(ChartAggregationJob, failed_id) is not None
-        assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 4
+        assert db.scalar(select(func.count()).select_from(ChartAggregationJob)) == 1
 
 
 def test_failed_calculation_rolls_back_partial_bars(database, monkeypatch):
@@ -220,6 +220,35 @@ def test_old_backfill_gets_service_during_continuous_focused_live_work(database,
             Bar.timeframe == 'M5', Bar.start == START)) is not None, 'Focused live work must not starve old backfill'
 
 
+def test_due_price_repair_precedes_older_observation_in_same_bucket(database, monkeypatch):
+    from alerts import market, storage
+    from alerts.storage import Bar
+    from test_publication_scheduler import MINUTE, START
+
+    now = START + 3 * 86400000
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    rows = [dict(timestamp=START + i * MINUTE, open=10, high=11, low=9, close=10) for i in range(60)]
+    with database.begin() as db:
+        inst = db.get(Instrument, 'BTCUSDT')
+        market.ingest(db, inst, {'rows': rows}, received_at=now-30000)
+        market.ingest(db, inst, {'rows': [{**rows[0], 'high': 15}]},
+                      received_at=now-20000, defer_aggregation=True)
+        observation = ChartAggregationJob(id='older-observation', instrument_id=inst.id,
+            timeframe='H1', kind='observed', start=START+59*MINUTE, end=START+60*MINUTE,
+            created_at=now-25000)
+        db.add(observation)
+
+    assert aggregate_once()
+    with database.begin() as db:
+        hour = db.scalar(select(Bar).where(Bar.instrument_id == 'BTCUSDT',
+            Bar.timeframe == 'H1', Bar.start == START))
+        assert hour.complete and hour.high == 15
+        assert db.get(ChartAggregationJob, 'older-observation').next_at == 0
+    assert aggregate_once()
+    with database.begin() as db:
+        assert not db.scalar(select(ChartAggregationJob.id))
+
+
 def test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(database, monkeypatch):
     from alerts import market, storage
     from test_publication_scheduler import MINUTE, START
@@ -230,13 +259,86 @@ def test_large_aged_backfill_yields_to_all_other_targets_across_worker_restarts(
         enqueue_aggregation(db, 'EURUSD', START, START + MINUTE, now - 15000)
     served = []
     monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw:
-                        served.append((inst.id, kw['timeframes'][0])))
+                        served.append((inst.id, tuple(kw['timeframes']))))
     # Every call opens a fresh transaction, as on an independent worker restart.
     for _ in range(10):
         assert aggregate_once()
-    assert {frame for ident, frame in served if ident == 'EURUSD'} == set(('M5','M15','H1','H4','D1'))
+    assert {frame for ident, frames in served if ident == 'EURUSD' for frame in frames} == set(
+        ('M5', 'M15', 'H1', 'H4', 'D1'))
     with database.begin() as db:
         assert db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
             ChartAggregationJob.instrument_id == 'BTCUSDT')) > 0
         assert db.scalar(select(func.count()).select_from(ChartAggregationJob).where(
             ChartAggregationJob.instrument_id == 'EURUSD')) == 0
+
+
+def test_old_period_backfill_batches_staggered_ranges(database, monkeypatch):
+    from alerts import market, storage
+    from test_publication_scheduler import MINUTE, START
+
+    day = 1440 * MINUTE
+    now = START + 5 * day
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    with database.begin() as db:
+        db.add_all([
+            ChartAggregationJob(instrument_id='BTCUSDT', timeframe='M5',
+                start=START + 120 * MINUTE, end=START + day + 60 * MINUTE, created_at=now - 20000),
+            ChartAggregationJob(instrument_id='BTCUSDT', timeframe='D1',
+                start=START, end=START + day, created_at=now - 20000),
+            ChartAggregationJob(instrument_id='BTCUSDT', timeframe='M5',
+                start=START + day + 60 * MINUTE, end=START + 2 * day, created_at=now - 20000),
+        ])
+    calls = []
+    monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kw:
+                        calls.append(kw.get('touched_by_frame')))
+
+    assert aggregate_once()
+
+    m5, daily = calls[0]['M5'], calls[0]['D1']
+    assert min(m5) == storage.instant(START + 120 * MINUTE)
+    assert min(daily) == storage.instant(START)
+    assert len(m5) == 2 * 1440 - 120
+    assert max(m5) == storage.instant(START + 2 * day - MINUTE)
+    assert max(daily) == storage.instant(START + day - MINUTE)
+    with database.begin() as db:
+        assert not db.scalar(select(ChartAggregationJob.id))
+
+
+def test_fixed_history_drains_all_old_work_without_a_viewer(database, monkeypatch):
+    from alerts import generic_derivation, market, storage
+    from test_history_versions import create
+    from test_publication_scheduler import MINUTE, START
+
+    day = 1440 * MINUTE
+    now = START + 5 * day
+    version, ident = create(database)
+    monkeypatch.setattr(storage, 'now_ms', lambda: now)
+    monkeypatch.setattr(generic_derivation, 'now_ms', lambda: now)
+    with database.begin() as db:
+        fixed = db.get(storage.HistoryVersion, version)
+        fixed.start, fixed.end, fixed.cursor, fixed.status = START, START+MINUTE, START+MINUTE, 'published'
+        db.add(storage.HistoryArtifact(id='fixed', version_id=version, timeframe='M5',
+            status='published', count=1, cursor=fixed.end, rule_version='test'))
+        db.add(storage.ChartHistoryPlan(instrument_id=ident, target_start=START+day,
+            target_end=now, status='cancelled', realtime_enabled=True))
+        db.add_all([
+            ChartAggregationJob(instrument_id=ident, timeframe='M5',
+                start=START, end=START+MINUTE, created_at=now-20000),
+            ChartAggregationJob(instrument_id=ident, timeframe='H1', kind='observed',
+                start=START, end=START+MINUTE, created_at=now-20000),
+            ChartAggregationJob(instrument_id=ident, timeframe='H4', kind='volume',
+                start=START, end=START+MINUTE, created_at=now-20000),
+            ChartAggregationJob(instrument_id=ident, timeframe='M5',
+                start=now-MINUTE, end=now, created_at=now),
+        ])
+    calls = []
+    monkeypatch.setattr(market, 'aggregate_touched', lambda db, inst, touched, **kwargs:
+                        calls.append(min(touched)))
+
+    for _ in range(4):
+        assert aggregate_once()
+    assert not aggregate_once()
+    assert sorted(calls) == [storage.instant(START)] * 3 + [storage.instant(now-MINUTE)]
+    with database() as db:
+        assert not db.scalar(select(ChartAggregationJob.id))
+        assert not db.scalar(select(storage.MarketDemand.id)), 'No reader should be needed to finish history'

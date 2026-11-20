@@ -78,6 +78,8 @@ def update_demand(db, *, ident, instrument, timeframe, end, visible, focused, no
     """Viewport interest is read-only with respect to acquisition authorization."""
     if timeframe not in (*FRAMES, 'W1', 'MN') or not 1 <= visible <= 2000:
         raise ValueError('Invalid viewport demand')
+    from .compatibility_retirement import require_read
+    require_read(db, instrument)
     plan = db.get(ChartHistoryPlan, instrument)
     if plan is None:
         return None
@@ -304,15 +306,17 @@ def plan_status(db, plan, now):
             attempts=j.attempts, retry_at=j.next_at, status=j.status) for j in jobs if j.error],
         aggregation_errors=[dict(id=j.id, timeframe=j.timeframe, start=j.start, end=j.end,
             error=j.error, attempts=j.attempts, retry_at=j.next_at) for j in aggregation if j.error],
-        periods=[status(db, inst, frame) for frame in (*sorted(FRAMES), 'W1', 'MN')])
+        periods=[status(db, inst, frame, request_derivation=False) for frame in (*sorted(FRAMES), 'W1', 'MN')])
 
 
 def control_plan(db, instrument, action, now):
+    from .compatibility_retirement import require_available
     from .storage import ImportJob
-
     if action not in ('cancel', 'resume', 'retry'):
         raise ValueError('Unknown plan action')
     lock_plan_instrument(db, instrument)
+    if action != "cancel":
+        require_available(db, instrument)
     plan = db.get(ChartHistoryPlan, instrument, populate_existing=True)
     if plan is None:
         raise ValueError('History plan not found')
