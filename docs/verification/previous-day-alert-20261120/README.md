@@ -10,8 +10,33 @@
 
 验证：后端 preset/settlement/close/notification/API/service 回归 87 passed、1 skipped；另新增 UTC0 日期边界后 preset 17 passed。桥接单测 15 passed。TypeScript/Vite/原生图表完整构建通过；实际许可 widget 的桌面快捷流程和新模板浏览器流程通过。手机模板流程通过，覆盖 375/412px、深浅主题、100%/150% 字号，截图已人工检查。验证了单次提交、截止毫秒保留、区间外提醒、图表仍保持原 H1、无桌面布局/偏好写入。数据写入及触发仅使用测试夹具。
 
-独立 Standards/Spec 审查发现最终确认仍使用原 started_at 的问题；现统一使用 frozen_at（旧规则 fallback started_at）围栏确认与读取完成时刻，并补充截止前已观察、截止后 30 秒确认的真实 LiveMinute 时序回归。Standards 复审通过，Spec 复审待最终记录。
+独立 Standards/Spec 审查发现最终确认仍使用原 started_at 的问题；现统一使用 frozen_at（旧规则 fallback started_at）围栏确认与读取完成时刻，并补充截止前已观察、截止后 30 秒确认的真实 LiveMinute 时序回归。Standards 与 Spec 复审均通过，无剩余阻断。另补充最后 M5 两方向事件消息包含上破/下破标识的回归，3 passed。
 
 兼容与回退：无 schema 迁移；旧规则的默认序列化与请求 hash 不变，新代码可读既有配置。新模板会持久化 close_expiry_grace_ms=120000，旧后台 extra=forbid 无法识别，因此创建模板后不能仅换旧镜像降级。回退须先导出受影响规则及版本，再定向移除新增字段（会失去最后 M5 等待语义），或使用相应备份；不默认恢复整个数据库覆盖用户后续数据。本次开发实例验收只读，不创建真实规则、不发送 ntfy，部署前后保留规则快照；若无新模板规则，旧镜像可直接回退。
 
-后续开发实例部署与真实数据对照结果在完成后追加。Android 系统键盘、触控和实际通知实收不由浏览器截图代替。
+开发实例于 2026-11-20 12:19 UTC 部署完成，实际主机为 Ubuntu 本机 Docker，project `mw-dev`。访问 https://quant.kookvv.com:8443/m/chart ，保留 HTTPS 18443 直连及现有下载挂载。本轮仅更新 Web/API 和三个 Python worker 的镜像；PostgreSQL、TLS、ntfy 容器 ID 不变，无 schema 操作。服务器页面更新即可使用，无需安装新 APK。
+
+真实认证 API：9/9 自建品种预填成功，耗时 68–127ms。AUDJPY、AUDUSD、NZDUSD、GBPJPY、USDCAD、EURUSD、USDJPY、XAUUSD、GBPUSD 的参考交易日均为 2026-11-19，NY17 当前截止为 2026-11-20 22:00 UTC。分别读取同修订的前日 M1（1380–1440 根，包含正常稀疏行情），独立重算 min(low)/max(high)，9/9 与预填一致。例：EURUSD 1.095540–1.100990；XAUUSD 3619.788000–3758.424000。
+
+实际部署页面：XAUUSD、EURUSD 从真实图表十字线加号打开预填表单，核对日期、上下沿、区间外提醒并截图检查，随后关闭，未提交。未发出告警创建/编辑/生命周期及桌面布局/偏好写请求。部署前后 7 条真实规则的状态、次数、run、version 和 12 个历史版本配置均一致。真实 PostgreSQL 既有版本均可被新 AlertConfig 解析。API ready、认证告警列表、行情状态通过；market/data/notification 共 39 个角色采样无 error_type。APK 更新清单 200、真实 JSON、Cache-Control:no-store。
+
+实现镜像基于 commit `a965e6d7`；之后仅追加测试断言与验收记录，不改变运行代码。
+
+- API / market-runtime / data-worker / notification-worker：`sha256:e1b48c618fa5437d83bb9b2b975407c7da4494b9ddaf02c8bfa865ac90c169cc`
+- Web：`sha256:a4fd9a432e5bdee12f3332838df914afdc361ec5e9a989e694912606bcf1a432`
+- 部署前 API：`sha256:5403a1602e5e2f4a09294dd6988fc71d077465983029b0b713053866aba91d31`
+- 部署前 Web：`sha256:32781c2eaab3ca9beda9c85363f460fd3d24beaf73c3cac7b72b62d2966bc1ed`
+- 部署前 notification-worker：`sha256:2859c77d79d491911adf59309760de5841c006d594e0b1d021455ec8f4dacaa2`
+
+持久配置已同步到 `~/.local/share/market-watch-dev/updates/mw-mobile-resume-20261117/run.json`。只启动本轮服务：
+
+```bash
+docker compose -p mw-dev -f ~/.local/share/market-watch-dev/updates/mw-mobile-resume-20261117/run.json up -d --no-build --no-deps api market-runtime data-worker notification-worker web
+mw-dev status
+# 仅在需要停止开发实例应用服务时执行：
+mw-dev stop api market-runtime data-worker notification-worker web
+```
+
+旧镜像及配置快照保留于私有 `~/.local/share/market-watch-dev/evidence/previous-day-alert-20261120/`，含 run-before.json、部署前后规则快照、candidate-images.json、真实 API 与 M1 对照、浏览器检查。回退前先核对是否已有真实模板规则，再按前述配置兼容边界处理；仅替换涉及服务的旧镜像引用，不覆盖其他配置，不默认恢复数据库。本次未运行回退或删除资源。
+
+浏览器截图：[浅色 412px](mobile-light-412.png)、[深色 375px / 150% 字号](mobile-dark-375-150.png)。Android 系统键盘、真机触控和实际通知实收未在本轮验证；浏览器普通快捷告警的触控拖动回归通过。本轮没有真实告警或 ntfy 测试，通知出站行为仅通过夹具验证。唯一跳过项为要求隔离 PostgreSQL 的既有通知精度测试，由 PR CI 的 PostgreSQL 服务执行。

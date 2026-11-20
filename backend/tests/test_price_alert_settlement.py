@@ -247,6 +247,7 @@ def test_disabled_acquisition_still_settles_committed_valid_input(database, monk
 
 @pytest.mark.parametrize("closing_price", ["1.119", "1.100"])
 def test_preset_waits_for_last_m5_and_emits_only_one_event(database, monkeypatch, closing_price):
+    from alerts.chart_alert_message import signal_message
     from alerts.storage import LiveMinute
     from test_composite_aggregates import drain as aggregate
     from test_fixed_indicators import add_tail
@@ -279,6 +280,7 @@ def test_preset_waits_for_last_m5_and_emits_only_one_event(database, monkeypatch
         events = evaluate(db, ident, now=end + 30010)
         assert len(events) == 1 and events[0].occurred_at == end
         assert events[0].threshold == (Decimal("1.115") if closing_price == "1.119" else Decimal("1.105"))
+        assert ("上破上沿" if closing_price == "1.119" else "下破下沿") in signal_message(events[0])
         assert db.get(ChartAlert, ident).count == 1
         assert evaluate(db, ident, now=end + 300000) == []
         assert db.scalar(select(func.count()).select_from(SignalRow).where(SignalRow.chart_alert_id == ident)) == 1
