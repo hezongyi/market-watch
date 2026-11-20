@@ -8,6 +8,7 @@ from decimal import Decimal, InvalidOperation
 
 from sqlalchemy import select
 
+from .history_artifact_blocks import manifest_blocks
 from .market_contracts import NativeBarRow
 from .market_datasets import version_price_rows
 from .source_history_store import raw_chunk
@@ -153,8 +154,7 @@ def artifact_step(db, artifact, version, dataset, instrument):
     if artifact.cursor != version.end:
         return
     db.flush()
-    blocks = list(db.scalars(select(HistoryArtifactBlock).where(
-        HistoryArtifactBlock.artifact_id == artifact.id).order_by(HistoryArtifactBlock.start)))
+    blocks = manifest_blocks(db, artifact.id)
     facts = version.manifest.get("frames", {}).get(frame, {})
     family, adjustment = dataset.identity.get("source_family"), dataset.identity.get("adjustment")
     qfq_view = artifact.rule_version == RULE and dataset.asset_class in ("equity", "etf") and (

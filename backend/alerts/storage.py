@@ -275,6 +275,11 @@ class HistoryArtifactBlock(Base):
     count: Mapped[int]
     checksum: Mapped[str] = mapped_column(String(64))
     content: Mapped[bytes] = mapped_column(LargeBinary)
+    # References always point directly to an inline block, never to a chain.
+    source_block_id: Mapped[str | None] = mapped_column(
+        ForeignKey("market_history_artifact_blocks.id", name="fk_artifact_block_source"), index=True)
+    input_count: Mapped[int | None] = mapped_column(BigInteger)
+    complete_count: Mapped[int | None]
 
 
 class HistoryReclamation(Base):
@@ -638,6 +643,9 @@ def immutable_dataset_identity(db, flush_context, instances):
     from .history_retention import guard_reference_writes
 
     guard_reference_writes(db)
+    from .history_artifact_blocks import validate_new_references
+
+    validate_new_references(db)
 
     # Cover every ORM producer, including manual import, plan retry and volume
     # backfill. Hints share the work transaction and disappear on rollback.
@@ -1146,6 +1154,7 @@ def bootstrap(db_engine=engine):
         Base.metadata.create_all(connection)
         if db_engine.dialect.name == "sqlite":
             _bootstrap_history_modes(connection)
+            _bootstrap_artifact_sharing(connection)
         with sessionmaker(bind=connection).begin() as db:
             if not db.get(Preference, "auth.admin"):
                 db.add(Preference(key="auth.admin", value={}))
@@ -1180,6 +1189,20 @@ def bootstrap(db_engine=engine):
             from .realtime_switch import initialize_defaults
 
             initialize_defaults(db, now=now_ms())
+
+
+def _bootstrap_artifact_sharing(connection):
+    from sqlalchemy import inspect
+
+    columns = {c["name"] for c in inspect(connection).get_columns("market_history_artifact_blocks")}
+    for name, kind in (
+        ("source_block_id", "VARCHAR(36) REFERENCES market_history_artifact_blocks(id)"),
+        ("input_count", "BIGINT"), ("complete_count", "INTEGER"),
+    ):
+        if name not in columns:
+            connection.execute(text(f"ALTER TABLE market_history_artifact_blocks ADD COLUMN {name} {kind}"))
+    connection.execute(text("CREATE INDEX IF NOT EXISTS ix_market_history_artifact_blocks_source_block_id "
+                            "ON market_history_artifact_blocks (source_block_id)"))
 
 
 def _bootstrap_history_modes(connection):
