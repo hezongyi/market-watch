@@ -256,7 +256,7 @@ def test_preset_waits_for_last_m5_and_emits_only_one_event(database, monkeypatch
     end = 165600000 + 900000
     ident, _, revision, seam, _ = armed(database, monkeypatch, mode="close", timeframe="M5",
         condition={"relation": "exit", "lower": "1.105", "upper": "1.115"},
-        max_triggers=1, expires_at=end + 1, close_expiry_grace_ms=120000)
+        max_triggers=1, expires_at=end + 1, close_expiry_grace_ms=120000, notify_ntfy=True)
     with database.begin() as db:
         target = current_version(db, db.get(ChartAlert, ident)).market_identity["target_dataset_id"]
         db.add(LiveMinute(dataset_id=target, start=end - 60000, expected=True,
@@ -281,6 +281,7 @@ def test_preset_waits_for_last_m5_and_emits_only_one_event(database, monkeypatch
         assert len(events) == 1 and events[0].occurred_at == end
         assert events[0].threshold == (Decimal("1.115") if closing_price == "1.119" else Decimal("1.105"))
         assert ("上破上沿" if closing_price == "1.119" else "下破下沿") in signal_message(events[0])
+        assert db.scalar(select(Outbox)).status == "pending"
         assert db.get(ChartAlert, ident).count == 1
         assert evaluate(db, ident, now=end + 300000) == []
         assert db.scalar(select(func.count()).select_from(SignalRow).where(SignalRow.chart_alert_id == ident)) == 1
