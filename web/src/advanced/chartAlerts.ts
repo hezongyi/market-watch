@@ -164,6 +164,12 @@ export function isChartPrice(config: AlertConfig) {
   return !config.association?.object_kind && !c.offset && c.left.kind === "price" &&
     c.right?.kind === "constant" && ["cross", "cross_up", "cross_down", "above", "below"].includes(c.relation);
 }
+export function isChartRange(config: AlertConfig) {
+  const c = config.condition;
+  return config.series_kind === "composite" && !config.association?.object_kind && c.left.kind === "price" && !c.offset &&
+    c.relation === "exit" && [c.lower, c.upper].every(v => typeof v === "string" &&
+      Number.isFinite(Number(v)) && Number(v) > 0) && Number(c.lower) < Number(c.upper);
+}
 export function offsetSnapshot(value: unknown): string | null {
   if (!value || typeof value !== "object") return null;
   const v = value as Record<string, unknown>;

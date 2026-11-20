@@ -72,6 +72,21 @@ widget.onChartReady(async()=>{
    const preset=await page.evaluate(()=>rows[1].config);
    assert.equal(preset.condition.relation,'exit');assert.equal(preset.condition.lower,'1.10000');assert.equal(preset.condition.upper,'1.12000');
    assert.equal(preset.mode,'close');assert.equal(preset.timeframe,'M5');assert.equal(preset.max_triggers,1);assert.equal(preset.expires_at%60000,1);assert.equal(preset.close_expiry_grace_ms,120000);
+   const range=chart.locator('[data-name="mw-alert-range-label"]'),edges=chart.locator('[data-name="mw-alert-range-boundary"]'),actions=chart.locator('[data-name="mw-alert-range-actions"]');
+   await page.evaluate(()=>{const scale=widget.activeChart().getPanes()[0].getMainSourcePriceScale();scale.setAutoScale(false);scale.setVisiblePriceRange({from:1.09,to:1.13});});
+   await expect(range).toBeVisible();await expect(edges).toHaveCount(2);await expect(range).toContainText('前日高低 · M5');
+   await page.screenshot({path:path.join(out,'range-dark.png')});
+   await edges.filter({has:chart.locator('span',{hasText:'前低'})}).click({position:{x:100,y:6}});
+   await expect(actions).toBeVisible();await actions.getByRole('button',{name:'暂停',exact:true}).click();await expect(range).toContainText('Ⅱ');
+   await actions.getByRole('button',{name:'恢复',exact:true}).click();await expect(range).not.toContainText('Ⅱ');
+   await actions.getByRole('button',{name:'关闭',exact:true}).click();
+   await page.evaluate(()=>widget.activeChart().setResolution('60'));await page.waitForFunction(()=>widget.activeChart().dataReady()&&widget.activeChart().resolution()==='60');
+   await expect(range).toBeVisible();await expect(range).toContainText('M5');
+   await page.evaluate(()=>widget.changeTheme('Light'));await page.waitForTimeout(400);await expect(range).toBeVisible();await page.screenshot({path:path.join(out,'range-light-h1.png')});
+   await range.click();await actions.getByRole('button',{name:'查看规则',exact:true}).click();await expect(chart.getByRole('region',{name:'告警详情',exact:true})).toBeVisible();await chart.getByRole('button',{name:'关闭详情',exact:true}).click();await chart.locator('.chart-alert-card.alert-selected').getByRole('button',{name:'编辑',exact:true}).click();await expect(chart.locator('[data-name="mw-native-alert-dialog"]')).toBeVisible();await page.keyboard.press('Escape');
+   await page.evaluate(()=>{rows[1].status='expired';rows[1].control_revision++;bridge.setRows(rows);});await expect(range).toHaveCount(0);await expect(edges).toHaveCount(0);
+   assert.equal(await page.evaluate(()=>rows.length),2,'both boundaries still belong to one rule');
+   report.cases.push('paired native boundaries and one tag; lower boundary opens same rule; pause/resume; M5 rule remains on H1; dark/light; edit; expiry removes both without drawings or layout writes');
    report.cases.push('desktop native plus opens existing editor with the previous-day preset and saves exactly one M5/close/exit rule');
    assert.deepEqual(report.errors,[]);report.passed=true;return;
   }

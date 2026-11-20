@@ -335,6 +335,7 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
     await shot('previous-day-'+mode+'-'+width+'-font'+font);await expect(page.getByRole('button',{name:'创建告警',exact:true})).toBeInViewport();
     assert(await page.locator('.mobile-sheet-body, [data-mobile-overlay="true"]').evaluateAll(els=>els.every(el=>el.scrollWidth<=el.clientWidth+1)),'no horizontal overflow');
    }
+   const priceRangeBefore=await page.evaluate(()=>MW_TEST_WIDGET.activeChart().getPanes()[0].getMainSourcePriceScale().getVisiblePriceRange());
    await page.getByRole('button',{name:'创建告警',exact:true}).click();
    await expect(page.getByRole('heading',{name:'设置告警',exact:true})).toHaveCount(0);
    const created=priceRules.at(-1).config;
@@ -344,8 +345,23 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
    assert.equal(created.notify_ntfy,true);assert.equal(created.association,null);
    assert.equal(await page.evaluate(()=>MW_TEST_WIDGET.activeChart().resolution()),'60','template does not switch the chart itself');
    assert.equal(requests.filter(r=>r.method==='POST'&&r.path==='/api/chart-alerts').length,1);
+   const rangeLabel=native().locator('[data-name="mw-alert-range-label"]');
+   await expect(rangeLabel).toHaveCount(1);
+   assert.deepEqual(await page.evaluate(()=>MW_TEST_WIDGET.activeChart().getPanes()[0].getMainSourcePriceScale().getVisiblePriceRange()),priceRangeBefore,'range lines do not expand the visible price range');
+   await page.evaluate(()=>{const scale=MW_TEST_WIDGET.activeChart().getPanes()[0].getMainSourcePriceScale();scale.setAutoScale(false);scale.setVisiblePriceRange({from:97,to:104});});
+   await expect(rangeLabel).toBeVisible();await expect(rangeLabel).toContainText('前日高低 · M5');
+   for(const mode of ['dark','light'])for(const width of [375,412]){
+    await page.locator('.mobile-app').evaluate((el,mode)=>el.setAttribute('data-theme',mode),mode);
+    await page.evaluate(mode=>MW_TEST_WIDGET.changeTheme(mode==='dark'?'Dark':'Light'),mode);
+    await page.setViewportSize({width,height:width===375?812:915});await shot('range-'+mode+'-'+width);
+   }
+   await rangeLabel.click();await native().locator('[data-name="mw-alert-range-actions"]').getByRole('button',{name:'编辑',exact:true}).click();await expect(page.getByRole('heading',{name:'编辑告警',exact:true})).toBeVisible();
+   await expect(page.locator('#alert-lower')).toHaveValue('98.50');await expect(page.locator('#alert-upper')).toHaveValue('103.25');
+   await page.getByRole('button',{name:'关闭',exact:true}).click();
+   await expect(page.getByRole('heading',{name:'编辑告警',exact:true})).toHaveCount(0);
+   assert.equal(await page.evaluate(()=>MW_TEST_WIDGET.activeChart().resolution()),'60','range display and editing leave the chart interval unchanged');
    const forbidden=requests.filter(r=>r.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)|\/tasks/.test(r.path));assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
-   checks.push('native plus opens shared mobile form; one exit/M5/close/once rule; exact expiry survives form; outside warning; 375/412 dark/light 100/150%; no chart/layout writes');
+   checks.push('native plus opens shared mobile form; one exit/M5/close/once rule; paired range lines reopen that rule; exact expiry survives form; outside warning; 375/412 dark/light 100/150%; no chart/layout writes');
    fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors,created,forbidden},null,2));console.log(JSON.stringify({checks,errors}));return;
   }
   if(process.env.MOBILE_CHART_PRICE_ALERT_ONLY){

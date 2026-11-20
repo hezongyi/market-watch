@@ -47,6 +47,7 @@ const { chromium } = require("@playwright/test"),
         interval = event(),
         visible = event();
       let y = 80,
+        rangeShift = 0,
         epoch = 1,
         hold = false,
         fail = true;
@@ -57,9 +58,9 @@ const { chromium } = require("@playwright/test"),
       const scale = {
         isEmpty: () => false,
         priceToCoordinate: (price, first) => {
-          if (price !== 1.11951 || first !== 100)
+          if (first !== 100)
             throw Error("wrong native coordinate inputs");
-          return y;
+          return price === 1.11951 ? y : 120 + (105 - price) * 10 + rangeShift;
         },
         priceRangeChanged: () => range,
         modeChanged: () => mode,
@@ -98,6 +99,14 @@ const { chromium } = require("@playwright/test"),
                     }
                   : k === "removed"
                     ? o.removed
+                    : k === "colors"
+                      ? o.colors
+                    : k === "editable"
+                      ? o.editable
+                    : k === "setEditable"
+                      ? value => {o.editable=value;return line;}
+                    : k === "setLineColor"
+                      ? color => { (o.colors ||= []).push(color); return line; }
                     : () => line,
           });
           lines.push(line);
@@ -121,12 +130,21 @@ const { chromium } = require("@playwright/test"),
         },
         runtime: {},
       };
+      const edits=[];
+      let rangeSaved, rangeWrites=0;
       const adapter = nativeAlertPriceLines({
         current: (row, chart, captured) => captured === epoch,
         archive: async (row) => {
           archives.push(row.version);
           if (fail) throw Error("conflict");
         },
+        edit: row => edits.push(row.id),
+        action: async (row, action) => {
+          rangeWrites++;
+          rangeSaved={...row,status:action==='resume'?'active':'paused',control_revision:row.control_revision+1};
+          throw Object.assign(Error('lost lifecycle response'),{outcomeUnknown:true});
+        },
+        read: async () => rangeSaved,
         report: (row, text) => reports.push(text),
       });
       const sync = (rowValue = row) =>
@@ -227,6 +245,33 @@ const { chromium } = require("@playwright/test"),
         adapter.diagnostics().entries === 0,
         "indicator units are not drawn as price",
       );
+      const beforeRange=lines.length;
+      const rangeRow={...row,name:"EURUSD 前日高低突破",config:{condition:{relation:"exit",left:{kind:"price"},lower:"100",upper:"110"},timeframe:"M5",series_kind:"composite"}};
+      sync(rangeRow);await frame();
+      const rangeLabel=document.querySelector('[data-name="mw-alert-range-label"]');
+      expect(lines.length===beforeRange+2,"one rule creates two native boundaries");
+      expect(lines.slice(beforeRange).every(line=>line.editable===false),"neither boundary can be dragged to change its reference price");
+      expect(rangeLabel&&rangeLabel.textContent==="前日高低 · M5","one compact shared label names its confirmation period");
+      expect(Math.abs(parseFloat(rangeLabel.style.top)-(20+70))<1,"shared tag follows the visible upper boundary");
+      rangeLabel.click();await frame();document.querySelector('[data-name="mw-alert-range-actions"]').querySelectorAll('button')[1].click();expect(edits.join(",")==="rule","either range is managed through the one rule");
+      sync({...rangeRow,status:"paused"});await frame();
+      expect(rangeLabel.textContent==="Ⅱ 前日高低 · M5","paused range is clearly marked");
+      expect(lines.slice(beforeRange).every(line=>line.colors?.includes("#969da8")||line.colors?.includes("#787f8c")),"both paused boundaries use the same muted color: "+JSON.stringify(lines.slice(beforeRange).map(line=>line.colors)));
+      rangeLabel.click();await frame();
+      const rangeActions=document.querySelector('[data-name="mw-alert-range-actions"]');
+      const rangeButtons=rangeActions.querySelectorAll('button');
+      rangeButtons[0].click();await frame();
+      expect(rangeButtons[0].disabled&&!rangeButtons[3].hidden,"uncertain lifecycle disables duplicate writes and offers verification");
+      sync(rangeSaved);await frame();
+      rangeButtons[3].click();await frame();
+      expect(!rangeButtons[0].disabled&&rangeButtons[3].hidden&&rangeWrites===1,"polling a committed revision does not prevent readback from clearing uncertainty");
+      sync({...rangeSaved,name:"EURUSD 普通区间"});await frame();
+      expect(rangeLabel.textContent==="区间告警 · M5","ordinary exit rules are not described as a previous-day preset");
+      expect([...document.querySelectorAll('[data-name="mw-alert-range-boundary"] span')].map(v=>v.textContent).join(',')==='下沿,上沿',"ordinary ranges use neutral boundary captions");
+      rangeShift=400;range.fire();await frame();
+      expect(rangeLabel.style.display==="none","range tag hides when neither bound is visible, without changing scale");
+      sync({...rangeRow,status:"completed"});await frame();
+      expect(!document.querySelector('[data-name="mw-alert-range-label"]'),"completed range leaves the active chart");
       sync();
       await frame();
       symbol.fire();
