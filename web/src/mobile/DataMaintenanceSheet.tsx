@@ -1,4 +1,5 @@
 import { sourceLabel } from "./marketIdentity";
+import { historyError } from "./ManagedDataFacts";
 import { useRef, useState } from "react";
 import { ApiError } from "../api";
 import { editableFramePlan } from "../market-data/FrameSchedules";
@@ -549,7 +550,7 @@ export default function DataMaintenanceSheet({
                     {task.derivation.total_periods} 个周期
                   </p>
                 )}
-                <DataFeedback error={task.error} />
+                <DataFeedback error={historyError(task.error)} />
                 {task.controllable && (
                   <div className="data-action-row">
                     {["pending", "running", "retrying", "deriving"].includes(

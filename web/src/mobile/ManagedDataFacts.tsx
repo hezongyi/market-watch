@@ -153,6 +153,30 @@ function maintenanceFailed(plan: Plan) {
     )
   );
 }
+export function historyError(error?: string) {
+  if (!error) return undefined;
+  return (
+    (
+      {
+        unavailable: "历史来源暂不可用",
+        timeout: "历史读取超时",
+        rate_limited: "历史来源暂时限流",
+        unauthorized: "历史来源授权异常",
+        invalid_payload: "历史来源返回的数据未通过校验",
+        all_periods_failed: "本次历史更新失败",
+        no_confirmed_bars: "历史来源暂未返回已确认的 K 线",
+        history_source_configuration: "历史来源配置需检查",
+      } as Record<string, string>
+    )[error] || error
+  );
+}
+export function historyUpdateError(dataset: Dataset) {
+  const error = historyError(dataset.maintenance.task_error);
+  if (!error) return undefined;
+  const retry = dataset.maintenance.task_status === "retrying";
+  const available = dataset.periods.some((p) => p.available_version_id);
+  return `${error}${retry ? "，系统自动重试" : ""}；${available ? "已有历史仍可查看" : "尚无可用历史"}`;
+}
 export function maintenanceState(dataset: Dataset) {
   const plan = dataset.maintenance;
   if (plan.archived) return "已归档";
