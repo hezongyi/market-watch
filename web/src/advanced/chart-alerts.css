@@ -900,3 +900,13 @@ html.theme-dark .mw-native-alert-shell {
   color: var(--alert-text);
   background: var(--alert-border);
 }
+
+.alert-preset-note {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0;
+  color: var(--muted, #787b86);
+  font-size: 12px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}

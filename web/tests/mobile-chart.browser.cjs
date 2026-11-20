@@ -6,6 +6,7 @@ const dist=path.resolve('dist'),id='a'.repeat(64),ticker='MWC:'+id;
 const out=process.env.MOBILE_CHART_OUTPUT || '/tmp/mw-chart-round1';fs.mkdirSync(out,{recursive:true});
 const requests=[],errors=[],checks=[],consoleErrors=[],layouts=[];let catalogMode='hold',releaseCatalog,holdHistory=false,failHistory=false,priceOffset=0;const heldHistory=[];
 const provider='MWP:YAHOO:AAPL';
+const now=Date.now();
 const alertRule={id:'fixture-rule',name:'EURUSD H1',status:'paused',health:'ready',version:1,control_revision:1,run:1,count:0,max_triggers:1,created_at:Date.now(),updated_at:Date.now(),display_identity:{code:'EURUSD',source:'composite'},condition_summary:'价格 上穿 101',runtime:{},config:{name:'EURUSD H1',instrument:id,series_kind:'composite',source:'composite',timeframe:'H1',mode:'close',condition:{relation:'cross_up',left:{kind:'price'},right:{kind:'constant',value:'101'}},max_triggers:1,expires_at:null,message:'',notify_web:true,notify_ntfy:false,late_delivery:'log_only',association:null,calculation_version:'chart-python-v1'}};
 const priceRules=[alertRule];
 let logged=false,shellRevision=0,brokenInstall=false,delayLogin=false,pendingLogin;
@@ -43,6 +44,7 @@ const server=http.createServer(async(req,res)=>{
    if(url.pathname==='/api/advanced-charts/catalog'){if(catalogMode==='hold')await new Promise(resolve=>releaseCatalog=resolve);if(catalogMode==='fail')return json({detail:'图表目录读取失败'},500);return json({SMA:{label:"SMA 简单均线",pane:"main",aliases:["SMA","均线"],params:{period:20},series:[{key:"value",type:"line"}]}});}
    if(url.pathname==='/api/charts/history-capabilities')return json({protocol:1,version:'test',mode:'continuous',max_bars:20000,workspace_bars:100000,default_bars:1000,task_seconds:30});
    if(url.pathname==='/api/market-data/resolve')return json({symbol:query.series_kind==='provider'?'AAPL':'EURUSD · 日内观察组合',source:query.series_kind==='provider'?'yahoo':'composite',price_description:'收盘价',source_display:'FXCM',historical_source:'fxcm',name:query.series_kind==='provider'?'苹果':'受控组合',precision:2,calendar:'utc0',asset_type:'CRYPTO',frames:['M1','M5','H1','D1'],created:true,stream:false});
+   if(url.pathname==='/api/chart-alerts/presets/previous-day')return json({kind:'previous_day',lower:'98.50',upper:'103.25',reference_date:'2026-11-19',reference_start:now-172800000,reference_end:now-86400000,day_end:Math.floor(now/86400000)*86400000+86400000,expires_at:Math.floor(now/86400000)*86400000+86400001,calendar:'utc0',outside:true,composite_revision_id:'b'.repeat(64),phone_available:true});
    if(url.pathname==='/api/chart-alerts/page')return json({items:[alertRule],next_cursor:null});
    if(url.pathname==='/api/chart-alerts/fixture-rule')return json(alertRule);
    if(url.pathname==='/api/chart-alerts/capabilities')return json({composite_revision_id:'b'.repeat(64),phone:{available:true,reason:null},sources:[{source:'composite',series_kind:'composite',available:true,atr_frames:['M1','M5','H1','D1'],price_modes:{intrabar:{available:true},close:{available:true}}}]});
@@ -318,6 +320,34 @@ const originalMount=MWChartAdapter.mount;MWChartAdapter.mount=(root,app)=>origin
   await native().getByRole('radio',{name:'1 分钟',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('1');
   await native().getByRole('radio',{name:'5 分钟',exact:true}).click();await expect.poll(()=>page.evaluate(()=>window.MW_TEST_WIDGET.activeChart().resolution())).toBe('5');await widgetReady();await shot('favorite-shortcuts-dark-412');
   checks.push('native header replaces outer toolbar; period menu only supported intervals; native star adds direct shortcut; Android back closes period popup; one-tap M1/M5');
+  if(process.env.MOBILE_CHART_PREVIOUS_DAY_ONLY){
+   await page.evaluate(()=>MW_TEST_WIDGET.activeChart().setResolution('60'));await widgetReady();
+   const plus=async()=>{const b=await page.evaluate(()=>MW_TEST_WIDGET.activeChart()._chartWidget.paneWidgets().find(p=>p.containsMainSeries()).canvasElement().getBoundingClientRect().toJSON());await page.mouse.move(b.left+40,b.y+b.height*.46);await page.mouse.move(b.right-9,b.y+b.height*.46);await page.waitForTimeout(250);await page.mouse.click(b.right-9,b.y+b.height*.46);};
+   await plus();await shot('previous-day-menu');
+   await native().getByText('前日高低突破…',{exact:true}).click();
+   await expect(page.getByRole('heading',{name:'设置告警',exact:true})).toBeVisible();
+   await expect(page.locator('#alert-lower')).toHaveValue('98.50');
+   await expect(page.locator('#alert-upper')).toHaveValue('103.25');
+   await expect(page.getByText('最近 M5 收盘已在区间外，回到区间后再次离开才触发。',{exact:true})).toBeVisible();
+   assert.equal(requests.filter(r=>r.method==='POST'&&r.path==='/api/chart-alerts').length,0);
+   for(const mode of ['dark','light'])for(const width of [375,412])for(const font of [14,21]){
+    await page.locator('.mobile-app').evaluate((el,mode)=>el.setAttribute('data-theme',mode),mode);await page.setViewportSize({width,height:width===375?812:915});await page.evaluate(font=>document.documentElement.style.fontSize=font+'px',font);
+    await shot('previous-day-'+mode+'-'+width+'-font'+font);await expect(page.getByRole('button',{name:'创建告警',exact:true})).toBeInViewport();
+    assert(await page.locator('.mobile-sheet-body, [data-mobile-overlay="true"]').evaluateAll(els=>els.every(el=>el.scrollWidth<=el.clientWidth+1)),'no horizontal overflow');
+   }
+   await page.getByRole('button',{name:'创建告警',exact:true}).click();
+   await expect(page.getByRole('heading',{name:'设置告警',exact:true})).toHaveCount(0);
+   const created=priceRules.at(-1).config;
+   assert.equal(priceRules.length,2);assert.equal(created.condition.relation,'exit');assert.equal(created.condition.lower,'98.50');assert.equal(created.condition.upper,'103.25');
+   assert.equal(created.timeframe,'M5');assert.equal(created.mode,'close');assert.equal(created.max_triggers,1);
+   assert.equal(created.expires_at,Math.floor(now/86400000)*86400000+86400001);assert.equal(created.close_expiry_grace_ms,120000);
+   assert.equal(created.notify_ntfy,true);assert.equal(created.association,null);
+   assert.equal(await page.evaluate(()=>MW_TEST_WIDGET.activeChart().resolution()),'60','template does not switch the chart itself');
+   assert.equal(requests.filter(r=>r.method==='POST'&&r.path==='/api/chart-alerts').length,1);
+   const forbidden=requests.filter(r=>r.method==='POST'&&/advanced-charts\/(preferences|workspaces|native-charts)|\/tasks/.test(r.path));assert.deepEqual(forbidden,[]);assert.deepEqual(errors,[]);
+   checks.push('native plus opens shared mobile form; one exit/M5/close/once rule; exact expiry survives form; outside warning; 375/412 dark/light 100/150%; no chart/layout writes');
+   fs.writeFileSync(path.join(out,'proof.json'),JSON.stringify({checks,errors,created,forbidden},null,2));console.log(JSON.stringify({checks,errors}));return;
+  }
   if(process.env.MOBILE_CHART_PRICE_ALERT_ONLY){
    await page.evaluate(()=>MW_TEST_WIDGET.activeChart().setResolution('60'));await widgetReady();
    const labels=native().locator('[data-name="mw-alert-price-label"]');await expect(labels).toHaveCount(1);

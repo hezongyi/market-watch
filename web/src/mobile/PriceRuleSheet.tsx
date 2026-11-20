@@ -1,3 +1,4 @@
+import { PreviousDayAlertNote } from "../advanced/PreviousDayAlertNote";
 import { logEvent, logFailure } from "./logs";
 import { useEffect, useRef, useState } from "react";
 import { api, ApiError, errorMessage } from "../api";
@@ -6,6 +7,7 @@ import {
   relations,
   indicatorDefaults,
   type AlertConfig,
+  type PreviousDayPreset,
   type AlertRow,
   type Capabilities,
   type IndicatorSpec,
@@ -29,6 +31,7 @@ import { DataMore, DataSelect } from "./DataFormParts";
 import SymbolInfo from "./SymbolInfo";
 
 type Props = {
+  preset?: PreviousDayPreset;
   initial: AlertConfig;
   editing?: AlertRow;
   label: string;
@@ -47,6 +50,7 @@ type Props = {
   maintain?(): void;
 };
 export default function PriceRuleSheet({
+  preset,
   initial,
   editing,
   label,
@@ -139,7 +143,8 @@ export default function PriceRuleSheet({
     setDirty(true);
     setError("");
     setFields([]);
-    setDraft((old) => ({ ...old, ...values }));
+    setDraft((old) => ({ ...old, ...values,
+      ...(values.mode === "intrabar" || values.expires_at === null ? {close_expiry_grace_ms:0} : {}) }));
   };
   const field = (key: string) =>
     fields.find((item) => item.field === key)?.message;
@@ -159,7 +164,8 @@ export default function PriceRuleSheet({
       (draft.notify_ntfy && !ntfy && !unknown)
     )
       return;
-    const expiry = expiryText ? Date.parse(expiryText + "Z") : null;
+    // Preserve exact stored precision unless the user edits the expiry field.
+    const expiry = draft.expires_at;
     if (
       !unknown &&
       expiry !== null &&
@@ -303,6 +309,7 @@ export default function PriceRuleSheet({
         <div className="alert-editor-symbol">
           <SymbolInfo code={label} name={name} source={source} custom />
         </div>
+        {preset && <PreviousDayAlertNote preset={preset} />}
         <FieldGroup>
           {indicator && (
             <>

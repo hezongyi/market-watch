@@ -112,6 +112,9 @@ function fixture({ readonly = false, series_kind = "managed" } = {}) {
     rpc: async (q) => {
       calls.push(structuredClone(q));
       if(q.op === "price_capabilities") return {sources:[{source:"composite",series_kind:"composite",price_modes:{intrabar:{available:true}}}],phone:{available:true},composite_revision_id:"revision"};
+      if(q.op === "price_previous_day") return {kind:"previous_day",lower:"1.10",upper:"1.12",
+        reference_date:"2026-11-19",day_end:1795212000000,expires_at:1795212000001,
+        composite_revision_id:"revision",phone_available:true,outside:false};
       if(q.op === "price_create") return {id:"created",version:1,control_revision:1,status:"active",config:{source:"composite",instrument:q.context.instrument,series_kind:"composite",mode:"intrabar",timeframe:q.context.timeframe,association:null,condition:{left:{kind:"price"},right:{kind:"constant",value:q.context.price},relation:"cross"}}};
       if (q.op === "geometry")
         return {
@@ -415,7 +418,7 @@ test('price-axis plus opens selection; only its alert action creates at captured
   await tick();
   assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'plus itself never creates');
   const items = await f.api.menu([], {createAction: value => value}, {menuName:'CrosshairMenuView'});
-  assert.equal(items.length, 3);assert.match(items[0].label, /穿越 1\.11951 时提醒/);
+  assert.equal(items.length, 4);assert.match(items[0].label, /穿越 1\.11951 时提醒/);
   assert.equal(f.messages.filter(m => m.type === 'chart-alert-context').length, 0, 'opening menu never creates');
   await items[0].onExecute();
   const created=f.calls.filter(q=>q.op==='price_create');
@@ -468,4 +471,31 @@ test('plus selection rejects changed chart and missing/invalid captured price', 
     const native={native:true};const items=await f.api.menu([native], {createAction:v=>v}, {menuName:'CrosshairMenuView'});
     assert.deepEqual(items,[native]);
   }
+});
+
+
+test("previous day preset opens one captured draft, independent of chart resolution and cursor price", async () => {
+  const f=fixture({series_kind:"composite"});
+  f.subscriptions.onPlusClick({symbol:"BTCUSDT",price:999});
+  const items=await f.api.menu([], {createAction:v=>v}, {menuName:"CrosshairMenuView"});
+  const preset=items.find(i=>i.actionId==="mw-chart-previous-day");
+  assert.ok(preset);
+  assert.equal(f.calls.filter(q=>q.op==="price_previous_day").length,0);
+  await preset.onExecute();
+  const request=f.calls.find(q=>q.op==="price_previous_day");
+  assert.equal(request.timeframe,"M5");
+  const context=f.messages.find(m=>m.type==="chart-alert-context").context;
+  assert.equal(context.timeframe,"H1","keep initiating chart identity for stale checks");
+  assert.equal(context.previous_day.lower,"1.10");
+  assert.equal(context.previous_day.upper,"1.12");
+  assert.equal(f.calls.filter(q=>q.op==="price_create").length,0,"preset opens editor, never silently creates");
+});
+
+test("an old preset menu cannot open a draft after the chart changes", async () => {
+  const f=fixture({series_kind:"composite"});
+  const items=await f.api.menu([], {createAction:v=>v}, {detail:{type:"series"}});
+  f.switchSymbol();
+  await items.find(i=>i.actionId==="mw-chart-previous-day").onExecute();
+  assert.equal(f.calls.filter(q=>q.op==="price_previous_day").length,0);
+  assert.equal(f.messages.filter(m=>m.type==="chart-alert-context").length,0);
 });

@@ -20,6 +20,12 @@ export async function chartPriceAlertRequest(q: any, call: AlertApi, current: ()
     if (!value || value.series_kind !== "composite" || !/^[a-f0-9]{64}$/.test(value.instrument) || !frames.includes(value.timeframe))
       throw Error("仅支持已开启实时的自建行情；请到数据页查看对应自建，核对来源后重新设价");
   };
+  if (q.op === "price_previous_day") {
+    identity(q);
+    return request("/chart-alerts/presets/previous-day", {
+      instrument:q.instrument, composite_revision_id:q.composite_revision_id ?? null,
+    });
+  }
   if (q.op === "price_capabilities") {
     identity(q);
     return request<Capabilities>("/chart-alerts/capabilities", {instrument:q.instrument, series_kind:q.series_kind, timeframe:q.timeframe});

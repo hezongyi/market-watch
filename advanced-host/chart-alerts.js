@@ -320,6 +320,23 @@ function chartAlertBridge({
       if(!disposed && stillCurrent(chart,context))feedback(chart,"创建尚未确认："+String(error.message || error),()=>quickCreate(chart,context));
     } finally {quickFlights.delete(context.request_id);}
   }
+  const presetFlights = new Set();
+  async function previousDay(chart, context) {
+    if (readonly || !stillCurrent(chart,context) || presetFlights.has(chart)) return;
+    presetFlights.add(chart);
+    feedback(chart,"正在读取前日高低价…");
+    try {
+      const preset = await rpc({op:"price_previous_day", instrument:context.instrument,
+        series_kind:context.series_kind, timeframe:"M5", composite_revision_id:context.composite_revision_id});
+      if (!stillCurrent(chart,context)) return;
+      feedback(chart,"");
+      send({type:"chart-alert-context", context:{...context, request_id:crypto.randomUUID(),
+        previous_day:preset, phone_available:preset.phone_available,
+        composite_revision_id:preset.composite_revision_id}});
+    } catch(error) {
+      if (stillCurrent(chart,context)) feedback(chart,String(error.message || error),()=>previousDay(chart,context));
+    } finally {presetFlights.delete(chart);}
+  }
   async function menu(items, actionsFactory, params) {
     if (readonly || disposed) return items;
     const plus = params.menuName === "CrosshairMenuView" ? plusMenuPoint : null;
@@ -359,6 +376,9 @@ function chartAlertBridge({
       if(context.series_kind !== "composite")return [
         actionsFactory.createAction({actionId:"mw-chart-price-unavailable",label:"原生行情暂不支持价格告警",disabled:true}),
         actionsFactory.createAction({actionId:"mw-chart-price-maintain",label:"查看对应自建行情…",onExecute:()=>send({type:"chart-alert-maintain",context})}),...items];
+      // Preset uses M5 close capability independently of current chart/intrabar.
+      const presetAction=actionsFactory.createAction({actionId:"mw-chart-previous-day",
+        label:"前日高低突破…",onExecute:()=>previousDay(chart,context)});
       let caps,reason;
       try {
         caps=await rpc({op:"price_capabilities",instrument:context.instrument,series_kind:context.series_kind,timeframe:context.timeframe});
@@ -369,13 +389,14 @@ function chartAlertBridge({
         context.phone_available=caps.phone?.available===true;
         context.composite_revision_id=caps.composite_revision_id || context.composite_revision_id;
       } catch(error) {reason="能力核验未完成，请重新打开菜单重试";}
-      if(reason)return [actionsFactory.createAction({actionId:"mw-chart-price-unavailable",label:reason,disabled:true}),
+      if(reason)return [presetAction,actionsFactory.createAction({actionId:"mw-chart-price-unavailable",label:reason,disabled:true}),
         actionsFactory.createAction({actionId:"mw-chart-price-maintain",label:"查看实时自建设置…",onExecute:()=>send({type:"chart-alert-maintain",context})}),
         actionsFactory.createAction({actionId:"mw-chart-price-settings",label:"更多告警设置…",onExecute:()=>create({chart,price,context})}),...items];
       if(Number.isFinite(price))return [
         actionsFactory.createAction({actionId:"mw-chart-alert-create",label:`价格穿越 ${context.price_presentation.text} 时提醒`,onExecute:()=>create({chart,price,context,quick:true})}),
         actionsFactory.createAction({actionId:"mw-chart-price-summary",label:`盘中 · 一次 · ${context.phone_available?'手机推送':'仅站内记录（手机推送未启用）'}`,disabled:true}),
-        actionsFactory.createAction({actionId:"mw-chart-price-settings",label:"更多设置…",onExecute:()=>create({chart,price,context})}),...items];
+        actionsFactory.createAction({actionId:"mw-chart-price-settings",label:"更多设置…",onExecute:()=>create({chart,price,context})}),presetAction,...items];
+      items=[presetAction,...items];
     }
     const item = actionsFactory.createAction({
       actionId: "mw-chart-alert-create",

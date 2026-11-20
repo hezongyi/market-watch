@@ -52,6 +52,7 @@ class AlertConfig(Contract):
     condition: Condition
     max_triggers: Literal[1, 2, 3] = 1
     expires_at: int | None = Field(default=None, gt=0)
+    close_expiry_grace_ms: Literal[0, 120000] = 0
     message: str = Field(default="", max_length=2000)
     notify_web: bool = True
     notify_ntfy: bool = False
@@ -79,6 +80,8 @@ class AlertConfig(Contract):
             decode("MWC:" + self.instrument)
             if self.source != "composite" or self.published:
                 raise ValueError("组合告警必须使用明确组合来源，不使用旧发布系列")
+        if self.close_expiry_grace_ms and (self.mode != "close" or self.series_kind != "composite" or self.expires_at is None):
+            raise ValueError("收盘结算等待仅适用于有截止时间的自建收盘告警")
         validate_template(self.message)
         return self
 
@@ -94,8 +97,15 @@ class Conflict(ValueError):
     pass
 
 
-def config_hash(config):
+def config_payload(config):
     payload = config.model_dump(mode="json")
+    if not config.close_expiry_grace_ms:
+        payload.pop("close_expiry_grace_ms", None)
+    return payload
+
+
+def config_hash(config):
+    payload = config_payload(config)
     # Preserve pre-offset protocol hashes, including historical request retries.
     if config.condition.offset is None:
         payload["condition"].pop("offset", None)
@@ -236,7 +246,7 @@ def create(db, request_id: str, config: AlertConfig, *, dataset_id=None, at=None
                        expires_at=config.expires_at)
     db.add(alert)
     db.flush()
-    db.add(ChartAlertVersion(alert_id=alert.id, version=1, config=config.model_dump(mode="json"),
+    db.add(ChartAlertVersion(alert_id=alert.id, version=1, config=config_payload(config),
                              market_identity=identity, dataset_id=dataset_id, effective_at=at))
     db.add(Audit(kind="chart_alert_created", details={"alert_id": alert.id, "version": 1}))
     db.flush()
@@ -333,7 +343,7 @@ def edit(db, alert_id, expected_version, config, *, dataset_id=None, at=None, ex
     if alert.count >= alert.max_triggers:
         alert.status = "completed"
     db.add(ChartAlertVersion(alert_id=alert.id, version=alert.version,
-                             config=config.model_dump(mode="json"), market_identity=identity,
+                             config=config_payload(config), market_identity=identity,
                              dataset_id=dataset_id, effective_at=at))
     db.add(Audit(kind="chart_alert_edited", details={"alert_id": alert.id, "version": alert.version}))
     db.flush()

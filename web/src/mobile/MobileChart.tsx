@@ -626,7 +626,7 @@ export default forwardRef<
     >
       <MobileOverlaysProvider>
         {priceEditor && <PriceRuleSheet key={priceEditor.row?.id || priceEditor.context?.request_id}
-          initial={priceEditor.config} editing={priceEditor.row} label={priceEditor.label} source={priceEditor.source} name={priceEditor.name}
+          preset={priceEditor.context?.previous_day} initial={priceEditor.config} editing={priceEditor.row} label={priceEditor.label} source={priceEditor.source} name={priceEditor.name}
           frames={Object.values(timeframes)} online={chartOnline} ntfy={phoneAvailable}
           open={priceEditorOpen && visible} close={()=>setPriceEditorOpen(false)} onClosed={()=>setPriceEditor(null)}
           saved={row=>{setPriceEditorOpen(false);void chart.current?.update({type:'chart-alert-price-saved',row});}}
