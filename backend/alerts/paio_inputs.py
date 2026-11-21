@@ -361,6 +361,7 @@ def freeze_fixed(db, run, rows, *, state=None, stamp=None, snapshot=None):
                  count=1, now=stamp or run.target_end) if revision else
             read_artifact(db, version.id, run.timeframe, end=run.target_end, limit=1, newest_first=True))
     return dict(frames=frozen, as_of=stamp or run.target_end,
+                source_end=None if revision else version.end,
                 calendar_profile=version.manifest.get("calendar_profile", {}),
                 last_bar_time=tail[-1]["start"] if tail else rows[-1]["start"] if rows else None)
 
@@ -378,7 +379,11 @@ def attach_fixed(run, rows, phase, *, initial_state=None, provisional=False):
         return rows
     from .series_access import fixed_label
 
+    source_end = rows[0].get("paio_inputs", {}).get("source_end")
     prepared = [{**row, "indicator_timeframe": run.timeframe, "indicator_calendar": phase,
+                 # A fixed window can end inside an aggregate. Its refused
+                 # tail is not a missing historical segment or a live preview.
+                 "paio_terminal_partial": source_end is not None and row["start"] < source_end < row["end"],
                  "indicator_calendar_profile": rows[0].get("paio_inputs", {}).get("calendar_profile", {}),
                  "chart_time": fixed_label(row, run.timeframe, phase)} for row in rows]
     state = (run.state if initial_state is None else initial_state) or {}

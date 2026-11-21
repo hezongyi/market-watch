@@ -189,3 +189,44 @@ def test_foreground_mixed_specs_freeze_independent_full_paio_dependencies(databa
             assert actual["presentation"]==expected["presentation"]
             assert actual["calculation"]["canonical_verified"] is False
             assert actual["series"][11]["values"][-1]["value"] is not None
+
+
+@pytest.mark.parametrize("policy", ["strict_confirmed_v1", "observed_display_v1"])
+def test_fixed_truncated_h4_tail_keeps_drawings_across_foreground_worker_restart(database, monkeypatch, policy):
+    from alerts.history_artifacts import artifact_tick, request_artifacts
+    from alerts.storage import HistoryVersion
+
+    version = history(database, monkeypatch, count=1501)
+    with database.begin() as db:
+        request_artifacts(db, db.get(HistoryVersion, version), ["H4", "M15", "H1"])
+    while artifact_tick(version):
+        pass
+    specs = [dict(name="EMA", params=dict(period=2)), dict(name="PAIO_V1", params=dict(bi_step=0))]
+    query = DataQuery(instrument=version, series_kind="history", timeframe="H4", limit=4,
+        indicators=specs, client="paio-partial-test", indicator_input_policy=policy,
+        indicator_consumers=[dict(id=str(i), generation=1, spec=spec) for i, spec in enumerate(specs)])
+    # A page ending at the last full bucket must not inherit an empty display
+    # merely because the shared replay also reads the rejected terminal bucket.
+    initial = data_sync(query)
+    assert initial["bars"][-1]["end"] > 1501 * 60000
+    older_query = query.model_copy(update=dict(before=initial["bars"][-1]["start"]))
+    foreground = data_sync(older_query)
+    paio = foreground["indicators"][1]
+    assert paio["calculation"]["execution"]["path"] == "bounded-fixed-replay"
+    assert paio["presentation"]["objects"]
+    assert paio["presentation"]["readiness"]["bar_index"]
+    assert paio["presentation"]["as_of_bar_time"] == foreground["bars"][-1]["start"]
+    for item in initial["indicators"]:
+        while jobs.indicator_tick(item["calculation"]["run_id"], raise_errors=True):
+            pass
+    # Durable state is reconstructed in a new transaction/engine, with no
+    # foreground cache. Neither policy is allowed to confirm the truncated bar.
+    durable = data_sync(query.model_copy(update=dict(client=None, indicator_consumers=[])))
+    paio = durable["indicators"][1]
+    assert all(series["values"][-1]["value"] is None for series in paio["series"])
+    assert paio["dependencies"][-1]["initialized"] is False
+    if policy == "observed_display_v1":
+        assert paio["dependencies"][-1]["input_quality"]["reason_code"] == "PARTIAL_PERIOD"
+    assert paio["presentation"] == foreground["indicators"][1]["presentation"]
+    older = data_sync(older_query.model_copy(update=dict(client=None, indicator_consumers=[])))
+    assert older["indicators"][1]["presentation"] == paio["presentation"]

@@ -156,3 +156,19 @@ def test_does_not_mutate_caller_rows():
     original = copy.deepcopy(rows)
     calculate(rows,dict(name="PAIO_V1"))
     assert rows == original
+
+
+def test_fixed_terminal_partial_keeps_confirmed_state_but_interior_gap_resets():
+    rows = bars([(0, 10), (1, 9), (2, 8), (3, 7)])
+    engine, _ = run(rows[:3])
+    confirmed = copy.deepcopy(engine.state)
+    assert engine.presentation()["objects"]
+    engine.step(rows[-1], provisional=True)
+    assert engine.last_presentation["provisional"]
+    for provisional in (False, True):
+        values = engine.step(rows[-1] | dict(complete=False, paio_terminal_partial=True), provisional=provisional)
+        assert all(value is None for value in values.values())
+        assert engine.state == confirmed
+        assert engine.last_presentation == engine.presentation()
+    engine.step(rows[-1] | dict(complete=False))
+    assert engine.state == {}

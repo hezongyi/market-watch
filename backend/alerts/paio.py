@@ -64,6 +64,12 @@ class PaioState:
                     objects=[copy.deepcopy(obj) for ledger in s.get("objects", {}).values() for obj in ledger.values()])
 
     def step(self, row, *, provisional=False):
+        if row.get("paio_terminal_partial"):
+            # Keep the last confirmed checkpoint/drawings while refusing the
+            # truncated fixed bucket. Genuine interior gaps still reset below.
+            if hasattr(self, "_preview"):
+                del self._preview
+            return dict.fromkeys(OUTPUTS)
         if provisional:
             trial = PaioState(self.params, self.state)
             values = trial.step({**row, "complete": True, "paio_preview": True})

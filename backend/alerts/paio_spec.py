@@ -5,7 +5,7 @@ Host capacity limits are explicit; no parameter is silently clamped.
 """
 
 NAME = "PAIO_V1"
-ALGORITHM = "paio-fengyangsi-v6-state-v1"
+ALGORITHM = "paio-fengyangsi-v6-state-v2"
 FRAMES = {**dict(zip(("1", "5", "15", "30", "60", "240", "1D", "1W", "1M"),
                      ("M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1", "MN"))),
           "D": "D1", "W": "W1", "M": "MN", "Chart": "Chart", "": "Chart"}
