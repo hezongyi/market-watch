@@ -79,10 +79,11 @@ function pythonStudies(PineJS, catalog) {
     const supertrend = meta.render_profile === "supertrend_pine_v1";
     const squeeze = meta.render_profile === "rolling_range_squeeze_v1";
     const nrBreakout = meta.render_profile === 'nr_breakout_v1';
+    const paio = meta.render_profile === 'paio_v1';
     const profile = supertrend ? supertrendPineProfile() : nrBreakout ? nrBreakoutPineProfile(meta) : null;
     const keys = Object.keys(meta.params),
       series = supertrend ? meta.series.filter(s => s.key !== "direction") :
-        nrBreakout ? meta.series.filter(s=>s.key==='range_high') : meta.series;
+        nrBreakout ? meta.series.filter(s=>s.key==='range_high') : paio ? meta.series.filter(s=>/^(ema|pv)_\d$/.test(s.key)) : meta.series;
     const swing = meta.render_profile === "swing_sr_v1";
     const displayInputs = Array.isArray(meta.display_inputs) ? meta.display_inputs : [];
     const colors = ["#42a5f5", "#ffb74d", "#ab47bc"];
@@ -92,11 +93,11 @@ function pythonStudies(PineJS, catalog) {
         _metainfoVersion: 53,
         id: "MWPython" + name + "@market-watch-1",
         description: "守望 Python " + name,
-        shortDescription: swing ? "Swing" : squeeze ? "Rolling Range Squeeze" : nrBreakout ? "LuxAlgo · NR4/NR7" : "PY " + name,
+        shortDescription: paio ? "PAIO" : swing ? "Swing" : squeeze ? "Rolling Range Squeeze" : nrBreakout ? "LuxAlgo · NR4/NR7" : "PY " + name,
         is_hidden_study: false,
         is_price_study: meta.pane === "main",
         isCustomIndicator: true,
-        format: swing || squeeze || name === "LWMA" ? { type: "inherit" } : { type: "price", precision: 5 },
+        format: paio || swing || squeeze || name === "LWMA" ? { type: "inherit" } : { type: "price", precision: 5 },
         plots: series.map((s, i) => ({ id: "plot" + i, type: "line" })),
         ...(name === "BBANDS" ? {filledAreas: [
           {id: "band_fill", objAId: "plot0", objBId: "plot2", type: "plot_plot",
@@ -123,14 +124,14 @@ function pythonStudies(PineJS, catalog) {
               {
                 linestyle: 0,
                 linewidth: 2,
-                plottype: swing ? 6 : s.type === "histogram" ? 1 : 0,
+                plottype: paio ? (s.key === 'ema_2' ? 3 : s.key.startsWith('pv_') ? 7 : 0) : swing ? 6 : s.type === "histogram" ? 1 : 0,
                 ...(swing ? {joinPoints:false} : {}),
                 ...(swing ? {display: i === 0 || i === 2 ? 4294967295 : 4294967283} : {}),
                 trackPrice: false,
                 transparency: 0,
                 visible: !squeeze || s.key === 'sma',
                 ...(squeeze && s.key !== 'sma' ? {display:0} : {}),
-                color: squeeze ? '#2196f3' : swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#787b86" : colors[i % colors.length],
+                color: paio ? (s.key.startsWith('ema_') ? '#ff9800' : ['#434651','#F23645','#089981'][i-3]) : squeeze ? '#2196f3' : swing ? (i < 2 ? "#f23645" : "#00bcd4") : name === "LWMA" ? "#787b86" : colors[i % colors.length],
               },
             ]),
           ),
@@ -150,15 +151,17 @@ function pythonStudies(PineJS, catalog) {
               : { type: "integer", min: 2, max: 500 });
           return {
             id: key,
-            name: rule.label || (swing ? (key === "high_strength" ? "High strength" : "Low strength") : key),
+            name: (paio && rule.group ? rule.group+' · ' : '') + (rule.label || (swing ? (key === "high_strength" ? "High strength" : "Low strength") : key)),
             type: rule.type === 'enum' ? 'text' : rule.type,
             defval: meta.params[key],
+            ...(paio ? {display:0} : {}),
             min: rule.min,
             max: rule.max,
             ...(rule.step ? {step:rule.step} : {}),
             ...(rule.type === 'enum' ? {type:'text',options:rule.options} : {}),
           };
-        }), ...displayInputs.map(item=>({id:item.id,name:item.name,type:item.type,defval:item.default,
+        }), ...displayInputs.map(item=>({id:item.id,name:(paio && item.group ? item.group+' · ' : '')+item.name,type:item.type,defval:item.default,
+          ...(paio ? {display:0} : {}),
           ...(item.options ? {options:item.options} : {}),
           ...(swing && ['show_average_spacing','statistics_position'].includes(item.id)
             ? {isHidden:false,display:0} : {})}))],
@@ -185,7 +188,7 @@ function pythonStudies(PineJS, catalog) {
             } : Object.fromEntries(keys.map((k, i) => [k, input(i)])),
           };
           this.offsets = series.map(s=>s.key === 'high_left' ? -spec.params.high_strength :
-            s.key === 'low_left' ? -spec.params.low_strength : 0);
+            s.key === 'low_left' ? -spec.params.low_strength : paio && s.key.startsWith('ema_') ? spec.params['ma_'+s.key.slice(-1)+'_offset'] : 0);
           for (const s of series) {
             const ticker="MWPY_" + btoa(JSON.stringify({ symbol, spec, key: s.key }));
             ctx.new_sym(window ? '='+JSON.stringify({symbol:ticker,'mw-window':window}) : ticker,
@@ -203,8 +206,13 @@ function pythonStudies(PineJS, catalog) {
             const value = ctx.new_var(
               valid > 0 && !gap ? PineJS.Std.close(ctx) : NaN,
             );
-            const result = value.adopt(source, target, 1);
-            return swing ? {value:result,offset:this.offsets[i]} : result;
+            let result = value.adopt(source, target, 1);
+            if(paio){
+              const key=series[i].key,index=Number(key.slice(-1));
+              const use=key.startsWith('ema_') ? specInput('ma_'+index+'_use') : specInput('pv'+['1st','2nd','3rd'][index-1]+'Use') && !specInput('pvLineDraw');
+              if(!use)result=NaN;
+            }
+            return swing || paio ? {value:result,offset:this.offsets[i]} : result;
           });
           ctx.select_sym(0);
           if (supertrend) {
@@ -213,6 +221,7 @@ function pythonStudies(PineJS, catalog) {
               buy, sell, input(4) ? buy : NaN, input(4) ? sell : NaN];
           }
           return values;
+          function specInput(key){return input(keys.indexOf(key));}
         };
       },
     };

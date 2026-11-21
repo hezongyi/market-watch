@@ -151,13 +151,19 @@ def tick():
             inputs = read_window(db, revision.composite_id, run.timeframe, cursor, end,
                 revision_id=revision.id, provisional=True, now=snapshot.content['now'],
                 display_snapshot=snapshot)['bars']
+            if run.spec['name'] == 'PAIO_V1':
+                from .paio_inputs import attach_fixed, prepare_fixed
+
+                inputs = attach_fixed(run, prepare_fixed(db, run, inputs, state=engine.state,
+                    stamp=snapshot.content['now'], snapshot=snapshot), phase,
+                    initial_state=engine.checkpoint(), provisional=True)
             rows, dependent = json.loads(gzip.decompress(task.output)), task.dependent
             for bar in inputs:
-                row = {**bar, 'indicator_calendar': phase, 'gap_before': fixed.gap_before(engine.state.get('last_end'), bar['start'], phase, profiles)}
+                row = {**bar, 'indicator_calendar': phase, 'gap_before': bool(bar.get('gap_before')) if run.spec['name'] == 'PAIO_V1' else fixed.gap_before(engine.state.get('last_end'), bar['start'], phase, profiles)}
                 if row['gap_before']:
                     dependent = False
                 dependent |= not bar['complete']
-                if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE', 'NR4_NR7_BREAKOUT_V1'):
+                if run.spec['name'] in ('SWING_SR_V1', 'ROLLING_RANGE_SQUEEZE', 'NR4_NR7_BREAKOUT_V1', 'PAIO_V1'):
                     from .series_access import fixed_label
 
                     row['chart_time'] = fixed_label(row, run.timeframe, phase)

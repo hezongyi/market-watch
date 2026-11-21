@@ -1,7 +1,7 @@
 export type IndicatorSpec = {
-  name: "SMA" | "EMA" | "RSI" | "MACD" | "ROLLING_RANGE_SQUEEZE";
+  name: "SMA" | "EMA" | "RSI" | "MACD" | "ROLLING_RANGE_SQUEEZE" | "PAIO_V1";
   version: "1";
-  params: Record<string, number | boolean>;
+  params: Record<string, number | boolean | string>;
   output: string;
 };
 export type LineGeometry = {
@@ -198,7 +198,26 @@ export type Capabilities = {
   }[];
   modes: string[];
   indicators: string[];
-  indicator_metadata?: Record<string, {label:string;parameter_schema:Record<string,{label?:string;min:number;max:number;type:string}>;series:{key:string;label?:string;type:string}[]}>;
+  indicator_metadata?: Record<
+    string,
+    {
+      label: string;
+      params: Record<string, number | boolean | string>;
+      parameter_schema: Record<
+        string,
+        {
+          label?: string;
+          group?: string;
+          min?: number;
+          max?: number;
+          max_length?: number;
+          options?: string[];
+          type: string;
+        }
+      >;
+      series: { key: string; label?: string; type: string }[];
+    }
+  >;
   line_mapping: string;
 };
 export const statuses: Record<string, string> = {
@@ -241,15 +260,17 @@ export const deliveryNames: Record<string, string> = {
   blocked: "投递受阻",
   cancelled: "已停止此事件投递",
 };
-export const indicatorDefaults: Record<string, Record<string, number | boolean>> = {
+export const indicatorDefaults: Record<string, Record<string, number | boolean | string>> = {
   SMA: { period: 20 },
   EMA: { period: 20 },
   RSI: { period: 14 },
   MACD: { fast: 12, slow: 26, signal: 9 },
+  PAIO_V1: {},
   ROLLING_RANGE_SQUEEZE: { k: 10, lookback: 252, low_pct: 5, confirm_on_close: true },
 };
 
 export function indicatorUnit(value: IndicatorSpec): string {
+  if (value.name === "PAIO_V1") return "boolean";
   if (value.name === "ROLLING_RANGE_SQUEEZE")
     return ({sma:"price", signal:"boolean", pct_rank:"percent"} as Record<string,string>)[value.output] || "ratio";
   return value.name === "RSI" ? "RSI" : value.name === "MACD" ? "MACD" : "price";
@@ -293,6 +314,7 @@ export function validAlertContext(
   );
 }
 export function freshDraft(context: AlertContext): AlertConfig {
+  const paio = context.indicator?.name === "PAIO_V1";
   const squeeze = context.indicator?.name === "ROLLING_RANGE_SQUEEZE" && context.indicator.output === "signal";
   const price = !context.line && !context.indicator;
   return {
@@ -305,13 +327,13 @@ export function freshDraft(context: AlertContext): AlertConfig {
     timeframe: context.timeframe,
     mode: price ? "intrabar" : "close",
     condition: {
-      relation: squeeze ? "above" : price ? "cross" : "cross_up",
+      relation: squeeze || paio ? "above" : price ? "cross" : "cross_up",
       left: context.indicator
         ? { kind: "indicator", indicator: context.indicator }
         : { kind: "price" },
       right: context.line
         ? { kind: "line", line: context.line }
-        : { kind: "constant", value: squeeze ? "0" : context.price || "" },
+        : { kind: "constant", value: squeeze || paio ? "0" : context.price || "" },
     },
     max_triggers: 1,
     expires_at: null,

@@ -103,4 +103,10 @@ def freeze(db, inst, pub, body, *, ceiling):
                 _INPUTS.popitem(last=False)
     end = bisect.bisect_right(rows, ceiling, key=lambda row: row["start"])
     rows = rows if end == len(rows) else rows[:end]
-    return Inputs(rows, key, epoch, pub.revision), stats
+    dependencies = None
+    if any(spec["name"] == "PAIO_V1" for spec in body.indicators):
+        from .paio_inputs import freeze_managed
+        from .storage import now_ms
+
+        dependencies = freeze_managed(db, inst.id, body.indicators, rows, body.timeframe, as_of=now_ms())
+    return Inputs(rows, key, epoch, pub.revision, dependencies), stats

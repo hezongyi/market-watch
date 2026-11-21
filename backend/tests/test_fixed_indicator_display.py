@@ -40,13 +40,14 @@ def test_confirmed_composite_foreground_skips_redundant_display_suffix(database,
     assert actual["dependencies"] == canonical["dependencies"]
 
 
-def test_chart_route_serializes_native_json_catalog_payload_without_recursive_reencoding(database, monkeypatch):
+@pytest.mark.parametrize("names", [list(CATALOG)[offset:offset+12] for offset in range(0,len(CATALOG),12)])
+def test_chart_route_serializes_native_json_catalog_payload_without_recursive_reencoding(database, monkeypatch, names):
     from alerts import api
     from fastapi import routing
     from fastapi.testclient import TestClient
 
     version = history(database, monkeypatch, count=300)
-    specs = [{"name": name} for name in CATALOG]
+    specs = [{"name": name} for name in names]
     pending = data_sync(DataQuery(instrument=version, series_kind="history", timeframe="M1",
         limit=25, indicators=specs))
     for progress in pending["indicator_progress"]:
@@ -69,7 +70,7 @@ def test_chart_route_serializes_native_json_catalog_payload_without_recursive_re
             assert result.headers["content-type"] == "application/json"
             page = result.json()
             assert len(page["bars"]) == 25
-            assert {item["name"] for item in page["indicators"]} == set(CATALOG)
+            assert {item["name"] for item in page["indicators"]} == set(names)
             assert all(len(series["values"]) == 25 for item in page["indicators"] for series in item["series"])
     finally:
         api.app.dependency_overrides.clear()

@@ -900,3 +900,24 @@ html.theme-dark .mw-native-alert-shell {
   color: var(--alert-text);
   background: var(--alert-border);
 }
+
+/* PAIO has six independent groups; keep the default rule form short. */
+.alert-paio-group summary {
+  cursor: pointer;
+  padding: 10px 0;
+  font-weight: 500;
+}
+.alert-paio-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  padding: 4px 0 12px;
+}
+.alert-paio-fields label {
+  min-width: 0;
+}
+@media (max-width: 420px) {
+  .alert-paio-fields {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

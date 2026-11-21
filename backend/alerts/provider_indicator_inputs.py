@@ -5,6 +5,7 @@ origin or revision being calculated. Database mutations fence retained prefixes.
 """
 
 import bisect
+import hashlib
 import json
 import threading
 from collections import OrderedDict
@@ -31,6 +32,7 @@ class Inputs:
     identity: tuple
     epoch: object
     revision: int
+    dependencies: dict | None = None
 
 
 @dataclass
@@ -67,7 +69,7 @@ def freeze(db, page, body, maximum, *, evaluation_end=None, telemetry=None):
     stats.update(input_cache='miss', sql_payload_rows=0)
     dataset = db.get(ProviderDataset, page["dataset_id"])
     origin = body.calculation_origin or 0
-    swing = any(s["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") for s in body.indicators)
+    swing = any(s["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "PAIO_V1") for s in body.indicators)
     ceiling = page["bars"][-1]["start"]
     if swing:
         tail = page.get("_snapshot_tail")
@@ -127,7 +129,14 @@ def freeze(db, page, body, maximum, *, evaluation_end=None, telemetry=None):
         tail = page.get("_snapshot_tail")
         if tail is not None and rows and rows[-1]["start"] == tail["start"]:
             rows = [*rows[:-1], tail]
-        return Inputs(rows, identity, epoch, page.get("cache_revision", revision))
+        dependencies = None
+        if any(spec["name"] == "PAIO_V1" for spec in body.indicators):
+            from .paio_inputs import freeze_provider
+            from .storage import now_ms
+
+            dependencies = freeze_provider(db, dataset, body.indicators, rows, as_of=now_ms(),
+                credential=page.get('_paio_credential') or page.get('_provider_snapshot'))
+        return Inputs(rows, identity, epoch, page.get("cache_revision", revision), dependencies)
     finally:
         entry.lock.release()
         _prune(_INPUTS, MAX_ROWS)
@@ -147,9 +156,13 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
     key = (inputs.identity, name, json.dumps(params, sort_keys=True),
            json.dumps(meta.get("calendar_profile"), sort_keys=True), meta["calendar"], instrument,
            meta.get("timezone"), meta.get("session"), timeframe)
+    if name == "PAIO_V1":
+        return _compute_paio(inputs, meta, instrument, spec, key, first=first,
+                             provisional=provisional, stats=stats, timeframe=timeframe)
     if name in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") or name not in SUPPORTED:
         key = ("batch", key, inputs.epoch, inputs.revision, provisional,
-               json.dumps(rows[-1], sort_keys=True) if rows else "")
+               json.dumps(rows[-1], sort_keys=True) if rows else "",
+               hashlib.sha256(json.dumps(inputs.dependencies, sort_keys=True).encode()).hexdigest() if name == "PAIO_V1" else None)
         entry = _entry(_RESULTS, key, MAX_VALUES)
         while not entry.lock.acquire(timeout=0.05):
             check_cancelled()
@@ -157,7 +170,11 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
             if entry.value is None:
                 check_cancelled()
                 prepared = calculation_rows(rows, meta, instrument, timeframe,
-                                            infer_gaps=name != "ROLLING_RANGE_SQUEEZE")
+                                            infer_gaps=name not in ("ROLLING_RANGE_SQUEEZE", "PAIO_V1"))
+                if name == "PAIO_V1":
+                    from .paio_inputs import attach
+
+                    prepared = attach(prepared, params, inputs.dependencies, chart_frame=timeframe, provisional=provisional)
                 result = calculate(prepared, spec, provisional=provisional)
                 check_cancelled()
                 entry.value, entry.weight = result, len(rows) * max(6, len(CATALOG[name]["series"]))
@@ -230,6 +247,88 @@ def compute(inputs, meta, instrument, spec, *, first, provisional, telemetry=Non
         result = presentation(spec, rendered)
         return {**result, "series": [{"key": s["key"], "type": s["type"], "values": s["values"]}
                                      for s in result["series"]]}
+    finally:
+        entry.lock.release()
+        _prune(_RESULTS, MAX_VALUES)
+
+
+def _compute_paio(inputs, meta, instrument, spec, key, *, first, provisional, stats, timeframe):
+    """Retain only the confirmed checkpoint preceding the mutable chart tail.
+
+    Dependency history epochs fence corrected prefixes. Their ordinary tail
+    revisions invalidate the observation, not the confirmed prefix. Observation
+    clocks never become part of a full-history cache key.
+    """
+    from .paio_inputs import NATIVE_CALENDARS, attach
+    from .paio_spec import FRAMES
+    from .provider_cache import check_cancelled
+
+    frozen = inputs.dependencies or {}
+    fence = tuple((frame, json.dumps({k: v for k, v in item.items()
+        if k not in ("rows", "revision")}, sort_keys=True))
+        for frame, item in sorted(frozen.get("frames", {}).items()))
+    if meta.get("calendar") in NATIVE_CALENDARS:
+        # A newly observed native period can establish the previous period's
+        # close and a PV projection from two periods ago. OHLC ticks alone do
+        # not change this calendar fence.
+        params = validate(spec)[1]
+        frames = {FRAMES[params["bi_timeframe"]],
+                  *(FRAMES[params[f"pv{ordinal}TF"]] for ordinal in ("1st", "2nd", "3rd"))}
+        if params["pvDisplay"] == "Today":
+            frames.add("D1")
+        periods = {frame: inputs.rows if frame == timeframe else frozen.get("frames", {}).get(frame, {}).get("rows", [])
+                   for frame in frames}
+        fence += (("native-boundaries", tuple((frame, tuple((bar["start"], bar["end"]) for bar in rows[-3:]))
+                   for frame, rows in sorted(periods.items()))),)
+    entry = _entry(_RESULTS, ("paio", key, inputs.epoch, fence), MAX_VALUES)
+    while not entry.lock.acquire(timeout=.05):
+        check_cancelled()
+    try:
+        rows = inputs.rows
+        previous = entry.value
+        reusable = (previous is not None and rows and previous["index"] < len(rows)
+                    and previous["start"] == rows[previous["index"]]["start"])
+        if reusable:
+            cutoff = rows[previous["index"]]["start"]
+            for frame, old in previous.get("dependency_tails", {}).items():
+                current = frozen.get("frames", {}).get(frame, {}).get("rows", [])
+                # A late/corrected source tail may affect already committed
+                # chart bars even when the primary chart has not advanced.
+                at = bisect.bisect_left(current, old["start"], key=lambda bar: bar["start"])
+                if (old["end"] <= cutoff and (at >= len(current) or current[at] != old)
+                        or any(bar["end"] <= cutoff for bar in current[at+1:])):
+                    reusable = False
+                    break
+        index = previous["index"] if reusable else 0
+        state = IndicatorState(spec, previous["checkpoint"] if reusable else None)
+        values = previous["values"][:index] if reusable else []
+        stats.update(result_cache="checkpoint" if reusable else "miss", checkpoint_index=index)
+        prepared = calculation_rows(rows[index:], meta, instrument, timeframe, infer_gaps=False)
+        prepared = [{**row, "indicator_calendar_profile": meta.get("calendar_profile", {}),
+                     "indicator_gold": "XAU" in instrument.upper(),
+                     "indicator_native_parameters": meta.get("native_parameters")} for row in prepared]
+        prepared = attach(prepared, state.params, frozen, chart_frame=timeframe,
+                          provisional=provisional, state=state.state)
+        checkpoint = state.checkpoint()
+        tail_index = index
+        for offset, row in enumerate(prepared, index):
+            if offset % 512 == 0:
+                check_cancelled()
+            if offset == len(rows)-1:
+                checkpoint, tail_index = state.checkpoint(), offset
+            preview = provisional and offset == len(rows)-1 and not row["complete"]
+            value = state.step(row, provisional=preview)
+            values.append(dict(start=row["start"], values=value,
+                **({"provisional": True} if preview else {}),
+                **({"break_before": True} if row.get("gap_before") else {})))
+        stats['calculation_steps'] = len(prepared)
+        if rows:
+            entry.value = dict(index=tail_index, start=rows[tail_index]["start"],
+                               checkpoint=checkpoint, values=values,
+                               dependency_tails={frame: dict(item["rows"][-1])
+                                   for frame, item in frozen.get("frames", {}).items() if item.get("rows")})
+            entry.weight = len(values) * len(CATALOG['PAIO_V1']['series'])
+        return presentation(spec, [row for row in values if row['start'] >= first], state.last_presentation)
     finally:
         entry.lock.release()
         _prune(_RESULTS, MAX_VALUES)

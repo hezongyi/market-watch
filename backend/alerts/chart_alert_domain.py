@@ -18,7 +18,7 @@ class Contract(BaseModel):
 
 
 class Indicator(Contract):
-    name: Literal["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"]
+    name: Literal["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE", "PAIO_V1"]
     version: Literal["1"] = "1"
     params: dict = Field(default_factory=dict)
     output: str = "value"
@@ -28,11 +28,18 @@ class Indicator(Contract):
         name, params = validate(self.model_dump())
         if self.output not in {s["key"] for s in CATALOG[name]["series"]}:
             raise ValueError("未知指标输出")
+        if name == "PAIO_V1":
+            from .paio_spec import ALERTS
+
+            if self.output not in ALERTS:
+                raise ValueError("PAIO 仅开放源码声明的十个告警条件")
         object.__setattr__(self, "params", params)
         return self
 
     @property
     def unit(self):
+        if self.name == "PAIO_V1":
+            return "boolean"
         if self.name == "ROLLING_RANGE_SQUEEZE":
             return {"sma": "price", "signal": "boolean", "pct_rank": "percent"}.get(self.output, "ratio")
         return "rsi" if self.name == "RSI" else "price_delta" if self.name == "MACD" else "price"
@@ -173,6 +180,7 @@ class EvaluationState:
     left: str | None = None
     right: str | None = None
     count: int = 0
+    condition_bar: int | None = None
 
 
 @dataclass(frozen=True)
@@ -202,6 +210,15 @@ def advance(condition: Condition, state: EvaluationState, observation: Observati
     previous, current = Decimal(state.left), observation.left
     direction, threshold = None, observation.right
     relation = condition.relation
+    if (condition.left.indicator and condition.left.indicator.name == "PAIO_V1"
+            and relation == "above" and observation.right == 0 and current > 0):
+        # PAIO's source conditions are per-bar predicates, not rising edges.
+        # Repeated intrabar samples of one candle may trigger only once.
+        bar = (observation.evidence or {}).get("bar", {}).get("start", observation.occurred_at)
+        if state.condition_bar == bar:
+            return next_state, None
+        next_state = replace(next_state, count=state.count + 1, condition_bar=bar)
+        return next_state, Trigger(observation, "up", next_state.count, observation.right)
     if interval:
         inside = condition.lower <= current <= condition.upper
         was_inside = condition.lower <= previous <= condition.upper
