@@ -1,0 +1,60 @@
+{
+  "statuses": {
+    "/readyz": 200,
+    "/api/session": 200,
+    "/api/advanced-charts/catalog": 200,
+    "/api/settings/mobile-display": 200,
+    "/downloads/android-update.json": 200
+  },
+  "paio_instances": 2,
+  "chart_bars": 20,
+  "terminal_checks": [
+    {
+      "policy": "strict_confirmed_v1",
+      "visible_complete": true,
+      "truncated_values_null": true,
+      "confirmed_objects_retained": true,
+      "earlier_page_retained": true
+    },
+    {
+      "policy": "observed_display_v1",
+      "visible_complete": true,
+      "truncated_values_null": true,
+      "confirmed_objects_retained": true,
+      "earlier_page_retained": true
+    }
+  ],
+  "visible_complete": true,
+  "native_readiness": [
+    {
+      "gap": true,
+      "bar_index": true,
+      "ema_1": true,
+      "ema_2": true,
+      "ema_3": true,
+      "pv_1": true,
+      "pv_2": true,
+      "pv_3": true,
+      "io": true,
+      "hlc": true
+    },
+    {
+      "gap": true,
+      "bar_index": true,
+      "ema_1": true,
+      "ema_2": true,
+      "ema_3": true,
+      "pv_1": true,
+      "pv_2": true,
+      "pv_3": true,
+      "io": true,
+      "hlc": true
+    }
+  ],
+  "mobile_page_errors": [],
+  "https_verified": true,
+  "no_real_rule_or_notification_writes": true,
+  "acceptance_elapsed_ms": 5259,
+  "chart_timeframe": "M1",
+  "h4_terminal_verified": true
+}
