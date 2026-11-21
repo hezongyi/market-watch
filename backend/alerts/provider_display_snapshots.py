@@ -43,6 +43,10 @@ def capture(db, page, *, full_series=True):
                'epoch': dataset.metadata_json.get('indicator_history_epoch'),
                'calendar': _calendar(dataset.metadata_json), 'tail': tail,
                'as_of': page['as_of']}
+    if dataset.metadata_json.get('paio_dependency_frames'):
+        from .paio_inputs import capture_provider_requests
+
+        content.update(capture_provider_requests(db, dataset, tail))
     raw = json.dumps(content, sort_keys=True, separators=(',', ':')).encode()
     page['_provider_snapshot'] = content
     page['provider_snapshot_id'] = hashlib.sha256(raw).hexdigest()

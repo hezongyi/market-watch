@@ -45,6 +45,64 @@ function IndicatorFields({
   onChange: (v: IndicatorSpec) => void;
   metadata?: Capabilities["indicator_metadata"];
 }) {
+  const parameterField = ([key, n]: [string, number | boolean | string]) =>
+    typeof n === "boolean" ? (
+      <AlertCheckbox
+        key={key}
+        label={metadata?.[value.name]?.parameter_schema[key]?.label || key}
+        data-alert-field={`condition.${side}.indicator.params.${key}`}
+        checked={n}
+        onChange={(checked) =>
+          onChange({ ...value, params: { ...value.params, [key]: checked } })
+        }
+      />
+    ) : (
+      <label key={key}>
+        {metadata?.[value.name]?.parameter_schema[key]?.label || key}
+        {metadata?.[value.name]?.parameter_schema[key]?.type === "enum" ? (
+          <AlertSelect
+            value={String(n)}
+            onChange={(e) =>
+              onChange({
+                ...value,
+                params: { ...value.params, [key]: e.target.value },
+              })
+            }
+          >
+            {metadata[value.name].parameter_schema[key].options?.map(
+              (option) => (
+                <option key={option}>{option}</option>
+              ),
+            )}
+          </AlertSelect>
+        ) : (
+          <AlertInput
+            data-alert-field={`condition.${side}.indicator.params.${key}`}
+            type={typeof n === "string" ? "text" : "number"}
+            maxLength={
+              metadata?.[value.name]?.parameter_schema[key]?.max_length
+            }
+            min={metadata?.[value.name]?.parameter_schema[key]?.min ?? 2}
+            max={metadata?.[value.name]?.parameter_schema[key]?.max ?? 500}
+            step={key === "low_pct" || key === "HLCInterval" ? 0.1 : 1}
+            required={typeof n !== "string"}
+            value={n}
+            onChange={(e) =>
+              onChange({
+                ...value,
+                params: {
+                  ...value.params,
+                  [key]:
+                    typeof n === "string"
+                      ? e.target.value
+                      : Number(e.target.value),
+                },
+              })
+            }
+          />
+        )}
+      </label>
+    );
   return (
     <fieldset className="alert-indicator-fields">
       <legend>指标参数快照</legend>
@@ -58,42 +116,51 @@ function IndicatorFields({
             onChange({
               name,
               version: "1",
-              params: { ...indicatorDefaults[name] },
-              output: name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
+              params: {
+                ...(metadata?.[name]?.params || indicatorDefaults[name]),
+              },
+              output:
+                name === "PAIO_V1"
+                  ? "pattern_ii"
+                  : name === "ROLLING_RANGE_SQUEEZE"
+                    ? "signal"
+                    : name === "MACD"
+                      ? "macd"
+                      : "value",
             });
           }}
         >
           {Object.keys(indicatorDefaults).map((name) => (
-            <option key={name}>{name}</option>
+            <option key={name} value={name}>
+              {metadata?.[name]?.label || name}
+            </option>
           ))}
         </AlertSelect>
       </label>
-      {Object.entries(value.params).map(([key, n]) => (
-        typeof n === "boolean" ? <AlertCheckbox
-            key={key}
-            label={metadata?.[value.name]?.parameter_schema[key]?.label || key}
-            data-alert-field={`condition.${side}.indicator.params.${key}`}
-            checked={n}
-            onChange={(checked)=>onChange({...value, params:{...value.params,[key]:checked}})}
-          /> : <label key={key}>
-          {metadata?.[value.name]?.parameter_schema[key]?.label || key}
-          <AlertInput
-            data-alert-field={`condition.${side}.indicator.params.${key}`}
-            type="number"
-            min={metadata?.[value.name]?.parameter_schema[key]?.min ?? 2}
-            max={metadata?.[value.name]?.parameter_schema[key]?.max ?? 500}
-            step={key === "low_pct" ? 0.1 : 1}
-            required
-            value={n}
-            onChange={(e) =>
-              onChange({
-                ...value,
-                params: { ...value.params, [key]: Number(e.target.value) },
-              })
-            }
-          />
-        </label>
-      ))}
+      {value.name === "PAIO_V1"
+        ? [
+            ...new Set(
+              Object.keys(value.params).map(
+                (key) =>
+                  metadata?.[value.name]?.parameter_schema[key]?.group ||
+                  "参数",
+              ),
+            ),
+          ].map((group) => (
+            <details key={group} className="alert-paio-group">
+              <summary>{group}</summary>
+              <div className="alert-paio-fields">
+                {Object.entries(value.params)
+                  .filter(
+                    ([key]) =>
+                      (metadata?.[value.name]?.parameter_schema[key]?.group ||
+                        "参数") === group,
+                  )
+                  .map(parameterField)}
+              </div>
+            </details>
+          ))
+        : Object.entries(value.params).map(parameterField)}
       <label>
         输出
         <AlertSelect
@@ -101,9 +168,15 @@ function IndicatorFields({
           value={value.output}
           onChange={(e) => onChange({ ...value, output: e.target.value })}
         >
-          {(value.name === "ROLLING_RANGE_SQUEEZE" ? ["signal", "sma", "ratio", "threshold", "pct_rank"] : value.name === "MACD"
-            ? ["macd", "signal", "histogram"]
-            : ["value"]
+          {(value.name === "PAIO_V1"
+            ? (metadata?.PAIO_V1?.series || [])
+                .slice(0, 10)
+                .map((item) => item.key)
+            : value.name === "ROLLING_RANGE_SQUEEZE"
+              ? ["signal", "sma", "ratio", "threshold", "pct_rank"]
+              : value.name === "MACD"
+                ? ["macd", "signal", "histogram"]
+                : ["value"]
           ).map((key) => (
             <option key={key} value={key}>
               {metadata?.[value.name]?.series.find((item) => item.key === key)
@@ -295,6 +368,17 @@ export function ChartAlertDialog({
     setExpiryInputRevision((value) => value + 1);
   }
   function operand(side: "left" | "right", value: Operand) {
+    if (side === "left" && value.indicator?.name === "PAIO_V1") {
+      change({
+        mode: "close",
+        condition: {
+          relation: "above",
+          left: value,
+          right: { kind: "constant", value: "0" },
+        },
+      });
+      return;
+    }
     change({ condition: { ...draft.condition, [side]: value } });
   }
   async function submit() {

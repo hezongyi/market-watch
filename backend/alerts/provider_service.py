@@ -170,13 +170,20 @@ def subscribe(
         from .publication_wakeup import PROVIDER_CHANNEL, notify
         notify(db, PROVIDER_CHANNEL)
         # Existing finite read targets remain while this dataset is subscribed.
+    if any(spec["name"] == "PAIO_V1" for spec in indicators or []):
+        from .paio_inputs import requests
+
+        for dependency in requests(indicators, frame, calendar=meta.get("calendar")):
+            if dependency in source_frames(meta["source"]):
+                subscribe(client, listener + ":paio:" + dependency, instrument, dependency)
     return {"id": ident, "dataset_id": key}
 
 
 def unsubscribe(client, listener):
     with transaction() as db:
         db.execute(
-            delete(ProviderInterest).where(ProviderInterest.id == interest_id(client, listener))
+            delete(ProviderInterest).where(ProviderInterest.client == client,
+                (ProviderInterest.listener == listener) | ProviderInterest.listener.startswith(listener + ":paio:"))
         )
 
 

@@ -29,7 +29,8 @@ def operand_values(rows, operand: Operand, *, provisional=False, indices=None, c
         result = calculate(rows, spec, provisional=provisional)
     else:
         digest = hashlib.sha256(json.dumps([
-            [r["start"], r["high"], r["low"], r["close"], r["complete"], bool(r.get("gap_before"))]
+            [r["start"], r.get("open"), r["high"], r["low"], r["close"], r["complete"], bool(r.get("gap_before")),
+             r.get("paio_context") if operand.indicator.name == "PAIO_V1" else None]
             for r in rows
         ], separators=(",", ":"), default=str).encode()).hexdigest()
         key = (digest, provisional, json.dumps(spec, sort_keys=True))

@@ -454,8 +454,18 @@ function startIndicatorCoordinator(catalog) {
   const nrDrawings=typeof chartNRBreakoutDisplay==='function' ? chartNRBreakoutDisplay({
     report:error=>send({type:'error',error:'NR4/NR7 绘制失败：'+String(error)}),
   }) : undefined;
+  const paioDrawings=typeof chartPAIODisplay==='function' ? chartPAIODisplay({
+    report:error=>send({type:'error',error:'PAIO 绘制失败：'+String(error)}),
+  }) : undefined;
+  const renderers=[nrDrawings,paioDrawings].filter(Boolean);
   indicatorCoordinator=chartIndicatorCoordinator(widget,catalog,{
-    drawings:nrDrawings,
+    drawings:{
+      needsSnapshot:consumer=>renderers.some(renderer=>renderer.needsSnapshot(consumer)),
+      update:(...args)=>renderers.forEach(renderer=>renderer.update(...args)),
+      refresh:(...args)=>renderers.forEach(renderer=>renderer.refresh(...args)),
+      clear:(...args)=>renderers.forEach(renderer=>renderer.clear(...args)),
+      dispose:()=>renderers.forEach(renderer=>renderer.dispose()),
+    },
     read:(symbol,res,args,current)=>query(symbol,res,args,Date.now()+30000,current),
     recover:(ticker,res,token,error)=>recoverDisplaySnapshot(ticker,res,token,false,error?.snapshot_evidence),
     identity:{
@@ -2568,7 +2578,8 @@ function boot(
   alertBridge?.destroy();
   alertBridge = chartAlertBridge({getWidget:()=>widget,getWorkspace:()=>currentNativeWorkspace,
     getEpoch:()=>workspaceEpoch,isLoading:()=>loading||!ready,readonly,
-    metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),frames,
+    metadata:ticker=>alertSourceMetadata.get(MWSeries.encode(MWSeries.decode(ticker).symbol,MWSeries.decode(ticker).series_kind)),
+    indicatorCatalog:catalog,frames,
     unavailable:chart=>{
       const target=chartResolves.get(resolveChartKey(chart));
       return target && resolveCurrent(target) && target.state!=='ready' ? target.message : null;

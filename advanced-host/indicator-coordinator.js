@@ -49,12 +49,16 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
     const supertrend=meta.render_profile==='supertrend_pine_v1';
     const swing=meta.render_profile==='swing_sr_v1';
     const nrBreakout=meta.render_profile==='nr_breakout_v1';
+    const paio=meta.render_profile==='paio_v1';
     const series=supertrend ? meta.series.filter(series=>series.key!=='direction') :
-      nrBreakout ? meta.series.filter(series=>series.key==='range_high') : meta.series;
-    const offsets=swing ? {plot1:-params.high_strength,plot3:-params.low_strength} : {};
+      nrBreakout ? meta.series.filter(series=>series.key==='range_high') : paio ? meta.series.filter(series=>/^(ema|pv)_\d$/.test(series.key)) : meta.series;
+    const offsets=swing ? {plot1:-params.high_strength,plot3:-params.low_strength} : paio ?
+      {plot0:params.ma_1_offset,plot1:params.ma_2_offset,plot2:params.ma_3_offset} : {};
     const rows=page.bars.map(bar=>{
       const values=series.map(series=>{
         const point=source.get(series.key)?.get(bar.start);
+        if(paio){const index=Number(series.key.slice(-1));
+          if(series.key.startsWith('ema_') ? !params['ma_'+index+'_use'] : params.pvLineDraw || !params['pv'+['1st','2nd','3rd'][index-1]+'Use'])return null;}
         return point?.break_before && supertrend && ['up','down','fill_reference'].includes(series.key) ? null : point?.value ?? null;
       });
       if(supertrend){
@@ -221,7 +225,9 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         // the same consumer/input observation, now fenced by its new generation.
         scope={...scope,generation:consumer.handle.generation};
       }
-      const offsets=meta.render_profile==='swing_sr_v1'?{plot1:-params.high_strength,plot3:-params.low_strength}:{};
+      const offsets=meta.render_profile==='swing_sr_v1'?{plot1:-params.high_strength,plot3:-params.low_strength}:
+        meta.render_profile==='paio_v1'?{plot0:params.ma_1_offset,plot1:params.ma_2_offset,plot2:params.ma_3_offset,
+          plot3:0,plot4:0,plot5:0}:{};
       const coverage={first:scope.first,last:scope.last,count:scope.count,identity:JSON.stringify(nextIdentity),
         sourceFirst:tail ? previous.sourceFirst : batch.rows.find(row=>row.time>=scope.first)?.sourceTime,
         correctionVersion:binding.correctionVersion,inputRevision:binding.inputRevision,tailVersion:binding.tailVersion};
@@ -231,7 +237,8 @@ function chartIndicatorCoordinator(widget,catalog,{read,identity,recover,report=
         generation:consumer.handle.generation,sequence:++consumer.sequence,inputRevision:revision,
         kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,offsets,coverage});
       if(accepted){consumer.acceptedScope={...coverage,generation:consumer.handle.generation};
-        drawings?.update(consumer,{kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,identity:nextIdentity});
+        drawings?.update(consumer,{kind:prepend?'prepend':tail?'append':'snapshot',rows:batch.rows,identity:nextIdentity,
+          presentation:batch.pages.at(-1)?.page.presentation});
         consumer.accepted=JSON.stringify([consumer.handle.generation,nextIdentity,binding.inputRevision,scope.first,scope.last,scope.count,binding.tailVersion,binding.correctionVersion,binding.displaySnapshot,binding.providerSnapshot,inputs.showsignals,inputs.highlighting]);
         consumer.requested=consumer.accepted;
         const evidence=batch.pages.map(item=>item.calculation).filter(Boolean);

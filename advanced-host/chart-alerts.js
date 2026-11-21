@@ -15,6 +15,7 @@ function chartAlertBridge({
   send,
   fail,
   mobile = false,
+  indicatorCatalog = {},
   active = () => typeof document === 'undefined' || !document.hidden,
 }) {
   let ids = new Map(),
@@ -221,21 +222,22 @@ function chartAlertBridge({
       .getAllStudies()
       .find((item) => String(item.id) === String(nativeId));
     const name = String(entry?.name || "").match(
-      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD|ROLLING_RANGE_SQUEEZE)(?:@|$)/,
+      /(?:MWPython|守望 Python |PY )(SMA|EMA|RSI|MACD|ROLLING_RANGE_SQUEEZE|PAIO_V1)(?:@|$)/,
     )?.[1];
-    if (!name) throw Error("仅支持已映射的守望 Python SMA、EMA、RSI、MACD、ROLLING_RANGE_SQUEEZE");
+    if (!name) throw Error("仅支持已映射的守望 Python 指标告警");
     const params = Object.fromEntries(
       chart
         .getStudyById(nativeId)
         .getInputValues()
         .filter(input=>name!=='ROLLING_RANGE_SQUEEZE' || ['k','lookback','low_pct','confirm_on_close'].includes(input.id))
+        .filter(input=>name!=='PAIO_V1' || Object.hasOwn(indicatorCatalog?.[name]?.params || {},input.id))
         .map((input) => [input.id, input.value]),
     );
     return {
       name,
       version: "1",
       params,
-      output: name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
+      output: name === "PAIO_V1" ? "pattern_ii" : name === "ROLLING_RANGE_SQUEEZE" ? "signal" : name === "MACD" ? "macd" : "value",
     };
   }
   async function create({

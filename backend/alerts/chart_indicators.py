@@ -180,6 +180,12 @@ def _validate_metadata(name, meta):
     if not isinstance(schema, dict) or set(schema) != set(params):
         raise ValueError(f"{name}: parameter schema must match params")
     for key, rule in schema.items():
+        if isinstance(rule, dict) and rule.get("type") == "text":
+            if (type(rule.get("max_length")) is not int or not 1 <= rule["max_length"] <= 4096
+                    or rule.get("default") != params[key]):
+                raise ValueError(f"{name}: invalid text parameter {key}")
+            _validate_parameter(name, key, params[key], rule)
+            continue
         if isinstance(rule, dict) and rule.get("type") == "bool":
             if type(rule.get("default")) is not bool or rule["default"] != params[key]:
                 raise ValueError(f"{name}: invalid boolean parameter {key}")
@@ -209,13 +215,15 @@ def _validate_metadata(name, meta):
         _validate_parameter(name, key, params[key], rule)
     if "history_requirement" in meta and not callable(meta["history_requirement"]):
         raise ValueError(f"{name}: history_requirement must be callable")
-    if meta.get("result_format") not in (None, "series_presentation_v1"):
+    if meta.get("result_format") not in (None, "series_presentation_v1", "paio_presentation_v1"):
         raise ValueError(f"{name}: unknown result format")
     profile = meta.get("render_profile")
-    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1", "rolling_range_squeeze_v1", "nr_breakout_v1"):
+    if profile not in (None, "swing_sr_v1", "supertrend_pine_v1", "rolling_range_squeeze_v1", "nr_breakout_v1", "paio_v1"):
         raise ValueError(f"{name}: invalid render_profile")
-    if (profile == "swing_sr_v1") != bool(meta.get("result_format")):
+    if (profile == "swing_sr_v1") != (meta.get("result_format") == "series_presentation_v1"):
         raise ValueError(f"{name}: Swing render profile requires the extended result contract")
+    if (profile == "paio_v1") != (meta.get("result_format") == "paio_presentation_v1"):
+        raise ValueError(f"{name}: PAIO requires its own presentation contract")
     display = meta.get("display_inputs", [])
     if profile == "supertrend_pine_v1":
         if (not isinstance(display, dict) or set(display) - {"showsignals", "highlighting"}
@@ -245,6 +253,10 @@ def _validate_metadata(name, meta):
 
 
 def _validate_parameter(name, key, value, rule):
+    if rule["type"] == "text":
+        if not isinstance(value, str) or len(value) > rule["max_length"] or any(ord(char) < 32 for char in value):
+            raise ValueError(f"{name}: {key} 应为不超过 {rule['max_length']} 字的单行文本")
+        return
     if rule["type"] == "bool":
         if type(value) is not bool:
             raise ValueError(f"{name}: {key} 应为布尔值")
@@ -290,13 +302,13 @@ def public_catalog():
             "series": [{key: item[key] for key in ("key", "type", "label") if key in item} for item in meta["series"]],
             "parameter_schema": {
                 parameter: {key: deepcopy(rule[key]) for key in
-                            ("type", "min", "max", "default", "options", "label") if key in rule}
+                            ("type", "min", "max", "default", "options", "label", "group", "max_length") if key in rule}
                 for parameter, rule in meta["parameter_schema"].items()
             },
             "version": "1",
             "source": "Python",
             **({"display_inputs": [{key: deepcopy(item[key]) for key in
-                                    ("id", "name", "type", "default", "options") if key in item}
+                                    ("id", "name", "type", "default", "options", "group") if key in item}
                                    for item in meta["display_inputs"]]}
                if isinstance(meta.get("display_inputs"), list) else {}),
         }
@@ -420,6 +432,15 @@ def _run(name, arrays, params):
 
 def calculate(rows, spec, *, provisional=False):
     name, p = validate(spec)
+    if name == "PAIO_V1":
+        from .paio import calculate as paio_calculate
+        from .paio_inputs import attach, validate_presentation
+
+        prepared = rows if not rows or "paio_context" in rows[0] else attach(
+            rows, p, chart_frame=rows[0].get("indicator_timeframe"), provisional=provisional)
+        result = paio_calculate(prepared, p, provisional=provisional)
+        validate_presentation(result["presentation"])
+        return result
     if name == "ROLLING_RANGE_SQUEEZE":
         from .rolling_range_squeeze import calculate_rows
 
@@ -547,3 +568,9 @@ from .nr_breakout import NAME as _NR_NAME  # noqa: E402
 from .nr_breakout import calculate as _nr_calculate  # noqa: E402
 
 register(_NR_NAME, _NR_METADATA, _nr_calculate)
+
+from .paio import calculate as _paio_calculate  # noqa: E402
+from .paio_spec import METADATA as _PAIO_METADATA  # noqa: E402
+from .paio_spec import NAME as _PAIO_NAME  # noqa: E402
+
+register(_PAIO_NAME, _PAIO_METADATA, _paio_calculate)
