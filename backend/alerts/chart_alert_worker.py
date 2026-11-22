@@ -266,7 +266,8 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
         return []
     calendar = Calendar(meta["calendar"])
     closures = closures_from(meta.get("calendar_profile"))
-    rows = calculation_rows(rows, meta, config.instrument)
+    rows = calculation_rows(rows, meta, config.instrument, config.timeframe,
+        infer_gaps=not any(spec.name == "PAIO_V1" for spec in config.indicators()))
     if not rows:
         health(alert, "warming", "等待首个有效行情样本")
         return []
@@ -292,14 +293,32 @@ def evaluate(db, alert_id, *, now=None, values_cache=None, clock=None):
     if runtime.get("fingerprint") and fingerprint(committed) != runtime["fingerprint"]:
         health(alert, "blocked", "已判历史发生修订，等待核对及重建；未重复发送历史事件")
         return []
-    left = operand_values(rows, config.condition.left, provisional=config.mode == "intrabar", cache=values_cache)
+    paio_rows = None
+    if any(spec.name == "PAIO_V1" for spec in config.indicators()):
+        from .paio_inputs import freeze_managed, freeze_provider
+
+        specs = [spec.model_dump(exclude={"output"}) for spec in config.indicators()]
+        deps = (freeze_provider(db, db.get(ProviderDataset, version.dataset_id), specs, rows, as_of=now)
+                if version.dataset_id else freeze_managed(db, config.instrument, specs, rows, config.timeframe, as_of=now))
+        paio_rows = (rows, deps)
+
+    def values_for(operand, **kwargs):
+        effective = rows
+        if operand and operand.indicator and operand.indicator.name == "PAIO_V1" and paio_rows:
+            from .paio_inputs import attach
+
+            effective = attach(rows, operand.indicator.params, paio_rows[1], chart_frame=config.timeframe,
+                               provisional=config.mode == "intrabar")
+        return operand_values(effective, operand, **kwargs)
+
+    left = values_for(config.condition.left, provisional=config.mode == "intrabar", cache=values_cache)
     line = config.condition.right.line if config.condition.right else None
     try:
         indices = geometry_indices(rows, line, meta=meta, config=config) if line else None
     except ValueError as exc:
         health(alert, "blocked", str(exc))
         return []
-    right = operand_values(rows, config.condition.right, provisional=config.mode == "intrabar",
+    right = values_for(config.condition.right, provisional=config.mode == "intrabar",
                            indices=indices, cache=values_cache) if config.condition.right else [None] * len(rows)
     results = []
     atr_input = None

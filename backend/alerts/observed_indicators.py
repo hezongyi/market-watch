@@ -35,6 +35,20 @@ def engine_for(run, checkpoint=None):
 class ObservedState:
     """Chart-only state; closed unverified observations and live preview differ."""
 
+    @property
+    def last_presentation(self):
+        if self.name == "PAIO_V1":
+            if hasattr(self, "_display"):
+                return self._display
+            return {**self.engine.last_presentation, "input_policy": OBSERVED, "input_quality": self.last_quality}
+        if not hasattr(self, "_display"):
+            raise AttributeError("last_presentation")
+        return self._display
+
+    @last_presentation.setter
+    def last_presentation(self, value):
+        self._display = value
+
     def __init__(self, spec, checkpoint=None, *, source_start=None, source_end=None):
         base = IndicatorState(spec)
         self.algorithm = PREFIX + base.algorithm
@@ -130,6 +144,8 @@ class ObservedState:
         return self._advance(row)
 
     def _advance(self, row, *, forming=False):
+        if self.name == "PAIO_V1" and hasattr(self, "_display"):
+            del self._display
         m = self.meta
         partial = (
             m["source_start"] is not None
@@ -175,7 +191,7 @@ class ObservedState:
         # This is an isolated algorithm input. The source bar and strict run
         # retain their original complete/coverage flags and checksum.
         effective = {**row, "complete": admitted, "gap_before": not admitted}
-        if forming and self.name in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") and admitted:
+        if forming and self.name in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "PAIO_V1") and admitted:
             values = self.engine.display_step(effective, provisional_dependency=True)
         else:
             values = self.engine.step(effective)
@@ -183,7 +199,7 @@ class ObservedState:
         self.last_quality = self.quality(provisional=forming, reason=reason)
         self.last_initialized = admitted and self.engine.initialized(values)
         m["last_quality"] = self.last_quality
-        if hasattr(self.engine, "last_presentation"):
+        if self.name != "PAIO_V1" and hasattr(self.engine, "last_presentation"):
             self.last_presentation = copy.deepcopy(self.engine.last_presentation)
             for side, event in self.last_presentation.get("current", {}).items():
                 if (
@@ -212,7 +228,7 @@ def calculate(run, rows, phase, profiles, *, seam=None, initial_state=None):
             **source,
             "indicator_calendar": phase,
             "indicator_timeframe": run.timeframe,
-            "gap_before": gap_before(previous, source["start"], phase, profiles),
+            "gap_before": bool(source.get("gap_before")) if run.spec["name"] == "PAIO_V1" else gap_before(previous, source["start"], phase, profiles),
             "chart_time": fixed_label(source, run.timeframe, phase),
         }
         if seam is not None and previous is not None and previous <= seam <= row["start"]:
@@ -425,10 +441,16 @@ def suffix(db, run, page, *, stamp, replay_pages=None):
             )
     _, _, _, profiles = jobs._context(db, run)
     output = []
-    for bar in sorted(inputs.values(), key=lambda row: row["start"]):
+    prepared = sorted(inputs.values(), key=lambda row: row["start"])
+    if run.spec["name"] == "PAIO_V1":
+        from .paio_inputs import attach_fixed, prepare_fixed
+
+        prepared = attach_fixed(run, prepare_fixed(db, run, prepared, state=engine.state,
+            stamp=stamp, snapshot=snapshot), phase, initial_state=engine.checkpoint(), provisional=True)
+    for bar in prepared:
         row = {
             **bar,
-            "gap_before": jobs.gap_before(engine.meta["last_end"], bar["start"], phase, profiles),
+            "gap_before": bool(bar.get("gap_before")) if run.spec["name"] == "PAIO_V1" else jobs.gap_before(engine.meta["last_end"], bar["start"], phase, profiles),
             "chart_time": fixed_label(bar, run.timeframe, phase),
             "indicator_calendar": phase,
         }

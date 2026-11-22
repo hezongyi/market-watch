@@ -154,7 +154,13 @@ def request(db, page, spec, *, stamp=None, input_policy=STRICT):
         # Keep the clock boundary only while the last observed bucket is open.
         target = min(period(calculation_stamp, page["timeframe"], phase)[0],
                      period(max(revision.seam, latest if latest is not None else revision.seam), page["timeframe"], phase)[1])
-    group = digest([version.id, revision_id, page["timeframe"], engine.spec, engine.algorithm])
+    dependency_identity = None
+    if engine.name == "PAIO_V1":
+        from .paio_inputs import fixed_identity
+
+        dependency_identity = fixed_identity(db, version, engine.spec, page["timeframe"])
+    group = digest([version.id, revision_id, page["timeframe"], engine.spec, engine.algorithm,
+                    *([dependency_identity] if dependency_identity is not None else [])])
     ident = digest([group, value, target])
     existing = db.get(FixedIndicatorRun, ident)
     if existing:
@@ -227,7 +233,7 @@ def gap_before(previous_end, start, phase, profiles):
     return False
 
 
-def input_rows(db, run, *, limit=None):
+def input_rows(db, run, *, limit=None, freeze_dependencies=True):
     """Forward indexed artifacts only; wait for complete composite waterline."""
     from .composite_aggregates import read
 
@@ -248,6 +254,10 @@ def input_rows(db, run, *, limit=None):
         if tail is None:
             return None
         rows += tail
+    if freeze_dependencies and run.spec["name"] == "PAIO_V1":
+        from .paio_inputs import prepare_fixed
+
+        rows = prepare_fixed(db, run, rows)
     return rows, phase, profiles
 
 
@@ -292,14 +302,22 @@ def build(ownership):
             return None
         rows, phase, profiles = inputs
         seam = db.get(CompositeRevision, run.revision_id).seam if run.revision_id else None
-        calculated = calculate_inputs(run, rows, phase, profiles, seam=seam)
-        cursor = rows[-1]["end"] if rows else run.target_end
-        done = len(rows) < PAGE_SIZE or cursor >= run.target_end
-        return {**calculated, "cursor": run.target_end if done else cursor, "done": done}
+        from types import SimpleNamespace
+
+        frozen_run = SimpleNamespace(spec=run.spec, state=run.state, timeframe=run.timeframe,
+            algorithm=run.algorithm, target_end=run.target_end)
+    calculated = calculate_inputs(frozen_run, rows, phase, profiles, seam=seam)
+    cursor = rows[-1]["end"] if rows else frozen_run.target_end
+    done = len(rows) < PAGE_SIZE or cursor >= frozen_run.target_end
+    return {**calculated, "cursor": frozen_run.target_end if done else cursor, "done": done}
 
 
 def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=None, batch=False):
     """One exact numerical path for worker pages and bounded foreground replay."""
+    if run.spec["name"] == "PAIO_V1":
+        from .paio_inputs import attach_fixed
+
+        rows = attach_fixed(run, rows, phase, initial_state=initial_state)
     if is_observed(run):
         from .observed_indicators import calculate
 
@@ -333,11 +351,12 @@ def calculate_inputs(run, rows, phase, profiles, *, seam=None, initial_state=Non
     output = []
     for source in rows:
         row = {**source, "indicator_calendar": phase, "indicator_timeframe": run.timeframe}
-        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "NR4_NR7_BREAKOUT_V1"):
+        if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "NR4_NR7_BREAKOUT_V1", "PAIO_V1"):
             from .series_access import fixed_label
 
             row["chart_time"] = fixed_label(row, run.timeframe, phase)
-        row["gap_before"] = gap_before(engine.state.get("last_end"), row["start"], phase, profiles)
+        row["gap_before"] = (bool(source.get("gap_before")) if run.spec["name"] == "PAIO_V1" else
+                             gap_before(engine.state.get("last_end"), row["start"], phase, profiles))
         previous_end = engine.state.get("last_end")
         if (seam is not None and not row["gap_before"] and previous_end is not None
                 and previous_end <= seam <= row["start"]):
@@ -508,6 +527,11 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                     'checkpoint' if run.cursor > page['origin'] or run.parent_id else 'miss',
                 'calculation_steps': 0}
         display = None
+        if run.spec["name"] == "PAIO_V1":
+            from .paio import PaioState
+
+            display = PaioState(run.spec["params"], run.state["state"], copy_state=False).presentation()
+            display.update(history_complete=run.status == "complete", history_revision=run.id)
         if run.spec["name"] in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE"):
             from .rolling_range_squeeze import SqueezeState
             from .swing_sr import SwingState
@@ -560,6 +584,11 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
         elif (run.status == "complete" or appended is not None) and provisional and (end > run.target_end or tail is not page["bars"]):
             _, _, phase, profiles = _context(db, run)
             engine = IndicatorState(run.spec, decision_state)
+            if run.spec["name"] == "PAIO_V1":
+                from .paio_inputs import attach_fixed, prepare_fixed
+
+                tail = attach_fixed(run, prepare_fixed(db, run, tail, state=engine.state, stamp=stamp),
+                                    phase, initial_state=decision_state, provisional=True)
             for bar in tail:
                 if bar["start"] < run.target_end:
                     continue
@@ -568,7 +597,7 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
                 if rows and bar["start"] <= rows[-1]["start"]:
                     raise ValueError("Indicator tail overlaps fixed output")
                 row = {**bar, "indicator_calendar": phase, "indicator_timeframe": run.timeframe,
-                       "gap_before": gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
+                       "gap_before": bool(bar.get("gap_before")) if run.spec["name"] == "PAIO_V1" else gap_before(engine.state.get("last_end"), bar["start"], phase, profiles)}
                 if display is not None or run.spec["name"] == "NR4_NR7_BREAKOUT_V1":
                     from .series_access import fixed_label
 
@@ -598,6 +627,10 @@ def chart_results(db, page, specs, *, provisional=False, stamp=None, purpose='di
             input_evidence={'revision_id':run.revision_id,'input_revision':run.input_revision,
                 'history_version_id':run.history_version_id,'display_snapshot_id':page.get('display_snapshot_id')},
             display_task_ids=[repaired['task_id']] if provisional and purpose=='display' and run.revision_id and repaired and repaired.get('task_id') else [])
+        if run.spec["name"] == "PAIO_V1":
+            status.update(accuracy="source_formula_replication", canonical_verified=False,
+                          module_readiness=(display or {}).get("readiness", {}),
+                          requested_dependencies=(display or {}).get("dependencies", {}))
         results.append({**result, "id": status["id"], "calculation": status,
                         "dependencies": [{key: row.get(key) for key in
                             ("start", "dependency_origin", "seam_dependency", "initialized", "provisional")} for row in rows]})

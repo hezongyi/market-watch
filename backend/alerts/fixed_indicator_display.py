@@ -69,7 +69,7 @@ def prepare(db, page, body):
                 reader.cursor = jobs.period(version.start, run.timeframe, phase)[0]
             rows = []
             while reader.cursor < run.target_end:
-                inputs = jobs.input_rows(db, reader)
+                inputs = jobs.input_rows(db, reader, freeze_dependencies=False)
                 if inputs is None:
                     return []
                 chunk, _, _ = inputs
@@ -86,8 +86,26 @@ def prepare(db, page, body):
             entry.value, entry.weight = Inputs(rows, key, key, run.input_revision), len(rows)
         frozen = entry.value
     _prune(_INPUTS, MAX_ROWS)
-    return [(item, db.get(FixedIndicatorRun, item["calculation"]["run_id"]), frozen,
-             phase, profiles, revision.seam if revision else None, hit) for item in pending]
+    prepared = []
+    for item in pending:
+        selected = db.get(FixedIndicatorRun, item["calculation"]["run_id"])
+        selected_frozen, selected_hit = frozen, hit
+        if selected.spec["name"] == "PAIO_V1":
+            from .paio_inputs import prepare_fixed
+
+            dependency_key = ("fixed-display-paio", key, selected.id)
+            dependency_entry = _entry(_INPUTS, dependency_key, MAX_ROWS)
+            with dependency_entry.lock:
+                selected_hit = dependency_entry.value is not None
+                if not selected_hit:
+                    rows = prepare_fixed(db, selected, frozen.rows, state={})
+                    dependency_entry.value = Inputs(rows, dependency_key, dependency_key, selected.input_revision)
+                    dependency_entry.weight = len(rows) + sum(len(part.get("rows", []))
+                        for part in rows[0].get("paio_inputs", {}).get("frames", {}).values()) if rows else 0
+                selected_frozen = dependency_entry.value
+        prepared.append((item, selected, selected_frozen, phase, profiles, revision.seam if revision else None, selected_hit))
+    _prune(_INPUTS, MAX_ROWS)
+    return prepared
 
 
 def complete(page, prepared):
@@ -124,4 +142,6 @@ def complete(page, prepared):
                        "calculation_ms": round((perf_counter()-started)*1000, 2)})
         if is_observed(run):
             status.update(observed_status(rows, complete=True))
+        if run.spec["name"] == "PAIO_V1":
+            status.update(accuracy="source_formula_unverified_runtime", canonical_verified=False)
     return page

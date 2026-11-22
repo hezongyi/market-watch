@@ -942,6 +942,11 @@ def data(body):
             from .native_series import parameters
             page["native_parameters"] = parameters(meta)
         return {k: v for k, v in page.items() if k not in ('interval', 'preceding', 'satisfied')}
+    if any(spec["name"] == "PAIO_V1" for spec in body.indicators):
+        from .paio_inputs import prepare_provider
+
+        prepare_provider(meta, body.indicators, body.timeframe, before, count,
+                         origin=body.calculation_origin, latest=latest)
     native = body.native_history is not None
     calculation_limit = capacity() if body.indicators else 0
     input_stats = {}
@@ -978,7 +983,9 @@ def data(body):
             credential = resolve(db, body.provider_snapshot_id, identity(meta, body.timeframe))
             page = snapshot_read(db, credential, before, count + extra, body.provider_snapshot_id)
             page["_snapshot_tail"] = credential["tail"]
+            page['_paio_credential'] = credential
             freeze_ready(db, page)
+            page.pop('_paio_credential', None)
             page.pop("_snapshot_tail", None)
     else:
         page = (native_read(meta, body, before, count, extra, latest, on_ready=freeze_ready) if native else
@@ -1023,6 +1030,10 @@ def data(body):
             input_evidence={'dataset_id':page['dataset_id'], 'provider_snapshot_id':page.get('provider_snapshot_id'),
                             'input_revision':frozen.revision if frozen is not None else page.get('cache_revision')},
             coverage=ranges, required_coverage=ranges, execution=execution)
+        if spec["name"] == "PAIO_V1":
+            result['calculation'].update(accuracy="source_formula_replication", canonical_verified=False,
+                module_readiness=result.get("presentation", {}).get("readiness", {}),
+                requested_dependencies=result.get("presentation", {}).get("dependencies", {}))
         if "presentation" in result:
             result["presentation"] = result["presentation"] | {
                 "history_revision": str(page.get("cache_revision", page.get("revision", 0))),

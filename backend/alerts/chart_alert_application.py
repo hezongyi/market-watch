@@ -91,8 +91,8 @@ def capabilities(body):
                     "calendar": meta["calendar"], "available": available, "price_modes": price_modes,
                     "reason": None if available else "实时流已关闭或来源不可用",
                     "observation_basis": "固定历史与确认M1接续；临时触价为显式抽样模式，断线后不追认未观测事件"}],
-                "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"],
-                "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE")},
+                "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE", "PAIO_V1"],
+                "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE", "PAIO_V1")},
                 "line_mapping": "固定组合修订；斜线需要准确周期柱序号", "seam_policies": ["reject", "accept_raw"]}
         instrument = db.get(Instrument, body.instrument)
         managed = ({"source": instrument.source, "series_kind": "managed", "basis": instrument.basis,
@@ -116,8 +116,8 @@ def capabilities(body):
         seconds = poll_seconds(row["source"]) if row["series_kind"] == "provider" else 15
         row["observation_basis"] = f"抽样 K 线当前收盘值，约每 {seconds} 秒观察；不重建未观测路径"
     return {"instrument": body.instrument, "timeframe": body.timeframe, "sources": sources,
-            "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE"],
-            "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE")},
+            "modes": ["close", "intrabar"], "indicators": ["SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE", "PAIO_V1"],
+            "indicator_metadata": {name: meta for name, meta in public_catalog().items() if name in ("SMA", "EMA", "RSI", "MACD", "ROLLING_RANGE_SQUEEZE", "PAIO_V1")},
             "relations": ["cross", "cross_up", "cross_down", "above", "below", "enter", "exit", "break_upper", "break_lower"],
             "line_mapping": "必须核对原生 K 线序号和价格轴；未匹配端点时等待数据"}
 
@@ -155,6 +155,13 @@ def dataset_for(config):
         raise ValueError("图表来源已改变，请重新读取图表上下文")
     if isinstance(config, AlertConfig) and config.condition.offset:
         ensure(meta, config.condition.offset.timeframe)
+    if isinstance(config, AlertConfig):
+        from .paio_inputs import requests
+        from .provider_capabilities import frames
+
+        for frame in requests([item.model_dump(exclude={"output"}) for item in config.indicators()], config.timeframe, calendar=meta.get("calendar")):
+            if frame in frames(config.source):
+                ensure(meta, frame)
     return ensure(meta, config.timeframe)
 
 

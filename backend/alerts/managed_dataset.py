@@ -707,7 +707,7 @@ def data(body):
         before = body.before or now_ms() + 1
         # Recursive algorithms use only the selected published dataset prefix;
         # backfill never extends the user's approved start as an indicator side effect.
-        swing = any(spec.get("name") in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE") for spec in body.indicators)
+        swing = any(spec.get("name") in ("SWING_SR_V1", "ROLLING_RANGE_SQUEEZE", "PAIO_V1") for spec in body.indicators)
         frozen, input_stats = None, {}
         if body.indicators and pub:
             frozen, input_stats = freeze(db, inst, pub, body, ceiling=now_ms() if swing else before-1)
@@ -749,6 +749,10 @@ def data(body):
             input_evidence={'publication_revision':revision}, execution=execution,
             coverage=[{'start':start,'end':visible[-1]['end']}] if visible else [],
             required_coverage=[{'start':start,'end':visible[-1]['end']}] if visible else [])
+        if spec["name"] == "PAIO_V1":
+            result['calculation'].update(accuracy="source_formula_replication", canonical_verified=False,
+                module_readiness=result.get("presentation", {}).get("readiness", {}),
+                requested_dependencies=result.get("presentation", {}).get("dependencies", {}))
         if "presentation" in result:
             result["presentation"] = result["presentation"] | {
                 "history_revision": str(revision), "history_complete": True}

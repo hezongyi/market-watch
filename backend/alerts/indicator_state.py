@@ -12,6 +12,9 @@ from .chart_indicators import CATALOG, validate
 from .nr_breakout import ALGORITHM as NR_ALGORITHM
 from .nr_breakout import NAME as NR_NAME
 from .nr_breakout import step as nr_step
+from .paio import PaioState
+from .paio_spec import ALGORITHM as PAIO_ALGORITHM
+from .paio_spec import NAME as PAIO_NAME
 from .rolling_range_squeeze import ALGORITHM as SQUEEZE_ALGORITHM
 from .rolling_range_squeeze import NAME as SQUEEZE_NAME
 from .rolling_range_squeeze import SqueezeState
@@ -21,8 +24,8 @@ from .supertrend_pine import step as supertrend_step
 
 ALGORITHM = "fixed-indicator-state-v3"
 SUPPORTED = frozenset(("SMA", "EMA", "LWMA", "BBANDS", "RSI", "MACD", "ATR", "STOCH",
-                       "SWING_SR_V1", SUPERTREND_NAME, SQUEEZE_NAME, NR_NAME))
-ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM, SQUEEZE_ALGORITHM, NR_ALGORITHM)
+                       "SWING_SR_V1", SUPERTREND_NAME, SQUEEZE_NAME, NR_NAME, PAIO_NAME))
+ALGORITHMS = (ALGORITHM, SUPERTREND_ALGORITHM, SQUEEZE_ALGORITHM, NR_ALGORITHM, PAIO_ALGORITHM)
 
 
 def advance_dependencies(state, name, params, row):
@@ -50,6 +53,18 @@ def advance_dependencies(state, name, params, row):
 
 
 class IndicatorState:
+    @property
+    def last_presentation(self):
+        if self.name == PAIO_NAME:
+            return self._display if hasattr(self, "_display") else PaioState(self.params, self.state, copy_state=False).presentation()
+        if not hasattr(self, "_display"):
+            raise AttributeError("last_presentation")
+        return self._display
+
+    @last_presentation.setter
+    def last_presentation(self, value):
+        self._display = value
+
     def __init__(self, spec, checkpoint=None):
         self.name, self.params = validate(spec)
         if self.name not in SUPPORTED:
@@ -60,6 +75,8 @@ class IndicatorState:
             self.algorithm = SQUEEZE_ALGORITHM
         if self.name == NR_NAME:
             self.algorithm = NR_ALGORITHM
+        if self.name == PAIO_NAME:
+            self.algorithm = PAIO_ALGORITHM
         self.state = {}
         if checkpoint is not None:
             if (checkpoint.get("algorithm") != self.algorithm or checkpoint.get("spec") != self.spec):
@@ -71,6 +88,8 @@ class IndicatorState:
                 "state": copy.deepcopy(self.state)}
 
     def initialized(self, values):
+        if self.name == PAIO_NAME:
+            return any(value is not None for value in values.values())
         # Event/alternating plots intentionally contain null after warmup.
         if self.name == SUPERTREND_NAME:
             return self.state.get("atr") is not None
@@ -86,6 +105,9 @@ class IndicatorState:
         Callers own the copied state. This is deliberately separate from the
         one-row provisional trial used by alert evaluation.
         """
+        if self.name == PAIO_NAME:
+            admitted = row.get('display_coverage_complete', not row.get('source_confirmed', row['complete']) or row['complete'])
+            return self.step({**row, "complete": admitted, "paio_preview": provisional_dependency or not row["complete"]})
         if self.name == SQUEEZE_NAME:
             admitted = row.get('display_coverage_complete', not row.get('source_confirmed', row['complete']) or row['complete'])
             engine = SqueezeState(self.params, self.state or None, copy_state=False)
@@ -109,6 +131,16 @@ class IndicatorState:
         return self.step({**row, 'complete': admitted})
 
     def step(self, row, *, provisional=False):
+        if self.name == PAIO_NAME:
+            engine = PaioState(self.params, self.state, copy_state=False)
+            values = engine.step(row, provisional=provisional)
+            if provisional:
+                self._display = engine.last_presentation
+            elif hasattr(self, "_display"):
+                del self._display
+            if not provisional:
+                self.state = engine.state
+            return values
         if self.name == SQUEEZE_NAME:
             engine = SqueezeState(self.params, self.state or None, copy_state=provisional)
             values = engine.step(row, provisional=provisional)
